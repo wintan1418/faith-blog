@@ -1,0 +1,36 @@
+<% content_for(:title) { "Bookmarks - Faith Community" } %>
+
+<div class="page-header">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-2xl sm:text-3xl font-bold text-stone-900">Saved Posts</h1>
+    <p class="text-stone-600 mt-1">Posts you've bookmarked for later.</p>
+  </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <% if @posts.any? %>
+    <div class="space-y-6">
+      <% @posts.each do |post| %>
+        <%= render "posts/card", post: post %>
+      <% end %>
+    </div>
+
+    <div class="mt-8">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  <% else %>
+    <div class="card p-12 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+        <svg class="w-8 h-8 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-stone-900 mb-2">No bookmarks yet</h3>
+      <p class="text-stone-600 mb-6">Save posts you want to read later by clicking the bookmark icon.</p>
+      <%= link_to feed_path, class: "btn-primary" do %>
+        Explore Posts
+      <% end %>
+    </div>
+  <% end %>
+</div>
+

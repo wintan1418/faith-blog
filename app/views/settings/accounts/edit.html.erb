@@ -1,0 +1,85 @@
+<% content_for(:title) { "Account Settings - Faith Community" } %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-stone-900">Settings</h1>
+    <p class="text-stone-600">Manage your profile and account settings.</p>
+  </div>
+
+  <!-- Settings Navigation -->
+  <div class="flex gap-2 mb-6 border-b border-stone-200 pb-4">
+    <%= link_to settings_profile_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-100" do %>
+      Profile
+    <% end %>
+    <%= link_to settings_account_path, class: "px-4 py-2 rounded-lg text-sm font-medium bg-amber-100 text-amber-800" do %>
+      Account
+    <% end %>
+  </div>
+
+  <div class="card">
+    <div class="p-6 border-b border-stone-100">
+      <h2 class="text-lg font-semibold text-stone-900">Account Settings</h2>
+      <p class="text-sm text-stone-600">Update your account credentials.</p>
+    </div>
+
+    <div class="p-6">
+      <%= form_with model: current_user, url: settings_account_path, method: :patch, class: "space-y-6" do |f| %>
+        <% if current_user.errors.any? %>
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <ul class="text-sm text-red-700 list-disc list-inside">
+              <% current_user.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.label :username, class: "label" %>
+          <%= f.text_field :username, class: "input" %>
+        </div>
+
+        <div>
+          <%= f.label :email, class: "label" %>
+          <%= f.email_field :email, class: "input" %>
+        </div>
+
+        <div class="pt-4 border-t border-stone-100">
+          <h3 class="text-sm font-medium text-stone-900 mb-4">Change Password</h3>
+          <p class="text-sm text-stone-500 mb-4">Leave blank if you don't want to change your password.</p>
+          
+          <div class="space-y-4">
+            <div>
+              <%= f.label :password, "New Password", class: "label" %>
+              <%= f.password_field :password, class: "input", autocomplete: "new-password" %>
+            </div>
+
+            <div>
+              <%= f.label :password_confirmation, "Confirm New Password", class: "label" %>
+              <%= f.password_field :password_confirmation, class: "input", autocomplete: "new-password" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-4">
+          <%= f.submit "Save Changes", class: "btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="card mt-6 border-red-200">
+    <div class="p-6 border-b border-red-100 bg-red-50">
+      <h2 class="text-lg font-semibold text-red-900">Danger Zone</h2>
+      <p class="text-sm text-red-600">Irreversible actions for your account.</p>
+    </div>
+    <div class="p-6">
+      <p class="text-sm text-stone-600 mb-4">
+        Once you delete your account, there is no going back. Please be certain.
+      </p>
+      <%= button_to "Delete Account", edit_user_registration_path, method: :get, class: "btn-danger", data: { turbo_confirm: "Are you absolutely sure you want to delete your account? This cannot be undone." } %>
+    </div>
+  </div>
+</div>
+

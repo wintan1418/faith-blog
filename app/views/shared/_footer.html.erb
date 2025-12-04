@@ -1,0 +1,52 @@
+<footer class="bg-stone-900 text-stone-300 mt-auto">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <!-- Brand -->
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-9 h-9 rounded-lg bg-amber-600 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+          </div>
+          <span class="font-serif text-xl font-semibold text-white">Faith Community</span>
+        </div>
+        <p class="text-stone-400 text-sm leading-relaxed max-w-md">
+          A safe, encouraging space for believers to share their faith journeys, testimonies, struggles, and victories. Together, we grow in faith and support one another.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-white font-semibold mb-4">Quick Links</h4>
+        <ul class="space-y-2">
+          <li><%= link_to "Home", root_path, class: "text-sm text-stone-400 hover:text-amber-400 transition-colors" %></li>
+          <li><%= link_to "Rooms", rooms_path, class: "text-sm text-stone-400 hover:text-amber-400 transition-colors" %></li>
+          <li><%= link_to "Resources", resources_root_path, class: "text-sm text-stone-400 hover:text-amber-400 transition-colors" %></li>
+          <li><%= link_to "About", about_path, class: "text-sm text-stone-400 hover:text-amber-400 transition-colors" %></li>
+        </ul>
+      </div>
+
+      <!-- Community -->
+      <div>
+        <h4 class="text-white font-semibold mb-4">Community</h4>
+        <ul class="space-y-2">
+          <li><%= link_to "Guidelines", guidelines_path, class: "text-sm text-stone-400 hover:text-amber-400 transition-colors" %></li>
+          <li><%= link_to "Contact Us", contact_path, class: "text-sm text-stone-400 hover:text-amber-400 transition-colors" %></li>
+          <li><a href="#" class="text-sm text-stone-400 hover:text-amber-400 transition-colors">Privacy Policy</a></li>
+          <li><a href="#" class="text-sm text-stone-400 hover:text-amber-400 transition-colors">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="border-t border-stone-800 mt-10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p class="text-sm text-stone-500">
+        &copy; <%= Date.current.year %> Faith Community. Built with love and faith.
+      </p>
+      <p class="text-sm text-stone-500 italic">
+        "Bear one another's burdens, and so fulfill the law of Christ." — Galatians 6:2
+      </p>
+    </div>
+  </div>
+</footer>
+

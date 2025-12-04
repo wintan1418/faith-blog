@@ -1,0 +1,67 @@
+<% content_for(:title) { "Join - Faith Community" } %>
+
+<div class="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-faith flex items-center justify-center shadow-lg">
+        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-stone-900">Join Our Community</h1>
+      <p class="text-stone-600 mt-1">Begin your journey of faith and fellowship</p>
+    </div>
+
+    <div class="card p-8">
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), class: "space-y-5") do |f| %>
+        <% if resource.errors.any? %>
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <ul class="text-sm text-red-700 list-disc list-inside">
+              <% resource.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.label :username, class: "label" %>
+          <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "input", placeholder: "Choose a username" %>
+          <p class="text-xs text-stone-500 mt-1">Letters, numbers, and underscores only. 3-30 characters.</p>
+        </div>
+
+        <div>
+          <%= f.label :email, class: "label" %>
+          <%= f.email_field :email, autocomplete: "email", class: "input", placeholder: "Enter your email" %>
+        </div>
+
+        <div>
+          <%= f.label :password, class: "label" %>
+          <%= f.password_field :password, autocomplete: "new-password", class: "input", placeholder: "Create a password" %>
+          <p class="text-xs text-stone-500 mt-1">Minimum 8 characters</p>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, "Confirm Password", class: "label" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "input", placeholder: "Confirm your password" %>
+        </div>
+
+        <div class="pt-2">
+          <%= f.submit "Create Account", class: "btn-primary w-full btn-lg" %>
+        </div>
+
+        <p class="text-xs text-stone-500 text-center">
+          By creating an account, you agree to our community guidelines and commit to treating others with love and respect.
+        </p>
+      <% end %>
+
+      <div class="mt-6 text-center">
+        <p class="text-stone-600">
+          Already have an account?
+          <%= link_to "Sign in", new_session_path(resource_name), class: "text-amber-700 hover:text-amber-800 font-medium" %>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+

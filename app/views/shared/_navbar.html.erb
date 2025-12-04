@@ -1,0 +1,172 @@
+<nav class="bg-white border-b border-stone-200 sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <!-- Logo and primary nav -->
+      <div class="flex items-center gap-8">
+        <%= link_to root_path, class: "flex items-center gap-2 group" do %>
+          <div class="w-9 h-9 rounded-lg gradient-faith flex items-center justify-center shadow-sm group-hover:shadow transition-shadow">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+          </div>
+          <span class="font-serif text-xl font-semibold text-stone-900">Faith Community</span>
+        <% end %>
+
+        <% if user_signed_in? %>
+          <div class="hidden md:flex items-center gap-1">
+            <%= link_to feed_path, class: "px-3 py-2 rounded-lg text-sm font-medium #{'bg-amber-50 text-amber-800' if current_page?(feed_path)} text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors" do %>
+              Feed
+            <% end %>
+            <%= link_to rooms_path, class: "px-3 py-2 rounded-lg text-sm font-medium #{'bg-amber-50 text-amber-800' if current_page?(rooms_path)} text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors" do %>
+              Rooms
+            <% end %>
+            <%= link_to resources_root_path, class: "px-3 py-2 rounded-lg text-sm font-medium #{'bg-amber-50 text-amber-800' if request.path.start_with?('/resources')} text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors" do %>
+              Resources
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Search and actions -->
+      <div class="flex items-center gap-3">
+        <% if user_signed_in? %>
+          <!-- Search -->
+          <%= form_with url: search_path, method: :get, class: "hidden sm:block" do |f| %>
+            <div class="relative">
+              <input type="text" name="q" placeholder="Search..." class="w-48 lg:w-64 pl-9 pr-4 py-2 text-sm bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:bg-white transition-all">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+          <% end %>
+
+          <!-- Create Post -->
+          <%= link_to new_post_path, class: "btn-primary hidden sm:inline-flex" do %>
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Share
+          <% end %>
+
+          <!-- Notifications -->
+          <%= link_to notifications_path, class: "relative p-2 rounded-lg text-stone-500 hover:text-stone-700 hover:bg-stone-50 transition-colors" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <% if current_user.unread_notifications_count > 0 %>
+              <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            <% end %>
+          <% end %>
+
+          <!-- User menu -->
+          <div class="relative" data-controller="dropdown">
+            <button type="button" data-action="click->dropdown#toggle" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-stone-50 transition-colors">
+              <% if current_user.profile.avatar.attached? %>
+                <%= image_tag current_user.profile.avatar_thumbnail, class: "w-8 h-8 avatar" %>
+              <% else %>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium">
+                  <%= current_user.username[0].upcase %>
+                </div>
+              <% end %>
+              <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+
+            <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-stone-200 py-2 animate-scale-in">
+              <div class="px-4 py-2 border-b border-stone-100">
+                <p class="text-sm font-medium text-stone-900"><%= current_user.username %></p>
+                <p class="text-xs text-stone-500"><%= current_user.email %></p>
+              </div>
+              
+              <%= link_to user_path(current_user.username), class: "flex items-center gap-3 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors" do %>
+                <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                My Profile
+              <% end %>
+              
+              <%= link_to bookmarks_path, class: "flex items-center gap-3 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors" do %>
+                <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                </svg>
+                Bookmarks
+              <% end %>
+              
+              <%= link_to settings_root_path, class: "flex items-center gap-3 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors" do %>
+                <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Settings
+              <% end %>
+              
+              <% if current_user.admin? %>
+                <div class="border-t border-stone-100 my-2"></div>
+                <%= link_to admin_root_path, class: "flex items-center gap-3 px-4 py-2 text-sm text-amber-700 hover:bg-amber-50 transition-colors" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  </svg>
+                  Admin Dashboard
+                <% end %>
+              <% end %>
+              
+              <div class="border-t border-stone-100 my-2"></div>
+              <%= button_to destroy_user_session_path, method: :delete, class: "w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Sign Out
+              <% end %>
+            </div>
+          </div>
+        <% else %>
+          <%= link_to "Sign In", new_user_session_path, class: "btn-ghost" %>
+          <%= link_to "Join Us", new_user_registration_path, class: "btn-primary" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile nav for signed in users -->
+  <% if user_signed_in? %>
+    <div class="md:hidden border-t border-stone-100 px-4 py-2 flex items-center justify-around">
+      <%= link_to feed_path, class: "flex flex-col items-center gap-1 p-2 rounded-lg #{'text-amber-700' if current_page?(feed_path)} text-stone-500" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+        </svg>
+        <span class="text-xs">Feed</span>
+      <% end %>
+      
+      <%= link_to rooms_path, class: "flex flex-col items-center gap-1 p-2 rounded-lg #{'text-amber-700' if current_page?(rooms_path)} text-stone-500" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+        </svg>
+        <span class="text-xs">Rooms</span>
+      <% end %>
+      
+      <%= link_to new_post_path, class: "flex flex-col items-center gap-1 p-2" do %>
+        <div class="w-10 h-10 rounded-full gradient-faith flex items-center justify-center text-white shadow-md">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+        </div>
+      <% end %>
+      
+      <%= link_to search_path, class: "flex flex-col items-center gap-1 p-2 rounded-lg text-stone-500" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <span class="text-xs">Search</span>
+      <% end %>
+      
+      <%= link_to resources_root_path, class: "flex flex-col items-center gap-1 p-2 rounded-lg #{'text-amber-700' if request.path.start_with?('/resources')} text-stone-500" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <span class="text-xs">Resources</span>
+      <% end %>
+    </div>
+  <% end %>
+</nav>
+

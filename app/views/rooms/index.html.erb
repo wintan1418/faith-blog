@@ -1,0 +1,64 @@
+<% content_for(:title) { "Rooms - Faith Community" } %>
+
+<div class="page-header">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+      <h1 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">Community Rooms</h1>
+      <p class="text-stone-600 max-w-2xl mx-auto">
+        Find your space to share, connect, and grow. Each room is designed for specific types of sharing and support.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @rooms.each_with_index do |room, index| %>
+      <div class="card-hover p-6 flex flex-col gap-4 animate-slide-up" style="animation-delay: <%= index * 0.05 %>s;">
+        <div class="flex items-start justify-between">
+          <div class="w-14 h-14 rounded-xl flex items-center justify-center text-3xl" style="background-color: <%= room.color %>20;">
+            <%= room.icon %>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="badge-secondary"><%= room.posts_count %> posts</span>
+            <span class="badge-secondary"><%= room.members_count %> members</span>
+          </div>
+        </div>
+        
+        <div class="flex-1">
+          <h3 class="text-xl font-semibold text-stone-900 mb-2"><%= room.name %></h3>
+          <p class="text-stone-600 text-sm leading-relaxed"><%= room.description %></p>
+        </div>
+
+        <% if room.rules.present? %>
+          <div class="bg-stone-50 rounded-lg p-3">
+            <p class="text-xs text-stone-500 font-medium mb-1">Room Guidelines</p>
+            <p class="text-xs text-stone-600"><%= truncate(room.rules, length: 100) %></p>
+          </div>
+        <% end %>
+
+        <div class="flex items-center gap-3 pt-2 border-t border-stone-100">
+          <%= link_to room_path(room), class: "btn-primary flex-1 justify-center" do %>
+            Enter Room
+          <% end %>
+          <% if user_signed_in? %>
+            <% if current_user.room_memberships.exists?(room: room) %>
+              <%= button_to leave_room_path(room), method: :delete, class: "btn-ghost px-3", data: { turbo_confirm: "Leave this room?" } do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              <% end %>
+            <% else %>
+              <%= button_to join_room_path(room), class: "btn-ghost px-3" do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+

@@ -1,0 +1,93 @@
+<% content_for(:title) { "Edit Profile - Faith Community" } %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-stone-900">Settings</h1>
+    <p class="text-stone-600">Manage your profile and account settings.</p>
+  </div>
+
+  <!-- Settings Navigation -->
+  <div class="flex gap-2 mb-6 border-b border-stone-200 pb-4">
+    <%= link_to settings_profile_path, class: "px-4 py-2 rounded-lg text-sm font-medium bg-amber-100 text-amber-800" do %>
+      Profile
+    <% end %>
+    <%= link_to settings_account_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-100" do %>
+      Account
+    <% end %>
+  </div>
+
+  <div class="card">
+    <div class="p-6 border-b border-stone-100">
+      <h2 class="text-lg font-semibold text-stone-900">Profile Information</h2>
+      <p class="text-sm text-stone-600">Update your public profile information.</p>
+    </div>
+
+    <div class="p-6">
+      <%= form_with model: @profile, url: settings_profile_path, method: :patch, class: "space-y-6" do |f| %>
+        <% if @profile.errors.any? %>
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <ul class="text-sm text-red-700 list-disc list-inside">
+              <% @profile.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <!-- Avatar -->
+        <div>
+          <label class="label">Profile Photo</label>
+          <div class="flex items-center gap-4">
+            <% if @profile.avatar.attached? %>
+              <%= image_tag @profile.avatar_medium, class: "w-20 h-20 avatar" %>
+            <% else %>
+              <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-medium">
+                <%= current_user.username[0].upcase %>
+              </div>
+            <% end %>
+            <div>
+              <%= f.file_field :avatar, class: "text-sm text-stone-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" %>
+              <p class="text-xs text-stone-500 mt-1">JPG, PNG up to 5MB</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bio -->
+        <div>
+          <%= f.label :bio, class: "label" %>
+          <%= f.text_area :bio, class: "input", rows: 4, placeholder: "Tell others a bit about yourself and your faith journey..." %>
+          <p class="text-xs text-stone-500 mt-1"><%= @profile.bio&.length || 0 %>/500 characters</p>
+        </div>
+
+        <!-- Location -->
+        <div>
+          <%= f.label :location, class: "label" %>
+          <%= f.text_field :location, class: "input", placeholder: "City, Country" %>
+        </div>
+
+        <!-- Faith Background -->
+        <div>
+          <%= f.label :faith_background, class: "label" %>
+          <%= f.text_field :faith_background, class: "input", placeholder: "e.g., Baptist, Non-denominational, Catholic" %>
+        </div>
+
+        <!-- Website -->
+        <div>
+          <%= f.label :website, class: "label" %>
+          <%= f.url_field :website, class: "input", placeholder: "https://yourblog.com" %>
+        </div>
+
+        <!-- Privacy -->
+        <div class="flex items-center gap-2 pt-4 border-t border-stone-100">
+          <%= f.check_box :public_profile, class: "w-4 h-4 text-amber-600 border-stone-300 rounded focus:ring-amber-500" %>
+          <%= f.label :public_profile, "Make my profile public", class: "text-sm text-stone-700" %>
+        </div>
+
+        <div class="flex items-center gap-3 pt-4">
+          <%= f.submit "Save Changes", class: "btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+

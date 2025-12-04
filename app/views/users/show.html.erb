@@ -1,0 +1,101 @@
+<% content_for(:title) { "#{@user.username} - Faith Community" } %>
+
+<div class="page-header">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+      <!-- Avatar -->
+      <% if @user.profile.avatar.attached? %>
+        <%= image_tag @user.profile.avatar_large, class: "w-24 h-24 sm:w-32 sm:h-32 avatar shadow-lg" %>
+      <% else %>
+        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-4xl font-semibold shadow-lg">
+          <%= @user.username[0].upcase %>
+        </div>
+      <% end %>
+
+      <div class="flex-1 text-center sm:text-left">
+        <div class="flex flex-col sm:flex-row items-center gap-3 mb-3">
+          <h1 class="text-2xl sm:text-3xl font-bold text-stone-900"><%= @user.username %></h1>
+          <% if @user.admin? %>
+            <span class="badge-primary">Admin</span>
+          <% elsif @user.moderator? %>
+            <span class="badge-faith">Moderator</span>
+          <% end %>
+        </div>
+
+        <% if @user.profile.bio.present? %>
+          <p class="text-stone-600 mb-4"><%= @user.profile.bio %></p>
+        <% end %>
+
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-stone-500 mb-4">
+          <% if @user.profile.location.present? %>
+            <span class="flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <%= @user.profile.location %>
+            </span>
+          <% end %>
+          <span class="flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Joined <%= @user.created_at.strftime("%B %Y") %>
+          </span>
+        </div>
+
+        <div class="flex items-center justify-center sm:justify-start gap-6 mb-4">
+          <%= link_to followers_user_path(@user.username), class: "text-center hover:text-amber-700 transition-colors" do %>
+            <span class="block text-xl font-bold text-stone-900"><%= @user.followers_count %></span>
+            <span class="text-sm text-stone-500">Followers</span>
+          <% end %>
+          <%= link_to following_user_path(@user.username), class: "text-center hover:text-amber-700 transition-colors" do %>
+            <span class="block text-xl font-bold text-stone-900"><%= @user.following_count %></span>
+            <span class="text-sm text-stone-500">Following</span>
+          <% end %>
+          <div class="text-center">
+            <span class="block text-xl font-bold text-stone-900"><%= @user.posts.published.count %></span>
+            <span class="text-sm text-stone-500">Posts</span>
+          </div>
+        </div>
+
+        <% if user_signed_in? && @user != current_user %>
+          <div class="flex items-center gap-3">
+            <% if current_user.following?(@user) %>
+              <%= button_to unfollow_user_path(@user.username), method: :delete, class: "btn-secondary" do %>
+                Following
+              <% end %>
+            <% else %>
+              <%= button_to follow_user_path(@user.username), class: "btn-primary" do %>
+                Follow
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold text-stone-900">Posts by <%= @user.username %></h2>
+  </div>
+
+  <% if @posts.any? %>
+    <div class="space-y-6">
+      <% @posts.each do |post| %>
+        <%= render "posts/card", post: post %>
+      <% end %>
+    </div>
+
+    <div class="mt-8">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  <% else %>
+    <div class="card p-12 text-center">
+      <p class="text-stone-500">No posts yet.</p>
+    </div>
+  <% end %>
+</div>
+

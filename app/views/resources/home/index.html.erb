@@ -1,0 +1,84 @@
+<% content_for(:title) { "Resources - Faith Community" } %>
+
+<div class="page-header">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+      <h1 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">Resource Library</h1>
+      <p class="text-stone-600 max-w-2xl mx-auto">
+        Discover articles, videos, podcasts, and more to support your faith journey.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <!-- Featured Resources -->
+  <% if @featured_resources.any? %>
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-stone-900 mb-6">Featured Resources</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @featured_resources.each do |resource| %>
+          <div class="card-hover p-6">
+            <div class="flex items-start gap-4">
+              <span class="text-3xl"><%= resource.type_icon %></span>
+              <div class="flex-1">
+                <span class="badge-secondary mb-2"><%= resource.resource_category.name %></span>
+                <h3 class="text-lg font-semibold text-stone-900 mb-2"><%= resource.title %></h3>
+                <p class="text-sm text-stone-600 line-clamp-2"><%= resource.description %></p>
+                <div class="flex items-center gap-4 mt-4 text-xs text-stone-500">
+                  <span><%= resource.views_count %> views</span>
+                  <% if resource.downloads_count > 0 %>
+                    <span><%= resource.downloads_count %> downloads</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Categories -->
+  <section class="mb-12">
+    <h2 class="text-2xl font-bold text-stone-900 mb-6">Browse by Category</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <% @categories.each do |category| %>
+        <%= link_to resource_category_path(category), class: "card-hover p-4 text-center" do %>
+          <span class="text-3xl block mb-2"><%= category.icon %></span>
+          <h3 class="font-medium text-stone-900 text-sm"><%= category.name %></h3>
+          <p class="text-xs text-stone-500 mt-1"><%= category.resources.approved.count %> resources</p>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+
+  <!-- Recent Resources -->
+  <% if @recent_resources.any? %>
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-stone-900">Recently Added</h2>
+        <% if user_signed_in? %>
+          <%= link_to new_resources_item_path, class: "btn-primary" do %>
+            Submit Resource
+          <% end %>
+        <% end %>
+      </div>
+      <div class="card divide-y divide-stone-100">
+        <% @recent_resources.each do |resource| %>
+          <div class="p-4 flex items-center gap-4">
+            <span class="text-2xl"><%= resource.type_icon %></span>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-medium text-stone-900 truncate"><%= resource.title %></h3>
+              <p class="text-sm text-stone-500">
+                <%= resource.resource_category.name %> · Added by <%= resource.user.username %>
+              </p>
+            </div>
+            <span class="text-xs text-stone-400"><%= time_ago_in_words(resource.created_at) %> ago</span>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>
+

@@ -1,0 +1,135 @@
+<% content_for(:title) { "Faith Community - Share Your Journey" } %>
+
+<!-- Hero Section -->
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50"></div>
+  <div class="absolute inset-0 opacity-30">
+    <div class="absolute top-20 left-10 w-72 h-72 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
+    <div class="absolute top-40 right-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
+    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-stone-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
+  </div>
+  
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+    <div class="text-center max-w-3xl mx-auto">
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight mb-6 animate-fade-in">
+        Share Your <span class="text-amber-700">Faith Journey</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-stone-600 mb-10 leading-relaxed animate-slide-up">
+        A welcoming community where brethren share testimonies, struggles, victories, and encouragement. 
+        Together, we grow in faith and support one another.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style="animation-delay: 0.1s;">
+        <%= link_to new_user_registration_path, class: "btn-primary btn-lg shadow-lg hover:shadow-xl transition-shadow" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+          </svg>
+          Join Our Community
+        <% end %>
+        <%= link_to rooms_path, class: "btn-secondary btn-lg" do %>
+          Explore Rooms
+          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Scripture Banner -->
+<section class="bg-stone-900 text-white py-8">
+  <div class="max-w-4xl mx-auto px-4 text-center">
+    <p class="text-lg sm:text-xl italic font-serif text-stone-200">
+      "Therefore encourage one another and build each other up, just as in fact you are doing."
+    </p>
+    <p class="text-amber-400 mt-2 text-sm font-medium">— 1 Thessalonians 5:11</p>
+  </div>
+</section>
+
+<!-- Rooms Section -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">Community Rooms</h2>
+      <p class="text-stone-600 max-w-2xl mx-auto">
+        Find your space. Connect with others who understand. Share and be encouraged.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @rooms.each_with_index do |room, index| %>
+        <div class="room-card animate-slide-up" style="animation-delay: <%= index * 0.05 %>s;">
+          <div class="flex items-start justify-between">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background-color: <%= room.color %>20;">
+              <%= room.icon %>
+            </div>
+            <span class="badge-secondary"><%= room.posts_count %> posts</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-stone-900 mb-2"><%= room.name %></h3>
+            <p class="text-sm text-stone-600 line-clamp-2"><%= room.description %></p>
+          </div>
+          <%= link_to room_path(room), class: "inline-flex items-center text-amber-700 hover:text-amber-800 text-sm font-medium mt-auto" do %>
+            Enter Room
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-10">
+      <%= link_to rooms_path, class: "btn-secondary" do %>
+        View All Rooms
+        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Posts -->
+<% if @featured_posts.any? %>
+<section class="py-20 bg-gradient-to-br from-stone-50 to-amber-50/30">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">Featured Testimonies</h2>
+      <p class="text-stone-600">Stories of faith that inspire and encourage</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% @featured_posts.each do |post| %>
+        <%= render "posts/card", post: post %>
+      <% end %>
+    </div>
+  </div>
+</section>
+<% end %>
+
+<!-- Call to Action -->
+<section class="py-20 bg-stone-900 relative overflow-hidden">
+  <div class="absolute inset-0 opacity-10">
+    <svg class="absolute top-0 left-0 w-64 h-64 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+    </svg>
+  </div>
+  
+  <div class="relative max-w-4xl mx-auto px-4 text-center">
+    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">
+      Your Story Matters
+    </h2>
+    <p class="text-stone-300 text-lg mb-8 max-w-2xl mx-auto">
+      Every testimony, every struggle, every victory can be a beacon of hope for someone else. 
+      Join our community and share your journey.
+    </p>
+    <%= link_to new_user_registration_path, class: "inline-flex items-center px-8 py-4 bg-amber-600 text-white font-semibold rounded-xl hover:bg-amber-500 transition-colors shadow-lg" do %>
+      Begin Your Journey
+      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+      </svg>
+    <% end %>
+  </div>
+</section>
+

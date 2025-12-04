@@ -1,0 +1,114 @@
+<% content_for(:title) { "Search - Faith Community" } %>
+
+<div class="page-header">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-2xl sm:text-3xl font-bold text-stone-900 mb-6">Search</h1>
+    
+    <%= form_with url: search_path, method: :get, class: "flex gap-3" do |f| %>
+      <div class="flex-1 relative">
+        <input type="text" name="q" value="<%= @query %>" 
+               class="w-full pl-10 pr-4 py-3 text-lg bg-white border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
+               placeholder="Search posts, users, resources...">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <button type="submit" class="btn-primary btn-lg">Search</button>
+    <% end %>
+  </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <% if @query.present? %>
+    <!-- Search Type Tabs -->
+    <div class="flex gap-2 mb-6 border-b border-stone-200 pb-4">
+      <%= link_to search_path(q: @query), class: "px-4 py-2 rounded-lg text-sm font-medium #{@result_type == :posts || @result_type.nil? ? 'bg-amber-100 text-amber-800' : 'text-stone-600 hover:bg-stone-100'}" do %>
+        Posts
+      <% end %>
+      <%= link_to search_path(q: @query, type: "users"), class: "px-4 py-2 rounded-lg text-sm font-medium #{@result_type == :users ? 'bg-amber-100 text-amber-800' : 'text-stone-600 hover:bg-stone-100'}" do %>
+        Users
+      <% end %>
+      <%= link_to search_path(q: @query, type: "resources"), class: "px-4 py-2 rounded-lg text-sm font-medium #{@result_type == :resources ? 'bg-amber-100 text-amber-800' : 'text-stone-600 hover:bg-stone-100'}" do %>
+        Resources
+      <% end %>
+    </div>
+
+    <% if @results&.any? %>
+      <p class="text-sm text-stone-500 mb-6">Found results for "<%= @query %>"</p>
+      
+      <% case @result_type %>
+      <% when :posts, nil %>
+        <div class="space-y-6">
+          <% @results.each do |post| %>
+            <%= render "posts/card", post: post %>
+          <% end %>
+        </div>
+      <% when :users %>
+        <div class="card divide-y divide-stone-100">
+          <% @results.each do |user| %>
+            <div class="p-4 flex items-center gap-4">
+              <% if user.profile.avatar.attached? %>
+                <%= image_tag user.profile.avatar_medium, class: "w-12 h-12 avatar" %>
+              <% else %>
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium">
+                  <%= user.username[0].upcase %>
+                </div>
+              <% end %>
+              <div class="flex-1">
+                <%= link_to user.username, user_path(user.username), class: "font-medium text-stone-900 hover:text-amber-700" %>
+                <% if user.profile.bio.present? %>
+                  <p class="text-sm text-stone-600 line-clamp-1"><%= user.profile.bio %></p>
+                <% end %>
+              </div>
+              <% if user_signed_in? && user != current_user %>
+                <% if current_user.following?(user) %>
+                  <%= button_to unfollow_user_path(user.username), method: :delete, class: "btn-secondary btn-sm" do %>
+                    Following
+                  <% end %>
+                <% else %>
+                  <%= button_to follow_user_path(user.username), class: "btn-primary btn-sm" do %>
+                    Follow
+                  <% end %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% when :resources %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <% @results.each do |resource| %>
+            <div class="card p-4">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl"><%= resource.type_icon %></span>
+                <div class="flex-1">
+                  <h3 class="font-medium text-stone-900"><%= resource.title %></h3>
+                  <p class="text-sm text-stone-600 line-clamp-2"><%= resource.description %></p>
+                  <p class="text-xs text-stone-500 mt-2"><%= resource.resource_category.name %></p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="mt-8">
+        <%== pagy_nav(@pagy) if @pagy&.pages.to_i > 1 %>
+      </div>
+    <% else %>
+      <div class="card p-12 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+          <svg class="w-8 h-8 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-stone-900 mb-2">No results found</h3>
+        <p class="text-stone-600">Try different keywords or browse our <%= link_to "rooms", rooms_path, class: "link" %>.</p>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-stone-600">Enter a search term to find posts, users, or resources.</p>
+    </div>
+  <% end %>
+</div>
+

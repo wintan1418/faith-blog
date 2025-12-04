@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 139 69 19; /* Warm brown - saddle brown */
+    --color-primary-dark: 101 67 33; /* Dark brown */
+    --color-accent: 218 165 32; /* Goldenrod */
+    --color-accent-light: 250 235 215; /* Antique white */
+    --color-faith: 70 130 180; /* Steel blue - calm, trustworthy */
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+    @apply text-stone-800;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply text-stone-900;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-amber-700 text-white hover:bg-amber-800 focus:ring-amber-500 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply btn bg-stone-100 text-stone-700 hover:bg-stone-200 focus:ring-stone-400 border border-stone-300;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-stone-600 hover:bg-stone-100 hover:text-stone-800;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-stone-200/60 overflow-hidden;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-300 hover:shadow-md hover:border-stone-300;
+  }
+
+  .input {
+    @apply w-full px-4 py-2.5 text-stone-800 bg-white border border-stone-300 rounded-lg placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors;
+  }
+
+  .input-error {
+    @apply border-red-500 focus:ring-red-500/20 focus:border-red-500;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-stone-700 mb-1.5;
+  }
+
+  .link {
+    @apply text-amber-700 hover:text-amber-800 hover:underline underline-offset-2 transition-colors;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-amber-100 text-amber-800;
+  }
+
+  .badge-secondary {
+    @apply badge bg-stone-100 text-stone-700;
+  }
+
+  .badge-success {
+    @apply badge bg-emerald-100 text-emerald-800;
+  }
+
+  .badge-faith {
+    @apply badge bg-sky-100 text-sky-800;
+  }
+
+  .avatar {
+    @apply rounded-full object-cover bg-stone-200;
+  }
+
+  .prose-faith {
+    @apply prose prose-stone prose-headings:font-serif prose-headings:text-stone-900 prose-a:text-amber-700 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-amber-500 prose-blockquote:bg-amber-50/50 prose-blockquote:rounded-r-lg prose-blockquote:py-1;
+  }
+
+  .section-header {
+    @apply flex items-center justify-between mb-6;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-stone-900;
+  }
+
+  .page-header {
+    @apply bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 border-b border-stone-200;
+  }
+
+  .room-card {
+    @apply card-hover p-6 flex flex-col gap-4;
+  }
+
+  .post-card {
+    @apply card-hover;
+  }
+
+  .reaction-btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
+  }
+
+  .reaction-btn-inactive {
+    @apply reaction-btn bg-stone-100 text-stone-600 hover:bg-stone-200;
+  }
+
+  .reaction-btn-active {
+    @apply reaction-btn bg-amber-100 text-amber-800;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from { 
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to { 
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .gradient-faith {
+    @apply bg-gradient-to-br from-amber-600 via-amber-700 to-orange-700;
+  }
+
+  .gradient-soft {
+    @apply bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50;
+  }
+}
+
+/* Trix editor customization */
+trix-editor {
+  @apply input min-h-[200px];
+}
+
+trix-toolbar {
+  @apply bg-stone-50 border border-stone-200 rounded-t-lg p-2 mb-0;
+}
+
+trix-toolbar .trix-button-group {
+  @apply border-stone-300;
+}
+
+trix-toolbar .trix-button {
+  @apply border-stone-300 hover:bg-stone-200;
+}
+
+trix-toolbar .trix-button.trix-active {
+  @apply bg-amber-100;
+}

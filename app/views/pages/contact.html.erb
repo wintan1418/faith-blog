@@ -1,0 +1,57 @@
+<% content_for(:title) { "Contact Us - Faith Community" } %>
+
+<div class="page-header">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+    <h1 class="text-4xl font-bold text-stone-900 mb-4">Contact Us</h1>
+    <p class="text-xl text-stone-600">We'd love to hear from you.</p>
+  </div>
+</div>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="card p-8">
+    <div class="text-center mb-8">
+      <p class="text-stone-600">
+        Have questions, feedback, or need to report an issue? We're here to help.
+      </p>
+    </div>
+
+    <form class="space-y-6">
+      <div>
+        <label class="label">Your Name</label>
+        <input type="text" class="input" placeholder="Enter your name">
+      </div>
+
+      <div>
+        <label class="label">Email Address</label>
+        <input type="email" class="input" placeholder="Enter your email">
+      </div>
+
+      <div>
+        <label class="label">Subject</label>
+        <select class="input">
+          <option value="">Select a topic...</option>
+          <option value="general">General Inquiry</option>
+          <option value="feedback">Feedback</option>
+          <option value="report">Report an Issue</option>
+          <option value="technical">Technical Support</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="label">Message</label>
+        <textarea class="input" rows="5" placeholder="How can we help you?"></textarea>
+      </div>
+
+      <button type="submit" class="btn-primary w-full btn-lg">Send Message</button>
+    </form>
+  </div>
+
+  <div class="mt-8 text-center text-stone-600">
+    <p class="text-sm">
+      You can also reach us at:<br>
+      <a href="mailto:support@faithcommunity.com" class="link">support@faithcommunity.com</a>
+    </p>
+  </div>
+</div>
+

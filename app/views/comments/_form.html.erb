@@ -1,0 +1,20 @@
+<%= form_with model: [post, comment], id: "comment_form", class: "flex items-start gap-3" do |f| %>
+  <% if current_user.profile.avatar.attached? %>
+    <%= image_tag current_user.profile.avatar_thumbnail, class: "w-10 h-10 avatar flex-shrink-0" %>
+  <% else %>
+    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium flex-shrink-0">
+      <%= current_user.username[0].upcase %>
+    </div>
+  <% end %>
+  
+  <div class="flex-1">
+    <%= f.text_area :content, 
+        class: "input resize-none", 
+        rows: 3, 
+        placeholder: "Share your thoughts, encouragement, or prayers..." %>
+    <div class="flex items-center justify-end gap-2 mt-2">
+      <%= f.submit "Post Comment", class: "btn-primary btn-sm" %>
+    </div>
+  </div>
+<% end %>
+

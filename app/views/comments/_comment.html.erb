@@ -1,0 +1,87 @@
+<div class="p-6" id="<%= dom_id(comment) %>">
+  <div class="flex items-start gap-3">
+    <%= link_to user_path(comment.user.username), class: "flex-shrink-0" do %>
+      <% if comment.user.profile.avatar.attached? %>
+        <%= image_tag comment.user.profile.avatar_thumbnail, class: "w-10 h-10 avatar" %>
+      <% else %>
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium">
+          <%= comment.user.username[0].upcase %>
+        </div>
+      <% end %>
+    <% end %>
+    
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 mb-1">
+        <%= link_to comment.user.username, user_path(comment.user.username), class: "font-medium text-stone-900 hover:text-amber-700" %>
+        <time class="text-xs text-stone-500" datetime="<%= comment.created_at.iso8601 %>">
+          <%= time_ago_in_words(comment.created_at) %> ago
+        </time>
+        <% if comment.edited? %>
+          <span class="text-xs text-stone-400">(edited)</span>
+        <% end %>
+      </div>
+      
+      <% if comment.deleted? %>
+        <p class="text-stone-400 italic"><%= comment.content %></p>
+      <% else %>
+        <div class="text-stone-700 prose-sm">
+          <%= simple_format(comment.content) %>
+        </div>
+        
+        <div class="flex items-center gap-4 mt-3">
+          <!-- Like -->
+          <% if user_signed_in? %>
+            <% if current_user.has_liked?(comment) %>
+              <%= button_to unlike_path(likeable_type: "Comment", likeable_id: comment.id), method: :delete, class: "text-xs text-amber-700 hover:text-amber-800 font-medium", data: { turbo_frame: "_top" } do %>
+                🙏 <%= comment.likes_count %>
+              <% end %>
+            <% else %>
+              <%= button_to likes_path(likeable_type: "Comment", likeable_id: comment.id), class: "text-xs text-stone-500 hover:text-amber-700", data: { turbo_frame: "_top" } do %>
+                🙏 <%= comment.likes_count > 0 ? comment.likes_count : "Amen" %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <span class="text-xs text-stone-500">🙏 <%= comment.likes_count %></span>
+          <% end %>
+
+          <!-- Reply -->
+          <% if user_signed_in? && comment.depth < 2 %>
+            <button type="button" 
+                    class="text-xs text-stone-500 hover:text-amber-700"
+                    data-controller="reply-toggle"
+                    data-action="click->reply-toggle#toggle">
+              Reply
+            </button>
+          <% end %>
+
+          <!-- Edit/Delete for owner -->
+          <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
+            <%= button_to post_comment_path(post, comment), method: :delete, class: "text-xs text-stone-400 hover:text-red-600", data: { turbo_confirm: "Delete this comment?" } do %>
+              Delete
+            <% end %>
+          <% end %>
+        </div>
+
+        <!-- Reply form (hidden by default) -->
+        <% if user_signed_in? && comment.depth < 2 %>
+          <div class="mt-4 hidden" data-reply-toggle-target="form">
+            <%= form_with url: reply_post_comment_path(post, comment), class: "flex items-start gap-2" do |f| %>
+              <%= f.text_area :content, class: "input resize-none text-sm", rows: 2, placeholder: "Write a reply..." %>
+              <%= f.submit "Reply", class: "btn-primary btn-sm" %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <!-- Nested replies -->
+      <% if comment.replies.active.any? %>
+        <div class="mt-4 pl-4 border-l-2 border-stone-100 space-y-4">
+          <% comment.replies.active.oldest_first.each do |reply| %>
+            <%= render "comments/comment", comment: reply, post: post %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+

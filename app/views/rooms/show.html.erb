@@ -1,0 +1,127 @@
+<% content_for(:title) { "#{@room.name} - Faith Community" } %>
+
+<!-- Room Header -->
+<div class="page-header">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col md:flex-row md:items-center gap-6">
+      <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-sm" style="background-color: <%= @room.color %>20;">
+        <%= @room.icon %>
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-2">
+          <h1 class="text-2xl sm:text-3xl font-bold text-stone-900"><%= @room.name %></h1>
+          <% if @is_member %>
+            <span class="badge-success">
+              <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              Member
+            </span>
+          <% end %>
+        </div>
+        <p class="text-stone-600 mb-4"><%= @room.description %></p>
+        <div class="flex flex-wrap items-center gap-4 text-sm text-stone-500">
+          <span class="flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+            </svg>
+            <%= @room.posts_count %> posts
+          </span>
+          <span class="flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <%= @room.members_count %> members
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <% if user_signed_in? %>
+          <%= link_to new_post_path(room_id: @room.id), class: "btn-primary" do %>
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Share Here
+          <% end %>
+          <% if @is_member %>
+            <%= button_to leave_room_path(@room), method: :delete, class: "btn-secondary", data: { turbo_confirm: "Leave this room?" } do %>
+              Leave Room
+            <% end %>
+          <% else %>
+            <%= button_to join_room_path(@room), class: "btn-secondary" do %>
+              Join Room
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Posts -->
+    <div class="flex-1">
+      <% if @posts.any? %>
+        <div class="space-y-6">
+          <% @posts.each do |post| %>
+            <%= render "posts/card", post: post %>
+          <% end %>
+        </div>
+
+        <div class="mt-8">
+          <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+        </div>
+      <% else %>
+        <div class="card p-12 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center text-3xl">
+            <%= @room.icon %>
+          </div>
+          <h3 class="text-lg font-semibold text-stone-900 mb-2">No posts in this room yet</h3>
+          <p class="text-stone-600 mb-6">Be the first to share in <%= @room.name %>!</p>
+          <% if user_signed_in? %>
+            <%= link_to new_post_path(room_id: @room.id), class: "btn-primary" do %>
+              Create First Post
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="lg:w-80 space-y-6">
+      <!-- Room Guidelines -->
+      <% if @room.rules.present? %>
+        <div class="card p-6">
+          <h3 class="font-semibold text-stone-900 mb-3 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            Room Guidelines
+          </h3>
+          <p class="text-sm text-stone-600 leading-relaxed"><%= @room.rules %></p>
+        </div>
+      <% end %>
+
+      <!-- Other Rooms -->
+      <div class="card p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-stone-900">Other Rooms</h3>
+          <%= link_to "View all", rooms_path, class: "text-sm text-amber-700 hover:text-amber-800" %>
+        </div>
+        <div class="space-y-3">
+          <% Room.public_rooms.where.not(id: @room.id).ordered.limit(5).each do |room| %>
+            <%= link_to room_path(room), class: "flex items-center gap-3 p-2 rounded-lg hover:bg-stone-50 transition-colors" do %>
+              <span class="text-lg"><%= room.icon %></span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-stone-900 truncate"><%= room.name %></p>
+                <p class="text-xs text-stone-500"><%= room.posts_count %> posts</p>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+

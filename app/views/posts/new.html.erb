@@ -1,0 +1,15 @@
+<% content_for(:title) { "Create Post - Faith Community" } %>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="card">
+    <div class="p-6 border-b border-stone-100">
+      <h1 class="text-2xl font-bold text-stone-900">Share with the Community</h1>
+      <p class="text-stone-600 mt-1">Your story can encourage and inspire others.</p>
+    </div>
+
+    <div class="p-6">
+      <%= render "form", post: @post, rooms: @rooms %>
+    </div>
+  </div>
+</div>
+

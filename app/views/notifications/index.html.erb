@@ -1,0 +1,66 @@
+<% content_for(:title) { "Notifications - Faith Community" } %>
+
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-stone-900">Notifications</h1>
+    <% if @notifications.any? { |n| n.unread? } %>
+      <%= button_to mark_all_read_notifications_path, class: "btn-ghost text-sm" do %>
+        Mark all as read
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @notifications.any? %>
+    <div class="card divide-y divide-stone-100">
+      <% @notifications.each do |notification| %>
+        <div class="p-4 flex items-start gap-4 <%= notification.unread? ? 'bg-amber-50/50' : '' %>">
+          <% if notification.actor %>
+            <% if notification.actor.profile.avatar.attached? %>
+              <%= image_tag notification.actor.profile.avatar_thumbnail, class: "w-10 h-10 avatar flex-shrink-0" %>
+            <% else %>
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
+                <%= notification.actor.username[0].upcase %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+            </div>
+          <% end %>
+          
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-stone-900">
+              <%= notification.message %>
+            </p>
+            <p class="text-xs text-stone-500 mt-1">
+              <%= time_ago_in_words(notification.created_at) %> ago
+            </p>
+          </div>
+
+          <% if notification.unread? %>
+            <%= button_to mark_read_notification_path(notification), class: "p-1 rounded text-amber-600 hover:bg-amber-100", data: { turbo_frame: "_top" } do %>
+              <span class="w-2 h-2 block rounded-full bg-amber-500"></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-8">
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    </div>
+  <% else %>
+    <div class="card p-12 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
+        <svg class="w-8 h-8 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-stone-900 mb-2">No notifications</h3>
+      <p class="text-stone-600">You're all caught up! Check back later.</p>
+    </div>
+  <% end %>
+</div>
+
