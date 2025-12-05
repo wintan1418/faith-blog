@@ -17,7 +17,7 @@ class CreateComments < ActiveRecord::Migration[8.0]
     end
 
     add_index :comments, [:post_id, :created_at]
-    add_index :comments, :parent_comment_id
+    # parent_comment_id index is automatically created by t.references above
     add_index :comments, :flagged
     add_index :comments, :deleted_at
   end
