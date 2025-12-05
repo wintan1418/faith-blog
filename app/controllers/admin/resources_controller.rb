@@ -12,6 +12,24 @@ class Admin::ResourcesController < ApplicationController
   def show
   end
 
+  def new
+    @resource = Resource.new
+  end
+
+  def create
+    @resource = Resource.new(resource_params)
+    @resource.user = current_user
+    @resource.approved = true
+    @resource.approved_by = current_user
+    @resource.approved_at = Time.current
+    
+    if @resource.save
+      redirect_to admin_resource_path(@resource), notice: "Resource created."
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
   def edit
   end
 

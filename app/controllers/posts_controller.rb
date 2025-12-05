@@ -27,6 +27,7 @@ class PostsController < ApplicationController
     @post = current_user.posts.build(post_params)
     
     if @post.save
+      handle_post_links
       redirect_to @post, notice: "Post created successfully!"
     else
       @rooms = Room.public_rooms.ordered
@@ -40,6 +41,7 @@ class PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
+      handle_post_links
       redirect_to @post, notice: "Post updated successfully!"
     else
       @rooms = Room.public_rooms.ordered
@@ -71,7 +73,19 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :room_id, :status, :anonymous, :allow_comments, :tag_list)
+    params.require(:post).permit(:title, :content, :room_id, :status, :anonymous, :allow_comments, :tag_list, images: [])
+  end
+
+  def handle_post_links
+    return unless params[:linked_post_ids].present?
+    
+    # Clear existing links and create new ones
+    @post.outbound_links.destroy_all
+    
+    linked_ids = params[:linked_post_ids].reject(&:blank?)
+    linked_ids.each do |target_id|
+      @post.outbound_links.create(target_post_id: target_id, link_type: :related)
+    end
   end
 
   def authorize_post!
