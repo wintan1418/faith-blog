@@ -1,0 +1,4 @@
+<%= turbo_stream.replace dom_id(@post, :reshare) do %>
+  <%= render "reshares/button", post: @post %>
+<% end %>
+

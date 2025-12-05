@@ -9,7 +9,7 @@
 
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <% if @posts.any? %>
-    <div class="space-y-6">
+    <div>
       <% @posts.each do |post| %>
         <%= render "posts/card", post: post %>
       <% end %>
@@ -27,7 +27,7 @@
       </div>
       <h3 class="text-lg font-semibold text-stone-900 mb-2">No bookmarks yet</h3>
       <p class="text-stone-600 mb-6">Save posts you want to read later by clicking the bookmark icon.</p>
-      <%= link_to feed_path, class: "btn-primary" do %>
+      <%= link_to feed_path, class: "btn btn-primary" do %>
         Explore Posts
       <% end %>
     </div>

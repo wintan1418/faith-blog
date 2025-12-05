@@ -1,19 +1,22 @@
 <% content_for(:title) { "Search - Faith Community" } %>
 
-<div class="page-header">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <h1 class="text-2xl sm:text-3xl font-bold text-stone-900 mb-6">Search</h1>
+<div class="bg-gradient-to-b from-amber-50 to-transparent dark:from-gray-900 dark:to-gray-900">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2 text-center">Discover Stories</h1>
+    <p class="text-gray-600 dark:text-gray-400 text-center mb-8">Search posts, find people, explore resources</p>
     
-    <%= form_with url: search_path, method: :get, class: "flex gap-3" do |f| %>
-      <div class="flex-1 relative">
+    <%= form_with url: search_path, method: :get, class: "max-w-2xl mx-auto" do |f| %>
+      <div class="relative">
         <input type="text" name="q" value="<%= @query %>" 
-               class="w-full pl-10 pr-4 py-3 text-lg bg-white border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
-               placeholder="Search posts, users, resources...">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               class="w-full pl-12 pr-6 py-4 text-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 dark:text-white shadow-sm"
+               placeholder="Search posts, users, resources..." autofocus>
+        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
+        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 btn btn-primary">
+          Search
+        </button>
       </div>
-      <button type="submit" class="btn-primary btn-lg">Search</button>
     <% end %>
   </div>
 </div>
@@ -21,52 +24,75 @@
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <% if @query.present? %>
     <!-- Search Type Tabs -->
-    <div class="flex gap-2 mb-6 border-b border-stone-200 pb-4">
-      <%= link_to search_path(q: @query), class: "px-4 py-2 rounded-lg text-sm font-medium #{@result_type == :posts || @result_type.nil? ? 'bg-amber-100 text-amber-800' : 'text-stone-600 hover:bg-stone-100'}" do %>
+    <div class="flex justify-center gap-2 mb-8">
+      <%= link_to search_path(q: @query), 
+          class: "px-5 py-2.5 rounded-full text-sm font-medium transition-all #{@result_type == :posts || @result_type.nil? ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}" do %>
+        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+        </svg>
         Posts
       <% end %>
-      <%= link_to search_path(q: @query, type: "users"), class: "px-4 py-2 rounded-lg text-sm font-medium #{@result_type == :users ? 'bg-amber-100 text-amber-800' : 'text-stone-600 hover:bg-stone-100'}" do %>
-        Users
+      <%= link_to search_path(q: @query, type: "users"), 
+          class: "px-5 py-2.5 rounded-full text-sm font-medium transition-all #{@result_type == :users ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}" do %>
+        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        People
       <% end %>
-      <%= link_to search_path(q: @query, type: "resources"), class: "px-4 py-2 rounded-lg text-sm font-medium #{@result_type == :resources ? 'bg-amber-100 text-amber-800' : 'text-stone-600 hover:bg-stone-100'}" do %>
+      <%= link_to search_path(q: @query, type: "resources"), 
+          class: "px-5 py-2.5 rounded-full text-sm font-medium transition-all #{@result_type == :resources ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}" do %>
+        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
         Resources
       <% end %>
     </div>
 
     <% if @results&.any? %>
-      <p class="text-sm text-stone-500 mb-6">Found results for "<%= @query %>"</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center">
+        Found <span class="font-medium text-gray-900 dark:text-white"><%= @results.count %></span> results for "<span class="font-medium"><%= @query %></span>"
+      </p>
       
       <% case @result_type %>
       <% when :posts, nil %>
-        <div class="space-y-6">
+        <div>
           <% @results.each do |post| %>
             <%= render "posts/card", post: post %>
           <% end %>
         </div>
       <% when :users %>
-        <div class="card divide-y divide-stone-100">
+        <div class="space-y-3">
           <% @results.each do |user| %>
-            <div class="p-4 flex items-center gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
               <% if user.profile.avatar.attached? %>
-                <%= image_tag user.profile.avatar_medium, class: "w-12 h-12 avatar" %>
+                <%= image_tag user.profile.avatar, class: "w-16 h-16 rounded-full object-cover" %>
               <% else %>
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-xl font-semibold">
                   <%= user.username[0].upcase %>
                 </div>
               <% end %>
-              <div class="flex-1">
-                <%= link_to user.username, user_path(user.username), class: "font-medium text-stone-900 hover:text-amber-700" %>
+              <div class="flex-1 min-w-0">
+                <%= link_to user.username, user_path(user.username), class: "text-lg font-semibold text-gray-900 dark:text-white hover:text-amber-600 dark:hover:text-amber-400" %>
                 <% if user.profile.bio.present? %>
-                  <p class="text-sm text-stone-600 line-clamp-1"><%= user.profile.bio %></p>
+                  <p class="text-gray-600 dark:text-gray-400 line-clamp-2 mt-1"><%= user.profile.bio %></p>
+                <% end %>
+                <% if user.profile.location.present? %>
+                  <p class="text-sm text-gray-500 dark:text-gray-500 mt-1 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <%= user.profile.location %>
+                  </p>
                 <% end %>
               </div>
               <% if user_signed_in? && user != current_user %>
                 <% if current_user.following?(user) %>
-                  <%= button_to unfollow_user_path(user.username), method: :delete, class: "btn-secondary btn-sm" do %>
+                  <%= button_to unfollow_user_path(user.username), method: :delete, class: "btn btn-secondary" do %>
                     Following
                   <% end %>
                 <% else %>
-                  <%= button_to follow_user_path(user.username), class: "btn-primary btn-sm" do %>
+                  <%= button_to follow_user_path(user.username), class: "btn btn-primary" do %>
                     Follow
                   <% end %>
                 <% end %>
@@ -77,13 +103,20 @@
       <% when :resources %>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <% @results.each do |resource| %>
-            <div class="card p-4">
-              <div class="flex items-start gap-3">
-                <span class="text-2xl"><%= resource.type_icon %></span>
-                <div class="flex-1">
-                  <h3 class="font-medium text-stone-900"><%= resource.title %></h3>
-                  <p class="text-sm text-stone-600 line-clamp-2"><%= resource.description %></p>
-                  <p class="text-xs text-stone-500 mt-2"><%= resource.resource_category.name %></p>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-5 hover:shadow-md transition-shadow">
+              <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-2xl flex-shrink-0">
+                  <%= resource.type_icon %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-semibold text-gray-900 dark:text-white line-clamp-1"><%= resource.title %></h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mt-1"><%= resource.description %></p>
+                  <div class="flex items-center gap-2 mt-3">
+                    <span class="px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full">
+                      <%= resource.resource_category.name %>
+                    </span>
+                    <span class="text-xs text-gray-500 dark:text-gray-500">by <%= resource.user.username %></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -95,20 +128,43 @@
         <%== pagy_nav(@pagy) if @pagy&.pages.to_i > 1 %>
       </div>
     <% else %>
-      <div class="card p-12 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-stone-100 flex items-center justify-center">
-          <svg class="w-8 h-8 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      <div class="text-center py-16">
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+          <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-stone-900 mb-2">No results found</h3>
-        <p class="text-stone-600">Try different keywords or browse our <%= link_to "rooms", rooms_path, class: "link" %>.</p>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No results found</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">We couldn't find anything matching "<%= @query %>"</p>
+        <div class="flex justify-center gap-3">
+          <%= link_to rooms_path, class: "btn btn-secondary" do %>
+            Browse Rooms
+          <% end %>
+          <%= link_to feed_path, class: "btn btn-primary" do %>
+            Explore Feed
+          <% end %>
+        </div>
       </div>
     <% end %>
   <% else %>
-    <div class="text-center py-12">
-      <p class="text-stone-600">Enter a search term to find posts, users, or resources.</p>
+    <!-- Show trending/suggested content when no search query -->
+    <div class="text-center py-16">
+      <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+        <svg class="w-10 h-10 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">What are you looking for?</h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-8">Search for posts, find community members, or discover resources</p>
+      
+      <!-- Quick suggestions -->
+      <div class="flex flex-wrap justify-center gap-2">
+        <% %w[testimony prayer faith hope healing worship].each do |tag| %>
+          <%= link_to search_path(q: tag), class: "px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-amber-100 dark:hover:bg-amber-900/30 hover:text-amber-700 dark:hover:text-amber-400 transition-colors" do %>
+            #<%= tag %>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   <% end %>
 </div>
-

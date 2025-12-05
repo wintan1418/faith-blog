@@ -29,6 +29,20 @@
 
       <!-- Search and actions -->
       <div class="flex items-center gap-3">
+        <!-- Theme Toggle -->
+        <div data-controller="theme">
+          <button type="button" data-action="click->theme#toggle" class="theme-toggle" aria-label="Toggle theme">
+            <!-- Sun icon (show in dark mode) -->
+            <svg data-theme-target="darkIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <!-- Moon icon (show in light mode) -->
+            <svg data-theme-target="lightIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+        </div>
+
         <% if user_signed_in? %>
           <!-- Search -->
           <%= form_with url: search_path, method: :get, class: "hidden sm:block" do |f| %>
@@ -62,7 +76,7 @@
           <div class="relative" data-controller="dropdown">
             <button type="button" data-action="click->dropdown#toggle" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-stone-50 transition-colors">
               <% if current_user.profile.avatar.attached? %>
-                <%= image_tag current_user.profile.avatar_thumbnail, class: "w-8 h-8 avatar" %>
+                <%= image_tag current_user.profile.avatar, class: "w-8 h-8 avatar rounded-full object-cover" %>
               <% else %>
                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium">
                   <%= current_user.username[0].upcase %>
@@ -93,7 +107,19 @@
                 Bookmarks
               <% end %>
               
-              <%= link_to settings_root_path, class: "flex items-center gap-3 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors" do %>
+              <%= link_to my_connections_path, class: "flex items-center gap-3 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors" do %>
+                <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                My Connections
+                <% if current_user.received_connection_requests.pending.any? %>
+                  <span class="ml-auto w-5 h-5 rounded-full bg-amber-500 text-white text-xs flex items-center justify-center">
+                    <%= current_user.received_connection_requests.pending.count %>
+                  </span>
+                <% end %>
+              <% end %>
+              
+              <%= link_to edit_settings_profile_path, class: "flex items-center gap-3 px-4 py-2 text-sm text-stone-700 hover:bg-stone-50 transition-colors" do %>
                 <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -121,8 +147,8 @@
             </div>
           </div>
         <% else %>
-          <%= link_to "Sign In", new_user_session_path, class: "btn-ghost" %>
-          <%= link_to "Join Us", new_user_registration_path, class: "btn-primary" %>
+          <%= link_to "Sign In", new_user_session_path, class: "btn btn-ghost" %>
+          <%= link_to "Join Us", new_user_registration_path, class: "btn btn-primary" %>
         <% end %>
       </div>
     </div>

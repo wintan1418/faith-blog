@@ -1,0 +1,4 @@
+<%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
+  <%= render "likes/reactions", likeable: @likeable %>
+<% end %>
+

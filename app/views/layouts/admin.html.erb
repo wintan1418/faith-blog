@@ -105,7 +105,7 @@
             <div class="flex items-center gap-4">
               <span class="text-sm text-stone-600">Welcome, <%= current_user.username %></span>
               <% if current_user.profile.avatar.attached? %>
-                <%= image_tag current_user.profile.avatar_thumbnail, class: "w-8 h-8 avatar" %>
+                <%= image_tag current_user.profile.avatar, class: "w-8 h-8 avatar rounded-full object-cover" %>
               <% else %>
                 <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium">
                   <%= current_user.username[0].upcase %>

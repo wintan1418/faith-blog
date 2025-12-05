@@ -1,13 +1,13 @@
-<%= form_with model: post, class: "space-y-6" do |f| %>
+<%= form_with model: post, class: "space-y-6", data: { controller: "post-form" } do |f| %>
   <% if post.errors.any? %>
-    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
       <div class="flex items-start gap-3">
         <svg class="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
         </svg>
         <div>
-          <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
-          <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+          <h3 class="text-sm font-medium text-red-800 dark:text-red-400">Please fix the following errors:</h3>
+          <ul class="mt-2 text-sm text-red-700 dark:text-red-300 list-disc list-inside">
             <% post.errors.full_messages.each do |message| %>
               <li><%= message %></li>
             <% end %>
@@ -23,7 +23,7 @@
         rooms.map { |r| ["#{r.icon} #{r.name}", r.id] },
         { prompt: "Choose a room..." },
         class: "input" %>
-    <p class="text-xs text-stone-500 mt-1">Choose the most appropriate room for your post.</p>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Choose the most appropriate room for your post.</p>
   </div>
 
   <div>
@@ -31,37 +31,196 @@
     <%= f.text_field :title, class: "input", placeholder: "Give your post a meaningful title..." %>
   </div>
 
-  <div>
-    <%= f.label :content, "Your Message", class: "label" %>
-    <%= f.rich_text_area :content, class: "input min-h-[300px]", placeholder: "Share your testimony, thoughts, or prayer request..." %>
+  <div data-controller="emoji-picker">
+    <div class="flex items-center justify-between mb-2">
+      <%= f.label :content, "Your Message", class: "label mb-0" %>
+      <button type="button" 
+              data-emoji-picker-target="button"
+              data-action="click->emoji-picker#toggle"
+              class="p-2 text-gray-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
+              title="Add emoji">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Emoji Picker -->
+    <div class="relative">
+      <div data-emoji-picker-target="picker" 
+           data-emoji-picker-target="editor"
+           class="hidden absolute right-0 top-0 z-50 mb-2">
+        <emoji-picker 
+          style="width: 350px; height: 400px;"
+          skin-tone-emoji="👍"
+          class="rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
+        </emoji-picker>
+      </div>
+    </div>
+    
+    <%= f.rich_text_area :content, 
+        class: "input min-h-[300px]", 
+        placeholder: "Share your testimony, thoughts, or prayer request...",
+        data: { emoji_picker_target: "editor" } %>
   </div>
+
+  <!-- Image Upload Section -->
+  <div class="space-y-3">
+    <%= f.label :images, "Add Images (up to 5)", class: "label" %>
+    
+    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center hover:border-amber-400 dark:hover:border-amber-500 transition-colors">
+      <div class="space-y-2">
+        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+          <label for="post_images" class="relative cursor-pointer rounded-md font-medium text-amber-600 hover:text-amber-500 dark:text-amber-400">
+            <span>Upload images</span>
+            <%= f.file_field :images, 
+                multiple: true, 
+                accept: "image/*",
+                class: "sr-only",
+                id: "post_images",
+                data: { action: "change->post-form#previewImages" } %>
+          </label>
+          <span>or drag and drop</span>
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF up to 10MB each (max 5 images)</p>
+      </div>
+    </div>
+
+    <!-- Image Previews -->
+    <% if post.persisted? && post.images.attached? %>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <% post.images.each do |image| %>
+          <div class="relative group">
+            <%= image_tag image, class: "w-full h-24 object-cover rounded-lg" %>
+            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+              <span class="text-white text-xs">Attached</span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <div id="image-previews" class="grid grid-cols-2 sm:grid-cols-5 gap-3 hidden" data-post-form-target="previews"></div>
+  </div>
+
+  <!-- Link to Other Posts Section -->
+  <div class="space-y-3">
+    <label class="label">Link to Related Posts (optional)</label>
+    <p class="text-xs text-gray-500 dark:text-gray-400 -mt-2">Connect this post to other relevant posts. This creates outbound links (posts you link to) and inbound links (posts that link back to yours).</p>
+    
+    <div class="space-y-3">
+      <!-- Outbound Links (posts this links TO) -->
+      <div>
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Posts this links to (Outbound):</label>
+        <div class="space-y-2" id="outbound-links">
+          <% if post.persisted? && post.linked_posts.any? %>
+            <% post.linked_posts.each do |linked| %>
+              <div class="flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+                <input type="hidden" name="linked_post_ids[]" value="<%= linked.id %>">
+                <span class="flex-1 text-sm text-gray-700 dark:text-gray-300"><%= truncate(linked.title, length: 60) %></span>
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        
+        <select id="post-selector" class="input mt-2" onchange="addLinkedPost(this)">
+          <option value="">Search and select a post to link...</option>
+          <% Post.published.where.not(id: post.id).order(published_at: :desc).limit(100).each do |p| %>
+            <% next if post.persisted? && post.linked_posts.include?(p) %>
+            <option value="<%= p.id %>" data-title="<%= p.title %>"><%= truncate(p.title, length: 80) %></option>
+          <% end %>
+        </select>
+      </div>
+      
+      <!-- Inbound Links Info (posts that link TO this) -->
+      <% if post.persisted? && post.linking_posts.any? %>
+        <div>
+          <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Posts that link here (Inbound):</label>
+          <div class="space-y-2">
+            <% post.linking_posts.each do |linking| %>
+              <%= link_to post_path(linking), class: "block p-2 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" do %>
+                <p class="text-sm font-medium text-gray-900 dark:text-white"><%= truncate(linking.title, length: 60) %></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">by <%= linking.user.username %></p>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <script>
+    function addLinkedPost(select) {
+      if (!select.value) return;
+      
+      const option = select.options[select.selectedIndex];
+      const postId = select.value;
+      const title = option.dataset.title;
+      
+      // Check if already added
+      const container = document.getElementById('outbound-links');
+      const existing = Array.from(container.querySelectorAll('input[type="hidden"]'))
+        .some(input => input.value === postId);
+      
+      if (existing) {
+        alert('This post is already linked');
+        select.value = '';
+        return;
+      }
+      
+      // Create new link item
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg';
+      div.innerHTML = `
+        <input type="hidden" name="linked_post_ids[]" value="${postId}">
+        <span class="flex-1 text-sm text-gray-700 dark:text-gray-300">${title}</span>
+        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      `;
+      container.appendChild(div);
+      
+      // Remove from select
+      option.remove();
+      select.value = '';
+    }
+  </script>
 
   <div>
     <%= f.label :tag_list, "Tags (optional)", class: "label" %>
     <%= f.text_field :tag_list, class: "input", placeholder: "faith, testimony, prayer (comma separated)" %>
-    <p class="text-xs text-stone-500 mt-1">Add tags to help others find your post.</p>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Add tags to help others find your post.</p>
   </div>
 
-  <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-stone-100">
+  <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
     <div class="flex items-center gap-2">
-      <%= f.check_box :anonymous, class: "w-4 h-4 text-amber-600 border-stone-300 rounded focus:ring-amber-500" %>
-      <%= f.label :anonymous, "Post anonymously", class: "text-sm text-stone-700" %>
+      <%= f.check_box :anonymous, class: "w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500" %>
+      <%= f.label :anonymous, "Post anonymously", class: "text-sm text-gray-700 dark:text-gray-300" %>
     </div>
 
     <div class="flex items-center gap-2">
-      <%= f.check_box :allow_comments, class: "w-4 h-4 text-amber-600 border-stone-300 rounded focus:ring-amber-500", checked: post.allow_comments.nil? ? true : post.allow_comments %>
-      <%= f.label :allow_comments, "Allow comments", class: "text-sm text-stone-700" %>
+      <%= f.check_box :allow_comments, class: "w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500", checked: post.allow_comments.nil? ? true : post.allow_comments %>
+      <%= f.label :allow_comments, "Allow comments", class: "text-sm text-gray-700 dark:text-gray-300" %>
     </div>
   </div>
 
   <div class="flex items-center gap-3 pt-4">
     <%= f.hidden_field :status, value: "published" %>
-    <%= f.submit post.persisted? ? "Update Post" : "Publish Post", class: "btn-primary btn-lg" %>
+    <%= f.submit post.persisted? ? "Update Post" : "Publish Post", class: "btn btn-primary btn-lg" %>
     <% if post.persisted? %>
-      <%= link_to "Cancel", post_path(post), class: "btn-secondary" %>
+      <%= link_to "Cancel", post_path(post), class: "btn btn-secondary" %>
     <% else %>
-      <%= link_to "Cancel", feed_path, class: "btn-secondary" %>
+      <%= link_to "Cancel", feed_path, class: "btn btn-secondary" %>
     <% end %>
   </div>
 <% end %>
-

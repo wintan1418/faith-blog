@@ -1,55 +1,67 @@
 <% content_for(:title) { "Rooms - Faith Community" } %>
 
 <div class="page-header">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <div class="text-center">
-      <h1 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">Community Rooms</h1>
-      <p class="text-stone-600 max-w-2xl mx-auto">
-        Find your space to share, connect, and grow. Each room is designed for specific types of sharing and support.
+      <h1 class="text-4xl sm:text-5xl font-bold text-stone-900 mb-4">🌿 Community Rooms</h1>
+      <p class="text-stone-600 max-w-2xl mx-auto text-lg">
+        Find your space to share, connect, and grow. Each room is a garden where seeds of faith are planted and nurtured.
       </p>
     </div>
   </div>
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     <% @rooms.each_with_index do |room, index| %>
-      <div class="card-hover p-6 flex flex-col gap-4 animate-slide-up" style="animation-delay: <%= index * 0.05 %>s;">
+      <div class="room-card animate-slide-up" style="animation-delay: <%= index * 0.08 %>s;">
+        <!-- Icon & Stats Header -->
         <div class="flex items-start justify-between">
-          <div class="w-14 h-14 rounded-xl flex items-center justify-center text-3xl" style="background-color: <%= room.color %>20;">
-            <%= room.icon %>
+          <div class="icon-box icon-box-lg" style="background: linear-gradient(145deg, <%= room.color %>15 0%, <%= room.color %>25 100%); border-color: <%= room.color %>40;">
+            <span class="drop-shadow-sm"><%= room.icon %></span>
           </div>
-          <div class="flex items-center gap-2">
-            <span class="badge-secondary"><%= room.posts_count %> posts</span>
+          <div class="flex flex-col items-end gap-1">
+            <span class="badge-primary"><%= room.posts_count %> posts</span>
             <span class="badge-secondary"><%= room.members_count %> members</span>
           </div>
         </div>
         
-        <div class="flex-1">
-          <h3 class="text-xl font-semibold text-stone-900 mb-2"><%= room.name %></h3>
+        <!-- Content -->
+        <div class="flex-1 space-y-3">
+          <h3 class="text-xl font-bold text-stone-900"><%= room.name %></h3>
           <p class="text-stone-600 text-sm leading-relaxed"><%= room.description %></p>
         </div>
 
+        <!-- Guidelines -->
         <% if room.rules.present? %>
-          <div class="bg-stone-50 rounded-lg p-3">
-            <p class="text-xs text-stone-500 font-medium mb-1">Room Guidelines</p>
-            <p class="text-xs text-stone-600"><%= truncate(room.rules, length: 100) %></p>
+          <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-100 dark:border-green-800/30">
+            <p class="text-xs text-green-700 dark:text-green-400 font-semibold mb-1.5 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              Room Guidelines
+            </p>
+            <p class="text-xs text-green-600 dark:text-green-300"><%= truncate(room.rules, length: 120) %></p>
           </div>
         <% end %>
 
-        <div class="flex items-center gap-3 pt-2 border-t border-stone-100">
+        <!-- Actions -->
+        <div class="flex items-center gap-3 pt-3 border-t border-stone-100 dark:border-stone-700">
           <%= link_to room_path(room), class: "btn-primary flex-1 justify-center" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
             Enter Room
           <% end %>
           <% if user_signed_in? %>
             <% if current_user.room_memberships.exists?(room: room) %>
-              <%= button_to leave_room_path(room), method: :delete, class: "btn-ghost px-3", data: { turbo_confirm: "Leave this room?" } do %>
+              <%= button_to leave_room_path(room), method: :delete, class: "btn-ghost px-3", data: { turbo_confirm: "Leave this room?" }, title: "Leave room" do %>
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               <% end %>
             <% else %>
-              <%= button_to join_room_path(room), class: "btn-ghost px-3" do %>
+              <%= button_to join_room_path(room), class: "btn-ghost px-3", title: "Join room" do %>
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -61,4 +73,3 @@
     <% end %>
   </div>
 </div>
-

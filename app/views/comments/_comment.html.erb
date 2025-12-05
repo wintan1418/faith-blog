@@ -2,7 +2,7 @@
   <div class="flex items-start gap-3">
     <%= link_to user_path(comment.user.username), class: "flex-shrink-0" do %>
       <% if comment.user.profile.avatar.attached? %>
-        <%= image_tag comment.user.profile.avatar_thumbnail, class: "w-10 h-10 avatar" %>
+        <%= image_tag comment.user.profile.avatar, class: "w-10 h-10 avatar rounded-full object-cover" %>
       <% else %>
         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium">
           <%= comment.user.username[0].upcase %>

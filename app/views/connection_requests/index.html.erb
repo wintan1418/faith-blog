@@ -1,0 +1,146 @@
+<% content_for :title, "Connection Requests" %>
+
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Connection Requests</h1>
+      <p class="text-gray-600 dark:text-gray-400">
+        Manage "Can I Know You More?" requests
+      </p>
+    </div>
+    <%= link_to my_connections_path, class: "btn btn-secondary" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+      </svg>
+      My Connections (<%= current_user.connections_count %>)
+    <% end %>
+  </div>
+
+  <!-- Pending Requests -->
+  <div class="card p-6 mb-8">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <span class="text-2xl">📥</span>
+      Received Requests
+      <% if @pending_requests.any? %>
+        <span class="badge badge-primary ml-2"><%= @pending_requests.count %></span>
+      <% end %>
+    </h2>
+
+    <% if @pending_requests.any? %>
+      <div class="space-y-4">
+        <% @pending_requests.each do |request| %>
+          <div class="brethren-card-mini">
+            <% if request.sender.profile&.avatar&.attached? %>
+              <%= image_tag request.sender.profile.avatar, class: "w-14 h-14 rounded-full object-cover border-2 border-amber-300" %>
+            <% else %>
+              <div class="w-14 h-14 rounded-full bg-amber-200 border-2 border-amber-300 flex items-center justify-center">
+                <span class="text-xl font-bold text-amber-700"><%= request.sender.display_name[0].upcase %></span>
+              </div>
+            <% end %>
+            
+            <div class="flex-1 min-w-0">
+              <%= link_to user_path(request.sender.username), class: "font-semibold text-gray-900 dark:text-white hover:text-amber-600 dark:hover:text-amber-400" do %>
+                <%= request.sender.display_name %>
+              <% end %>
+              <p class="text-sm text-gray-600 dark:text-gray-400">wants to know you more</p>
+              <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                <%= time_ago_in_words(request.created_at) %> ago
+              </p>
+            </div>
+            
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <%= button_to accept_connection_request_path(request), method: :post, class: "btn btn-success btn-sm" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Accept
+              <% end %>
+              <%= button_to decline_connection_request_path(request), method: :post, class: "btn btn-ghost btn-sm text-red-600 hover:bg-red-50" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Decline
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <span class="text-4xl mb-3 block">🤝</span>
+        <p class="text-gray-500 dark:text-gray-400">No pending requests</p>
+        <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
+          When someone wants to know you more, their request will appear here
+        </p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Sent Requests -->
+  <div class="card p-6">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+      <span class="text-2xl">📤</span>
+      Sent Requests
+    </h2>
+
+    <% if @sent_requests.any? %>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <% @sent_requests.each do |request| %>
+          <div class="flex items-center gap-4 py-4">
+            <% if request.receiver.profile&.avatar&.attached? %>
+              <%= image_tag request.receiver.profile.avatar, class: "w-12 h-12 rounded-full object-cover" %>
+            <% else %>
+              <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span class="text-lg font-bold text-gray-500 dark:text-gray-400"><%= request.receiver.display_name[0].upcase %></span>
+              </div>
+            <% end %>
+            
+            <div class="flex-1 min-w-0">
+              <%= link_to user_path(request.receiver.username), class: "font-semibold text-gray-900 dark:text-white hover:text-amber-600 dark:hover:text-amber-400" do %>
+                <%= request.receiver.display_name %>
+              <% end %>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Sent <%= time_ago_in_words(request.created_at) %> ago
+              </p>
+            </div>
+            
+            <div class="flex-shrink-0">
+              <% case request.status %>
+              <% when "pending" %>
+                <span class="badge badge-primary">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                  </svg>
+                  Pending
+                </span>
+              <% when "accepted" %>
+                <span class="badge badge-success">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  Connected
+                </span>
+              <% when "declined" %>
+                <span class="badge badge-secondary">
+                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                  </svg>
+                  Declined
+                </span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <span class="text-4xl mb-3 block">✨</span>
+        <p class="text-gray-500 dark:text-gray-400">You haven't sent any requests yet</p>
+        <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">
+          Find members in the feed or rooms and send them a "Can I Know You More?" request
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>
+

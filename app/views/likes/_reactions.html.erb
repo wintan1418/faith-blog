@@ -1,0 +1,59 @@
+<%# Reactions component - pass likeable (Post or Comment) %>
+<% likeable ||= local_assigns[:likeable] %>
+<% user_like = user_signed_in? ? current_user.likes.find_by(likeable: likeable) : nil %>
+<% reactions = [:amen, :praying, :encourage, :love, :inspired] %>
+
+<div class="reaction-container" id="<%= dom_id(likeable, :reactions) %>" data-controller="reactions">
+  <% if user_signed_in? %>
+    <% if user_like %>
+      <!-- User has reacted - show their reaction -->
+      <%= button_to unlike_path(likeable_type: likeable.class.name, likeable_id: likeable.id), 
+          method: :delete, 
+          class: "reaction-btn reaction-btn-active",
+          data: { turbo_frame: dom_id(likeable, :reactions) } do %>
+        <span class="text-lg"><%= Like.reaction_emoji(user_like.reaction_type) %></span>
+        <span class="font-semibold"><%= likeable.likes_count %></span>
+      <% end %>
+    <% else %>
+      <!-- User hasn't reacted - show default with hover dropdown -->
+      <button type="button" class="reaction-btn reaction-btn-inactive" data-action="click->reactions#showDropdown">
+        <span class="text-lg">🙏</span>
+        <span><%= likeable.likes_count > 0 ? likeable.likes_count : "React" %></span>
+      </button>
+      
+      <!-- Reaction Dropdown -->
+      <div class="reaction-dropdown" data-reactions-target="dropdown">
+        <% reactions.each do |reaction| %>
+          <%= button_to likes_path(likeable_type: likeable.class.name, likeable_id: likeable.id, reaction_type: reaction),
+              class: "reaction-emoji",
+              title: Like.reaction_label(reaction),
+              data: { turbo_frame: dom_id(likeable, :reactions) } do %>
+            <%= Like.reaction_emoji(reaction) %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  <% else %>
+    <!-- Not signed in -->
+    <%= link_to new_user_session_path, class: "reaction-btn reaction-btn-inactive" do %>
+      <span class="text-lg">🙏</span>
+      <span><%= likeable.likes_count %></span>
+    <% end %>
+  <% end %>
+  
+  <!-- Reaction breakdown tooltip (optional) -->
+  <% if likeable.likes_count > 0 %>
+    <div class="hidden absolute bottom-full left-0 mb-2 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-lg border text-xs">
+      <% reactions.each do |reaction| %>
+        <% count = likeable.likes.where(reaction_type: reaction).count %>
+        <% if count > 0 %>
+          <div class="flex items-center gap-1">
+            <span><%= Like.reaction_emoji(reaction) %></span>
+            <span><%= count %></span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+

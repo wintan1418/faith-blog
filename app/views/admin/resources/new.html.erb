@@ -1,0 +1,18 @@
+<% content_for(:page_title) { "Add New Resource" } %>
+
+<div class="max-w-2xl">
+  <div class="mb-6">
+    <%= link_to admin_resources_path, class: "btn btn-ghost btn-sm" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back to Resources
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-6">Resource Details</h2>
+    <%= render "form", resource: @resource %>
+  </div>
+</div>
+

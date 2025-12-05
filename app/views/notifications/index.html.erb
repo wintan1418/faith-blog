@@ -16,7 +16,7 @@
         <div class="p-4 flex items-start gap-4 <%= notification.unread? ? 'bg-amber-50/50' : '' %>">
           <% if notification.actor %>
             <% if notification.actor.profile.avatar.attached? %>
-              <%= image_tag notification.actor.profile.avatar_thumbnail, class: "w-10 h-10 avatar flex-shrink-0" %>
+              <%= image_tag notification.actor.profile.avatar, class: "w-10 h-10 avatar rounded-full object-cover flex-shrink-0" %>
             <% else %>
               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium flex-shrink-0">
                 <%= notification.actor.username[0].upcase %>

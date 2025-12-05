@@ -37,18 +37,18 @@
       </div>
       <div class="flex items-center gap-3">
         <% if user_signed_in? %>
-          <%= link_to new_post_path(room_id: @room.id), class: "btn-primary" do %>
+          <%= link_to new_post_path(room_id: @room.id), class: "btn btn-primary" do %>
             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Share Here
           <% end %>
           <% if @is_member %>
-            <%= button_to leave_room_path(@room), method: :delete, class: "btn-secondary", data: { turbo_confirm: "Leave this room?" } do %>
+            <%= button_to leave_room_path(@room), method: :delete, class: "btn btn-secondary", data: { turbo_confirm: "Leave this room?" } do %>
               Leave Room
             <% end %>
           <% else %>
-            <%= button_to join_room_path(@room), class: "btn-secondary" do %>
+            <%= button_to join_room_path(@room), class: "btn btn-secondary" do %>
               Join Room
             <% end %>
           <% end %>
@@ -63,7 +63,7 @@
     <!-- Posts -->
     <div class="flex-1">
       <% if @posts.any? %>
-        <div class="space-y-6">
+        <div>
           <% @posts.each do |post| %>
             <%= render "posts/card", post: post %>
           <% end %>
@@ -80,7 +80,7 @@
           <h3 class="text-lg font-semibold text-stone-900 mb-2">No posts in this room yet</h3>
           <p class="text-stone-600 mb-6">Be the first to share in <%= @room.name %>!</p>
           <% if user_signed_in? %>
-            <%= link_to new_post_path(room_id: @room.id), class: "btn-primary" do %>
+            <%= link_to new_post_path(room_id: @room.id), class: "btn btn-primary" do %>
               Create First Post
             <% end %>
           <% end %>

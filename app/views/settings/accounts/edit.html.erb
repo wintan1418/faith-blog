@@ -7,12 +7,15 @@
   </div>
 
   <!-- Settings Navigation -->
-  <div class="flex gap-2 mb-6 border-b border-stone-200 pb-4">
-    <%= link_to settings_profile_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-100" do %>
+  <div class="flex flex-wrap gap-2 mb-6 border-b border-stone-200 dark:border-gray-700 pb-4">
+    <%= link_to edit_settings_profile_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800" do %>
       Profile
     <% end %>
-    <%= link_to settings_account_path, class: "px-4 py-2 rounded-lg text-sm font-medium bg-amber-100 text-amber-800" do %>
+    <%= link_to edit_settings_account_path, class: "px-4 py-2 rounded-lg text-sm font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" do %>
       Account
+    <% end %>
+    <%= link_to edit_settings_brethren_card_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-stone-600 dark:text-gray-400 hover:bg-stone-100 dark:hover:bg-gray-800" do %>
+      🤝 Brethren Card
     <% end %>
   </div>
 
@@ -62,7 +65,7 @@
         </div>
 
         <div class="flex items-center gap-3 pt-4">
-          <%= f.submit "Save Changes", class: "btn-primary" %>
+          <%= f.submit "Save Changes", class: "btn btn-primary" %>
         </div>
       <% end %>
     </div>
@@ -78,7 +81,7 @@
       <p class="text-sm text-stone-600 mb-4">
         Once you delete your account, there is no going back. Please be certain.
       </p>
-      <%= button_to "Delete Account", edit_user_registration_path, method: :get, class: "btn-danger", data: { turbo_confirm: "Are you absolutely sure you want to delete your account? This cannot be undone." } %>
+      <%= button_to "Delete Account", edit_user_registration_path, method: :get, class: "btn btn-danger", data: { turbo_confirm: "Are you absolutely sure you want to delete your account? This cannot be undone." } %>
     </div>
   </div>
 </div>

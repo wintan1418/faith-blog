@@ -1,0 +1,222 @@
+<% content_for :title, "Edit Your Brethren Card" %>
+
+<div class="max-w-3xl mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+    <p class="text-gray-600 dark:text-gray-400">Manage your profile and account settings.</p>
+  </div>
+
+  <!-- Settings Navigation -->
+  <div class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+    <%= link_to edit_settings_profile_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800" do %>
+      Profile
+    <% end %>
+    <%= link_to edit_settings_account_path, class: "px-4 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800" do %>
+      Account
+    <% end %>
+    <%= link_to edit_settings_brethren_card_path, class: "px-4 py-2 rounded-lg text-sm font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" do %>
+      🤝 Brethren Card
+    <% end %>
+  </div>
+
+  <div class="mb-6">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Your Brethren Card</h2>
+    <p class="text-gray-600 dark:text-gray-400">
+      This card is shared when you connect with other members. Complete all fields to start connecting!
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Edit Form -->
+    <div class="card p-6">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Card Details</h2>
+      
+      <%= form_with model: @brethren_card, url: settings_brethren_card_path, method: :patch, class: "space-y-5" do |f| %>
+        <% if @brethren_card.errors.any? %>
+          <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+            <p class="text-sm text-red-600 dark:text-red-400 font-medium mb-2">
+              Please correct the following:
+            </p>
+            <ul class="list-disc list-inside text-sm text-red-600 dark:text-red-400 space-y-1">
+              <% @brethren_card.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <!-- Church/Assembly -->
+        <div>
+          <%= f.label :church_or_assembly, "Church / Assembly", class: "label" %>
+          <%= f.text_field :church_or_assembly, 
+              class: "input", 
+              placeholder: "e.g. Living Faith Chapel, Lagos" %>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Where do you fellowship?</p>
+        </div>
+
+        <!-- Bio -->
+        <div>
+          <%= f.label :bio, "About You", class: "label" %>
+          <%= f.text_area :bio, 
+              class: "input min-h-[100px] resize-none", 
+              placeholder: "Share a brief introduction about yourself, your faith journey, or what brings you to this community...",
+              maxlength: 500 %>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <%= @brethren_card.bio&.length || 0 %>/500 characters
+          </p>
+        </div>
+
+        <!-- Occupation -->
+        <div>
+          <%= f.label :occupation, "What You Do", class: "label" %>
+          <%= f.text_field :occupation, 
+              class: "input", 
+              placeholder: "e.g. Software Engineer, Youth Pastor, Student" %>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Your profession or ministry role</p>
+        </div>
+
+        <!-- WhatsApp Number -->
+        <div>
+          <%= f.label :whatsapp_number, "WhatsApp Number", class: "label" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+            </div>
+            <%= f.text_field :whatsapp_number, 
+                class: "input pl-10", 
+                placeholder: "+234 812 345 6789" %>
+          </div>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Include country code for WhatsApp link to work</p>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <%= f.label :email, "Email Address", class: "label" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <%= f.text_field :email, 
+                class: "input pl-10", 
+                type: "email",
+                placeholder: "your.email@example.com" %>
+          </div>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">For email communication</p>
+        </div>
+
+        <!-- Profile Picture Note -->
+        <div class="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl">
+          <div class="flex items-start gap-3">
+            <span class="text-2xl">📸</span>
+            <div>
+              <p class="text-sm font-medium text-amber-800 dark:text-amber-200">Profile Picture</p>
+              <p class="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                Your profile picture from your 
+                <%= link_to "account settings", edit_settings_profile_path, class: "underline hover:no-underline" %> 
+                will be used on your Brethren Card.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4">
+          <%= f.submit "Save Brethren Card", class: "btn btn-primary w-full" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Preview -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Preview</h2>
+      
+      <div class="brethren-card">
+        <!-- Card Header -->
+        <div class="text-center mb-6 relative z-10">
+          <div class="inline-block p-1 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 mb-4">
+            <% if current_user.profile&.avatar&.attached? %>
+              <%= image_tag current_user.profile.avatar, class: "w-20 h-20 rounded-full object-cover border-4 border-white" %>
+            <% else %>
+              <div class="w-20 h-20 rounded-full bg-amber-100 border-4 border-white flex items-center justify-center">
+                <span class="text-2xl font-bold text-amber-600"><%= current_user.display_name[0].upcase %></span>
+              </div>
+            <% end %>
+          </div>
+          
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-1">
+            <%= current_user.display_name %>
+          </h3>
+          
+          <p class="text-amber-700 dark:text-amber-400 font-medium text-sm" id="preview-occupation">
+            <%= @brethren_card.occupation.presence || "Your occupation" %>
+          </p>
+        </div>
+
+        <div class="space-y-3 relative z-10 text-sm">
+          <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <span>⛪</span>
+            <span id="preview-church"><%= @brethren_card.church_or_assembly.presence || "Your church/assembly" %></span>
+          </div>
+          <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <span>📝</span>
+            <span id="preview-bio" class="line-clamp-2"><%= @brethren_card.bio.presence || "About you..." %></span>
+          </div>
+          <div class="flex items-center gap-2 text-green-600 dark:text-green-400">
+            <span>📱</span>
+            <span id="preview-whatsapp"><%= @brethren_card.whatsapp_number.presence || "WhatsApp number" %></span>
+          </div>
+          <div class="flex items-center gap-2 text-red-600 dark:text-red-400">
+            <span>✉️</span>
+            <span id="preview-email"><%= @brethren_card.email.presence || "Email address" %></span>
+          </div>
+        </div>
+
+        <!-- Completion Status -->
+        <div class="mt-4 pt-4 border-t border-amber-200/50 dark:border-amber-700/30 relative z-10">
+          <% if @brethren_card.complete? %>
+            <div class="flex items-center justify-center gap-2 text-green-600 dark:text-green-400">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-sm font-medium">Card Complete!</span>
+            </div>
+          <% else %>
+            <div class="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-sm font-medium">Complete all fields + add profile photo</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Info Box -->
+      <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl">
+        <h4 class="font-semibold text-blue-800 dark:text-blue-200 mb-2">How it works</h4>
+        <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-2">
+          <li class="flex items-start gap-2">
+            <span>1️⃣</span>
+            <span>Complete your Brethren Card with all required information</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span>2️⃣</span>
+            <span>Send a "Can I Know You More?" request to any member</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span>3️⃣</span>
+            <span>Once they accept, you'll both see each other's Brethren Cards</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span>4️⃣</span>
+            <span>Connect via WhatsApp or Email to continue your fellowship!</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
