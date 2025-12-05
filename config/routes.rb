@@ -39,6 +39,7 @@ Rails.application.routes.draw do
       end
     end
     resource :bookmark, only: [:create, :destroy]
+    resource :reshare, only: [:create, :destroy]
   end
 
   # Likes (polymorphic)
@@ -88,12 +89,23 @@ Rails.application.routes.draw do
 
   # Settings
   namespace :settings do
-    root to: "profiles#edit"
+    get "/", to: redirect("/settings/profile/edit")
     resource :profile, only: [:edit, :update]
     resource :account, only: [:edit, :update]
     resource :notifications, only: [:edit, :update]
     resource :privacy, only: [:edit, :update]
+    resource :brethren_card, only: [:edit, :update]
   end
+
+  # Brethren Card & Connection Requests
+  resources :brethren_cards, only: [:show], param: :username
+  resources :connection_requests, only: [:index, :create] do
+    member do
+      post :accept
+      post :decline
+    end
+  end
+  get "my-connections", to: "connection_requests#connections", as: :my_connections
 
   # Admin namespace
   namespace :admin do
