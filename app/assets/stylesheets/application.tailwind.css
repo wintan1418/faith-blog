@@ -1,215 +1,1263 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --color-primary: 139 69 19; /* Warm brown - saddle brown */
-    --color-primary-dark: 101 67 33; /* Dark brown */
-    --color-accent: 218 165 32; /* Goldenrod */
-    --color-accent-light: 250 235 215; /* Antique white */
-    --color-faith: 70 130 180; /* Steel blue - calm, trustworthy */
+/* ==========================================
+   🌿 FAITH COMMUNITY THEME
+   Clean, warm, welcoming design
+   ========================================== */
+
+/* ==========================================
+   BASE STYLES
+   ========================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  color: #3d4852;
+  background-color: #faf9f7;
+}
+
+/* Dark mode body */
+html.dark body {
+  background-color: #111827;
+  color: #e5e7eb;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', Georgia, serif;
+  color: #1f2937;
+}
+
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+  color: #f9fafb;
+}
+
+/* ==========================================
+   BUTTON COMPONENTS - Professional & Polished
+   ========================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.125rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease-out;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  gap: 0.5rem;
+  white-space: nowrap;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(217, 119, 6, 0.5);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(217, 119, 6, 0.5);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Primary Button - Warm amber with depth */
+.btn-primary {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  color: white !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 
+              0 2px 4px rgba(217, 119, 6, 0.15),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(180, 83, 9, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 
+              0 4px 8px rgba(217, 119, 6, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  color: white !important;
+}
+
+.btn-primary:active {
+  background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1),
+              inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .btn-primary {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1f2937 !important;
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+html.dark .btn-primary:hover {
+  background: linear-gradient(180deg, #fcd34d 0%, #fbbf24 100%);
+  color: #1f2937 !important;
+}
+
+/* Secondary Button - Clean and subtle */
+.btn-secondary {
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  color: #374151 !important;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+  border-color: #9ca3af;
+  color: #1f2937 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:active {
+  background: #f3f4f6;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .btn-secondary {
+  background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+  color: #e5e7eb !important;
+  border-color: #4b5563;
+}
+
+html.dark .btn-secondary:hover {
+  background: linear-gradient(180deg, #4b5563 0%, #374151 100%);
+  border-color: #6b7280;
+  color: #f9fafb !important;
+}
+
+/* Ghost Button - Minimal and clean */
+.btn-ghost {
+  background: transparent;
+  color: #4b5563 !important;
+  border: 1px solid transparent;
+}
+
+.btn-ghost:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #1f2937 !important;
+}
+
+.btn-ghost:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+html.dark .btn-ghost {
+  color: #9ca3af !important;
+}
+
+html.dark .btn-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #e5e7eb !important;
+}
+
+/* Success Button - Green with depth */
+.btn-success {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  color: white !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 
+              0 2px 4px rgba(5, 150, 105, 0.15),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(4, 120, 87, 0.3);
+}
+
+.btn-success:hover {
+  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 
+              0 4px 8px rgba(5, 150, 105, 0.2);
+  transform: translateY(-1px);
+  color: white !important;
+}
+
+.btn-success:active {
+  background: linear-gradient(180deg, #059669 0%, #047857 100%);
+  transform: translateY(0);
+}
+
+/* Danger Button */
+.btn-danger {
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  color: white !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 
+              0 2px 4px rgba(220, 38, 38, 0.15),
+              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(185, 28, 28, 0.3);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 
+              0 4px 8px rgba(220, 38, 38, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  border-radius: 0.375rem;
+  gap: 0.375rem;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+}
+
+/* ==========================================
+   CARD COMPONENTS
+   ========================================== */
+
+.card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+  overflow: hidden;
+}
+
+html.dark .card {
+  background-color: #1f2937;
+  border-color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-hover {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: #e5e7eb;
+}
+
+html.dark .card-hover {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+html.dark .card-hover:hover {
+  border-color: #4b5563;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================
+   FORM COMPONENTS
+   ========================================== */
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  color: #1f2937;
+  background-color: white;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 0.625rem;
+  transition: all 0.2s ease;
+  font-size: 0.9375rem;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+
+html.dark .input {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+html.dark .input::placeholder {
+  color: #6b7280;
+}
+
+html.dark .input:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.input-error {
+  border-color: #ef4444;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+html.dark .label {
+  color: #d1d5db;
+}
+
+/* ==========================================
+   BADGE COMPONENTS - High Contrast
+   ========================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-primary {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+html.dark .badge-primary {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.badge-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+html.dark .badge-secondary {
+  background-color: #374151;
+  color: #d1d5db;
+}
+
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+html.dark .badge-success {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.badge-faith {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+html.dark .badge-faith {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+}
+
+/* Room Badge - Colorful and readable */
+.room-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  transition: all 0.15s ease;
+}
+
+.room-badge:hover {
+  background-color: #fde68a;
+  border-color: #f59e0b;
+}
+
+html.dark .room-badge {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+html.dark .room-badge:hover {
+  background-color: rgba(245, 158, 11, 0.25);
+}
+
+/* Featured Badge - Standout */
+.featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #f59e0b;
+}
+
+html.dark .featured-badge {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* Tag Badge - Subtle but readable */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+html.dark .tag-badge {
+  background-color: #374151;
+  color: #d1d5db;
+  border-color: #4b5563;
+}
+
+/* Stat Badge - For counts */
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  transition: all 0.15s ease;
+}
+
+.stat-badge:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+html.dark .stat-badge {
+  background-color: #374151;
+  color: #9ca3af;
+  border-color: #4b5563;
+}
+
+html.dark .stat-badge:hover {
+  background-color: #4b5563;
+  color: #e5e7eb;
+}
+
+/* Bookmark Button */
+.bookmark-btn {
+  padding: 0.625rem;
+  border-radius: 0.75rem;
+  color: #6b7280;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bookmark-btn:hover {
+  color: #f59e0b;
+  background-color: #fef3c7;
+}
+
+.bookmark-btn-active {
+  color: #f59e0b;
+  background-color: #fef3c7;
+}
+
+html.dark .bookmark-btn {
+  color: #6b7280;
+}
+
+html.dark .bookmark-btn:hover {
+  color: #fbbf24;
+  background-color: rgba(245, 158, 11, 0.15);
+}
+
+html.dark .bookmark-btn-active {
+  color: #fbbf24;
+  background-color: rgba(245, 158, 11, 0.15);
+}
+
+/* Read More Link */
+.read-more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #b45309;
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.read-more-link:hover {
+  color: #92400e;
+  background-color: #fef3c7;
+}
+
+html.dark .read-more-link {
+  color: #fbbf24;
+}
+
+html.dark .read-more-link:hover {
+  color: #fcd34d;
+  background-color: rgba(245, 158, 11, 0.15);
+}
+
+/* ==========================================
+   ICON BOX - Room & Feature Icons
+   ========================================== */
+
+.icon-box {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+html.dark .icon-box {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+.icon-box-lg {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 1.25rem;
+  font-size: 2rem;
+}
+
+.icon-box-sm {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  font-size: 1.125rem;
+}
+
+/* ==========================================
+   REACTION COMPONENTS
+   ========================================== */
+
+.reaction-container {
+  position: relative;
+}
+
+.reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: none;
+}
+
+.reaction-btn-inactive {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+.reaction-btn-inactive:hover {
+  background-color: #fef3c7;
+  border-color: #fcd34d;
+  color: #b45309;
+}
+
+html.dark .reaction-btn-inactive {
+  background-color: #374151;
+  color: #9ca3af;
+  border-color: #4b5563;
+}
+
+html.dark .reaction-btn-inactive:hover {
+  background-color: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+.reaction-btn-active {
+  background-color: #fef3c7;
+  color: #b45309;
+  border-color: #fcd34d;
+}
+
+html.dark .reaction-btn-active {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* Reaction dropdown */
+.reaction-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  transform: translateY(-8px);
+  background: white;
+  border-radius: 2rem;
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 50;
+}
+
+html.dark .reaction-dropdown {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.reaction-container:hover .reaction-dropdown,
+.reaction-dropdown:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-12px);
+}
+
+.reaction-emoji {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  background: transparent;
+}
+
+.reaction-emoji:hover {
+  background-color: #fef3c7;
+  transform: scale(1.2);
+}
+
+html.dark .reaction-emoji:hover {
+  background-color: rgba(245, 158, 11, 0.2);
+}
+
+/* ==========================================
+   NAVIGATION
+   ========================================== */
+
+nav {
+  background-color: white !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+html.dark nav {
+  background-color: #1f2937 !important;
+  border-bottom-color: #374151 !important;
+}
+
+/* ==========================================
+   AVATAR
+   ========================================== */
+
+.avatar {
+  border-radius: 9999px;
+  object-fit: cover;
+  background-color: #f3f4f6;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .avatar {
+  background-color: #374151;
+  border-color: #1f2937;
+}
+
+/* ==========================================
+   SECTION & PAGE HEADERS
+   ========================================== */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+html.dark .section-title {
+  color: #f9fafb;
+}
+
+.page-header {
+  background-color: #fefdfb;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+html.dark .page-header {
+  background-color: #111827;
+  border-bottom-color: #374151;
+}
+
+/* ==========================================
+   ROOM & POST CARDS
+   ========================================== */
+
+.room-card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.room-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #e5e7eb;
+}
+
+html.dark .room-card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+html.dark .room-card:hover {
+  border-color: #4b5563;
+}
+
+.post-card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: #e5e7eb;
+}
+
+html.dark .post-card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+html.dark .post-card:hover {
+  border-color: #4b5563;
+}
+
+/* ==========================================
+   BRETHREN CARD STYLES
+   ========================================== */
+
+.brethren-card {
+  background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  border: 2px solid #fcd34d;
+  box-shadow: 0 4px 20px rgba(217, 119, 6, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.brethren-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+html.dark .brethren-card {
+  background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
+  border-color: #f59e0b;
+}
+
+html.dark .brethren-card::before {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+}
+
+.brethren-card-mini {
+  background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%);
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1.5px solid #fcd34d;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+}
+
+.brethren-card-mini:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
+}
+
+html.dark .brethren-card-mini {
+  background: linear-gradient(145deg, #374151 0%, #1f2937 100%);
+  border-color: #f59e0b;
+}
+
+/* ==========================================
+   LINK STYLES
+   ========================================== */
+
+.link {
+  color: #d97706;
+  transition: color 0.2s ease;
+  text-underline-offset: 2px;
+}
+
+.link:hover {
+  color: #b45309;
+  text-decoration: underline;
+}
+
+html.dark .link {
+  color: #fbbf24;
+}
+
+html.dark .link:hover {
+  color: #fcd34d;
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(16px);
   }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    font-family: 'Source Sans 3', system-ui, sans-serif;
-    @apply text-stone-800;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', Georgia, serif;
-    @apply text-stone-900;
+  to { 
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@layer components {
+@keyframes scaleIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Gradients */
+.gradient-faith {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.gradient-soft {
+  background-color: #fefdfb;
+}
+
+html.dark .gradient-soft {
+  background-color: #111827;
+}
+
+/* ==========================================
+   DARK MODE OVERRIDES - Comprehensive
+   ========================================== */
+
+/* Stone colors - text */
+html.dark .text-stone-900 { color: #f9fafb !important; }
+html.dark .text-stone-800 { color: #f3f4f6 !important; }
+html.dark .text-stone-700 { color: #e5e7eb !important; }
+html.dark .text-stone-600 { color: #d1d5db !important; }
+html.dark .text-stone-500 { color: #9ca3af !important; }
+html.dark .text-stone-400 { color: #6b7280 !important; }
+html.dark .text-stone-300 { color: #4b5563 !important; }
+
+/* Gray colors - text */
+html.dark .text-gray-900 { color: #f9fafb !important; }
+html.dark .text-gray-800 { color: #f3f4f6 !important; }
+html.dark .text-gray-700 { color: #e5e7eb !important; }
+html.dark .text-gray-600 { color: #d1d5db !important; }
+html.dark .text-gray-500 { color: #9ca3af !important; }
+html.dark .text-gray-400 { color: #6b7280 !important; }
+
+/* Background colors */
+html.dark .bg-stone-50 { background-color: #1f2937 !important; }
+html.dark .bg-stone-100 { background-color: #374151 !important; }
+html.dark .bg-gray-50 { background-color: #1f2937 !important; }
+html.dark .bg-gray-100 { background-color: #374151 !important; }
+html.dark .bg-white { background-color: #1f2937 !important; }
+
+/* Border colors */
+html.dark .border-stone-200,
+html.dark .border-stone-100,
+html.dark .border-gray-200,
+html.dark .border-gray-100 {
+  border-color: #374151 !important;
+}
+
+/* Divide colors */
+html.dark .divide-stone-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-stone-200 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #374151 !important;
+}
+
+/* Dropdown menu */
+html.dark [data-dropdown-target="menu"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+html.dark [data-dropdown-target="menu"] a,
+html.dark [data-dropdown-target="menu"] button {
+  color: #e5e7eb !important;
+}
+
+html.dark [data-dropdown-target="menu"] a:hover,
+html.dark [data-dropdown-target="menu"] button:hover {
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+html.dark [data-dropdown-target="menu"] p {
+  color: #9ca3af !important;
+}
+
+html.dark [data-dropdown-target="menu"] .text-stone-900,
+html.dark [data-dropdown-target="menu"] .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+html.dark [data-dropdown-target="menu"] .text-stone-500,
+html.dark [data-dropdown-target="menu"] .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+/* Prose and rich text - Medium Style */
+.prose-faith {
+  color: #374151;
+  max-width: 100%;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.prose-faith p {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+}
+
+.prose-faith h1,
+.prose-faith h2,
+.prose-faith h3,
+.prose-faith h4 {
+  font-weight: 700;
+  margin-top: 2em;
+  margin-bottom: 1em;
+  line-height: 1.2;
+}
+
+.prose-faith h1 {
+  font-size: 2.25em;
+}
+
+.prose-faith h2 {
+  font-size: 1.875em;
+}
+
+.prose-faith h3 {
+  font-size: 1.5em;
+}
+
+.prose-faith a {
+  color: #d97706;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose-faith a:hover {
+  color: #b45309;
+}
+
+.prose-faith strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.prose-faith ul,
+.prose-faith ol {
+  margin-top: 1.25em;
+  margin-bottom: 1.25em;
+  padding-left: 1.625em;
+}
+
+.prose-faith li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-faith blockquote {
+  border-left: 4px solid #f59e0b;
+  padding-left: 1.5em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: #6b7280;
+  background-color: #fef3c7;
+  padding: 1em 1.5em;
+  border-radius: 0.5rem;
+}
+
+.prose-faith img {
+  margin: 2em auto;
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+}
+
+.prose-faith code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: 'Courier New', monospace;
+}
+
+.prose-faith pre {
+  background-color: #1f2937;
+  color: #e5e7eb;
+  padding: 1em;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+.prose-faith hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 2em 0;
+}
+
+html.dark .prose-faith {
+  color: #d1d5db;
+}
+
+html.dark .prose-faith strong {
+  color: #f9fafb;
+}
+
+html.dark .prose-faith blockquote {
+  background-color: rgba(245, 158, 11, 0.1);
+  border-left-color: #f59e0b;
+  color: #d1d5db;
+}
+
+html.dark .prose-faith code {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+html.dark .prose-faith hr {
+  border-top-color: #4b5563;
+}
+
+html.dark .prose,
+html.dark .trix-content {
+  color: #d1d5db;
+}
+
+/* Form selects */
+html.dark select {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+
+/* Footer */
+html.dark footer {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+}
+
+/* Alert backgrounds */
+html.dark .bg-red-50 { background-color: rgba(127, 29, 29, 0.3) !important; }
+html.dark .bg-emerald-50 { background-color: rgba(6, 78, 59, 0.3) !important; }
+html.dark .bg-amber-50 { background-color: rgba(120, 53, 15, 0.3) !important; }
+html.dark .bg-green-50 { background-color: rgba(6, 78, 59, 0.3) !important; }
+
+/* Hover states */
+html.dark .hover\:bg-stone-50:hover { background-color: #374151 !important; }
+html.dark .hover\:bg-stone-100:hover { background-color: #4b5563 !important; }
+html.dark .hover\:bg-gray-50:hover { background-color: #374151 !important; }
+html.dark .hover\:text-stone-900:hover { color: #f9fafb !important; }
+html.dark .hover\:text-gray-900:hover { color: #f9fafb !important; }
+
+/* Theme toggle */
+.theme-toggle {
+  padding: 0.625rem;
+  border-radius: 0.625rem;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+html.dark .theme-toggle {
+  color: #9ca3af;
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+html.dark .theme-toggle:hover {
+  background-color: #4b5563;
+  color: #e5e7eb;
+}
+
+/* ==========================================
+   RESPONSIVE UTILITIES
+   ========================================== */
+
+@media (max-width: 640px) {
   .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
   }
-
-  .btn-primary {
-    @apply btn bg-amber-700 text-white hover:bg-amber-800 focus:ring-amber-500 shadow-sm;
-  }
-
-  .btn-secondary {
-    @apply btn bg-stone-100 text-stone-700 hover:bg-stone-200 focus:ring-stone-400 border border-stone-300;
-  }
-
-  .btn-ghost {
-    @apply btn bg-transparent text-stone-600 hover:bg-stone-100 hover:text-stone-800;
-  }
-
-  .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
-  }
-
-  .btn-sm {
-    @apply px-3 py-1.5 text-xs;
-  }
-
+  
   .btn-lg {
-    @apply px-6 py-3 text-base;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
   }
-
-  .card {
-    @apply bg-white rounded-xl shadow-sm border border-stone-200/60 overflow-hidden;
+  
+  .icon-box {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.25rem;
   }
-
-  .card-hover {
-    @apply card transition-all duration-300 hover:shadow-md hover:border-stone-300;
+  
+  .icon-box-lg {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.5rem;
   }
-
-  .input {
-    @apply w-full px-4 py-2.5 text-stone-800 bg-white border border-stone-300 rounded-lg placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-colors;
-  }
-
-  .input-error {
-    @apply border-red-500 focus:ring-red-500/20 focus:border-red-500;
-  }
-
-  .label {
-    @apply block text-sm font-medium text-stone-700 mb-1.5;
-  }
-
-  .link {
-    @apply text-amber-700 hover:text-amber-800 hover:underline underline-offset-2 transition-colors;
-  }
-
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .badge-primary {
-    @apply badge bg-amber-100 text-amber-800;
-  }
-
-  .badge-secondary {
-    @apply badge bg-stone-100 text-stone-700;
-  }
-
-  .badge-success {
-    @apply badge bg-emerald-100 text-emerald-800;
-  }
-
-  .badge-faith {
-    @apply badge bg-sky-100 text-sky-800;
-  }
-
-  .avatar {
-    @apply rounded-full object-cover bg-stone-200;
-  }
-
-  .prose-faith {
-    @apply prose prose-stone prose-headings:font-serif prose-headings:text-stone-900 prose-a:text-amber-700 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-amber-500 prose-blockquote:bg-amber-50/50 prose-blockquote:rounded-r-lg prose-blockquote:py-1;
-  }
-
-  .section-header {
-    @apply flex items-center justify-between mb-6;
-  }
-
-  .section-title {
-    @apply text-2xl font-bold text-stone-900;
-  }
-
-  .page-header {
-    @apply bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50 border-b border-stone-200;
-  }
-
+  
   .room-card {
-    @apply card-hover p-6 flex flex-col gap-4;
+    padding: 1.25rem;
   }
-
-  .post-card {
-    @apply card-hover;
-  }
-
-  .reaction-btn {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200;
-  }
-
-  .reaction-btn-inactive {
-    @apply reaction-btn bg-stone-100 text-stone-600 hover:bg-stone-200;
-  }
-
-  .reaction-btn-active {
-    @apply reaction-btn bg-amber-100 text-amber-800;
+  
+  .brethren-card {
+    padding: 1.25rem;
   }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* ==========================================
+   EMOJI PICKER STYLES
+   ========================================== */
 
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.2s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from { 
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to { 
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from { 
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to { 
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .gradient-faith {
-    @apply bg-gradient-to-br from-amber-600 via-amber-700 to-orange-700;
-  }
-
-  .gradient-soft {
-    @apply bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50;
-  }
+emoji-picker {
+  --emoji-size: 1.5rem;
+  --num-columns: 8;
+  --category-emoji-size: 1.25rem;
+  --border-radius: 0.5rem;
 }
 
-/* Trix editor customization */
-trix-editor {
-  @apply input min-h-[200px];
-}
-
-trix-toolbar {
-  @apply bg-stone-50 border border-stone-200 rounded-t-lg p-2 mb-0;
-}
-
-trix-toolbar .trix-button-group {
-  @apply border-stone-300;
-}
-
-trix-toolbar .trix-button {
-  @apply border-stone-300 hover:bg-stone-200;
-}
-
-trix-toolbar .trix-button.trix-active {
-  @apply bg-amber-100;
+html.dark emoji-picker {
+  --background: #1f2937;
+  --border-color: #374151;
+  --category-button-active-background: rgba(245, 158, 11, 0.2);
+  --category-button-active-color: #fbbf24;
+  --category-button-hover-background: rgba(245, 158, 11, 0.1);
+  --emoji-hover-background: rgba(245, 158, 11, 0.15);
+  --input-background: #374151;
+  --input-border-color: #4b5563;
+  --input-focus-border-color: #f59e0b;
+  --input-text-color: #e5e7eb;
+  --text-color: #e5e7eb;
+  --text-secondary: #9ca3af;
 }

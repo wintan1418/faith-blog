@@ -12,3 +12,15 @@ application.register("flash", FlashController)
 
 import ReplyToggleController from "./reply_toggle_controller"
 application.register("reply-toggle", ReplyToggleController)
+
+import ThemeController from "./theme_controller"
+application.register("theme", ThemeController)
+
+import ReactionsController from "./reactions_controller"
+application.register("reactions", ReactionsController)
+
+import PostFormController from "./post_form_controller"
+application.register("post-form", PostFormController)
+
+import EmojiPickerController from "./emoji_picker_controller"
+application.register("emoji-picker", EmojiPickerController)
