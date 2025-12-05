@@ -16,6 +16,8 @@ class User < ApplicationRecord
   has_many :likes, dependent: :destroy
   has_many :bookmarks, dependent: :destroy
   has_many :bookmarked_posts, through: :bookmarks, source: :post
+  has_many :reshares, dependent: :destroy
+  has_many :reshared_posts, through: :reshares, source: :post
   has_many :resources, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :reports, foreign_key: :reporter_id, dependent: :destroy
@@ -24,6 +26,11 @@ class User < ApplicationRecord
   # Room memberships
   has_many :room_memberships, dependent: :destroy
   has_many :rooms, through: :room_memberships
+
+  # Brethren Card & Connection Requests
+  has_one :brethren_card, dependent: :destroy
+  has_many :sent_connection_requests, class_name: 'ConnectionRequest', foreign_key: :sender_id, dependent: :destroy
+  has_many :received_connection_requests, class_name: 'ConnectionRequest', foreign_key: :receiver_id, dependent: :destroy
 
   # Following system
   has_many :active_follows, class_name: "Follow", foreign_key: :follower_id, dependent: :destroy
@@ -38,6 +45,7 @@ class User < ApplicationRecord
 
   # Callbacks
   after_create :create_profile
+  after_create :create_brethren_card
 
   # Scopes
   scope :active, -> { where(active: true) }
@@ -82,14 +90,48 @@ class User < ApplicationRecord
     bookmarks.exists?(post: post)
   end
 
+  def has_reshared?(post)
+    reshares.exists?(post: post)
+  end
+
   def unread_notifications_count
     notifications.unread.count
+  end
+
+  def connected_with?(user)
+    ConnectionRequest.connected?(self, user)
+  end
+
+  def connection_with(user)
+    ConnectionRequest.between(self, user)
+  end
+
+  def pending_connection_from?(user)
+    received_connection_requests.pending.exists?(sender: user)
+  end
+
+  def has_sent_connection_to?(user)
+    sent_connection_requests.exists?(receiver: user)
+  end
+
+  def connections
+    accepted_sent = sent_connection_requests.accepted.includes(:receiver).map(&:receiver)
+    accepted_received = received_connection_requests.accepted.includes(:sender).map(&:sender)
+    accepted_sent + accepted_received
+  end
+
+  def connections_count
+    sent_connection_requests.accepted.count + received_connection_requests.accepted.count
   end
 
   private
 
   def create_profile
     build_profile.save
+  end
+
+  def create_brethren_card
+    build_brethren_card.save(validate: false)
   end
 end
 

@@ -8,6 +8,9 @@ class Post < ApplicationRecord
 
   # Rich text content
   has_rich_text :content
+  
+  # Multiple images (up to 5)
+  has_many_attached :images
 
   # Enums
   enum :status, { draft: 0, published: 1, archived: 2 }
@@ -18,15 +21,24 @@ class Post < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
   has_many :bookmarks, dependent: :destroy
+  has_many :reshares, dependent: :destroy
+  has_many :reshared_by_users, through: :reshares, source: :user
   has_many :post_tags, dependent: :destroy
   has_many :tags, through: :post_tags
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
+  
+  # Post linking (outbound = posts this links TO, inbound = posts that link TO this)
+  has_many :outbound_links, class_name: 'PostLink', foreign_key: :source_post_id, dependent: :destroy
+  has_many :inbound_links, class_name: 'PostLink', foreign_key: :target_post_id, dependent: :destroy
+  has_many :linked_posts, through: :outbound_links, source: :target_post
+  has_many :linking_posts, through: :inbound_links, source: :source_post
 
   # Validations
   validates :title, presence: true, length: { minimum: 5, maximum: 200 }
   validates :content, presence: true
   validates :slug, presence: true, uniqueness: true
+  validate :max_images_count
 
   # Search
   pg_search_scope :search,
@@ -78,10 +90,24 @@ class Post < ApplicationRecord
     self.tags = Tag.find_or_create_by_names(names.split(",").map(&:strip))
   end
 
+  def cover_image
+    images.first
+  end
+
+  def has_images?
+    images.attached? && images.any?
+  end
+
   private
 
   def set_published_at
     self.published_at ||= Time.current
+  end
+
+  def max_images_count
+    if images.attached? && images.count > 5
+      errors.add(:images, "cannot exceed 5 images per post")
+    end
   end
 end
 

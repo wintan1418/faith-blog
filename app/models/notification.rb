@@ -12,7 +12,10 @@ class Notification < ApplicationRecord
     resource_rejected: 6,
     mentioned: 7,
     post_liked: 8,
-    comment_liked: 9
+    comment_liked: 9,
+    connection_request: 10,
+    connection_accepted: 11,
+    post_reshared: 12
   }
 
   # Associations
@@ -64,6 +67,12 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} reacted to your post"
     when :comment_liked
       "#{actor&.display_name || 'Someone'} reacted to your comment"
+    when :connection_request
+      "#{actor&.display_name || 'Someone'} wants to know you more"
+    when :connection_accepted
+      "#{actor&.display_name || 'Someone'} accepted your connection request"
+    when :post_reshared
+      "#{actor&.display_name || 'Someone'} reshared your post"
     else
       "You have a new notification"
     end
