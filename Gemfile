@@ -32,7 +32,7 @@ gem "actiontext"
 gem "pg_search", "~> 2.3"
 
 # Friendly URLs
-gem "friendly_id", "~> 5.5"
+gem "friendly_id", "~> 5.6"
 
 # Pagination
 gem "pagy", "~> 6.2"
