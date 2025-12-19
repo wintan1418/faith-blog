@@ -35,7 +35,7 @@ gem "pg_search", "~> 2.3"
 gem "friendly_id", "~> 5.5"
 
 # Pagination
-gem "pagy", "~> 6.2"
+gem "pagy", "~> 43.2"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
