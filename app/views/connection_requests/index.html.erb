@@ -12,45 +12,7 @@
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">
-      <section class="mystic-panel p-6">
-        <div class="mb-5 flex items-center justify-between">
-          <h2 class="text-xl font-bold text-faith-dark">Received Requests</h2>
-          <% if @pending_requests.any? %>
-            <span class="mystic-badge px-3 py-1"><%= @pending_requests.count %></span>
-          <% end %>
-        </div>
-
-        <% if @pending_requests.any? %>
-          <div class="space-y-4">
-            <% @pending_requests.each do |request| %>
-              <div class="rounded-2xl bg-white/60 p-4">
-                <div class="flex items-center gap-3">
-                  <% if request.sender.profile&.avatar&.attached? %>
-                    <%= image_tag request.sender.profile.avatar, class: "mystic-avatar h-12 w-12 object-cover" %>
-                  <% else %>
-                    <span class="mystic-avatar mystic-avatar-fallback grid h-12 w-12 place-items-center font-bold">
-                      <%= request.sender.display_name.first.upcase %>
-                    </span>
-                  <% end %>
-                  <div class="min-w-0 flex-1">
-                    <%= link_to request.sender.display_name, user_path(request.sender.username), class: "font-bold text-faith-dark hover:text-faith-green" %>
-                    <p class="text-sm text-faith-muted">wants to know you more</p>
-                    <p class="text-xs font-semibold text-faith-muted"><%= time_ago_in_words(request.created_at) %> ago</p>
-                  </div>
-                </div>
-                <div class="mt-4 flex gap-2">
-                  <%= button_to "Accept", accept_connection_request_path(request), method: :post, class: "btn btn-primary btn-sm" %>
-                  <%= button_to "Decline", decline_connection_request_path(request), method: :post, class: "btn btn-secondary btn-sm" %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="rounded-2xl bg-white/45 p-8 text-center">
-            <p class="font-semibold text-faith-muted">No pending requests.</p>
-          </div>
-        <% end %>
-      </section>
+      <%= render "received_requests", pending_requests: @pending_requests %>
 
       <section class="mystic-panel p-6">
         <h2 class="mb-5 text-xl font-bold text-faith-dark">Sent Requests</h2>

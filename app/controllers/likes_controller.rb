@@ -9,6 +9,7 @@ class LikesController < ApplicationController
     @like.reaction_type = params[:reaction_type] || :amen
 
     if @like.save
+      @likeable.reload
       create_notification
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path }
@@ -23,6 +24,7 @@ class LikesController < ApplicationController
     @like = current_user.likes.find_by(likeable: @likeable)
 
     if @like&.destroy
+      @likeable.reload
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path }
         format.turbo_stream

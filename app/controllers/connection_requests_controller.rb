@@ -111,6 +111,7 @@ class ConnectionRequestsController < ApplicationController
         end
         format.turbo_stream do
           @receiver = @connection_request.sender
+          set_pending_requests
           flash.now[:notice] = "You're now connected with #{@connection_request.sender.display_name}! You can now view each other's Brethren Cards."
         end
       end
@@ -119,6 +120,7 @@ class ConnectionRequestsController < ApplicationController
         format.html { redirect_back fallback_location: connection_requests_path, alert: "Could not accept request." }
         format.turbo_stream do
           @receiver = @connection_request.sender
+          set_pending_requests
           flash.now[:alert] = "Could not accept request."
           render :accept, status: :unprocessable_entity
         end
@@ -132,6 +134,7 @@ class ConnectionRequestsController < ApplicationController
         format.html { redirect_back fallback_location: connection_requests_path, notice: "Request declined." }
         format.turbo_stream do
           @receiver = @connection_request.sender
+          set_pending_requests
           flash.now[:notice] = "Request declined."
         end
       end
@@ -140,6 +143,7 @@ class ConnectionRequestsController < ApplicationController
         format.html { redirect_back fallback_location: connection_requests_path, alert: "Could not decline request." }
         format.turbo_stream do
           @receiver = @connection_request.sender
+          set_pending_requests
           flash.now[:alert] = "Could not decline request."
           render :decline, status: :unprocessable_entity
         end
@@ -156,5 +160,9 @@ class ConnectionRequestsController < ApplicationController
       redirect_back fallback_location: connection_requests_path,
                     alert: "You can only respond to requests sent to you."
     end
+  end
+
+  def set_pending_requests
+    @pending_requests = current_user.received_connection_requests.pending.includes(sender: :brethren_card)
   end
 end

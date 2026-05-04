@@ -1,2 +1,3 @@
 <%= turbo_stream.replace "flash_messages", partial: "shared/flash" %>
 <%= turbo_stream.replace dom_id(@receiver, :connection_actions), partial: "users/connection_actions", locals: { user: @receiver } %>
+<%= turbo_stream.replace "connection_requests_received", partial: "connection_requests/received_requests", locals: { pending_requests: @pending_requests } %>

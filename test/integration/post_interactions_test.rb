@@ -37,6 +37,7 @@ class PostInteractionsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal 1, @post.reload.likes_count
     assert_includes response.body, dom_id(@post, :reactions)
+    assert_includes response.body, ">1<"
   end
 
   test "bookmarks save and return matching turbo stream" do

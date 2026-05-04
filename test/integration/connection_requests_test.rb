@@ -43,6 +43,8 @@ class ConnectionRequestsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert request.reload.accepted?
     assert_includes response.body, dom_id(@sender, :connection_actions)
+    assert_includes response.body, "connection_requests_received"
+    assert_includes response.body, "No pending requests."
     assert_includes response.body, "View Brethren Card"
   end
 
