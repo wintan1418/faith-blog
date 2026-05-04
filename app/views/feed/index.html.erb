@@ -35,9 +35,20 @@
 
       <div class="fc-section-label">Your Rooms</div>
       <nav class="space-y-1">
-        <% Room.public_rooms.ordered.limit(5).each do |room| %>
+        <% Room.public_rooms.ordered.limit(6).each do |room| %>
+          <%
+            tint = case room.slug.to_s
+                   when /prayer/  then "prayer"
+                   when /testim/  then "testimony"
+                   when /bible/   then "bible"
+                   when /quest/   then "questions"
+                   when /encour/  then "encourage"
+                   when /youth/   then "youth"
+                   else "prayer"
+                   end
+          %>
           <%= link_to room_path(room), class: "fc-rail-link" do %>
-            <span class="grid h-5 w-5 place-items-center rounded bg-[var(--fc-surface-2)] text-[10px] text-[var(--fc-gold)]">
+            <span class="grid h-5 w-5 place-items-center rounded text-[10px] room-tint-<%= tint %>">
               <%= render_icon(room.icon || "sparkles", classes: "h-3.5 w-3.5") %>
             </span>
             <%= room.name %>

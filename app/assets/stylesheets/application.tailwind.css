@@ -4988,7 +4988,6 @@ html:not(.theme-dark),
   color-scheme: light;
 }
 
-/* Body canvas — soft mint halo over warm white */
 html.theme-light,
 html.theme-light body,
 html:not(.theme-dark),
@@ -5033,7 +5032,6 @@ html.theme-light ::-webkit-scrollbar-thumb:hover {
   border: 2px solid transparent;
 }
 
-/* Typography contrast */
 html.theme-light h1,
 html.theme-light h2,
 html.theme-light h3,
@@ -5090,7 +5088,6 @@ html.theme-light a:hover {
   color: var(--fc-accent-deep);
 }
 
-/* Topbar — frosted */
 html.theme-light .fc-topbar,
 html.theme-light nav.fc-topbar {
   background: rgba(247, 250, 248, 0.78) !important;
@@ -5131,7 +5128,6 @@ html.theme-light .fc-section-label {
   font-weight: 700 !important;
 }
 
-/* Search & composer */
 html.theme-light .fc-search,
 html.theme-light .fc-composer-input {
   background: var(--fc-surface) !important;
@@ -5150,7 +5146,6 @@ html.theme-light .fc-composer-input:focus {
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
 }
 
-/* Cards / panels — pure white surface, soft elevation */
 html.theme-light .fc-card,
 html.theme-light .fc-panel,
 html.theme-light .fc-side-card,
@@ -5206,7 +5201,6 @@ html.theme-light .fc-card footer {
   color: var(--fc-muted) !important;
 }
 
-/* Avatars — solid mint with white text */
 html.theme-light .fc-avatar {
   background: var(--fc-accent) !important;
   color: #ffffff !important;
@@ -5214,7 +5208,6 @@ html.theme-light .fc-avatar {
   box-shadow: 0 0 0 2px var(--fc-surface) !important;
 }
 
-/* Badges */
 html.theme-light .fc-badge,
 html.theme-light .badge,
 html.theme-light .badge-primary,
@@ -5235,7 +5228,6 @@ html.theme-light .featured-badge {
   color: var(--fc-accent-deep) !important;
 }
 
-/* Buttons — primary mint */
 html.theme-light .fc-btn-primary,
 html.theme-light .fc-btn-primary *,
 html.theme-light .btn-primary,
@@ -5299,7 +5291,6 @@ html.theme-light .fc-action:hover {
   color: var(--fc-ink) !important;
 }
 
-/* Tabs */
 html.theme-light .fc-tabs {
   border-bottom: 1px solid var(--fc-line-strong) !important;
 }
@@ -5315,7 +5306,6 @@ html.theme-light .fc-tab.is-active {
   box-shadow: inset 0 -2px 0 var(--fc-accent) !important;
 }
 
-/* Inputs */
 html.theme-light .input,
 html.theme-light input[type="text"],
 html.theme-light input[type="email"],
@@ -5350,7 +5340,6 @@ html.theme-light label {
   font-weight: 600 !important;
 }
 
-/* Dropdown */
 html.theme-light .fc-dropdown-menu,
 html.theme-light [data-dropdown-target="menu"] {
   background: var(--fc-surface) !important;
@@ -5378,7 +5367,6 @@ html.theme-light .fc-dropdown-danger {
   color: var(--fc-danger) !important;
 }
 
-/* Pagination */
 html.theme-light .pagy a,
 html.theme-light .pagy span,
 html.theme-light .fc-main nav a,
@@ -5405,7 +5393,6 @@ html.theme-light .fc-main nav span.current {
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.32) !important;
 }
 
-/* Settings tabs */
 html.theme-light .settings-tab {
   background: var(--fc-surface) !important;
   border: 1px solid var(--fc-line-strong) !important;
@@ -5422,7 +5409,6 @@ html.theme-light .settings-tab.is-active {
   box-shadow: 0 4px 14px rgba(16, 185, 129, 0.32) !important;
 }
 
-/* Trix */
 html.theme-light trix-editor,
 html.theme-light .trix-content {
   background: var(--fc-surface) !important;
@@ -5453,7 +5439,6 @@ html.theme-light trix-toolbar .trix-button.trix-active {
   color: var(--fc-accent-deep) !important;
 }
 
-/* Brethren card — clean white with one mint glow */
 html.theme-light .bc-card {
   background:
     radial-gradient(circle at top right, rgba(16, 185, 129, 0.10), transparent 42%),
@@ -5489,7 +5474,6 @@ html.theme-light .bc-avatar-ring {
   background: var(--fc-accent) !important;
 }
 
-/* Footer */
 html.theme-light .mystic-footer,
 html.theme-light body:has(.home-page) .mystic-footer {
   background: linear-gradient(180deg, #0e2419, #0a1c13) !important;
@@ -5509,7 +5493,6 @@ html.theme-light .mystic-footer a:hover {
   color: #6ee7b7 !important;
 }
 
-/* Tailwind utility overrides — strip lavender, keep mint */
 html.theme-light .bg-faith-green,
 html.theme-light .mystic-shell .bg-faith-green,
 html.theme-light .fc-app .bg-faith-green {
@@ -5550,21 +5533,18 @@ html.theme-light .mystic-shell .border-emerald-200 {
   border-color: rgba(16, 185, 129, 0.28) !important;
 }
 
-/* Flash toasts */
 html.theme-light [data-flash-target="message"].bg-emerald-50 {
   background: rgba(16, 185, 129, 0.10) !important;
   border-color: rgba(16, 185, 129, 0.30) !important;
   color: var(--fc-accent-deep) !important;
 }
 
-/* Focus ring — keyboard users */
 html.theme-light *:focus-visible {
   outline: 2px solid var(--fc-accent) !important;
   outline-offset: 2px !important;
   border-radius: 6px;
 }
 
-/* HOME PAGE — light mode mint */
 html.theme-light .home-page {
   color: var(--fc-ink) !important;
   background:
@@ -5581,152 +5561,6 @@ html.theme-light .home-kicker {
   background: var(--fc-accent-soft) !important;
   border: 1px solid rgba(16, 185, 129, 0.28) !important;
   color: var(--fc-accent-deep) !important;
-}
-
-/* Canonical light accent lock: keep light mode on the green faith palette. */
-:root,
-html.theme-light,
-html:not(.theme-dark) {
-  --fc-accent: #10b981;
-  --fc-accent-2: #059669;
-  --fc-accent-deep: #047857;
-  --fc-accent-soft: rgba(16, 185, 129, 0.12);
-  --fc-accent-glow: rgba(16, 185, 129, 0.32);
-  --primary: var(--fc-accent);
-  --primary-2: var(--fc-accent-2);
-  --primary-soft: var(--fc-accent-soft);
-  --mystic-primary: var(--fc-accent);
-  --mystic-primary-dark: var(--fc-accent-2);
-  --mystic-violet: var(--fc-accent);
-  --mystic-violet-soft: var(--fc-accent-soft);
-  --home-accent: var(--fc-accent);
-  --home-accent-2: var(--fc-accent-2);
-  --faith-green: var(--fc-accent);
-}
-
-html.theme-light body,
-html:not(.theme-dark) body,
-body.theme-light {
-  background:
-    radial-gradient(ellipse 70rem 32rem at 50% -8rem, rgba(16, 185, 129, 0.1), transparent 65%),
-    var(--fc-bg) !important;
-}
-
-html.theme-light .fc-brand-mark,
-html.theme-light .fc-btn-primary,
-html.theme-light .btn-primary,
-html.theme-light .home-btn-primary,
-html.theme-light .gradient-faith,
-html.theme-light .bg-faith-green,
-html.theme-light .mystic-shell .bg-faith-green,
-html.theme-light .fc-app .bg-faith-green,
-html:not(.theme-dark) .fc-brand-mark,
-html:not(.theme-dark) .fc-btn-primary,
-html:not(.theme-dark) .btn-primary,
-html:not(.theme-dark) .home-btn-primary,
-html:not(.theme-dark) .gradient-faith,
-html:not(.theme-dark) .bg-faith-green,
-html:not(.theme-dark) .mystic-shell .bg-faith-green,
-html:not(.theme-dark) .fc-app .bg-faith-green {
-  background: var(--fc-accent) !important;
-  border-color: var(--fc-accent) !important;
-  color: #ffffff !important;
-}
-
-html.theme-light .fc-btn-primary:hover,
-html.theme-light .btn-primary:hover,
-html.theme-light .home-btn-primary:hover,
-html:not(.theme-dark) .fc-btn-primary:hover,
-html:not(.theme-dark) .btn-primary:hover,
-html:not(.theme-dark) .home-btn-primary:hover {
-  background: var(--fc-accent-2) !important;
-  border-color: var(--fc-accent-2) !important;
-}
-
-html.theme-light a,
-html.theme-light .text-faith-green,
-html.theme-light .text-emerald-500,
-html.theme-light .text-emerald-600,
-html.theme-light .text-emerald-700,
-html.theme-light .text-emerald-800,
-html.theme-light .text-green-500,
-html.theme-light .text-green-600,
-html.theme-light .text-green-700,
-html.theme-light .text-green-800,
-html.theme-light .text-teal-500,
-html.theme-light .text-teal-600,
-html.theme-light .text-teal-700,
-html.theme-light .text-teal-800,
-html:not(.theme-dark) a,
-html:not(.theme-dark) .text-faith-green,
-html:not(.theme-dark) .text-emerald-500,
-html:not(.theme-dark) .text-emerald-600,
-html:not(.theme-dark) .text-emerald-700,
-html:not(.theme-dark) .text-emerald-800,
-html:not(.theme-dark) .text-green-500,
-html:not(.theme-dark) .text-green-600,
-html:not(.theme-dark) .text-green-700,
-html:not(.theme-dark) .text-green-800,
-html:not(.theme-dark) .text-teal-500,
-html:not(.theme-dark) .text-teal-600,
-html:not(.theme-dark) .text-teal-700,
-html:not(.theme-dark) .text-teal-800 {
-  color: var(--fc-accent-deep) !important;
-}
-
-html.theme-light .fc-badge,
-html.theme-light .mystic-badge,
-html.theme-light .mystic-kicker,
-html.theme-light .badge,
-html.theme-light .badge-primary,
-html.theme-light .room-badge,
-html.theme-light .tag-badge,
-html.theme-light .bg-emerald-50,
-html.theme-light .bg-green-50,
-html.theme-light .bg-teal-50,
-html.theme-light .fc-nav-link.is-active,
-html.theme-light .fc-rail-link.is-active,
-html:not(.theme-dark) .fc-badge,
-html:not(.theme-dark) .mystic-badge,
-html:not(.theme-dark) .mystic-kicker,
-html:not(.theme-dark) .badge,
-html:not(.theme-dark) .badge-primary,
-html:not(.theme-dark) .room-badge,
-html:not(.theme-dark) .tag-badge,
-html:not(.theme-dark) .bg-emerald-50,
-html:not(.theme-dark) .bg-green-50,
-html:not(.theme-dark) .bg-teal-50,
-html:not(.theme-dark) .fc-nav-link.is-active,
-html:not(.theme-dark) .fc-rail-link.is-active {
-  background: var(--fc-accent-soft) !important;
-  border-color: rgba(16, 185, 129, 0.28) !important;
-  color: var(--fc-accent-deep) !important;
-}
-
-html.theme-light .fc-card:hover,
-html.theme-light .card-hover:hover,
-html.theme-light .room-card:hover,
-html.theme-light .mystic-card-link:hover,
-html.theme-light .home-room-card:hover,
-html.theme-light .home-story-card:hover,
-html:not(.theme-dark) .fc-card:hover,
-html:not(.theme-dark) .card-hover:hover,
-html:not(.theme-dark) .room-card:hover,
-html:not(.theme-dark) .mystic-card-link:hover,
-html:not(.theme-dark) .home-room-card:hover,
-html:not(.theme-dark) .home-story-card:hover {
-  border-color: rgba(16, 185, 129, 0.4) !important;
-  box-shadow:
-    0 0 0 1px rgba(16, 185, 129, 0.16),
-    0 18px 40px rgba(15, 30, 22, 0.1) !important;
-}
-
-html.theme-light .mystic-footer,
-html.theme-light body:has(.home-page) .mystic-footer,
-html:not(.theme-dark) .mystic-footer,
-html:not(.theme-dark) body:has(.home-page) .mystic-footer {
-  background: linear-gradient(180deg, #0e2419, #0a1c13) !important;
-  border-top-color: rgba(16, 185, 129, 0.18) !important;
 }
 
 html.theme-light .home-title,
@@ -6496,5 +6330,226 @@ html.theme-dark .home-composer-post {
 
   .home-inline-rooms {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ==========================================================================
+   ✦ POST CARD STRUCTURE (theme-agnostic)
+   Small structural pieces to match the prototype layout — colors flow from
+   whichever theme is active.
+   ========================================================================== */
+
+.fc-featured-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 0.45rem;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--fc-gold-soft);
+  border: 1px solid currentColor;
+  color: var(--fc-gold);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.fc-card-header-strip {
+  justify-content: space-between;
+}
+
+/* Clean public feed layout: compact app shell matching the main feed structure. */
+:root,
+html.theme-light,
+html:not(.theme-dark) {
+  --fc-accent: #10b981;
+  --fc-accent-2: #059669;
+  --fc-accent-deep: #047857;
+  --fc-accent-soft: rgba(16, 185, 129, 0.12);
+  --fc-accent-glow: rgba(16, 185, 129, 0.32);
+  --primary: var(--fc-accent);
+  --primary-2: var(--fc-accent-2);
+  --primary-soft: var(--fc-accent-soft);
+  --mystic-primary: var(--fc-accent);
+  --mystic-primary-dark: var(--fc-accent-2);
+  --mystic-violet: var(--fc-accent);
+  --mystic-violet-soft: var(--fc-accent-soft);
+  --home-accent: var(--fc-accent);
+  --home-accent-2: var(--fc-accent-2);
+  --faith-green: var(--fc-accent);
+}
+
+.home-feed-page .mystic-footer {
+  display: none;
+}
+
+.home-feed-page .home-public-shell {
+  grid-template-columns: 220px minmax(520px, 650px) 280px;
+  gap: 1.35rem;
+  width: min(1120px, calc(100% - 2rem));
+  padding-top: 1.35rem;
+}
+
+.home-feed-page .home-public-rail {
+  top: 4.75rem;
+}
+
+.home-feed-page .home-rail-section-label {
+  margin: 0 0 0.45rem;
+  padding: 0 0.25rem;
+  color: var(--home-muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.home-feed-page .home-rail-nav {
+  margin: 0 0 1.05rem;
+}
+
+.home-feed-page .home-rail-nav a {
+  min-height: 2.55rem;
+  background: transparent;
+  color: var(--home-soft);
+}
+
+.home-feed-page .home-rail-nav a.is-active,
+.home-feed-page .home-rail-nav a:hover {
+  background: var(--fc-accent-soft);
+  color: var(--home-accent-deep);
+}
+
+.home-feed-page .home-rooms-panel,
+.home-feed-page .home-rail-brand {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  padding: 0;
+}
+
+.home-feed-page .home-panel-head {
+  padding: 0 0.25rem;
+}
+
+.home-feed-page .home-room-row,
+.home-feed-page .home-prayer-row,
+.home-feed-page .home-resource-row {
+  min-width: 0;
+  width: 100%;
+}
+
+.home-feed-page .home-room-row {
+  padding: 0.48rem 0.55rem;
+}
+
+.home-feed-page .home-room-row div,
+.home-feed-page .home-prayer-row div,
+.home-feed-page .home-resource-row div {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.home-feed-page .home-room-row strong,
+.home-feed-page .home-prayer-row strong,
+.home-feed-page .home-resource-row strong,
+.home-feed-page .home-trend-row strong {
+  max-width: 100%;
+}
+
+.home-feed-page .home-public-composer {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin-bottom: 0.85rem;
+}
+
+.home-feed-page .home-composer-prompt {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.home-feed-page .home-feed-head {
+  display: none;
+}
+
+.home-feed-page .home-feed-control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--home-line-strong);
+  margin-bottom: 0.8rem;
+}
+
+.home-feed-page .home-public-tabs {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
+.home-feed-page .home-public-tabs a {
+  padding: 0.75rem 0.05rem;
+  font-size: 0.88rem;
+}
+
+.home-feed-page .home-room-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  border: 1px solid var(--home-line-strong);
+  border-radius: 999px;
+  background: var(--home-surface);
+  color: var(--home-soft);
+  padding: 0 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.home-feed-page .home-feed-card h2 {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.12rem;
+  line-height: 1.28;
+  font-weight: 850;
+}
+
+.home-feed-page .home-feed-card p {
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.home-feed-page .home-mini-panel {
+  box-shadow: none !important;
+}
+
+.home-feed-page .home-verse-panel blockquote {
+  font-size: 1.14rem;
+}
+
+@media (max-width: 1120px) {
+  .home-feed-page .home-public-shell {
+    grid-template-columns: 210px minmax(0, 1fr);
+    width: min(960px, calc(100% - 1.5rem));
+  }
+}
+
+@media (max-width: 760px) {
+  .home-feed-page .home-public-shell {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(100% - 1rem, 720px);
+  }
+
+  .home-feed-page .home-rail-section-label {
+    display: none;
+  }
+
+  .home-feed-page .home-feed-control-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .home-feed-page .home-room-filter {
+    justify-content: center;
   }
 }

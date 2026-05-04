@@ -23,21 +23,23 @@
           <% if post.room %>
             <%= link_to post.room.name, room_path(post.room), class: "fc-badge" %>
           <% end %>
-          <span class="text-xs font-semibold text-[var(--fc-muted)]">· <%= time_ago_in_words(post.published_at || post.created_at) %></span>
           <% if post.featured? %>
-            <span class="text-xs font-bold text-[var(--fc-gold)]">Featured</span>
+            <span class="fc-featured-tag">★ Featured</span>
           <% end %>
         </div>
       </div>
     </div>
 
-    <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
-      <%= link_to edit_post_path(post), class: "fc-action", title: "Edit post" do %>
-        <%= render_icon("pencil", classes: "h-4 w-4") %>
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-semibold text-[var(--fc-muted)] whitespace-nowrap"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
+      <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
+        <%= link_to edit_post_path(post), class: "fc-action", title: "Edit post" do %>
+          <%= render_icon("pencil", classes: "h-4 w-4") %>
+        <% end %>
+      <% else %>
+        <span class="text-[var(--fc-muted)] leading-none">...</span>
       <% end %>
-    <% else %>
-      <span class="text-[var(--fc-muted)]">...</span>
-    <% end %>
+    </div>
   </header>
 
   <div class="fc-card-body">

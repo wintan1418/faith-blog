@@ -3,14 +3,7 @@
 <div class="home-page home-feed-page">
   <div class="home-public-shell">
     <aside class="home-public-rail home-public-rail-left" aria-label="Community rooms">
-      <div class="home-rail-brand">
-        <span class="home-brand-mark"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
-        <div>
-          <strong>Faith Community</strong>
-          <span>Stories, prayer, rooms</span>
-        </div>
-      </div>
-
+      <div class="home-rail-section-label">Your Space</div>
       <nav class="home-rail-nav" aria-label="Explore">
         <%= link_to root_path, class: "is-active" do %>
           <%= render_icon("message_circle", classes: "h-4 w-4") %>
@@ -30,7 +23,8 @@
         <% end %>
       </nav>
 
-      <div class="home-mini-panel">
+      <div class="home-rail-section-label">Your Rooms</div>
+      <div class="home-mini-panel home-rooms-panel">
         <div class="home-panel-head">
           <span>Rooms</span>
           <%= link_to "All", rooms_path %>
@@ -61,23 +55,17 @@
         <% end %>
       </section>
 
-      <section class="home-feed-head">
-        <div>
-          <span class="home-kicker">Public Feed</span>
-          <h1>What the community is carrying today.</h1>
+      <section class="home-feed-control-row">
+        <div class="home-public-tabs" role="list" aria-label="Feed filters">
+          <%= link_to "Recent", root_path, class: "is-active" %>
+          <%= link_to "Trending", rooms_path %>
+          <%= link_to "Following", new_user_session_path %>
         </div>
-        <div class="home-auth-actions">
-          <%= link_to "Sign in", new_user_session_path, class: "home-btn home-btn-secondary" %>
-          <%= link_to "Join", new_user_registration_path, class: "home-btn home-btn-primary" %>
-        </div>
+        <%= link_to rooms_path, class: "home-room-filter" do %>
+          All rooms
+          <%= render_icon("arrow_right", classes: "h-3.5 w-3.5") %>
+        <% end %>
       </section>
-
-      <div class="home-public-tabs" role="list" aria-label="Feed filters">
-        <%= link_to "Recent", root_path, class: "is-active" %>
-        <%= link_to "Testimonies", rooms_path %>
-        <%= link_to "Prayer", rooms_path %>
-        <%= link_to "Scripture", rooms_path %>
-      </div>
 
       <section class="home-feed-stream" aria-label="Latest community posts">
         <% if @posts.any? %>
