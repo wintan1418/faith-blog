@@ -88,18 +88,20 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: faith_blog_production
-    username: faith_blog
-    password: <%= ENV["FAITH_BLOG_DATABASE_PASSWORD"] %>
+    database: <%= ENV.fetch("DATABASE_NAME", "faith_blog_production") %>
+    username: <%= ENV.fetch("DATABASE_USERNAME", "faith_blog") %>
+    password: <%= ENV["DATABASE_PASSWORD"].presence || ENV["FAITH_BLOG_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DATABASE_HOST", "127.0.0.1") %>
+    port: <%= ENV.fetch("DATABASE_PORT", 5432) %>
   cache:
     <<: *primary_production
-    database: faith_blog_production_cache
+    database: <%= ENV.fetch("DATABASE_CACHE_NAME", "faith_blog_production_cache") %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: faith_blog_production_queue
+    database: <%= ENV.fetch("DATABASE_QUEUE_NAME", "faith_blog_production_queue") %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: faith_blog_production_cable
+    database: <%= ENV.fetch("DATABASE_CABLE_NAME", "faith_blog_production_cable") %>
     migrations_paths: db/cable_migrate

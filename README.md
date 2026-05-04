@@ -152,7 +152,10 @@ config.action_mailer.smtp_settings = {
 Set these in production:
 
 - `RAILS_MASTER_KEY` - Master key for credentials
-- `DATABASE_URL` - Database connection string (optional)
+- `DATABASE_HOST` - PostgreSQL host, usually `127.0.0.1` on a single-server deploy
+- `DATABASE_USERNAME` - PostgreSQL role, defaults to `faith_blog`
+- `DATABASE_PASSWORD` or `FAITH_BLOG_DATABASE_PASSWORD` - PostgreSQL password
+- `DATABASE_NAME` - Primary production database, defaults to `faith_blog_production`
 - `SECRET_KEY_BASE` - Secret key (if not using credentials)
 - SMTP credentials (via Rails credentials)
 
