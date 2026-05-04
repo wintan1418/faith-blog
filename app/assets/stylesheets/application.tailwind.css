@@ -1705,13 +1705,13 @@ h1, h2, h3, h4, h5, h6 {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr) 280px;
   gap: 1.5rem;
-  padding: 1.5rem 0 2.5rem;
+  padding: 2.25rem 0 2.75rem;
 }
 
 .fc-sidebar,
 .fc-aside {
   position: sticky;
-  top: 58px;
+  top: 72px;
   align-self: start;
 }
 
@@ -1918,6 +1918,7 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 760px) {
   .fc-shell {
     grid-template-columns: minmax(0, 1fr);
+    padding-top: 1.25rem;
   }
   .fc-sidebar {
     display: none;
