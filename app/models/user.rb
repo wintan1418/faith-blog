@@ -4,7 +4,7 @@ class User < ApplicationRecord
   # Devise modules
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :trackable, :confirmable
+         :trackable
 
   # Enums
   enum :role, { member: 0, moderator: 1, admin: 2 }

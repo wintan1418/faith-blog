@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   # Root path
   root "home#index"
+  get "favicon.ico", to: proc { [ 204, { "Content-Type" => "image/x-icon" }, [] ] }
 
   # Static pages
   get "about", to: "pages#about"

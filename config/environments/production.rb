@@ -54,12 +54,6 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Email configuration
-  # Set this to true to raise delivery errors in production
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.perform_deliveries = true
-  config.action_mailer.delivery_method = :smtp
-
   # Set host to be used by links generated in mailer templates.
   # Update this with your actual domain
   config.action_mailer.default_url_options = {
@@ -67,24 +61,31 @@ Rails.application.configure do
     protocol: "https"
   }
 
-  # SMTP configuration
-  # Credentials can be set via Rails credentials or environment variables
-  # To set via credentials: rails credentials:edit
-  # Add: smtp:
-  #        user_name: your_email@example.com
-  #        password: your_password
-  #        address: smtp.example.com
-  #        domain: yourdomain.com
-  config.action_mailer.smtp_settings = {
+  smtp_user_name = Rails.application.credentials.dig(:smtp, :user_name) || ENV["SMTP_USER_NAME"]
+  smtp_password = Rails.application.credentials.dig(:smtp, :password) || ENV["SMTP_PASSWORD"]
+  smtp_authentication = Rails.application.credentials.dig(:smtp, :authentication) || ENV["SMTP_AUTH"]
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.raise_delivery_errors = smtp_user_name.present? && smtp_password.present?
+  config.action_mailer.perform_deliveries = smtp_user_name.present? && smtp_password.present?
+
+  smtp_settings = {
     address: Rails.application.credentials.dig(:smtp, :address) || ENV.fetch("SMTP_ADDRESS", "smtp.gmail.com"),
     port: Rails.application.credentials.dig(:smtp, :port) || ENV.fetch("SMTP_PORT", "587").to_i,
     domain: Rails.application.credentials.dig(:smtp, :domain) || ENV.fetch("SMTP_DOMAIN", "yourdomain.com"),
-    user_name: Rails.application.credentials.dig(:smtp, :user_name) || ENV["SMTP_USER_NAME"],
-    password: Rails.application.credentials.dig(:smtp, :password) || ENV["SMTP_PASSWORD"],
-    authentication: Rails.application.credentials.dig(:smtp, :authentication) || ENV.fetch("SMTP_AUTH", "plain").to_sym,
     enable_starttls_auto: true,
     openssl_verify_mode: "none" # Use "peer" in production with proper SSL
   }
+
+  if smtp_user_name.present? && smtp_password.present?
+    smtp_settings.merge!(
+      user_name: smtp_user_name,
+      password: smtp_password,
+      authentication: (smtp_authentication.presence || "plain").to_sym
+    )
+  end
+
+  config.action_mailer.smtp_settings = smtp_settings
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
