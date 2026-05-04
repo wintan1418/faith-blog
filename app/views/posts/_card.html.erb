@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <% if user_signed_in? && (post.user == current_user || current_user.admin?) %>
+    <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
       <%= link_to edit_post_path(post), class: "fc-action", title: "Edit post" do %>
         <%= render_icon("pencil", classes: "h-4 w-4") %>
       <% end %>

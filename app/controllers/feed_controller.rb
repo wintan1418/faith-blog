@@ -2,6 +2,7 @@
 
 class FeedController < ApplicationController
   before_action :authenticate_user!
+  before_action :load_sidebar_context
 
   def index
     @pagy, @posts = pagy(
@@ -30,5 +31,19 @@ class FeedController < ApplicationController
           .recent
     )
     render :index
+  end
+
+  private
+
+  def load_sidebar_context
+    @prayer_room = Room.prayers.public_rooms.ordered.first
+    prayer_room_ids = Room.prayers.select(:id)
+    prayer_posts = Post.published
+                       .where(room_id: prayer_room_ids)
+                       .includes(:user, :room)
+                       .recent
+
+    @open_prayer_requests_count = prayer_posts.count
+    @open_prayer_requests = prayer_posts.limit(3)
   end
 end

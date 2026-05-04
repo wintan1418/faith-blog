@@ -189,7 +189,7 @@
             <% end %>
           <% end %>
 
-          <% if user_signed_in? && (@post.user == current_user || current_user.admin?) %>
+          <% if user_signed_in? && (@post.user == current_user || current_user_admin?) %>
             <%= link_to "Edit", edit_post_path(@post), class: "btn btn-secondary" %>
           <% end %>
 

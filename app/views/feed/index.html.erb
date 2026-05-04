@@ -25,6 +25,12 @@
           <%= render_icon("sparkles", classes: "h-4 w-4") %>
           Notifications
         <% end %>
+        <% if current_user_admin? %>
+          <%= link_to admin_root_path, class: "fc-rail-link #{'is-active' if request.path.start_with?('/admin')}" do %>
+            <%= render_icon("sparkles", classes: "h-4 w-4") %>
+            Admin
+          <% end %>
+        <% end %>
       </nav>
 
       <div class="fc-section-label">Your Rooms</div>
@@ -94,24 +100,47 @@
       <div class="fc-side-card">
         <div class="mb-3 flex items-center justify-between">
           <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Open prayer requests</h3>
-          <span class="text-sm text-[var(--fc-muted)]">3</span>
+          <span class="text-sm text-[var(--fc-muted)]"><%= @open_prayer_requests_count %></span>
         </div>
-        <div class="space-y-3">
-          <% [
-            ["J", "Joy", "3d before chemo"],
-            ["A", "Anonymous", "biopsy results Friday"],
-            ["M", "Marcus", "job interview Tue"]
-          ].each do |initial, name, detail| %>
+        <% if @open_prayer_requests.any? %>
+          <div class="space-y-3">
+            <% @open_prayer_requests.each do |post| %>
             <div class="flex items-center gap-3">
-              <span class="fc-avatar"><%= initial %></span>
-              <span class="min-w-0 flex-1">
-                <span class="block text-sm font-bold text-[var(--fc-ink)]"><%= name %></span>
-                <span class="block truncate text-xs text-[var(--fc-muted)]"><%= detail %></span>
+              <span class="fc-avatar">
+                <%= post.anonymous? ? render_icon("users", classes: "h-4 w-4") : post.user.username.first.upcase %>
               </span>
-              <button class="fc-btn">Pray</button>
+              <span class="min-w-0 flex-1">
+                <%= link_to post_path(post), class: "block truncate text-sm font-bold text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" do %>
+                  <%= truncate(post.title, length: 42) %>
+                <% end %>
+                <span class="block truncate text-xs text-[var(--fc-muted)]">
+                  <%= post.anonymous? ? "Anonymous" : post.user.username %> · <%= time_ago_in_words(post.published_at || post.created_at) %> ago
+                </span>
+              </span>
+              <% if current_user.has_liked?(post) %>
+                <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
+                    method: :delete,
+                    class: "fc-btn text-[var(--fc-accent)]",
+                    data: { turbo_frame: "_top" } do %>
+                  Praying
+                <% end %>
+              <% else %>
+                <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_type: :praying),
+                    class: "fc-btn",
+                    data: { turbo_frame: "_top" } do %>
+                  Pray
+                <% end %>
+              <% end %>
             </div>
-          <% end %>
-        </div>
+            <% end %>
+          </div>
+          <%= link_to "View prayer room", (@prayer_room ? room_path(@prayer_room) : rooms_path), class: "mt-4 inline-block text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
+        <% else %>
+          <div class="rounded-md border border-[var(--fc-line)] bg-[var(--fc-surface-2)] p-4">
+            <p class="text-sm font-semibold text-[var(--fc-soft)]">No prayer requests yet.</p>
+            <%= link_to "Start one", new_post_path, class: "mt-3 inline-block text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
+          </div>
+        <% end %>
       </div>
     </aside>
   </div>

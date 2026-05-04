@@ -91,7 +91,7 @@ class PostsController < ApplicationController
   end
 
   def authorize_post!
-    unless @post.user == current_user || current_user.admin?
+    unless @post.user == current_user || current_user_admin?
       redirect_to @post, alert: "You're not authorized to perform this action."
     end
   end
