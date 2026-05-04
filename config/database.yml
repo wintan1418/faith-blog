@@ -88,20 +88,16 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: <%= ENV.fetch("DATABASE_NAME", "faith_blog_production") %>
-    username: <%= ENV.fetch("DATABASE_USERNAME", "faith_blog") %>
-    password: <%= ENV["DATABASE_PASSWORD"].presence || ENV["FAITH_BLOG_DATABASE_PASSWORD"] %>
-    host: <%= ENV.fetch("DATABASE_HOST", "127.0.0.1") %>
-    port: <%= ENV.fetch("DATABASE_PORT", 5432) %>
+    url: <%= ENV["PRIMARY_DATABASE_URL"] || ENV["DATABASE_URL"] %>
   cache:
     <<: *primary_production
-    database: <%= ENV.fetch("DATABASE_CACHE_NAME", "faith_blog_production_cache") %>
+    url: <%= ENV["CACHE_DATABASE_URL"] || ENV["PRIMARY_DATABASE_URL"] || ENV["DATABASE_URL"] %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: <%= ENV.fetch("DATABASE_QUEUE_NAME", "faith_blog_production_queue") %>
+    url: <%= ENV["QUEUE_DATABASE_URL"] || ENV["PRIMARY_DATABASE_URL"] || ENV["DATABASE_URL"] %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: <%= ENV.fetch("DATABASE_CABLE_NAME", "faith_blog_production_cable") %>
+    url: <%= ENV["CABLE_DATABASE_URL"] || ENV["PRIMARY_DATABASE_URL"] || ENV["DATABASE_URL"] %>
     migrations_paths: db/cable_migrate
