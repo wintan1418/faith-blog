@@ -1,0 +1,2 @@
+<%= turbo_stream.replace "flash_messages", partial: "shared/flash" %>
+<%= turbo_stream.replace dom_id(@receiver, :connection_actions), partial: "users/connection_actions", locals: { user: @receiver } %>

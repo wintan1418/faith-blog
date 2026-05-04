@@ -64,24 +64,14 @@
           </div>
 
           <% if user_signed_in? && @user != current_user %>
-            <div class="mt-6 flex flex-wrap gap-3">
+            <div class="mt-6 flex flex-wrap items-center gap-3">
               <% if current_user.following?(@user) %>
                 <%= button_to "Following", unfollow_user_path(@user.username), method: :delete, class: "btn btn-secondary" %>
               <% else %>
                 <%= button_to "Follow", follow_user_path(@user.username), class: "btn btn-primary" %>
               <% end %>
 
-              <% connection = current_user.connection_with(@user) %>
-              <% if connection&.accepted? %>
-                <%= link_to "View Brethren Card", brethren_card_path(@user.username), class: "btn btn-secondary" %>
-              <% elsif connection&.pending? && connection.sender == current_user %>
-                <span class="btn btn-secondary cursor-not-allowed opacity-70">Request Sent</span>
-              <% elsif connection&.pending? && connection.receiver == current_user %>
-                <%= button_to "Accept Request", accept_connection_request_path(connection), method: :post, class: "btn btn-primary" %>
-                <%= button_to "Decline", decline_connection_request_path(connection), method: :post, class: "btn btn-secondary" %>
-              <% else %>
-                <%= button_to "Can I Know You More?", connection_requests_path(receiver_id: @user.id), method: :post, class: "btn btn-primary" %>
-              <% end %>
+              <%= render "users/connection_actions", user: @user %>
             </div>
           <% end %>
         </div>
