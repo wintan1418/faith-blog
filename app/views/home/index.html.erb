@@ -1,115 +1,219 @@
-<% content_for(:title) { "Faith Community - Stories, Prayer, Rooms" } %>
+<% content_for(:title) { "Faith Community - Public Feed" } %>
 
-<div class="home-page">
-  <section class="home-hero">
-    <div class="home-container home-hero-grid">
-      <div class="home-hero-copy">
-        <span class="home-kicker">
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
-          Faith Community
-        </span>
-        <h1 class="home-title">A thoughtful home for stories, prayer, and wisdom.</h1>
-        <p class="home-lede">
-          Share testimonies, ask for prayer, join focused rooms, and keep spiritual resources close without the noise of a generic social feed.
-        </p>
-        <div class="home-actions">
-          <% if user_signed_in? %>
-            <%= link_to "Open Feed", feed_path, class: "home-btn home-btn-primary" %>
-            <%= link_to "Browse Rooms", rooms_path, class: "home-btn home-btn-secondary" %>
-          <% else %>
-            <%= link_to "Join Community", new_user_registration_path, class: "home-btn home-btn-primary" %>
-            <%= link_to "Sign In", new_user_session_path, class: "home-btn home-btn-secondary" %>
-          <% end %>
-        </div>
-        <div class="home-quick-list" aria-label="Community features">
-          <span>Prayer rooms</span>
-          <span>Testimonies</span>
-          <span>Saved resources</span>
-        </div>
-      </div>
-
-      <div class="home-summary" aria-label="Community summary">
-        <div class="home-summary-top">
-          <span>Today</span>
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
-        </div>
-        <blockquote>
-          "How good and pleasant it is when God's people live together in unity."
-        </blockquote>
-        <p>Psalm 133:1</p>
-        <div class="home-stats">
-          <div>
-            <strong><%= @rooms.size %></strong>
-            <span>Rooms</span>
-          </div>
-          <div>
-            <strong><%= @featured_posts.size %></strong>
-            <span>Featured</span>
-          </div>
-          <div>
-            <strong>24/7</strong>
-            <span>Prayer</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="home-section">
-    <div class="home-container">
-      <div class="home-section-head">
+<div class="home-page home-feed-page">
+  <div class="home-public-shell">
+    <aside class="home-public-rail home-public-rail-left" aria-label="Community rooms">
+      <div class="home-rail-brand">
+        <span class="home-brand-mark"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
         <div>
-          <span class="home-kicker">Rooms</span>
-          <h2>Find the right room for the conversation.</h2>
+          <strong>Faith Community</strong>
+          <span>Stories, prayer, rooms</span>
         </div>
-        <%= link_to "View all rooms", rooms_path, class: "home-link-btn" %>
       </div>
 
-      <div class="home-card-grid">
-        <% @rooms.first(6).each do |room| %>
-          <%= link_to room_path(room), class: "home-room-card" do %>
-            <div class="home-card-icon">
-              <%= render_icon(room.icon || "sparkles", classes: "h-5 w-5") %>
-            </div>
-            <h3><%= room.name %></h3>
-            <p><%= room.description %></p>
-            <div class="home-card-meta">
-              <span><%= pluralize(room.posts_count, "post") %></span>
-              <span><%= pluralize(room.members_count, "member") %></span>
-            </div>
-          <% end %>
+      <nav class="home-rail-nav" aria-label="Explore">
+        <%= link_to root_path, class: "is-active" do %>
+          <%= render_icon("message_circle", classes: "h-4 w-4") %>
+          Feed
         <% end %>
-      </div>
-    </div>
-  </section>
+        <%= link_to rooms_path do %>
+          <%= render_icon("users", classes: "h-4 w-4") %>
+          Rooms
+        <% end %>
+        <%= link_to resources_root_path do %>
+          <%= render_icon("bookopen", classes: "h-4 w-4") %>
+          Library
+        <% end %>
+        <%= link_to search_path do %>
+          <%= render_icon("search", classes: "h-4 w-4") %>
+          Search
+        <% end %>
+      </nav>
 
-  <% if @featured_posts.any? %>
-    <section class="home-section home-section-featured">
-      <div class="home-container">
-        <div class="home-section-head">
-          <div>
-            <span class="home-kicker">Featured</span>
-            <h2>Stories worth slowing down for.</h2>
-          </div>
+      <div class="home-mini-panel">
+        <div class="home-panel-head">
+          <span>Rooms</span>
+          <%= link_to "All", rooms_path %>
         </div>
-
-        <div class="home-story-grid">
-          <% @featured_posts.each do |post| %>
-            <%= link_to post_path(post), class: "home-story-card" do %>
-              <div class="home-story-meta">
-                <span><%= post.room.name %></span>
-                <time><%= time_ago_in_words(post.published_at || post.created_at) %> ago</time>
-              </div>
-              <h3><%= post.title %></h3>
-              <p><%= post.content.to_plain_text.truncate(180) %></p>
-              <div class="home-story-foot">
-                <span><%= post.anonymous? ? "Anonymous" : post.user.username %></span>
-                <span><%= pluralize(post.comments_count, "comment") %></span>
+        <div class="home-room-list">
+          <% @rooms.first(6).each do |room| %>
+            <%= link_to room_path(room), class: "home-room-row" do %>
+              <span><%= render_icon(room.icon || "sparkles", classes: "h-4 w-4") %></span>
+              <div>
+                <strong><%= room.name %></strong>
+                <small><%= pluralize(room.posts_count, "post") %></small>
               </div>
             <% end %>
           <% end %>
         </div>
       </div>
-    </section>
-  <% end %>
+    </aside>
+
+    <main class="home-public-main">
+      <section class="home-public-composer" aria-label="Join the conversation">
+        <div class="home-public-avatar">FC</div>
+        <%= link_to new_user_registration_path, class: "home-composer-prompt" do %>
+          Share a testimony, prayer request, question, or encouragement...
+        <% end %>
+        <%= link_to new_user_registration_path, class: "home-composer-post" do %>
+          <%= render_icon("send", classes: "h-4 w-4") %>
+          Join
+        <% end %>
+      </section>
+
+      <section class="home-feed-head">
+        <div>
+          <span class="home-kicker">Public Feed</span>
+          <h1>What the community is carrying today.</h1>
+        </div>
+        <div class="home-auth-actions">
+          <%= link_to "Sign in", new_user_session_path, class: "home-btn home-btn-secondary" %>
+          <%= link_to "Join", new_user_registration_path, class: "home-btn home-btn-primary" %>
+        </div>
+      </section>
+
+      <div class="home-public-tabs" role="list" aria-label="Feed filters">
+        <%= link_to "Recent", root_path, class: "is-active" %>
+        <%= link_to "Testimonies", rooms_path %>
+        <%= link_to "Prayer", rooms_path %>
+        <%= link_to "Scripture", rooms_path %>
+      </div>
+
+      <section class="home-feed-stream" aria-label="Latest community posts">
+        <% if @posts.any? %>
+          <% @posts.each_with_index do |post, index| %>
+            <article class="home-feed-card">
+              <header class="home-feed-card-head">
+                <div class="home-author-avatar"><%= post.anonymous? ? "A" : post.user.username.first.upcase %></div>
+                <div class="home-author-copy">
+                  <div>
+                    <strong><%= post.anonymous? ? "Anonymous" : post.user.display_name %></strong>
+                    <%= link_to post.room.name, room_path(post.room), class: "home-room-pill" %>
+                  </div>
+                  <span><%= time_ago_short(post.published_at || post.created_at) %> ago · <%= pluralize(post.reading_time, "min") %> read</span>
+                </div>
+              </header>
+
+              <%= link_to post_path(post), class: "home-feed-card-body" do %>
+                <h2><%= post.title %></h2>
+                <p><%= post.content.to_plain_text.truncate(240) %></p>
+              <% end %>
+
+              <% if post.tags.any? %>
+                <div class="home-tag-row">
+                  <% post.tags.first(4).each do |tag| %>
+                    <span>#<%= tag.name %></span>
+                  <% end %>
+                </div>
+              <% end %>
+
+              <% if index == 1 && @featured_rooms.any? %>
+                <div class="home-inline-rooms">
+                  <div>
+                    <strong>Find a focused room</strong>
+                    <span>Move from scrolling into smaller, clearer conversations.</span>
+                  </div>
+                  <div>
+                    <% @featured_rooms.first(3).each do |room| %>
+                      <%= link_to room.name, room_path(room) %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+
+              <footer class="home-feed-actions">
+                <%= link_to new_user_registration_path do %>
+                  <%= render_icon("handheart", classes: "h-4 w-4") %>
+                  <%= post.likes_count %>
+                <% end %>
+                <%= link_to post_path(post) do %>
+                  <%= render_icon("message_circle", classes: "h-4 w-4") %>
+                  <%= post.comments_count %>
+                <% end %>
+                <%= link_to new_user_registration_path do %>
+                  <%= render_icon("bookmark", classes: "h-4 w-4") %>
+                  Save
+                <% end %>
+              </footer>
+            </article>
+          <% end %>
+        <% else %>
+          <div class="home-empty-feed">
+            <span><%= render_icon("sparkles", classes: "h-5 w-5") %></span>
+            <h2>The public feed is ready.</h2>
+            <p>Seed starter rooms and posts, then this page becomes the front door into the actual community.</p>
+            <%= link_to "Join Community", new_user_registration_path, class: "home-btn home-btn-primary" %>
+          </div>
+        <% end %>
+      </section>
+    </main>
+
+    <aside class="home-public-rail home-public-rail-right" aria-label="Community context">
+      <section class="home-mini-panel home-verse-panel">
+        <span>Today's Verse</span>
+        <blockquote>"He gives strength to the weary and increases the power of the weak."</blockquote>
+        <p>Isaiah 40:29 · NIV</p>
+      </section>
+
+      <section class="home-mini-panel">
+        <div class="home-panel-head">
+          <span>Open Prayer</span>
+          <%= link_to "Rooms", rooms_path %>
+        </div>
+        <div class="home-prayer-list">
+          <% if @prayer_posts.any? %>
+            <% @prayer_posts.each do |post| %>
+              <%= link_to post_path(post), class: "home-prayer-row" do %>
+                <span><%= post.anonymous? ? "A" : post.user.username.first.upcase %></span>
+                <div>
+                  <strong><%= post.title.truncate(42) %></strong>
+                  <small><%= post.content.to_plain_text.truncate(58) %></small>
+                </div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <p class="home-panel-empty">No open prayer requests yet.</p>
+          <% end %>
+        </div>
+      </section>
+
+      <section class="home-mini-panel">
+        <div class="home-panel-head">
+          <span>Trending</span>
+          <%= link_to "Feed", feed_path %>
+        </div>
+        <div class="home-trend-list">
+          <% @trending_posts.first(4).each do |post| %>
+            <%= link_to post_path(post), class: "home-trend-row" do %>
+              <small><%= post.room.name %></small>
+              <strong><%= post.title.truncate(58) %></strong>
+              <span><%= pluralize(post.comments_count, "comment") %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
+
+      <section class="home-mini-panel">
+        <div class="home-panel-head">
+          <span>Library</span>
+          <%= link_to "Open", resources_root_path %>
+        </div>
+        <div class="home-resource-list">
+          <% if @resources.any? %>
+            <% @resources.each do |resource| %>
+              <%= link_to resources_root_path, class: "home-resource-row" do %>
+                <span><%= render_icon(resource.type_icon, classes: "h-4 w-4") %></span>
+                <div>
+                  <strong><%= resource.title.truncate(44) %></strong>
+                  <small><%= resource.resource_category.name %></small>
+                </div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <p class="home-panel-empty">Featured resources will appear here.</p>
+          <% end %>
+        </div>
+      </section>
+    </aside>
+  </div>
 </div>
