@@ -133,61 +133,14 @@
 
       <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-faith-green/10 bg-white/35 px-6 py-4 sm:px-8">
         <div class="flex flex-wrap items-center gap-2">
-          <% if user_signed_in? %>
-            <div class="relative" data-controller="reactions" id="<%= dom_id(@post, :reactions) %>">
-              <% user_like = current_user.likes.find_by(likeable: @post) %>
-              <% if user_like %>
-                <%= button_to unlike_path(likeable_type: "Post", likeable_id: @post.id),
-                    method: :delete,
-                    class: "mystic-action inline-flex items-center gap-2 rounded-full bg-white/75 px-4 py-2 text-sm font-bold text-faith-green",
-                    data: { turbo_frame: "_top" },
-                    title: "Remove reaction" do %>
-                  <span><%= Like.reaction_emoji(user_like.reaction_type) %></span>
-                  <span><%= @post.likes_count %></span>
-                <% end %>
-              <% else %>
-                <button type="button"
-                        class="mystic-action inline-flex items-center gap-2 rounded-full bg-white/75 px-4 py-2 text-sm font-bold"
-                        data-action="click->reactions#showDropdown"
-                        title="Add reaction">
-                  <span>Pray</span>
-                  <span><%= @post.likes_count %></span>
-                </button>
-                <div class="absolute bottom-full left-0 z-50 mb-2 hidden rounded-2xl border border-faith-green/10 bg-white p-2 shadow-xl" data-reactions-target="dropdown">
-                  <div class="flex gap-1">
-                    <% Like.reaction_types.keys.each do |reaction| %>
-                      <%= button_to likes_path(likeable_type: "Post", likeable_id: @post.id, reaction_type: reaction),
-                          class: "rounded-xl p-2 text-xl hover:bg-faith-bg",
-                          title: Like.reaction_label(reaction),
-                          data: { turbo_frame: "_top" } do %>
-                        <%= Like.reaction_emoji(reaction) %>
-                      <% end %>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          <% else %>
-            <span class="mystic-stat">Pray <%= @post.likes_count %></span>
-          <% end %>
-
-          <div id="<%= dom_id(@post, :reshare) %>">
-            <%= render "reshares/button", post: @post %>
-          </div>
+          <%= render "posts/reactions", post: @post %>
+          <%= render "posts/comment_count", post: @post %>
+          <%= render "posts/impressions", post: @post %>
+          <%= render "reshares/button", post: @post %>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <% if user_signed_in? %>
-            <% if current_user.has_bookmarked?(@post) %>
-              <%= button_to post_bookmark_path(@post), method: :delete, class: "btn btn-secondary", data: { turbo_frame: "_top" } do %>
-                Saved
-              <% end %>
-            <% else %>
-              <%= button_to post_bookmark_path(@post), class: "btn btn-secondary", data: { turbo_frame: "_top" } do %>
-                Save
-              <% end %>
-            <% end %>
-          <% end %>
+          <%= render "posts/bookmark_button", post: @post %>
 
           <% if user_signed_in? && (@post.user == current_user || current_user_admin?) %>
             <%= link_to "Edit", edit_post_path(@post), class: "btn btn-secondary" %>
@@ -211,7 +164,7 @@
     <section id="comments" class="mt-8">
       <div class="mystic-panel overflow-hidden">
         <div class="border-b border-faith-green/10 p-6">
-          <h2 class="text-2xl font-bold text-faith-dark">Comments (<%= @post.comments_count %>)</h2>
+          <%= render "comments/count", post: @post %>
         </div>
 
         <% if @post.allow_comments? %>
@@ -227,17 +180,7 @@
             </div>
           <% end %>
 
-          <div class="divide-y divide-faith-green/10">
-            <% if @comments.any? %>
-              <% @comments.each do |comment| %>
-                <%= render "comments/comment", comment: comment, post: @post %>
-              <% end %>
-            <% else %>
-              <div class="p-8 text-center">
-                <p class="text-faith-muted">No comments yet. Be the first to share your thoughts.</p>
-              </div>
-            <% end %>
-          </div>
+          <%= render "comments/list", post: @post %>
         <% else %>
           <div class="p-8 text-center">
             <p class="text-faith-muted">Comments are disabled for this post.</p>

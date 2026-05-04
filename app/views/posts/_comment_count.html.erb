@@ -1,0 +1,4 @@
+<%= link_to post_path(post, anchor: "comments"), class: "fc-action", id: dom_id(post, :comment_count) do %>
+  <%= render_icon("message_circle", classes: "h-4 w-4") %>
+  <%= post.comments_count %>
+<% end %>

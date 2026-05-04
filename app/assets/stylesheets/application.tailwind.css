@@ -1885,6 +1885,19 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--fc-surface-2);
 }
 
+.fc-card-actions form,
+.fc-card-actions span[id$="_bookmark"],
+.fc-card-actions span[id$="_reshare"],
+.fc-card-actions span[id$="_reaction"] {
+  display: inline-flex;
+}
+
+.fc-action-static,
+.fc-action-static:hover {
+  cursor: default;
+  background: transparent;
+}
+
 .fc-side-card {
   background: var(--fc-surface);
   border: 1px solid var(--fc-line-strong);

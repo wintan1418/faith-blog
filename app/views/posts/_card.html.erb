@@ -68,70 +68,20 @@
 
     <footer class="fc-card-actions mt-5">
       <div class="flex flex-wrap items-center gap-3">
-        <% if user_signed_in? %>
-          <div class="relative" data-controller="reactions" id="<%= dom_id(post, :reactions) %>">
-            <% user_like = current_user.likes.find_by(likeable: post) %>
-            <% if user_like %>
-              <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
-                  method: :delete,
-                  class: "fc-action text-[var(--fc-accent)]",
-                  data: { turbo_frame: "_top" },
-                  title: "Remove reaction" do %>
-                <span><%= Like.reaction_emoji(user_like.reaction_type) %></span>
-                <span><%= post.likes_count %></span>
-              <% end %>
-            <% else %>
-              <button type="button"
-                      class="fc-action"
-                      data-action="click->reactions#showDropdown"
-                      title="Add reaction">
-                <span>Pray</span>
-                <span><%= post.likes_count %></span>
-              </button>
+        <%= render "posts/reactions", post: post %>
+        <%= render "posts/comment_count", post: post %>
+        <%= render "posts/impressions", post: post %>
 
-              <div class="absolute bottom-full left-0 z-50 mb-2 hidden rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-2 shadow-xl" data-reactions-target="dropdown">
-                <div class="flex gap-1">
-                  <% Like.reaction_types.keys.each do |reaction| %>
-                    <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_type: reaction),
-                        class: "rounded-md p-2 text-xl hover:bg-[var(--fc-surface-2)]",
-                        title: Like.reaction_label(reaction),
-                        data: { turbo_frame: "_top" } do %>
-                      <%= Like.reaction_emoji(reaction) %>
-                    <% end %>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <span class="font-bold">Pray <%= post.likes_count %></span>
-        <% end %>
-
-        <%= link_to post_path(post, anchor: "comments"), class: "fc-action" do %>
-          <%= render_icon("message_circle", classes: "h-4 w-4") %>
-          <%= post.comments_count %>
-        <% end %>
-
-        <div id="<%= dom_id(post, :reshare) %>" class="leading-none">
-          <%= render "reshares/button", post: post %>
-        </div>
+        <%= render "reshares/button", post: post %>
       </div>
 
       <% if user_signed_in? %>
-        <% if current_user.has_bookmarked?(post) %>
-          <%= button_to post_bookmark_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", data: { turbo_frame: "_top" }, title: "Remove bookmark" do %>
-            <%= render_icon("bookmark", classes: "h-4 w-4") %>
-            Saved
-          <% end %>
-        <% else %>
-          <%= button_to post_bookmark_path(post), class: "fc-action", data: { turbo_frame: "_top" }, title: "Save post" do %>
-            <%= render_icon("bookmark", classes: "h-4 w-4") %>
-            Save
-          <% end %>
-        <% end %>
+        <%= render "posts/bookmark_button", post: post %>
         <% unless post.user == current_user %>
           <%= render "reports/button", reportable: post, label: "Report" %>
         <% end %>
+      <% else %>
+        <%= render "posts/bookmark_button", post: post %>
       <% end %>
     </footer>
   </div>

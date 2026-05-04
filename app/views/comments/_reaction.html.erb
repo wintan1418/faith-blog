@@ -1,0 +1,15 @@
+<span id="<%= dom_id(comment, :reaction) %>">
+  <% if user_signed_in? %>
+    <% if current_user.has_liked?(comment) %>
+      <%= button_to unlike_path(likeable_type: "Comment", likeable_id: comment.id), method: :delete, class: "text-xs font-bold text-faith-green hover:text-faith-dark" do %>
+        Pray <%= comment.likes_count %>
+      <% end %>
+    <% else %>
+      <%= button_to likes_path(likeable_type: "Comment", likeable_id: comment.id), class: "text-xs font-bold text-faith-muted hover:text-faith-green" do %>
+        Pray <%= comment.likes_count.positive? ? comment.likes_count : "" %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <span class="text-xs font-bold text-faith-muted">Pray <%= comment.likes_count %></span>
+  <% end %>
+</span>

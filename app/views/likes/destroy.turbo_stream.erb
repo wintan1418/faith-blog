@@ -1,4 +1,9 @@
-<%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
-  <%= render "likes/reactions", likeable: @likeable %>
+<% if @likeable.is_a?(Post) %>
+  <%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
+    <%= render "posts/reactions", post: @likeable %>
+  <% end %>
+<% else %>
+  <%= turbo_stream.replace dom_id(@likeable, :reaction) do %>
+    <%= render "comments/reaction", comment: @likeable %>
+  <% end %>
 <% end %>
-

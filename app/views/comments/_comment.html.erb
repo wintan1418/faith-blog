@@ -29,19 +29,7 @@
         </div>
 
         <div class="mt-3 flex flex-wrap items-center gap-3">
-          <% if user_signed_in? %>
-            <% if current_user.has_liked?(comment) %>
-              <%= button_to unlike_path(likeable_type: "Comment", likeable_id: comment.id), method: :delete, class: "text-xs font-bold text-faith-green hover:text-faith-dark", data: { turbo_frame: "_top" } do %>
-                Pray <%= comment.likes_count %>
-              <% end %>
-            <% else %>
-              <%= button_to likes_path(likeable_type: "Comment", likeable_id: comment.id), class: "text-xs font-bold text-faith-muted hover:text-faith-green", data: { turbo_frame: "_top" } do %>
-                Pray <%= comment.likes_count > 0 ? comment.likes_count : "" %>
-              <% end %>
-            <% end %>
-          <% else %>
-            <span class="text-xs font-bold text-faith-muted">Pray <%= comment.likes_count %></span>
-          <% end %>
+          <%= render "comments/reaction", comment: comment %>
 
           <% if user_signed_in? && comment.depth < 2 %>
             <button type="button"
@@ -65,7 +53,7 @@
 
         <% if user_signed_in? && comment.depth < 2 %>
           <div class="mt-4 hidden" data-reply-toggle-target="form">
-            <%= form_with url: reply_post_comment_path(post, comment), class: "flex items-start gap-2" do |f| %>
+            <%= form_with url: reply_post_comment_path(post, comment), scope: :comment, class: "flex items-start gap-2" do |f| %>
               <%= f.text_area :content, class: "input resize-none text-sm", rows: 2, placeholder: "Write a reply..." %>
               <%= f.submit "Reply", class: "btn btn-primary btn-sm" %>
             <% end %>

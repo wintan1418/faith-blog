@@ -1,0 +1,17 @@
+<% @post.reload %>
+
+<%= turbo_stream.replace dom_id(@post, :comments_heading) do %>
+  <%= render "comments/count", post: @post %>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@post, :comment_count) do %>
+  <%= render "posts/comment_count", post: @post %>
+<% end %>
+
+<%= turbo_stream.replace dom_id(@post, :comments_list) do %>
+  <%= render "comments/list", post: @post %>
+<% end %>
+
+<%= turbo_stream.replace "comment_form" do %>
+  <%= render "comments/form", post: @post, comment: Comment.new %>
+<% end %>
