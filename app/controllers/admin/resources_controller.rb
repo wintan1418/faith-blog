@@ -3,7 +3,7 @@
 class Admin::ResourcesController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
-  before_action :set_resource, only: [:show, :edit, :update, :destroy, :approve, :reject]
+  before_action :set_resource, only: [ :show, :edit, :update, :destroy, :approve, :reject ]
 
   def index
     @resources = Resource.includes(:user, :resource_category).order(created_at: :desc).page(params[:page]).per(20)
@@ -22,7 +22,7 @@ class Admin::ResourcesController < ApplicationController
     @resource.approved = true
     @resource.approved_by = current_user
     @resource.approved_at = Time.current
-    
+
     if @resource.save
       redirect_to admin_resource_path(@resource), notice: "Resource created."
     else
@@ -49,28 +49,28 @@ class Admin::ResourcesController < ApplicationController
   def approve
     @resource.approve!(current_user)
     ModerationLog.log_action(moderator: current_user, action: "approved_resource", target: @resource)
-    
+
     Notification.create(
       user: @resource.user,
       actor: current_user,
       notifiable: @resource,
       notification_type: :resource_approved
     )
-    
+
     redirect_to admin_resources_path, notice: "Resource approved."
   end
 
   def reject
     @resource.reject!(current_user)
     ModerationLog.log_action(moderator: current_user, action: "rejected_resource", target: @resource)
-    
+
     Notification.create(
       user: @resource.user,
       actor: current_user,
       notifiable: @resource,
       notification_type: :resource_rejected
     )
-    
+
     redirect_to admin_resources_path, notice: "Resource rejected."
   end
 
@@ -84,4 +84,3 @@ class Admin::ResourcesController < ApplicationController
     params.require(:resource).permit(:title, :description, :resource_type, :url, :resource_category_id, :featured)
   end
 end
-

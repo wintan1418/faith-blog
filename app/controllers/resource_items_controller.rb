@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ResourceItemsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_resource, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!, except: [ :index, :show ]
+  before_action :set_resource, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @resources = Resource.approved.includes(:user, :resource_category).recent
@@ -20,7 +20,7 @@ class ResourceItemsController < ApplicationController
 
   def create
     @resource = current_user.resources.build(resource_params)
-    
+
     if @resource.save
       redirect_to resources_root_path, notice: "Resource submitted for approval. Thank you!"
     else
@@ -57,4 +57,3 @@ class ResourceItemsController < ApplicationController
     params.require(:resource).permit(:title, :description, :resource_type, :url, :resource_category_id, :file)
   end
 end
-

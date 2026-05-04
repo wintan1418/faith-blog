@@ -7,4 +7,3 @@ class MakeCommentsContentNullable < ActiveRecord::Migration[8.0]
     change_column_null :comments, :content, true
   end
 end
-

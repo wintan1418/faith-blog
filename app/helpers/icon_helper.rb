@@ -1,7 +1,7 @@
 module IconHelper
   def render_icon(name, classes: "w-6 h-6")
     icon_name = name.to_s.downcase
-    
+
     case icon_name
     when "heart"
       icon_svg("M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z", classes)
@@ -98,7 +98,7 @@ module IconHelper
       raw(if path.include?("<path") then path else "<path d='#{path}' />" end)
     end
   end
-  
+
   def icon_path(d, classes)
     # helper for multi-path icons
     ""

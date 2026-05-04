@@ -83,4 +83,3 @@ class Notification < ApplicationRecord
     user.notifications.unread.update_all(read_at: Time.current)
   end
 end
-

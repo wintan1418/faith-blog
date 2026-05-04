@@ -9,7 +9,7 @@ class Post < ApplicationRecord
 
   # Rich text content
   has_rich_text :content
-  
+
   # Multiple images (up to 5)
   has_many_attached :images
 
@@ -28,10 +28,10 @@ class Post < ApplicationRecord
   has_many :tags, through: :post_tags
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
-  
+
   # Post linking (outbound = posts this links TO, inbound = posts that link TO this)
-  has_many :outbound_links, class_name: 'PostLink', foreign_key: :source_post_id, dependent: :destroy
-  has_many :inbound_links, class_name: 'PostLink', foreign_key: :target_post_id, dependent: :destroy
+  has_many :outbound_links, class_name: "PostLink", foreign_key: :source_post_id, dependent: :destroy
+  has_many :inbound_links, class_name: "PostLink", foreign_key: :target_post_id, dependent: :destroy
   has_many :linked_posts, through: :outbound_links, source: :target_post
   has_many :linking_posts, through: :inbound_links, source: :source_post
 
@@ -43,9 +43,9 @@ class Post < ApplicationRecord
 
   # Search
   pg_search_scope :search,
-                  against: [:title],
+                  against: [ :title ],
                   associated_against: {
-                    rich_text_content: [:body]
+                    rich_text_content: [ :body ]
                   },
                   using: {
                     tsearch: { prefix: true, dictionary: "english" }
@@ -116,4 +116,3 @@ class Post < ApplicationRecord
     process_mentions!(user) if user.present?
   end
 end
-

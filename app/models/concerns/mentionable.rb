@@ -34,15 +34,15 @@ module Mentionable
       content.to_plain_text
     else
       # Strip HTML tags manually
-      html_content.gsub(/<[^>]+>/, ' ')
+      html_content.gsub(/<[^>]+>/, " ")
     end
 
     # Extract from HTML (mentions might be in HTML like <div>@username</div>)
     html_mentions = html_content.scan(/@([a-zA-Z0-9_-]{3,30})/).flatten.uniq
-    
+
     # Extract from plain text (in case they're in text nodes)
     plain_mentions = plain_text.scan(/@([a-zA-Z0-9_-]{3,30})/).flatten.uniq
-    
+
     # Combine and return unique mentions
     (html_mentions + plain_mentions).uniq
   end
@@ -50,7 +50,7 @@ module Mentionable
   # Process mentions and create Mention records
   def process_mentions!(mentioned_by_user)
     return [] unless mentioned_by_user.present?
-    
+
     usernames = extract_mentions
     return [] if usernames.empty?
 
@@ -78,7 +78,7 @@ module Mentionable
         actor: mentioned_by_user,
         notifiable: self,
         notification_type: :mentioned
-      ).where('created_at > ?', 1.hour.ago).first
+      ).where("created_at > ?", 1.hour.ago).first
 
       unless existing_notification
         Notification.create(
@@ -98,7 +98,7 @@ module Mentionable
     if respond_to?(:content) && content.present?
       # For ActionText, we need to process the HTML
       html_content = content.to_s
-      
+
       # Replace @username with links in HTML
       html_content.gsub(/@([a-zA-Z0-9_-]{3,30})/) do |match|
         username = $1
@@ -126,4 +126,3 @@ module Mentionable
     end
   end
 end
-

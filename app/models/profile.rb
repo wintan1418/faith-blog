@@ -13,15 +13,14 @@ class Profile < ApplicationRecord
 
   # Avatar variant helpers
   def avatar_thumbnail
-    avatar.variant(resize_to_fill: [100, 100])
+    avatar.variant(resize_to_fill: [ 100, 100 ])
   end
 
   def avatar_medium
-    avatar.variant(resize_to_fill: [200, 200])
+    avatar.variant(resize_to_fill: [ 200, 200 ])
   end
 
   def avatar_large
-    avatar.variant(resize_to_fill: [400, 400])
+    avatar.variant(resize_to_fill: [ 400, 400 ])
   end
 end
-

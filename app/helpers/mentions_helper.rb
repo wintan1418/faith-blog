@@ -22,9 +22,9 @@ module MentionsHelper
     result = ""
     i = 0
     while i < html.length
-      if html[i] == '<'
+      if html[i] == "<"
         # Find the end of the tag
-        tag_end = html.index('>', i)
+        tag_end = html.index(">", i)
         if tag_end
           # Add the entire tag as-is
           result += html[i..tag_end]
@@ -35,9 +35,9 @@ module MentionsHelper
         end
       else
         # Find the start of the next tag or end of string
-        next_tag = html.index('<', i)
+        next_tag = html.index("<", i)
         text_content = next_tag ? html[i...next_tag] : html[i..-1]
-        
+
         # Process mentions in this text content
         processed_text = text_content.gsub(/@([a-zA-Z0-9_-]{3,30})/) do |match|
           username = $1
@@ -48,7 +48,7 @@ module MentionsHelper
             match
           end
         end
-        
+
         result += processed_text
         i = next_tag || html.length
       end
@@ -62,4 +62,3 @@ module MentionsHelper
     mentionable.mentioned_users if mentionable.respond_to?(:mentioned_users)
   end
 end
-

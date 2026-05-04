@@ -9,8 +9,7 @@ class CreateConnectionRequests < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :connection_requests, [:sender_id, :receiver_id], unique: true
+    add_index :connection_requests, [ :sender_id, :receiver_id ], unique: true
     add_index :connection_requests, :status
   end
 end
-

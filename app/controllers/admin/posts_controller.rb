@@ -3,7 +3,7 @@
 class Admin::PostsController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
-  before_action :set_post, only: [:show, :edit, :update, :destroy, :feature, :unfeature]
+  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature ]
 
   def index
     @posts = Post.includes(:user, :room).order(created_at: :desc).page(params[:page]).per(20)
@@ -51,4 +51,3 @@ class Admin::PostsController < ApplicationController
     params.require(:post).permit(:title, :status, :featured, :room_id)
   end
 end
-

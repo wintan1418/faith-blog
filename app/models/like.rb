@@ -9,7 +9,7 @@ class Like < ApplicationRecord
   belongs_to :likeable, polymorphic: true, counter_cache: :likes_count
 
   # Validations
-  validates :user_id, uniqueness: { scope: [:likeable_type, :likeable_id], message: "has already reacted to this" }
+  validates :user_id, uniqueness: { scope: [ :likeable_type, :likeable_id ], message: "has already reacted to this" }
 
   # Scopes
   scope :by_reaction, ->(reaction) { where(reaction_type: reaction) }
@@ -37,4 +37,3 @@ class Like < ApplicationRecord
     end
   end
 end
-

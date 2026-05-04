@@ -29,8 +29,8 @@ class User < ApplicationRecord
 
   # Brethren Card & Connection Requests
   has_one :brethren_card, dependent: :destroy
-  has_many :sent_connection_requests, class_name: 'ConnectionRequest', foreign_key: :sender_id, dependent: :destroy
-  has_many :received_connection_requests, class_name: 'ConnectionRequest', foreign_key: :receiver_id, dependent: :destroy
+  has_many :sent_connection_requests, class_name: "ConnectionRequest", foreign_key: :sender_id, dependent: :destroy
+  has_many :received_connection_requests, class_name: "ConnectionRequest", foreign_key: :receiver_id, dependent: :destroy
 
   # Following system
   has_many :active_follows, class_name: "Follow", foreign_key: :follower_id, dependent: :destroy
@@ -134,4 +134,3 @@ class User < ApplicationRecord
     build_brethren_card.save(validate: false)
   end
 end
-

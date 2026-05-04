@@ -21,4 +21,3 @@ class Settings::AccountsController < ApplicationController
     params.require(:user).permit(:email, :username, :password, :password_confirmation)
   end
 end
-

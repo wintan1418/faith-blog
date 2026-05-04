@@ -8,6 +8,15 @@ module ApplicationHelper
     title.present? ? "#{title} - #{base_title}" : base_title
   end
 
+  def safe_external_url(url)
+    uri = URI.parse(url.to_s)
+    return url if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+
+    "#"
+  rescue URI::InvalidURIError
+    "#"
+  end
+
   def avatar_for(user, size: :medium)
     sizes = {
       small: "w-8 h-8",
@@ -20,10 +29,10 @@ module ApplicationHelper
 
     if user.profile.avatar.attached?
       variant = case size
-                when :small then user.profile.avatar_thumbnail
-                when :large, :xlarge then user.profile.avatar_large
-                else user.profile.avatar_medium
-                end
+      when :small then user.profile.avatar_thumbnail
+      when :large, :xlarge then user.profile.avatar_large
+      else user.profile.avatar_medium
+      end
       image_tag variant, class: css_class
     else
       content_tag :div, class: "#{sizes[size]} rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium" do
@@ -36,7 +45,7 @@ module ApplicationHelper
     return "" unless time
 
     seconds = (Time.current - time).to_i
-    
+
     case seconds
     when 0..59 then "#{seconds}s"
     when 60..3599 then "#{seconds / 60}m"
@@ -51,7 +60,7 @@ module ApplicationHelper
     return "" if pagy.pages <= 1
 
     html = '<nav class="flex items-center justify-center gap-1" aria-label="Pagination">'
-    
+
     if pagy.prev
       html += link_to(pagy_url_for(pagy, pagy.prev), class: "px-3 py-2 rounded-lg text-sm font-medium text-stone-600 hover:bg-stone-100 transition-colors") do
         '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>'.html_safe
@@ -75,7 +84,7 @@ module ApplicationHelper
       end
     end
 
-    html += '</nav>'
+    html += "</nav>"
     html.html_safe
   end
 end

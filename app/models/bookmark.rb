@@ -11,4 +11,3 @@ class Bookmark < ApplicationRecord
   # Scopes
   scope :recent, -> { order(created_at: :desc) }
 end
-

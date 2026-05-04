@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   # Devise authentication
   devise_for :users, controllers: {
-    registrations: 'users/registrations',
-    sessions: 'users/sessions'
+    registrations: "users/registrations",
+    sessions: "users/sessions"
   }
 
   # Root path
@@ -19,12 +19,12 @@ Rails.application.routes.draw do
   get "feed/following", to: "feed#following"
 
   # Rooms
-  resources :rooms, only: [:index, :show] do
+  resources :rooms, only: [ :index, :show ] do
     member do
       post :join
       delete :leave
     end
-    resources :posts, only: [:index], module: :rooms
+    resources :posts, only: [ :index ], module: :rooms
   end
 
   # Posts
@@ -33,13 +33,13 @@ Rails.application.routes.draw do
       post :feature
       post :unfeature
     end
-    resources :comments, only: [:create, :update, :destroy] do
+    resources :comments, only: [ :create, :update, :destroy ] do
       member do
         post :reply
       end
     end
-    resource :bookmark, only: [:create, :destroy]
-    resource :reshare, only: [:create, :destroy]
+    resource :bookmark, only: [ :create, :destroy ]
+    resource :reshare, only: [ :create, :destroy ]
   end
 
   # Likes (polymorphic)
@@ -50,7 +50,7 @@ Rails.application.routes.draw do
   get "mentions", to: "users#mentions"
 
   # User profiles
-  resources :users, only: [:show], param: :username, path: "u" do
+  resources :users, only: [ :show ], param: :username, path: "u" do
     member do
       post :follow
       delete :unfollow
@@ -72,13 +72,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :resource_categories, only: [:index, :show]
+  resources :resource_categories, only: [ :index, :show ]
 
   # Bookmarks
   get "bookmarks", to: "bookmarks#index"
 
   # Notifications
-  resources :notifications, only: [:index] do
+  resources :notifications, only: [ :index ] do
     collection do
       post :mark_all_read
     end
@@ -93,17 +93,17 @@ Rails.application.routes.draw do
   # Settings
   namespace :settings do
     get "/", to: redirect("/settings/profile/edit")
-    resource :profile, only: [:edit, :update]
-    resource :account, only: [:edit, :update]
-    resource :notifications, only: [:edit, :update]
-    resource :privacy, only: [:edit, :update]
-    resource :brethren_card, only: [:edit, :update]
-    resource :dark_mode, only: [:update]
+    resource :profile, only: [ :edit, :update ]
+    resource :account, only: [ :edit, :update ]
+    resource :notifications, only: [ :edit, :update ]
+    resource :privacy, only: [ :edit, :update ]
+    resource :brethren_card, only: [ :edit, :update ]
+    resource :dark_mode, only: [ :update ]
   end
 
   # Brethren Card & Connection Requests
-  resources :brethren_cards, only: [:show], param: :username
-  resources :connection_requests, only: [:index, :create] do
+  resources :brethren_cards, only: [ :show ], param: :username
+  resources :connection_requests, only: [ :index, :create ] do
     member do
       post :accept
       post :decline
@@ -141,7 +141,7 @@ Rails.application.routes.draw do
         post :dismiss
       end
     end
-    resources :moderation_logs, only: [:index, :show]
+    resources :moderation_logs, only: [ :index, :show ]
   end
 
   # Health check

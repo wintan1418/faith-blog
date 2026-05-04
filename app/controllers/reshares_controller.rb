@@ -6,7 +6,7 @@ class ResharesController < ApplicationController
 
   def create
     @reshare = current_user.reshares.find_or_initialize_by(post: @post)
-    
+
     if @reshare.save
       respond_to do |format|
         format.html { redirect_back fallback_location: @post, notice: "Post reshared!" }
@@ -19,7 +19,7 @@ class ResharesController < ApplicationController
 
   def destroy
     @reshare = current_user.reshares.find_by(post: @post)
-    
+
     if @reshare&.destroy
       respond_to do |format|
         format.html { redirect_back fallback_location: @post, notice: "Reshare removed." }

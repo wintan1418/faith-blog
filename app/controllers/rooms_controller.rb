@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class RoomsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_room, only: [:show, :join, :leave]
+  before_action :authenticate_user!, except: [ :index, :show ]
+  before_action :set_room, only: [ :show, :join, :leave ]
 
   def index
     @rooms = Room.public_rooms.ordered
@@ -17,7 +17,7 @@ class RoomsController < ApplicationController
 
   def join
     membership = current_user.room_memberships.find_or_initialize_by(room: @room)
-    
+
     if membership.new_record? && membership.save
       redirect_to @room, notice: "You've joined #{@room.name}!"
     else
@@ -27,7 +27,7 @@ class RoomsController < ApplicationController
 
   def leave
     membership = current_user.room_memberships.find_by(room: @room)
-    
+
     if membership&.destroy
       redirect_to @room, notice: "You've left #{@room.name}."
     else
@@ -41,4 +41,3 @@ class RoomsController < ApplicationController
     @room = Room.friendly.find(params[:id])
   end
 end
-

@@ -32,7 +32,7 @@
 
           <div class="mt-6 flex flex-wrap gap-3">
             <% if @resource.url.present? %>
-              <%= link_to "Open Resource", @resource.url, target: "_blank", rel: "noopener", class: "btn btn-primary" %>
+              <%= link_to "Open Resource", safe_external_url(@resource.url), target: "_blank", rel: "noopener", class: "btn btn-primary" %>
             <% end %>
             <% if @resource.file.attached? %>
               <%= link_to "Download File", rails_blob_path(@resource.file, disposition: "attachment"), class: "btn btn-primary" %>

@@ -1,6 +1,6 @@
 class ConnectionRequestsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_connection_request, only: [:accept, :decline]
+  before_action :set_connection_request, only: [ :accept, :decline ]
 
   def index
     @pending_requests = current_user.received_connection_requests.pending.includes(sender: :brethren_card)
@@ -13,7 +13,7 @@ class ConnectionRequestsController < ApplicationController
 
   def create
     receiver = User.find(params[:receiver_id])
-    
+
     # Check if current user's brethren card is complete
     unless current_user.brethren_card&.complete?
       redirect_back fallback_location: settings_brethren_card_path,
@@ -78,11 +78,10 @@ class ConnectionRequestsController < ApplicationController
 
   def set_connection_request
     @connection_request = ConnectionRequest.find(params[:id])
-    
+
     unless @connection_request.receiver == current_user
       redirect_back fallback_location: connection_requests_path,
                     alert: "You can only respond to requests sent to you."
     end
   end
 end
-

@@ -24,4 +24,3 @@ class CreateRooms < ActiveRecord::Migration[8.0]
     add_index :rooms, :position
   end
 end
-

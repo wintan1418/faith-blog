@@ -14,4 +14,3 @@ class RoomMembership < ApplicationRecord
   # Scopes
   scope :with_notifications, -> { where(notifications_enabled: true) }
 end
-

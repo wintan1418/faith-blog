@@ -72,7 +72,7 @@ group :development, :test do
 end
 
 # Environment variables from .env file
-gem "dotenv-rails", groups: [:development, :test, :production]
+gem "dotenv-rails", groups: [ :development, :test, :production ]
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]

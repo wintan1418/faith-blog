@@ -25,8 +25,7 @@ class CreatePosts < ActiveRecord::Migration[8.0]
     add_index :posts, :featured
     add_index :posts, :published_at
     add_index :posts, :views_count
-    add_index :posts, [:user_id, :status]
-    add_index :posts, [:room_id, :status, :published_at]
+    add_index :posts, [ :user_id, :status ]
+    add_index :posts, [ :room_id, :status, :published_at ]
   end
 end
-

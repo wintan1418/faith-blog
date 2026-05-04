@@ -15,4 +15,3 @@ class ResourceCategory < ApplicationRecord
   scope :ordered, -> { order(position: :asc) }
   scope :with_approved_resources, -> { joins(:resources).where(resources: { approved: true }).distinct }
 end
-

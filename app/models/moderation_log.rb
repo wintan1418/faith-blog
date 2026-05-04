@@ -24,4 +24,3 @@ class ModerationLog < ApplicationRecord
     )
   end
 end
-

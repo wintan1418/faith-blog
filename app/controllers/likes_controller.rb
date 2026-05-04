@@ -21,7 +21,7 @@ class LikesController < ApplicationController
 
   def destroy
     @like = current_user.likes.find_by(likeable: @likeable)
-    
+
     if @like&.destroy
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path }
@@ -35,10 +35,14 @@ class LikesController < ApplicationController
   private
 
   def set_likeable
-    @likeable_type = params[:likeable_type].classify
+    @likeable_type = params[:likeable_type].to_s.classify
     @likeable_id = params[:likeable_id]
-    @likeable = @likeable_type.constantize.find(@likeable_id)
-  rescue
+
+    likeable_class = { "Post" => Post, "Comment" => Comment }[@likeable_type]
+    raise ActiveRecord::RecordNotFound unless likeable_class
+
+    @likeable = likeable_class.find(@likeable_id)
+  rescue ActiveRecord::RecordNotFound
     redirect_back fallback_location: root_path, alert: "Invalid content."
   end
 
@@ -55,4 +59,3 @@ class LikesController < ApplicationController
     )
   end
 end
-

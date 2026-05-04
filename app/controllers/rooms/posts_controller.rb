@@ -15,4 +15,3 @@ class Rooms::PostsController < ApplicationController
     @room = Room.friendly.find(params[:room_id])
   end
 end
-

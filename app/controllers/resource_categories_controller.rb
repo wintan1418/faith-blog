@@ -10,4 +10,3 @@ class ResourceCategoriesController < ApplicationController
     @pagy, @resources = pagy(@category.resources.approved.includes(:user).recent)
   end
 end
-

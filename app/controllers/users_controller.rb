@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
-  before_action :authenticate_user!, except: [:show, :posts]
-  before_action :set_user, except: [:mentions]
+  before_action :authenticate_user!, except: [ :show, :posts ]
+  before_action :set_user, except: [ :mentions ]
 
   def show
     @pagy, @posts = pagy(@user.posts.published.includes(:room, :tags).recent)
@@ -18,7 +18,7 @@ class UsersController < ApplicationController
     return render json: [] if query.length < 1
 
     users = User.where("username ILIKE ? OR email ILIKE ?", "%#{query}%", "%#{query}%").limit(10)
-    
+
     render json: users.map { |u|
       {
         username: u.username,
@@ -64,4 +64,3 @@ class UsersController < ApplicationController
     @user = User.find_by!(username: params[:username])
   end
 end
-

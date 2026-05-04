@@ -27,4 +27,3 @@ class Follow < ApplicationRecord
     )
   end
 end
-

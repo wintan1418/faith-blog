@@ -38,7 +38,7 @@
 
       <div>
         <h3 class="text-sm font-semibold text-gray-500 uppercase mb-1">URL</h3>
-        <%= link_to @resource.url, @resource.url, target: "_blank", class: "text-amber-600 hover:underline break-all" %>
+        <%= link_to @resource.url, safe_external_url(@resource.url), target: "_blank", rel: "noopener", class: "text-amber-600 hover:underline break-all" %>
       </div>
     </div>
   </div>
@@ -90,4 +90,3 @@
     <% end %>
   </div>
 </div>
-

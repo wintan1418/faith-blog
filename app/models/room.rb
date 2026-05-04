@@ -41,4 +41,3 @@ class Room < ApplicationRecord
     room_memberships.exists?(user: user, role: :moderator)
   end
 end
-

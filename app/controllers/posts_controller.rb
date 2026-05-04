@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_post, only: [:show, :edit, :update, :destroy, :feature, :unfeature]
-  before_action :authorize_post!, only: [:edit, :update, :destroy]
-  before_action :authorize_feature!, only: [:feature, :unfeature]
+  before_action :authenticate_user!, except: [ :index, :show ]
+  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature ]
+  before_action :authorize_post!, only: [ :edit, :update, :destroy ]
+  before_action :authorize_feature!, only: [ :feature, :unfeature ]
 
   def index
     @pagy, @posts = pagy(
@@ -25,7 +25,7 @@ class PostsController < ApplicationController
 
   def create
     @post = current_user.posts.build(post_params)
-    
+
     if @post.save
       handle_post_links
       # Mentions are processed in after_save callback, no need to call again
@@ -80,10 +80,10 @@ class PostsController < ApplicationController
 
   def handle_post_links
     return unless params[:linked_post_ids].present?
-    
+
     # Clear existing links and create new ones
     @post.outbound_links.destroy_all
-    
+
     linked_ids = params[:linked_post_ids].reject(&:blank?)
     linked_ids.each do |target_id|
       @post.outbound_links.create(target_post_id: target_id, link_type: :related)
@@ -102,4 +102,3 @@ class PostsController < ApplicationController
     end
   end
 end
-

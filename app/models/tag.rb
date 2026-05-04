@@ -32,4 +32,3 @@ class Tag < ApplicationRecord
     self.name = name.downcase
   end
 end
-

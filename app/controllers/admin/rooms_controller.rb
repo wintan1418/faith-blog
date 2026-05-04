@@ -3,7 +3,7 @@
 class Admin::RoomsController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
-  before_action :set_room, only: [:show, :edit, :update, :destroy]
+  before_action :set_room, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @rooms = Room.ordered
@@ -51,4 +51,3 @@ class Admin::RoomsController < ApplicationController
     params.require(:room).permit(:name, :description, :room_type, :icon, :color, :rules, :is_public, :position)
   end
 end
-

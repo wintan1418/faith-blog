@@ -32,4 +32,3 @@ class FeedController < ApplicationController
     render :index
   end
 end
-

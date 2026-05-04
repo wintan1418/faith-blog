@@ -7,4 +7,3 @@ class Resources::HomeController < ApplicationController
     @recent_resources = Resource.approved.recent.includes(:resource_category, :user).limit(10)
   end
 end
-

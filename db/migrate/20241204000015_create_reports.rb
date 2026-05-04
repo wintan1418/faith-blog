@@ -15,7 +15,6 @@ class CreateReports < ActiveRecord::Migration[8.0]
     end
 
     add_index :reports, :status
-    add_index :reports, [:reportable_type, :reportable_id, :status]
+    add_index :reports, [ :reportable_type, :reportable_id, :status ]
   end
 end
-

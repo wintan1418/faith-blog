@@ -25,7 +25,7 @@ class Resource < ApplicationRecord
 
   # Search
   pg_search_scope :search,
-                  against: [:title, :description],
+                  against: [ :title, :description ],
                   using: {
                     tsearch: { prefix: true, dictionary: "english" }
                   }
@@ -67,4 +67,3 @@ class Resource < ApplicationRecord
     end
   end
 end
-

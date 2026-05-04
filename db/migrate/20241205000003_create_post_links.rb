@@ -8,7 +8,6 @@ class CreatePostLinks < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :post_links, [:source_post_id, :target_post_id], unique: true
+    add_index :post_links, [ :source_post_id, :target_post_id ], unique: true
   end
 end
-

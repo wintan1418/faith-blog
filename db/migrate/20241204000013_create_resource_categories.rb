@@ -16,4 +16,3 @@ class CreateResourceCategories < ActiveRecord::Migration[8.0]
     add_index :resource_categories, :position
   end
 end
-

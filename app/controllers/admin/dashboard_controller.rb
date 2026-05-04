@@ -15,4 +15,3 @@ class Admin::DashboardController < ApplicationController
     @recent_users = User.includes(:profile).order(created_at: :desc).limit(5)
   end
 end
-

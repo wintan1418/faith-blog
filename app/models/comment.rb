@@ -64,4 +64,3 @@ class Comment < ApplicationRecord
     process_mentions!(user) if user.present?
   end
 end
-

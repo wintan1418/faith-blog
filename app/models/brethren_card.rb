@@ -12,7 +12,7 @@ class BrethrenCard < ApplicationRecord
   def whatsapp_link
     return nil unless whatsapp_number.present?
     # Remove non-digits and create WhatsApp link
-    clean_number = whatsapp_number.gsub(/\D/, '')
+    clean_number = whatsapp_number.gsub(/\D/, "")
     "https://wa.me/#{clean_number}"
   end
 
@@ -39,4 +39,3 @@ class BrethrenCard < ApplicationRecord
     ].all?
   end
 end
-

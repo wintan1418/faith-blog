@@ -11,8 +11,7 @@ class CreateRoomMemberships < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :room_memberships, [:user_id, :room_id], unique: true
+    add_index :room_memberships, [ :user_id, :room_id ], unique: true
     add_index :room_memberships, :role
   end
 end
-

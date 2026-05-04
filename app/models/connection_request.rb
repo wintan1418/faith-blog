@@ -1,6 +1,6 @@
 class ConnectionRequest < ApplicationRecord
-  belongs_to :sender, class_name: 'User'
-  belongs_to :receiver, class_name: 'User'
+  belongs_to :sender, class_name: "User"
+  belongs_to :receiver, class_name: "User"
 
   enum :status, { pending: 0, accepted: 1, declined: 2 }
 
@@ -50,7 +50,7 @@ class ConnectionRequest < ApplicationRecord
 
   def notify_on_acceptance
     return unless saved_change_to_status? && accepted?
-    
+
     Notification.create!(
       user: sender,
       actor: receiver,
@@ -59,4 +59,3 @@ class ConnectionRequest < ApplicationRecord
     )
   end
 end
-

@@ -3,7 +3,7 @@
 class Admin::UsersController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin]
+  before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin ]
 
   def index
     @users = User.includes(:profile).order(created_at: :desc).page(params[:page]).per(20)
@@ -59,7 +59,6 @@ class Admin::UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:username, :email, :role, :active)
+    params.require(:user).permit(:username, :email)
   end
 end
-

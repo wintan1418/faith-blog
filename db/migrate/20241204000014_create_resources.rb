@@ -24,7 +24,6 @@ class CreateResources < ActiveRecord::Migration[8.0]
     add_index :resources, :resource_type
     add_index :resources, :approved
     add_index :resources, :featured
-    add_index :resources, [:approved, :created_at]
+    add_index :resources, [ :approved, :created_at ]
   end
 end
-

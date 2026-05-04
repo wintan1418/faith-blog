@@ -62,7 +62,7 @@ Rails.application.configure do
 
   # Set host to be used by links generated in mailer templates.
   # Update this with your actual domain
-  config.action_mailer.default_url_options = { 
+  config.action_mailer.default_url_options = {
     host: ENV.fetch("RAILS_HOST", "yourdomain.com"),
     protocol: "https"
   }

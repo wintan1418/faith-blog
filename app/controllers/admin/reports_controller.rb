@@ -3,7 +3,7 @@
 class Admin::ReportsController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
-  before_action :set_report, only: [:show, :resolve, :dismiss]
+  before_action :set_report, only: [ :show, :resolve, :dismiss ]
 
   def index
     @reports = Report.includes(:reporter, :reportable).order(created_at: :desc).page(params[:page]).per(20)
@@ -31,4 +31,3 @@ class Admin::ReportsController < ApplicationController
     @report = Report.find(params[:id])
   end
 end
-

@@ -40,4 +40,3 @@ class BookmarksController < ApplicationController
     @post = Post.friendly.find(params[:post_id]) if params[:post_id]
   end
 end
-

@@ -13,8 +13,7 @@ class CreateModerationLogs < ActiveRecord::Migration[8.0]
     end
 
     add_index :moderation_logs, :action
-    add_index :moderation_logs, [:target_type, :target_id]
+    add_index :moderation_logs, [ :target_type, :target_id ]
     add_index :moderation_logs, :created_at
   end
 end
-
