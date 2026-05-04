@@ -50,7 +50,7 @@ namespace :faith do
       user.password_confirmation = user.password
     end
 
-    user.role = :admin
+    user.role = :super_admin
     user.active = true if user.respond_to?(:active=)
     user.verified_at ||= Time.current if user.respond_to?(:verified_at=)
     user.save!

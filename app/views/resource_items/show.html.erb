@@ -56,6 +56,11 @@
               <%= link_to "Edit Resource", edit_resources_item_path(@resource), class: "btn btn-secondary w-full" %>
             </div>
           <% end %>
+          <% if user_signed_in? && @resource.user != current_user %>
+            <div class="rounded-lg bg-white/60 p-4">
+              <%= render "reports/button", reportable: @resource, label: "Report Resource", classes: "btn btn-secondary w-full text-red-600" %>
+            </div>
+          <% end %>
         </aside>
       </div>
     </article>

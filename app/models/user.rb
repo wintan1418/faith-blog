@@ -7,7 +7,7 @@ class User < ApplicationRecord
          :trackable
 
   # Enums
-  enum :role, { member: 0, moderator: 1, admin: 2 }
+  enum :role, { member: 0, moderator: 1, admin: 2, super_admin: 3 }
 
   # Associations
   has_one :profile, dependent: :destroy
@@ -57,7 +57,15 @@ class User < ApplicationRecord
   end
 
   def admin_or_moderator?
-    admin? || moderator?
+    super_admin? || admin? || moderator?
+  end
+
+  def active_for_authentication?
+    super && active?
+  end
+
+  def inactive_message
+    active? ? super : :inactive
   end
 
   def follow(user)

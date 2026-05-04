@@ -6,7 +6,7 @@ class Admin::UsersController < ApplicationController
   before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin ]
 
   def index
-    @users = User.includes(:profile).order(created_at: :desc).page(params[:page]).per(20)
+    @pagy, @users = pagy(User.includes(:profile).order(created_at: :desc), items: 20)
   end
 
   def show

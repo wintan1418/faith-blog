@@ -46,6 +46,7 @@ Rails.application.routes.draw do
   # Likes (polymorphic)
   post "likes/:likeable_type/:likeable_id", to: "likes#create", as: :likes
   delete "likes/:likeable_type/:likeable_id", to: "likes#destroy", as: :unlike
+  resources :reports, only: [ :create ]
 
   # Mentions autocomplete
   get "mentions", to: "users#mentions"
@@ -66,12 +67,7 @@ Rails.application.routes.draw do
     root to: "home#index"
   end
 
-  resources :resource_items, path: "resources", as: :resources_items do
-    member do
-      post :approve
-      post :reject
-    end
-  end
+  resources :resource_items, path: "resources", as: :resources_items
 
   resources :resource_categories, only: [ :index, :show ]
 
@@ -136,7 +132,7 @@ Rails.application.routes.draw do
         post :reject
       end
     end
-    resources :reports do
+    resources :reports, only: [ :index, :show ] do
       member do
         post :resolve
         post :dismiss

@@ -1,0 +1,46 @@
+<% content_for(:page_title) { "Reports" } %>
+
+<div class="mb-6">
+  <p class="text-gray-600"><%= pluralize(@pending_reports, "pending report") %> needs review.</p>
+</div>
+
+<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+  <table class="w-full">
+    <thead class="border-b border-gray-200 bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Content</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Reason</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Reporter</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+        <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200">
+      <% @reports.each do |report| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4">
+            <p class="font-semibold text-gray-900"><%= report.reportable_type %> #<%= report.reportable_id %></p>
+            <p class="text-xs text-gray-500"><%= time_ago_in_words(report.created_at) %> ago</p>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700"><%= truncate(report.reason, length: 90) %></td>
+          <td class="px-6 py-4 text-sm text-gray-700"><%= report.reporter&.username || "Unknown" %></td>
+          <td class="px-6 py-4"><span class="badge badge-secondary"><%= report.status.humanize %></span></td>
+          <td class="px-6 py-4 text-right">
+            <% if report.pending? %>
+              <div class="flex justify-end gap-2">
+                <%= button_to "Resolve", resolve_admin_report_path(report), method: :post, class: "btn btn-primary btn-sm" %>
+                <%= button_to "Dismiss", dismiss_admin_report_path(report), method: :post, class: "btn btn-secondary btn-sm" %>
+              </div>
+            <% else %>
+              <%= link_to "View", admin_report_path(report), class: "btn btn-secondary btn-sm" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+<% end %>

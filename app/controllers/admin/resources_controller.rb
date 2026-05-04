@@ -6,7 +6,7 @@ class Admin::ResourcesController < ApplicationController
   before_action :set_resource, only: [ :show, :edit, :update, :destroy, :approve, :reject ]
 
   def index
-    @resources = Resource.includes(:user, :resource_category).order(created_at: :desc).page(params[:page]).per(20)
+    @pagy, @resources = pagy(Resource.includes(:user, :resource_category).order(created_at: :desc), items: 20)
   end
 
   def show

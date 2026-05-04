@@ -200,6 +200,10 @@
               <%= button_to "Feature", feature_post_path(@post), class: "btn btn-secondary" %>
             <% end %>
           <% end %>
+
+          <% if user_signed_in? && @post.user != current_user %>
+            <%= render "reports/button", reportable: @post, label: "Report", classes: "btn btn-secondary text-red-600" %>
+          <% end %>
         </div>
       </footer>
     </article>

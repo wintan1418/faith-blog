@@ -6,7 +6,7 @@ class Admin::PostsController < ApplicationController
   before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature ]
 
   def index
-    @posts = Post.includes(:user, :room).order(created_at: :desc).page(params[:page]).per(20)
+    @pagy, @posts = pagy(Post.includes(:user, :room).order(created_at: :desc), items: 20)
   end
 
   def show

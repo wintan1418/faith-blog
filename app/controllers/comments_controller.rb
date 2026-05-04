@@ -7,6 +7,8 @@ class CommentsController < ApplicationController
   before_action :authorize_comment!, only: [ :update, :destroy ]
 
   def create
+    return redirect_to(@post, alert: "Comments are disabled for this post.") unless @post.allow_comments?
+
     @comment = @post.comments.build(comment_params)
     @comment.user = current_user
 
@@ -26,6 +28,8 @@ class CommentsController < ApplicationController
   end
 
   def reply
+    return redirect_to(@post, alert: "Comments are disabled for this post.") unless @post.allow_comments?
+
     @reply = @post.comments.build(comment_params)
     @reply.user = current_user
     @reply.parent_comment = @comment

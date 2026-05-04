@@ -1,0 +1,39 @@
+<% content_for(:page_title) { "Report ##{@report.id}" } %>
+
+<div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+  <div class="mb-5 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wide text-gray-500"><%= @report.reportable_type %> #<%= @report.reportable_id %></p>
+      <h2 class="mt-1 text-2xl font-bold text-gray-900"><%= @report.status.humanize %></h2>
+    </div>
+    <%= link_to "Back to Reports", admin_reports_path, class: "btn btn-secondary" %>
+  </div>
+
+  <dl class="grid gap-4 md:grid-cols-2">
+    <div>
+      <dt class="text-sm font-bold text-gray-500">Reporter</dt>
+      <dd class="mt-1 text-gray-900"><%= @report.reporter&.username || "Unknown" %></dd>
+    </div>
+    <div>
+      <dt class="text-sm font-bold text-gray-500">Reported</dt>
+      <dd class="mt-1 text-gray-900"><%= @report.created_at.to_fs(:long) %></dd>
+    </div>
+    <div class="md:col-span-2">
+      <dt class="text-sm font-bold text-gray-500">Reason</dt>
+      <dd class="mt-1 text-gray-900"><%= @report.reason %></dd>
+    </div>
+    <% if @report.resolution_notes.present? %>
+      <div class="md:col-span-2">
+        <dt class="text-sm font-bold text-gray-500">Resolution Notes</dt>
+        <dd class="mt-1 text-gray-900"><%= @report.resolution_notes %></dd>
+      </div>
+    <% end %>
+  </dl>
+
+  <% if @report.pending? %>
+    <div class="mt-6 flex gap-2">
+      <%= button_to "Resolve", resolve_admin_report_path(@report), method: :post, class: "btn btn-primary" %>
+      <%= button_to "Dismiss", dismiss_admin_report_path(@report), method: :post, class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div>

@@ -127,6 +127,9 @@
             Save
           <% end %>
         <% end %>
+        <% unless post.user == current_user %>
+          <%= render "reports/button", reportable: post, label: "Report" %>
+        <% end %>
       <% end %>
     </footer>
   </div>

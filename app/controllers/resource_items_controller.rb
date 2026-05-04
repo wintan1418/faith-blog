@@ -3,6 +3,7 @@
 class ResourceItemsController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_resource, only: [ :show, :edit, :update, :destroy ]
+  before_action :authorize_resource!, only: [ :edit, :update, :destroy ]
 
   def index
     @resources = Resource.approved.includes(:user, :resource_category).recent
@@ -55,5 +56,11 @@ class ResourceItemsController < ApplicationController
 
   def resource_params
     params.require(:resource).permit(:title, :description, :resource_type, :url, :resource_category_id, :file)
+  end
+
+  def authorize_resource!
+    return if @resource.user == current_user || current_user.admin_or_moderator?
+
+    redirect_to resources_item_path(@resource), alert: "You're not authorized to manage this resource."
   end
 end

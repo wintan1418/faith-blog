@@ -57,6 +57,10 @@
               Delete
             <% end %>
           <% end %>
+
+          <% if user_signed_in? && comment.user != current_user %>
+            <%= render "reports/button", reportable: comment, label: "Report", classes: "text-xs font-bold text-faith-muted hover:text-red-600" %>
+          <% end %>
         </div>
 
         <% if user_signed_in? && comment.depth < 2 %>

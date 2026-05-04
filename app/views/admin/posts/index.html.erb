@@ -1,0 +1,45 @@
+<% content_for(:page_title) { "Posts" } %>
+
+<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+  <table class="w-full">
+    <thead class="border-b border-gray-200 bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Post</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Room</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Author</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+        <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200">
+      <% @posts.each do |post| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4">
+            <p class="font-semibold text-gray-900"><%= truncate(post.title, length: 52) %></p>
+            <p class="text-xs text-gray-500"><%= time_ago_in_words(post.created_at) %> ago</p>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700"><%= post.room&.name || "No room" %></td>
+          <td class="px-6 py-4 text-sm text-gray-700"><%= post.anonymous? ? "Anonymous" : post.user.username %></td>
+          <td class="px-6 py-4">
+            <span class="badge badge-secondary"><%= post.status.humanize %></span>
+            <% if post.featured? %><span class="badge badge-faith ml-1">Featured</span><% end %>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <div class="flex justify-end gap-2">
+              <%= link_to "View", post_path(post), class: "btn btn-secondary btn-sm" %>
+              <% if post.featured? %>
+                <%= button_to "Unfeature", unfeature_admin_post_path(post), method: :post, class: "btn btn-secondary btn-sm" %>
+              <% else %>
+                <%= button_to "Feature", feature_admin_post_path(post), method: :post, class: "btn btn-primary btn-sm" %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+<% end %>

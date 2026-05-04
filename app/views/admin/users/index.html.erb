@@ -1,0 +1,47 @@
+<% content_for(:page_title) { "Users" } %>
+
+<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+  <table class="w-full">
+    <thead class="border-b border-gray-200 bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">User</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Role</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
+        <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200">
+      <% @users.each do |user| %>
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4">
+            <p class="font-semibold text-gray-900"><%= user.username %></p>
+            <p class="text-sm text-gray-500"><%= user.email %></p>
+          </td>
+          <td class="px-6 py-4"><span class="badge badge-secondary"><%= user.role.humanize %></span></td>
+          <td class="px-6 py-4">
+            <span class="badge <%= user.active? ? 'badge-success' : 'badge-primary' %>"><%= user.active? ? "Active" : "Suspended" %></span>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <div class="flex justify-end gap-2">
+              <% if user.active? %>
+                <%= button_to "Suspend", suspend_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm text-red-600" %>
+              <% else %>
+                <%= button_to "Activate", activate_admin_user_path(user), method: :post, class: "btn btn-primary btn-sm" %>
+              <% end %>
+              <% unless user.moderator? || user.admin? || user.super_admin? %>
+                <%= button_to "Moderator", make_moderator_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm" %>
+              <% end %>
+              <% unless user.admin? || user.super_admin? %>
+                <%= button_to "Admin", make_admin_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm" %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+<% end %>

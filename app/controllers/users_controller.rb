@@ -17,7 +17,7 @@ class UsersController < ApplicationController
     query = params[:query].to_s.strip
     return render json: [] if query.length < 1
 
-    users = User.where("username ILIKE ? OR email ILIKE ?", "%#{query}%", "%#{query}%").limit(10)
+    users = User.where("username ILIKE ?", "%#{query}%").limit(10)
 
     render json: users.map { |u|
       {

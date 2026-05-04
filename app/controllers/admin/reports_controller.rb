@@ -6,8 +6,8 @@ class Admin::ReportsController < ApplicationController
   before_action :set_report, only: [ :show, :resolve, :dismiss ]
 
   def index
-    @reports = Report.includes(:reporter, :reportable).order(created_at: :desc).page(params[:page]).per(20)
-    @pending_reports = @reports.pending
+    @pagy, @reports = pagy(Report.includes(:reporter, :reportable).order(created_at: :desc), items: 20)
+    @pending_reports = Report.pending.count
   end
 
   def show

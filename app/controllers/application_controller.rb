@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
 
-  helper_method :current_user_admin?, :current_user_moderator?
+  helper_method :current_user_admin?, :current_user_moderator?, :current_user_super_admin?
 
   protected
 
@@ -15,7 +15,11 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_admin!
-    redirect_to root_path, alert: "Access denied." unless current_user&.admin?
+    redirect_to root_path, alert: "Access denied." unless current_user&.super_admin? || current_user&.admin?
+  end
+
+  def authenticate_super_admin!
+    redirect_to root_path, alert: "Access denied." unless current_user&.super_admin?
   end
 
   def authenticate_moderator!
@@ -23,11 +27,15 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user_admin?
-    current_user&.admin?
+    current_user&.super_admin? || current_user&.admin?
   end
 
   def current_user_moderator?
     current_user&.admin_or_moderator?
+  end
+
+  def current_user_super_admin?
+    current_user&.super_admin?
   end
 
   def after_sign_in_path_for(resource)
