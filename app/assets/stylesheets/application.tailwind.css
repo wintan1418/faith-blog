@@ -3974,3 +3974,1876 @@ html.theme-dark .trix-content {
 html.theme-dark trix-editor:empty:not(:focus)::before {
   color: var(--fc-muted) !important;
 }
+
+/* ==========================================================================
+   ✦ DARK THEME — WORLD-CLASS LAYER (KEEP LAST)
+   Inspired by Linear / Vercel / Spotify dark surfaces.
+   This block is the source of truth for dark mode and overrides every
+   earlier pass. Edit here, not above.
+   ========================================================================== */
+
+html.theme-dark {
+  /* Surface elevation — deep ink-charcoal with a hint of warmth, never violet, never void */
+  --fc-bg:           #0b0f10;
+  --fc-bg-2:         #11161a;
+  --fc-surface:      #161d22;
+  --fc-surface-2:    #1d262c;
+  --fc-surface-3:    #2a3640;
+  --fc-surface-4:    #3a4a56;
+
+  /* Text — crisp, AAA on body */
+  --fc-ink:    #f4faf7;
+  --fc-soft:   #c8d3cf;
+  --fc-muted:  #8a9893;
+  --fc-faint:  #5e6b67;
+
+  /* Lines — clean, no chromatic tint */
+  --fc-line:         rgba(255, 255, 255, 0.07);
+  --fc-line-strong:  rgba(255, 255, 255, 0.14);
+
+  /* Brand — electric mint. One confident accent. */
+  --fc-accent:       #34d399;
+  --fc-accent-2:     #6ee7b7;
+  --fc-accent-deep:  #059669;
+  --fc-accent-soft:  rgba(52, 211, 153, 0.14);
+  --fc-accent-glow:  rgba(52, 211, 153, 0.45);
+
+  /* Gold — used sparingly for the brand mark and "Today's verse" only */
+  --fc-gold:         #fcd34d;
+  --fc-gold-soft:    rgba(252, 211, 77, 0.12);
+
+  /* Semantic */
+  --fc-danger:       #fb7185;
+  --fc-success:      #34d399;
+  --fc-warning:      #fbbf24;
+  --fc-info:         #60a5fa;
+
+  /* Shadows — neutral elevation; the glow comes from the accent ring, not from every shadow */
+  --sh-sm: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --sh-md: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --sh-lg: 0 16px 40px rgba(0, 0, 0, 0.55), 0 4px 10px rgba(0, 0, 0, 0.35);
+  --sh-glow: 0 0 0 1px rgba(52, 211, 153, 0.35), 0 12px 32px rgba(16, 185, 129, 0.32);
+
+  /* Bridge to legacy token names so old rules pick this up too */
+  --bg:            var(--fc-bg);
+  --bg-2:          var(--fc-bg-2);
+  --bg-translucent: rgba(10, 10, 15, 0.78);
+  --surface:       var(--fc-surface);
+  --surface-2:     var(--fc-surface-2);
+  --surface-3:     var(--fc-surface-3);
+  --ink:           var(--fc-ink);
+  --ink-2:         var(--fc-soft);
+  --muted:         var(--fc-muted);
+  --muted-2:       var(--fc-faint);
+  --border:        var(--fc-line-strong);
+  --border-2:      var(--fc-line);
+  --primary:       var(--fc-accent);
+  --primary-2:     var(--fc-accent-2);
+  --primary-soft:  var(--fc-accent-soft);
+  --accent:        var(--fc-gold);
+  --accent-soft:   var(--fc-gold-soft);
+
+  --mystic-bg:           var(--fc-bg);
+  --mystic-bg-2:         var(--fc-bg-2);
+  --mystic-surface:      var(--fc-surface);
+  --mystic-surface-soft: var(--fc-surface);
+  --mystic-ink:          var(--fc-ink);
+  --mystic-heading:      var(--fc-ink);
+  --mystic-muted:        var(--fc-muted);
+  --mystic-line:         var(--fc-line-strong);
+  --mystic-primary:      var(--fc-accent);
+  --mystic-primary-dark: var(--fc-accent-2);
+  --mystic-violet:       var(--fc-accent);
+  --mystic-violet-soft:  var(--fc-accent-soft);
+  --mystic-gold:         var(--fc-gold);
+
+  --home-bg:          var(--fc-bg);
+  --home-bg-2:        var(--fc-bg-2);
+  --home-surface:     var(--fc-surface);
+  --home-surface-2:   var(--fc-surface-2);
+  --home-ink:         var(--fc-ink);
+  --home-soft:        var(--fc-soft);
+  --home-muted:       var(--fc-muted);
+  --home-line:        var(--fc-line);
+  --home-line-strong: var(--fc-line-strong);
+  --home-accent:      var(--fc-accent);
+  --home-accent-2:    var(--fc-accent-2);
+  --home-gold:        var(--fc-gold);
+
+  --faith-green: var(--fc-accent);
+  --faith-dark:  var(--fc-ink);
+  --faith-muted: var(--fc-muted);
+  --faith-bg:    var(--fc-bg);
+  --faith-accent: var(--fc-gold);
+
+  color-scheme: dark;
+}
+
+/* Base canvas — one mint glow over deep charcoal. Atmosphere, not theatre. */
+html.theme-dark,
+html.theme-dark body,
+body.theme-dark {
+  background:
+    radial-gradient(ellipse 70rem 32rem at 50% -8rem, rgba(52, 211, 153, 0.18), transparent 60%),
+    var(--fc-bg) !important;
+  background-attachment: fixed !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .fc-app,
+html.theme-dark .mystic-shell {
+  background: transparent !important;
+  color: var(--fc-ink) !important;
+}
+
+/* Selection — branded */
+html.theme-dark ::selection {
+  background: rgba(52, 211, 153, 0.35);
+  color: #ffffff;
+}
+
+/* Scrollbar — slim and on-brand */
+html.theme-dark {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(52, 211, 153, 0.35) transparent;
+}
+html.theme-dark ::-webkit-scrollbar { width: 10px; height: 10px; }
+html.theme-dark ::-webkit-scrollbar-track { background: transparent; }
+html.theme-dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+html.theme-dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.4);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* Typography contrast — restore semantic hierarchy */
+html.theme-dark h1,
+html.theme-dark h2,
+html.theme-dark h3,
+html.theme-dark h4,
+html.theme-dark h5,
+html.theme-dark h6,
+html.theme-dark .fc-post-title,
+html.theme-dark .fc-brand,
+html.theme-dark .fc-brand *,
+html.theme-dark .text-faith-dark,
+html.theme-dark .text-stone-900,
+html.theme-dark .text-stone-800,
+html.theme-dark .text-gray-900,
+html.theme-dark .text-gray-800,
+html.theme-dark .text-\[var\(--fc-ink\)\],
+html.theme-dark .text-\[var\(--ink\)\] {
+  color: var(--fc-ink) !important;
+  text-shadow: none !important;
+}
+
+html.theme-dark p,
+html.theme-dark li,
+html.theme-dark .fc-post-copy,
+html.theme-dark .mystic-copy,
+html.theme-dark .bc-value,
+html.theme-dark .text-stone-700,
+html.theme-dark .text-stone-600,
+html.theme-dark .text-gray-700,
+html.theme-dark .text-gray-600,
+html.theme-dark .text-\[var\(--fc-soft\)\] {
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark small,
+html.theme-dark time,
+html.theme-dark .fc-section-label,
+html.theme-dark .fc-tags,
+html.theme-dark .fc-card-actions,
+html.theme-dark .bc-label,
+html.theme-dark .text-faith-muted,
+html.theme-dark .text-stone-500,
+html.theme-dark .text-gray-500,
+html.theme-dark .text-\[var\(--fc-muted\)\],
+html.theme-dark .text-\[var\(--muted\)\] {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-dark a {
+  color: var(--fc-accent-2);
+}
+html.theme-dark a:hover {
+  color: #ffffff;
+}
+
+/* Image dim — integrate photos with the dark shell */
+html.theme-dark img:not([src*=".svg"]) {
+  filter: brightness(0.94) contrast(1.02);
+}
+
+/* Topbar — frosted glass */
+html.theme-dark .fc-topbar,
+html.theme-dark nav.fc-topbar {
+  background: rgba(10, 10, 15, 0.72) !important;
+  border-bottom: 1px solid var(--fc-line) !important;
+  backdrop-filter: saturate(140%) blur(14px) !important;
+  -webkit-backdrop-filter: saturate(140%) blur(14px) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset !important;
+}
+
+html.theme-dark .fc-brand-mark {
+  background: var(--fc-accent) !important;
+  border: none !important;
+  color: #042f1d !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.10) inset, 0 4px 14px rgba(16, 185, 129, 0.40) !important;
+}
+
+html.theme-dark .fc-nav-link,
+html.theme-dark .fc-rail-link {
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+  transition: background-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+html.theme-dark .fc-nav-link:hover,
+html.theme-dark .fc-rail-link:hover {
+  color: #ffffff !important;
+  background: var(--fc-surface-2) !important;
+}
+
+html.theme-dark .fc-nav-link.is-active,
+html.theme-dark .fc-rail-link.is-active {
+  color: var(--fc-accent-2) !important;
+  background: var(--fc-accent-soft) !important;
+  box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.28) !important;
+}
+
+html.theme-dark .fc-section-label {
+  color: var(--fc-faint) !important;
+  letter-spacing: 0.12em !important;
+  font-weight: 700 !important;
+}
+
+/* Search input — clear surface delta */
+html.theme-dark .fc-search,
+html.theme-dark .fc-composer-input {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+}
+html.theme-dark .fc-search::placeholder,
+html.theme-dark .fc-composer-input::placeholder {
+  color: var(--fc-muted) !important;
+}
+html.theme-dark .fc-search:focus,
+html.theme-dark .fc-composer-input:focus {
+  outline: none !important;
+  background: var(--fc-surface-2) !important;
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.22) !important;
+}
+
+/* Cards / panels — clean elevated surface with one top-edge highlight */
+html.theme-dark .fc-card,
+html.theme-dark .fc-panel,
+html.theme-dark .fc-side-card,
+html.theme-dark .mystic-panel,
+html.theme-dark .mystic-panel-strong,
+html.theme-dark .card,
+html.theme-dark .card-hover,
+html.theme-dark .room-card,
+html.theme-dark .bc-card,
+html.theme-dark .brethren-card,
+html.theme-dark .brethren-card-mini {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  border-radius: 14px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    var(--sh-md) !important;
+  color: var(--fc-ink) !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease,
+    background-color 180ms ease !important;
+}
+
+html.theme-dark .card-hover:hover,
+html.theme-dark .fc-card:hover,
+html.theme-dark .room-card:hover,
+html.theme-dark .mystic-card-link:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(52, 211, 153, 0.40) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(52, 211, 153, 0.18),
+    0 18px 40px rgba(0, 0, 0, 0.55) !important;
+  transform: translateY(-2px) !important;
+}
+
+html.theme-dark .fc-card-header-strip {
+  background: rgba(255, 255, 255, 0.025) !important;
+  border-bottom: 1px solid var(--fc-line) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark .fc-card-body {
+  background: transparent !important;
+}
+
+html.theme-dark .fc-card-actions,
+html.theme-dark article.fc-card footer,
+html.theme-dark .fc-card footer {
+  background: transparent !important;
+  border-top: 1px solid var(--fc-line) !important;
+  color: var(--fc-muted) !important;
+}
+
+/* Avatars — solid mint, dark text. High contrast, no muddy gradient. */
+html.theme-dark .fc-avatar {
+  background: var(--fc-accent) !important;
+  color: #042f1d !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 0 2px var(--fc-surface) !important;
+}
+
+/* Badges — subtle, on-brand chips */
+html.theme-dark .fc-badge,
+html.theme-dark .badge,
+html.theme-dark .badge-primary,
+html.theme-dark .room-badge,
+html.theme-dark .tag-badge,
+html.theme-dark .mystic-badge,
+html.theme-dark .mystic-kicker {
+  background: var(--fc-accent-soft) !important;
+  border: 1px solid rgba(52, 211, 153, 0.22) !important;
+  color: var(--fc-accent-2) !important;
+  font-weight: 700 !important;
+}
+
+html.theme-dark .featured-badge,
+html.theme-dark .badge-success {
+  background: rgba(74, 222, 128, 0.12) !important;
+  border: 1px solid rgba(74, 222, 128, 0.28) !important;
+  color: #86efac !important;
+}
+
+/* Buttons — solid mint with real glow. No gradient theatre. */
+html.theme-dark .fc-btn-primary,
+html.theme-dark .fc-btn-primary *,
+html.theme-dark .btn-primary,
+html.theme-dark .btn-primary *,
+html.theme-dark a.fc-btn-primary,
+html.theme-dark button.fc-btn-primary,
+html.theme-dark .gradient-faith,
+html.theme-dark .home-btn-primary {
+  background: var(--fc-accent) !important;
+  border: 1px solid transparent !important;
+  color: #042f1d !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 8px 22px rgba(16, 185, 129, 0.42) !important;
+  transition: background 180ms ease, box-shadow 220ms ease, transform 160ms ease !important;
+}
+
+html.theme-dark .fc-btn-primary:hover,
+html.theme-dark .btn-primary:hover,
+html.theme-dark .home-btn-primary:hover,
+html.theme-dark a.fc-btn-primary:hover,
+html.theme-dark button.fc-btn-primary:hover {
+  background: var(--fc-accent-2) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 14px 32px rgba(52, 211, 153, 0.55) !important;
+  transform: translateY(-2px) !important;
+}
+
+html.theme-dark .fc-btn,
+html.theme-dark .fc-icon-btn,
+html.theme-dark .btn,
+html.theme-dark .btn-secondary,
+html.theme-dark .btn-ghost,
+html.theme-dark .home-btn,
+html.theme-dark .home-link-btn {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+html.theme-dark .fc-btn:hover,
+html.theme-dark .fc-icon-btn:hover,
+html.theme-dark .btn-secondary:hover,
+html.theme-dark .btn-ghost:hover,
+html.theme-dark .home-btn:hover,
+html.theme-dark .home-link-btn:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(52, 211, 153, 0.32) !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .fc-action {
+  color: var(--fc-muted) !important;
+  border-radius: 8px !important;
+  transition: background 140ms ease, color 140ms ease;
+}
+html.theme-dark .fc-action:hover {
+  background: var(--fc-surface-2) !important;
+  color: #ffffff !important;
+}
+
+/* Tabs — clean active rule, no shouting */
+html.theme-dark .fc-tabs {
+  border-bottom: 1px solid var(--fc-line-strong) !important;
+}
+html.theme-dark .fc-tab {
+  color: var(--fc-muted) !important;
+  font-weight: 600 !important;
+  transition: color 140ms ease, box-shadow 140ms ease;
+}
+html.theme-dark .fc-tab:hover {
+  color: var(--fc-soft) !important;
+}
+html.theme-dark .fc-tab.is-active {
+  color: #ffffff !important;
+  box-shadow: inset 0 -2px 0 var(--fc-accent) !important;
+}
+
+/* Inputs / forms */
+html.theme-dark .input,
+html.theme-dark input[type="text"],
+html.theme-dark input[type="email"],
+html.theme-dark input[type="password"],
+html.theme-dark input[type="search"],
+html.theme-dark input[type="url"],
+html.theme-dark input[type="tel"],
+html.theme-dark input[type="number"],
+html.theme-dark textarea,
+html.theme-dark select {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+html.theme-dark .input::placeholder,
+html.theme-dark textarea::placeholder,
+html.theme-dark input::placeholder {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-dark .input:focus,
+html.theme-dark input:focus,
+html.theme-dark textarea:focus,
+html.theme-dark select:focus {
+  outline: none !important;
+  border-color: var(--fc-accent) !important;
+  background: var(--fc-surface-2) !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.22) !important;
+}
+
+html.theme-dark .label,
+html.theme-dark label {
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+}
+
+/* Dropdowns / popovers */
+html.theme-dark .fc-dropdown-menu,
+html.theme-dark [data-dropdown-target="menu"] {
+  background: var(--fc-surface-2) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--sh-lg) !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .fc-dropdown-head {
+  border-bottom: 1px solid var(--fc-line) !important;
+}
+
+html.theme-dark .fc-dropdown-item,
+html.theme-dark [data-dropdown-target="menu"] a,
+html.theme-dark [data-dropdown-target="menu"] button {
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+}
+
+html.theme-dark .fc-dropdown-item:hover,
+html.theme-dark [data-dropdown-target="menu"] a:hover,
+html.theme-dark [data-dropdown-target="menu"] button:hover {
+  background: var(--fc-surface-3) !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .fc-dropdown-danger {
+  color: var(--fc-danger) !important;
+}
+
+/* Pagination */
+html.theme-dark .pagy,
+html.theme-dark nav.pagy,
+html.theme-dark .pagination,
+html.theme-dark .fc-main nav {
+  background: transparent !important;
+}
+
+html.theme-dark .pagy a,
+html.theme-dark .pagy span,
+html.theme-dark .fc-main nav a,
+html.theme-dark .fc-main nav span {
+  background: var(--fc-surface) !important;
+  color: var(--fc-soft) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+html.theme-dark .pagy a:hover,
+html.theme-dark .fc-main nav a:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(52, 211, 153, 0.32) !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .pagy .current,
+html.theme-dark .fc-main nav .active,
+html.theme-dark .fc-main nav [aria-current="page"],
+html.theme-dark .fc-main nav span.current {
+  background: var(--fc-accent) !important;
+  border-color: transparent !important;
+  color: #042f1d !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Settings tabs */
+html.theme-dark .settings-tabs {
+  border-bottom: 1px solid var(--fc-line-strong) !important;
+}
+html.theme-dark .settings-tab {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+}
+html.theme-dark .settings-tab:hover {
+  background: var(--fc-surface-2) !important;
+  color: #ffffff !important;
+}
+html.theme-dark .settings-tab.is-active {
+  background: var(--fc-accent) !important;
+  border-color: transparent !important;
+  color: #042f1d !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
+}
+
+/* Trix editor */
+html.theme-dark trix-editor,
+html.theme-dark .trix-content {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-dark trix-editor:focus {
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.22) !important;
+}
+html.theme-dark trix-toolbar,
+html.theme-dark trix-toolbar .trix-button-row,
+html.theme-dark trix-toolbar .trix-button-group {
+  background: var(--fc-surface-2) !important;
+  border-color: var(--fc-line-strong) !important;
+}
+html.theme-dark trix-toolbar .trix-button {
+  background: transparent !important;
+  border-color: var(--fc-line) !important;
+  color: var(--fc-soft) !important;
+}
+html.theme-dark trix-toolbar .trix-button:not(:disabled):hover {
+  background: var(--fc-surface-3) !important;
+  color: #ffffff !important;
+}
+html.theme-dark trix-toolbar .trix-button.trix-active {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent-2) !important;
+}
+html.theme-dark trix-toolbar .trix-button::before {
+  filter: invert(1) brightness(1.5) !important;
+  opacity: 0.85 !important;
+}
+
+/* Brethren card — clean elevated surface with one mint glow at the top corner */
+html.theme-dark .bc-card {
+  background:
+    radial-gradient(circle at top right, rgba(52, 211, 153, 0.12), transparent 42%),
+    var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    var(--sh-lg) !important;
+}
+html.theme-dark .bc-card::before {
+  background:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 48px) !important;
+}
+html.theme-dark .bc-field,
+html.theme-dark .bc-contact {
+  background: var(--fc-surface-2) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+}
+html.theme-dark .bc-contact:hover {
+  background: var(--fc-surface-3) !important;
+  border-color: rgba(52, 211, 153, 0.32) !important;
+  color: #ffffff !important;
+}
+html.theme-dark .bc-icon {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent-2) !important;
+}
+html.theme-dark .bc-avatar {
+  background: var(--fc-accent) !important;
+  border: 3px solid var(--fc-surface) !important;
+  color: #042f1d !important;
+}
+html.theme-dark .bc-avatar-ring {
+  background: var(--fc-accent) !important;
+}
+
+/* Footer */
+html.theme-dark .mystic-footer,
+html.theme-dark body:has(.home-page) .mystic-footer {
+  background: linear-gradient(180deg, var(--fc-bg-2), #050509) !important;
+  border-top: 1px solid var(--fc-line-strong) !important;
+}
+html.theme-dark .mystic-footer h4,
+html.theme-dark .mystic-footer .font-bold {
+  color: var(--fc-ink) !important;
+}
+html.theme-dark .mystic-footer p,
+html.theme-dark .mystic-footer a,
+html.theme-dark .mystic-footer li,
+html.theme-dark .mystic-footer div {
+  color: var(--fc-soft) !important;
+}
+html.theme-dark .mystic-footer a:hover {
+  color: var(--fc-accent-2) !important;
+}
+
+/* Tailwind utility overrides — keep the feed coherent when views use raw colors */
+html.theme-dark .bg-white,
+html.theme-dark .bg-white\/35,
+html.theme-dark .bg-white\/40,
+html.theme-dark .bg-white\/45,
+html.theme-dark .bg-white\/50,
+html.theme-dark .bg-white\/55,
+html.theme-dark .bg-white\/60,
+html.theme-dark .bg-white\/65,
+html.theme-dark .bg-white\/70,
+html.theme-dark .bg-white\/75,
+html.theme-dark .bg-white\/80,
+html.theme-dark .hover\:bg-white:hover,
+html.theme-dark .hover\:bg-white\/55:hover,
+html.theme-dark .hover\:bg-white\/70:hover {
+  background-color: var(--fc-surface) !important;
+}
+
+html.theme-dark .bg-stone-50,
+html.theme-dark .bg-stone-100,
+html.theme-dark .bg-gray-50,
+html.theme-dark .bg-gray-100 {
+  background-color: var(--fc-bg-2) !important;
+}
+
+html.theme-dark .bg-emerald-50,
+html.theme-dark .bg-green-50,
+html.theme-dark .bg-teal-50 {
+  background-color: var(--fc-accent-soft) !important;
+}
+
+html.theme-dark .border-stone-100,
+html.theme-dark .border-stone-200,
+html.theme-dark .border-gray-100,
+html.theme-dark .border-gray-200,
+html.theme-dark .border-emerald-100,
+html.theme-dark .border-emerald-200,
+html.theme-dark .divide-stone-100 > :not([hidden]) ~ :not([hidden]),
+html.theme-dark .divide-stone-200 > :not([hidden]) ~ :not([hidden]),
+html.theme-dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.theme-dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--fc-line-strong) !important;
+}
+
+html.theme-dark .text-emerald-500,
+html.theme-dark .text-emerald-600,
+html.theme-dark .text-emerald-700,
+html.theme-dark .text-emerald-800,
+html.theme-dark .text-green-600,
+html.theme-dark .text-green-700,
+html.theme-dark .text-teal-600,
+html.theme-dark .text-teal-700 {
+  color: var(--fc-accent-2) !important;
+}
+
+html.theme-dark .bg-faith-green,
+html.theme-dark .bg-faith-green *,
+html.theme-dark .mystic-shell .bg-faith-green,
+html.theme-dark .fc-app .bg-faith-green {
+  background: linear-gradient(135deg, var(--fc-accent), var(--fc-accent-deep)) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .text-faith-green {
+  color: var(--fc-accent-2) !important;
+}
+
+/* Flash toasts — restyle the emerald success / red alert for dark */
+html.theme-dark [data-flash-target="message"].bg-emerald-50,
+html.theme-dark .bg-emerald-50 {
+  background: rgba(74, 222, 128, 0.10) !important;
+  border-color: rgba(74, 222, 128, 0.32) !important;
+  color: #bbf7d0 !important;
+}
+html.theme-dark .bg-red-50 {
+  background: rgba(248, 113, 113, 0.10) !important;
+  border-color: rgba(248, 113, 113, 0.32) !important;
+  color: #fecaca !important;
+}
+
+/* Focus ring — keyboard users get the violet halo everywhere */
+html.theme-dark *:focus-visible {
+  outline: 2px solid var(--fc-accent) !important;
+  outline-offset: 2px !important;
+  border-radius: 6px;
+}
+
+/* Quiet a few legacy aggressive shadows we don't want */
+html.theme-dark .card-hover,
+html.theme-dark .room-card,
+html.theme-dark .fc-card,
+html.theme-dark .home-room-card,
+html.theme-dark .home-story-card,
+html.theme-dark .bc-contact {
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ==========================================================================
+   ✦ HOME PAGE — DARK MODE POLISH
+   ========================================================================== */
+
+html.theme-dark .home-page {
+  color: var(--fc-ink) !important;
+  background:
+    radial-gradient(ellipse 70rem 32rem at 50% -10rem, rgba(52, 211, 153, 0.16), transparent 65%),
+    var(--fc-bg) !important;
+}
+
+html.theme-dark .home-hero {
+  background: transparent !important;
+  border-bottom: 1px solid var(--fc-line) !important;
+}
+
+html.theme-dark .home-kicker {
+  background: var(--fc-accent-soft) !important;
+  border: 1px solid rgba(52, 211, 153, 0.28) !important;
+  color: var(--fc-accent-2) !important;
+}
+
+html.theme-dark .home-title {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .home-lede {
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark .home-quick-list span {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark .home-summary {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    var(--sh-lg) !important;
+}
+
+html.theme-dark .home-summary-top {
+  color: var(--fc-accent-2) !important;
+}
+
+html.theme-dark .home-summary blockquote {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .home-summary > p {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-dark .home-stats div {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+}
+html.theme-dark .home-stats strong {
+  color: var(--fc-ink) !important;
+}
+html.theme-dark .home-stats span {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-dark .home-section-head h2 {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .home-room-card,
+html.theme-dark .home-story-card {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+  box-shadow: var(--sh-md) !important;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease, background 180ms ease !important;
+}
+
+html.theme-dark .home-room-card:hover,
+html.theme-dark .home-story-card:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(52, 211, 153, 0.34) !important;
+  box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.14), 0 18px 40px rgba(0, 0, 0, 0.55) !important;
+  transform: translateY(-2px) !important;
+}
+
+html.theme-dark .home-room-card h3,
+html.theme-dark .home-story-card h3 {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .home-room-card p,
+html.theme-dark .home-story-card p {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-dark .home-card-icon {
+  background: var(--fc-accent-soft) !important;
+  border: 1px solid rgba(52, 211, 153, 0.28) !important;
+  color: var(--fc-accent-2) !important;
+}
+
+html.theme-dark .home-card-meta,
+html.theme-dark .home-story-foot {
+  color: var(--fc-muted) !important;
+  border-top: 1px solid var(--fc-line) !important;
+}
+
+html.theme-dark .home-story-meta span {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent-2) !important;
+}
+
+html.theme-dark .home-story-meta time {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-dark .home-btn,
+html.theme-dark .home-link-btn {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark .home-btn:hover,
+html.theme-dark .home-link-btn:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(52, 211, 153, 0.32) !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   ✦ MOTION
+   Respect reduced motion users.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html.theme-dark *,
+  html.theme-dark *::before,
+  html.theme-dark *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   ✦ LIGHT THEME — WORLD-CLASS LAYER (KEEP LAST)
+   Rhymes with the dark theme: same mint accent, fresh white-sage surfaces,
+   crisp ink. Overrides every legacy lavender/violet pass above.
+   ========================================================================== */
+
+html.theme-light,
+html:not(.theme-dark),
+:root {
+  /* Surfaces — clean, slightly warm white with sage hint */
+  --fc-bg:           #f7faf8;
+  --fc-bg-2:         #eef4f0;
+  --fc-surface:      #ffffff;
+  --fc-surface-2:    #f1f6f3;
+  --fc-surface-3:    #e3eee8;
+  --fc-surface-4:    #d2e2d8;
+
+  /* Text — crisp, AAA on body */
+  --fc-ink:    #0e1a14;
+  --fc-soft:   #2d3d36;
+  --fc-muted:  #5b6b63;
+  --fc-faint:  #8a988f;
+
+  /* Lines — sage-tinted, never gray */
+  --fc-line:         rgba(16, 50, 36, 0.08);
+  --fc-line-strong:  rgba(16, 50, 36, 0.15);
+
+  /* Brand — mint emerald that rhymes with dark mode */
+  --fc-accent:       #10b981;
+  --fc-accent-2:     #059669;
+  --fc-accent-deep:  #047857;
+  --fc-accent-soft:  rgba(16, 185, 129, 0.12);
+  --fc-accent-glow:  rgba(16, 185, 129, 0.32);
+
+  /* Gold — sparingly, for kicker/verse highlights */
+  --fc-gold:         #b88c4a;
+  --fc-gold-soft:    rgba(184, 140, 74, 0.14);
+
+  /* Semantic */
+  --fc-danger:       #dc2626;
+  --fc-success:      #059669;
+  --fc-warning:      #d97706;
+  --fc-info:         #2563eb;
+
+  /* Shadows — soft, neutral elevation */
+  --sh-sm: 0 1px 2px rgba(15, 30, 22, 0.05);
+  --sh-md: 0 4px 14px rgba(15, 30, 22, 0.07), 0 1px 2px rgba(15, 30, 22, 0.04);
+  --sh-lg: 0 18px 44px rgba(15, 30, 22, 0.10), 0 4px 10px rgba(15, 30, 22, 0.05);
+  --sh-glow: 0 0 0 1px rgba(16, 185, 129, 0.22), 0 12px 32px rgba(16, 185, 129, 0.22);
+
+  /* Bridge to legacy token names */
+  --bg:             var(--fc-bg);
+  --bg-2:           var(--fc-bg-2);
+  --bg-translucent: rgba(247, 250, 248, 0.85);
+  --surface:        var(--fc-surface);
+  --surface-2:      var(--fc-surface-2);
+  --surface-3:      var(--fc-surface-3);
+  --ink:            var(--fc-ink);
+  --ink-2:          var(--fc-soft);
+  --muted:          var(--fc-muted);
+  --muted-2:        var(--fc-faint);
+  --border:         var(--fc-line-strong);
+  --border-2:       var(--fc-line);
+  --primary:        var(--fc-accent);
+  --primary-2:      var(--fc-accent-2);
+  --primary-soft:   var(--fc-accent-soft);
+  --accent:         var(--fc-gold);
+  --accent-soft:    var(--fc-gold-soft);
+
+  --mystic-bg:           var(--fc-bg);
+  --mystic-bg-2:         var(--fc-bg-2);
+  --mystic-surface:      var(--fc-surface);
+  --mystic-surface-soft: rgba(255, 255, 255, 0.92);
+  --mystic-ink:          var(--fc-ink);
+  --mystic-heading:      var(--fc-ink);
+  --mystic-muted:        var(--fc-muted);
+  --mystic-line:         var(--fc-line-strong);
+  --mystic-primary:      var(--fc-accent);
+  --mystic-primary-dark: var(--fc-accent-2);
+  --mystic-violet:       var(--fc-accent);
+  --mystic-violet-soft:  var(--fc-accent-soft);
+  --mystic-gold:         var(--fc-gold);
+
+  --home-bg:          var(--fc-bg);
+  --home-bg-2:        var(--fc-bg-2);
+  --home-surface:     var(--fc-surface);
+  --home-surface-2:   var(--fc-surface-2);
+  --home-ink:         var(--fc-ink);
+  --home-soft:        var(--fc-soft);
+  --home-muted:       var(--fc-muted);
+  --home-line:        var(--fc-line);
+  --home-line-strong: var(--fc-line-strong);
+  --home-accent:      var(--fc-accent);
+  --home-accent-2:    var(--fc-accent-2);
+  --home-gold:        var(--fc-gold);
+
+  --faith-green:  var(--fc-accent);
+  --faith-dark:   var(--fc-ink);
+  --faith-muted:  var(--fc-muted);
+  --faith-bg:     var(--fc-bg);
+  --faith-accent: var(--fc-gold);
+
+  color-scheme: light;
+}
+
+/* Body canvas — soft mint halo over warm white */
+html.theme-light,
+html.theme-light body,
+html:not(.theme-dark),
+html:not(.theme-dark) body,
+body.theme-light {
+  background:
+    radial-gradient(ellipse 70rem 32rem at 50% -8rem, rgba(16, 185, 129, 0.10), transparent 65%),
+    var(--fc-bg) !important;
+  background-attachment: fixed !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-light .fc-app,
+html.theme-light .mystic-shell,
+html:not(.theme-dark) .fc-app,
+html:not(.theme-dark) .mystic-shell {
+  background: transparent !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-light ::selection,
+html:not(.theme-dark) ::selection {
+  background: rgba(16, 185, 129, 0.22);
+  color: var(--fc-ink);
+}
+
+html.theme-light {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.32) transparent;
+}
+html.theme-light ::-webkit-scrollbar { width: 10px; height: 10px; }
+html.theme-light ::-webkit-scrollbar-track { background: transparent; }
+html.theme-light ::-webkit-scrollbar-thumb {
+  background: rgba(15, 30, 22, 0.18);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+html.theme-light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.45);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+/* Typography contrast */
+html.theme-light h1,
+html.theme-light h2,
+html.theme-light h3,
+html.theme-light h4,
+html.theme-light h5,
+html.theme-light h6,
+html.theme-light .fc-post-title,
+html.theme-light .fc-brand,
+html.theme-light .fc-brand *,
+html.theme-light .text-faith-dark,
+html.theme-light .home-title,
+html.theme-light .text-stone-900,
+html.theme-light .text-stone-800,
+html.theme-light .text-gray-900,
+html.theme-light .text-gray-800,
+html.theme-light .text-\[var\(--fc-ink\)\],
+html.theme-light .text-\[var\(--ink\)\] {
+  color: var(--fc-ink) !important;
+  -webkit-text-fill-color: currentColor;
+  background-image: none !important;
+}
+
+html.theme-light p,
+html.theme-light li,
+html.theme-light .fc-post-copy,
+html.theme-light .mystic-copy,
+html.theme-light .bc-value,
+html.theme-light .text-stone-700,
+html.theme-light .text-stone-600,
+html.theme-light .text-gray-700,
+html.theme-light .text-gray-600,
+html.theme-light .text-\[var\(--fc-soft\)\] {
+  color: var(--fc-soft) !important;
+}
+
+html.theme-light small,
+html.theme-light time,
+html.theme-light .fc-section-label,
+html.theme-light .fc-tags,
+html.theme-light .fc-card-actions,
+html.theme-light .bc-label,
+html.theme-light .text-faith-muted,
+html.theme-light .text-stone-500,
+html.theme-light .text-gray-500,
+html.theme-light .text-\[var\(--fc-muted\)\],
+html.theme-light .text-\[var\(--muted\)\] {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-light a {
+  color: var(--fc-accent-2);
+}
+html.theme-light a:hover {
+  color: var(--fc-accent-deep);
+}
+
+/* Topbar — frosted */
+html.theme-light .fc-topbar,
+html.theme-light nav.fc-topbar {
+  background: rgba(247, 250, 248, 0.78) !important;
+  border-bottom: 1px solid var(--fc-line) !important;
+  backdrop-filter: saturate(140%) blur(14px) !important;
+  -webkit-backdrop-filter: saturate(140%) blur(14px) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset !important;
+}
+
+html.theme-light .fc-brand-mark {
+  background: var(--fc-accent) !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 4px 14px rgba(16, 185, 129, 0.32) !important;
+}
+
+html.theme-light .fc-nav-link,
+html.theme-light .fc-rail-link {
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+}
+
+html.theme-light .fc-nav-link:hover,
+html.theme-light .fc-rail-link:hover {
+  color: var(--fc-ink) !important;
+  background: var(--fc-surface-2) !important;
+}
+
+html.theme-light .fc-nav-link.is-active,
+html.theme-light .fc-rail-link.is-active {
+  color: var(--fc-accent-deep) !important;
+  background: var(--fc-accent-soft) !important;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.24) !important;
+}
+
+html.theme-light .fc-section-label {
+  color: var(--fc-faint) !important;
+  font-weight: 700 !important;
+}
+
+/* Search & composer */
+html.theme-light .fc-search,
+html.theme-light .fc-composer-input {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light .fc-search::placeholder,
+html.theme-light .fc-composer-input::placeholder {
+  color: var(--fc-muted) !important;
+}
+html.theme-light .fc-search:focus,
+html.theme-light .fc-composer-input:focus {
+  outline: none !important;
+  background: var(--fc-surface) !important;
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
+}
+
+/* Cards / panels — pure white surface, soft elevation */
+html.theme-light .fc-card,
+html.theme-light .fc-panel,
+html.theme-light .fc-side-card,
+html.theme-light .mystic-panel,
+html.theme-light .mystic-panel-strong,
+html.theme-light .card,
+html.theme-light .card-hover,
+html.theme-light .room-card,
+html.theme-light .bc-card,
+html.theme-light .brethren-card,
+html.theme-light .brethren-card-mini {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--sh-md) !important;
+  color: var(--fc-ink) !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease,
+    background-color 180ms ease !important;
+}
+
+html.theme-light .card-hover:hover,
+html.theme-light .fc-card:hover,
+html.theme-light .room-card:hover,
+html.theme-light .mystic-card-link:hover {
+  border-color: rgba(16, 185, 129, 0.40) !important;
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, 0.16),
+    0 18px 40px rgba(15, 30, 22, 0.10) !important;
+  transform: translateY(-2px) !important;
+}
+
+html.theme-light .fc-card-header-strip {
+  background: var(--fc-surface-2) !important;
+  border-bottom: 1px solid var(--fc-line) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-light .fc-card-body {
+  background: transparent !important;
+}
+
+html.theme-light .fc-card-actions,
+html.theme-light article.fc-card footer,
+html.theme-light .fc-card footer {
+  background: transparent !important;
+  border-top: 1px solid var(--fc-line) !important;
+  color: var(--fc-muted) !important;
+}
+
+/* Avatars — solid mint with white text */
+html.theme-light .fc-avatar {
+  background: var(--fc-accent) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 0 2px var(--fc-surface) !important;
+}
+
+/* Badges */
+html.theme-light .fc-badge,
+html.theme-light .badge,
+html.theme-light .badge-primary,
+html.theme-light .room-badge,
+html.theme-light .tag-badge,
+html.theme-light .mystic-badge,
+html.theme-light .mystic-kicker {
+  background: var(--fc-accent-soft) !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  color: var(--fc-accent-deep) !important;
+  font-weight: 700 !important;
+}
+
+html.theme-light .badge-success,
+html.theme-light .featured-badge {
+  background: rgba(5, 150, 105, 0.10) !important;
+  border: 1px solid rgba(5, 150, 105, 0.28) !important;
+  color: var(--fc-accent-deep) !important;
+}
+
+/* Buttons — primary mint */
+html.theme-light .fc-btn-primary,
+html.theme-light .fc-btn-primary *,
+html.theme-light .btn-primary,
+html.theme-light .btn-primary *,
+html.theme-light a.fc-btn-primary,
+html.theme-light button.fc-btn-primary,
+html.theme-light .gradient-faith,
+html.theme-light .home-btn-primary {
+  background: var(--fc-accent) !important;
+  border: 1px solid transparent !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.30) inset,
+    0 8px 22px rgba(16, 185, 129, 0.32) !important;
+  transition: background 180ms ease, box-shadow 220ms ease, transform 160ms ease !important;
+}
+
+html.theme-light .fc-btn-primary:hover,
+html.theme-light .btn-primary:hover,
+html.theme-light .home-btn-primary:hover,
+html.theme-light a.fc-btn-primary:hover,
+html.theme-light button.fc-btn-primary:hover {
+  background: var(--fc-accent-2) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.36) inset,
+    0 14px 32px rgba(5, 150, 105, 0.40) !important;
+  transform: translateY(-2px) !important;
+}
+
+html.theme-light .fc-btn,
+html.theme-light .fc-icon-btn,
+html.theme-light .btn-secondary,
+html.theme-light .btn-ghost,
+html.theme-light .home-btn,
+html.theme-light .home-link-btn {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+}
+
+html.theme-light .fc-btn:hover,
+html.theme-light .fc-icon-btn:hover,
+html.theme-light .btn-secondary:hover,
+html.theme-light .btn-ghost:hover,
+html.theme-light .home-btn:hover,
+html.theme-light .home-link-btn:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(16, 185, 129, 0.36) !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-light .fc-action {
+  color: var(--fc-muted) !important;
+  border-radius: 8px !important;
+}
+html.theme-light .fc-action:hover {
+  background: var(--fc-surface-2) !important;
+  color: var(--fc-ink) !important;
+}
+
+/* Tabs */
+html.theme-light .fc-tabs {
+  border-bottom: 1px solid var(--fc-line-strong) !important;
+}
+html.theme-light .fc-tab {
+  color: var(--fc-muted) !important;
+  font-weight: 600 !important;
+}
+html.theme-light .fc-tab:hover {
+  color: var(--fc-ink) !important;
+}
+html.theme-light .fc-tab.is-active {
+  color: var(--fc-ink) !important;
+  box-shadow: inset 0 -2px 0 var(--fc-accent) !important;
+}
+
+/* Inputs */
+html.theme-light .input,
+html.theme-light input[type="text"],
+html.theme-light input[type="email"],
+html.theme-light input[type="password"],
+html.theme-light input[type="search"],
+html.theme-light input[type="url"],
+html.theme-light input[type="tel"],
+html.theme-light input[type="number"],
+html.theme-light textarea,
+html.theme-light select {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light .input::placeholder,
+html.theme-light textarea::placeholder,
+html.theme-light input::placeholder {
+  color: var(--fc-muted) !important;
+}
+html.theme-light .input:focus,
+html.theme-light input:focus,
+html.theme-light textarea:focus,
+html.theme-light select:focus {
+  outline: none !important;
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
+}
+
+html.theme-light .label,
+html.theme-light label {
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+}
+
+/* Dropdown */
+html.theme-light .fc-dropdown-menu,
+html.theme-light [data-dropdown-target="menu"] {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--sh-lg) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light .fc-dropdown-head {
+  border-bottom: 1px solid var(--fc-line) !important;
+}
+html.theme-light .fc-dropdown-item,
+html.theme-light [data-dropdown-target="menu"] a,
+html.theme-light [data-dropdown-target="menu"] button {
+  color: var(--fc-soft) !important;
+  font-weight: 600 !important;
+}
+html.theme-light .fc-dropdown-item:hover,
+html.theme-light [data-dropdown-target="menu"] a:hover,
+html.theme-light [data-dropdown-target="menu"] button:hover {
+  background: var(--fc-surface-2) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light .fc-dropdown-danger {
+  color: var(--fc-danger) !important;
+}
+
+/* Pagination */
+html.theme-light .pagy a,
+html.theme-light .pagy span,
+html.theme-light .fc-main nav a,
+html.theme-light .fc-main nav span {
+  background: var(--fc-surface) !important;
+  color: var(--fc-soft) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+html.theme-light .pagy a:hover,
+html.theme-light .fc-main nav a:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(16, 185, 129, 0.40) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light .pagy .current,
+html.theme-light .fc-main nav .active,
+html.theme-light .fc-main nav [aria-current="page"],
+html.theme-light .fc-main nav span.current {
+  background: var(--fc-accent) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.32) !important;
+}
+
+/* Settings tabs */
+html.theme-light .settings-tab {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+}
+html.theme-light .settings-tab:hover {
+  background: var(--fc-surface-2) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light .settings-tab.is-active {
+  background: var(--fc-accent) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.32) !important;
+}
+
+/* Trix */
+html.theme-light trix-editor,
+html.theme-light .trix-content {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light trix-editor:focus {
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18) !important;
+}
+html.theme-light trix-toolbar,
+html.theme-light trix-toolbar .trix-button-row,
+html.theme-light trix-toolbar .trix-button-group {
+  background: var(--fc-surface-2) !important;
+  border-color: var(--fc-line-strong) !important;
+}
+html.theme-light trix-toolbar .trix-button {
+  background: transparent !important;
+  border-color: var(--fc-line) !important;
+  color: var(--fc-soft) !important;
+}
+html.theme-light trix-toolbar .trix-button:not(:disabled):hover {
+  background: var(--fc-surface-3) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light trix-toolbar .trix-button.trix-active {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent-deep) !important;
+}
+
+/* Brethren card — clean white with one mint glow */
+html.theme-light .bc-card {
+  background:
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.10), transparent 42%),
+    var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  box-shadow: var(--sh-lg) !important;
+}
+html.theme-light .bc-card::before {
+  background:
+    repeating-linear-gradient(135deg, rgba(15, 30, 22, 0.025) 0 1px, transparent 1px 48px) !important;
+}
+html.theme-light .bc-field,
+html.theme-light .bc-contact {
+  background: var(--fc-surface-2) !important;
+  border: 1px solid var(--fc-line) !important;
+  color: var(--fc-soft) !important;
+}
+html.theme-light .bc-contact:hover {
+  background: var(--fc-surface-3) !important;
+  border-color: rgba(16, 185, 129, 0.36) !important;
+  color: var(--fc-ink) !important;
+}
+html.theme-light .bc-icon {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent-deep) !important;
+}
+html.theme-light .bc-avatar {
+  background: var(--fc-accent) !important;
+  border: 3px solid var(--fc-surface) !important;
+  color: #ffffff !important;
+}
+html.theme-light .bc-avatar-ring {
+  background: var(--fc-accent) !important;
+}
+
+/* Footer */
+html.theme-light .mystic-footer,
+html.theme-light body:has(.home-page) .mystic-footer {
+  background: linear-gradient(180deg, #0e2419, #0a1c13) !important;
+  border-top: 1px solid rgba(16, 185, 129, 0.18) !important;
+}
+html.theme-light .mystic-footer h4,
+html.theme-light .mystic-footer .font-bold {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+html.theme-light .mystic-footer p,
+html.theme-light .mystic-footer a,
+html.theme-light .mystic-footer li,
+html.theme-light .mystic-footer div {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+html.theme-light .mystic-footer a:hover {
+  color: #6ee7b7 !important;
+}
+
+/* Tailwind utility overrides — strip lavender, keep mint */
+html.theme-light .bg-faith-green,
+html.theme-light .mystic-shell .bg-faith-green,
+html.theme-light .fc-app .bg-faith-green {
+  background: var(--fc-accent) !important;
+  border-color: var(--fc-accent) !important;
+  color: #ffffff !important;
+}
+
+html.theme-light .text-faith-green,
+html.theme-light .text-emerald-500,
+html.theme-light .text-emerald-600,
+html.theme-light .text-emerald-700,
+html.theme-light .text-emerald-800,
+html.theme-light .text-green-600,
+html.theme-light .text-green-700,
+html.theme-light .text-teal-600,
+html.theme-light .text-teal-700 {
+  color: var(--fc-accent-deep) !important;
+}
+
+html.theme-light .bg-emerald-50,
+html.theme-light .bg-green-50,
+html.theme-light .bg-teal-50,
+html.theme-light .fc-app .bg-emerald-50,
+html.theme-light .fc-app .bg-green-50,
+html.theme-light .mystic-shell .bg-emerald-50,
+html.theme-light .mystic-shell .bg-green-50 {
+  background-color: var(--fc-accent-soft) !important;
+}
+
+html.theme-light .border-emerald-200,
+html.theme-light .border-green-200,
+html.theme-light .border-teal-200,
+html.theme-light .fc-app .border-faith-green,
+html.theme-light .fc-app .border-emerald-200,
+html.theme-light .mystic-shell .border-faith-green,
+html.theme-light .mystic-shell .border-emerald-200 {
+  border-color: rgba(16, 185, 129, 0.28) !important;
+}
+
+/* Flash toasts */
+html.theme-light [data-flash-target="message"].bg-emerald-50 {
+  background: rgba(16, 185, 129, 0.10) !important;
+  border-color: rgba(16, 185, 129, 0.30) !important;
+  color: var(--fc-accent-deep) !important;
+}
+
+/* Focus ring — keyboard users */
+html.theme-light *:focus-visible {
+  outline: 2px solid var(--fc-accent) !important;
+  outline-offset: 2px !important;
+  border-radius: 6px;
+}
+
+/* HOME PAGE — light mode mint */
+html.theme-light .home-page {
+  color: var(--fc-ink) !important;
+  background:
+    radial-gradient(ellipse 70rem 32rem at 50% -10rem, rgba(16, 185, 129, 0.10), transparent 65%),
+    var(--fc-bg) !important;
+}
+
+html.theme-light .home-hero {
+  background: transparent !important;
+  border-bottom: 1px solid var(--fc-line) !important;
+}
+
+html.theme-light .home-kicker {
+  background: var(--fc-accent-soft) !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  color: var(--fc-accent-deep) !important;
+}
+
+/* Canonical light accent lock: keep light mode on the green faith palette. */
+:root,
+html.theme-light,
+html:not(.theme-dark) {
+  --fc-accent: #10b981;
+  --fc-accent-2: #059669;
+  --fc-accent-deep: #047857;
+  --fc-accent-soft: rgba(16, 185, 129, 0.12);
+  --fc-accent-glow: rgba(16, 185, 129, 0.32);
+  --primary: var(--fc-accent);
+  --primary-2: var(--fc-accent-2);
+  --primary-soft: var(--fc-accent-soft);
+  --mystic-primary: var(--fc-accent);
+  --mystic-primary-dark: var(--fc-accent-2);
+  --mystic-violet: var(--fc-accent);
+  --mystic-violet-soft: var(--fc-accent-soft);
+  --home-accent: var(--fc-accent);
+  --home-accent-2: var(--fc-accent-2);
+  --faith-green: var(--fc-accent);
+}
+
+html.theme-light body,
+html:not(.theme-dark) body,
+body.theme-light {
+  background:
+    radial-gradient(ellipse 70rem 32rem at 50% -8rem, rgba(16, 185, 129, 0.1), transparent 65%),
+    var(--fc-bg) !important;
+}
+
+html.theme-light .fc-brand-mark,
+html.theme-light .fc-btn-primary,
+html.theme-light .btn-primary,
+html.theme-light .home-btn-primary,
+html.theme-light .gradient-faith,
+html.theme-light .bg-faith-green,
+html.theme-light .mystic-shell .bg-faith-green,
+html.theme-light .fc-app .bg-faith-green,
+html:not(.theme-dark) .fc-brand-mark,
+html:not(.theme-dark) .fc-btn-primary,
+html:not(.theme-dark) .btn-primary,
+html:not(.theme-dark) .home-btn-primary,
+html:not(.theme-dark) .gradient-faith,
+html:not(.theme-dark) .bg-faith-green,
+html:not(.theme-dark) .mystic-shell .bg-faith-green,
+html:not(.theme-dark) .fc-app .bg-faith-green {
+  background: var(--fc-accent) !important;
+  border-color: var(--fc-accent) !important;
+  color: #ffffff !important;
+}
+
+html.theme-light .fc-btn-primary:hover,
+html.theme-light .btn-primary:hover,
+html.theme-light .home-btn-primary:hover,
+html:not(.theme-dark) .fc-btn-primary:hover,
+html:not(.theme-dark) .btn-primary:hover,
+html:not(.theme-dark) .home-btn-primary:hover {
+  background: var(--fc-accent-2) !important;
+  border-color: var(--fc-accent-2) !important;
+}
+
+html.theme-light a,
+html.theme-light .text-faith-green,
+html.theme-light .text-emerald-500,
+html.theme-light .text-emerald-600,
+html.theme-light .text-emerald-700,
+html.theme-light .text-emerald-800,
+html.theme-light .text-green-500,
+html.theme-light .text-green-600,
+html.theme-light .text-green-700,
+html.theme-light .text-green-800,
+html.theme-light .text-teal-500,
+html.theme-light .text-teal-600,
+html.theme-light .text-teal-700,
+html.theme-light .text-teal-800,
+html:not(.theme-dark) a,
+html:not(.theme-dark) .text-faith-green,
+html:not(.theme-dark) .text-emerald-500,
+html:not(.theme-dark) .text-emerald-600,
+html:not(.theme-dark) .text-emerald-700,
+html:not(.theme-dark) .text-emerald-800,
+html:not(.theme-dark) .text-green-500,
+html:not(.theme-dark) .text-green-600,
+html:not(.theme-dark) .text-green-700,
+html:not(.theme-dark) .text-green-800,
+html:not(.theme-dark) .text-teal-500,
+html:not(.theme-dark) .text-teal-600,
+html:not(.theme-dark) .text-teal-700,
+html:not(.theme-dark) .text-teal-800 {
+  color: var(--fc-accent-deep) !important;
+}
+
+html.theme-light .fc-badge,
+html.theme-light .mystic-badge,
+html.theme-light .mystic-kicker,
+html.theme-light .badge,
+html.theme-light .badge-primary,
+html.theme-light .room-badge,
+html.theme-light .tag-badge,
+html.theme-light .bg-emerald-50,
+html.theme-light .bg-green-50,
+html.theme-light .bg-teal-50,
+html.theme-light .fc-nav-link.is-active,
+html.theme-light .fc-rail-link.is-active,
+html:not(.theme-dark) .fc-badge,
+html:not(.theme-dark) .mystic-badge,
+html:not(.theme-dark) .mystic-kicker,
+html:not(.theme-dark) .badge,
+html:not(.theme-dark) .badge-primary,
+html:not(.theme-dark) .room-badge,
+html:not(.theme-dark) .tag-badge,
+html:not(.theme-dark) .bg-emerald-50,
+html:not(.theme-dark) .bg-green-50,
+html:not(.theme-dark) .bg-teal-50,
+html:not(.theme-dark) .fc-nav-link.is-active,
+html:not(.theme-dark) .fc-rail-link.is-active {
+  background: var(--fc-accent-soft) !important;
+  border-color: rgba(16, 185, 129, 0.28) !important;
+  color: var(--fc-accent-deep) !important;
+}
+
+html.theme-light .fc-card:hover,
+html.theme-light .card-hover:hover,
+html.theme-light .room-card:hover,
+html.theme-light .mystic-card-link:hover,
+html.theme-light .home-room-card:hover,
+html.theme-light .home-story-card:hover,
+html:not(.theme-dark) .fc-card:hover,
+html:not(.theme-dark) .card-hover:hover,
+html:not(.theme-dark) .room-card:hover,
+html:not(.theme-dark) .mystic-card-link:hover,
+html:not(.theme-dark) .home-room-card:hover,
+html:not(.theme-dark) .home-story-card:hover {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, 0.16),
+    0 18px 40px rgba(15, 30, 22, 0.1) !important;
+}
+
+html.theme-light .mystic-footer,
+html.theme-light body:has(.home-page) .mystic-footer,
+html:not(.theme-dark) .mystic-footer,
+html:not(.theme-dark) body:has(.home-page) .mystic-footer {
+  background: linear-gradient(180deg, #0e2419, #0a1c13) !important;
+  border-top-color: rgba(16, 185, 129, 0.18) !important;
+}
+
+html.theme-light .home-title,
+html.theme-light .home-section-head h2 {
+  color: var(--fc-ink) !important;
+  background: none !important;
+  -webkit-text-fill-color: var(--fc-ink) !important;
+}
+
+html.theme-light .home-lede {
+  color: var(--fc-soft) !important;
+}
+
+html.theme-light .home-quick-list span {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-light .home-summary {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  box-shadow: var(--sh-lg) !important;
+}
+
+html.theme-light .home-summary-top {
+  color: var(--fc-accent-deep) !important;
+}
+
+html.theme-light .home-summary blockquote {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-light .home-summary > p {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-light .home-stats div {
+  background: var(--fc-surface-2) !important;
+  border: 1px solid var(--fc-line) !important;
+}
+html.theme-light .home-stats strong {
+  color: var(--fc-ink) !important;
+}
+html.theme-light .home-stats span {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-light .home-room-card,
+html.theme-light .home-story-card {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+  box-shadow: var(--sh-md) !important;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease, background 180ms ease !important;
+}
+
+html.theme-light .home-room-card:hover,
+html.theme-light .home-story-card:hover {
+  background: var(--fc-surface) !important;
+  border-color: rgba(16, 185, 129, 0.38) !important;
+  box-shadow:
+    0 0 0 1px rgba(16, 185, 129, 0.16),
+    0 18px 40px rgba(15, 30, 22, 0.10) !important;
+  transform: translateY(-2px) !important;
+}
+
+html.theme-light .home-room-card h3,
+html.theme-light .home-story-card h3 {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-light .home-room-card p,
+html.theme-light .home-story-card p {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-light .home-card-icon {
+  background: var(--fc-accent-soft) !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  color: var(--fc-accent-deep) !important;
+}
+
+html.theme-light .home-card-meta,
+html.theme-light .home-story-foot {
+  color: var(--fc-muted) !important;
+  border-top: 1px solid var(--fc-line) !important;
+}
+
+html.theme-light .home-story-meta span {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent-deep) !important;
+}
+
+html.theme-light .home-story-meta time {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-light .home-btn,
+html.theme-light .home-link-btn {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line-strong) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-light .home-btn:hover,
+html.theme-light .home-link-btn:hover {
+  background: var(--fc-surface-2) !important;
+  border-color: rgba(16, 185, 129, 0.36) !important;
+  color: var(--fc-ink) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-light *,
+  html.theme-light *::before,
+  html.theme-light *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
