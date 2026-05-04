@@ -5847,3 +5847,87 @@ html.theme-light .home-link-btn:hover {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Admin shell uses the same token system as the community UI. */
+.fc-admin {
+  background:
+    radial-gradient(ellipse 70rem 30rem at 50% -14rem, rgba(16, 185, 129, 0.14), transparent 64%),
+    var(--fc-bg) !important;
+  color: var(--fc-ink) !important;
+}
+
+.fc-admin .bg-white,
+.fc-admin .bg-gray-50,
+.fc-admin .bg-stone-50,
+.fc-admin .bg-stone-100 {
+  background: var(--fc-surface) !important;
+}
+
+.fc-admin thead.bg-gray-50,
+.fc-admin thead.bg-stone-50,
+.fc-admin .border-b.bg-gray-50 {
+  background: var(--fc-surface-2) !important;
+}
+
+.fc-admin .border-gray-200,
+.fc-admin .border-stone-200,
+.fc-admin .border-stone-100,
+.fc-admin .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.fc-admin .divide-stone-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--fc-line-strong) !important;
+}
+
+.fc-admin .text-gray-900,
+.fc-admin .text-stone-900 {
+  color: var(--fc-ink) !important;
+}
+
+.fc-admin .text-gray-700,
+.fc-admin .text-stone-700,
+.fc-admin .text-gray-600,
+.fc-admin .text-stone-600 {
+  color: var(--fc-soft) !important;
+}
+
+.fc-admin .text-gray-500,
+.fc-admin .text-stone-500,
+.fc-admin .text-gray-400,
+.fc-admin .text-stone-400 {
+  color: var(--fc-muted) !important;
+}
+
+.fc-admin tr.hover\:bg-gray-50:hover,
+.fc-admin tr.hover\:bg-stone-50:hover,
+.fc-admin .hover\:bg-gray-50:hover,
+.fc-admin .hover\:bg-stone-50:hover {
+  background: var(--fc-surface-2) !important;
+}
+
+.fc-admin .rounded-xl,
+.fc-admin .rounded-lg {
+  border-radius: 8px !important;
+}
+
+.fc-admin .shadow-sm {
+  box-shadow: var(--sh-md) !important;
+}
+
+html.theme-dark .fc-admin {
+  background:
+    radial-gradient(ellipse 70rem 30rem at 50% -14rem, rgba(110, 231, 183, 0.08), transparent 64%),
+    var(--fc-bg) !important;
+}
+
+html.theme-dark .fc-admin .bg-red-50 {
+  background: rgba(127, 29, 29, 0.24) !important;
+}
+
+html.theme-dark .fc-admin .text-red-600,
+html.theme-dark .fc-admin .text-red-700,
+html.theme-dark .fc-admin .text-red-800 {
+  color: #fca5a5 !important;
+}
+
+html.theme-dark .fc-admin .border-red-200 {
+  border-color: rgba(252, 165, 165, 0.28) !important;
+}

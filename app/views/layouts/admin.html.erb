@@ -1,140 +1,130 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full theme-light" data-theme="light">
   <head>
+    <script>
+      (function() {
+        const saved = localStorage.getItem('fc-dark');
+        const legacy = localStorage.getItem('theme');
+        const serverDark = <%= current_user&.respond_to?(:dark_mode?) && current_user.dark_mode? ? "true" : "false" %>;
+        const dark = saved === null
+          ? (legacy ? legacy === 'dark' : (serverDark || window.matchMedia('(prefers-color-scheme: dark)').matches))
+          : saved === '1';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.classList.toggle('theme-dark', dark);
+        document.documentElement.classList.toggle('theme-light', !dark);
+      })();
+    </script>
     <title><%= content_for(:title) || "Admin - Faith Community" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "actiontext", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="h-full bg-stone-100">
-    <div class="min-h-full flex">
-      <!-- Sidebar -->
-      <aside class="w-64 bg-stone-900 text-white flex-shrink-0">
-        <div class="p-6">
-          <%= link_to root_path, class: "flex items-center gap-2" do %>
-            <div class="w-9 h-9 rounded-lg bg-amber-600 flex items-center justify-center shadow-sm">
-              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-              </svg>
-            </div>
-            <span class="font-serif text-lg font-semibold">Admin</span>
-          <% end %>
-        </div>
+  <body class="h-full font-sans antialiased theme-light">
+    <script>
+      (function() {
+        var dark = document.documentElement.classList.contains('theme-dark');
+        document.body.classList.toggle('theme-dark', dark);
+        document.body.classList.toggle('theme-light', !dark);
+      })();
+    </script>
 
-        <nav class="px-4 pb-6">
-          <ul class="space-y-1">
-            <li>
-              <%= link_to admin_root_path, class: "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium #{'bg-stone-800' if current_page?(admin_root_path)} hover:bg-stone-800 transition-colors" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
+    <div class="fc-app fc-admin min-h-full">
+      <div class="fc-topbar sticky top-0 z-50">
+        <div class="fc-topbar-inner">
+          <div class="flex min-w-0 items-center gap-3">
+            <%= link_to admin_root_path, class: "fc-brand flex min-w-0 items-center gap-2" do %>
+              <span class="fc-brand-mark"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
+              <span class="hidden text-base font-extrabold sm:inline">Faith Community</span>
+              <span class="hidden rounded-md border border-[var(--fc-line)] px-2 py-0.5 text-xs font-bold text-[var(--fc-muted)] md:inline">Admin</span>
+            <% end %>
+
+            <nav class="hidden items-center gap-1 lg:flex">
+              <%= link_to admin_root_path, class: "fc-nav-link #{'is-active' if current_page?(admin_root_path)}" do %>
+                <%= render_icon("home", classes: "h-4 w-4") %>
                 Dashboard
               <% end %>
-            </li>
-            <li>
-              <%= link_to admin_users_path, class: "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium #{request.path.include?('/admin/users') ? 'bg-stone-800' : ''} hover:bg-stone-800 transition-colors" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m12 5.197v-4m0 0V7m0 4h4m-4 0H17"/>
-                </svg>
+              <%= link_to admin_users_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/users')}" do %>
+                <%= render_icon("users", classes: "h-4 w-4") %>
                 Users
               <% end %>
-            </li>
-            <li>
-              <%= link_to admin_posts_path, class: "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium #{request.path.include?('/admin/posts') ? 'bg-stone-800' : ''} hover:bg-stone-800 transition-colors" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-                </svg>
+              <%= link_to admin_posts_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/posts')}" do %>
+                <%= render_icon("filetext", classes: "h-4 w-4") %>
                 Posts
               <% end %>
-            </li>
-            <li>
-              <%= link_to admin_rooms_path, class: "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium #{request.path.include?('/admin/rooms') ? 'bg-stone-800' : ''} hover:bg-stone-800 transition-colors" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                </svg>
+              <%= link_to admin_rooms_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/rooms')}" do %>
+                <%= render_icon("message_circle", classes: "h-4 w-4") %>
                 Rooms
               <% end %>
-            </li>
-            <li>
-              <%= link_to admin_resources_path, class: "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium #{request.path.include?('/admin/resources') ? 'bg-stone-800' : ''} hover:bg-stone-800 transition-colors" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
+              <%= link_to admin_resources_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/resources')}" do %>
+                <%= render_icon("bookopen", classes: "h-4 w-4") %>
                 Resources
               <% end %>
-            </li>
-            <li>
-              <%= link_to admin_reports_path, class: "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium #{request.path.include?('/admin/reports') ? 'bg-stone-800' : ''} hover:bg-stone-800 transition-colors" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                </svg>
+              <%= link_to admin_reports_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/reports')}" do %>
+                <%= render_icon("shield", classes: "h-4 w-4") %>
                 Reports
                 <% pending_count = Report.pending.count %>
-                <% if pending_count > 0 %>
-                  <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full"><%= pending_count %></span>
+                <% if pending_count.positive? %>
+                  <span class="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-extrabold text-red-700"><%= pending_count %></span>
                 <% end %>
               <% end %>
-            </li>
-          </ul>
-        </nav>
+            </nav>
+          </div>
 
-        <div class="mt-auto p-4 border-t border-stone-800">
-          <%= link_to feed_path, class: "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors text-stone-400" do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/>
-            </svg>
-            Back to Site
-          <% end %>
-        </div>
-      </aside>
-
-      <!-- Main Content -->
-      <main class="flex-1 overflow-auto">
-        <!-- Top Bar -->
-        <header class="bg-white border-b border-stone-200 px-8 py-4">
-          <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-stone-900"><%= content_for(:page_title) || "Dashboard" %></h1>
-            <div class="flex items-center gap-4">
-              <span class="text-sm text-stone-600">Welcome, <%= current_user.username %></span>
+          <div class="flex items-center gap-2">
+            <%= link_to feed_path, class: "fc-btn" do %>
+              <%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") %>
+              Site
+            <% end %>
+            <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
+              <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
+              <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
+            </button>
+            <div class="fc-avatar">
               <% if current_user.profile.avatar.attached? %>
-                <%= image_tag current_user.profile.avatar, class: "w-8 h-8 avatar rounded-full object-cover" %>
+                <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover" %>
               <% else %>
-                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm font-medium">
-                  <%= current_user.username[0].upcase %>
-                </div>
+                <%= current_user.username.first.upcase %>
               <% end %>
             </div>
           </div>
-        </header>
-
-        <% if notice || alert %>
-          <div class="px-8 py-4">
-            <% if notice %>
-              <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg">
-                <%= notice %>
-              </div>
-            <% end %>
-            <% if alert %>
-              <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-                <%= alert %>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-
-        <div class="p-8">
-          <%= yield %>
         </div>
+      </div>
+
+      <% if notice || alert %>
+        <div class="mx-auto max-w-6xl px-4 pt-4">
+          <% if notice %>
+            <div class="mb-2 rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] px-4 py-3 text-sm font-semibold text-[var(--fc-soft)] shadow-sm">
+              <%= notice %>
+            </div>
+          <% end %>
+          <% if alert %>
+            <div class="mb-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm">
+              <%= alert %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <main class="mx-auto w-full max-w-6xl px-4 py-7">
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p class="fc-section-label mb-2">Admin Console</p>
+            <h1 class="text-2xl font-extrabold text-[var(--fc-ink)]"><%= content_for(:page_title) || "Dashboard" %></h1>
+          </div>
+          <p class="text-sm font-semibold text-[var(--fc-muted)]">Signed in as <%= current_user.username %></p>
+        </div>
+
+        <%= yield %>
       </main>
     </div>
   </body>
 </html>
-
