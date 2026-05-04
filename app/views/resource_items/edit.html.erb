@@ -1,0 +1,15 @@
+<% content_for(:title) { "Edit Resource - Faith Community" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Library</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Edit Resource</h1>
+      <p class="mystic-copy mt-2">Update resource details.</p>
+    </div>
+
+    <div class="mystic-panel-strong p-6">
+      <%= render "form", resource: @resource, categories: @categories %>
+    </div>
+  </div>
+</div>

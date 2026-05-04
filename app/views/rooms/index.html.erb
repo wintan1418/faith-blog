@@ -1,75 +1,65 @@
-<% content_for(:title) { "Rooms - Faith Community" } %>
+<% content_for(:title) { "Community Rooms - Faith Community" } %>
 
-<div class="page-header">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="text-center">
-      <h1 class="text-4xl sm:text-5xl font-bold text-stone-900 mb-4">🌿 Community Rooms</h1>
-      <p class="text-stone-600 max-w-2xl mx-auto text-lg">
-        Find your space to share, connect, and grow. Each room is a garden where seeds of faith are planted and nurtured.
-      </p>
+<div class="mystic-shell">
+  <section class="mystic-hero">
+    <div class="mystic-container py-14 sm:py-18">
+      <div class="max-w-3xl space-y-5">
+        <span class="mystic-kicker">
+          <%= render_icon("users", classes: "w-4 h-4") %>
+          Community Rooms
+        </span>
+        <h1 class="mystic-title text-4xl sm:text-6xl">Focused spaces for real conversation.</h1>
+        <p class="mystic-copy text-lg">
+          Each room keeps a topic clear so prayer requests, testimonies, questions, and resources do not collapse into one noisy stream.
+        </p>
+      </div>
     </div>
-  </div>
-</div>
+  </section>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    <% @rooms.each_with_index do |room, index| %>
-      <div class="room-card animate-slide-up" style="animation-delay: <%= index * 0.08 %>s;">
-        <!-- Icon & Stats Header -->
-        <div class="flex items-start justify-between">
-          <div class="icon-box icon-box-lg" style="background: linear-gradient(145deg, <%= room.color %>15 0%, <%= room.color %>25 100%); border-color: <%= room.color %>40;">
-            <span class="drop-shadow-sm"><%= room.icon %></span>
-          </div>
-          <div class="flex flex-col items-end gap-1">
-            <span class="badge-primary"><%= room.posts_count %> posts</span>
-            <span class="badge-secondary"><%= room.members_count %> members</span>
-          </div>
-        </div>
-        
-        <!-- Content -->
-        <div class="flex-1 space-y-3">
-          <h3 class="text-xl font-bold text-stone-900"><%= room.name %></h3>
-          <p class="text-stone-600 text-sm leading-relaxed"><%= room.description %></p>
-        </div>
-
-        <!-- Guidelines -->
-        <% if room.rules.present? %>
-          <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 border border-green-100 dark:border-green-800/30">
-            <p class="text-xs text-green-700 dark:text-green-400 font-semibold mb-1.5 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-              </svg>
-              Room Guidelines
-            </p>
-            <p class="text-xs text-green-600 dark:text-green-300"><%= truncate(room.rules, length: 120) %></p>
-          </div>
-        <% end %>
-
-        <!-- Actions -->
-        <div class="flex items-center gap-3 pt-3 border-t border-stone-100 dark:border-stone-700">
-          <%= link_to room_path(room), class: "btn-primary flex-1 justify-center" do %>
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-            </svg>
-            Enter Room
-          <% end %>
-          <% if user_signed_in? %>
-            <% if current_user.room_memberships.exists?(room: room) %>
-              <%= button_to leave_room_path(room), method: :delete, class: "btn-ghost px-3", data: { turbo_confirm: "Leave this room?" }, title: "Leave room" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-              <% end %>
-            <% else %>
-              <%= button_to join_room_path(room), class: "btn-ghost px-3", title: "Join room" do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-              <% end %>
-            <% end %>
-          <% end %>
+  <section class="mystic-container py-10">
+    <div class="mb-8 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
+      <div class="mystic-panel p-4">
+        <div class="flex flex-wrap gap-2">
+          <span class="mystic-badge px-4 py-2">All Rooms</span>
+          <span class="mystic-badge px-4 py-2"><%= pluralize(@rooms.size, "room") %></span>
+          <span class="mystic-badge px-4 py-2"><%= pluralize(@rooms.sum(&:posts_count), "post") %></span>
         </div>
       </div>
+      <% if user_signed_in? %>
+        <%= link_to "Start a Post", new_post_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+
+    <% if @rooms.any? %>
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <% @rooms.each do |room| %>
+          <%= link_to room_path(room), class: "mystic-card-link mystic-panel p-6" do %>
+            <div class="flex items-start justify-between gap-4">
+              <div class="grid h-14 w-14 place-items-center rounded-2xl bg-white/75 text-faith-green">
+                <%= render_icon(room.icon || "sparkles", classes: "w-7 h-7") %>
+              </div>
+              <% if room.posts_count.to_i > 50 %>
+                <span class="mystic-badge px-3 py-1 text-faith-accent">Active</span>
+              <% end %>
+            </div>
+
+            <div class="mt-6">
+              <h2 class="text-2xl font-bold leading-tight text-faith-dark"><%= room.name %></h2>
+              <p class="mystic-copy mt-3 line-clamp-3 text-sm"><%= room.description %></p>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-4 border-t border-faith-green/10 pt-4">
+              <span class="mystic-stat"><%= render_icon("message_circle", classes: "w-4 h-4") %><%= pluralize(room.posts_count, "post") %></span>
+              <span class="mystic-stat"><%= render_icon("users", classes: "w-4 h-4") %><%= pluralize(room.members_count, "member") %></span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="mystic-panel p-10 text-center">
+        <h2 class="text-xl font-bold text-faith-dark">No rooms yet</h2>
+        <p class="mystic-copy mt-2">Rooms will appear here once they are created.</p>
+      </div>
     <% end %>
-  </div>
+  </section>
 </div>

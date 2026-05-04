@@ -1,47 +1,51 @@
 <% content_for(:title) { "Sign In - Faith Community" } %>
 
-<div class="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12">
-  <div class="w-full max-w-md">
-    <div class="text-center mb-8">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-faith flex items-center justify-center shadow-lg">
-        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
-      </div>
-      <h1 class="text-2xl font-bold text-stone-900">Welcome Back</h1>
-      <p class="text-stone-600 mt-1">Sign in to continue your faith journey</p>
+<div class="mystic-shell flex min-h-[calc(100vh-160px)] items-center px-4 py-12">
+  <div class="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[1fr_440px] lg:items-center">
+    <div class="hidden space-y-5 lg:block">
+      <span class="mystic-kicker">
+        <%= render_icon("sparkles", classes: "w-4 h-4") %>
+        Welcome back
+      </span>
+      <h1 class="mystic-title text-6xl">Return to the conversation with a clear heart.</h1>
+      <p class="mystic-copy max-w-xl text-lg">Pick up your feed, rooms, bookmarks, and connections without changing context.</p>
     </div>
 
-    <div class="card p-8">
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name), class: "space-y-5") do |f| %>
+    <div class="mystic-panel-strong p-6 sm:p-8">
+      <div class="mb-8">
+        <div class="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-white/80 text-faith-green">
+          <%= render_icon("sparkles", classes: "w-6 h-6") %>
+        </div>
+        <h1 class="text-3xl font-bold text-faith-dark">Sign in</h1>
+        <p class="mt-1 text-sm text-faith-muted">Continue to Faith Community.</p>
+      </div>
+
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5" }) do |f| %>
         <div>
           <%= f.label :email, class: "label" %>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input", placeholder: "Enter your email" %>
+          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input", placeholder: "you@example.com" %>
         </div>
 
         <div>
           <%= f.label :password, class: "label" %>
-          <%= f.password_field :password, autocomplete: "current-password", class: "input", placeholder: "Enter your password" %>
+          <%= f.password_field :password, autocomplete: "current-password", class: "input", placeholder: "Your password" %>
         </div>
 
-        <div class="flex items-center justify-between">
-          <label class="flex items-center gap-2">
-            <%= f.check_box :remember_me, class: "w-4 h-4 text-amber-600 border-stone-300 rounded focus:ring-amber-500" %>
-            <span class="text-sm text-stone-600">Remember me</span>
+        <div class="flex items-center justify-between gap-3">
+          <label class="flex items-center gap-2 text-sm font-semibold text-faith-muted">
+            <%= f.check_box :remember_me, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+            Remember me
           </label>
-          <%= link_to "Forgot password?", new_password_path(resource_name), class: "text-sm text-amber-700 hover:text-amber-800" %>
+          <%= link_to "Forgot password?", new_password_path(resource_name), class: "text-sm font-bold text-faith-green hover:text-faith-dark" %>
         </div>
 
-        <%= f.submit "Sign In", class: "btn-primary w-full btn-lg" %>
+        <%= f.submit "Sign In", class: "btn btn-primary btn-lg w-full" %>
       <% end %>
 
-      <div class="mt-6 text-center">
-        <p class="text-stone-600">
-          Don't have an account?
-          <%= link_to "Join our community", new_registration_path(resource_name), class: "text-amber-700 hover:text-amber-800 font-medium" %>
-        </p>
-      </div>
+      <p class="mt-6 text-center text-sm text-faith-muted">
+        New here?
+        <%= link_to "Create an account", new_registration_path(resource_name), class: "font-bold text-faith-green hover:text-faith-dark" %>
+      </p>
     </div>
   </div>
 </div>
-

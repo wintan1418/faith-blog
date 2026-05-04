@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_05_195026) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_01_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,7 +79,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_195026) do
     t.bigint "user_id", null: false
     t.bigint "post_id", null: false
     t.bigint "parent_comment_id"
-    t.text "content", null: false
+    t.text "content"
     t.datetime "edited_at"
     t.datetime "deleted_at"
     t.boolean "flagged", default: false, null: false
@@ -129,6 +129,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_195026) do
     t.index ["reaction_type"], name: "index_likes_on_reaction_type"
     t.index ["user_id", "likeable_type", "likeable_id"], name: "index_likes_on_user_and_likeable", unique: true
     t.index ["user_id"], name: "index_likes_on_user_id"
+  end
+
+  create_table "mentions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "mentionable_type", null: false
+    t.bigint "mentionable_id", null: false
+    t.string "mentioned_by_type", null: false
+    t.bigint "mentioned_by_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mentionable_type", "mentionable_id"], name: "index_mentions_on_mentionable"
+    t.index ["mentionable_type", "mentionable_id"], name: "index_mentions_on_mentionable_type_and_mentionable_id"
+    t.index ["mentioned_by_type", "mentioned_by_id"], name: "index_mentions_on_mentioned_by"
+    t.index ["mentioned_by_type", "mentioned_by_id"], name: "index_mentions_on_mentioned_by_type_and_mentioned_by_id"
+    t.index ["user_id", "mentionable_type", "mentionable_id"], name: "index_mentions_on_user_and_mentionable"
+    t.index ["user_id"], name: "index_mentions_on_user_id"
   end
 
   create_table "moderation_logs", force: :cascade do |t|
@@ -357,6 +373,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_195026) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "dark_mode", default: false, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -377,6 +394,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_195026) do
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "follows", "users", column: "following_id"
   add_foreign_key "likes", "users"
+  add_foreign_key "mentions", "users"
   add_foreign_key "moderation_logs", "users", column: "moderator_id"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "actor_id"

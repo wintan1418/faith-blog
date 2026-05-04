@@ -12,6 +12,7 @@ class CommentsController < ApplicationController
 
     if @comment.save
       create_notification
+      # Mentions are processed in after_save callback, no need to call again
       respond_to do |format|
         format.html { redirect_to @post, notice: "Comment added!" }
         format.turbo_stream
@@ -31,6 +32,7 @@ class CommentsController < ApplicationController
 
     if @reply.save
       create_reply_notification
+      # Mentions are processed in after_save callback, no need to call again
       respond_to do |format|
         format.html { redirect_to @post, notice: "Reply added!" }
         format.turbo_stream
@@ -46,6 +48,7 @@ class CommentsController < ApplicationController
   def update
     if @comment.update(comment_params)
       @comment.mark_as_edited!
+      # Mentions are processed in after_save callback, no need to call again
       respond_to do |format|
         format.html { redirect_to @post, notice: "Comment updated!" }
         format.turbo_stream

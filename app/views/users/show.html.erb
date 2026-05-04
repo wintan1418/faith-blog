@@ -1,227 +1,156 @@
 <% content_for(:title) { "#{@user.username} - Faith Community" } %>
 
-<div class="page-header">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-      <!-- Avatar -->
-      <% if @user.profile&.avatar&.attached? %>
-        <%= image_tag @user.profile.avatar, class: "w-24 h-24 sm:w-32 sm:h-32 avatar rounded-full object-cover shadow-lg" %>
-      <% else %>
-        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-4xl font-semibold shadow-lg">
-          <%= @user.username[0].upcase %>
-        </div>
-      <% end %>
-
-      <div class="flex-1 text-center sm:text-left">
-        <div class="flex flex-col sm:flex-row items-center gap-3 mb-3">
-          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white"><%= @user.username %></h1>
-          <% if @user.admin? %>
-            <span class="badge-primary">Admin</span>
-          <% elsif @user.moderator? %>
-            <span class="badge-faith">Moderator</span>
-          <% end %>
-        </div>
-
-        <% if @user.profile.bio.present? %>
-          <p class="text-gray-600 dark:text-gray-300 mb-4"><%= @user.profile.bio %></p>
-        <% end %>
-
-        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
-          <% if @user.profile.location.present? %>
-            <span class="flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-              <%= @user.profile.location %>
+<div class="mystic-shell">
+  <section class="mystic-hero">
+    <div class="mystic-container max-w-5xl py-12">
+      <div class="flex flex-col gap-8 md:flex-row md:items-start">
+        <div class="relative shrink-0">
+          <% if @user.profile&.avatar&.attached? %>
+            <%= image_tag @user.profile.avatar, class: "mystic-avatar h-32 w-32 object-cover md:h-40 md:w-40" %>
+          <% else %>
+            <span class="mystic-avatar mystic-avatar-fallback grid h-32 w-32 place-items-center text-5xl font-bold md:h-40 md:w-40">
+              <%= @user.username.first.upcase %>
             </span>
           <% end %>
-          <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-            </svg>
-            Joined <%= @user.created_at.strftime("%B %Y") %>
-          </span>
+          <% if @user.admin? || @user.moderator? %>
+            <span class="absolute -bottom-2 right-2 mystic-badge px-3 py-1 shadow-sm">
+              <%= @user.admin? ? "Admin" : "Moderator" %>
+            </span>
+          <% end %>
         </div>
 
-        <div class="flex items-center justify-center sm:justify-start gap-6 mb-4">
-          <%= link_to followers_user_path(@user.username), class: "text-center hover:text-amber-600 dark:hover:text-amber-400 transition-colors" do %>
-            <span class="block text-xl font-bold text-gray-900 dark:text-white"><%= @user.followers_count %></span>
-            <span class="text-sm text-gray-500 dark:text-gray-400">Followers</span>
-          <% end %>
-          <%= link_to following_user_path(@user.username), class: "text-center hover:text-amber-600 dark:hover:text-amber-400 transition-colors" do %>
-            <span class="block text-xl font-bold text-gray-900 dark:text-white"><%= @user.following_count %></span>
-            <span class="text-sm text-gray-500 dark:text-gray-400">Following</span>
-          <% end %>
-          <div class="text-center">
-            <span class="block text-xl font-bold text-gray-900 dark:text-white"><%= @user.posts.published.count %></span>
-            <span class="text-sm text-gray-500 dark:text-gray-400">Posts</span>
-          </div>
-        </div>
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 class="mystic-title text-4xl sm:text-6xl"><%= @user.display_name.presence || @user.username %></h1>
+              <p class="mt-1 text-lg font-semibold text-faith-muted">@<%= @user.username %></p>
+            </div>
 
-        <% if user_signed_in? && @user != current_user %>
-          <div class="flex flex-wrap items-center gap-3">
-            <% if current_user.following?(@user) %>
-              <%= button_to unfollow_user_path(@user.username), method: :delete, class: "btn btn-secondary" do %>
-                Following
-              <% end %>
-            <% else %>
-              <%= button_to follow_user_path(@user.username), class: "btn btn-primary" do %>
-                Follow
-              <% end %>
+            <% if user_signed_in? && @user == current_user %>
+              <%= link_to "Edit Profile", edit_settings_profile_path, class: "btn btn-secondary" %>
             <% end %>
+          </div>
 
-            <!-- Can I Know You More? Button -->
-            <% connection = current_user.connection_with(@user) %>
-            <% if connection&.accepted? %>
-              <%= link_to brethren_card_path(@user.username), class: "btn btn-success" do %>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
-                </svg>
-                View Brethren Card
-              <% end %>
-            <% elsif connection&.pending? && connection.sender == current_user %>
-              <span class="btn btn-ghost cursor-not-allowed opacity-75">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                </svg>
-                Request Sent
+          <% if @user.profile.bio.present? %>
+            <p class="mystic-copy mt-5 max-w-2xl text-lg"><%= @user.profile.bio %></p>
+          <% end %>
+
+          <div class="mt-5 flex flex-wrap gap-3">
+            <% if @user.profile.location.present? %>
+              <span class="mystic-badge px-3 py-1">
+                <%= render_icon("globe", classes: "w-4 h-4") %>
+                <%= @user.profile.location %>
               </span>
-            <% elsif connection&.pending? && connection.receiver == current_user %>
-              <div class="flex items-center gap-2">
-                <%= button_to accept_connection_request_path(connection), method: :post, class: "btn btn-success btn-sm" do %>
-                  Accept Request
-                <% end %>
-                <%= button_to decline_connection_request_path(connection), method: :post, class: "btn btn-ghost btn-sm" do %>
-                  Decline
-                <% end %>
-              </div>
-            <% else %>
-              <%= button_to connection_requests_path(receiver_id: @user.id), method: :post, class: "btn bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0" do %>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Can I Know You More?
-              <% end %>
             <% end %>
+            <span class="mystic-badge px-3 py-1">
+              <%= render_icon("clock", classes: "w-4 h-4") %>
+              Joined <%= @user.created_at.strftime("%B %Y") %>
+            </span>
           </div>
-        <% end %>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- My Brethren Card Section (only visible to profile owner) -->
-<% if user_signed_in? && @user == current_user %>
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="brethren-card">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <span class="text-2xl">🤝</span>
-          My Brethren Card
-        </h2>
-        <%= link_to edit_settings_brethren_card_path, class: "btn btn-sm btn-secondary" do %>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-          </svg>
-          Edit Card
-        <% end %>
-      </div>
+          <div class="mt-6 grid max-w-md grid-cols-3 gap-3">
+            <%= link_to followers_user_path(@user.username), class: "rounded-2xl bg-white/65 p-4 text-center transition hover:bg-white" do %>
+              <span class="block text-2xl font-bold text-faith-dark"><%= number_to_human(@user.followers_count, format: "%n%u", units: { thousand: "k" }) %></span>
+              <span class="text-xs font-semibold text-faith-muted">Followers</span>
+            <% end %>
+            <%= link_to following_user_path(@user.username), class: "rounded-2xl bg-white/65 p-4 text-center transition hover:bg-white" do %>
+              <span class="block text-2xl font-bold text-faith-dark"><%= number_to_human(@user.following_count, format: "%n%u", units: { thousand: "k" }) %></span>
+              <span class="text-xs font-semibold text-faith-muted">Following</span>
+            <% end %>
+            <div class="rounded-2xl bg-white/65 p-4 text-center">
+              <span class="block text-2xl font-bold text-faith-dark"><%= @user.posts.published.count %></span>
+              <span class="text-xs font-semibold text-faith-muted">Posts</span>
+            </div>
+          </div>
 
-      <% if current_user.brethren_card&.complete? %>
-        <!-- Card is complete - show preview -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-3">
-            <div class="flex items-start gap-3">
-              <span class="text-lg">⛪</span>
-              <div>
-                <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">Church / Assembly</p>
-                <p class="text-gray-800 dark:text-gray-200"><%= current_user.brethren_card.church_or_assembly %></p>
-              </div>
+          <% if user_signed_in? && @user != current_user %>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <% if current_user.following?(@user) %>
+                <%= button_to "Following", unfollow_user_path(@user.username), method: :delete, class: "btn btn-secondary" %>
+              <% else %>
+                <%= button_to "Follow", follow_user_path(@user.username), class: "btn btn-primary" %>
+              <% end %>
+
+              <% connection = current_user.connection_with(@user) %>
+              <% if connection&.accepted? %>
+                <%= link_to "View Brethren Card", brethren_card_path(@user.username), class: "btn btn-secondary" %>
+              <% elsif connection&.pending? && connection.sender == current_user %>
+                <span class="btn btn-secondary cursor-not-allowed opacity-70">Request Sent</span>
+              <% elsif connection&.pending? && connection.receiver == current_user %>
+                <%= button_to "Accept Request", accept_connection_request_path(connection), method: :post, class: "btn btn-primary" %>
+                <%= button_to "Decline", decline_connection_request_path(connection), method: :post, class: "btn btn-secondary" %>
+              <% else %>
+                <%= button_to "Can I Know You More?", connection_requests_path(receiver_id: @user.id), method: :post, class: "btn btn-primary" %>
+              <% end %>
             </div>
-            <div class="flex items-start gap-3">
-              <span class="text-lg">💼</span>
-              <div>
-                <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">What I Do</p>
-                <p class="text-gray-800 dark:text-gray-200"><%= current_user.brethren_card.occupation %></p>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <span class="text-lg">📝</span>
-              <div>
-                <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">About Me</p>
-                <p class="text-gray-800 dark:text-gray-200 line-clamp-2"><%= current_user.brethren_card.bio %></p>
-              </div>
-            </div>
-          </div>
-          <div class="space-y-3">
-            <div class="flex items-start gap-3">
-              <span class="text-lg">📱</span>
-              <div>
-                <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">WhatsApp</p>
-                <p class="text-gray-800 dark:text-gray-200"><%= current_user.brethren_card.whatsapp_number %></p>
-              </div>
-            </div>
-            <div class="flex items-start gap-3">
-              <span class="text-lg">✉️</span>
-              <div>
-                <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase">Email</p>
-                <p class="text-gray-800 dark:text-gray-200"><%= current_user.brethren_card.email %></p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4 pt-4 border-t border-amber-200/50 dark:border-amber-700/30">
-          <p class="text-sm text-green-700 dark:text-green-400 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-            </svg>
-            Your card is complete! Others can send you "Can I Know You More?" requests.
-          </p>
-        </div>
-      <% else %>
-        <!-- Card is incomplete - prompt to fill -->
-        <div class="text-center py-6">
-          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-            <svg class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Complete Your Brethren Card</h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-4 max-w-md mx-auto">
-            Fill in your Brethren Card so others can connect with you. This card is shared when you exchange "Can I Know You More?" requests.
-          </p>
-          <%= link_to edit_settings_brethren_card_path, class: "btn btn-primary" do %>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-            </svg>
-            Complete My Card Now
           <% end %>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="mystic-container max-w-5xl py-10">
+    <% if user_signed_in? && @user == current_user %>
+      <section class="mystic-panel-strong mb-10 p-6 sm:p-8">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="mystic-kicker">Private Profile Card</span>
+            <h2 class="mt-3 text-3xl font-bold text-faith-dark">My Brethren Card</h2>
+            <p class="mystic-copy mt-2">Shared only when connection requests are accepted.</p>
+          </div>
+          <%= link_to "Edit Card", edit_settings_brethren_card_path, class: "btn btn-secondary" %>
+        </div>
+
+        <% if current_user.brethren_card&.complete? %>
+          <div class="grid gap-4 md:grid-cols-2">
+            <% [
+              ["Church / Assembly", current_user.brethren_card.church_or_assembly],
+              ["Occupation", current_user.brethren_card.occupation],
+              ["WhatsApp", current_user.brethren_card.whatsapp_number],
+              ["Email", current_user.brethren_card.email],
+              ["About", current_user.brethren_card.bio]
+            ].each do |label, value| %>
+              <% next if value.blank? %>
+              <div class="rounded-2xl bg-white/65 p-4">
+                <p class="text-xs font-bold uppercase tracking-wide text-faith-muted"><%= label %></p>
+                <p class="mt-1 text-sm font-semibold text-faith-dark"><%= value %></p>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="rounded-2xl border border-dashed border-faith-green/25 bg-white/45 p-8 text-center">
+            <h3 class="text-xl font-bold text-faith-dark">Complete Your Brethren Card</h3>
+            <p class="mystic-copy mx-auto mt-2 max-w-md">Add the details you want trusted connections to see after a request is accepted.</p>
+            <%= link_to "Complete My Card", edit_settings_brethren_card_path, class: "btn btn-primary mt-6" %>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+
+    <section>
+      <div class="mb-6 flex items-center gap-3">
+        <%= render_icon("filetext", classes: "w-6 h-6 text-faith-green") %>
+        <h2 class="text-3xl font-bold text-faith-dark">Posts by <%= @user.display_name.presence || @user.username %></h2>
+      </div>
+
+      <% if @posts.any? %>
+        <div class="space-y-5">
+          <% @posts.each do |post| %>
+            <%= render "posts/card", post: post %>
+          <% end %>
+        </div>
+
+        <% if @pagy.pages > 1 %>
+          <div class="mt-8">
+            <%== pagy_nav(@pagy) %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="mystic-panel p-12 text-center">
+          <h3 class="text-xl font-bold text-faith-dark">No posts yet</h3>
+          <p class="mystic-copy mt-2">Posts will appear here when published.</p>
+        </div>
       <% end %>
-    </div>
+    </section>
   </div>
-<% end %>
-
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="mb-6">
-    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Posts by <%= @user.username %></h2>
-  </div>
-
-  <% if @posts.any? %>
-    <div>
-      <% @posts.each do |post| %>
-        <%= render "posts/card", post: post %>
-      <% end %>
-    </div>
-
-    <div class="mt-8">
-      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
-    </div>
-  <% else %>
-    <div class="card p-12 text-center">
-      <p class="text-gray-500 dark:text-gray-400">No posts yet.</p>
-    </div>
-  <% end %>
 </div>
-

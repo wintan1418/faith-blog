@@ -1,135 +1,115 @@
-<% content_for(:title) { "Faith Community - Share Your Journey" } %>
+<% content_for(:title) { "Faith Community - Stories, Prayer, Rooms" } %>
 
-<!-- Hero Section -->
-<section class="relative overflow-hidden">
-  <div class="absolute inset-0 bg-gradient-to-br from-amber-50 via-stone-50 to-orange-50"></div>
-  <div class="absolute inset-0 opacity-30">
-    <div class="absolute top-20 left-10 w-72 h-72 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
-    <div class="absolute top-40 right-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
-    <div class="absolute bottom-20 left-1/3 w-72 h-72 bg-stone-200 rounded-full mix-blend-multiply filter blur-3xl"></div>
-  </div>
-  
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-    <div class="text-center max-w-3xl mx-auto">
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-900 leading-tight mb-6 animate-fade-in">
-        Share Your <span class="text-amber-700">Faith Journey</span>
-      </h1>
-      <p class="text-lg sm:text-xl text-stone-600 mb-10 leading-relaxed animate-slide-up">
-        A welcoming community where brethren share testimonies, struggles, victories, and encouragement. 
-        Together, we grow in faith and support one another.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style="animation-delay: 0.1s;">
-        <%= link_to new_user_registration_path, class: "btn-primary btn-lg shadow-lg hover:shadow-xl transition-shadow" do %>
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-          </svg>
-          Join Our Community
-        <% end %>
-        <%= link_to rooms_path, class: "btn-secondary btn-lg" do %>
-          Explore Rooms
-          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
+<div class="home-page">
+  <section class="home-hero">
+    <div class="home-container home-hero-grid">
+      <div class="home-hero-copy">
+        <span class="home-kicker">
+          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          Faith Community
+        </span>
+        <h1 class="home-title">A thoughtful home for stories, prayer, and wisdom.</h1>
+        <p class="home-lede">
+          Share testimonies, ask for prayer, join focused rooms, and keep spiritual resources close without the noise of a generic social feed.
+        </p>
+        <div class="home-actions">
+          <% if user_signed_in? %>
+            <%= link_to "Open Feed", feed_path, class: "home-btn home-btn-primary" %>
+            <%= link_to "Browse Rooms", rooms_path, class: "home-btn home-btn-secondary" %>
+          <% else %>
+            <%= link_to "Join Community", new_user_registration_path, class: "home-btn home-btn-primary" %>
+            <%= link_to "Sign In", new_user_session_path, class: "home-btn home-btn-secondary" %>
+          <% end %>
+        </div>
+        <div class="home-quick-list" aria-label="Community features">
+          <span>Prayer rooms</span>
+          <span>Testimonies</span>
+          <span>Saved resources</span>
+        </div>
+      </div>
+
+      <div class="home-summary" aria-label="Community summary">
+        <div class="home-summary-top">
+          <span>Today</span>
+          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+        </div>
+        <blockquote>
+          "How good and pleasant it is when God's people live together in unity."
+        </blockquote>
+        <p>Psalm 133:1</p>
+        <div class="home-stats">
+          <div>
+            <strong><%= @rooms.size %></strong>
+            <span>Rooms</span>
+          </div>
+          <div>
+            <strong><%= @featured_posts.size %></strong>
+            <span>Featured</span>
+          </div>
+          <div>
+            <strong>24/7</strong>
+            <span>Prayer</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-section">
+    <div class="home-container">
+      <div class="home-section-head">
+        <div>
+          <span class="home-kicker">Rooms</span>
+          <h2>Find the right room for the conversation.</h2>
+        </div>
+        <%= link_to "View all rooms", rooms_path, class: "home-link-btn" %>
+      </div>
+
+      <div class="home-card-grid">
+        <% @rooms.first(6).each do |room| %>
+          <%= link_to room_path(room), class: "home-room-card" do %>
+            <div class="home-card-icon">
+              <%= render_icon(room.icon || "sparkles", classes: "h-5 w-5") %>
+            </div>
+            <h3><%= room.name %></h3>
+            <p><%= room.description %></p>
+            <div class="home-card-meta">
+              <span><%= pluralize(room.posts_count, "post") %></span>
+              <span><%= pluralize(room.members_count, "member") %></span>
+            </div>
+          <% end %>
         <% end %>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Scripture Banner -->
-<section class="bg-stone-900 text-white py-8">
-  <div class="max-w-4xl mx-auto px-4 text-center">
-    <p class="text-lg sm:text-xl italic font-serif text-stone-200">
-      "Therefore encourage one another and build each other up, just as in fact you are doing."
-    </p>
-    <p class="text-amber-400 mt-2 text-sm font-medium">— 1 Thessalonians 5:11</p>
-  </div>
-</section>
-
-<!-- Rooms Section -->
-<section class="py-20 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">Community Rooms</h2>
-      <p class="text-stone-600 max-w-2xl mx-auto">
-        Find your space. Connect with others who understand. Share and be encouraged.
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <% @rooms.each_with_index do |room, index| %>
-        <div class="room-card animate-slide-up" style="animation-delay: <%= index * 0.05 %>s;">
-          <div class="flex items-start justify-between">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background-color: <%= room.color %>20;">
-              <%= room.icon %>
-            </div>
-            <span class="badge-secondary"><%= room.posts_count %> posts</span>
-          </div>
+  <% if @featured_posts.any? %>
+    <section class="home-section home-section-featured">
+      <div class="home-container">
+        <div class="home-section-head">
           <div>
-            <h3 class="text-lg font-semibold text-stone-900 mb-2"><%= room.name %></h3>
-            <p class="text-sm text-stone-600 line-clamp-2"><%= room.description %></p>
+            <span class="home-kicker">Featured</span>
+            <h2>Stories worth slowing down for.</h2>
           </div>
-          <%= link_to room_path(room), class: "inline-flex items-center text-amber-700 hover:text-amber-800 text-sm font-medium mt-auto" do %>
-            Enter Room
-            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
+        </div>
+
+        <div class="home-story-grid">
+          <% @featured_posts.each do |post| %>
+            <%= link_to post_path(post), class: "home-story-card" do %>
+              <div class="home-story-meta">
+                <span><%= post.room.name %></span>
+                <time><%= time_ago_in_words(post.published_at || post.created_at) %> ago</time>
+              </div>
+              <h3><%= post.title %></h3>
+              <p><%= post.content.to_plain_text.truncate(180) %></p>
+              <div class="home-story-foot">
+                <span><%= post.anonymous? ? "Anonymous" : post.user.username %></span>
+                <span><%= pluralize(post.comments_count, "comment") %></span>
+              </div>
+            <% end %>
           <% end %>
         </div>
-      <% end %>
-    </div>
-
-    <div class="text-center mt-10">
-      <%= link_to rooms_path, class: "btn btn-secondary" do %>
-        View All Rooms
-        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-        </svg>
-      <% end %>
-    </div>
-  </div>
-</section>
-
-<!-- Featured Posts -->
-<% if @featured_posts.any? %>
-<section class="py-20 bg-gradient-to-br from-stone-50 to-amber-50/30">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl sm:text-4xl font-bold text-stone-900 mb-4">Featured Testimonies</h2>
-      <p class="text-stone-600">Stories of faith that inspire and encourage</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <% @featured_posts.each do |post| %>
-        <%= render "posts/card", post: post %>
-      <% end %>
-    </div>
-  </div>
-</section>
-<% end %>
-
-<!-- Call to Action -->
-<section class="py-20 bg-stone-900 relative overflow-hidden">
-  <div class="absolute inset-0 opacity-10">
-    <svg class="absolute top-0 left-0 w-64 h-64 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-    </svg>
-  </div>
-  
-  <div class="relative max-w-4xl mx-auto px-4 text-center">
-    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-6">
-      Your Story Matters
-    </h2>
-    <p class="text-stone-300 text-lg mb-8 max-w-2xl mx-auto">
-      Every testimony, every struggle, every victory can be a beacon of hope for someone else. 
-      Join our community and share your journey.
-    </p>
-    <%= link_to new_user_registration_path, class: "inline-flex items-center px-8 py-4 bg-amber-600 text-white font-semibold rounded-xl hover:bg-amber-500 transition-colors shadow-lg" do %>
-      Begin Your Journey
-      <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-      </svg>
-    <% end %>
-  </div>
-</section>
-
+      </div>
+    </section>
+  <% end %>
+</div>

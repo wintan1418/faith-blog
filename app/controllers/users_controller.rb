@@ -2,7 +2,7 @@
 
 class UsersController < ApplicationController
   before_action :authenticate_user!, except: [:show, :posts]
-  before_action :set_user
+  before_action :set_user, except: [:mentions]
 
   def show
     @pagy, @posts = pagy(@user.posts.published.includes(:room, :tags).recent)
@@ -11,6 +11,21 @@ class UsersController < ApplicationController
   def posts
     @pagy, @posts = pagy(@user.posts.published.includes(:room, :tags).recent)
     render :show
+  end
+
+  def mentions
+    query = params[:query].to_s.strip
+    return render json: [] if query.length < 1
+
+    users = User.where("username ILIKE ? OR email ILIKE ?", "%#{query}%", "%#{query}%").limit(10)
+    
+    render json: users.map { |u|
+      {
+        username: u.username,
+        name: u.display_name,
+        avatar_url: u.profile&.avatar&.attached? ? url_for(u.profile.avatar) : nil
+      }
+    }
   end
 
   def follow

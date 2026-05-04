@@ -21,8 +21,9 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Store uploaded files on Cloudinary (see config/storage.yml for options).
+  # For local development, use :local. For production, use :cloudinary
+  config.active_storage.service = ENV.fetch("RAILS_STORAGE_SERVICE", "cloudinary").to_sym
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
@@ -53,21 +54,37 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Email configuration
+  # Set this to true to raise delivery errors in production
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.delivery_method = :smtp
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  # Update this with your actual domain
+  config.action_mailer.default_url_options = { 
+    host: ENV.fetch("RAILS_HOST", "yourdomain.com"),
+    protocol: "https"
+  }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # SMTP configuration
+  # Credentials can be set via Rails credentials or environment variables
+  # To set via credentials: rails credentials:edit
+  # Add: smtp:
+  #        user_name: your_email@example.com
+  #        password: your_password
+  #        address: smtp.example.com
+  #        domain: yourdomain.com
+  config.action_mailer.smtp_settings = {
+    address: Rails.application.credentials.dig(:smtp, :address) || ENV.fetch("SMTP_ADDRESS", "smtp.gmail.com"),
+    port: Rails.application.credentials.dig(:smtp, :port) || ENV.fetch("SMTP_PORT", "587").to_i,
+    domain: Rails.application.credentials.dig(:smtp, :domain) || ENV.fetch("SMTP_DOMAIN", "yourdomain.com"),
+    user_name: Rails.application.credentials.dig(:smtp, :user_name) || ENV["SMTP_USER_NAME"],
+    password: Rails.application.credentials.dig(:smtp, :password) || ENV["SMTP_PASSWORD"],
+    authentication: Rails.application.credentials.dig(:smtp, :authentication) || ENV.fetch("SMTP_AUTH", "plain").to_sym,
+    enable_starttls_auto: true,
+    openssl_verify_mode: "none" # Use "peer" in production with proper SSL
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full theme-light" data-theme="light">
   <head>
     <script>
       // Apply theme immediately to prevent flash
       (function() {
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-          document.documentElement.classList.add('dark');
-        }
+        const saved = localStorage.getItem('fc-dark');
+        const legacy = localStorage.getItem('theme');
+        const serverDark = <%= current_user&.respond_to?(:dark_mode?) && current_user.dark_mode? ? "true" : "false" %>;
+        const dark = saved === null
+          ? (legacy ? legacy === 'dark' : (serverDark || window.matchMedia('(prefers-color-scheme: dark)').matches))
+          : saved === '1';
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        document.documentElement.classList.toggle('theme-dark', dark);
+        document.documentElement.classList.toggle('theme-light', !dark);
       })();
     </script>
     <title><%= content_for(:title) || "Faith Community" %></title>
@@ -27,7 +31,14 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="h-full bg-stone-50 font-sans antialiased">
+  <body class="h-full bg-stone-50 font-sans antialiased theme-light">
+    <script>
+      (function() {
+        var dark = document.documentElement.classList.contains('theme-dark');
+        document.body.classList.toggle('theme-dark', dark);
+        document.body.classList.toggle('theme-light', !dark);
+      })();
+    </script>
     <div class="min-h-full">
       <%= render "shared/navbar" %>
       

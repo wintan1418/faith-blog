@@ -61,7 +61,10 @@
     <%= f.rich_text_area :content, 
         class: "input min-h-[300px]", 
         placeholder: "Share your testimony, thoughts, or prayer request...",
-        data: { emoji_picker_target: "editor" } %>
+        data: { 
+          emoji_picker_target: "editor",
+          controller: "mentions" 
+        } %>
   </div>
 
   <!-- Image Upload Section -->

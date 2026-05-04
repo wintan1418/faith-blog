@@ -1,0 +1,50 @@
+<%= form_with model: resource, url: resource.persisted? ? resources_item_path(resource) : resources_items_path, class: "space-y-5" do |f| %>
+  <% if resource.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4">
+      <ul class="list-inside list-disc text-sm text-red-700">
+        <% resource.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :title, class: "label" %>
+    <%= f.text_field :title, class: "input", placeholder: "Resource title" %>
+  </div>
+
+  <div>
+    <%= f.label :description, class: "label" %>
+    <%= f.text_area :description, class: "input", rows: 5, placeholder: "What is this resource and who will it help?" %>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :resource_category_id, "Category", class: "label" %>
+      <%= f.collection_select :resource_category_id, categories, :id, :name, { prompt: "Choose a category" }, class: "input" %>
+    </div>
+
+    <div>
+      <%= f.label :resource_type, "Type", class: "label" %>
+      <%= f.select :resource_type, Resource.resource_types.keys.map { |type| [type.titleize, type] }, {}, class: "input" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :url, "URL", class: "label" %>
+    <%= f.url_field :url, class: "input", placeholder: "https://..." %>
+    <p class="mt-1 text-xs text-faith-muted">Required for links and videos.</p>
+  </div>
+
+  <div>
+    <%= f.label :file, "File", class: "label" %>
+    <%= f.file_field :file, class: "text-sm text-faith-muted file:mr-4 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-bold file:text-faith-green" %>
+    <p class="mt-1 text-xs text-faith-muted">Required for PDFs and audio.</p>
+  </div>
+
+  <div class="flex flex-wrap gap-3 border-t border-faith-green/10 pt-5">
+    <%= f.submit resource.persisted? ? "Update Resource" : "Submit Resource", class: "btn btn-primary" %>
+    <%= link_to "Cancel", resources_root_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

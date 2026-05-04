@@ -1,0 +1,27 @@
+@layer components {
+
+    /* Tribute.js Styles */
+    .tribute-container {
+        @apply absolute top-0 left-0 h-auto overflow-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50;
+        max-height: 300px;
+        width: auto;
+        min-width: 200px;
+    }
+
+    .tribute-container ul {
+        @apply m-0 p-0 list-none block;
+    }
+
+    .tribute-container li {
+        @apply cursor-pointer;
+    }
+
+    .tribute-container li.highlight,
+    .tribute-container li:hover {
+        @apply bg-amber-50 dark:bg-amber-900/20;
+    }
+
+    .tribute-container li span {
+        @apply font-medium;
+    }
+}

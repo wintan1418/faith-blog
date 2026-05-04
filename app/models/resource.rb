@@ -58,12 +58,12 @@ class Resource < ApplicationRecord
 
   def type_icon
     case resource_type.to_sym
-    when :link then "🔗"
-    when :video then "🎬"
-    when :pdf then "📄"
-    when :audio then "🎧"
-    when :book then "📚"
-    else "📁"
+    when :link then "externallink"
+    when :video then "video"
+    when :pdf then "filetext"
+    when :audio then "headphones"
+    when :book then "bookopen"
+    else "filetext"
     end
   end
 end

@@ -1,22 +1,29 @@
 <% content_for(:title) { "Join - Faith Community" } %>
 
-<div class="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12">
-  <div class="w-full max-w-md">
-    <div class="text-center mb-8">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl gradient-faith flex items-center justify-center shadow-lg">
-        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
-      </div>
-      <h1 class="text-2xl font-bold text-stone-900">Join Our Community</h1>
-      <p class="text-stone-600 mt-1">Begin your journey of faith and fellowship</p>
+<div class="mystic-shell flex min-h-[calc(100vh-160px)] items-center px-4 py-12">
+  <div class="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[1fr_460px] lg:items-center">
+    <div class="hidden space-y-5 lg:block">
+      <span class="mystic-kicker">
+        <%= render_icon("users", classes: "w-4 h-4") %>
+        Join the community
+      </span>
+      <h1 class="mystic-title text-6xl">Create a place for your story, prayers, and growth.</h1>
+      <p class="mystic-copy max-w-xl text-lg">Your account unlocks posting, rooms, bookmarks, connections, and your Brethren Card profile.</p>
     </div>
 
-    <div class="card p-8">
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), class: "space-y-5") do |f| %>
+    <div class="mystic-panel-strong p-6 sm:p-8">
+      <div class="mb-8">
+        <div class="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-white/80 text-faith-green">
+          <%= render_icon("sparkles", classes: "w-6 h-6") %>
+        </div>
+        <h1 class="text-3xl font-bold text-faith-dark">Create account</h1>
+        <p class="mt-1 text-sm text-faith-muted">Start participating in Faith Community.</p>
+      </div>
+
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
         <% if resource.errors.any? %>
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-            <ul class="text-sm text-red-700 list-disc list-inside">
+          <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
+            <ul class="list-inside list-disc text-sm text-red-700">
               <% resource.errors.full_messages.each do |message| %>
                 <li><%= message %></li>
               <% end %>
@@ -27,41 +34,35 @@
         <div>
           <%= f.label :username, class: "label" %>
           <%= f.text_field :username, autofocus: true, autocomplete: "username", class: "input", placeholder: "Choose a username" %>
-          <p class="text-xs text-stone-500 mt-1">Letters, numbers, and underscores only. 3-30 characters.</p>
+          <p class="mt-1 text-xs text-faith-muted">Letters, numbers, and underscores. 3-30 characters.</p>
         </div>
 
         <div>
           <%= f.label :email, class: "label" %>
-          <%= f.email_field :email, autocomplete: "email", class: "input", placeholder: "Enter your email" %>
+          <%= f.email_field :email, autocomplete: "email", class: "input", placeholder: "you@example.com" %>
         </div>
 
         <div>
           <%= f.label :password, class: "label" %>
-          <%= f.password_field :password, autocomplete: "new-password", class: "input", placeholder: "Create a password" %>
-          <p class="text-xs text-stone-500 mt-1">Minimum 8 characters</p>
+          <%= f.password_field :password, autocomplete: "new-password", class: "input", placeholder: "Minimum 8 characters" %>
         </div>
 
         <div>
           <%= f.label :password_confirmation, "Confirm Password", class: "label" %>
-          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "input", placeholder: "Confirm your password" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "input", placeholder: "Repeat your password" %>
         </div>
 
-        <div class="pt-2">
-          <%= f.submit "Create Account", class: "btn-primary w-full btn-lg" %>
-        </div>
+        <%= f.submit "Create Account", class: "btn btn-primary btn-lg w-full" %>
 
-        <p class="text-xs text-stone-500 text-center">
-          By creating an account, you agree to our community guidelines and commit to treating others with love and respect.
+        <p class="text-center text-xs leading-5 text-faith-muted">
+          By creating an account, you agree to follow the community guidelines and treat others with care.
         </p>
       <% end %>
 
-      <div class="mt-6 text-center">
-        <p class="text-stone-600">
-          Already have an account?
-          <%= link_to "Sign in", new_session_path(resource_name), class: "text-amber-700 hover:text-amber-800 font-medium" %>
-        </p>
-      </div>
+      <p class="mt-6 text-center text-sm text-faith-muted">
+        Already have an account?
+        <%= link_to "Sign in", new_session_path(resource_name), class: "font-bold text-faith-green hover:text-faith-dark" %>
+      </p>
     </div>
   </div>
 </div>
-

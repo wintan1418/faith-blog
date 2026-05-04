@@ -28,6 +28,14 @@ local:
 #   storage_access_key: <%= Rails.application.credentials.dig(:azure_storage, :storage_access_key) %>
 #   container: your_container_name-<%= Rails.env %>
 
+# Cloudinary configuration
+# Set these in Rails credentials: cloudinary:cloud_name, api_key, api_secret
+cloudinary:
+  service: Cloudinary
+  cloud_name: <%= Rails.application.credentials.dig(:cloudinary, :cloud_name) || ENV['CLOUDINARY_CLOUD_NAME'] %>
+  api_key: <%= Rails.application.credentials.dig(:cloudinary, :api_key) || ENV['CLOUDINARY_API_KEY'] %>
+  api_secret: <%= Rails.application.credentials.dig(:cloudinary, :api_secret) || ENV['CLOUDINARY_API_SECRET'] %>
+
 # mirror:
 #   service: Mirror
 #   primary: local

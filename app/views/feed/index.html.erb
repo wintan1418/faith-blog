@@ -1,184 +1,117 @@
 <% content_for(:title) { "Feed - Faith Community" } %>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="flex flex-col lg:flex-row gap-8">
-    <!-- Main Feed -->
-    <div class="flex-1 max-w-3xl">
-      <!-- Feed Tabs -->
-      <div class="flex items-center gap-1 mb-8 border-b border-gray-200 dark:border-gray-700">
-        <%= link_to feed_path, class: "px-4 py-3 text-sm font-medium border-b-2 transition-colors #{current_page?(feed_path) ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}" do %>
-          Latest
+<div class="fc-app">
+  <div class="fc-shell">
+    <aside class="fc-sidebar">
+      <div class="fc-section-label">Your Space</div>
+      <nav class="space-y-1">
+        <%= link_to feed_path, class: "fc-rail-link #{'is-active' if current_page?(feed_path)}" do %>
+          <%= render_icon("message_circle", classes: "h-4 w-4") %>
+          Feed
         <% end %>
-        <%= link_to feed_trending_path, class: "px-4 py-3 text-sm font-medium border-b-2 transition-colors #{current_page?(feed_trending_path) ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}" do %>
-          Trending
+        <%= link_to bookmarks_path, class: "fc-rail-link" do %>
+          <%= render_icon("bookmark", classes: "h-4 w-4") %>
+          Bookmarks
         <% end %>
-        <% if user_signed_in? %>
-          <%= link_to feed_following_path, class: "px-4 py-3 text-sm font-medium border-b-2 transition-colors #{current_page?(feed_following_path) ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}" do %>
-            Following
+        <%= link_to user_path(current_user.username), class: "fc-rail-link" do %>
+          <%= render_icon("users", classes: "h-4 w-4") %>
+          Profile
+        <% end %>
+        <%= link_to my_connections_path, class: "fc-rail-link" do %>
+          <%= render_icon("users", classes: "h-4 w-4") %>
+          Connections
+        <% end %>
+        <%= link_to notifications_path, class: "fc-rail-link" do %>
+          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          Notifications
+        <% end %>
+      </nav>
+
+      <div class="fc-section-label">Your Rooms</div>
+      <nav class="space-y-1">
+        <% Room.public_rooms.ordered.limit(5).each do |room| %>
+          <%= link_to room_path(room), class: "fc-rail-link" do %>
+            <span class="grid h-5 w-5 place-items-center rounded bg-[var(--fc-surface-2)] text-[10px] text-[var(--fc-gold)]">
+              <%= render_icon(room.icon || "sparkles", classes: "h-3.5 w-3.5") %>
+            </span>
+            <%= room.name %>
           <% end %>
+        <% end %>
+        <%= link_to "Browse all rooms ->", rooms_path, class: "mt-3 block px-3 text-sm font-semibold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
+      </nav>
+    </aside>
+
+    <main class="fc-main">
+      <div class="fc-panel fc-composer">
+        <% if current_user.profile&.avatar&.attached? %>
+          <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+        <% else %>
+          <span class="fc-avatar"><%= current_user.username.first.upcase %></span>
+        <% end %>
+        <%= link_to "Share an encouragement, request, or question...", new_post_path, class: "fc-composer-input flex items-center text-[var(--fc-muted)]" %>
+        <%= link_to new_post_path, class: "fc-btn fc-btn-primary" do %>
+          Post
         <% end %>
       </div>
 
-      <!-- Featured Post (if any) -->
-      <% featured = @posts.find { |p| p.featured? } %>
-      <% if featured && current_page?(feed_path) %>
-        <div class="mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
-          <span class="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3 block">Featured Story</span>
-          <%= link_to post_path(featured), class: "block group" do %>
-            <% if featured.has_images? %>
-              <%= image_tag featured.images.first, 
-                  class: "w-full h-64 object-cover rounded-xl mb-5 group-hover:opacity-90 transition-opacity",
-                  alt: featured.title %>
-            <% end %>
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight">
-              <%= featured.title %>
-            </h2>
-          <% end %>
-          <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3 text-lg leading-relaxed">
-            <%= truncate(featured.content.to_plain_text, length: 250) %>
-          </p>
-          <div class="flex items-center gap-3">
-            <% unless featured.anonymous? %>
-              <%= link_to user_path(featured.user.username), class: "flex items-center gap-2" do %>
-                <% if featured.user.profile&.avatar&.attached? %>
-                  <%= image_tag featured.user.profile.avatar, class: "w-8 h-8 rounded-full object-cover" %>
-                <% else %>
-                  <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white text-sm font-medium">
-                    <%= featured.user.username[0].upcase %>
-                  </div>
-                <% end %>
-                <span class="text-sm font-medium text-gray-900 dark:text-white"><%= featured.user.username %></span>
-              <% end %>
-            <% end %>
-            <span class="text-gray-400">·</span>
-            <span class="text-sm text-gray-500 dark:text-gray-400"><%= featured.published_at&.strftime("%b %d") %></span>
-            <span class="text-gray-400">·</span>
-            <span class="text-sm text-gray-500 dark:text-gray-400"><%= featured.reading_time %> min read</span>
-          </div>
+      <div class="fc-tabs">
+        <%= link_to "Recent", feed_path, class: "fc-tab #{current_page?(feed_path) ? 'is-active' : ''}" %>
+        <%= link_to "Trending", feed_trending_path, class: "fc-tab #{current_page?(feed_trending_path) ? 'is-active' : ''}" %>
+        <%= link_to "Following", feed_following_path, class: "fc-tab #{current_page?(feed_following_path) ? 'is-active' : ''}" %>
+        <div class="ml-auto">
+          <%= link_to "All rooms", rooms_path, class: "fc-btn" %>
         </div>
-      <% end %>
+      </div>
 
-      <!-- Posts -->
-      <% if @posts.any? %>
-        <div>
-          <% @posts.reject { |p| p == featured && current_page?(feed_path) }.each do |post| %>
+      <div class="mt-4 space-y-3">
+        <% if @posts.any? %>
+          <% @posts.each do |post| %>
             <%= render "posts/card", post: post %>
           <% end %>
-        </div>
 
-        <div class="mt-8">
-          <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
-        </div>
-      <% else %>
-        <div class="text-center py-16">
-          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
-            </svg>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No stories yet</h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">Be the first to share something with the community!</p>
-          <%= link_to new_post_path, class: "btn btn-primary" do %>
-            Write Your First Story
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-
-    <!-- Sidebar -->
-    <aside class="lg:w-80 space-y-6">
-      <!-- Quick Actions -->
-      <% if user_signed_in? %>
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
-          <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Share Your Story</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Your testimony could be exactly what someone needs to hear today.</p>
-          <%= link_to new_post_path, class: "btn btn-primary w-full justify-center" do %>
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-            </svg>
-            Start Writing
-          <% end %>
-        </div>
-      <% end %>
-
-      <!-- Explore Rooms -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold text-gray-900 dark:text-white">Rooms to Explore</h3>
-          <%= link_to "See all", rooms_path, class: "text-sm text-amber-600 dark:text-amber-400 hover:underline" %>
-        </div>
-        <div class="space-y-3">
-          <% Room.public_rooms.ordered.limit(5).each do |room| %>
-            <%= link_to room_path(room), class: "flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" do %>
-              <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-lg">
-                <%= room.icon %>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 dark:text-white truncate"><%= room.name %></p>
-                <p class="text-xs text-gray-500 dark:text-gray-400"><%= room.posts_count %> stories</p>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
-
-      <!-- Scripture of the Day -->
-      <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-6 border border-amber-200/50 dark:border-amber-800/30">
-        <div class="flex items-center gap-2 mb-3">
-          <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-          </svg>
-          <h3 class="font-semibold text-amber-900 dark:text-amber-400">Daily Encouragement</h3>
-        </div>
-        <p class="text-sm text-amber-800 dark:text-amber-200/80 italic leading-relaxed">
-          "For I know the plans I have for you," declares the LORD, "plans to prosper you and not to harm you, plans to give you hope and a future."
-        </p>
-        <p class="text-xs text-amber-700 dark:text-amber-400/70 mt-3 font-medium">— Jeremiah 29:11</p>
-      </div>
-
-      <!-- Who to Follow -->
-      <% if user_signed_in? %>
-        <% suggested_users = User.where.not(id: [current_user.id] + current_user.following.pluck(:id)).includes(:profile).order("RANDOM()").limit(3) %>
-        <% if suggested_users.any? %>
-          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Who to Follow</h3>
-            <div class="space-y-4">
-              <% suggested_users.each do |user| %>
-                <div class="flex items-center gap-3">
-                  <% if user.profile.avatar.attached? %>
-                    <%= link_to user_path(user.username) do %>
-                      <%= image_tag user.profile.avatar, class: "w-10 h-10 rounded-full object-cover" %>
-                    <% end %>
-                  <% else %>
-                    <%= link_to user_path(user.username) do %>
-                      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-medium">
-                        <%= user.username[0].upcase %>
-                      </div>
-                    <% end %>
-                  <% end %>
-                  <div class="flex-1 min-w-0">
-                    <%= link_to user.username, user_path(user.username), class: "text-sm font-medium text-gray-900 dark:text-white hover:text-amber-600 dark:hover:text-amber-400 block truncate" %>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate"><%= user.profile.bio.present? ? truncate(user.profile.bio, length: 40) : "Faith Community member" %></p>
-                  </div>
-                  <%= button_to follow_user_path(user.username), class: "text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300" do %>
-                    Follow
-                  <% end %>
-                </div>
-              <% end %>
+          <% if @pagy.pages > 1 %>
+            <div class="pt-4">
+              <%== pagy_nav(@pagy) %>
             </div>
+          <% end %>
+        <% else %>
+          <div class="fc-panel p-8 text-center">
+            <h2 class="text-lg font-bold text-[var(--fc-ink)]">No posts yet</h2>
+            <p class="mt-2 text-sm text-[var(--fc-muted)]">Start the first conversation.</p>
+            <%= link_to "Write a Post", new_post_path, class: "fc-btn fc-btn-primary mt-5" %>
           </div>
         <% end %>
-      <% end %>
+      </div>
+    </main>
 
-      <!-- Footer Links -->
-      <div class="text-xs text-gray-500 dark:text-gray-400 space-x-3">
-        <span>© <%= Date.current.year %> Faith Community</span>
-        <span>·</span>
-        <a href="#" class="hover:text-gray-700 dark:hover:text-gray-300">About</a>
-        <span>·</span>
-        <a href="#" class="hover:text-gray-700 dark:hover:text-gray-300">Terms</a>
-        <span>·</span>
-        <a href="#" class="hover:text-gray-700 dark:hover:text-gray-300">Privacy</a>
+    <aside class="fc-aside space-y-3">
+      <div class="fc-side-card">
+        <h3 class="mb-3 text-sm font-extrabold text-[var(--fc-ink)]">Today's verse</h3>
+        <p class="font-serif text-lg leading-7 text-[var(--fc-soft)]">"He gives strength to the weary, and increases the power of the weak."</p>
+        <p class="mt-3 text-sm text-[var(--fc-muted)]">Isaiah 40:29</p>
+      </div>
+
+      <div class="fc-side-card">
+        <div class="mb-3 flex items-center justify-between">
+          <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Open prayer requests</h3>
+          <span class="text-sm text-[var(--fc-muted)]">3</span>
+        </div>
+        <div class="space-y-3">
+          <% [
+            ["J", "Joy", "3d before chemo"],
+            ["A", "Anonymous", "biopsy results Friday"],
+            ["M", "Marcus", "job interview Tue"]
+          ].each do |initial, name, detail| %>
+            <div class="flex items-center gap-3">
+              <span class="fc-avatar"><%= initial %></span>
+              <span class="min-w-0 flex-1">
+                <span class="block text-sm font-bold text-[var(--fc-ink)]"><%= name %></span>
+                <span class="block truncate text-xs text-[var(--fc-muted)]"><%= detail %></span>
+              </span>
+              <button class="fc-btn">Pray</button>
+            </div>
+          <% end %>
+        </div>
       </div>
     </aside>
   </div>

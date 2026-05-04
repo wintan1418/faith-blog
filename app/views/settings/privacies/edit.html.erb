@@ -1,0 +1,44 @@
+<% content_for(:title) { "Privacy Settings - Faith Community" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Settings</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Privacy</h1>
+      <p class="mystic-copy mt-2">Control how visible your profile is to the community.</p>
+    </div>
+
+    <%= render "settings/tabs", active: :privacy %>
+
+    <div class="mystic-panel-strong overflow-hidden">
+      <div class="border-b border-faith-green/10 p-6">
+        <h2 class="text-xl font-bold text-faith-dark">Profile Visibility</h2>
+        <p class="mystic-copy text-sm">This affects profile discovery and public profile pages.</p>
+      </div>
+
+      <div class="p-6">
+        <%= form_with model: @profile, url: settings_privacy_path, method: :patch, class: "space-y-6" do |f| %>
+          <% if @profile.errors.any? %>
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
+              <ul class="list-inside list-disc text-sm text-red-700">
+                <% @profile.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <label class="mystic-panel flex items-start gap-3 p-5">
+            <%= f.check_box :public_profile, class: "mt-1 h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+            <span>
+              <span class="block font-bold text-faith-dark">Make my profile public</span>
+              <span class="mt-1 block text-sm text-faith-muted">Members can find your profile and read the public details you add.</span>
+            </span>
+          </label>
+
+          <%= f.submit "Save Changes", class: "btn btn-primary" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

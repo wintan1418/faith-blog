@@ -24,3 +24,6 @@ application.register("post-form", PostFormController)
 
 import EmojiPickerController from "./emoji_picker_controller"
 application.register("emoji-picker", EmojiPickerController)
+
+import MentionsController from "./mentions_controller"
+application.register("mentions", MentionsController)

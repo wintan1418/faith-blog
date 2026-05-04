@@ -28,6 +28,7 @@ class PostsController < ApplicationController
     
     if @post.save
       handle_post_links
+      # Mentions are processed in after_save callback, no need to call again
       redirect_to @post, notice: "Post created successfully!"
     else
       @rooms = Room.public_rooms.ordered
@@ -42,6 +43,7 @@ class PostsController < ApplicationController
   def update
     if @post.update(post_params)
       handle_post_links
+      # Mentions are processed in after_save callback, no need to call again
       redirect_to @post, notice: "Post updated successfully!"
     else
       @rooms = Room.public_rooms.ordered

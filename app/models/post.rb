@@ -3,6 +3,7 @@
 class Post < ApplicationRecord
   extend FriendlyId
   include PgSearch::Model
+  include Mentionable
 
   friendly_id :title, use: :slugged
 
@@ -62,6 +63,7 @@ class Post < ApplicationRecord
 
   # Callbacks
   before_save :set_published_at, if: -> { status_changed? && published? }
+  after_save :process_mentions_after_save
 
   # Instance methods
   def engagement_score
@@ -108,6 +110,10 @@ class Post < ApplicationRecord
     if images.attached? && images.count > 5
       errors.add(:images, "cannot exceed 5 images per post")
     end
+  end
+
+  def process_mentions_after_save
+    process_mentions!(user) if user.present?
   end
 end
 

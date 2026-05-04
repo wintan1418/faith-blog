@@ -1,0 +1,44 @@
+<% content_for(:title) { "Notification Settings - Faith Community" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Settings</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Notifications</h1>
+      <p class="mystic-copy mt-2">Choose which room conversations should send updates.</p>
+    </div>
+
+    <%= render "settings/tabs", active: :notifications %>
+
+    <div class="mystic-panel-strong overflow-hidden">
+      <div class="border-b border-faith-green/10 p-6">
+        <h2 class="text-xl font-bold text-faith-dark">Room Notifications</h2>
+        <p class="mystic-copy text-sm">Keep prayer and room updates focused on spaces you follow closely.</p>
+      </div>
+
+      <div class="p-6">
+        <%= form_with url: settings_notifications_path, method: :patch, class: "space-y-5" do %>
+          <% if @room_memberships.any? %>
+            <div class="space-y-3">
+              <% @room_memberships.each do |membership| %>
+                <label class="mystic-panel flex items-center justify-between gap-4 p-4">
+                  <span>
+                    <span class="block font-bold text-faith-dark"><%= membership.room.name %></span>
+                    <span class="text-sm text-faith-muted"><%= membership.role.titleize %></span>
+                  </span>
+                  <%= check_box_tag "room_membership_ids[]", membership.id, membership.notifications_enabled, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+                </label>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="mystic-panel p-5">
+              <p class="mystic-copy text-sm">Join a room to manage room notification preferences.</p>
+            </div>
+          <% end %>
+
+          <%= submit_tag "Save Changes", class: "btn btn-primary" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

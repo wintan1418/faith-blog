@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class Comment < ApplicationRecord
+  include Mentionable
+
+  # Rich text content
+  has_rich_text :content
+
   # Associations
   belongs_to :user
   belongs_to :post, counter_cache: true
@@ -11,7 +16,10 @@ class Comment < ApplicationRecord
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   # Validations
-  validates :content, presence: true, length: { minimum: 1, maximum: 2000 }
+  validates :content, presence: true
+
+  # Callbacks
+  after_save :process_mentions_after_save
 
   # Scopes
   scope :root_comments, -> { where(parent_comment_id: nil) }
@@ -22,7 +30,8 @@ class Comment < ApplicationRecord
 
   # Instance methods
   def soft_delete!
-    update(deleted_at: Time.current, content: "[This comment has been deleted]")
+    update(deleted_at: Time.current)
+    content.update(body: "[This comment has been deleted]") if content.present?
   end
 
   def deleted?
@@ -47,6 +56,12 @@ class Comment < ApplicationRecord
 
   def reply?
     parent_comment_id.present?
+  end
+
+  private
+
+  def process_mentions_after_save
+    process_mentions!(user) if user.present?
   end
 end
 

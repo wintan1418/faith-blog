@@ -15,6 +15,7 @@
     "@tailwindcss/cli": "^4.1.17",
     "emoji-picker-element": "^1.28.0",
     "tailwindcss": "^4.1.17",
-    "trix": "^2.1.15"
+    "trix": "^2.1.15",
+    "tributejs": "^5.1.3"
   }
 }

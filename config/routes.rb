@@ -46,6 +46,9 @@ Rails.application.routes.draw do
   post "likes/:likeable_type/:likeable_id", to: "likes#create", as: :likes
   delete "likes/:likeable_type/:likeable_id", to: "likes#destroy", as: :unlike
 
+  # Mentions autocomplete
+  get "mentions", to: "users#mentions"
+
   # User profiles
   resources :users, only: [:show], param: :username, path: "u" do
     member do
@@ -95,6 +98,7 @@ Rails.application.routes.draw do
     resource :notifications, only: [:edit, :update]
     resource :privacy, only: [:edit, :update]
     resource :brethren_card, only: [:edit, :update]
+    resource :dark_mode, only: [:update]
   end
 
   # Brethren Card & Connection Requests

@@ -1,0 +1,34 @@
+<% content_for(:title) { "#{@category.name} Resources - Faith Community" } %>
+
+<div class="mystic-shell">
+  <section class="mystic-hero">
+    <div class="mystic-container py-8 sm:py-10">
+      <span class="mystic-kicker">Category</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl"><%= @category.name %></h1>
+      <% if @category.description.present? %>
+        <p class="mystic-copy mt-2 max-w-2xl"><%= @category.description %></p>
+      <% end %>
+    </div>
+  </section>
+
+  <div class="mystic-container py-8">
+    <% if @resources.any? %>
+      <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <% @resources.each do |resource| %>
+          <%= render "resource_items/resource", resource: resource %>
+        <% end %>
+      </div>
+
+      <% if @pagy.pages > 1 %>
+        <div class="mt-8">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="mystic-panel p-10 text-center">
+        <h2 class="text-xl font-bold text-faith-dark">No resources yet</h2>
+        <p class="mystic-copy mt-2">Approved resources in this category will appear here.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
