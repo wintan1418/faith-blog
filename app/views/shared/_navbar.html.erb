@@ -30,18 +30,12 @@
           <%= render_icon("search", classes: "h-4 w-4") %>
           Search
         <% end %>
-        <% if user_signed_in? && current_user_admin? %>
-          <%= link_to admin_root_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/admin')}" do %>
-            <%= render_icon("sparkles", classes: "h-4 w-4") %>
-            Admin
-          <% end %>
-        <% end %>
       </div>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex min-w-0 items-center gap-2">
       <% if user_signed_in? %>
-        <%= form_with url: search_path, method: :get, class: "relative hidden lg:block" do %>
+        <%= form_with url: search_path, method: :get, class: "relative hidden min-w-0 lg:block" do %>
           <%= render_icon("search", classes: "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#75847a]") %>
           <input type="text" name="q" placeholder="Search posts, people, resources..." class="fc-search">
         <% end %>

@@ -1663,7 +1663,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .fc-search {
   height: 32px;
-  width: min(360px, 32vw);
+  width: clamp(15rem, 26vw, 22rem);
+  max-width: 100%;
   border-radius: 6px;
   border: 1px solid var(--fc-line);
   background: #eef4f0;
