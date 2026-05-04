@@ -360,7 +360,7 @@ admin = User.new(
   password_confirmation: "password123",
   role: :admin
 )
-admin.skip_confirmation!
+admin.skip_confirmation! if admin.respond_to?(:skip_confirmation!)
 admin.save!
 admin.profile.update!(
   bio: "Platform administrator for Faith Community. Here to serve and support our growing community of believers.",
@@ -388,7 +388,7 @@ moderators = moderators_data.map.with_index do |data, idx|
     password_confirmation: "password123",
     role: :moderator
   )
-  user.skip_confirmation!
+  user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
   user.save!
   user.profile.update!(bio: data[:bio], faith_background: data[:faith_background], location: data[:location])
 
@@ -427,7 +427,7 @@ members = members_data.map.with_index do |data, idx|
     password_confirmation: "password123",
     role: :member
   )
-  user.skip_confirmation!
+  user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
   user.save!
   user.profile.update!(bio: data[:bio], faith_background: data[:faith_background], location: data[:location])
 
