@@ -32,9 +32,9 @@ local:
 # Set CLOUDINARY_URL or cloudinary:cloud_name/api_key/api_secret credentials.
 cloudinary:
   service: Cloudinary
-  cloud_name: <%= Rails.application.credentials.dig(:cloudinary, :cloud_name) || ENV["CLOUDINARY_CLOUD_NAME"] %>
-  api_key: <%= Rails.application.credentials.dig(:cloudinary, :api_key) || ENV["CLOUDINARY_API_KEY"] %>
-  api_secret: <%= Rails.application.credentials.dig(:cloudinary, :api_secret) || ENV["CLOUDINARY_API_SECRET"] %>
+  cloud_name: <%= Rails.application.credentials.dig(:cloudinary, :cloud_name) || ENV["CLOUDINARY_CLOUD_NAME"] || Cloudinary.config.cloud_name %>
+  api_key: <%= Rails.application.credentials.dig(:cloudinary, :api_key) || ENV["CLOUDINARY_API_KEY"] || Cloudinary.config.api_key %>
+  api_secret: <%= Rails.application.credentials.dig(:cloudinary, :api_secret) || ENV["CLOUDINARY_API_SECRET"] || Cloudinary.config.api_secret %>
   folder: <%= ENV.fetch("CLOUDINARY_FOLDER", "faith-blog/#{Rails.env}") %>
   secure: true
 
