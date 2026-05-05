@@ -6,11 +6,12 @@ class LikesController < ApplicationController
 
   def create
     @like = current_user.likes.find_or_initialize_by(likeable: @likeable)
+    new_reaction = @like.new_record?
     @like.reaction_type = params[:reaction_type] || :amen
 
     if @like.save
       @likeable.reload
-      create_notification
+      create_notification if new_reaction
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path }
         format.turbo_stream

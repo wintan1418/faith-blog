@@ -1951,6 +1951,77 @@ h1, h2, h3, h4, h5, h6 {
   background: transparent;
 }
 
+.reaction-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.reaction-rail form,
+.comment-reaction form {
+  display: inline-flex;
+}
+
+.reaction-chip {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  background: var(--fc-surface);
+  color: var(--fc-soft);
+  padding: 0 0.62rem;
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1;
+  transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.reaction-chip:hover,
+.reaction-chip.is-active {
+  border-color: var(--fc-accent);
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-deep);
+}
+
+.reaction-chip:hover {
+  transform: translateY(-1px);
+}
+
+.reaction-chip-emoji {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.reaction-chip-count {
+  color: var(--fc-muted);
+  font-size: 0.72rem;
+  font-weight: 950;
+}
+
+.comment-reaction {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.28rem;
+  border: 1px solid var(--fc-line);
+  border-radius: 999px;
+  background: var(--fc-surface);
+  color: var(--fc-muted);
+  padding: 0 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.comment-reaction:hover,
+.comment-reaction.is-active {
+  border-color: var(--fc-accent);
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-deep);
+}
+
 .fc-side-card {
   background: var(--fc-surface);
   border: 1px solid var(--fc-line-strong);

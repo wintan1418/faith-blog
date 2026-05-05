@@ -1,15 +1,20 @@
 <span id="<%= dom_id(comment, :reaction) %>">
   <% if user_signed_in? %>
-    <% if current_user.has_liked?(comment) %>
-      <%= button_to unlike_path(likeable_type: "Comment", likeable_id: comment.id), method: :delete, class: "text-xs font-bold text-faith-green hover:text-faith-dark" do %>
-        Pray <%= comment.likes_count %>
+    <% user_like = current_user.likes.find_by(likeable: comment) %>
+    <% if user_like %>
+      <%= button_to unlike_path(likeable_type: "Comment", likeable_id: comment.id), method: :delete, class: "comment-reaction is-active" do %>
+        <%= Like.reaction_emoji(user_like.reaction_type) %>
+        <span><%= comment.likes_count %></span>
       <% end %>
     <% else %>
-      <%= button_to likes_path(likeable_type: "Comment", likeable_id: comment.id), class: "text-xs font-bold text-faith-muted hover:text-faith-green" do %>
-        Pray <%= comment.likes_count.positive? ? comment.likes_count : "" %>
+      <%= button_to likes_path(likeable_type: "Comment", likeable_id: comment.id, reaction_type: :amen), class: "comment-reaction" do %>
+        Amen
+        <% if comment.likes_count.positive? %>
+          <span><%= comment.likes_count %></span>
+        <% end %>
       <% end %>
     <% end %>
   <% else %>
-    <span class="text-xs font-bold text-faith-muted">Pray <%= comment.likes_count %></span>
+    <span class="comment-reaction">Amen <%= comment.likes_count if comment.likes_count.positive? %></span>
   <% end %>
 </span>

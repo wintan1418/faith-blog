@@ -1,40 +1,41 @@
 <% user_like = user_signed_in? ? current_user.likes.find_by(likeable: post) : nil %>
+<% reactions = Like.reaction_types.keys %>
 
-<div class="relative" data-controller="reactions" id="<%= dom_id(post, :reactions) %>">
+<div class="reaction-rail" id="<%= dom_id(post, :reactions) %>">
   <% if user_signed_in? %>
-    <% if user_like %>
-      <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
-          method: :delete,
-          class: "fc-action text-[var(--fc-accent)]",
-          title: "Remove reaction" do %>
-        <span><%= Like.reaction_emoji(user_like.reaction_type) %></span>
-        <span><%= post.likes_count %></span>
-      <% end %>
-    <% else %>
-      <button type="button"
-              class="fc-action"
-              data-action="click->reactions#showDropdown"
-              title="Add reaction">
-        <span>Pray</span>
-        <span><%= post.likes_count %></span>
-      </button>
-
-      <div class="absolute bottom-full left-0 z-50 mb-2 hidden rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-2 shadow-xl" data-reactions-target="dropdown">
-        <div class="flex gap-1">
-          <% Like.reaction_types.keys.each do |reaction| %>
-            <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_type: reaction),
-                class: "rounded-md p-2 text-xl hover:bg-[var(--fc-surface-2)]",
-                title: Like.reaction_label(reaction) do %>
-              <%= Like.reaction_emoji(reaction) %>
-            <% end %>
+    <% reactions.each do |reaction| %>
+      <% active = user_like&.reaction_type == reaction %>
+      <% count = post.likes.where(reaction_type: reaction).count %>
+      <% if active %>
+        <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
+            method: :delete,
+            class: "reaction-chip is-active",
+            title: "Remove #{Like.reaction_label(reaction)}" do %>
+          <span class="reaction-chip-emoji"><%= Like.reaction_emoji(reaction) %></span>
+          <span class="reaction-chip-label"><%= Like.reaction_label(reaction) %></span>
+          <% if count.positive? %>
+            <span class="reaction-chip-count"><%= count %></span>
           <% end %>
-        </div>
-      </div>
+        <% end %>
+      <% else %>
+        <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_type: reaction),
+            class: "reaction-chip",
+            title: Like.reaction_label(reaction) do %>
+          <span class="reaction-chip-emoji"><%= Like.reaction_emoji(reaction) %></span>
+          <span class="reaction-chip-label"><%= Like.reaction_label(reaction) %></span>
+          <% if count.positive? %>
+            <span class="reaction-chip-count"><%= count %></span>
+          <% end %>
+        <% end %>
+      <% end %>
     <% end %>
   <% else %>
-    <%= link_to new_user_session_path, class: "fc-action" do %>
-      <span>Pray</span>
-      <span><%= post.likes_count %></span>
+    <%= link_to new_user_session_path, class: "reaction-chip" do %>
+      <span class="reaction-chip-emoji">🙏</span>
+      <span class="reaction-chip-label">React</span>
+      <% if post.likes_count.positive? %>
+        <span class="reaction-chip-count"><%= post.likes_count %></span>
+      <% end %>
     <% end %>
   <% end %>
 </div>
