@@ -25,9 +25,18 @@ if Rails.application.config.active_storage.service.to_sym == :cloudinary
   missing << "cloud_name" if Cloudinary.config.cloud_name.blank?
   missing << "api_key" if Cloudinary.config.api_key.blank?
   missing << "api_secret" if Cloudinary.config.api_secret.blank?
+  placeholders = []
+  placeholders << "cloud_name" if Cloudinary.config.cloud_name.to_s.match?(/\A(CLOUD_NAME|your_cloud_name)\z/i)
+  placeholders << "api_key" if Cloudinary.config.api_key.to_s.match?(/\A(API_KEY|your_api_key)\z/i)
+  placeholders << "api_secret" if Cloudinary.config.api_secret.to_s.match?(/\A(API_SECRET|your_api_secret)\z/i)
 
   if missing.any?
     raise "Cloudinary Active Storage is enabled but missing #{missing.join(', ')}. " \
           "Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME/CLOUDINARY_API_KEY/CLOUDINARY_API_SECRET."
+  end
+
+  if placeholders.any?
+    raise "Cloudinary Active Storage is enabled but #{placeholders.join(', ')} still uses a placeholder value. " \
+          "Replace CLOUDINARY_URL with the real value from the Cloudinary dashboard."
   end
 end

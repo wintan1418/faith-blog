@@ -8,6 +8,15 @@ CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
 CLOUDINARY_FOLDER=brethreign/production
 ```
 
+Replace all three placeholder parts. For example, if Cloudinary shows cloud name `brethreign-app`,
+API key `123456789`, and API secret `abcxyz`, set:
+
+```bash
+CLOUDINARY_URL=cloudinary://123456789:abcxyz@brethreign-app
+```
+
+Do not leave `API_KEY`, `API_SECRET`, or `CLOUD_NAME` in the value.
+
 You can also use separate variables instead of `CLOUDINARY_URL`:
 
 ```bash
