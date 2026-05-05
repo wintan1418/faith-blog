@@ -17,6 +17,14 @@ trix-editor {
   background-color: #fff;
 }
 
+trix-editor.input,
+trix-editor.trix-content {
+  min-height: 14rem;
+  padding: 1rem 1.1rem;
+  line-height: 1.7;
+  overflow-y: auto;
+}
+
 trix-editor:focus {
   border-color: #f59e0b;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
@@ -31,6 +39,14 @@ html.dark trix-editor {
   background-color: #1e293b;
   border-color: #475569;
   color: #e2e8f0;
+}
+
+html.theme-dark trix-editor,
+html.theme-dark trix-editor.input,
+html.theme-dark trix-editor.trix-content {
+  background-color: var(--fc-surface);
+  border-color: var(--fc-line-strong);
+  color: var(--fc-ink);
 }
 
 html.dark trix-editor:focus {
@@ -547,10 +563,23 @@ trix-editor .attachment__metadata .attachment__size {
   overflow-wrap: break-word;
   word-break: break-word;
   color: #374151;
+  font-size: 1rem;
 }
 
 html.dark .trix-content {
   color: #cbd5e1;
+}
+
+html.dark trix-editor strong,
+html.dark trix-editor b,
+html.dark .trix-content strong,
+html.dark .trix-content b,
+html.theme-dark trix-editor strong,
+html.theme-dark trix-editor b,
+html.theme-dark .trix-content strong,
+html.theme-dark .trix-content b {
+  color: #f8fafc;
+  font-weight: 800;
 }
 
 .trix-content * {
@@ -572,14 +601,32 @@ html.dark .trix-content h1 {
 }
 
 .trix-content p {
-  margin: 0.75em 0;
+  margin: 0.95em 0;
+}
+
+.trix-content p:first-child,
+.trix-content h1:first-child,
+.trix-content blockquote:first-child,
+.trix-content ul:first-child,
+.trix-content ol:first-child,
+.trix-content pre:first-child {
+  margin-top: 0;
+}
+
+.trix-content p:last-child,
+.trix-content h1:last-child,
+.trix-content blockquote:last-child,
+.trix-content ul:last-child,
+.trix-content ol:last-child,
+.trix-content pre:last-child {
+  margin-bottom: 0;
 }
 
 .trix-content blockquote {
   border: 0 solid #f59e0b;
   border-left-width: 4px;
   margin: 1em 0;
-  padding: 0.75em 1em;
+  padding: 0.9em 1.05em;
   background-color: #fffbeb;
   border-radius: 0 0.5rem 0.5rem 0;
   font-style: italic;
@@ -601,12 +648,13 @@ html.dark .trix-content blockquote {
 
 .trix-content ul,
 .trix-content ol {
-  margin: 0.75em 0;
-  padding-left: 1.5em;
+  margin: 1em 0;
+  padding-left: 1.65em;
 }
 
 .trix-content li {
-  margin: 0.25em 0;
+  margin: 0.4em 0;
+  padding-left: 0.15em;
 }
 
 .trix-content [dir=rtl] li {

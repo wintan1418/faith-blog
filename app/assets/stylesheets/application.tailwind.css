@@ -1182,12 +1182,29 @@ html.dark [data-dropdown-target="menu"] .text-gray-500 {
   color: #374151;
   max-width: 100%;
   font-size: 1.125rem;
-  line-height: 1.75;
+  line-height: 1.78;
+  overflow-wrap: anywhere;
+}
+
+.prose-faith .trix-content {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .prose-faith p {
-  margin-top: 1.25em;
-  margin-bottom: 1.25em;
+  margin-top: 1.05em;
+  margin-bottom: 1.05em;
+}
+
+.prose-faith p:first-child,
+.prose-faith .trix-content > *:first-child {
+  margin-top: 0;
+}
+
+.prose-faith p:last-child,
+.prose-faith .trix-content > *:last-child {
+  margin-bottom: 0;
 }
 
 .prose-faith h1,
@@ -1223,7 +1240,7 @@ html.dark [data-dropdown-target="menu"] .text-gray-500 {
 }
 
 .prose-faith strong {
-  font-weight: 600;
+  font-weight: 800;
   color: #1f2937;
 }
 
@@ -1241,13 +1258,26 @@ html.dark [data-dropdown-target="menu"] .text-gray-500 {
 
 .prose-faith blockquote {
   border-left: 4px solid #f59e0b;
-  padding-left: 1.5em;
+  padding-left: 1.25em;
   margin: 1.5em 0;
   font-style: italic;
   color: #6b7280;
   background-color: #fef3c7;
-  padding: 1em 1.5em;
+  padding: 1.1em 1.25em;
   border-radius: 0.5rem;
+}
+
+trix-editor.input,
+trix-editor.trix-content {
+  min-height: 14rem;
+  padding: 1rem 1.1rem !important;
+  line-height: 1.7;
+}
+
+trix-editor.input:focus,
+trix-editor.trix-content:focus {
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px var(--fc-accent-soft) !important;
 }
 
 .prose-faith img {
@@ -1306,6 +1336,28 @@ html.dark .prose-faith hr {
 html.dark .prose,
 html.dark .trix-content {
   color: #d1d5db;
+}
+
+html.theme-dark trix-editor.input,
+html.theme-dark trix-editor.trix-content,
+html.theme-dark .trix-content.input {
+  background: var(--fc-surface) !important;
+  border-color: var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+}
+
+html.dark .trix-content strong,
+html.dark .trix-content b,
+html.dark trix-editor strong,
+html.dark trix-editor b,
+html.theme-dark .trix-content strong,
+html.theme-dark .trix-content b,
+html.theme-dark trix-editor strong,
+html.theme-dark trix-editor b,
+html.theme-dark .prose-faith strong,
+html.theme-dark .prose-faith b {
+  color: var(--fc-ink) !important;
+  font-weight: 850;
 }
 
 /* Form selects */
