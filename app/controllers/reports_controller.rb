@@ -30,6 +30,9 @@ class ReportsController < ApplicationController
       Comment.find(reportable_id)
     when "Resource"
       Resource.find(reportable_id)
+    when "Message"
+      conversation = current_user.conversations.joins(:messages).where(messages: { id: reportable_id }).first!
+      conversation.messages.find(reportable_id)
     else
       raise ActiveRecord::RecordNotFound
     end

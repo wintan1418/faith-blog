@@ -1,6 +1,13 @@
 <% other_user = conversation.other_participant_for(current_user) %>
 
-<section class="inbox-thread">
+<section class="inbox-thread"
+         data-controller="typing"
+         data-typing-conversation-id-value="<%= conversation.id %>"
+         data-typing-user-id-value="<%= current_user.id %>"
+         data-typing-username-value="<%= current_user.display_name %>">
+  <%= turbo_stream_from [conversation, current_user.id, :messages] %>
+  <%= turbo_stream_from [conversation, current_user.id, :read_receipt] %>
+
   <header class="inbox-thread-head">
     <div class="flex min-w-0 items-center gap-3">
       <%= render "conversations/avatar", user: other_user, size: "h-11 w-11" %>
@@ -12,20 +19,37 @@
 
     <div class="flex items-center gap-2">
       <%= link_to "View Profile", user_path(other_user.username), class: "btn btn-secondary btn-sm" %>
+      <% if current_user.blocked_message_user?(other_user) %>
+        <%= button_to "Unblock", message_block_path(other_user), method: :delete, class: "btn btn-secondary btn-sm" %>
+      <% else %>
+        <%= button_to "Block", message_blocks_path(user_id: other_user.id), method: :post, class: "btn btn-secondary btn-sm" %>
+      <% end %>
       <%= button_to "Archive", archive_conversation_path(conversation), method: :post, class: "btn btn-secondary btn-sm" %>
     </div>
   </header>
 
   <div id="messages" class="inbox-messages">
     <% if messages.any? %>
-      <%= render partial: "conversations/message", collection: messages, as: :message %>
+      <%= render partial: "conversations/message", collection: messages, as: :message, locals: { viewer_id: current_user.id } %>
     <% else %>
-      <div class="mystic-panel p-10 text-center">
-        <h2 class="text-xl font-black text-[var(--fc-ink)]">Start the conversation</h2>
-        <p class="mystic-copy mx-auto mt-2 max-w-md">This space is private between you and <%= other_user.display_name %>.</p>
+      <div class="inbox-empty-card">
+        <%= render_icon("mail", classes: "h-9 w-9") %>
+        <h2>Start gently</h2>
+        <p>This space is private between you and <%= other_user.display_name %>. Send a thoughtful first message.</p>
       </div>
     <% end %>
   </div>
 
-  <%= render "conversations/composer", conversation: conversation, message: message %>
+  <%= render "conversations/read_receipt", conversation: conversation, viewer_id: current_user.id %>
+  <div class="typing-indicator hidden" data-typing-target="indicator"></div>
+
+  <% if conversation.blocked_for?(current_user) %>
+    <div class="inbox-composer">
+      <div class="rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-4 py-3 text-sm font-bold text-[var(--fc-muted)]">
+        Messaging is blocked in this conversation.
+      </div>
+    </div>
+  <% else %>
+    <%= render "conversations/composer", conversation: conversation, message: message %>
+  <% end %>
 </section>

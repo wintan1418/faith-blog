@@ -115,6 +115,7 @@ Rails.application.routes.draw do
     end
     resources :messages, only: [ :create ]
   end
+  resources :message_blocks, only: [ :create, :destroy ], param: :user_id
 
   # Admin namespace
   namespace :admin do

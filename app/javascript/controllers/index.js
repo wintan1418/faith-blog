@@ -27,3 +27,6 @@ application.register("emoji-picker", EmojiPickerController)
 
 import MentionsController from "./mentions_controller"
 application.register("mentions", MentionsController)
+
+import TypingController from "./typing_controller"
+application.register("typing", TypingController)

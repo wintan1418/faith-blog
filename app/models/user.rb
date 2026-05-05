@@ -25,6 +25,9 @@ class User < ApplicationRecord
   has_many :conversation_participants, dependent: :destroy
   has_many :conversations, through: :conversation_participants
   has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy
+  has_many :message_blocks, foreign_key: :blocker_id, dependent: :destroy
+  has_many :blocked_message_users, through: :message_blocks, source: :blocked
+  has_many :message_blocks_against, class_name: "MessageBlock", foreign_key: :blocked_id, dependent: :destroy
 
   # Room memberships
   has_many :room_memberships, dependent: :destroy
@@ -120,6 +123,14 @@ class User < ApplicationRecord
 
   def connected_with?(user)
     ConnectionRequest.connected?(self, user)
+  end
+
+  def blocked_messages_with?(user)
+    MessageBlock.between?(self, user)
+  end
+
+  def blocked_message_user?(user)
+    message_blocks.exists?(blocked: user)
   end
 
   def connection_with(user)

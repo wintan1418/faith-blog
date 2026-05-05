@@ -1,0 +1,8 @@
+<% viewer_id = local_assigns.fetch(:viewer_id, current_user&.id) %>
+<% latest_sent = conversation.messages.visible.where(sender_id: viewer_id).order(created_at: :desc).first %>
+
+<div id="read_receipt" class="read-receipt">
+  <% if latest_sent %>
+    <%= conversation.read_by_other?(latest_sent) ? "Read" : "Sent" %>
+  <% end %>
+</div>

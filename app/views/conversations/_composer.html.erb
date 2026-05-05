@@ -10,7 +10,8 @@
                     rows: 2,
                     class: "inbox-input",
                     maxlength: 4000,
-                    placeholder: "Write a thoughtful message..." %>
+                    placeholder: "Write a thoughtful message...",
+                    data: { typing_target: "input", action: "input->typing#input" } %>
     <%= f.button class: "fc-btn fc-btn-primary min-h-11" do %>
       <%= render_icon("send", classes: "h-4 w-4") %>
       Send

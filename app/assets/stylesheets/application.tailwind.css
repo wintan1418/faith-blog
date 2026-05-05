@@ -7074,6 +7074,38 @@ html:not(.theme-dark) {
   color: var(--fc-muted);
 }
 
+.message-meta {
+  display: flex !important;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.message-report-btn {
+  color: var(--fc-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.message-report-btn:hover {
+  color: var(--fc-accent);
+}
+
+.read-receipt,
+.typing-indicator {
+  min-height: 1.35rem;
+  padding: 0 1rem 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 850;
+  color: var(--fc-muted);
+  text-align: right;
+}
+
+.typing-indicator {
+  text-align: left;
+}
+
 .inbox-composer {
   border-top: 1px solid var(--fc-line-strong);
   background: var(--fc-surface);
@@ -7107,6 +7139,31 @@ html:not(.theme-dark) {
   padding: 2rem;
   text-align: center;
   color: var(--fc-muted);
+}
+
+.inbox-empty-card {
+  display: grid;
+  place-items: center;
+  gap: 0.75rem;
+  margin: auto;
+  max-width: 28rem;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 8px;
+  background: var(--fc-surface);
+  padding: 2rem;
+  text-align: center;
+  color: var(--fc-muted);
+}
+
+.inbox-empty-card h2 {
+  color: var(--fc-ink);
+  font-size: 1.35rem;
+  font-weight: 950;
+}
+
+.inbox-empty-card p {
+  font-weight: 650;
+  line-height: 1.55;
 }
 
 .inbox-empty h2 {

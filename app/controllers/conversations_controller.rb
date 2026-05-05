@@ -22,6 +22,10 @@ class ConversationsController < ApplicationController
       redirect_back fallback_location: user_path(@recipient.username), alert: "You can only message accepted connections."
       return
     end
+    if MessageBlock.between?(current_user, @recipient)
+      redirect_back fallback_location: user_path(@recipient.username), alert: "Messaging is blocked between you and #{@recipient.display_name}."
+      return
+    end
 
     @conversation = Conversation.find_or_create_between!(current_user, @recipient)
     redirect_to conversation_path(@conversation)

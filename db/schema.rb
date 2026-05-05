@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_05_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_05_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -166,6 +166,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_05_000002) do
     t.index ["mentioned_by_type", "mentioned_by_id"], name: "index_mentions_on_mentioned_by_type_and_mentioned_by_id"
     t.index ["user_id", "mentionable_type", "mentionable_id"], name: "index_mentions_on_user_and_mentionable"
     t.index ["user_id"], name: "index_mentions_on_user_id"
+  end
+
+  create_table "message_blocks", force: :cascade do |t|
+    t.bigint "blocker_id", null: false
+    t.bigint "blocked_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blocked_id", "blocker_id"], name: "index_message_blocks_on_blocked_id_and_blocker_id"
+    t.index ["blocked_id"], name: "index_message_blocks_on_blocked_id"
+    t.index ["blocker_id", "blocked_id"], name: "index_message_blocks_on_blocker_id_and_blocked_id", unique: true
+    t.index ["blocker_id"], name: "index_message_blocks_on_blocker_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -433,6 +444,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_05_000002) do
   add_foreign_key "follows", "users", column: "following_id"
   add_foreign_key "likes", "users"
   add_foreign_key "mentions", "users"
+  add_foreign_key "message_blocks", "users", column: "blocked_id"
+  add_foreign_key "message_blocks", "users", column: "blocker_id"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "moderation_logs", "users", column: "moderator_id"

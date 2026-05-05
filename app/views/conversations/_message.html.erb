@@ -1,5 +1,6 @@
 <% message = local_assigns.fetch(:message) %>
-<% mine = message.sender == current_user %>
+<% viewer_id = local_assigns.fetch(:viewer_id, current_user&.id) %>
+<% mine = message.sender_id == viewer_id %>
 
 <div id="<%= dom_id(message) %>" class="message-row <%= mine ? 'is-mine' : 'is-theirs' %>">
   <% unless mine %>
@@ -7,6 +8,11 @@
   <% end %>
   <div class="message-bubble">
     <div><%= simple_format(message.body) %></div>
-    <span><%= message.created_at.strftime("%I:%M %p") %></span>
+    <span class="message-meta">
+      <%= message.created_at.strftime("%I:%M %p") %>
+      <% unless mine %>
+        <%= button_to "Report", reports_path(reportable_type: "Message", reportable_id: message.id, reason: "Reported private message."), method: :post, class: "message-report-btn" %>
+      <% end %>
+    </span>
   </div>
 </div>
