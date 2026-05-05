@@ -54,7 +54,7 @@
         <% if user_signed_in? && comment.depth < 2 %>
           <div class="mt-4 hidden" data-reply-toggle-target="form">
             <%= form_with url: reply_post_comment_path(post, comment), scope: :comment, class: "flex items-start gap-2" do |f| %>
-              <%= f.text_area :content, class: "input resize-none text-sm", rows: 2, placeholder: "Write a reply..." %>
+              <%= f.text_area :content, class: "input resize-none text-sm", rows: 2, placeholder: "Write a reply...", data: { controller: "mentions" } %>
               <%= f.submit "Reply", class: "btn btn-primary btn-sm" %>
             <% end %>
           </div>

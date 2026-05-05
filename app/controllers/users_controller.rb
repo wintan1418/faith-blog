@@ -17,7 +17,12 @@ class UsersController < ApplicationController
     query = params[:query].to_s.strip
     return render json: [] if query.length < 1
 
-    users = User.where("username ILIKE ?", "%#{query}%").limit(10)
+    users = User
+      .active
+      .includes(:profile)
+      .where("username ILIKE ?", "%#{query}%")
+      .order(:username)
+      .limit(10)
 
     render json: users.map { |u|
       {

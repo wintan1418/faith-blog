@@ -2022,6 +2022,90 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--fc-accent-deep);
 }
 
+.mention-link {
+  color: var(--fc-accent-deep);
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.mention-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tribute-container {
+  z-index: 9999;
+  max-height: 18rem;
+  min-width: 15rem;
+  overflow: auto;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 8px;
+  background: var(--fc-surface);
+  box-shadow: var(--sh-lg);
+}
+
+.tribute-container ul {
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+}
+
+.tribute-container li {
+  cursor: pointer;
+  border-radius: 7px;
+}
+
+.tribute-container li.highlight,
+.tribute-container li:hover {
+  background: var(--fc-accent-soft);
+}
+
+.mention-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem;
+}
+
+.mention-avatar {
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: none;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.mention-avatar-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-deep);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.mention-copy {
+  min-width: 0;
+  display: grid;
+}
+
+.mention-copy span {
+  color: var(--fc-ink);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.mention-copy small,
+.mention-empty {
+  color: var(--fc-muted);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.mention-empty {
+  padding: 0.7rem 0.8rem;
+}
+
 .fc-side-card {
   background: var(--fc-surface);
   border: 1px solid var(--fc-line-strong);

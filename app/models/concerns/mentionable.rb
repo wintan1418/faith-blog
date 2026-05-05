@@ -51,24 +51,20 @@ module Mentionable
   def process_mentions!(mentioned_by_user)
     return [] unless mentioned_by_user.present?
 
-    usernames = extract_mentions
+    usernames = extract_mentions.map(&:downcase).uniq
+    mentions.where.not(user_id: User.where("LOWER(username) IN (?)", usernames).select(:id)).destroy_all
     return [] if usernames.empty?
 
-    mentioned_users = User.where(username: usernames)
+    mentioned_users = User.where("LOWER(username) IN (?)", usernames)
     created_mentions = []
 
     mentioned_users.each do |user|
       # Skip if user mentioned themselves
       next if user == mentioned_by_user
 
-      # Remove old mentions for this user to avoid duplicates
-      mentions.where(user: user).destroy_all
-
-      # Create new mention
-      mention = mentions.create(
-        user: user,
-        mentioned_by: mentioned_by_user
-      )
+      mention = mentions.find_or_initialize_by(user: user)
+      mention.mentioned_by = mentioned_by_user
+      mention.save! if mention.new_record? || mention.changed?
 
       created_mentions << mention
 
@@ -104,7 +100,7 @@ module Mentionable
         username = $1
         user = User.find_by(username: username)
         if user
-          %(<a href="/u/#{user.username}" class="mention-link text-blue-600 dark:text-blue-400 hover:underline font-medium">@#{username}</a>)
+          %(<a href="/u/#{user.username}" class="mention-link">@#{user.username}</a>)
         else
           match
         end
@@ -116,7 +112,7 @@ module Mentionable
         username = $1
         user = User.find_by(username: username)
         if user
-          %(<a href="/u/#{user.username}" class="mention-link text-blue-600 dark:text-blue-400 hover:underline font-medium">@#{username}</a>)
+          %(<a href="/u/#{user.username}" class="mention-link">@#{user.username}</a>)
         else
           match
         end

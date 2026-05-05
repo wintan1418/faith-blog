@@ -3,36 +3,41 @@ import Tribute from "tributejs"
 
 export default class extends Controller {
   connect() {
-    console.log("🔔 MentionsController connected!", this.element)
     this.initializeTribute()
   }
 
+  disconnect() {
+    if (this.tribute) this.tribute.detach(this.element)
+  }
+
   initializeTribute() {
-    console.log("🛠️ Initializing Tribute.js...")
     this.tribute = new Tribute({
       allowSpaces: false,
+      autocompleteMode: false,
       trigger: "@",
       values: (text, cb) => {
         this.fetchUsers(text, cb)
       },
       lookup: "username",
       fillAttr: "username",
+      noMatchTemplate: () => '<div class="mention-empty">No matching people</div>',
       menuItemTemplate: function (item) {
         return `
-          <div class="flex items-center gap-2 p-2">
-            ${item.original.avatar_url 
-              ? `<img src="${item.original.avatar_url}" class="w-6 h-6 rounded-full object-cover">` 
-              : `<div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">${item.original.username.charAt(0).toUpperCase()}</div>`
+          <div class="mention-option">
+            ${item.original.avatar_url
+              ? `<img src="${item.original.avatar_url}" class="mention-avatar">`
+              : `<div class="mention-avatar mention-avatar-fallback">${item.original.username.charAt(0).toUpperCase()}</div>`
             }
-            <div class="flex flex-col">
-              <span class="font-medium text-sm text-gray-900">${item.original.username}</span>
-              <span class="text-xs text-gray-500">${item.original.name || ""}</span>
+            <div class="mention-copy">
+              <span>@${item.original.username}</span>
+              <small>${item.original.name || ""}</small>
             </div>
           </div>
         `
       },
       selectTemplate: function(item) {
-        return `@${item.original.username}`;
+        if (!item) return null
+        return `@${item.original.username} `
       }
     })
 
@@ -40,7 +45,6 @@ export default class extends Controller {
   }
 
   fetchUsers(text, cb) {
-    console.log(`🔍 Fetching users for query: "${text}"`)
     fetch(`/mentions?query=${encodeURIComponent(text)}`, {
       headers: {
         "Accept": "application/json",

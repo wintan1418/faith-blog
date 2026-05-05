@@ -17,6 +17,9 @@ module MentionsHelper
 
     return "" if html.blank?
 
+    usernames = html.scan(/@([a-zA-Z0-9_-]{3,30})/).flatten.map(&:downcase).uniq
+    users_by_username = usernames.any? ? User.where("LOWER(username) IN (?)", usernames).index_by { |user| user.username.downcase } : {}
+
     # Process mentions in text content only (not inside HTML tag attributes)
     # Split HTML into parts: tags and text content
     result = ""
@@ -41,9 +44,9 @@ module MentionsHelper
         # Process mentions in this text content
         processed_text = text_content.gsub(/@([a-zA-Z0-9_-]{3,30})/) do |match|
           username = $1
-          user = User.find_by(username: username)
+          user = users_by_username[username.downcase]
           if user
-            %(<a href="#{user_path(user)}" class="mention-link text-blue-600 dark:text-blue-400 hover:underline font-medium">@#{username}</a>)
+            %(<a href="#{user_path(user.username)}" class="mention-link">@#{user.username}</a>)
           else
             match
           end
