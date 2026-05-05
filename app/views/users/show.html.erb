@@ -1,20 +1,15 @@
 <% content_for(:title) { "#{@user.username} - Faith Community" } %>
 
-<div class="mystic-shell">
-  <section class="mystic-hero">
-    <div class="mystic-container max-w-5xl py-12">
-      <div class="flex flex-col gap-8 md:flex-row md:items-start">
-        <div class="relative shrink-0">
+<div class="mystic-shell profile-page">
+  <section class="profile-hero">
+    <div class="mystic-container max-w-6xl py-12">
+      <div class="profile-hero-panel">
+        <div class="profile-avatar-wrap">
           <% if @user.profile&.avatar&.attached? %>
-            <%= image_tag @user.profile.avatar, class: "mystic-avatar h-32 w-32 object-cover md:h-40 md:w-40" %>
+            <%= image_tag @user.profile.avatar, class: "profile-avatar object-cover", alt: @user.display_name %>
           <% else %>
-            <span class="mystic-avatar mystic-avatar-fallback grid h-32 w-32 place-items-center text-5xl font-bold md:h-40 md:w-40">
+            <span class="profile-avatar profile-avatar-fallback">
               <%= @user.username.first.upcase %>
-            </span>
-          <% end %>
-          <% if @user.super_admin? || @user.admin? || @user.moderator? %>
-            <span class="absolute -bottom-2 right-2 mystic-badge px-3 py-1 shadow-sm">
-              <%= @user.super_admin? ? "Super Admin" : (@user.admin? ? "Admin" : "Moderator") %>
             </span>
           <% end %>
         </div>
@@ -22,8 +17,16 @@
         <div class="min-w-0 flex-1">
           <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 class="mystic-title text-4xl sm:text-6xl"><%= @user.display_name.presence || @user.username %></h1>
-              <p class="mt-1 text-lg font-semibold text-faith-muted">@<%= @user.username %></p>
+              <div class="flex flex-wrap items-center gap-3">
+                <h1 class="profile-title"><%= @user.display_name.presence || @user.username %></h1>
+                <% if @user.super_admin? || @user.admin? || @user.moderator? %>
+                  <span class="profile-role-badge">
+                    <%= render_icon("shield", classes: "h-3.5 w-3.5") %>
+                    <%= @user.super_admin? ? "Super Admin" : (@user.admin? ? "Admin" : "Moderator") %>
+                  </span>
+                <% end %>
+              </div>
+              <p class="profile-handle">@<%= @user.username %></p>
             </div>
 
             <% if user_signed_in? && @user == current_user %>
@@ -32,34 +35,40 @@
           </div>
 
           <% if @user.profile.bio.present? %>
-            <p class="mystic-copy mt-5 max-w-2xl text-lg"><%= @user.profile.bio %></p>
+            <p class="profile-bio"><%= @user.profile.bio %></p>
           <% end %>
 
           <div class="mt-5 flex flex-wrap gap-3">
             <% if @user.profile.location.present? %>
-              <span class="mystic-badge px-3 py-1">
+              <span class="profile-meta">
                 <%= render_icon("globe", classes: "w-4 h-4") %>
                 <%= @user.profile.location %>
               </span>
             <% end %>
-            <span class="mystic-badge px-3 py-1">
+            <% if @user.profile.faith_background.present? %>
+              <span class="profile-meta">
+                <%= render_icon("church", classes: "w-4 h-4") %>
+                <%= @user.profile.faith_background %>
+              </span>
+            <% end %>
+            <span class="profile-meta">
               <%= render_icon("clock", classes: "w-4 h-4") %>
               Joined <%= @user.created_at.strftime("%B %Y") %>
             </span>
           </div>
 
-          <div class="mt-6 grid max-w-md grid-cols-3 gap-3">
-            <%= link_to followers_user_path(@user.username), class: "rounded-2xl bg-white/65 p-4 text-center transition hover:bg-white" do %>
-              <span class="block text-2xl font-bold text-faith-dark"><%= number_to_human(@user.followers_count, format: "%n%u", units: { thousand: "k" }) %></span>
-              <span class="text-xs font-semibold text-faith-muted">Followers</span>
+          <div class="profile-stats">
+            <%= link_to followers_user_path(@user.username), class: "profile-stat" do %>
+              <span><%= number_to_human(@user.followers_count, format: "%n%u", units: { thousand: "k" }) %></span>
+              <small>Followers</small>
             <% end %>
-            <%= link_to following_user_path(@user.username), class: "rounded-2xl bg-white/65 p-4 text-center transition hover:bg-white" do %>
-              <span class="block text-2xl font-bold text-faith-dark"><%= number_to_human(@user.following_count, format: "%n%u", units: { thousand: "k" }) %></span>
-              <span class="text-xs font-semibold text-faith-muted">Following</span>
+            <%= link_to following_user_path(@user.username), class: "profile-stat" do %>
+              <span><%= number_to_human(@user.following_count, format: "%n%u", units: { thousand: "k" }) %></span>
+              <small>Following</small>
             <% end %>
-            <div class="rounded-2xl bg-white/65 p-4 text-center">
-              <span class="block text-2xl font-bold text-faith-dark"><%= @user.posts.published.count %></span>
-              <span class="text-xs font-semibold text-faith-muted">Posts</span>
+            <div class="profile-stat">
+              <span><%= @user.posts.published.count %></span>
+              <small>Posts</small>
             </div>
           </div>
 

@@ -37,94 +37,96 @@
       })();
     </script>
 
-    <div class="fc-app fc-admin min-h-full">
-      <div class="fc-topbar sticky top-0 z-50">
-        <div class="fc-topbar-inner">
-          <div class="flex min-w-0 items-center gap-3">
-            <%= link_to admin_root_path, class: "fc-brand flex min-w-0 items-center gap-2" do %>
-              <span class="fc-brand-mark"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
-              <span class="hidden text-base font-extrabold sm:inline">Faith Community</span>
-              <span class="hidden rounded-md border border-[var(--fc-line)] px-2 py-0.5 text-xs font-bold text-[var(--fc-muted)] md:inline">Admin</span>
-            <% end %>
+    <% pending_count = Report.pending.count %>
+    <% admin_nav_items = [
+      ["Dashboard", admin_root_path, "home", current_page?(admin_root_path)],
+      ["Users", admin_users_path, "users", request.path.include?("/admin/users")],
+      ["Posts", admin_posts_path, "filetext", request.path.include?("/admin/posts")],
+      ["Rooms", admin_rooms_path, "message_circle", request.path.include?("/admin/rooms")],
+      ["Resources", admin_resources_path, "bookopen", request.path.include?("/admin/resources")],
+      ["Reports", admin_reports_path, "shield", request.path.include?("/admin/reports")]
+    ] %>
 
-            <nav class="hidden items-center gap-1 lg:flex">
-              <%= link_to admin_root_path, class: "fc-nav-link #{'is-active' if current_page?(admin_root_path)}" do %>
-                <%= render_icon("home", classes: "h-4 w-4") %>
-                Dashboard
-              <% end %>
-              <%= link_to admin_users_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/users')}" do %>
-                <%= render_icon("users", classes: "h-4 w-4") %>
-                Users
-              <% end %>
-              <%= link_to admin_posts_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/posts')}" do %>
-                <%= render_icon("filetext", classes: "h-4 w-4") %>
-                Posts
-              <% end %>
-              <%= link_to admin_rooms_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/rooms')}" do %>
-                <%= render_icon("message_circle", classes: "h-4 w-4") %>
-                Rooms
-              <% end %>
-              <%= link_to admin_resources_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/resources')}" do %>
-                <%= render_icon("bookopen", classes: "h-4 w-4") %>
-                Resources
-              <% end %>
-              <%= link_to admin_reports_path, class: "fc-nav-link #{'is-active' if request.path.include?('/admin/reports')}" do %>
-                <%= render_icon("shield", classes: "h-4 w-4") %>
-                Reports
-                <% pending_count = Report.pending.count %>
-                <% if pending_count.positive? %>
-                  <span class="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-extrabold text-red-700"><%= pending_count %></span>
+    <div class="fc-app fc-admin min-h-full">
+      <div class="admin-shell">
+        <aside class="admin-sidebar">
+          <%= link_to admin_root_path, class: "admin-brand" do %>
+            <span class="fc-brand-mark"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
+            <span>
+              <span class="block text-sm font-extrabold text-[var(--fc-ink)]">Faith Community</span>
+              <span class="block text-xs font-bold text-[var(--fc-muted)]">Admin Console</span>
+            </span>
+          <% end %>
+
+          <nav class="admin-side-nav" aria-label="Admin navigation">
+            <% admin_nav_items.each do |label, path, icon, active| %>
+              <%= link_to path, class: "admin-side-link #{'is-active' if active}" do %>
+                <span class="admin-side-icon"><%= render_icon(icon, classes: "h-4 w-4") %></span>
+                <span class="min-w-0 flex-1"><%= label %></span>
+                <% if label == "Reports" && pending_count.positive? %>
+                  <span class="admin-count"><%= pending_count %></span>
                 <% end %>
               <% end %>
-            </nav>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <%= link_to feed_path, class: "fc-btn" do %>
-              <%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") %>
-              Site
             <% end %>
-            <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
-              <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
-              <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
-            </button>
-            <div class="fc-avatar">
-              <% if current_user.profile.avatar.attached? %>
-                <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover" %>
-              <% else %>
-                <%= current_user.username.first.upcase %>
+          </nav>
+
+          <div class="admin-sidebar-footer">
+            <%= link_to feed_path, class: "admin-side-link" do %>
+              <span class="admin-side-icon"><%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") %></span>
+              <span>Back to Site</span>
+            <% end %>
+          </div>
+        </aside>
+
+        <div class="admin-main">
+          <header class="admin-topbar">
+            <div class="min-w-0">
+              <p class="fc-section-label mb-1">Admin Console</p>
+              <h1 class="truncate text-2xl font-extrabold text-[var(--fc-ink)]"><%= content_for(:page_title) || "Dashboard" %></h1>
+            </div>
+
+            <div class="flex shrink-0 items-center gap-2">
+              <nav class="admin-mobile-nav" aria-label="Admin navigation">
+                <% admin_nav_items.each do |label, path, icon, active| %>
+                  <%= link_to path, class: "admin-mobile-link #{'is-active' if active}", title: label, aria: { label: label } do %>
+                    <%= render_icon(icon, classes: "h-4 w-4") %>
+                  <% end %>
+                <% end %>
+              </nav>
+              <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
+                <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
+                <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
+              </button>
+              <div class="fc-avatar" title="<%= current_user.username %>">
+                <% if current_user.profile.avatar.attached? %>
+                  <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover", alt: current_user.username %>
+                <% else %>
+                  <%= current_user.username.first.upcase %>
+                <% end %>
+              </div>
+            </div>
+          </header>
+
+          <% if notice || alert %>
+            <div class="admin-flashes">
+              <% if notice %>
+                <div class="rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] px-4 py-3 text-sm font-semibold text-[var(--fc-soft)] shadow-sm">
+                  <%= notice %>
+                </div>
+              <% end %>
+              <% if alert %>
+                <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm">
+                  <%= alert %>
+                </div>
               <% end %>
             </div>
-          </div>
+          <% end %>
+
+          <main class="admin-content">
+            <%= yield %>
+          </main>
         </div>
       </div>
-
-      <% if notice || alert %>
-        <div class="mx-auto max-w-6xl px-4 pt-4">
-          <% if notice %>
-            <div class="mb-2 rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] px-4 py-3 text-sm font-semibold text-[var(--fc-soft)] shadow-sm">
-              <%= notice %>
-            </div>
-          <% end %>
-          <% if alert %>
-            <div class="mb-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm">
-              <%= alert %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-
-      <main class="mx-auto w-full max-w-6xl px-4 py-7">
-        <div class="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p class="fc-section-label mb-2">Admin Console</p>
-            <h1 class="text-2xl font-extrabold text-[var(--fc-ink)]"><%= content_for(:page_title) || "Dashboard" %></h1>
-          </div>
-          <p class="text-sm font-semibold text-[var(--fc-muted)]">Signed in as <%= current_user.username %></p>
-        </div>
-
-        <%= yield %>
-      </main>
     </div>
   </body>
 </html>
