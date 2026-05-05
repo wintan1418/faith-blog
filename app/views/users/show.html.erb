@@ -90,11 +90,11 @@
 
   <div class="mystic-container max-w-5xl py-10">
     <% if user_signed_in? && @user == current_user %>
-      <section class="mystic-panel-strong mb-10 p-6 sm:p-8">
+      <section class="mystic-panel-strong profile-card-panel mb-10 p-6 sm:p-8">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <span class="mystic-kicker">Private Profile Card</span>
-            <h2 class="mt-3 text-3xl font-bold text-faith-dark">My Brethren Card</h2>
+            <h2 class="profile-section-title mt-3">My Brethren Card</h2>
             <p class="mystic-copy mt-2">Shared only when connection requests are accepted.</p>
           </div>
           <%= link_to "Edit Card", edit_settings_brethren_card_path, class: "btn btn-secondary" %>
@@ -110,15 +110,15 @@
               ["About", current_user.brethren_card.bio]
             ].each do |label, value| %>
               <% next if value.blank? %>
-              <div class="rounded-2xl bg-white/65 p-4">
-                <p class="text-xs font-bold uppercase tracking-wide text-faith-muted"><%= label %></p>
-                <p class="mt-1 text-sm font-semibold text-faith-dark"><%= value %></p>
+              <div class="profile-card-field">
+                <p class="profile-card-label"><%= label %></p>
+                <p class="profile-card-value"><%= value %></p>
               </div>
             <% end %>
           </div>
         <% else %>
-          <div class="rounded-2xl border border-dashed border-faith-green/25 bg-white/45 p-8 text-center">
-            <h3 class="text-xl font-bold text-faith-dark">Complete Your Brethren Card</h3>
+          <div class="profile-card-empty">
+            <h3>Complete Your Brethren Card</h3>
             <p class="mystic-copy mx-auto mt-2 max-w-md">Add the details you want trusted connections to see after a request is accepted.</p>
             <%= link_to "Complete My Card", edit_settings_brethren_card_path, class: "btn btn-primary mt-6" %>
           </div>
@@ -127,9 +127,9 @@
     <% end %>
 
     <section>
-      <div class="mb-6 flex items-center gap-3">
+      <div class="profile-section-heading mb-6 flex items-center gap-3">
         <%= render_icon("filetext", classes: "w-6 h-6 text-faith-green") %>
-        <h2 class="text-3xl font-bold text-faith-dark">Posts by <%= @user.display_name.presence || @user.username %></h2>
+        <h2>Posts by <%= @user.display_name.presence || @user.username %></h2>
       </div>
 
       <% if @posts.any? %>
@@ -145,8 +145,8 @@
           </div>
         <% end %>
       <% else %>
-        <div class="mystic-panel p-12 text-center">
-          <h3 class="text-xl font-bold text-faith-dark">No posts yet</h3>
+        <div class="mystic-panel profile-empty-posts p-12 text-center">
+          <h3>No posts yet</h3>
           <p class="mystic-copy mt-2">Posts will appear here when published.</p>
         </div>
       <% end %>

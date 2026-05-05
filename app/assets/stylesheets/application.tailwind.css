@@ -6208,6 +6208,12 @@ html.theme-dark .fc-admin .border-red-200 {
     var(--fc-bg);
 }
 
+html.theme-dark .profile-page {
+  background:
+    radial-gradient(ellipse 56rem 22rem at 22% -10rem, rgba(52, 211, 153, 0.1), transparent 64%),
+    linear-gradient(180deg, color-mix(in srgb, var(--fc-bg) 88%, #17231d 12%), var(--fc-bg));
+}
+
 .profile-hero {
   border-bottom: 1px solid var(--fc-line);
 }
@@ -6340,10 +6346,120 @@ html.theme-dark .fc-admin .border-red-200 {
 }
 
 html.theme-dark .profile-hero-panel {
-  background:
-    linear-gradient(135deg, rgba(31, 25, 40, 0.92), rgba(31, 25, 40, 0.72)),
-    var(--fc-surface);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+  background: var(--fc-surface) !important;
+  border-color: var(--fc-line-strong) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28) !important;
+}
+
+html.theme-dark .profile-avatar-wrap {
+  background: linear-gradient(135deg, var(--fc-accent), color-mix(in srgb, var(--fc-surface-2) 80%, white 20%));
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+}
+
+html.theme-dark .profile-avatar {
+  border-color: var(--fc-surface);
+  background: var(--fc-surface-2);
+  color: var(--fc-ink);
+}
+
+html.theme-dark .profile-avatar-fallback {
+  background: linear-gradient(135deg, var(--fc-accent), color-mix(in srgb, var(--fc-accent) 24%, var(--fc-surface-2)));
+  color: #06261b;
+}
+
+html.theme-dark .profile-title,
+html.theme-dark .profile-section-title,
+html.theme-dark .profile-section-heading h2,
+html.theme-dark .profile-empty-posts h3 {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .profile-handle,
+html.theme-dark .profile-bio {
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark .profile-role-badge {
+  background: color-mix(in srgb, var(--fc-accent) 14%, var(--fc-surface-2)) !important;
+  border-color: color-mix(in srgb, var(--fc-accent) 42%, var(--fc-line-strong)) !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .profile-meta,
+html.theme-dark .profile-stat,
+html.theme-dark .profile-card-field,
+html.theme-dark .profile-card-empty {
+  background: var(--fc-surface-2) !important;
+  border-color: var(--fc-line-strong) !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .profile-stat small,
+html.theme-dark .profile-card-label {
+  color: var(--fc-muted) !important;
+}
+
+html.theme-dark .profile-card-value {
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .profile-card-panel {
+  background: var(--fc-surface) !important;
+  border-color: var(--fc-line-strong) !important;
+}
+
+.profile-section-title {
+  color: var(--fc-ink);
+  font-size: 1.875rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.profile-section-heading h2 {
+  color: var(--fc-ink);
+  font-size: 1.875rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.profile-card-field {
+  min-width: 0;
+  border: 1px solid var(--fc-line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--fc-surface-2) 76%, white 24%);
+  padding: 1rem;
+}
+
+.profile-card-label {
+  color: var(--fc-muted);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.profile-card-value {
+  margin-top: 0.35rem;
+  overflow-wrap: anywhere;
+  color: var(--fc-ink);
+  font-size: 0.94rem;
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.profile-card-empty {
+  border: 1px dashed color-mix(in srgb, var(--fc-accent) 34%, var(--fc-line-strong));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--fc-surface-2) 70%, white 30%);
+  padding: 2rem;
+  text-align: center;
+}
+
+.profile-card-empty h3,
+.profile-empty-posts h3 {
+  color: var(--fc-ink);
+  font-size: 1.25rem;
+  font-weight: 900;
 }
 
 @media (max-width: 767px) {
