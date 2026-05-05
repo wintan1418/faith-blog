@@ -83,6 +83,11 @@ Rails.application.routes.draw do
       post :mark_read
     end
   end
+  resources :invitations, only: [ :index, :create ] do
+    member do
+      post :resend
+    end
+  end
 
   # Search
   get "search", to: "search#index"

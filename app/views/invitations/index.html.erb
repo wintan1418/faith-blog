@@ -1,0 +1,82 @@
+<% content_for(:title) { "Invites - Brethreign" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-5xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Invites</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Invite someone into the community.</h1>
+      <p class="mystic-copy mt-2 max-w-2xl">Send a personal invitation link by email and track who has joined.</p>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+      <section class="mystic-panel-strong p-6">
+        <h2 class="text-xl font-black text-[var(--fc-ink)]">Send invite</h2>
+        <p class="mystic-copy mt-1 text-sm">The recipient will get a signed join link.</p>
+
+        <%= form_with model: @invitation, url: invitations_path, class: "mt-6 space-y-5" do |f| %>
+          <% if @invitation.errors.any? %>
+            <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+              <%= @invitation.errors.full_messages.to_sentence %>
+            </div>
+          <% end %>
+
+          <div>
+            <%= f.label :email, "Email address", class: "label" %>
+            <%= f.email_field :email, required: true, class: "input", placeholder: "friend@example.com" %>
+          </div>
+
+          <div>
+            <%= f.label :message, "Personal note", class: "label" %>
+            <%= f.text_area :message, rows: 5, maxlength: 1_000, class: "input", placeholder: "I thought this community would bless you..." %>
+          </div>
+
+          <%= f.button class: "fc-btn fc-btn-primary w-full justify-center" do %>
+            <%= render_icon("send", classes: "h-4 w-4") %>
+            Send Invitation
+          <% end %>
+        <% end %>
+      </section>
+
+      <section class="mystic-panel-strong overflow-hidden">
+        <div class="border-b border-[var(--fc-line-strong)] p-6">
+          <h2 class="text-xl font-black text-[var(--fc-ink)]">Sent invites</h2>
+          <p class="mystic-copy mt-1 text-sm">Pending and accepted invitations from your account.</p>
+        </div>
+
+        <% if @invitations.any? %>
+          <div class="divide-y divide-[var(--fc-line)]">
+            <% @invitations.each do |invitation| %>
+              <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div class="min-w-0">
+                  <p class="truncate font-black text-[var(--fc-ink)]"><%= invitation.email %></p>
+                  <p class="mt-1 text-sm font-semibold text-[var(--fc-muted)]">
+                    <% if invitation.accepted? %>
+                      Accepted <%= time_ago_in_words(invitation.accepted_at) %> ago
+                    <% elsif invitation.last_sent_at.present? %>
+                      Sent <%= time_ago_in_words(invitation.last_sent_at) %> ago
+                    <% else %>
+                      Created <%= time_ago_in_words(invitation.created_at) %> ago
+                    <% end %>
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="rounded-full border border-[var(--fc-line-strong)] px-3 py-1 text-xs font-black text-[var(--fc-muted)]">
+                    <%= invitation.accepted? ? "Accepted" : "Pending" %>
+                  </span>
+                  <% unless invitation.accepted? %>
+                    <%= button_to "Resend", resend_invitation_path(invitation), method: :post, class: "btn btn-secondary btn-sm" %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="p-8 text-center">
+            <h3 class="text-lg font-black text-[var(--fc-ink)]">No invites sent yet</h3>
+            <p class="mystic-copy mx-auto mt-2 max-w-sm text-sm">Invite someone who would value slower, faith-filled conversation.</p>
+          </div>
+        <% end %>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<div style="font-family: Inter, Arial, sans-serif; color: #17251d; line-height: 1.6;">
+  <p style="margin: 0 0 12px;">Hi <%= @user.display_name %>,</p>
+
+  <h1 style="font-size: 22px; line-height: 1.25; margin: 0 0 14px;">
+    <%= @notification.message %>
+  </h1>
+
+  <p style="margin: 0 0 20px; color: #52665a;">
+    Open Brethreign to respond, pray, encourage, or continue the conversation.
+  </p>
+
+  <p style="margin: 0 0 24px;">
+    <%= link_to "Open notification", @target_url, style: "display: inline-block; background: #10b981; color: #052016; font-weight: 800; padding: 11px 16px; border-radius: 8px; text-decoration: none;" %>
+  </p>
+
+  <p style="margin: 0; color: #6c7c72; font-size: 13px;">
+    You are receiving this because email notifications are enabled on your Brethreign account.
+  </p>
+</div>

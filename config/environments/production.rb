@@ -57,7 +57,7 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   # Update this with your actual domain
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("RAILS_HOST", "yourdomain.com"),
+    host: ENV.fetch("RAILS_HOST", "brethreign.com"),
     protocol: "https"
   }
 
@@ -72,7 +72,7 @@ Rails.application.configure do
   smtp_settings = {
     address: Rails.application.credentials.dig(:smtp, :address) || ENV.fetch("SMTP_ADDRESS", "smtp.gmail.com"),
     port: Rails.application.credentials.dig(:smtp, :port) || ENV.fetch("SMTP_PORT", "587").to_i,
-    domain: Rails.application.credentials.dig(:smtp, :domain) || ENV.fetch("SMTP_DOMAIN", "yourdomain.com"),
+    domain: Rails.application.credentials.dig(:smtp, :domain) || ENV.fetch("SMTP_DOMAIN", "brethreign.com"),
     enable_starttls_auto: true,
     openssl_verify_mode: "none" # Use "peer" in production with proper SSL
   }

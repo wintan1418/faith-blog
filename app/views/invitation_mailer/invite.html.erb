@@ -1,0 +1,25 @@
+<div style="font-family: Inter, Arial, sans-serif; color: #17251d; line-height: 1.6;">
+  <p style="margin: 0 0 12px;">Peace,</p>
+
+  <h1 style="font-size: 24px; line-height: 1.2; margin: 0 0 14px;">
+    <%= @inviter.display_name %> invited you to Brethreign.
+  </h1>
+
+  <p style="margin: 0 0 16px; color: #52665a;">
+    Brethreign is a calmer home for testimonies, prayer, rooms, resources, and thoughtful faith-filled conversation.
+  </p>
+
+  <% if @invitation.message.present? %>
+    <div style="border-left: 3px solid #10b981; padding-left: 12px; margin: 0 0 20px; color: #27382e;">
+      <%= simple_format(@invitation.message) %>
+    </div>
+  <% end %>
+
+  <p style="margin: 0 0 24px;">
+    <%= link_to "Join Brethreign", @join_url, style: "display: inline-block; background: #10b981; color: #052016; font-weight: 800; padding: 11px 16px; border-radius: 8px; text-decoration: none;" %>
+  </p>
+
+  <p style="margin: 0; color: #6c7c72; font-size: 13px;">
+    This invite was sent by <%= @inviter.display_name %> from Brethreign.
+  </p>
+</div>

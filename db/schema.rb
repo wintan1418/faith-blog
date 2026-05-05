@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_05_000003) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_05_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,6 +137,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_05_000003) do
     t.index ["follower_id", "following_id"], name: "index_follows_on_follower_id_and_following_id", unique: true
     t.index ["follower_id"], name: "index_follows_on_follower_id"
     t.index ["following_id"], name: "index_follows_on_following_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.bigint "inviter_id", null: false
+    t.bigint "invited_user_id"
+    t.string "email", null: false
+    t.string "token", null: false
+    t.text "message"
+    t.datetime "accepted_at"
+    t.datetime "last_sent_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_invitations_on_email"
+    t.index ["invited_user_id"], name: "index_invitations_on_invited_user_id"
+    t.index ["inviter_id", "email"], name: "index_invitations_on_inviter_id_and_email", unique: true
+    t.index ["inviter_id"], name: "index_invitations_on_inviter_id"
+    t.index ["token"], name: "index_invitations_on_token", unique: true
   end
 
   create_table "likes", force: :cascade do |t|
@@ -421,6 +438,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_05_000003) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "dark_mode", default: false, null: false
+    t.boolean "email_notifications_enabled", default: true, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -442,6 +460,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_05_000003) do
   add_foreign_key "conversation_participants", "users"
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "follows", "users", column: "following_id"
+  add_foreign_key "invitations", "users", column: "invited_user_id"
+  add_foreign_key "invitations", "users", column: "inviter_id"
   add_foreign_key "likes", "users"
   add_foreign_key "mentions", "users"
   add_foreign_key "message_blocks", "users", column: "blocked_id"

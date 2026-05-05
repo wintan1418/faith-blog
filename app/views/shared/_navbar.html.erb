@@ -84,6 +84,7 @@
             </div>
             <%= link_to "Profile", user_path(current_user.username), class: "fc-dropdown-item" %>
             <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>
+            <%= link_to "Invites", invitations_path, class: "fc-dropdown-item" %>
             <%= link_to "Connections", my_connections_path, class: "fc-dropdown-item" %>
             <%= link_to "Settings", edit_settings_profile_path, class: "fc-dropdown-item" %>
             <% if current_user_admin? %>

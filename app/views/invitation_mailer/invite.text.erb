@@ -1,0 +1,13 @@
+Peace,
+
+<%= @inviter.display_name %> invited you to Brethreign.
+
+Brethreign is a calmer home for testimonies, prayer, rooms, resources, and thoughtful faith-filled conversation.
+
+<% if @invitation.message.present? %>
+Message from <%= @inviter.display_name %>:
+<%= @invitation.message %>
+
+<% end %>
+Join here:
+<%= @join_url %>

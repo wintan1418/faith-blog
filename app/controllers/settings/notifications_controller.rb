@@ -10,6 +10,7 @@ module Settings
 
     def update
       enabled_ids = Array(params[:room_membership_ids]).map(&:to_i)
+      current_user.update(email_notifications_enabled: ActiveModel::Type::Boolean.new.cast(params[:email_notifications_enabled]))
 
       current_user.room_memberships.find_each do |membership|
         membership.update(notifications_enabled: enabled_ids.include?(membership.id))

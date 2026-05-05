@@ -27,6 +27,8 @@ class Notification < ApplicationRecord
   # Validations
   validates :notification_type, presence: true
 
+  after_create_commit :deliver_email_notification
+
   # Scopes
   scope :unread, -> { where(read_at: nil) }
   scope :read, -> { where.not(read_at: nil) }
@@ -81,8 +83,41 @@ class Notification < ApplicationRecord
     end
   end
 
+  def target_path
+    case notification_type.to_sym
+    when :new_comment, :comment_reply
+      Rails.application.routes.url_helpers.post_path(notifiable.post)
+    when :new_follower
+      Rails.application.routes.url_helpers.user_path(actor.username)
+    when :post_featured, :post_liked, :post_reshared, :mentioned
+      post = notifiable.respond_to?(:post) ? notifiable.post : notifiable
+      Rails.application.routes.url_helpers.post_path(post)
+    when :new_post_in_room
+      room = notifiable.respond_to?(:room) ? notifiable.room : notifiable
+      Rails.application.routes.url_helpers.room_path(room)
+    when :resource_approved, :resource_rejected
+      Rails.application.routes.url_helpers.resources_item_path(notifiable)
+    when :connection_request, :connection_accepted
+      Rails.application.routes.url_helpers.my_connections_path
+    when :direct_message
+      Rails.application.routes.url_helpers.conversation_path(notifiable.conversation)
+    else
+      Rails.application.routes.url_helpers.notifications_path
+    end
+  rescue StandardError
+    Rails.application.routes.url_helpers.notifications_path
+  end
+
   # Class methods
   def self.mark_all_as_read!(user)
     user.notifications.unread.update_all(read_at: Time.current)
+  end
+
+  private
+
+  def deliver_email_notification
+    return unless user.email_notifications_enabled?
+
+    NotificationMailer.with(notification: self).community_notification.deliver_later
   end
 end

@@ -28,6 +28,8 @@ class User < ApplicationRecord
   has_many :message_blocks, foreign_key: :blocker_id, dependent: :destroy
   has_many :blocked_message_users, through: :message_blocks, source: :blocked
   has_many :message_blocks_against, class_name: "MessageBlock", foreign_key: :blocked_id, dependent: :destroy
+  has_many :sent_invitations, class_name: "Invitation", foreign_key: :inviter_id, dependent: :destroy
+  has_many :accepted_invitations, class_name: "Invitation", foreign_key: :invited_user_id, dependent: :nullify
 
   # Room memberships
   has_many :room_memberships, dependent: :destroy

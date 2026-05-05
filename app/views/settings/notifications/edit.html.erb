@@ -12,12 +12,20 @@
 
     <div class="mystic-panel-strong overflow-hidden">
       <div class="border-b border-faith-green/10 p-6">
-        <h2 class="text-xl font-bold text-faith-dark">Room Notifications</h2>
-        <p class="mystic-copy text-sm">Keep prayer and room updates focused on spaces you follow closely.</p>
+        <h2 class="text-xl font-bold text-faith-dark">Email & Room Notifications</h2>
+        <p class="mystic-copy text-sm">Choose what should reach your inbox and which rooms stay close.</p>
       </div>
 
       <div class="p-6">
         <%= form_with url: settings_notifications_path, method: :patch, class: "space-y-5" do %>
+          <label class="mystic-panel flex items-center justify-between gap-4 p-4">
+            <span>
+              <span class="block font-bold text-faith-dark">Email notifications</span>
+              <span class="text-sm text-faith-muted">Receive important community activity by email.</span>
+            </span>
+            <%= check_box_tag "email_notifications_enabled", "1", current_user.email_notifications_enabled, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+          </label>
+
           <% if @room_memberships.any? %>
             <div class="space-y-3">
               <% @room_memberships.each do |membership| %>
