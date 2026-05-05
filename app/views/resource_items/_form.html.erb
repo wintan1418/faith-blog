@@ -39,7 +39,7 @@
 
   <div>
     <%= f.label :file, "File", class: "label" %>
-    <%= f.file_field :file, class: "text-sm text-faith-muted file:mr-4 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-bold file:text-faith-green" %>
+    <%= f.file_field :file, direct_upload: true, class: "text-sm text-faith-muted file:mr-4 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-bold file:text-faith-green" %>
     <p class="mt-1 text-xs text-faith-muted">Required for PDFs and audio.</p>
   </div>
 
