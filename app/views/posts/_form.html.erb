@@ -82,7 +82,6 @@
             <%= f.file_field :images, 
                 multiple: true, 
                 accept: "image/*",
-                direct_upload: true,
                 class: "sr-only",
                 id: "post_images",
                 data: { action: "change->post-form#previewImages" } %>

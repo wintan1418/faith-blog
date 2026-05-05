@@ -11,7 +11,6 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.20",
-    "@rails/activestorage": "8.1.100",
     "@rails/actiontext": "^8.1.100",
     "@tailwindcss/cli": "^4.1.17",
     "emoji-picker-element": "^1.28.0",
