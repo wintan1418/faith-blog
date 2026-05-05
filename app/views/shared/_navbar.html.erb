@@ -30,6 +30,12 @@
           <%= render_icon("search", classes: "h-4 w-4") %>
           Search
         <% end %>
+        <% if user_signed_in? %>
+          <%= link_to people_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/people')}" do %>
+            <%= render_icon("users", classes: "h-4 w-4") %>
+            People
+          <% end %>
+        <% end %>
       </div>
     </div>
 
@@ -85,6 +91,7 @@
             <%= link_to "Profile", user_path(current_user.username), class: "fc-dropdown-item" %>
             <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>
             <%= link_to "Invites", invitations_path, class: "fc-dropdown-item" %>
+            <%= link_to "People", people_path, class: "fc-dropdown-item" %>
             <%= link_to "Connections", my_connections_path, class: "fc-dropdown-item" %>
             <%= link_to "Settings", edit_settings_profile_path, class: "fc-dropdown-item" %>
             <% if current_user_admin? %>

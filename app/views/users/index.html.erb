@@ -1,0 +1,83 @@
+<% content_for(:title) { "People - Brethreign" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-6xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Community</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Find people walking the same road.</h1>
+      <p class="mystic-copy mt-2 max-w-2xl">Browse members, search by username or profile details, then follow or connect from their profile.</p>
+    </div>
+
+    <%= form_with url: people_path, method: :get, class: "mystic-panel-strong mb-6 p-4" do %>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <div class="relative min-w-0 flex-1">
+          <%= render_icon("search", classes: "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fc-muted)]") %>
+          <input type="text"
+                 name="q"
+                 value="<%= @query %>"
+                 class="input pl-10"
+                 placeholder="Search username, bio, location, faith background...">
+        </div>
+        <button type="submit" class="fc-btn fc-btn-primary justify-center">Search People</button>
+        <% if @query.present? %>
+          <%= link_to "Clear", people_path, class: "btn btn-secondary justify-center" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @users.any? %>
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <% @users.each do |user| %>
+          <article class="mystic-panel flex min-w-0 gap-4 p-5">
+            <%= link_to user_path(user.username), class: "shrink-0" do %>
+              <% if user.profile&.avatar&.attached? %>
+                <%= image_tag user.profile.avatar, class: "mystic-avatar h-14 w-14 object-cover" %>
+              <% else %>
+                <span class="mystic-avatar mystic-avatar-fallback grid h-14 w-14 place-items-center text-lg font-black">
+                  <%= user.username.first.upcase %>
+                </span>
+              <% end %>
+            <% end %>
+
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <%= link_to user.display_name, user_path(user.username), class: "block truncate text-base font-black text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" %>
+                  <p class="truncate text-sm font-semibold text-[var(--fc-muted)]">@<%= user.username %></p>
+                </div>
+                <% if current_user.following?(user) %>
+                  <%= button_to "Following", unfollow_user_path(user.username), method: :delete, class: "btn btn-secondary btn-sm" %>
+                <% else %>
+                  <%= button_to "Follow", follow_user_path(user.username), class: "fc-btn fc-btn-primary min-h-9 px-3 text-xs" %>
+                <% end %>
+              </div>
+
+              <% if user.profile&.bio.present? %>
+                <p class="mystic-copy mt-3 line-clamp-3 text-sm"><%= user.profile.bio %></p>
+              <% end %>
+
+              <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-[var(--fc-muted)]">
+                <span><%= pluralize(user.posts.published.count, "post") %></span>
+                <span><%= pluralize(user.connections_count, "connection") %></span>
+                <% if user.profile&.location.present? %>
+                  <span><%= user.profile.location %></span>
+                <% end %>
+              </div>
+            </div>
+          </article>
+        <% end %>
+      </div>
+
+      <% if @pagy.pages > 1 %>
+        <div class="mt-8">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="mystic-panel p-10 text-center">
+        <h2 class="text-xl font-black text-[var(--fc-ink)]">No people found</h2>
+        <p class="mystic-copy mx-auto mt-2 max-w-md">Try a username, location, ministry background, or a broader keyword.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

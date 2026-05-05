@@ -91,6 +91,7 @@ Rails.application.routes.draw do
 
   # Search
   get "search", to: "search#index"
+  get "people", to: "users#index", as: :people
 
   # Settings
   namespace :settings do

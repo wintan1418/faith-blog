@@ -2,7 +2,24 @@
 
 class UsersController < ApplicationController
   before_action :authenticate_user!, except: [ :show, :posts ]
-  before_action :set_user, except: [ :mentions ]
+  before_action :set_user, except: [ :index, :mentions ]
+
+  def index
+    @query = params[:q].to_s.strip
+    users = User.active.includes(:profile).order(created_at: :desc)
+
+    if @query.present?
+      users = users
+        .left_joins(:profile)
+        .where(
+          "users.username ILIKE :query OR users.email ILIKE :query OR profiles.bio ILIKE :query OR profiles.location ILIKE :query OR profiles.faith_background ILIKE :query",
+          query: "%#{@query}%"
+        )
+    end
+
+    users = users.where.not(id: current_user.id) if user_signed_in?
+    @pagy, @users = pagy(users, items: 24)
+  end
 
   def show
     @pagy, @posts = pagy(@user.posts.published.includes(:room, :tags).recent)
