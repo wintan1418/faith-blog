@@ -5697,12 +5697,23 @@ html.theme-light .home-link-btn:hover {
   }
 }
 
-/* Admin shell uses the same token system as the community UI. */
+/* Admin shell */
 .fc-admin {
-  background:
-    radial-gradient(ellipse 70rem 30rem at 50% -14rem, rgba(16, 185, 129, 0.14), transparent 64%),
-    var(--fc-bg) !important;
-  color: var(--fc-ink) !important;
+  --admin-bg: #f5f8f4;
+  --admin-sidebar: #f8fbf7;
+  --admin-sidebar-strong: #edf5ef;
+  --admin-panel: #ffffff;
+  --admin-panel-2: #eef5f0;
+  --admin-line: rgba(32, 71, 48, 0.14);
+  --admin-line-strong: rgba(32, 71, 48, 0.22);
+  --admin-ink: #17251d;
+  --admin-soft: #385040;
+  --admin-muted: #718173;
+  --admin-accent: #24c98b;
+  --admin-accent-ink: #06291c;
+  --admin-danger: #f87171;
+  background: var(--admin-bg) !important;
+  color: var(--admin-ink) !important;
 }
 
 .admin-shell {
@@ -5717,12 +5728,10 @@ html.theme-light .home-link-btn:hover {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--fc-line-strong);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.48)),
-    var(--fc-surface);
+  border-right: 1px solid var(--admin-line-strong);
+  background: var(--admin-sidebar) !important;
   padding: 1rem;
-  box-shadow: 18px 0 42px rgba(15, 35, 26, 0.06);
+  box-shadow: none;
 }
 
 .admin-brand {
@@ -5731,13 +5740,15 @@ html.theme-light .home-link-btn:hover {
   gap: 0.75rem;
   min-height: 48px;
   padding: 0.5rem 0.4rem 1rem;
-  border-bottom: 1px solid var(--fc-line);
+  border-bottom: 1px solid var(--admin-line);
+  color: var(--admin-ink);
 }
 
 .admin-side-nav {
   display: grid;
   gap: 0.35rem;
   padding: 1rem 0;
+  background: transparent !important;
 }
 
 .admin-side-link {
@@ -5748,23 +5759,24 @@ html.theme-light .home-link-btn:hover {
   border: 1px solid transparent;
   border-radius: 8px;
   padding: 0 0.75rem;
-  color: var(--fc-soft);
+  background: transparent !important;
+  color: var(--admin-soft) !important;
   font-size: 0.92rem;
   font-weight: 800;
   transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
 
 .admin-side-link:hover {
-  background: var(--fc-surface-2);
-  border-color: var(--fc-line);
-  color: var(--fc-ink);
+  background: var(--admin-sidebar-strong) !important;
+  border-color: var(--admin-line);
+  color: var(--admin-ink) !important;
 }
 
 .admin-side-link.is-active {
-  background: var(--fc-accent);
+  background: var(--admin-accent) !important;
   border-color: transparent;
-  color: #042f1d;
-  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.18);
+  color: var(--admin-accent-ink) !important;
+  box-shadow: none;
 }
 
 .admin-side-icon {
@@ -5781,20 +5793,20 @@ html.theme-light .home-link-btn:hover {
   display: inline-grid;
   place-items: center;
   border-radius: 999px;
-  background: rgba(185, 28, 28, 0.12);
+  background: rgba(248, 113, 113, 0.16);
   color: #b91c1c;
   font-size: 0.72rem;
   font-weight: 900;
 }
 
 .admin-side-link.is-active .admin-count {
-  background: rgba(4, 47, 29, 0.12);
-  color: #042f1d;
+  background: rgba(6, 41, 28, 0.13);
+  color: var(--admin-accent-ink);
 }
 
 .admin-sidebar-footer {
   margin-top: auto;
-  border-top: 1px solid var(--fc-line);
+  border-top: 1px solid var(--admin-line);
   padding-top: 1rem;
 }
 
@@ -5813,10 +5825,10 @@ html.theme-light .home-link-btn:hover {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border-bottom: 1px solid var(--fc-line-strong);
-  background: color-mix(in srgb, var(--fc-bg) 90%, transparent);
+  border-bottom: 1px solid var(--admin-line-strong);
+  background: color-mix(in srgb, var(--admin-bg) 94%, transparent);
   padding: 1rem 1.5rem;
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(14px);
 }
 
 .admin-content {
@@ -5844,38 +5856,38 @@ html.theme-light .home-link-btn:hover {
   place-items: center;
   border: 1px solid var(--fc-line);
   border-radius: 8px;
-  color: var(--fc-soft);
-  background: var(--fc-surface);
+  color: var(--admin-soft);
+  background: var(--admin-panel);
 }
 
 .admin-mobile-link.is-active {
-  background: var(--fc-accent);
+  background: var(--admin-accent);
   border-color: transparent;
-  color: #042f1d;
+  color: var(--admin-accent-ink);
 }
 
 .fc-admin .fc-card {
   border-radius: 8px !important;
-  border-color: var(--fc-line-strong) !important;
-  background: var(--fc-surface) !important;
-  box-shadow: 0 12px 28px rgba(21, 34, 28, 0.08) !important;
+  border-color: var(--admin-line-strong) !important;
+  background: var(--admin-panel) !important;
+  box-shadow: none !important;
 }
 
 .fc-admin .fc-card:hover {
-  border-color: color-mix(in srgb, var(--fc-accent) 45%, var(--fc-line-strong));
+  border-color: color-mix(in srgb, var(--admin-accent) 45%, var(--admin-line-strong));
 }
 
 .fc-admin .bg-white,
 .fc-admin .bg-gray-50,
 .fc-admin .bg-stone-50,
 .fc-admin .bg-stone-100 {
-  background: var(--fc-surface) !important;
+  background: var(--admin-panel) !important;
 }
 
 .fc-admin thead.bg-gray-50,
 .fc-admin thead.bg-stone-50,
 .fc-admin .border-b.bg-gray-50 {
-  background: var(--fc-surface-2) !important;
+  background: var(--admin-panel-2) !important;
 }
 
 .fc-admin .border-gray-200,
@@ -5883,33 +5895,33 @@ html.theme-light .home-link-btn:hover {
 .fc-admin .border-stone-100,
 .fc-admin .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
 .fc-admin .divide-stone-100 > :not([hidden]) ~ :not([hidden]) {
-  border-color: var(--fc-line-strong) !important;
+  border-color: var(--admin-line-strong) !important;
 }
 
 .fc-admin .text-gray-900,
 .fc-admin .text-stone-900 {
-  color: var(--fc-ink) !important;
+  color: var(--admin-ink) !important;
 }
 
 .fc-admin .text-gray-700,
 .fc-admin .text-stone-700,
 .fc-admin .text-gray-600,
 .fc-admin .text-stone-600 {
-  color: var(--fc-soft) !important;
+  color: var(--admin-soft) !important;
 }
 
 .fc-admin .text-gray-500,
 .fc-admin .text-stone-500,
 .fc-admin .text-gray-400,
 .fc-admin .text-stone-400 {
-  color: var(--fc-muted) !important;
+  color: var(--admin-muted) !important;
 }
 
 .fc-admin tr.hover\:bg-gray-50:hover,
 .fc-admin tr.hover\:bg-stone-50:hover,
 .fc-admin .hover\:bg-gray-50:hover,
 .fc-admin .hover\:bg-stone-50:hover {
-  background: var(--fc-surface-2) !important;
+  background: var(--admin-panel-2) !important;
 }
 
 .fc-admin .rounded-xl,
@@ -5922,20 +5934,29 @@ html.theme-light .home-link-btn:hover {
 }
 
 html.theme-dark .fc-admin {
-  background:
-    radial-gradient(ellipse 70rem 30rem at 50% -14rem, rgba(110, 231, 183, 0.08), transparent 64%),
-    var(--fc-bg) !important;
+  --admin-bg: #0f1714;
+  --admin-sidebar: #111914;
+  --admin-sidebar-strong: #18231d;
+  --admin-panel: #17211c;
+  --admin-panel-2: #1c2a23;
+  --admin-line: rgba(203, 213, 205, 0.12);
+  --admin-line-strong: rgba(203, 213, 205, 0.2);
+  --admin-ink: #f2f5ef;
+  --admin-soft: #c7d1c8;
+  --admin-muted: #8d9c91;
+  --admin-accent: #36d399;
+  --admin-accent-ink: #05281b;
+  --admin-danger: #f87171;
+  background: var(--admin-bg) !important;
 }
 
 html.theme-dark .admin-sidebar {
-  background:
-    linear-gradient(180deg, rgba(26, 21, 34, 0.92), rgba(26, 21, 34, 0.72)),
-    var(--fc-surface);
-  box-shadow: 18px 0 42px rgba(0, 0, 0, 0.22);
+  background: var(--admin-sidebar) !important;
+  box-shadow: none;
 }
 
 html.theme-dark .admin-topbar {
-  background: color-mix(in srgb, var(--fc-bg) 88%, transparent);
+  background: color-mix(in srgb, var(--admin-bg) 94%, transparent);
 }
 
 html.theme-dark .fc-admin .bg-red-50 {
