@@ -1,0 +1,62 @@
+# frozen_string_literal: true
+
+class ConversationsController < ApplicationController
+  before_action :authenticate_user!
+  before_action :set_conversation, only: [ :show, :archive, :mark_read ]
+
+  def index
+    @conversations = conversation_scope
+    @conversation = @conversations.first
+    load_thread if @conversation
+  end
+
+  def show
+    load_sidebar
+    load_thread
+    @conversation.mark_read_for!(current_user)
+  end
+
+  def create
+    @recipient = User.find(params[:recipient_id])
+    unless current_user.connected_with?(@recipient)
+      redirect_back fallback_location: user_path(@recipient.username), alert: "You can only message accepted connections."
+      return
+    end
+
+    @conversation = Conversation.find_or_create_between!(current_user, @recipient)
+    redirect_to conversation_path(@conversation)
+  end
+
+  def archive
+    @conversation.participant_for(current_user)&.update!(archived_at: Time.current)
+    redirect_to conversations_path, notice: "Conversation archived."
+  end
+
+  def mark_read
+    @conversation.mark_read_for!(current_user)
+    redirect_to conversation_path(@conversation)
+  end
+
+  private
+
+  def set_conversation
+    @conversation = current_user.conversations.find(params[:id])
+  end
+
+  def load_sidebar
+    @conversations = conversation_scope
+  end
+
+  def load_thread
+    @messages = @conversation.messages.visible.includes(sender: { profile: { avatar_attachment: :blob } }).oldest_first
+    @message = Message.new
+  end
+
+  def conversation_scope
+    current_user.conversations
+                .joins(:conversation_participants)
+                .where(conversation_participants: { user_id: current_user.id, archived_at: nil })
+                .includes(conversation_participants: { user: { profile: { avatar_attachment: :blob } } })
+                .recent
+  end
+end

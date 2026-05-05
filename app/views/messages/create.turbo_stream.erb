@@ -1,0 +1,9 @@
+<%= turbo_stream.replace "messages" do %>
+  <div id="messages" class="inbox-messages">
+    <%= render partial: "conversations/message", collection: @messages, as: :message %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "new_message" do %>
+  <%= render "conversations/composer", conversation: @conversation, message: Message.new %>
+<% end %>

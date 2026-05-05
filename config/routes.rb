@@ -108,6 +108,14 @@ Rails.application.routes.draw do
   end
   get "my-connections", to: "connection_requests#connections", as: :my_connections
 
+  resources :conversations, path: "inbox", only: [ :index, :show, :create ] do
+    member do
+      post :archive
+      post :mark_read
+    end
+    resources :messages, only: [ :create ]
+  end
+
   # Admin namespace
   namespace :admin do
     root to: "dashboard#index"

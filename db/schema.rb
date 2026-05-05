@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_01_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_05_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -108,6 +108,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_01_000001) do
     t.index ["status"], name: "index_connection_requests_on_status"
   end
 
+  create_table "conversation_participants", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "last_read_at"
+    t.datetime "archived_at"
+    t.datetime "muted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "user_id"], name: "index_conversation_participants_unique_pair", unique: true
+    t.index ["conversation_id"], name: "index_conversation_participants_on_conversation_id"
+    t.index ["user_id", "archived_at"], name: "index_conversation_participants_on_user_id_and_archived_at"
+    t.index ["user_id"], name: "index_conversation_participants_on_user_id"
+  end
+
+  create_table "conversations", force: :cascade do |t|
+    t.datetime "last_message_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_message_at"], name: "index_conversations_on_last_message_at"
+  end
+
   create_table "follows", force: :cascade do |t|
     t.bigint "follower_id", null: false
     t.bigint "following_id", null: false
@@ -145,6 +166,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_01_000001) do
     t.index ["mentioned_by_type", "mentioned_by_id"], name: "index_mentions_on_mentioned_by_type_and_mentioned_by_id"
     t.index ["user_id", "mentionable_type", "mentionable_id"], name: "index_mentions_on_user_and_mentionable"
     t.index ["user_id"], name: "index_mentions_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.bigint "sender_id", null: false
+    t.text "body", null: false
+    t.datetime "edited_at"
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["deleted_at"], name: "index_messages_on_deleted_at"
+    t.index ["sender_id", "created_at"], name: "index_messages_on_sender_id_and_created_at"
+    t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
 
   create_table "moderation_logs", force: :cascade do |t|
@@ -391,10 +427,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_01_000001) do
   add_foreign_key "comments", "users"
   add_foreign_key "connection_requests", "users", column: "receiver_id"
   add_foreign_key "connection_requests", "users", column: "sender_id"
+  add_foreign_key "conversation_participants", "conversations"
+  add_foreign_key "conversation_participants", "users"
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "follows", "users", column: "following_id"
   add_foreign_key "likes", "users"
   add_foreign_key "mentions", "users"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "moderation_logs", "users", column: "moderator_id"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "actor_id"

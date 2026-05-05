@@ -1,0 +1,19 @@
+<%= form_with model: [conversation, message], class: "inbox-composer" do |f| %>
+  <% if message.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
+      <%= message.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="flex items-end gap-2">
+    <%= f.text_area :body,
+                    rows: 2,
+                    class: "inbox-input",
+                    maxlength: 4000,
+                    placeholder: "Write a thoughtful message..." %>
+    <%= f.button class: "fc-btn fc-btn-primary min-h-11" do %>
+      <%= render_icon("send", classes: "h-4 w-4") %>
+      Send
+    <% end %>
+  </div>
+<% end %>

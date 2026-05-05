@@ -5,6 +5,9 @@
     <%= link_to "Complete Brethren Card", edit_settings_brethren_card_path, class: "btn btn-primary" %>
   <% elsif connection&.accepted? %>
     <%= link_to "View Brethren Card", brethren_card_path(user.username), class: "btn btn-secondary" %>
+    <%= button_to conversations_path(recipient_id: user.id), method: :post, class: "btn btn-primary" do %>
+      Message
+    <% end %>
   <% elsif connection&.pending? && connection.sender == current_user %>
     <span class="btn btn-secondary cursor-not-allowed opacity-70">Request Sent</span>
   <% elsif connection&.pending? && connection.receiver == current_user %>

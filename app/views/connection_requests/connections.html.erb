@@ -37,6 +37,9 @@
 
             <div class="mt-5 flex flex-wrap gap-2 border-t border-faith-green/10 pt-4">
               <%= link_to "View Card", brethren_card_path(user.username), class: "btn btn-primary btn-sm flex-1" %>
+              <%= button_to conversations_path(recipient_id: user.id), method: :post, class: "btn btn-secondary btn-sm" do %>
+                Message
+              <% end %>
               <% if user.brethren_card&.whatsapp_link %>
                 <%= link_to "WhatsApp", user.brethren_card.whatsapp_link, target: "_blank", rel: "noopener", class: "btn btn-secondary btn-sm" %>
               <% end %>

@@ -1,0 +1,12 @@
+<% message = local_assigns.fetch(:message) %>
+<% mine = message.sender == current_user %>
+
+<div id="<%= dom_id(message) %>" class="message-row <%= mine ? 'is-mine' : 'is-theirs' %>">
+  <% unless mine %>
+    <%= render "conversations/avatar", user: message.sender, size: "h-8 w-8" %>
+  <% end %>
+  <div class="message-bubble">
+    <div><%= simple_format(message.body) %></div>
+    <span><%= message.created_at.strftime("%I:%M %p") %></span>
+  </div>
+</div>

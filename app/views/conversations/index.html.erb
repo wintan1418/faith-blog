@@ -1,0 +1,46 @@
+<% content_for(:title) { "Inbox - Faith Community" } %>
+
+<div class="mystic-shell inbox-page">
+  <div class="mystic-container max-w-7xl py-8">
+    <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <span class="mystic-kicker">Inbox</span>
+        <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Private conversations</h1>
+        <p class="mystic-copy mt-2">Message accepted connections without exposing your Brethren Card details publicly.</p>
+      </div>
+      <%= link_to "My Connections", my_connections_path, class: "btn btn-secondary" %>
+    </div>
+
+    <div class="inbox-layout">
+      <aside class="inbox-list">
+        <div class="inbox-list-head">
+          <h2>Messages</h2>
+          <span><%= pluralize(@conversations.size, "thread") %></span>
+        </div>
+
+        <% if @conversations.any? %>
+          <div class="inbox-list-scroll">
+            <% @conversations.each do |conversation| %>
+              <%= render "conversations/conversation_row", conversation: conversation, active: @conversation == conversation %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="p-6 text-sm font-semibold text-[var(--fc-muted)]">
+            No conversations yet. Open a connected profile and start with Message.
+          </div>
+        <% end %>
+      </aside>
+
+      <% if @conversation %>
+        <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
+      <% else %>
+        <section class="inbox-empty">
+          <%= render_icon("mail", classes: "h-10 w-10") %>
+          <h2>No messages yet</h2>
+          <p>Connect with someone first, then start a private conversation from their profile or your connections page.</p>
+          <%= link_to "Find Connections", my_connections_path, class: "btn btn-primary" %>
+        </section>
+      <% end %>
+    </div>
+  </div>
+</div>

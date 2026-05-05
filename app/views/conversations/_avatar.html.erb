@@ -1,0 +1,10 @@
+<% user = local_assigns.fetch(:user) %>
+<% size = local_assigns.fetch(:size, "h-10 w-10") %>
+
+<% if user.profile&.avatar&.attached? %>
+  <%= image_tag user.profile.avatar, class: "#{size} rounded-full object-cover", alt: user.display_name %>
+<% else %>
+  <span class="<%= size %> grid place-items-center rounded-full bg-[var(--fc-surface-2)] text-sm font-black text-[var(--fc-ink)]">
+    <%= user.display_name.first.upcase %>
+  </span>
+<% end %>

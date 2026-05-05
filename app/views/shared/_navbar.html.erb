@@ -52,6 +52,13 @@
           <% end %>
         <% end %>
 
+        <%= link_to conversations_path, class: "fc-icon-btn relative", title: "Inbox" do %>
+          <%= render_icon("mail", classes: "h-4 w-4") %>
+          <% if current_user.unread_conversations_count.positive? %>
+            <span class="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[var(--fc-accent)]"></span>
+          <% end %>
+        <% end %>
+
         <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
           <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
           <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
@@ -76,6 +83,7 @@
               <p class="truncate text-xs text-[var(--fc-muted)]"><%= current_user.email %></p>
             </div>
             <%= link_to "Profile", user_path(current_user.username), class: "fc-dropdown-item" %>
+            <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>
             <%= link_to "Connections", my_connections_path, class: "fc-dropdown-item" %>
             <%= link_to "Settings", edit_settings_profile_path, class: "fc-dropdown-item" %>
             <% if current_user_admin? %>

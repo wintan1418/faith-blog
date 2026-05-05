@@ -22,6 +22,9 @@ class User < ApplicationRecord
   has_many :notifications, dependent: :destroy
   has_many :reports, foreign_key: :reporter_id, dependent: :destroy
   has_many :moderation_logs, foreign_key: :moderator_id, dependent: :nullify
+  has_many :conversation_participants, dependent: :destroy
+  has_many :conversations, through: :conversation_participants
+  has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy
 
   # Room memberships
   has_many :room_memberships, dependent: :destroy
@@ -104,6 +107,15 @@ class User < ApplicationRecord
 
   def unread_notifications_count
     notifications.unread.count
+  end
+
+  def unread_conversations_count
+    conversation_participants
+      .joins("INNER JOIN messages ON messages.conversation_id = conversation_participants.conversation_id")
+      .where.not(messages: { sender_id: id })
+      .where("conversation_participants.last_read_at IS NULL OR messages.created_at > conversation_participants.last_read_at")
+      .distinct
+      .count(:conversation_id)
   end
 
   def connected_with?(user)
