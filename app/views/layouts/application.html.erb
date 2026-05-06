@@ -48,6 +48,10 @@
         <%= yield %>
       </main>
 
+      <% if user_signed_in? %>
+        <%= render "shared/composer_modal" %>
+      <% end %>
+
       <%= render "shared/footer" %>
     </div>
   </body>

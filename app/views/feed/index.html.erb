@@ -65,10 +65,16 @@
         <% else %>
           <span class="fc-avatar"><%= current_user.username.first.upcase %></span>
         <% end %>
-        <%= link_to "Share an encouragement, request, or question...", new_post_path, class: "fc-composer-input flex items-center text-[var(--fc-muted)]" %>
-        <%= link_to new_post_path, class: "fc-btn fc-btn-primary" do %>
+        <button type="button"
+                class="fc-composer-input flex items-center text-[var(--fc-muted)]"
+                data-action="click->composer-modal#open">
+          Share an encouragement, request, or question...
+        </button>
+        <button type="button"
+                class="fc-btn fc-btn-primary"
+                data-action="click->composer-modal#open">
           Post
-        <% end %>
+        </button>
       </div>
 
       <div class="fc-tabs">

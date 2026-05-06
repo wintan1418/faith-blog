@@ -30,3 +30,6 @@ application.register("mentions", MentionsController)
 
 import TypingController from "./typing_controller"
 application.register("typing", TypingController)
+
+import ComposerModalController from "./composer_modal_controller"
+application.register("composer-modal", ComposerModalController)

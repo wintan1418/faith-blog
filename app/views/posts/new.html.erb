@@ -1,18 +1,15 @@
-<% content_for(:title) { "Create Post - Faith Community" } %>
+<% content_for(:title) { "New post - Faith Community" } %>
 
-<div class="mystic-shell py-8">
-  <div class="mystic-container max-w-3xl">
-    <div class="mystic-panel-strong overflow-hidden">
-      <div class="border-b border-faith-green/10 p-6">
-        <span class="mystic-kicker">New Post</span>
-        <h1 class="mt-3 text-3xl font-bold text-faith-dark">Share with the Community</h1>
-        <p class="mystic-copy mt-1">Your story can encourage and inspire others.</p>
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 640px;">
+    <main class="fc-main">
+      <div class="fc-panel fc-composer-panel-page">
+        <header class="fc-composer-bar">
+          <h1 class="fc-composer-bar-title">New post</h1>
+          <%= link_to "Cancel", feed_path, class: "fc-btn" %>
+        </header>
+        <%= render "posts/composer", post: @post, rooms: @rooms %>
       </div>
-
-      <div class="p-6">
-        <%= render "form", post: @post, rooms: @rooms %>
-      </div>
-    </div>
+    </main>
   </div>
 </div>
-

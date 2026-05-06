@@ -1,0 +1,94 @@
+<%# Lean Twitter-style composer used inside the modal AND on /posts/new.
+    Locals: post, rooms %>
+<%= form_with model: post, html: { class: "fc-composer-form", multipart: true, data: { controller: "post-form" } } do |f| %>
+  <% if post.errors.any? %>
+    <div class="fc-composer-errors">
+      <strong>Couldn't post:</strong>
+      <ul>
+        <% post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="fc-composer-head">
+    <% if current_user.profile&.avatar&.attached? %>
+      <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+    <% else %>
+      <span class="fc-avatar"><%= current_user.username.first.upcase %></span>
+    <% end %>
+    <div class="fc-composer-author">
+      <p class="fc-composer-name"><%= current_user.username %></p>
+      <p class="fc-composer-handle">posting to the community</p>
+    </div>
+  </div>
+
+  <%= f.text_field :title,
+      class: "fc-composer-title",
+      placeholder: "Give it a short title",
+      maxlength: 200,
+      required: true %>
+
+  <div data-controller="emoji-picker">
+    <%= f.rich_text_area :content,
+        class: "fc-composer-body",
+        placeholder: "What's on your heart?",
+        data: {
+          emoji_picker_target: "editor",
+          controller: "mentions"
+        } %>
+
+    <div class="fc-composer-toolbar">
+      <div class="fc-composer-tools">
+        <button type="button"
+                data-emoji-picker-target="button"
+                data-action="click->emoji-picker#toggle"
+                class="fc-composer-icon-btn"
+                title="Add emoji"
+                aria-label="Add emoji">
+          <%= render_icon("smile", classes: "h-5 w-5") %>
+        </button>
+
+        <label class="fc-composer-icon-btn cursor-pointer" title="Add images" aria-label="Add images">
+          <%= render_icon("image", classes: "h-5 w-5") %>
+          <%= f.file_field :images,
+              multiple: true,
+              accept: "image/*",
+              class: "sr-only",
+              data: { action: "change->post-form#previewImages" } %>
+        </label>
+      </div>
+
+      <div class="fc-composer-meta">
+        <label class="fc-composer-pill">
+          <span class="fc-composer-pill-label">Room</span>
+          <%= f.select :room_id,
+              rooms.map { |r| ["#{r.icon ? "#{r.icon} " : ""}#{r.name}", r.id] },
+              { prompt: "Choose..." },
+              class: "fc-composer-pill-select",
+              required: true %>
+        </label>
+
+        <label class="fc-composer-toggle">
+          <%= f.check_box :anonymous, class: "fc-composer-checkbox" %>
+          <span>Anonymous</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="relative">
+      <div data-emoji-picker-target="picker" class="hidden absolute right-0 z-50 mt-2">
+        <emoji-picker style="width: 320px; height: 380px;"></emoji-picker>
+      </div>
+    </div>
+  </div>
+
+  <div id="image-previews" class="fc-composer-previews hidden" data-post-form-target="previews"></div>
+
+  <div class="fc-composer-footer">
+    <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
+    <%= f.hidden_field :status, value: "published" %>
+    <%= f.submit post.persisted? ? "Update" : "Post", class: "fc-btn fc-btn-primary" %>
+  </div>
+<% end %>

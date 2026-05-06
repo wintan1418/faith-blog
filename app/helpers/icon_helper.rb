@@ -89,6 +89,10 @@ module IconHelper
       icon_svg("M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z M15 5l4 4", classes)
     when "checkmark", "check"
       icon_svg("M20 6 9 17l-5-5", classes)
+    when "smile"
+      icon_svg("<circle cx='12' cy='12' r='10' /><path d='M8 14s1.5 2 4 2 4-2 4-2' /><line x1='9' y1='9' x2='9.01' y2='9' /><line x1='15' y1='9' x2='15.01' y2='9' />", classes)
+    when "x", "close", "xmark"
+      icon_svg("M18 6 6 18 M6 6l12 12", classes)
     else
       # Default Sparkles
       icon_svg("m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z", classes)

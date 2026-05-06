@@ -1,0 +1,23 @@
+<% return unless user_signed_in? %>
+<% rooms = Room.public_rooms.ordered %>
+<% post = current_user.posts.build %>
+
+<div data-controller="composer-modal">
+  <dialog data-composer-modal-target="dialog"
+          data-action="click->composer-modal#backdropClick"
+          class="fc-composer-dialog">
+    <div class="fc-composer-panel">
+      <header class="fc-composer-bar">
+        <h2 class="fc-composer-bar-title">New post</h2>
+        <button type="button"
+                data-action="click->composer-modal#close"
+                class="fc-composer-icon-btn"
+                title="Close"
+                aria-label="Close">
+          <%= render_icon("x", classes: "h-5 w-5") %>
+        </button>
+      </header>
+      <%= render "posts/composer", post: post, rooms: rooms %>
+    </div>
+  </dialog>
+</div>

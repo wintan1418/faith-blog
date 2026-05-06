@@ -46,10 +46,12 @@
           <input type="text" name="q" placeholder="Search posts, people, resources..." class="fc-search">
         <% end %>
 
-        <%= link_to new_post_path, class: "fc-btn fc-btn-primary" do %>
+        <button type="button"
+                class="fc-btn fc-btn-primary"
+                data-action="click->composer-modal#open">
           <span class="text-lg leading-none">+</span>
           Post
-        <% end %>
+        </button>
 
         <%= link_to notifications_path, class: "fc-icon-btn relative", title: "Notifications" do %>
           <%= render_icon("sparkles", classes: "h-4 w-4") %>

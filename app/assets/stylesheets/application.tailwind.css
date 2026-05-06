@@ -7780,3 +7780,274 @@ html.theme-light .fc-topbar .fc-btn:not(.fc-btn-primary):hover {
     min-height: calc(100vh - 56px);
   }
 }
+
+/* ============================================================
+   ✦ COMPOSER MODAL — Twitter-style post composer
+   Final pass: source-order wins.
+   ============================================================ */
+
+.fc-composer-dialog {
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  max-width: 600px;
+  width: calc(100% - 2rem);
+  margin: auto;
+  color: var(--fc-ink);
+}
+
+.fc-composer-dialog::backdrop {
+  background: rgba(8, 14, 12, 0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.fc-composer-panel {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 16px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.fc-composer-panel-page {
+  padding: 0;
+  overflow: hidden;
+}
+
+.fc-composer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--fc-line);
+  background: var(--fc-surface);
+}
+
+.fc-composer-bar-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--fc-ink);
+  letter-spacing: -0.005em;
+}
+
+.fc-composer-form {
+  padding: 1.1rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fc-composer-errors {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.30);
+  color: #b91c1c;
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  font-size: 0.85rem;
+}
+.fc-composer-errors ul {
+  margin: 0.4rem 0 0 1.1rem;
+  list-style: disc;
+}
+html.theme-dark .fc-composer-errors {
+  background: rgba(248, 113, 113, 0.10);
+  border-color: rgba(248, 113, 113, 0.32);
+  color: #fca5a5;
+}
+
+.fc-composer-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.fc-composer-author {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.fc-composer-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--fc-ink);
+}
+
+.fc-composer-handle {
+  font-size: 0.75rem;
+  color: var(--fc-muted);
+  font-weight: 600;
+}
+
+.fc-composer-title {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--fc-line);
+  background: transparent;
+  padding: 0.4rem 0 0.55rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fc-ink);
+  outline: none;
+  letter-spacing: -0.01em;
+}
+.fc-composer-title::placeholder {
+  color: var(--fc-muted);
+  font-weight: 600;
+}
+.fc-composer-title:focus {
+  border-bottom-color: var(--fc-accent);
+}
+
+.fc-composer-body {
+  width: 100%;
+  min-height: 160px;
+  border: 0 !important;
+  background: transparent !important;
+  font-size: 1.05rem !important;
+  line-height: 1.5 !important;
+  color: var(--fc-ink) !important;
+  outline: none;
+  padding: 0.25rem 0 !important;
+  box-shadow: none !important;
+}
+.fc-composer-body:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.fc-composer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--fc-line);
+}
+
+.fc-composer-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.fc-composer-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--fc-accent);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.fc-composer-icon-btn:hover {
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-2);
+}
+
+.fc-composer-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fc-composer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--fc-soft);
+}
+
+.fc-composer-pill-label {
+  text-transform: uppercase;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  color: var(--fc-muted);
+}
+
+.fc-composer-pill-select {
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--fc-ink);
+  outline: none;
+  padding: 0.1rem 0;
+  appearance: none;
+  cursor: pointer;
+}
+
+.fc-composer-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--fc-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
+.fc-composer-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--fc-accent);
+}
+
+.fc-composer-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.fc-composer-previews:not(.hidden) {
+  display: grid;
+}
+.fc-composer-previews img {
+  width: 100%;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--fc-line);
+}
+
+.fc-composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--fc-line);
+}
+
+/* When composer page renders standalone, give it some breathing room */
+.fc-composer-panel-page .fc-composer-form {
+  padding: 1.4rem 1.5rem 1.25rem;
+}
+
+@media (max-width: 540px) {
+  .fc-composer-dialog {
+    width: 100%;
+    max-width: none;
+    border-radius: 0;
+  }
+  .fc-composer-panel {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+}
