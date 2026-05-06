@@ -21,6 +21,7 @@ class Comment < ApplicationRecord
 
   # Callbacks
   after_save :process_mentions_after_save
+  after_commit :enqueue_ai_moderation_review, on: :create
 
   # Scopes
   scope :root_comments, -> { where(parent_comment_id: nil) }
@@ -63,5 +64,9 @@ class Comment < ApplicationRecord
 
   def process_mentions_after_save
     process_mentions!(user) if user.present?
+  end
+
+  def enqueue_ai_moderation_review
+    AiModerationReviewJob.perform_later(self)
   end
 end

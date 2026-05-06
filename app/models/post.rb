@@ -65,6 +65,8 @@ class Post < ApplicationRecord
   # Callbacks
   before_save :set_published_at, if: -> { status_changed? && published? }
   after_save :process_mentions_after_save
+  after_commit :enqueue_ai_moderation_review, on: :create, if: :published?
+  after_update_commit :enqueue_ai_moderation_review_on_publish
 
   # Instance methods
   def engagement_score
@@ -115,5 +117,15 @@ class Post < ApplicationRecord
 
   def process_mentions_after_save
     process_mentions!(user) if user.present?
+  end
+
+  def enqueue_ai_moderation_review
+    AiModerationReviewJob.perform_later(self)
+  end
+
+  def enqueue_ai_moderation_review_on_publish
+    return unless saved_change_to_status? && published?
+
+    enqueue_ai_moderation_review
   end
 end
