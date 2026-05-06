@@ -858,15 +858,22 @@ html.dark .icon-box {
    ========================================== */
 
 nav.fc-topbar {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-bottom: 1px solid #e5e7eb !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--fc-line) !important;
 }
 
-html.dark nav.fc-topbar {
-  background-color: rgba(17, 24, 39, 0.9) !important;
-  border-bottom-color: #374151 !important;
+html.dark nav.fc-topbar,
+html.theme-dark nav.fc-topbar {
+  background-color: rgba(17, 24, 39, 0.92) !important;
+  border-bottom-color: var(--fc-line) !important;
+}
+
+html.dark .fc-bottom-nav,
+html.theme-dark .fc-bottom-nav {
+  background: var(--fc-surface);
+  border-top-color: var(--fc-line);
 }
 
 /* ==========================================
@@ -10590,4 +10597,9 @@ html.theme-light .google-auth-button {
 .mention-broadcast-icon.is-platform {
   background: linear-gradient(135deg, #d4a85a, #c08e3a);
   color: #1a1300;
+}
+
+/* Tribute dropdown lifted above modal chrome when mounted inside a dialog. */
+dialog .tribute-container {
+  z-index: 10000 !important;
 }

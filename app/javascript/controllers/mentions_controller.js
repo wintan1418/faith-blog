@@ -11,10 +11,17 @@ export default class extends Controller {
   }
 
   initializeTribute() {
+    // If we're inside a <dialog>, the dropdown has to live inside the dialog
+    // too — otherwise it ends up below the modal's top-layer backdrop.
+    const dialog = this.element.closest("dialog")
+    const menuContainer = dialog || document.body
+
     this.tribute = new Tribute({
       allowSpaces: false,
       autocompleteMode: false,
       trigger: "@",
+      menuContainer: menuContainer,
+      positionMenu: true,
       values: (text, cb) => {
         this.fetchUsers(text, cb)
       },
