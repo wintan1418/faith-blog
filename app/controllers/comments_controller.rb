@@ -36,7 +36,7 @@ class CommentsController < ApplicationController
   end
 
   def from_inline_thread?
-    request.headers["Turbo-Frame"].to_s.include?("_thread")
+    request.headers["Turbo-Frame"].to_s.start_with?("thread_")
   end
 
   def reply
