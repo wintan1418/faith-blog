@@ -1,15 +1,27 @@
 <nav class="fc-topbar sticky top-0 z-50">
   <div class="fc-topbar-inner">
     <div class="flex min-w-0 items-center gap-4">
-      <%= link_to root_path, class: "fc-brand flex items-center gap-2" do %>
-        <span class="fc-brand-mark">
-          <% if File.exist?(Rails.root.join("app/assets/images/logo.png")) %>
-            <%= image_tag "logo.png", class: "h-full w-full rounded-lg object-cover", alt: "Faith Community" %>
-          <% else %>
-            <%= render_icon("sparkles", classes: "h-4 w-4") %>
-          <% end %>
+      <%= link_to root_path, class: "brethreign-brand", aria: { label: "Brethreign" } do %>
+        <%# Custom brand mark — soft mint disc with a stylized 'breath' wave %>
+        <span class="brethreign-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="brthGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#059669"/>
+              </linearGradient>
+            </defs>
+            <circle cx="16" cy="16" r="15" fill="url(#brthGrad)"/>
+            <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19"
+                  fill="none" stroke="#042f1d" stroke-width="2.4"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="22" cy="11" r="1.6" fill="#042f1d"/>
+          </svg>
         </span>
-        <span class="hidden text-base font-extrabold sm:inline">Faith Community</span>
+        <span class="brethreign-wordmark">
+          <span class="brethreign-word">brethre<span class="brethreign-accent">i</span>gn</span>
+          <span class="brethreign-tag">come and breathe</span>
+        </span>
       <% end %>
 
       <div class="hidden items-center gap-0.5 md:flex">

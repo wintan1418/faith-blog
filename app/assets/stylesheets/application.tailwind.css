@@ -11458,24 +11458,31 @@ body.fc-discover-open::before {
 }
 .inbox-thread--empty { grid-template-rows: 1fr; }
 
+/* Turbo cable stream sources are zero-content elements but they still
+   participate in grid layout, which pushed the chat header down into
+   row 3. Hide them entirely so the explicit rows go to head /
+   messages / composer as intended. */
+.inbox-thread > turbo-cable-stream-source {
+  display: none !important;
+}
+
 .inbox-thread-head {
   position: sticky;
   top: 0;
   z-index: 5;
   display: flex !important;
   align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  background: rgba(22, 29, 34, 0.85);
-  border-bottom: 1px solid var(--fc-line);
-  backdrop-filter: saturate(160%) blur(14px);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
-  min-height: 64px;
+  gap: 14px;
+  padding: 14px 20px;
+  background: var(--fc-surface) !important;
+  border-bottom: 1px solid var(--fc-line-strong);
+  box-shadow: 0 6px 18px -12px rgba(0, 0, 0, 0.55);
+  min-height: 72px;
   flex-wrap: nowrap;
   border-radius: 0;
 }
 html.theme-light .inbox-thread-head {
-  background: rgba(255, 255, 255, 0.85);
+  background: #ffffff !important;
 }
 
 .inbox-thread-back {
@@ -11719,3 +11726,75 @@ html.theme-light .inbox-thread-head {
   .inbox-list:not(.inbox-list--full) { display: none; }
   .inbox-thread .inbox-thread-back { display: inline-flex; }
 }
+
+/* ============================================================
+   ✦ BRETHREIGN BRAND — custom navbar logo
+   ============================================================ */
+
+.brethreign-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.brethreign-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: transparent;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 14px rgba(16, 185, 129, 0.30));
+  transition: transform 220ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+.brethreign-mark svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.brethreign-brand:hover .brethreign-mark {
+  transform: rotate(-6deg) scale(1.05);
+}
+
+.brethreign-wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brethreign-word {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--fc-ink);
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+.brethreign-accent {
+  color: var(--fc-accent);
+  font-style: italic;
+}
+.brethreign-tag {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+  margin-top: 3px;
+}
+
+/* On the smallest screens the tagline disappears so the bar doesn't
+   feel cramped. */
+@media (max-width: 540px) {
+  .brethreign-tag { display: none; }
+  .brethreign-word { font-size: 1rem; }
+}
+
+/* Hide leftover .fc-brand styles by overriding their layout when present.
+   The brand markup no longer uses .fc-brand-mark, but old templates
+   elsewhere might. */
