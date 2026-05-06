@@ -99,9 +99,9 @@
                 aria-label="<%= post.threaded? ? "Open thread" : "Reply" %>">
           <%= render_icon("message_circle", classes: "h-4 w-4") %>
           <% if post.threaded? %>
-            <span>Open thread<% if post.comments_count.positive? %> · <%= pluralize(post.comments_count, "voice") %><% end %></span>
+            <span data-count="<%= post.comments_count %>">Open thread<% if post.comments_count.positive? %> · <%= pluralize(post.comments_count, "voice") %><% end %></span>
           <% else %>
-            <span>Reply</span>
+            <span data-count="0">Reply</span>
           <% end %>
         </button>
 
