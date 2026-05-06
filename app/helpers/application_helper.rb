@@ -8,6 +8,17 @@ module ApplicationHelper
     title.present? ? "#{title} - #{base_title}" : base_title
   end
 
+  def preview_for(reviewable)
+    case reviewable
+    when Post
+      [ reviewable.title, reviewable.content.to_plain_text ].compact.join(" — ")
+    when Comment
+      reviewable.content.to_plain_text
+    else
+      reviewable.try(:body).to_s
+    end
+  end
+
   def safe_external_url(url)
     uri = URI.parse(url.to_s)
     return url if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)

@@ -1,0 +1,113 @@
+<% content_for(:page_title) { "Moderation Queue" } %>
+
+<div class="mb-6 grid gap-3 sm:grid-cols-3">
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-4">
+    <p class="text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Open</p>
+    <p class="mt-1 text-2xl font-extrabold text-[var(--fc-ink)]"><%= @counts[:pending] + @counts[:flagged] %></p>
+  </div>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-4">
+    <p class="text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">High severity</p>
+    <p class="mt-1 text-2xl font-extrabold text-red-500"><%= @counts[:high] %></p>
+  </div>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-4">
+    <p class="text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Decided (all time)</p>
+    <p class="mt-1 text-2xl font-extrabold text-[var(--fc-ink)]"><%= AiModerationReview.where(status: %i[actioned dismissed]).count %></p>
+  </div>
+</div>
+
+<%
+  filter_link = ->(label, status) {
+    active = (params[:status] || "open") == status
+    link_to label, admin_moderation_reviews_path(status: status),
+      class: "rounded-md px-3 py-1.5 text-sm font-bold #{active ? 'bg-[var(--fc-accent-soft)] text-[var(--fc-accent-2)]' : 'text-[var(--fc-soft)] hover:bg-[var(--fc-surface-2)]'}"
+  }
+%>
+<div class="mb-4 flex flex-wrap items-center gap-2">
+  <%= filter_link.call("Open", "open") %>
+  <%= filter_link.call("Pending", "pending") %>
+  <%= filter_link.call("Flagged", "flagged") %>
+  <%= filter_link.call("Actioned", "actioned") %>
+  <%= filter_link.call("Dismissed", "dismissed") %>
+</div>
+
+<% if @reviews.empty? %>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
+    <p class="text-base font-bold text-[var(--fc-ink)]">Nothing in this view.</p>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">The queue is clear — nice work.</p>
+  </div>
+<% else %>
+  <div class="overflow-hidden rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] shadow-sm">
+    <table class="w-full">
+      <thead class="border-b border-[var(--fc-line)] bg-[var(--fc-surface-2)]">
+        <tr>
+          <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Severity</th>
+          <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Content</th>
+          <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Author</th>
+          <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Categories</th>
+          <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Status</th>
+          <th class="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[var(--fc-line)]">
+        <% @reviews.each do |review| %>
+          <% reviewable = review.reviewable %>
+          <tr class="hover:bg-[var(--fc-surface-2)]">
+            <td class="px-5 py-4">
+              <%
+                tone = case review.severity
+                       when "high"   then "bg-red-100 text-red-700"
+                       when "medium" then "bg-amber-100 text-amber-800"
+                       when "low"    then "bg-yellow-50 text-yellow-700"
+                       else "bg-[var(--fc-surface-3)] text-[var(--fc-soft)]"
+                       end
+              %>
+              <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-extrabold uppercase tracking-wider <%= tone %>">
+                <%= review.severity %>
+              </span>
+              <p class="mt-1 text-xs font-semibold text-[var(--fc-muted)]">score <%= review.score.round(2) %></p>
+            </td>
+            <td class="px-5 py-4">
+              <p class="font-bold text-[var(--fc-ink)]">
+                <%= reviewable.class.name %> #<%= reviewable.id %>
+              </p>
+              <p class="mt-1 line-clamp-2 max-w-md text-sm text-[var(--fc-soft)]">
+                <%= truncate(review.summary.presence || preview_for(reviewable), length: 140) %>
+              </p>
+              <p class="mt-1 text-xs text-[var(--fc-muted)]">
+                <%= time_ago_in_words(review.reviewed_at || review.created_at) %> ago
+              </p>
+            </td>
+            <td class="px-5 py-4 text-sm">
+              <% if review.user %>
+                <p class="font-semibold text-[var(--fc-ink)]"><%= review.user.username %></p>
+                <p class="text-xs text-[var(--fc-muted)]">risk: <%= review.user.risk_profile&.risk_level || "clear" %></p>
+              <% else %>
+                <span class="text-[var(--fc-muted)]">—</span>
+              <% end %>
+            </td>
+            <td class="px-5 py-4">
+              <div class="flex flex-wrap gap-1">
+                <% review.categories.first(3).each do |cat| %>
+                  <span class="rounded bg-[var(--fc-surface-3)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--fc-soft)]"><%= cat.tr("_", " ") %></span>
+                <% end %>
+                <% if review.categories.size > 3 %>
+                  <span class="text-[10px] font-bold text-[var(--fc-muted)]">+<%= review.categories.size - 3 %></span>
+                <% end %>
+              </div>
+            </td>
+            <td class="px-5 py-4">
+              <span class="inline-flex rounded-md bg-[var(--fc-surface-3)] px-2 py-1 text-xs font-bold text-[var(--fc-soft)]"><%= review.status.humanize %></span>
+            </td>
+            <td class="px-5 py-4 text-right">
+              <%= link_to "Review", admin_moderation_review_path(review), class: "btn btn-secondary btn-sm" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @pagy.pages > 1 %>
+    <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+  <% end %>
+<% end %>

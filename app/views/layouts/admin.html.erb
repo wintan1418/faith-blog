@@ -38,13 +38,15 @@
     </script>
 
     <% pending_count = Report.pending.count %>
+    <% queue_count = AiModerationReview.where(status: %i[pending flagged]).count %>
     <% admin_nav_items = [
       ["Dashboard", admin_root_path, "home", current_page?(admin_root_path)],
       ["Users", admin_users_path, "users", request.path.include?("/admin/users")],
       ["Posts", admin_posts_path, "filetext", request.path.include?("/admin/posts")],
       ["Rooms", admin_rooms_path, "message_circle", request.path.include?("/admin/rooms")],
       ["Resources", admin_resources_path, "bookopen", request.path.include?("/admin/resources")],
-      ["Reports", admin_reports_path, "shield", request.path.include?("/admin/reports")]
+      ["Reports", admin_reports_path, "shield", request.path.include?("/admin/reports")],
+      ["Moderation", admin_moderation_reviews_path, "sparkles", request.path.include?("/admin/moderation_reviews")]
     ] %>
 
     <div class="fc-app fc-admin min-h-full">
@@ -65,6 +67,8 @@
                 <span class="min-w-0 flex-1"><%= label %></span>
                 <% if label == "Reports" && pending_count.positive? %>
                   <span class="admin-count"><%= pending_count %></span>
+                <% elsif label == "Moderation" && queue_count.positive? %>
+                  <span class="admin-count"><%= queue_count %></span>
                 <% end %>
               <% end %>
             <% end %>

@@ -155,6 +155,11 @@ Rails.application.routes.draw do
       end
     end
     resources :moderation_logs, only: [ :index, :show ]
+    resources :moderation_reviews, only: [ :index, :show ] do
+      member do
+        post :decide
+      end
+    end
   end
 
   # Health check
