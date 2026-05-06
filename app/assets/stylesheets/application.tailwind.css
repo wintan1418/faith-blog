@@ -8889,40 +8889,35 @@ form.inline {
    ============================================================ */
 
 :root {
-  --post-bg:           #0b1117;
-  --post-bg-elevated:  #131b23;
-  --post-ink:          #f4ede0;
-  --post-ink-80:       #d8d0c2;
-  --post-ink-60:       #97917f;
-  --post-line:         rgba(244, 237, 224, 0.08);
-  --post-line-strong:  rgba(244, 237, 224, 0.15);
-
-  --post-sage:         #3ecf8e;
-  --post-sage-600:     #2fb377;
-  --post-sage-soft:    rgba(62, 207, 142, 0.12);
-  --post-sage-line:    rgba(62, 207, 142, 0.22);
-
-  --post-gold:         #d4a85a;
-  --post-gold-soft:    rgba(212, 168, 90, 0.10);
-
-  --post-heart:        #ff6b8a;
-
+  /* Editorial typography stays unique. */
   --post-serif: 'Fraunces', Georgia, 'Source Serif Pro', serif;
   --post-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Source Sans 3', sans-serif;
 
   --post-radius-sm: 8px;
   --post-radius:    14px;
   --post-radius-lg: 20px;
-}
 
-html.theme-light {
+  /* Color tokens map to the app palette so the post page sits inside the
+     same world as the rest of the app, not a different one. */
   --post-bg:           var(--fc-bg);
   --post-bg-elevated:  var(--fc-surface);
+  --post-bg-soft:      var(--fc-surface-2);
   --post-ink:          var(--fc-ink);
   --post-ink-80:       var(--fc-soft);
   --post-ink-60:       var(--fc-muted);
-  --post-line:         var(--fc-line);
+  --post-line:         var(--fc-line-strong);
   --post-line-strong:  var(--fc-line-strong);
+
+  /* Editorial accents — sage matches the app's mint, gold for scripture. */
+  --post-sage:         var(--fc-accent);
+  --post-sage-600:     var(--fc-accent-2);
+  --post-sage-soft:    var(--fc-accent-soft);
+  --post-sage-line:    rgba(52, 211, 153, 0.32);
+
+  --post-gold:         #d4a85a;
+  --post-gold-soft:    rgba(212, 168, 90, 0.12);
+
+  --post-heart:        #ff6b8a;
 }
 
 .post-page-shell {
@@ -8968,6 +8963,7 @@ html.theme-light {
   border: 1px solid var(--post-line);
   border-radius: var(--post-radius);
   padding: 16px 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 .post-back-link {
   display: inline-flex;
@@ -9011,9 +9007,12 @@ html.theme-light {
   border-left-color: var(--post-sage);
 }
 .post-toc-empty {
-  padding-left: 14px;
+  padding: 8px 0 8px 14px;
   font-size: 12.5px;
   color: var(--post-ink-60);
+  font-style: italic;
+  font-weight: 500;
+  border-left: 2px solid transparent;
 }
 
 .post-stats-list {
