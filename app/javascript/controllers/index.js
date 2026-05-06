@@ -33,3 +33,6 @@ application.register("typing", TypingController)
 
 import ComposerModalController from "./composer_modal_controller"
 application.register("composer-modal", ComposerModalController)
+
+import ShareController from "./share_controller"
+application.register("share", ShareController)

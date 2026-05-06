@@ -105,6 +105,23 @@ class Post < ApplicationRecord
     images.attached? && images.any?
   end
 
+  def held_for_review?
+    review = ai_moderation_review
+    return false unless review
+    return false unless review.severity == "high"
+
+    !%w[dismissed cleared].include?(review.status)
+  end
+
+  def visible_to?(viewer)
+    return true unless held_for_review?
+    return false unless viewer
+
+    viewer == user ||
+      (viewer.respond_to?(:admin?) && (viewer.admin? || viewer.super_admin?)) ||
+      (viewer.respond_to?(:moderator?) && viewer.moderator?)
+  end
+
   private
 
   def set_published_at

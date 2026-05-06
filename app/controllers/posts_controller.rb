@@ -5,6 +5,7 @@ class PostsController < ApplicationController
   before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature ]
   before_action :authorize_post!, only: [ :edit, :update, :destroy ]
   before_action :authorize_feature!, only: [ :feature, :unfeature ]
+  before_action :enforce_rate_limit!, only: [ :create ]
 
   def index
     @pagy, @posts = pagy(
@@ -100,5 +101,22 @@ class PostsController < ApplicationController
     unless current_user.admin_or_moderator?
       redirect_to @post, alert: "You're not authorized to perform this action."
     end
+  end
+
+  # New accounts that have been flagged once or more get rate-limited:
+  # at most 3 breaths per hour for the first 24 hours.
+  def enforce_rate_limit!
+    profile = current_user.risk_profile
+    return unless profile
+
+    fresh_account = current_user.created_at && current_user.created_at > 24.hours.ago
+    risky = profile.respond_to?(:at_least?) && profile.at_least?(:watch)
+
+    return unless fresh_account && risky
+
+    recent_count = current_user.posts.where("created_at > ?", 1.hour.ago).count
+    return if recent_count < 3
+
+    redirect_to feed_path, alert: "Slow down — new accounts are limited to 3 breaths an hour. Try again in a bit."
   end
 end

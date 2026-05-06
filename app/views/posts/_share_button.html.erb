@@ -1,0 +1,33 @@
+<%# Share menu trigger for a single breath. Local: post %>
+<%
+  snippet = truncate(post.content.to_plain_text.to_s.strip, length: 180, separator: " ")
+  author  = post.anonymous? ? "anonymous" : post.user.username
+  cover   = post.has_images? ? url_for(post.images.first) : ""
+%>
+<div class="fc-share" data-controller="share"
+     data-share-url-value="<%= post_url(post) %>"
+     data-share-title-value="<%= post.title %>"
+     data-share-author-value="<%= author %>"
+     data-share-snippet-value="<%= snippet %>"
+     data-share-image-value="<%= cover %>">
+  <button type="button"
+          class="fc-action"
+          data-action="click->share#toggle"
+          aria-label="Share this breath"
+          title="Share">
+    <%= render_icon("send", classes: "h-4 w-4") %>
+  </button>
+
+  <div data-share-target="menu" class="fc-share-menu hidden" role="menu">
+    <button type="button" data-action="click->share#copyLink" role="menuitem">Copy link</button>
+    <button type="button" data-action="click->share#whatsapp" role="menuitem">Send to WhatsApp</button>
+    <button type="button" data-action="click->share#twitter"  role="menuitem">Share on X</button>
+    <button type="button" data-action="click->share#email"    role="menuitem">Email</button>
+    <hr class="fc-share-divider">
+    <button type="button" data-action="click->share#snapshot" role="menuitem" class="fc-share-snap">
+      Save snapshot for status
+    </button>
+  </div>
+
+  <div data-share-target="toast" class="fc-share-toast hidden"></div>
+</div>

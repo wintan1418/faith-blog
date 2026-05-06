@@ -1,4 +1,18 @@
-<article class="fc-card" id="<%= dom_id(post) %>">
+<% if post.held_for_review? && !post.visible_to?(current_user) %>
+  <article class="fc-card fc-card-held" id="<%= dom_id(post) %>">
+    <div class="fc-held-placeholder">
+      <%= render_icon("shield", classes: "h-5 w-5") %>
+      <p>This breath is held for moderator review.</p>
+    </div>
+  </article>
+<% else %>
+<article class="fc-card<%= ' fc-card-held-author' if post.held_for_review? %>" id="<%= dom_id(post) %>">
+  <% if post.held_for_review? && current_user == post.user %>
+    <div class="fc-held-banner">
+      <%= render_icon("shield", classes: "h-4 w-4") %>
+      <span>Held for moderator review — only you and moderators can see this right now.</span>
+    </div>
+  <% end %>
   <header class="fc-card-header-strip">
     <div class="flex min-w-0 items-center gap-2">
       <% if post.anonymous? %>
@@ -73,6 +87,7 @@
         <%= render "posts/impressions", post: post %>
 
         <%= render "reshares/button", post: post %>
+        <%= render "posts/share_button", post: post %>
       </div>
 
       <% if user_signed_in? %>
@@ -86,3 +101,4 @@
     </footer>
   </div>
 </article>
+<% end %>

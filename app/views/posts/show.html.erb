@@ -11,6 +11,20 @@
 
 <div class="mystic-shell py-8">
   <div class="mystic-container max-w-4xl">
+    <% if @post.held_for_review? && !@post.visible_to?(current_user) %>
+      <article class="fc-card fc-card-held">
+        <div class="fc-held-placeholder">
+          <%= render_icon("shield", classes: "h-5 w-5") %>
+          <p>This breath is held for moderator review.</p>
+        </div>
+      </article>
+    <% else %>
+    <% if @post.held_for_review? && current_user == @post.user %>
+      <div class="fc-held-banner mb-4">
+        <%= render_icon("shield", classes: "h-4 w-4") %>
+        <span>Held for moderator review — only you and moderators can see this right now.</span>
+      </div>
+    <% end %>
     <article class="mystic-panel-strong overflow-hidden">
       <header class="border-b border-faith-green/10 p-6 sm:p-8">
         <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -197,5 +211,6 @@
         <% end %>
       </div>
     </section>
+    <% end %>
   </div>
 </div>
