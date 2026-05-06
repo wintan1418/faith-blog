@@ -111,11 +111,18 @@ module Mentionable
   end
 
   # @all — super_admin only — notify every active platform user.
-  # Cached cap: 1 platform-wide broadcast per super_admin per 24 hours.
+  # Soft cap of 1 platform-wide broadcast per super_admin per 24 hours,
+  # enforced via Rails.cache when available; if the cache backend isn't
+  # set up (e.g., solid_cache table missing), we skip the cap rather
+  # than crash the post creation.
   def fanout_platform_mention!(actor)
     cache_key = "platform_mention:#{actor.id}"
-    return if Rails.cache.exist?(cache_key)
-    Rails.cache.write(cache_key, true, expires_in: 24.hours)
+    begin
+      return if Rails.cache.exist?(cache_key)
+      Rails.cache.write(cache_key, true, expires_in: 24.hours)
+    rescue StandardError => e
+      Rails.logger.warn("[mentions] platform broadcast cache unavailable: #{e.message}")
+    end
 
     scope = User.respond_to?(:active) ? User.active : User.all
     target_user_ids = scope.where.not(id: actor.id).pluck(:id)
