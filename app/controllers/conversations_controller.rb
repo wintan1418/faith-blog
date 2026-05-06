@@ -61,6 +61,7 @@ class ConversationsController < ApplicationController
                 .joins(:conversation_participants)
                 .where(conversation_participants: { user_id: current_user.id, archived_at: nil })
                 .includes(conversation_participants: { user: { profile: { avatar_attachment: :blob } } })
+                .distinct
                 .recent
   end
 end

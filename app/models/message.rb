@@ -43,6 +43,10 @@ class Message < ApplicationRecord
 
   def broadcast_to_participants
     conversation.conversation_participants.find_each do |participant|
+      # Sender already saw the message echoed back through the
+      # create.turbo_stream response — skip them to avoid duplicates.
+      next if participant.user_id == sender_id
+
       broadcast_append_later_to(
         [ conversation, participant.user_id, :messages ],
         target: "messages",

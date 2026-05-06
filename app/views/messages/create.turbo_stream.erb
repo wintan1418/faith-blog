@@ -1,3 +1,10 @@
+<%# Append the freshly-saved message to the sender's thread immediately
+    and reset the composer. Other participants receive the message via
+    Action Cable broadcasts (Message#broadcast_to_participants). %>
+<%= turbo_stream.append "messages" do %>
+  <%= render "conversations/message", message: @message, viewer_id: current_user.id %>
+<% end %>
+
 <%= turbo_stream.replace "new_message" do %>
   <%= render "conversations/composer", conversation: @conversation, message: Message.new %>
 <% end %>
