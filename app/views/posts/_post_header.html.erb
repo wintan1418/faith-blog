@@ -1,0 +1,65 @@
+<header class="post-header">
+  <div class="post-author-row">
+    <% if post.anonymous? %>
+      <span class="post-author-avatar"><%= render_icon("users", classes: "h-5 w-5") %></span>
+      <div class="post-author-meta">
+        <p class="post-author-name">Anonymous</p>
+      </div>
+    <% else %>
+      <% if post.user.profile&.avatar&.attached? %>
+        <%= link_to user_path(post.user.username), class: "post-author-avatar" do %>
+          <%= image_tag post.user.profile.avatar, class: "object-cover", alt: post.user.username %>
+        <% end %>
+      <% else %>
+        <%= link_to user_path(post.user.username), class: "post-author-avatar" do %>
+          <%= post.user.username.first.upcase %>
+        <% end %>
+      <% end %>
+      <div class="post-author-meta">
+        <p class="post-author-name">
+          <%= link_to post.user.username, user_path(post.user.username) %>
+          <% if post.user.respond_to?(:verified?) && post.user.verified? %>
+            <span class="post-author-check" title="Verified">✓</span>
+          <% end %>
+        </p>
+        <p class="post-author-handle">
+          @<%= post.user.username %>
+          <span class="post-meta-dot">·</span>
+          <%= (post.published_at || post.created_at).strftime("%B %-d, %Y") %>
+        </p>
+      </div>
+      <% if user_signed_in? && post.user != current_user %>
+        <% if current_user.following?(post.user) %>
+          <%= button_to "Following", unfollow_user_path(post.user.username), method: :delete, form_class: "inline", class: "post-follow-pill is-following" %>
+        <% else %>
+          <%= button_to "+ Follow", follow_user_path(post.user.username), form_class: "inline", class: "post-follow-pill" %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="post-tag-row">
+    <% if post.room %>
+      <%= link_to room_path(post.room), class: "post-room-pill" do %>
+        <span class="post-room-dot"></span><%= post.room.name %>
+      <% end %>
+    <% end %>
+    <% if post.respond_to?(:reading_time) && post.reading_time.to_i.positive? %>
+      <span class="post-meta-dot">·</span>
+      <span class="post-meta-text"><%= post.reading_time %> min read</span>
+    <% end %>
+    <% if post.featured? %>
+      <span class="post-featured-pill">★ Featured</span>
+    <% end %>
+  </div>
+
+  <h1 class="post-title"><%= post.title %></h1>
+
+  <% if post.tags.any? %>
+    <div class="post-hashtags">
+      <% post.tags.each do |tag| %>
+        <%= link_to "##{tag.name}", search_path(q: tag.name, type: "posts"), class: "post-hashtag" %>
+      <% end %>
+    </div>
+  <% end %>
+</header>

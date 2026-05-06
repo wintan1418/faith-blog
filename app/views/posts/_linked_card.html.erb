@@ -1,0 +1,10 @@
+<%= link_to post_path(linked), class: "post-linked-card" do %>
+  <div class="post-linked-thumb">
+    <%= render_icon("bookopen", classes: "h-5 w-5") %>
+  </div>
+  <div class="post-linked-meta">
+    <p class="post-linked-title"><%= truncate(linked.title, length: 80) %></p>
+    <p class="post-linked-by">by <%= linked.anonymous? ? "Anonymous" : linked.user.username %><% if linked.respond_to?(:reading_time) && linked.reading_time.to_i.positive? %> · <%= linked.reading_time %> min<% end %></p>
+  </div>
+  <span class="post-linked-arrow">→</span>
+<% end %>

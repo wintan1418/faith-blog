@@ -9,197 +9,137 @@
   <% content_for(:og_image) { url_for(@post.images.first) } %>
 <% end %>
 
-<div class="fc-article-shell">
-  <div class="fc-article-wrap">
-    <% if @post.held_for_review? && !@post.visible_to?(current_user) %>
-      <article class="fc-card fc-card-held">
-        <div class="fc-held-placeholder">
-          <%= render_icon("shield", classes: "h-5 w-5") %>
-          <p>This breath is held for moderator review.</p>
-        </div>
-      </article>
-    <% else %>
-      <% if @post.held_for_review? && current_user == @post.user %>
-        <div class="fc-held-banner mb-4">
-          <%= render_icon("shield", classes: "h-4 w-4") %>
-          <span>Held for moderator review — only you and moderators can see this right now.</span>
-        </div>
-      <% end %>
-
-      <article class="fc-article">
-        <header class="fc-article-head">
-          <div class="fc-article-author">
-            <% if @post.anonymous? %>
-              <span class="fc-avatar"><%= render_icon("users", classes: "h-5 w-5") %></span>
-            <% elsif @post.user.profile&.avatar&.attached? %>
-              <%= link_to user_path(@post.user.username) do %>
-                <%= image_tag @post.user.profile.avatar, class: "fc-avatar object-cover", alt: @post.user.username %>
-              <% end %>
-            <% else %>
-              <%= link_to user_path(@post.user.username), class: "fc-avatar" do %>
-                <%= @post.user.username.first.upcase %>
-              <% end %>
-            <% end %>
-            <div class="min-w-0">
-              <% if @post.anonymous? %>
-                <p class="fc-breath-name">Anonymous</p>
-              <% else %>
-                <%= link_to @post.user.username, user_path(@post.user.username), class: "fc-breath-name block" %>
-                <p class="fc-breath-handle">@<%= @post.user.username %></p>
-              <% end %>
-            </div>
+<% if @post.held_for_review? && !@post.visible_to?(current_user) %>
+  <div class="post-page-shell">
+    <div class="post-page-grid">
+      <div class="post-page-main">
+        <article class="fc-card fc-card-held">
+          <div class="fc-held-placeholder">
+            <%= render_icon("shield", classes: "h-5 w-5") %>
+            <p>This breath is held for moderator review.</p>
           </div>
-          <div class="fc-article-author-actions">
-            <% if user_signed_in? && @post.user != current_user && !@post.anonymous? %>
-              <% if current_user.following?(@post.user) %>
-                <%= button_to "Following", unfollow_user_path(@post.user.username), method: :delete, form_class: "inline", class: "fc-btn" %>
-              <% else %>
-                <%= button_to "Follow", follow_user_path(@post.user.username), form_class: "inline", class: "fc-btn fc-btn-primary" %>
-              <% end %>
-            <% end %>
-            <% if user_signed_in? && (@post.user == current_user || current_user_admin?) %>
-              <%= link_to edit_post_path(@post), class: "fc-icon-btn", title: "Edit breath" do %>
-                <%= render_icon("pencil", classes: "h-4 w-4") %>
-              <% end %>
-            <% end %>
-          </div>
-        </header>
+        </article>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="post-page-shell">
+    <div class="post-page-grid">
+      <aside class="post-left-rail">
+        <%= render "posts/left_rail", post: @post %>
+      </aside>
 
-        <div class="fc-article-meta">
-          <%= link_to @post.room.name, room_path(@post.room), class: "fc-badge" %>
-          <span class="fc-article-meta-dot">·</span>
-          <time datetime="<%= @post.published_at&.iso8601 %>">
-            <%= (@post.published_at || @post.created_at).strftime("%B %-d, %Y") %>
-          </time>
-          <% if @post.respond_to?(:reading_time) && @post.reading_time.to_i.positive? %>
-            <span class="fc-article-meta-dot">·</span>
-            <span><%= @post.reading_time %> min read</span>
-          <% end %>
-          <% if @post.featured? %>
-            <span class="fc-featured-tag ml-2">★ Featured</span>
-          <% end %>
-        </div>
-
-        <h1 class="fc-article-title"><%= @post.title %></h1>
-
-        <% if @post.tags.any? %>
-          <div class="fc-article-tags">
-            <% @post.tags.each do |tag| %>
-              <%= link_to "##{tag.name}", search_path(q: tag.name, type: "posts"), class: "fc-breath-tag" %>
-            <% end %>
+      <main class="post-page-main">
+        <% if @post.held_for_review? && current_user == @post.user %>
+          <div class="fc-held-banner mb-4">
+            <%= render_icon("shield", classes: "h-4 w-4") %>
+            <span>Held for moderator review — only you and moderators can see this right now.</span>
           </div>
         <% end %>
 
-        <% if @post.has_images? %>
-          <div class="fc-article-media">
-            <% @post.images.each do |image| %>
-              <figure class="fc-article-figure">
-                <%= image_tag image, alt: @post.title %>
-              </figure>
-            <% end %>
+        <article class="post-card" data-controller="toc"
+                 data-toc-active-class="is-active">
+          <%= render "posts/post_header", post: @post %>
+
+          <% if @post.has_images? %>
+            <figure class="post-hero">
+              <%= image_tag @post.images.first, alt: @post.title %>
+            </figure>
+          <% end %>
+
+          <div class="post-body" data-toc-target="body">
+            <%= render_with_mentions(@post.content) %>
           </div>
-        <% end %>
 
-        <div class="fc-article-body">
-          <%= render_with_mentions(@post.content) %>
-        </div>
-
-        <% if @post.mentioned_users.any? %>
-          <div class="fc-article-mentioned">
-            <p class="fc-section-label">Mentioned</p>
-            <div class="flex flex-wrap gap-2">
-              <% @post.mentioned_users.each do |user| %>
-                <%= link_to user_path(user.username), class: "fc-badge inline-flex items-center gap-1.5" do %>
-                  <% if user.profile&.avatar&.attached? %>
-                    <%= image_tag user.profile.avatar, class: "h-4 w-4 rounded-full object-cover" %>
-                  <% end %>
-                  @<%= user.username %>
+          <% if @post.linked_posts.any? || @post.linking_posts.any? %>
+            <div class="post-linked">
+              <% if @post.linked_posts.any? %>
+                <p class="post-section-label">Related</p>
+                <% @post.linked_posts.each do |linked| %>
+                  <%= render "posts/linked_card", linked: linked %>
+                <% end %>
+              <% end %>
+              <% if @post.linking_posts.any? %>
+                <p class="post-section-label">Linked here</p>
+                <% @post.linking_posts.each do |linking| %>
+                  <%= render "posts/linked_card", linked: linking %>
                 <% end %>
               <% end %>
             </div>
-          </div>
-        <% end %>
-
-        <% if @post.linked_posts.any? || @post.linking_posts.any? %>
-          <div class="fc-article-related">
-            <% if @post.linked_posts.any? %>
-              <div>
-                <p class="fc-section-label">Related</p>
-                <div class="space-y-2">
-                  <% @post.linked_posts.each do |linked| %>
-                    <%= link_to post_path(linked), class: "fc-article-related-card" do %>
-                      <p class="fc-article-related-title"><%= linked.title %></p>
-                      <p class="fc-article-related-by">by <%= linked.user.username %></p>
-                    <% end %>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-            <% if @post.linking_posts.any? %>
-              <div>
-                <p class="fc-section-label">Linked here</p>
-                <div class="space-y-2">
-                  <% @post.linking_posts.each do |linking| %>
-                    <%= link_to post_path(linking), class: "fc-article-related-card" do %>
-                      <p class="fc-article-related-title"><%= linking.title %></p>
-                      <p class="fc-article-related-by">by <%= linking.user.username %></p>
-                    <% end %>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-
-        <footer class="fc-article-actions">
-          <div class="flex flex-wrap items-center gap-2">
-            <%= render "posts/reactions", post: @post %>
-            <%= render "posts/comment_count", post: @post %>
-            <%= render "posts/impressions", post: @post %>
-            <%= render "reshares/button", post: @post %>
-            <%= render "posts/share_button", post: @post %>
-          </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <%= render "posts/bookmark_button", post: @post %>
-            <% if user_signed_in? && current_user.admin_or_moderator? %>
-              <% if @post.featured? %>
-                <%= button_to "Unfeature", unfeature_post_path(@post), form_class: "inline", class: "fc-btn" %>
-              <% else %>
-                <%= button_to "Feature", feature_post_path(@post), form_class: "inline", class: "fc-btn" %>
-              <% end %>
-            <% end %>
-            <% if user_signed_in? && @post.user != current_user %>
-              <%= render "reports/button", reportable: @post, label: "Report" %>
-            <% end %>
-          </div>
-        </footer>
-      </article>
-
-      <section id="comments" class="fc-article-comments">
-        <header class="fc-article-comments-head">
-          <%= render "comments/count", post: @post %>
-        </header>
-        <% if @post.allow_comments? %>
-          <% if user_signed_in? %>
-            <div class="fc-article-comments-form">
-              <%= render "comments/form", post: @post, comment: @new_comment %>
-            </div>
-          <% else %>
-            <div class="fc-article-comments-empty">
-              <p>
-                <%= link_to "Sign in", new_user_session_path, class: "font-bold text-[var(--fc-accent-2)] hover:text-[var(--fc-ink)]" %>
-                to join the conversation.
-              </p>
-            </div>
           <% end %>
 
-          <%= render "comments/list", post: @post %>
-        <% else %>
-          <div class="fc-article-comments-empty">
-            <p>Comments are disabled for this breath.</p>
-          </div>
-        <% end %>
-      </section>
-    <% end %>
+          <%= render "posts/reactions_bar", post: @post %>
+        </article>
+
+        <section id="comments" class="post-conversation">
+          <header class="post-conversation-head">
+            <div>
+              <h2>The Conversation</h2>
+              <p><%= pluralize(@post.comments_count, "voice") %></p>
+            </div>
+          </header>
+
+          <% if @post.allow_comments? %>
+            <% if user_signed_in? %>
+              <div class="post-conversation-composer" data-controller="composer">
+                <%= form_with model: [@post, @new_comment], id: "comment_form", class: "composer-form" do |f| %>
+                  <% if current_user.profile&.avatar&.attached? %>
+                    <%= image_tag current_user.profile.avatar, class: "composer-avatar object-cover" %>
+                  <% else %>
+                    <span class="composer-avatar"><%= current_user.username.first.upcase %></span>
+                  <% end %>
+                  <div class="composer-body">
+                    <div class="composer-collapsed" data-composer-target="collapsed" data-action="click->composer#expand">
+                      Share encouragement, wisdom, or a prayer…
+                    </div>
+                    <div class="composer-expanded hidden" data-composer-target="expanded">
+                      <div data-controller="emoji-picker">
+                        <%= f.rich_text_area :content,
+                            class: "composer-input",
+                            placeholder: "Share encouragement, wisdom, or a prayer…",
+                            data: { controller: "mentions", emoji_picker_target: "editor" } %>
+                        <div class="composer-toolbar">
+                          <button type="button"
+                                  data-emoji-picker-target="button"
+                                  data-action="click->emoji-picker#toggle"
+                                  class="composer-tool"
+                                  title="Add emoji">
+                            <%= render_icon("smile", classes: "h-4 w-4") %>
+                          </button>
+                          <div class="composer-spacer"></div>
+                          <button type="button"
+                                  data-action="click->composer#collapse"
+                                  class="fc-btn">Cancel</button>
+                          <%= f.submit "Post", class: "fc-btn fc-btn-primary" %>
+                        </div>
+                        <div class="relative">
+                          <div data-emoji-picker-target="picker" class="hidden absolute right-0 z-50 mt-2">
+                            <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="post-conversation-empty">
+                <p><%= link_to "Sign in", new_user_session_path %> to join the conversation.</p>
+              </div>
+            <% end %>
+
+            <%= render "comments/list", post: @post %>
+          <% else %>
+            <div class="post-conversation-empty">
+              <p>Comments are disabled for this breath.</p>
+            </div>
+          <% end %>
+        </section>
+      </main>
+
+      <aside class="post-right-rail">
+        <%= render "posts/right_rail", post: @post %>
+      </aside>
+    </div>
   </div>
-</div>
+<% end %>

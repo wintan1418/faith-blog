@@ -1,0 +1,63 @@
+<% unless post.anonymous? %>
+  <div class="post-rail-card post-author-card">
+    <% if post.user.profile&.avatar&.attached? %>
+      <%= image_tag post.user.profile.avatar, class: "post-author-card-avatar object-cover" %>
+    <% else %>
+      <span class="post-author-card-avatar"><%= post.user.username.first.upcase %></span>
+    <% end %>
+    <div>
+      <p class="post-author-card-name">
+        <%= link_to post.user.username, user_path(post.user.username) %>
+      </p>
+      <p class="post-author-card-handle">@<%= post.user.username %></p>
+    </div>
+    <% if post.user.profile&.bio.to_s.strip.present? %>
+      <p class="post-author-card-bio"><%= truncate(post.user.profile.bio, length: 140) %></p>
+    <% end %>
+    <div class="post-author-card-stats">
+      <div>
+        <p><%= post.user.followers_count %></p>
+        <span>Followers</span>
+      </div>
+      <div>
+        <p><%= post.user.posts.published.count %></p>
+        <span>Breaths</span>
+      </div>
+    </div>
+    <% if user_signed_in? && post.user != current_user %>
+      <% if current_user.following?(post.user) %>
+        <%= button_to "Following", unfollow_user_path(post.user.username), method: :delete, form_class: "inline", class: "post-rail-cta is-following" %>
+      <% else %>
+        <%= button_to "+ Follow", follow_user_path(post.user.username), form_class: "inline", class: "post-rail-cta" %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="post-rail-card post-verse-card">
+  <p class="post-rail-label">Today's verse</p>
+  <p class="post-verse-quote">"He gives strength to the weary, and increases the power of the weak."</p>
+  <p class="post-verse-cite">Isaiah 40:29</p>
+</div>
+
+<%
+  more_from_author = post.user.posts.published
+                          .where.not(id: post.id)
+                          .recent
+                          .limit(3)
+%>
+<% if !post.anonymous? && more_from_author.any? %>
+  <div class="post-rail-card post-related-card">
+    <p class="post-rail-label">More from <%= post.user.username %></p>
+    <ul class="post-related-list">
+      <% more_from_author.each do |other| %>
+        <li>
+          <%= link_to post_path(other), class: "post-related-link" do %>
+            <p class="post-related-title"><%= truncate(other.title, length: 60) %></p>
+            <p class="post-related-meta"><%= time_ago_in_words(other.published_at || other.created_at) %> ago · <%= other.likes_count %> reactions</p>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

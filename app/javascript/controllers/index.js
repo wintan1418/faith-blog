@@ -42,3 +42,9 @@ application.register("thread-toggle", ThreadToggleController)
 
 import EmojiReactionsController from "./emoji_reactions_controller"
 application.register("emoji-reactions", EmojiReactionsController)
+
+import ComposerController from "./composer_controller"
+application.register("composer", ComposerController)
+
+import TocController from "./toc_controller"
+application.register("toc", TocController)
