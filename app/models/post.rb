@@ -27,7 +27,7 @@ class Post < ApplicationRecord
 
   # Associations
   belongs_to :user
-  belongs_to :room, counter_cache: :posts_count
+  belongs_to :room, counter_cache: :posts_count, optional: true
   has_many :comments, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
   has_many :bookmarks, dependent: :destroy

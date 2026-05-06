@@ -18,12 +18,12 @@
   <% end %>
 
   <div>
-    <%= f.label :room_id, "Select a Room", class: "label" %>
-    <%= f.select :room_id, 
+    <%= f.label :room_id, "Room (optional)", class: "label" %>
+    <%= f.select :room_id,
         rooms.map { |r| ["#{r.icon} #{r.name}", r.id] },
-        { prompt: "Choose a room..." },
+        { include_blank: "None — just breathe" },
         class: "input" %>
-    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Choose the most appropriate room for your post.</p>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Pick a room if it fits, or leave blank to breathe to the open feed.</p>
   </div>
 
   <div>

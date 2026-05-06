@@ -101,9 +101,8 @@
           <span class="fc-composer-pill-label">Room</span>
           <%= f.select :room_id,
               rooms.map { |r| ["#{r.icon ? "#{r.icon} " : ""}#{r.name}", r.id] },
-              { prompt: "Choose..." },
-              class: "fc-composer-pill-select",
-              required: true %>
+              { include_blank: "None — just breathe" },
+              class: "fc-composer-pill-select" %>
         </label>
 
         <label class="fc-composer-toggle">
