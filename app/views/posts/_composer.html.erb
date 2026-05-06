@@ -20,20 +20,20 @@
     <% end %>
     <div class="fc-composer-author">
       <p class="fc-composer-name"><%= current_user.username %></p>
-      <p class="fc-composer-handle">posting to the community</p>
+      <p class="fc-composer-handle">breathing into the community</p>
     </div>
   </div>
 
   <%= f.text_field :title,
       class: "fc-composer-title",
-      placeholder: "Give it a short title",
+      placeholder: "Title — what is this breath about?",
       maxlength: 200,
       required: true %>
 
   <div data-controller="emoji-picker">
     <%= f.rich_text_area :content,
         class: "fc-composer-body",
-        placeholder: "What's on your heart?",
+        placeholder: "What's on your heart? Breathe it out...",
         data: {
           emoji_picker_target: "editor",
           controller: "mentions"
@@ -89,6 +89,6 @@
   <div class="fc-composer-footer">
     <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
     <%= f.hidden_field :status, value: "published" %>
-    <%= f.submit post.persisted? ? "Update" : "Post", class: "fc-btn fc-btn-primary" %>
+    <%= f.submit post.persisted? ? "Update" : "Breathe", class: "fc-btn fc-btn-primary" %>
   </div>
 <% end %>

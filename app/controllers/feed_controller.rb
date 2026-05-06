@@ -45,5 +45,21 @@ class FeedController < ApplicationController
 
     @open_prayer_requests_count = prayer_posts.count
     @open_prayer_requests = prayer_posts.limit(3)
+
+    @trending_breaths = Post.published
+                            .where("published_at > ?", 7.days.ago)
+                            .includes(:user, :room)
+                            .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
+                            .limit(4)
+
+    following_ids = current_user.following.pluck(:id) << current_user.id
+    active_author_ids = Post.published
+                            .where("published_at > ?", 30.days.ago)
+                            .where.not(user_id: following_ids)
+                            .group(:user_id)
+                            .order(Arel.sql("COUNT(*) DESC"))
+                            .limit(3)
+                            .pluck(:user_id)
+    @who_to_brethren = User.where(id: active_author_ids).includes(:profile)
   end
 end

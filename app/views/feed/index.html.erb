@@ -68,12 +68,12 @@
         <button type="button"
                 class="fc-composer-input flex items-center text-[var(--fc-muted)]"
                 data-action="click->composer-modal#open">
-          Share an encouragement, request, or question...
+          What's on your heart? Take a breath...
         </button>
         <button type="button"
                 class="fc-btn fc-btn-primary"
                 data-action="click->composer-modal#open">
-          Post
+          Breathe
         </button>
       </div>
 
@@ -99,9 +99,13 @@
           <% end %>
         <% else %>
           <div class="fc-panel p-8 text-center">
-            <h2 class="text-lg font-bold text-[var(--fc-ink)]">No posts yet</h2>
+            <h2 class="text-lg font-bold text-[var(--fc-ink)]">No breaths yet</h2>
             <p class="mt-2 text-sm text-[var(--fc-muted)]">Start the first conversation.</p>
-            <%= link_to "Write a Post", new_post_path, class: "fc-btn fc-btn-primary mt-5" %>
+            <button type="button"
+                    class="fc-btn fc-btn-primary mt-5"
+                    data-action="click->composer-modal#open">
+              Take a breath
+            </button>
           </div>
         <% end %>
       </div>
@@ -155,10 +159,77 @@
         <% else %>
           <div class="rounded-md border border-[var(--fc-line)] bg-[var(--fc-surface-2)] p-4">
             <p class="text-sm font-semibold text-[var(--fc-soft)]">No prayer requests yet.</p>
-            <%= link_to "Start one", new_post_path, class: "mt-3 inline-block text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
+            <button type="button"
+                    data-action="click->composer-modal#open"
+                    class="mt-3 inline-block text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]">
+              Start one
+            </button>
           </div>
         <% end %>
       </div>
+
+      <% if @trending_breaths.any? %>
+        <div class="fc-side-card">
+          <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Trending breaths</h3>
+            <%= link_to "More", feed_trending_path, class: "text-xs font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
+          </div>
+          <div class="space-y-3">
+            <% @trending_breaths.each_with_index do |post, idx| %>
+              <%= link_to post_path(post), class: "flex items-start gap-3 hover:bg-[var(--fc-surface-2)] -mx-2 px-2 py-1.5 rounded-md transition-colors" do %>
+                <span class="text-xs font-extrabold text-[var(--fc-faint)] mt-0.5 w-4 text-right"><%= idx + 1 %></span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate text-sm font-bold text-[var(--fc-ink)]">
+                    <%= truncate(post.title, length: 48) %>
+                  </span>
+                  <span class="block truncate text-xs text-[var(--fc-muted)]">
+                    <%= post.anonymous? ? "Anonymous" : post.user.username %>
+                    · <%= post.likes_count + post.comments_count %> reactions
+                  </span>
+                </span>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @who_to_brethren.any? %>
+        <div class="fc-side-card">
+          <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Who to brethren</h3>
+            <%= link_to "See all", people_path, class: "text-xs font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
+          </div>
+          <div class="space-y-3">
+            <% @who_to_brethren.each do |user| %>
+              <div class="flex items-center gap-3">
+                <% if user.profile&.avatar&.attached? %>
+                  <%= link_to user_path(user.username) do %>
+                    <%= image_tag user.profile.avatar, class: "fc-avatar object-cover", alt: user.username %>
+                  <% end %>
+                <% else %>
+                  <%= link_to user.username.first.upcase, user_path(user.username), class: "fc-avatar" %>
+                <% end %>
+                <span class="min-w-0 flex-1">
+                  <%= link_to user.username, user_path(user.username), class: "block truncate text-sm font-bold text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" %>
+                  <% bio = user.profile&.bio.to_s.strip %>
+                  <% if bio.present? %>
+                    <span class="block truncate text-xs text-[var(--fc-muted)]"><%= truncate(bio, length: 32) %></span>
+                  <% else %>
+                    <span class="block truncate text-xs text-[var(--fc-muted)]">recent breath author</span>
+                  <% end %>
+                </span>
+                <%= button_to follow_user_path(user.username),
+                    method: :post,
+                    form_class: "inline",
+                    class: "fc-btn fc-btn-primary",
+                    data: { turbo_frame: "_top" } do %>
+                  Follow
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     </aside>
   </div>
 </div>

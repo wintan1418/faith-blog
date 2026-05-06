@@ -67,6 +67,8 @@ class Post < ApplicationRecord
   after_save :process_mentions_after_save
   after_commit :enqueue_ai_moderation_review, on: :create, if: :published?
   after_update_commit :enqueue_ai_moderation_review_on_publish
+  after_commit :fanout_to_followers, on: :create, if: :published?
+  after_update_commit :fanout_to_followers_on_publish
 
   # Instance methods
   def engagement_score
@@ -127,5 +129,15 @@ class Post < ApplicationRecord
     return unless saved_change_to_status? && published?
 
     enqueue_ai_moderation_review
+  end
+
+  def fanout_to_followers
+    BreathFanoutJob.perform_later(id)
+  end
+
+  def fanout_to_followers_on_publish
+    return unless saved_change_to_status? && published?
+
+    fanout_to_followers
   end
 end

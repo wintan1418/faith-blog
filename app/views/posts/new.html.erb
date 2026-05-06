@@ -1,11 +1,11 @@
-<% content_for(:title) { "New post - Faith Community" } %>
+<% content_for(:title) { "New breath - Faith Community" } %>
 
 <div class="fc-app">
   <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 640px;">
     <main class="fc-main">
       <div class="fc-panel fc-composer-panel-page">
         <header class="fc-composer-bar">
-          <h1 class="fc-composer-bar-title">New post</h1>
+          <h1 class="fc-composer-bar-title">Take a breath</h1>
           <%= link_to "Cancel", feed_path, class: "fc-btn" %>
         </header>
         <%= render "posts/composer", post: @post, rooms: @rooms %>
