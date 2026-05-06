@@ -2,7 +2,7 @@
 
 class PostsController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show ]
-  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature ]
+  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature, :inline_thread ]
   before_action :authorize_post!, only: [ :edit, :update, :destroy ]
   before_action :authorize_feature!, only: [ :feature, :unfeature ]
   before_action :enforce_rate_limit!, only: [ :create ]
@@ -61,6 +61,12 @@ class PostsController < ApplicationController
     @post.update(featured: true)
     ModerationLog.log_action(moderator: current_user, action: "featured_post", target: @post)
     redirect_to @post, notice: "Post has been featured."
+  end
+
+  def inline_thread
+    @comments = @post.comments.root_comments.active.includes(:user, :replies).order(created_at: :desc).limit(3)
+    @new_comment = Comment.new
+    render layout: false
   end
 
   def unfeature

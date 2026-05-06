@@ -7,7 +7,16 @@ class LikesController < ApplicationController
   def create
     @like = current_user.likes.find_or_initialize_by(likeable: @likeable)
     new_reaction = @like.new_record?
-    @like.reaction_type = params[:reaction_type] || :amen
+
+    emoji = params[:reaction_emoji].to_s.strip
+    if emoji.present?
+      @like.reaction_emoji = emoji
+      @like.reaction_type  = Like.enum_for_emoji(emoji)
+    else
+      enum = params[:reaction_type] || :amen
+      @like.reaction_type  = enum
+      @like.reaction_emoji = Like.reaction_emoji(enum)
+    end
 
     if @like.save
       @likeable.reload

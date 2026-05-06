@@ -1,0 +1,55 @@
+<%= turbo_frame_tag dom_id(@post, :thread), class: "fc-breath-thread" do %>
+  <% if user_signed_in? && @post.allow_comments? %>
+    <%= form_with model: [ @post, @new_comment ],
+        id: dom_id(@post, :inline_form),
+        class: "fc-inline-reply",
+        data: { turbo_frame: dom_id(@post, :thread) } do |f| %>
+      <% if current_user.profile&.avatar&.attached? %>
+        <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+      <% else %>
+        <span class="fc-avatar"><%= current_user.username.first.upcase %></span>
+      <% end %>
+
+      <div class="fc-inline-reply-body" data-controller="emoji-picker">
+        <%= f.rich_text_area :content,
+            class: "fc-inline-reply-input",
+            placeholder: "Reply with encouragement, prayer, or a word...",
+            data: { controller: "mentions", emoji_picker_target: "editor" } %>
+
+        <div class="fc-inline-reply-actions">
+          <button type="button"
+                  data-emoji-picker-target="button"
+                  data-action="click->emoji-picker#toggle"
+                  class="fc-composer-icon-btn"
+                  title="Add emoji"
+                  aria-label="Add emoji">
+            <%= render_icon("smile", classes: "h-5 w-5") %>
+          </button>
+
+          <%= f.submit "Reply", class: "fc-btn fc-btn-primary" %>
+        </div>
+
+        <div class="relative">
+          <div data-emoji-picker-target="picker" class="hidden absolute right-0 z-50 mt-2">
+            <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if @comments.any? %>
+    <ol class="fc-inline-thread-list" id="<%= dom_id(@post, :inline_list) %>">
+      <% @comments.each do |comment| %>
+        <%= render "posts/inline_comment", comment: comment %>
+      <% end %>
+    </ol>
+    <% if @post.comments_count > @comments.size %>
+      <%= link_to "View all #{@post.comments_count} replies →", post_path(@post, anchor: "comments"),
+          class: "fc-inline-thread-more",
+          data: { turbo_frame: "_top" } %>
+    <% end %>
+  <% else %>
+    <p class="fc-inline-thread-empty">No replies yet — be the first to breathe back.</p>
+  <% end %>
+<% end %>

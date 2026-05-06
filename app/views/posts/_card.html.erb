@@ -6,15 +6,16 @@
     </div>
   </article>
 <% else %>
-<article class="fc-card<%= ' fc-card-held-author' if post.held_for_review? %>" id="<%= dom_id(post) %>">
+<article class="fc-breath<%= ' fc-card-held-author' if post.held_for_review? %>" id="<%= dom_id(post) %>">
   <% if post.held_for_review? && current_user == post.user %>
     <div class="fc-held-banner">
       <%= render_icon("shield", classes: "h-4 w-4") %>
       <span>Held for moderator review — only you and moderators can see this right now.</span>
     </div>
   <% end %>
-  <header class="fc-card-header-strip">
-    <div class="flex min-w-0 items-center gap-2">
+
+  <div class="fc-breath-grid">
+    <div class="fc-breath-avatar">
       <% if post.anonymous? %>
         <span class="fc-avatar"><%= render_icon("users", classes: "h-4 w-4") %></span>
       <% elsif post.user.profile&.avatar&.attached? %>
@@ -26,79 +27,84 @@
           <%= post.user.username.first.upcase %>
         <% end %>
       <% end %>
+    </div>
 
-      <div class="min-w-0">
-        <div class="flex min-w-0 flex-wrap items-center gap-2 text-sm">
+    <div class="fc-breath-main">
+      <header class="fc-breath-head">
+        <div class="fc-breath-head-author">
           <% if post.anonymous? %>
-            <span class="font-extrabold text-[var(--fc-ink)]">Anonymous</span>
+            <span class="fc-breath-name">Anonymous</span>
           <% else %>
-            <%= link_to post.user.username, user_path(post.user.username), class: "font-extrabold text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" %>
+            <%= link_to post.user.username, user_path(post.user.username), class: "fc-breath-name" %>
+            <span class="fc-breath-handle">@<%= post.user.username %></span>
           <% end %>
+          <span class="fc-breath-dot">·</span>
+          <span class="fc-breath-time"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
           <% if post.room %>
-            <%= link_to post.room.name, room_path(post.room), class: "fc-badge" %>
+            <%= link_to post.room.name, room_path(post.room), class: "fc-badge ml-1" %>
           <% end %>
           <% if post.featured? %>
             <span class="fc-featured-tag">★ Featured</span>
           <% end %>
         </div>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-3">
-      <span class="text-xs font-semibold text-[var(--fc-muted)] whitespace-nowrap"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
-      <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
-        <%= link_to edit_post_path(post), class: "fc-action", title: "Edit post" do %>
-          <%= render_icon("pencil", classes: "h-4 w-4") %>
+        <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
+          <%= link_to edit_post_path(post), class: "fc-action", title: "Edit breath" do %>
+            <%= render_icon("pencil", classes: "h-4 w-4") %>
+          <% end %>
         <% end %>
-      <% else %>
-        <span class="text-[var(--fc-muted)] leading-none">...</span>
+      </header>
+
+      <%= link_to post_path(post), class: "fc-breath-body group block" do %>
+        <h2 class="fc-breath-title group-hover:text-[var(--fc-accent)]"><%= post.title %></h2>
+        <p class="fc-breath-copy"><%= truncate(post.content.to_plain_text, length: 240) %></p>
       <% end %>
-    </div>
-  </header>
 
-  <div class="fc-card-body">
-    <%= link_to post_path(post), class: "group block" do %>
-      <h2 class="fc-post-title transition-colors group-hover:text-[var(--fc-accent)]">
-        <%= post.title %>
-      </h2>
-      <p class="fc-post-copy mt-2 line-clamp-3">
-        <%= truncate(post.content.to_plain_text, length: 220) %>
-      </p>
-    <% end %>
-
-    <% if post.has_images? %>
-      <%= link_to post_path(post), class: "fc-post-media" do %>
-        <%= image_tag post.images.first, class: "fc-post-media-image", alt: post.title %>
-      <% end %>
-    <% end %>
-
-    <% if post.tags.any? %>
-      <div class="fc-tags mt-4 flex flex-wrap gap-x-3 gap-y-1">
-        <% post.tags.limit(4).each do |tag| %>
-          <%= link_to "##{tag.name}", search_path(q: tag.name), class: "hover:text-[var(--fc-ink)]" %>
+      <% if post.has_images? %>
+        <%= link_to post_path(post), class: "fc-breath-media" do %>
+          <%= image_tag post.images.first, class: "fc-breath-media-image", alt: post.title %>
         <% end %>
-      </div>
-    <% end %>
+      <% end %>
 
-    <footer class="fc-card-actions mt-5">
-      <div class="flex flex-wrap items-center gap-3">
+      <% if post.tags.any? %>
+        <div class="fc-breath-tags">
+          <% post.tags.limit(4).each do |tag| %>
+            <%= link_to "##{tag.name}", search_path(q: tag.name), class: "fc-breath-tag" %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <footer class="fc-breath-actions">
         <%= render "posts/reactions", post: post %>
-        <%= render "posts/comment_count", post: post %>
-        <%= render "posts/impressions", post: post %>
+
+        <button type="button"
+                class="fc-breath-action"
+                data-controller="thread-toggle"
+                data-thread-toggle-url-value="<%= inline_thread_post_path(post) %>"
+                data-thread-toggle-frame-value="<%= dom_id(post, :thread) %>"
+                data-action="click->thread-toggle#toggle"
+                aria-label="Reply">
+          <%= render_icon("message_circle", classes: "h-4 w-4") %>
+          <span><%= post.comments_count.positive? ? post.comments_count : "Reply" %></span>
+        </button>
 
         <%= render "reshares/button", post: post %>
         <%= render "posts/share_button", post: post %>
-      </div>
 
-      <% if user_signed_in? %>
-        <%= render "posts/bookmark_button", post: post %>
-        <% unless post.user == current_user %>
-          <%= render "reports/button", reportable: post, label: "Report" %>
-        <% end %>
-      <% else %>
-        <%= render "posts/bookmark_button", post: post %>
-      <% end %>
-    </footer>
+        <div class="fc-breath-actions-end">
+          <%= render "posts/impressions", post: post %>
+          <% if user_signed_in? %>
+            <%= render "posts/bookmark_button", post: post %>
+            <% unless post.user == current_user %>
+              <%= render "reports/button", reportable: post, label: "Report" %>
+            <% end %>
+          <% else %>
+            <%= render "posts/bookmark_button", post: post %>
+          <% end %>
+        </div>
+      </footer>
+
+      <%= turbo_frame_tag dom_id(post, :thread), class: "fc-breath-thread hidden" %>
+    </div>
   </div>
 </article>
 <% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_06_124423) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_06_141649) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -186,6 +186,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_124423) do
     t.integer "reaction_type", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "reaction_emoji"
+    t.index ["likeable_type", "likeable_id", "reaction_emoji"], name: "index_likes_on_likeable_and_emoji"
     t.index ["likeable_type", "likeable_id"], name: "index_likes_on_likeable"
     t.index ["reaction_type"], name: "index_likes_on_reaction_type"
     t.index ["user_id", "likeable_type", "likeable_id"], name: "index_likes_on_user_and_likeable", unique: true

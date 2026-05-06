@@ -36,3 +36,9 @@ application.register("composer-modal", ComposerModalController)
 
 import ShareController from "./share_controller"
 application.register("share", ShareController)
+
+import ThreadToggleController from "./thread_toggle_controller"
+application.register("thread-toggle", ThreadToggleController)
+
+import EmojiReactionsController from "./emoji_reactions_controller"
+application.register("emoji-reactions", EmojiReactionsController)

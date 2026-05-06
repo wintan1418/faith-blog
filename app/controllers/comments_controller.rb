@@ -16,15 +16,27 @@ class CommentsController < ApplicationController
       create_notification
       # Mentions are processed in after_save callback, no need to call again
       respond_to do |format|
-        format.html { redirect_to @post, notice: "Comment added!" }
-        format.turbo_stream
+        if from_inline_thread?
+          format.html { redirect_to inline_thread_post_path(@post) }
+        else
+          format.html { redirect_to @post, notice: "Comment added!" }
+          format.turbo_stream
+        end
       end
     else
       respond_to do |format|
-        format.html { redirect_to @post, alert: "Unable to add comment." }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("comment_form", partial: "comments/form", locals: { post: @post, comment: @comment }) }
+        if from_inline_thread?
+          format.html { redirect_to inline_thread_post_path(@post) }
+        else
+          format.html { redirect_to @post, alert: "Unable to add comment." }
+          format.turbo_stream { render turbo_stream: turbo_stream.replace("comment_form", partial: "comments/form", locals: { post: @post, comment: @comment }) }
+        end
       end
     end
+  end
+
+  def from_inline_thread?
+    request.headers["Turbo-Frame"].to_s.include?("_thread")
   end
 
   def reply

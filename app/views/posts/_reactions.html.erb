@@ -1,41 +1,58 @@
-<% user_like = user_signed_in? ? current_user.likes.find_by(likeable: post) : nil %>
-<% reactions = Like.reaction_types.keys %>
+<%
+  user_like = user_signed_in? ? current_user.likes.find_by(likeable: post) : nil
+  emoji_counts = post.likes
+                     .group(:reaction_emoji)
+                     .order(Arel.sql("COUNT(*) DESC"))
+                     .limit(4)
+                     .count
+  total = post.likes_count.to_i
+%>
 
-<div class="reaction-rail" id="<%= dom_id(post, :reactions) %>">
+<div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions">
+  <% emoji_counts.each do |emoji, count| %>
+    <% next if emoji.blank? %>
+    <% mine = user_like&.display_emoji == emoji %>
+    <% if mine %>
+      <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
+          method: :delete,
+          form_class: "inline",
+          class: "fc-reaction-pill is-mine",
+          title: "Remove your reaction" do %>
+        <span class="fc-reaction-emoji"><%= emoji %></span>
+        <span class="fc-reaction-count"><%= count %></span>
+      <% end %>
+    <% else %>
+      <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_emoji: emoji),
+          form_class: "inline",
+          class: "fc-reaction-pill" do %>
+        <span class="fc-reaction-emoji"><%= emoji %></span>
+        <span class="fc-reaction-count"><%= count %></span>
+      <% end %>
+    <% end %>
+  <% end %>
+
   <% if user_signed_in? %>
-    <% reactions.each do |reaction| %>
-      <% active = user_like&.reaction_type == reaction %>
-      <% count = post.likes.where(reaction_type: reaction).count %>
-      <% if active %>
-        <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
-            method: :delete,
-            class: "reaction-chip is-active",
-            title: "Remove #{Like.reaction_label(reaction)}" do %>
-          <span class="reaction-chip-emoji"><%= Like.reaction_emoji(reaction) %></span>
-          <span class="reaction-chip-label"><%= Like.reaction_label(reaction) %></span>
-          <% if count.positive? %>
-            <span class="reaction-chip-count"><%= count %></span>
-          <% end %>
-        <% end %>
-      <% else %>
-        <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_type: reaction),
-            class: "reaction-chip",
-            title: Like.reaction_label(reaction) do %>
-          <span class="reaction-chip-emoji"><%= Like.reaction_emoji(reaction) %></span>
-          <span class="reaction-chip-label"><%= Like.reaction_label(reaction) %></span>
-          <% if count.positive? %>
-            <span class="reaction-chip-count"><%= count %></span>
-          <% end %>
-        <% end %>
+    <button type="button"
+            class="fc-reaction-add"
+            data-action="click->emoji-reactions#toggle"
+            aria-label="Add a reaction"
+            title="Add a reaction">
+      <%= render_icon("smile", classes: "h-4 w-4") %>
+      <% if emoji_counts.empty? %>
+        <span class="fc-reaction-add-label">React</span>
       <% end %>
-    <% end %>
+    </button>
+
+    <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker"
+         data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
+         data-emoji-reactions-token-value="<%= form_authenticity_token %>">
+      <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
+    </div>
   <% else %>
-    <%= link_to new_user_session_path, class: "reaction-chip" do %>
-      <span class="reaction-chip-emoji">🙏</span>
-      <span class="reaction-chip-label">React</span>
-      <% if post.likes_count.positive? %>
-        <span class="reaction-chip-count"><%= post.likes_count %></span>
-      <% end %>
-    <% end %>
+    <%= link_to "React", new_user_session_path, class: "fc-reaction-add" %>
+  <% end %>
+
+  <% if total.positive? && emoji_counts.empty? %>
+    <span class="fc-reaction-summary"><%= total %></span>
   <% end %>
 </div>

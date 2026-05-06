@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     member do
       post :feature
       post :unfeature
+      get  :inline_thread
     end
     resources :comments, only: [ :create, :update, :destroy ] do
       member do
