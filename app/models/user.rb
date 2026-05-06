@@ -118,6 +118,29 @@ class User < ApplicationRecord
     likes.exists?(likeable: likeable)
   end
 
+  # Online if we touched last_seen_at within the past minute. Touch is
+  # done by ApplicationController on every authenticated request.
+  def online?
+    last_seen_at.present? && last_seen_at > 1.minute.ago
+  end
+
+  def last_seen_label
+    return "Active now" if online?
+    return "Last seen recently" if last_seen_at.blank?
+
+    diff = Time.current - last_seen_at
+    case diff
+    when 0..(60)            then "Active now"
+    when 60..(60 * 60)      then "Last seen #{(diff / 60).to_i}m ago"
+    when (60 * 60)..(24 * 60 * 60)
+      "Last seen #{(diff / 3600).to_i}h ago"
+    when (24 * 60 * 60)..(7 * 24 * 60 * 60)
+      "Last seen #{(diff / 86_400).to_i}d ago"
+    else
+      "Last seen #{last_seen_at.strftime("%b %-d")}"
+    end
+  end
+
   def has_bookmarked?(post)
     bookmarks.exists?(post: post)
   end

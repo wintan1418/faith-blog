@@ -1,23 +1,21 @@
 <% other_user = @conversation.other_participant_for(current_user) %>
 <% content_for(:title) { "Message #{other_user.display_name} - Faith Community" } %>
 
-<div class="mystic-shell inbox-page">
-  <div class="mystic-container max-w-7xl py-8">
-    <div class="inbox-layout">
-      <aside class="inbox-list">
-        <div class="inbox-list-head">
-          <h2>Messages</h2>
-          <%= link_to "All", conversations_path, class: "text-sm font-black text-[var(--fc-accent)]" %>
-        </div>
-
-        <div class="inbox-list-scroll">
-          <% @conversations.each do |conversation| %>
-            <%= render "conversations/conversation_row", conversation: conversation, active: @conversation == conversation %>
-          <% end %>
-        </div>
-      </aside>
-
-      <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
+<div class="inbox-shell">
+  <aside class="inbox-list">
+    <div class="inbox-list-head">
+      <h2>Messages</h2>
+      <%= link_to inbox_search_path, class: "fc-icon-btn", title: "Search messages" do %>
+        <%= render_icon("search", classes: "h-4 w-4") %>
+      <% end %>
     </div>
-  </div>
+
+    <div class="inbox-list-scroll">
+      <% @conversations.each do |conversation| %>
+        <%= render "conversations/conversation_row", conversation: conversation, active: @conversation == conversation %>
+      <% end %>
+    </div>
+  </aside>
+
+  <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
 </div>

@@ -9,22 +9,36 @@
   <%= turbo_stream_from [conversation, current_user.id, :read_receipt] %>
 
   <header class="inbox-thread-head">
-    <div class="flex min-w-0 items-center gap-3">
-      <%= render "conversations/avatar", user: other_user, size: "h-11 w-11" %>
-      <div class="min-w-0">
-        <%= link_to other_user.display_name, user_path(other_user.username), class: "block truncate text-base font-black text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" %>
-        <p class="truncate text-sm font-semibold text-[var(--fc-muted)]">@<%= other_user.username %></p>
-      </div>
-    </div>
+    <%= link_to conversations_path, class: "inbox-thread-back", title: "Back to inbox" do %>
+      <%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") rescue "‹" %>
+    <% end %>
 
-    <div class="flex items-center gap-2">
-      <%= link_to "View Profile", user_path(other_user.username), class: "btn btn-secondary btn-sm" %>
-      <% if current_user.blocked_message_user?(other_user) %>
-        <%= button_to "Unblock", message_block_path(other_user), method: :delete, class: "btn btn-secondary btn-sm" %>
-      <% else %>
-        <%= button_to "Block", message_blocks_path(user_id: other_user.id), method: :post, class: "btn btn-secondary btn-sm" %>
-      <% end %>
-      <%= button_to "Archive", archive_conversation_path(conversation), method: :post, class: "btn btn-secondary btn-sm" %>
+    <%= link_to user_path(other_user.username), class: "inbox-thread-identity" do %>
+      <span class="inbox-avatar-wrap<%= ' is-online' if other_user.online? %>">
+        <%= render "conversations/avatar", user: other_user, size: "h-10 w-10" %>
+      </span>
+      <div class="min-w-0">
+        <p class="inbox-thread-name"><%= other_user.display_name %></p>
+        <p class="inbox-thread-handle<%= ' is-online' if other_user.online? %>">
+          <% if other_user.online? %><span class="inbox-pulse-dot"></span><% end %>
+          <%= other_user.last_seen_label %>
+        </p>
+      </div>
+    <% end %>
+
+    <div class="inbox-thread-actions" data-controller="dropdown">
+      <button type="button" class="fc-icon-btn" data-action="click->dropdown#toggle" title="More" aria-label="More">
+        <%= render_icon("sparkles", classes: "h-4 w-4") rescue "⋯" %>
+      </button>
+      <div data-dropdown-target="menu" class="fc-dropdown-menu hidden absolute right-0 top-full mt-2 w-48 py-2 z-30">
+        <%= link_to "View profile", user_path(other_user.username), class: "fc-dropdown-item" %>
+        <% if current_user.blocked_message_user?(other_user) %>
+          <%= button_to "Unblock", message_block_path(other_user), method: :delete, form_class: "inline w-full", class: "fc-dropdown-item w-full text-left" %>
+        <% else %>
+          <%= button_to "Block", message_blocks_path(user_id: other_user.id), method: :post, form_class: "inline w-full", class: "fc-dropdown-item w-full text-left" %>
+        <% end %>
+        <%= button_to "Archive conversation", archive_conversation_path(conversation), method: :post, form_class: "inline w-full", class: "fc-dropdown-item fc-dropdown-danger w-full text-left" %>
+      </div>
     </div>
   </header>
 
@@ -46,11 +60,15 @@
   </div>
 
   <%= render "conversations/read_receipt", conversation: conversation, viewer_id: current_user.id %>
-  <div class="typing-indicator hidden" data-typing-target="indicator"></div>
+
+  <div class="typing-indicator hidden" data-typing-target="indicator">
+    <span class="typing-dots"><span></span><span></span><span></span></span>
+    <span class="typing-text"></span>
+  </div>
 
   <% if conversation.blocked_for?(current_user) %>
     <div class="inbox-composer">
-      <div class="rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-4 py-3 text-sm font-bold text-[var(--fc-muted)]">
+      <div class="inbox-blocked-note">
         Messaging is blocked in this conversation.
       </div>
     </div>

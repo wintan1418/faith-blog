@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   include Pagy::Backend
 
   before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :touch_last_seen,                 if: :user_signed_in?
 
   helper_method :current_user_admin?, :current_user_moderator?, :current_user_super_admin?
 
@@ -44,5 +45,16 @@ class ApplicationController < ActionController::Base
 
   def after_sign_out_path_for(_resource_or_scope)
     root_path
+  end
+
+  # Refresh user's last_seen_at on each authenticated request, but
+  # throttle to once a minute so we don't write on every page hit.
+  def touch_last_seen
+    return unless current_user
+
+    last = current_user.last_seen_at
+    return if last.present? && last > 1.minute.ago
+
+    current_user.update_column(:last_seen_at, Time.current)
   end
 end

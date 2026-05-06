@@ -1,52 +1,44 @@
 <% content_for(:title) { "Inbox - Faith Community" } %>
 
-<div class="mystic-shell inbox-page">
-  <div class="mystic-container max-w-7xl py-8">
-    <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <span class="mystic-kicker">Inbox</span>
-        <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Private conversations</h1>
-        <p class="mystic-copy mt-2">Message accepted connections without exposing your Brethren Card details publicly.</p>
-      </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <%= link_to inbox_search_path, class: "btn btn-secondary" do %>
+<div class="inbox-shell">
+  <aside class="inbox-list inbox-list--full">
+    <div class="inbox-list-head">
+      <h2>Messages</h2>
+      <div class="flex items-center gap-1">
+        <%= link_to inbox_search_path, class: "fc-icon-btn", title: "Search messages" do %>
           <%= render_icon("search", classes: "h-4 w-4") %>
-          Search messages
         <% end %>
-        <%= link_to "My Connections", my_connections_path, class: "btn btn-secondary" %>
+        <%= link_to my_connections_path, class: "fc-icon-btn", title: "My connections" do %>
+          <%= render_icon("users", classes: "h-4 w-4") %>
+        <% end %>
       </div>
     </div>
 
-    <div class="inbox-layout">
-      <aside class="inbox-list">
-        <div class="inbox-list-head">
-          <h2>Messages</h2>
-          <span><%= pluralize(@conversations.size, "thread") %></span>
-        </div>
-
-        <% if @conversations.any? %>
-          <div class="inbox-list-scroll">
-            <% @conversations.each do |conversation| %>
-              <%= render "conversations/conversation_row", conversation: conversation, active: @conversation == conversation %>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="p-6 text-sm font-semibold text-[var(--fc-muted)]">
-            No conversations yet. Open a connected profile and start with Message.
-          </div>
+    <% if @conversations.any? %>
+      <div class="inbox-list-scroll">
+        <% @conversations.each do |conversation| %>
+          <%= render "conversations/conversation_row", conversation: conversation, active: @conversation == conversation %>
         <% end %>
-      </aside>
+      </div>
+    <% else %>
+      <div class="inbox-list-empty">
+        <%= render_icon("mail", classes: "h-7 w-7") %>
+        <p>No conversations yet.</p>
+        <small>Open a connected profile and tap Message.</small>
+      </div>
+    <% end %>
+  </aside>
 
-      <% if @conversation %>
-        <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
-      <% else %>
-        <section class="inbox-empty">
-          <%= render_icon("mail", classes: "h-10 w-10") %>
-          <h2>No messages yet</h2>
-          <p>Connect with someone first, then start a private conversation from their profile or your connections page.</p>
-          <%= link_to "Find Connections", my_connections_path, class: "btn btn-primary" %>
-        </section>
-      <% end %>
-    </div>
-  </div>
+  <% if @conversation %>
+    <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
+  <% else %>
+    <section class="inbox-thread inbox-thread--empty">
+      <div class="inbox-thread-empty">
+        <%= render_icon("mail", classes: "h-12 w-12") %>
+        <h2>No conversation selected</h2>
+        <p>Pick someone from your messages on the left, or start a new one from a connected profile.</p>
+        <%= link_to "Find Connections", my_connections_path, class: "fc-btn fc-btn-primary" %>
+      </div>
+    </section>
+  <% end %>
 </div>

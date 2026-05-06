@@ -36,7 +36,8 @@ export default class extends Controller {
     if (Number(data.user_id) === this.userIdValue) return
 
     if (data.typing) {
-      this.indicatorTarget.textContent = `${data.username} is typing...`
+      const text = this.indicatorTarget.querySelector(".typing-text")
+      if (text) text.textContent = `${data.username} is typing`
       this.indicatorTarget.classList.remove("hidden")
       clearTimeout(this.hideTimer)
       this.hideTimer = setTimeout(() => this.hide(), 2200)
@@ -48,7 +49,8 @@ export default class extends Controller {
   hide() {
     if (this.hasIndicatorTarget) {
       this.indicatorTarget.classList.add("hidden")
-      this.indicatorTarget.textContent = ""
+      const text = this.indicatorTarget.querySelector(".typing-text")
+      if (text) text.textContent = ""
     }
   }
 
