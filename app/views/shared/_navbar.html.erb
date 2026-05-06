@@ -20,7 +20,7 @@
         </span>
         <span class="brethreign-wordmark">
           <span class="brethreign-word">brethre<span class="brethreign-accent">i</span>gn</span>
-          <span class="brethreign-tag">come and breathe</span>
+          <span class="brethreign-tag">breathe!</span>
         </span>
       <% end %>
 
@@ -44,12 +44,12 @@
           <%= render_icon("bookopen", classes: "h-4 w-4") %>
           Library
         <% end %>
-        <%= link_to search_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/search')}" do %>
+        <%= link_to search_path, class: "fc-nav-link hidden xl:inline-flex #{'is-active' if request.path.start_with?('/search')}" do %>
           <%= render_icon("search", classes: "h-4 w-4") %>
           Search
         <% end %>
         <% if user_signed_in? %>
-          <%= link_to people_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/people')}" do %>
+          <%= link_to people_path, class: "fc-nav-link hidden xl:inline-flex #{'is-active' if request.path.start_with?('/people')}" do %>
             <%= render_icon("users", classes: "h-4 w-4") %>
             People
           <% end %>
@@ -90,7 +90,7 @@
           <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
         </button>
 
-        <%= link_to bookmarks_path, class: "fc-icon-btn hidden sm:inline-flex", title: "Bookmarks" do %>
+        <%= link_to bookmarks_path, class: "fc-icon-btn hidden xl:inline-flex", title: "Bookmarks" do %>
           <%= render_icon("bookmark", classes: "h-4 w-4") %>
         <% end %>
 

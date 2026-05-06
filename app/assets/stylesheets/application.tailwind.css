@@ -11607,8 +11607,23 @@ html.theme-light .inbox-thread-head {
   color: #042f1d !important;
   box-shadow: 0 4px 14px -4px rgba(16, 185, 129, 0.40);
 }
-.message-row.is-mine .message-meta { color: rgba(4, 47, 29, 0.75); }
-.message-row.is-mine .message-status.is-seen { color: #042f1d; }
+/* Force readable text on the gradient bubble — every nested element
+   that simple_format / Trix may produce inside (p / div / span / a) */
+.message-row.is-mine .message-bubble,
+.message-row.is-mine .message-bubble *,
+.message-row.is-mine .message-body,
+.message-row.is-mine .message-body * {
+  color: #042f1d !important;
+}
+.message-row.is-mine .message-bubble a {
+  color: #042f1d !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(4, 47, 29, 0.5);
+}
+.message-row.is-mine .message-meta {
+  color: rgba(4, 47, 29, 0.75) !important;
+}
+.message-row.is-mine .message-status.is-seen { color: #042f1d !important; }
 
 .message-body { font-size: 0.94rem; line-height: 1.5; }
 
@@ -11788,11 +11803,14 @@ html.theme-light .inbox-thread-head {
   margin-top: 3px;
 }
 
-/* On the smallest screens the tagline disappears so the bar doesn't
-   feel cramped. */
-@media (max-width: 540px) {
+/* Tighten the brand so it never crowds the nav links. The tagline
+   gets dropped early; the wordmark itself stays compact. */
+@media (max-width: 1180px) {
   .brethreign-tag { display: none; }
   .brethreign-word { font-size: 1rem; }
+}
+@media (max-width: 720px) {
+  .brethreign-wordmark { display: none; }
 }
 
 /* Hide leftover .fc-brand styles by overriding their layout when present.
