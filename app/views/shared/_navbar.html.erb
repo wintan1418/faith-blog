@@ -3,7 +3,7 @@
     <div class="flex min-w-0 items-center gap-4">
       <%= link_to root_path, class: "fc-brand flex items-center gap-2" do %>
         <span class="fc-brand-mark">
-          <% if Rails.application.assets_manifest.assets["logo.png"] || File.exist?(Rails.root.join("app/assets/images/logo.png")) %>
+          <% if File.exist?(Rails.root.join("app/assets/images/logo.png")) %>
             <%= image_tag "logo.png", class: "h-full w-full rounded-lg object-cover", alt: "Faith Community" %>
           <% else %>
             <%= render_icon("sparkles", classes: "h-4 w-4") %>
