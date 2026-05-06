@@ -9047,10 +9047,15 @@ form.inline {
   background: var(--post-bg-elevated);
   border: 1px solid var(--post-line);
   border-radius: var(--post-radius-lg);
-  padding: 36px 56px 28px;
+  padding: 44px 64px 32px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.post-header { margin-bottom: 28px; }
+@media (max-width: 1024px) {
+  .post-card { padding: 36px 48px 28px; }
+}
+
+.post-header { margin-bottom: 32px; }
 
 .post-author-row {
   display: grid;
@@ -9208,10 +9213,13 @@ form.inline {
 .post-body {
   font-family: var(--post-serif);
   font-size: 18px;
-  line-height: 1.7;
+  line-height: 1.75;
   color: var(--post-ink-80);
   max-width: 68ch;
+  margin-inline: auto;
   font-variation-settings: "opsz" 12;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .post-body p { margin: 0 0 1.05em; }
@@ -9664,8 +9672,17 @@ form.inline {
 }
 
 @media (max-width: 700px) {
-  .post-card { padding: 24px 22px; }
-  .post-conversation { padding: 22px 18px; }
-  .post-body { font-size: 17px; }
+  .post-card { padding: 28px 24px 24px; }
+  .post-conversation { padding: 24px 22px; }
+  .post-body { font-size: 17px; line-height: 1.7; }
   .post-body > p:first-of-type { font-size: 19px; }
+  .post-body > p:first-of-type::first-letter {
+    font-size: 3.2em;
+    padding: 4px 10px 0 0;
+  }
+  .post-body h2 {
+    font-size: 22px;
+    margin: 1.8em 0 0.7em;
+  }
+  .post-title { line-height: 1.12; }
 }
