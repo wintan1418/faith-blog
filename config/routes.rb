@@ -157,6 +157,12 @@ Rails.application.routes.draw do
       end
     end
     resources :moderation_logs, only: [ :index, :show ]
+    resources :bible_verses do
+      member { post :toggle }
+    end
+    resources :golden_breaths do
+      member { post :toggle }
+    end
     resources :moderation_reviews, only: [ :index, :show ] do
       member do
         post :decide

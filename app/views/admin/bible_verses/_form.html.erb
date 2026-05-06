@@ -1,0 +1,36 @@
+<%= form_with model: [:admin, verse], class: "fc-cms-form" do |f| %>
+  <% if verse.errors.any? %>
+    <div class="fc-composer-errors">
+      <strong>Couldn't save:</strong>
+      <ul>
+        <% verse.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
+      </ul>
+    </div>
+  <% end %>
+
+  <label class="fc-cms-label">
+    <span>Verse text</span>
+    <%= f.text_area :text, rows: 4, class: "fc-cms-input", placeholder: "He gives strength to the weary..." %>
+  </label>
+
+  <label class="fc-cms-label">
+    <span>Reference</span>
+    <%= f.text_field :reference, class: "fc-cms-input", placeholder: "Isaiah 40:29" %>
+  </label>
+
+  <div class="grid grid-cols-2 gap-4">
+    <label class="fc-cms-label">
+      <span>Position</span>
+      <%= f.number_field :position, class: "fc-cms-input", min: 0 %>
+    </label>
+    <label class="fc-composer-toggle">
+      <%= f.check_box :active, class: "fc-composer-checkbox" %>
+      <span>Active</span>
+    </label>
+  </div>
+
+  <div class="fc-cms-footer">
+    <%= link_to "Cancel", admin_bible_verses_path, class: "fc-btn" %>
+    <%= f.submit verse.persisted? ? "Save changes" : "Add verse", class: "fc-btn fc-btn-primary" %>
+  </div>
+<% end %>

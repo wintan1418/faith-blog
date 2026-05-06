@@ -1,0 +1,48 @@
+<% content_for(:page_title) { "Golden Breaths" } %>
+
+<div class="mb-6 flex items-center justify-between">
+  <p class="text-sm text-[var(--fc-muted)]"><%= pluralize(@pagy.count, "breath") %> · curated quotes for the feed sidebar</p>
+  <%= link_to "+ Add a golden breath", new_admin_golden_breath_path, class: "fc-btn fc-btn-primary" %>
+</div>
+
+<% if @breaths.any? %>
+  <ul class="fc-cms-list">
+    <% @breaths.each do |breath| %>
+      <li class="fc-cms-row<%= ' is-inactive' unless breath.active %>">
+        <div class="fc-cms-body">
+          <p class="fc-cms-text">"<%= truncate(breath.text, length: 240) %>"</p>
+          <p class="fc-cms-meta">
+            <% if breath.author_name.present? %>— <%= breath.author_name %><% end %>
+            <% if breath.reference.present? %> · <span class="text-[var(--fc-accent-2)]"><%= breath.reference %></span><% end %>
+          </p>
+        </div>
+        <div class="fc-cms-actions">
+          <span class="fc-cms-status<%= ' is-on' if breath.active %>">
+            <%= breath.active? ? "Active" : "Hidden" %>
+          </span>
+          <%= button_to breath.active? ? "Hide" : "Show",
+              toggle_admin_golden_breath_path(breath),
+              method: :post,
+              form_class: "inline",
+              class: "fc-btn" %>
+          <%= link_to "Edit", edit_admin_golden_breath_path(breath), class: "fc-btn" %>
+          <%= button_to "Delete",
+              admin_golden_breath_path(breath),
+              method: :delete,
+              form_class: "inline",
+              class: "fc-btn",
+              data: { turbo_confirm: "Delete this golden breath?" } %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+
+  <% if @pagy.pages > 1 %>
+    <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+  <% end %>
+<% else %>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
+    <p class="text-base font-bold text-[var(--fc-ink)]">No golden breaths yet.</p>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">Add a quote, attribute it, optionally tie a verse to it.</p>
+  </div>
+<% end %>

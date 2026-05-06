@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_06_163800) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_06_181017) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,6 +73,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_163800) do
     t.index ["severity"], name: "index_ai_moderation_reviews_on_severity"
     t.index ["status"], name: "index_ai_moderation_reviews_on_status"
     t.index ["user_id"], name: "index_ai_moderation_reviews_on_user_id"
+  end
+
+  create_table "bible_verses", force: :cascade do |t|
+    t.text "text", null: false
+    t.string "reference"
+    t.boolean "active", default: true, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_bible_verses_on_active"
+    t.index ["position"], name: "index_bible_verses_on_position"
   end
 
   create_table "bookmarks", force: :cascade do |t|
@@ -160,6 +171,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_163800) do
     t.index ["follower_id", "following_id"], name: "index_follows_on_follower_id_and_following_id", unique: true
     t.index ["follower_id"], name: "index_follows_on_follower_id"
     t.index ["following_id"], name: "index_follows_on_following_id"
+  end
+
+  create_table "golden_breaths", force: :cascade do |t|
+    t.text "text", null: false
+    t.string "author_name"
+    t.string "reference"
+    t.string "source_url"
+    t.boolean "active", default: true, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_golden_breaths_on_active"
+    t.index ["position"], name: "index_golden_breaths_on_position"
   end
 
   create_table "invitations", force: :cascade do |t|

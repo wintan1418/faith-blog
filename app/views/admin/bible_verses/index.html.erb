@@ -1,0 +1,47 @@
+<% content_for(:page_title) { "Bible Verses" } %>
+
+<div class="mb-6 flex items-center justify-between">
+  <p class="text-sm text-[var(--fc-muted)]"><%= pluralize(@pagy.count, "verse") %> · rotates daily on the feed sidebar</p>
+  <%= link_to "+ Add verse", new_admin_bible_verse_path, class: "fc-btn fc-btn-primary" %>
+</div>
+
+<% if @verses.any? %>
+  <ul class="fc-cms-list">
+    <% @verses.each do |verse| %>
+      <li class="fc-cms-row<%= ' is-inactive' unless verse.active %>">
+        <div class="fc-cms-body">
+          <p class="fc-cms-text">"<%= truncate(verse.text, length: 220) %>"</p>
+          <% if verse.reference.present? %>
+            <p class="fc-cms-meta"><%= verse.reference %></p>
+          <% end %>
+        </div>
+        <div class="fc-cms-actions">
+          <span class="fc-cms-status<%= ' is-on' if verse.active %>">
+            <%= verse.active? ? "Active" : "Hidden" %>
+          </span>
+          <%= button_to verse.active? ? "Hide" : "Show",
+              toggle_admin_bible_verse_path(verse),
+              method: :post,
+              form_class: "inline",
+              class: "fc-btn" %>
+          <%= link_to "Edit", edit_admin_bible_verse_path(verse), class: "fc-btn" %>
+          <%= button_to "Delete",
+              admin_bible_verse_path(verse),
+              method: :delete,
+              form_class: "inline",
+              class: "fc-btn",
+              data: { turbo_confirm: "Delete this verse?" } %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+
+  <% if @pagy.pages > 1 %>
+    <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+  <% end %>
+<% else %>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
+    <p class="text-base font-bold text-[var(--fc-ink)]">No verses yet.</p>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">Add the first one — it'll appear in the feed sidebar tomorrow.</p>
+  </div>
+<% end %>

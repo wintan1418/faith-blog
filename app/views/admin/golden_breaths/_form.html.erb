@@ -1,0 +1,48 @@
+<%= form_with model: [:admin, breath], class: "fc-cms-form" do |f| %>
+  <% if breath.errors.any? %>
+    <div class="fc-composer-errors">
+      <strong>Couldn't save:</strong>
+      <ul>
+        <% breath.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
+      </ul>
+    </div>
+  <% end %>
+
+  <label class="fc-cms-label">
+    <span>The breath</span>
+    <%= f.text_area :text, rows: 5, class: "fc-cms-input", placeholder: "A short, beautiful excerpt people will want to share..." %>
+  </label>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <label class="fc-cms-label">
+      <span>Author</span>
+      <%= f.text_field :author_name, class: "fc-cms-input", placeholder: "Author's name" %>
+    </label>
+
+    <label class="fc-cms-label">
+      <span>Anchor verse (optional)</span>
+      <%= f.text_field :reference, class: "fc-cms-input", placeholder: "Romans 8:28" %>
+    </label>
+  </div>
+
+  <label class="fc-cms-label">
+    <span>Source URL (optional)</span>
+    <%= f.url_field :source_url, class: "fc-cms-input", placeholder: "https://..." %>
+  </label>
+
+  <div class="grid grid-cols-2 gap-4">
+    <label class="fc-cms-label">
+      <span>Position</span>
+      <%= f.number_field :position, class: "fc-cms-input", min: 0 %>
+    </label>
+    <label class="fc-composer-toggle">
+      <%= f.check_box :active, class: "fc-composer-checkbox" %>
+      <span>Active</span>
+    </label>
+  </div>
+
+  <div class="fc-cms-footer">
+    <%= link_to "Cancel", admin_golden_breaths_path, class: "fc-btn" %>
+    <%= f.submit breath.persisted? ? "Save changes" : "Add golden breath", class: "fc-btn fc-btn-primary" %>
+  </div>
+<% end %>

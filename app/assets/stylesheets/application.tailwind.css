@@ -10603,3 +10603,171 @@ html.theme-light .google-auth-button {
 dialog .tribute-container {
   z-index: 10000 !important;
 }
+
+/* ============================================================
+   ✦ ADMIN CMS — list + form layout for Verses / Golden Breaths
+   ============================================================ */
+
+.fc-cms-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fc-cms-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 12px;
+  transition: border-color 140ms ease;
+}
+.fc-cms-row:hover { border-color: var(--fc-line-strong); }
+.fc-cms-row.is-inactive { opacity: 0.55; }
+
+.fc-cms-body { min-width: 0; }
+.fc-cms-text {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--fc-ink);
+  font-style: italic;
+}
+.fc-cms-meta {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--fc-muted);
+}
+
+.fc-cms-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.fc-cms-actions form.inline { margin: 0; }
+
+.fc-cms-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+.fc-cms-status.is-on {
+  background: var(--fc-accent-soft);
+  border-color: rgba(52, 211, 153, 0.32);
+  color: var(--fc-accent-2);
+}
+
+.fc-cms-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.fc-cms-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+.fc-cms-input {
+  border: 1px solid var(--fc-line-strong);
+  background: var(--fc-bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--fc-ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.fc-cms-input:focus {
+  outline: none;
+  border-color: var(--fc-accent);
+  box-shadow: 0 0 0 3px var(--fc-accent-soft);
+}
+.fc-cms-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--fc-line);
+}
+
+@media (max-width: 720px) {
+  .fc-cms-row { grid-template-columns: 1fr; }
+  .fc-cms-actions { justify-content: flex-end; flex-wrap: wrap; }
+}
+
+/* ── Golden Breath sidebar card ── */
+.fc-golden-card {
+  background: linear-gradient(160deg,
+    rgba(212, 168, 90, 0.10),
+    rgba(212, 168, 90, 0.04) 70%,
+    transparent
+  ), var(--fc-surface) !important;
+  border: 1px solid rgba(212, 168, 90, 0.28) !important;
+  position: relative;
+}
+.fc-golden-card::before {
+  content: "\201C";
+  position: absolute;
+  top: 4px;
+  right: 16px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 56px;
+  line-height: 1;
+  color: rgba(212, 168, 90, 0.30);
+  pointer-events: none;
+}
+.fc-golden-kicker {
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #d4a85a;
+  margin: 0 0 0.55rem;
+}
+.fc-golden-quote {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--fc-ink);
+}
+.fc-golden-foot {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.78rem;
+}
+.fc-golden-author {
+  font-weight: 800;
+  color: var(--fc-soft);
+}
+.fc-golden-ref {
+  color: #d4a85a;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
