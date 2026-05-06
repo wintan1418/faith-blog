@@ -169,6 +169,7 @@ Rails.application.routes.draw do
     resources :moderation_reviews, only: [ :index, :show ] do
       member do
         post :decide
+        post :copilot
       end
     end
   end

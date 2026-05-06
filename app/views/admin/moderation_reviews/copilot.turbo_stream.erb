@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@review, :copilot) do %>
+  <%= render "copilot", review: @review, output: @copilot_output, operation: @copilot_op %>
+<% end %>

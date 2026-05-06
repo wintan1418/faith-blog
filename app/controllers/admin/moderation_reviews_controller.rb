@@ -3,7 +3,7 @@
 class Admin::ModerationReviewsController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
-  before_action :set_review, only: [ :show, :decide ]
+  before_action :set_review, only: [ :show, :decide, :copilot ]
 
   ALLOWED_DECISIONS = %w[approve hide warn restrict suspend dismiss].freeze
 
@@ -52,6 +52,28 @@ class Admin::ModerationReviewsController < ApplicationController
     end
 
     redirect_to admin_moderation_reviews_path, notice: "Review #{decision}d."
+  end
+
+  def copilot
+    op = params[:operation].to_s
+    unless Ai::Moderation::Copilot::OPERATIONS.include?(op)
+      render plain: "unknown operation", status: :bad_request and return
+    end
+
+    @copilot_op     = op
+    @copilot_output = Ai::Moderation::Copilot.call(operation: op, review: @review)
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to admin_moderation_review_path(@review) }
+    end
+  rescue Ai::Moderation::Copilot::Error => e
+    @copilot_op     = op
+    @copilot_output = "Copilot failed: #{e.message}"
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to admin_moderation_review_path(@review), alert: @copilot_output }
+    end
   end
 
   private

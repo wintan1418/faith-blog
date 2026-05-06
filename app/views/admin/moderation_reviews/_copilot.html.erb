@@ -1,0 +1,52 @@
+<div id="<%= dom_id(review, :copilot) %>" class="fc-copilot">
+  <header class="fc-copilot-head">
+    <span class="fc-copilot-kicker">
+      <%= render_icon("sparkles", classes: "h-4 w-4") %>
+      Moderator Copilot
+    </span>
+    <span class="fc-copilot-provider">via <%= Ai::Moderation::Client.provider_name %></span>
+  </header>
+
+  <div class="fc-copilot-actions">
+    <%= button_to copilot_admin_moderation_review_path(review),
+        method: :post,
+        params: { operation: "summarize" },
+        form_class: "inline",
+        class: "fc-btn",
+        data: { turbo_method: :post } do %>
+      <%= render_icon("filetext", classes: "h-4 w-4") %>
+      Summarize
+    <% end %>
+
+    <%= button_to copilot_admin_moderation_review_path(review),
+        method: :post,
+        params: { operation: "suggest_action" },
+        form_class: "inline",
+        class: "fc-btn",
+        data: { turbo_method: :post } do %>
+      <%= render_icon("shield", classes: "h-4 w-4") %>
+      Suggest action
+    <% end %>
+
+    <%= button_to copilot_admin_moderation_review_path(review),
+        method: :post,
+        params: { operation: "draft_warning" },
+        form_class: "inline",
+        class: "fc-btn",
+        data: { turbo_method: :post } do %>
+      <%= render_icon("send", classes: "h-4 w-4") %>
+      Draft warning
+    <% end %>
+  </div>
+
+  <% if local_assigns[:output].present? %>
+    <div class="fc-copilot-output">
+      <p class="fc-copilot-op-label">
+        <%= local_assigns[:operation].to_s.humanize %>
+      </p>
+      <p class="fc-copilot-text"><%= simple_format(local_assigns[:output]) %></p>
+    </div>
+  <% else %>
+    <p class="fc-copilot-empty">Pick one — output appears here. Use the result however you like (paste into a warning, copy into your decision notes, or just read).</p>
+  <% end %>
+</div>
