@@ -1,107 +1,71 @@
 # frozen_string_literal: true
 
-require "net/http"
-require "json"
-require "uri"
-
 module Ai
   module Moderation
+    # Dispatches the moderation call to whichever provider is configured.
+    # Provider precedence:
+    #   1. AI_MODERATION_STUB=1            -> Stub (no network)
+    #   2. AI_MODERATION_PROVIDER=<name>   -> explicit choice (gemini/openai/anthropic/stub)
+    #   3. First env key found             -> gemini > openai > anthropic
+    #   4. Fallback                        -> Stub
     class Client
-      class Error < StandardError; end
+      class Error      < StandardError; end
       class ConfigError < Error; end
-      class ApiError < Error; end
+      class ApiError    < Error; end
 
-      ENDPOINT = URI("https://api.anthropic.com/v1/messages")
-      ANTHROPIC_VERSION = "2023-06-01"
-      DEFAULT_MODEL = "claude-haiku-4-5-20251001"
-      DEFAULT_MAX_TOKENS = 600
-      DEFAULT_TIMEOUT = 12
+      PROVIDERS = {
+        "gemini"    => { klass: Providers::Gemini,    env_key: "GEMINI_API_KEY" },
+        "openai"    => { klass: Providers::Openai,    env_key: "OPENAI_API_KEY" },
+        "anthropic" => { klass: Providers::Anthropic, env_key: "ANTHROPIC_API_KEY" },
+        "stub"      => { klass: Providers::Stub,      env_key: nil }
+      }.freeze
+
+      def self.call(system:, user:)
+        new.call(system: system, user: user)
+      end
 
       def self.stub?
-        ENV["AI_MODERATION_STUB"] == "1" || ENV["ANTHROPIC_API_KEY"].to_s.strip.empty?
+        resolve_provider_name == "stub"
       end
 
-      def self.call(system:, user:, model: DEFAULT_MODEL)
-        new(model: model).call(system: system, user: user)
+      def self.provider_name
+        resolve_provider_name
       end
 
-      def initialize(model: DEFAULT_MODEL, api_key: ENV["ANTHROPIC_API_KEY"], timeout: DEFAULT_TIMEOUT)
-        @model = model
-        @api_key = api_key
-        @timeout = timeout
+      def self.resolve_provider_name
+        return "stub" if ENV["AI_MODERATION_STUB"] == "1"
+
+        explicit = ENV["AI_MODERATION_PROVIDER"].to_s.downcase
+        return explicit if PROVIDERS.key?(explicit) && key_present_for?(explicit)
+
+        %w[gemini openai anthropic].each do |name|
+          return name if key_present_for?(name)
+        end
+
+        "stub"
+      end
+
+      def self.key_present_for?(name)
+        env_key = PROVIDERS.dig(name, :env_key)
+        return true if env_key.nil? # stub has no key
+
+        ENV[env_key].to_s.strip.length.positive?
+      end
+
+      def initialize(provider: nil)
+        name = provider || self.class.resolve_provider_name
+        config = PROVIDERS.fetch(name) { raise ConfigError, "unknown provider: #{name}" }
+        api_key = config[:env_key] ? ENV[config[:env_key]] : nil
+
+        @provider_name = name
+        @impl = config[:klass].new(api_key: api_key)
       end
 
       def call(system:, user:)
-        return stub_response(user) if self.class.stub?
-
-        request = Net::HTTP::Post.new(ENDPOINT)
-        request["content-type"] = "application/json"
-        request["x-api-key"] = @api_key
-        request["anthropic-version"] = ANTHROPIC_VERSION
-        request.body = JSON.dump(
-          model: @model,
-          max_tokens: DEFAULT_MAX_TOKENS,
-          system: system,
-          messages: [ { role: "user", content: user } ]
-        )
-
-        http = Net::HTTP.new(ENDPOINT.host, ENDPOINT.port)
-        http.use_ssl = true
-        http.open_timeout = @timeout
-        http.read_timeout = @timeout
-
-        response = http.request(request)
-        raise ApiError, "anthropic #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
-
-        JSON.parse(response.body)
+        @impl.call(system: system, user: user)
       end
 
-      private
-
-      # Deterministic stub for development/test. No external call.
-      # Looks for obvious red-flag tokens so tests can assert flow without live AI.
-      def stub_response(user)
-        flagged_keywords = %w[kill suicide bomb scam phish stupid hate]
-        match = flagged_keywords.find { |w| user.to_s.downcase.include?(w) }
-
-        if match
-          severity = (match == "kill" || match == "bomb" || match == "suicide") ? "high" : "medium"
-          payload = {
-            safe: false,
-            severity: severity,
-            categories: [ infer_category(match) ],
-            score: severity == "high" ? 0.92 : 0.65,
-            summary: "Stub flagged content matched keyword '#{match}'.",
-            recommended_action: Policy.severity_to_action(severity)
-          }
-        else
-          payload = {
-            safe: true,
-            severity: "none",
-            categories: [],
-            score: 0.05,
-            summary: "Stub review found no obvious violations.",
-            recommended_action: "allow"
-          }
-        end
-
-        {
-          "id" => "stub_#{SecureRandom.hex(6)}",
-          "model" => "stub",
-          "content" => [ { "type" => "text", "text" => JSON.dump(payload) } ]
-        }
-      end
-
-      def infer_category(word)
-        case word
-        when "kill", "bomb"        then "violence"
-        when "suicide"             then "self_harm"
-        when "scam", "phish"       then "scam"
-        when "hate"                then "hate"
-        when "stupid"              then "harassment"
-        else "heated_language"
-        end
-      end
+      attr_reader :provider_name
     end
   end
 end
