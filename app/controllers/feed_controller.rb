@@ -9,7 +9,7 @@ class FeedController < ApplicationController
   PER_PAGE        = 20
 
   def index
-    posts    = Post.published.includes(:user, :room, :tags).recent.limit(POSTS_BUFFER)
+    posts    = Post.published.includes(:user, :room, :tags, :likes).recent.limit(POSTS_BUFFER)
     reshares = Reshare.includes(:user, post: [ :user, :room, :tags ])
                       .order(created_at: :desc)
                       .limit(RESHARES_BUFFER)
@@ -20,7 +20,7 @@ class FeedController < ApplicationController
   def threads
     posts = Post.published
                 .threads_or_active
-                .includes(:user, :room, :tags)
+                .includes(:user, :room, :tags, :likes)
                 .recent
                 .limit(POSTS_BUFFER)
 
@@ -30,7 +30,7 @@ class FeedController < ApplicationController
 
   def trending
     posts = Post.published
-                .includes(:user, :room, :tags)
+                .includes(:user, :room, :tags, :likes)
                 .where("published_at > ?", 7.days.ago)
                 .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
                 .limit(POSTS_BUFFER)
@@ -43,7 +43,7 @@ class FeedController < ApplicationController
     followed_user_ids = current_user.following.pluck(:id)
 
     posts    = Post.published
-                   .includes(:user, :room, :tags)
+                   .includes(:user, :room, :tags, :likes)
                    .where(user_id: followed_user_ids)
                    .recent
                    .limit(POSTS_BUFFER)

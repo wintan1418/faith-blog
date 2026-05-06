@@ -1,12 +1,13 @@
 <%
-  user_like = user_signed_in? ? current_user.likes.find_by(likeable: post) : nil
-  emoji_counts = post.likes
-                     .where.not(reaction_emoji: [ nil, "" ])
-                     .group(:reaction_emoji)
-                     .count
-                     .sort_by { |_, c| -c }
-                     .first(4)
-                     .to_h
+  loaded_likes = post.likes.loaded? ? post.likes.to_a : post.likes.to_a
+  user_like    = user_signed_in? ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
+  emoji_counts = loaded_likes
+                   .reject { |l| l.reaction_emoji.to_s.empty? }
+                   .group_by(&:reaction_emoji)
+                   .transform_values(&:size)
+                   .sort_by { |_, c| -c }
+                   .first(4)
+                   .to_h
 %>
 
 <div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions"

@@ -9751,18 +9751,53 @@ form.inline {
 .fc-thread-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 0 0.5rem;
-  height: 20px;
-  border-radius: 6px;
+  gap: 5px;
+  padding: 2px 8px;
+  height: 22px;
+  border-radius: 999px;
   background: var(--fc-accent-soft);
-  border: 1px solid rgba(52, 211, 153, 0.24);
+  border: 1px solid rgba(52, 211, 153, 0.28);
   color: var(--fc-accent-2);
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
+  line-height: 1;
+}
+.fc-thread-chip svg { flex-shrink: 0; }
+
+.fc-inline-thread-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--fc-line);
+}
+.fc-inline-thread-bar > span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+.fc-inline-thread-close {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: var(--fc-muted);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.fc-inline-thread-close:hover {
+  background: var(--fc-surface-2);
+  color: var(--fc-ink);
 }
 
 .fc-breath-action.is-thread {

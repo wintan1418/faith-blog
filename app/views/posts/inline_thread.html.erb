@@ -1,4 +1,15 @@
 <%= turbo_frame_tag dom_id(@post, :thread), class: "fc-breath-thread" do %>
+  <header class="fc-inline-thread-bar">
+    <span>Thread · <%= pluralize(@post.comments_count, "voice") %></span>
+    <button type="button"
+            class="fc-inline-thread-close"
+            data-frame-id="<%= dom_id(@post, :thread) %>"
+            onclick="document.getElementById(this.dataset.frameId)?.classList.add('is-closed')"
+            aria-label="Close thread">
+      <%= render_icon("x", classes: "h-4 w-4") %>
+    </button>
+  </header>
+
   <% if user_signed_in? && @post.allow_comments? %>
     <%= form_with model: [ @post, @new_comment ],
         id: dom_id(@post, :inline_form),
