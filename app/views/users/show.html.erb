@@ -127,10 +127,10 @@
         <h2>Posts by <%= @user.display_name.presence || @user.username %></h2>
       </div>
 
-      <% if @posts.any? %>
+      <% if @items.any? %>
         <div class="space-y-5">
-          <% @posts.each do |post| %>
-            <%= render "posts/card", post: post %>
+          <% @items.each do |item| %>
+            <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
           <% end %>
         </div>
 

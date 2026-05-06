@@ -1,3 +1,4 @@
+<% reshared_by = local_assigns[:reshared_by] %>
 <% if post.held_for_review? && !post.visible_to?(current_user) %>
   <article class="fc-card fc-card-held" id="<%= dom_id(post) %>">
     <div class="fc-held-placeholder">
@@ -7,6 +8,13 @@
   </article>
 <% else %>
 <article class="fc-breath<%= ' fc-card-held-author' if post.held_for_review? %>" id="<%= dom_id(post) %>">
+  <% if reshared_by %>
+    <div class="fc-breath-attribution">
+      <%= render_icon("repeat", classes: "h-3.5 w-3.5") %>
+      <%= link_to reshared_by.username, user_path(reshared_by.username), class: "fc-breath-attribution-name" %>
+      <span>reshared</span>
+    </div>
+  <% end %>
   <% if post.held_for_review? && current_user == post.user %>
     <div class="fc-held-banner">
       <%= render_icon("shield", classes: "h-4 w-4") %>

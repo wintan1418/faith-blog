@@ -22,7 +22,12 @@ class UsersController < ApplicationController
   end
 
   def show
-    @pagy, @posts = pagy(@user.posts.published.includes(:room, :tags).recent)
+    posts    = @user.posts.published.includes(:room, :tags).recent.limit(60)
+    reshares = Reshare.where(user: @user).includes(post: [ :user, :room, :tags ])
+                      .order(created_at: :desc).limit(60)
+    @items = FeedItem.merge(posts: posts, reshares: reshares)
+    @pagy, @items = pagy_array(@items, items: 20)
+    @posts = @items.map(&:post) # back-compat for any partials still using @posts
   end
 
   def posts

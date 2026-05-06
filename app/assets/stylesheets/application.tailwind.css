@@ -8862,3 +8862,23 @@ form.inline {
   padding-left: 0.85rem;
   border-left: 2px solid var(--fc-line);
 }
+
+.fc-breath-attribution {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -0.25rem 0 0.55rem 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--fc-muted);
+}
+.fc-breath-attribution svg {
+  color: var(--fc-accent);
+}
+.fc-breath-attribution-name {
+  color: var(--fc-soft);
+  font-weight: 800;
+}
+.fc-breath-attribution-name:hover {
+  color: var(--fc-accent);
+}

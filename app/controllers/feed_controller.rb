@@ -4,32 +4,44 @@ class FeedController < ApplicationController
   before_action :authenticate_user!
   before_action :load_sidebar_context
 
+  POSTS_BUFFER    = 60
+  RESHARES_BUFFER = 60
+  PER_PAGE        = 20
+
   def index
-    @pagy, @posts = pagy(
-      Post.published
-          .includes(:user, :room, :tags)
-          .recent
-    )
+    posts    = Post.published.includes(:user, :room, :tags).recent.limit(POSTS_BUFFER)
+    reshares = Reshare.includes(:user, post: [ :user, :room, :tags ])
+                      .order(created_at: :desc)
+                      .limit(RESHARES_BUFFER)
+
+    @pagy, @items = pagy_array(FeedItem.merge(posts: posts, reshares: reshares), items: PER_PAGE)
   end
 
   def trending
-    @pagy, @posts = pagy(
-      Post.published
-          .includes(:user, :room, :tags)
-          .where("published_at > ?", 7.days.ago)
-          .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
-    )
+    posts = Post.published
+                .includes(:user, :room, :tags)
+                .where("published_at > ?", 7.days.ago)
+                .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
+                .limit(POSTS_BUFFER)
+
+    @pagy, @items = pagy_array(posts.map { |p| FeedItem.from_post(p) }, items: PER_PAGE)
     render :index
   end
 
   def following
     followed_user_ids = current_user.following.pluck(:id)
-    @pagy, @posts = pagy(
-      Post.published
-          .where(user_id: followed_user_ids)
-          .includes(:user, :room, :tags)
-          .recent
-    )
+
+    posts    = Post.published
+                   .includes(:user, :room, :tags)
+                   .where(user_id: followed_user_ids)
+                   .recent
+                   .limit(POSTS_BUFFER)
+    reshares = Reshare.includes(:user, post: [ :user, :room, :tags ])
+                      .where(user_id: followed_user_ids)
+                      .order(created_at: :desc)
+                      .limit(RESHARES_BUFFER)
+
+    @pagy, @items = pagy_array(FeedItem.merge(posts: posts, reshares: reshares), items: PER_PAGE)
     render :index
   end
 
