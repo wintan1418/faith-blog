@@ -50,7 +50,7 @@ class LikesController < ApplicationController
     @likeable_type = params[:likeable_type].to_s.classify
     @likeable_id = params[:likeable_id]
 
-    likeable_class = { "Post" => Post, "Comment" => Comment }[@likeable_type]
+    likeable_class = { "Post" => Post, "Comment" => Comment, "Message" => Message }[@likeable_type]
     raise ActiveRecord::RecordNotFound unless likeable_class
 
     @likeable = likeable_class.find(@likeable_id)

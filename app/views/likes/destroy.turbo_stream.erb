@@ -2,8 +2,12 @@
   <%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
     <%= render "posts/reactions", post: @likeable %>
   <% end %>
-<% else %>
+<% elsif @likeable.is_a?(Comment) %>
   <%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
     <%= render "comments/reaction", comment: @likeable %>
+  <% end %>
+<% elsif @likeable.is_a?(Message) %>
+  <%= turbo_stream.replace dom_id(@likeable) do %>
+    <%= render "conversations/message", message: @likeable, viewer_id: current_user.id %>
   <% end %>
 <% end %>

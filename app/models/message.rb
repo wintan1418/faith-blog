@@ -4,6 +4,11 @@ class Message < ApplicationRecord
   belongs_to :conversation
   belongs_to :sender, class_name: "User"
   has_many :reports, as: :reportable, dependent: :destroy
+  has_many :likes, as: :likeable, dependent: :destroy
+
+  def edited?
+    edited_at.present?
+  end
 
   validates :body, presence: true, length: { maximum: 4_000 }
   validate :sender_is_participant

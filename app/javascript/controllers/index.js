@@ -57,3 +57,6 @@ application.register("golden-carousel", GoldenCarouselController)
 
 import DiscoverController from "./discover_controller"
 application.register("discover", DiscoverController)
+
+import MessageEditController from "./message_edit_controller"
+application.register("message-edit", MessageEditController)

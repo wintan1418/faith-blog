@@ -125,7 +125,7 @@ Rails.application.routes.draw do
       post :archive
       post :mark_read
     end
-    resources :messages, only: [ :create ]
+    resources :messages, only: [ :create, :update, :destroy ]
   end
   resources :message_blocks, only: [ :create, :destroy ], param: :user_id
 

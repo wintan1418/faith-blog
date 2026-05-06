@@ -1,18 +1,110 @@
 <% message = local_assigns.fetch(:message) %>
 <% viewer_id = local_assigns.fetch(:viewer_id, current_user&.id) %>
 <% mine = message.sender_id == viewer_id %>
+<% deleted = message.deleted? %>
 
-<div id="<%= dom_id(message) %>" class="message-row <%= mine ? 'is-mine' : 'is-theirs' %>">
+<%
+  loaded_likes = message.likes.includes(:user).to_a
+  user_like    = current_user ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
+  emoji_counts = loaded_likes
+                   .reject { |l| l.reaction_emoji.to_s.empty? }
+                   .group_by(&:reaction_emoji)
+                   .transform_values(&:size)
+                   .sort_by { |_, c| -c }
+                   .first(4)
+                   .to_h
+%>
+
+<div id="<%= dom_id(message) %>" class="message-row <%= mine ? 'is-mine' : 'is-theirs' %><%= ' is-deleted' if deleted %>">
   <% unless mine %>
     <%= render "conversations/avatar", user: message.sender, size: "h-8 w-8" %>
   <% end %>
-  <div class="message-bubble">
-    <div><%= simple_format(message.body) %></div>
-    <span class="message-meta">
-      <%= message.created_at.strftime("%I:%M %p") %>
-      <% unless mine %>
-        <%= button_to "Report", reports_path(reportable_type: "Message", reportable_id: message.id, reason: "Reported private message."), method: :post, class: "message-report-btn" %>
+
+  <div class="message-stack">
+    <div class="message-bubble">
+      <% if deleted %>
+        <div class="message-deleted">— message deleted —</div>
+      <% else %>
+        <div class="message-body"><%= simple_format(message.body) %></div>
       <% end %>
-    </span>
+
+      <span class="message-meta">
+        <%= message.created_at.strftime("%I:%M %p") %>
+        <% if message.respond_to?(:edited?) && message.edited? %>
+          <span class="message-edited">· edited</span>
+        <% end %>
+      </span>
+
+      <% unless deleted %>
+        <div class="message-actions" data-controller="emoji-reactions message-edit"
+             data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Message", likeable_id: message.id) %>"
+             data-emoji-reactions-token-value="<%= form_authenticity_token %>">
+          <button type="button"
+                  class="message-action-btn"
+                  data-action="click->emoji-reactions#toggle"
+                  title="React"
+                  aria-label="React">
+            <%= render_icon("smile", classes: "h-4 w-4") %>
+          </button>
+
+          <% if mine %>
+            <button type="button"
+                    class="message-action-btn"
+                    data-action="click->message-edit#start"
+                    data-message-edit-message-id-param="<%= message.id %>"
+                    title="Edit"
+                    aria-label="Edit">
+              <%= render_icon("pencil", classes: "h-4 w-4") %>
+            </button>
+            <%= button_to conversation_message_path(message.conversation_id, message),
+                method: :delete,
+                form_class: "inline",
+                class: "message-action-btn",
+                title: "Delete",
+                data: { turbo_confirm: "Delete this message?" } do %>
+              <%= render_icon("x", classes: "h-4 w-4") %>
+            <% end %>
+          <% else %>
+            <%= button_to reports_path(reportable_type: "Message", reportable_id: message.id, reason: "Reported private message."),
+                method: :post,
+                form_class: "inline",
+                class: "message-action-btn",
+                title: "Report",
+                data: { turbo_frame: "_top", turbo_confirm: "Report this message?" } do %>
+              <%= render_icon("shield", classes: "h-4 w-4") %>
+            <% end %>
+          <% end %>
+
+          <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker">
+            <emoji-picker style="width: 300px; height: 340px;"></emoji-picker>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <% if !deleted && (emoji_counts.any? || user_like) %>
+      <div class="message-reactions">
+        <% emoji_counts.each do |emoji, count| %>
+          <% mine_emoji = user_like&.display_emoji == emoji %>
+          <% if mine_emoji %>
+            <%= button_to unlike_path(likeable_type: "Message", likeable_id: message.id),
+                method: :delete,
+                form_class: "inline",
+                class: "fc-reaction-pill is-mine",
+                title: "Remove your reaction" do %>
+              <span class="fc-reaction-emoji"><%= emoji %></span>
+              <span class="fc-reaction-count"><%= count %></span>
+            <% end %>
+          <% else %>
+            <%= button_to likes_path(likeable_type: "Message", likeable_id: message.id, reaction_emoji: emoji),
+                form_class: "inline",
+                class: "fc-reaction-pill" do %>
+              <span class="fc-reaction-emoji"><%= emoji %></span>
+              <span class="fc-reaction-count"><%= count %></span>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>
