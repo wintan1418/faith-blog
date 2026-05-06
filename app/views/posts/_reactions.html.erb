@@ -1,16 +1,18 @@
 <%
   user_like = user_signed_in? ? current_user.likes.find_by(likeable: post) : nil
   emoji_counts = post.likes
+                     .where.not(reaction_emoji: [ nil, "" ])
                      .group(:reaction_emoji)
-                     .order(Arel.sql("COUNT(*) DESC"))
-                     .limit(4)
                      .count
-  total = post.likes_count.to_i
+                     .sort_by { |_, c| -c }
+                     .first(4)
+                     .to_h
 %>
 
-<div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions">
+<div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions"
+     data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
+     data-emoji-reactions-token-value="<%= form_authenticity_token %>">
   <% emoji_counts.each do |emoji, count| %>
-    <% next if emoji.blank? %>
     <% mine = user_like&.display_emoji == emoji %>
     <% if mine %>
       <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
@@ -32,27 +34,26 @@
   <% end %>
 
   <% if user_signed_in? %>
+    <% if emoji_counts.empty? && user_like.nil? %>
+      <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_emoji: "🙏"),
+          form_class: "inline",
+          class: "fc-reaction-add",
+          title: "Amen" do %>
+        <span class="fc-reaction-emoji">🙏</span>
+        <span class="fc-reaction-add-label">Amen</span>
+      <% end %>
+    <% end %>
     <button type="button"
             class="fc-reaction-add"
             data-action="click->emoji-reactions#toggle"
-            aria-label="Add a reaction"
+            aria-label="Add reaction"
             title="Add a reaction">
       <%= render_icon("smile", classes: "h-4 w-4") %>
-      <% if emoji_counts.empty? %>
-        <span class="fc-reaction-add-label">React</span>
-      <% end %>
     </button>
-
-    <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker"
-         data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
-         data-emoji-reactions-token-value="<%= form_authenticity_token %>">
+    <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker">
       <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
     </div>
   <% else %>
     <%= link_to "React", new_user_session_path, class: "fc-reaction-add" %>
-  <% end %>
-
-  <% if total.positive? && emoji_counts.empty? %>
-    <span class="fc-reaction-summary"><%= total %></span>
   <% end %>
 </div>
