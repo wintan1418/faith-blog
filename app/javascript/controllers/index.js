@@ -48,3 +48,6 @@ application.register("composer", ComposerController)
 
 import TocController from "./toc_controller"
 application.register("toc", TocController)
+
+import ComposerModeController from "./composer_mode_controller"
+application.register("composer-mode", ComposerModeController)

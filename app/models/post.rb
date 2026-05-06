@@ -15,6 +15,15 @@ class Post < ApplicationRecord
 
   # Enums
   enum :status, { draft: 0, published: 1, archived: 2 }
+  enum :kind,   { breath: 0, thread: 1 }, prefix: :kind
+
+  scope :threads_or_active, -> { where(kind: :thread).or(where("comments_count > 0")) }
+
+  # A post is "threaded" if the author chose Thread mode OR if any reply
+  # has shown up. Either way the card swaps to Open-thread chrome.
+  def threaded?
+    kind_thread? || comments_count.to_i > 0
+  end
 
   # Associations
   belongs_to :user

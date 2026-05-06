@@ -82,7 +82,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :room_id, :status, :anonymous, :allow_comments, :tag_list, images: [])
+    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :anonymous, :allow_comments, :tag_list, images: [])
   end
 
   def handle_post_links

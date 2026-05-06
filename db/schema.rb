@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_06_141649) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_06_163800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -309,7 +309,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_141649) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "reshares_count", default: 0, null: false
+    t.integer "kind", default: 0, null: false
     t.index ["featured"], name: "index_posts_on_featured"
+    t.index ["kind"], name: "index_posts_on_kind"
     t.index ["published_at"], name: "index_posts_on_published_at"
     t.index ["room_id", "status", "published_at"], name: "index_posts_on_room_id_and_status_and_published_at"
     t.index ["room_id"], name: "index_posts_on_room_id"

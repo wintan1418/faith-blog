@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "feed", to: "feed#index"
   get "feed/trending", to: "feed#trending"
   get "feed/following", to: "feed#following"
+  get "feed/threads",   to: "feed#threads"
 
   # Rooms
   resources :rooms, only: [ :index, :show ] do

@@ -79,6 +79,7 @@
 
       <div class="fc-tabs">
         <%= link_to "Recent", feed_path, class: "fc-tab #{current_page?(feed_path) ? 'is-active' : ''}" %>
+        <%= link_to "Threads", feed_threads_path, class: "fc-tab #{current_page?(feed_threads_path) ? 'is-active' : ''}" %>
         <%= link_to "Trending", feed_trending_path, class: "fc-tab #{current_page?(feed_trending_path) ? 'is-active' : ''}" %>
         <%= link_to "Following", feed_following_path, class: "fc-tab #{current_page?(feed_following_path) ? 'is-active' : ''}" %>
         <div class="ml-auto">

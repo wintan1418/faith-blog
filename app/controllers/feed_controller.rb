@@ -17,6 +17,17 @@ class FeedController < ApplicationController
     @pagy, @items = pagy_array(FeedItem.merge(posts: posts, reshares: reshares), items: PER_PAGE)
   end
 
+  def threads
+    posts = Post.published
+                .threads_or_active
+                .includes(:user, :room, :tags)
+                .recent
+                .limit(POSTS_BUFFER)
+
+    @pagy, @items = pagy_array(posts.map { |p| FeedItem.from_post(p) }, items: PER_PAGE)
+    render :index
+  end
+
   def trending
     posts = Post.published
                 .includes(:user, :room, :tags)

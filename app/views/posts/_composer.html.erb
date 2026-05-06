@@ -1,6 +1,8 @@
 <%# Lean Twitter-style composer used inside the modal AND on /posts/new.
     Locals: post, rooms %>
-<%= form_with model: post, html: { class: "fc-composer-form", multipart: true, data: { controller: "post-form" } } do |f| %>
+<% mode = local_assigns.fetch(:mode, post.kind || "breath").to_s %>
+<%= form_with model: post,
+    html: { class: "fc-composer-form", multipart: true, data: { controller: "post-form composer-mode", composer_mode_initial_value: mode } } do |f| %>
   <% if post.errors.any? %>
     <div class="fc-composer-errors">
       <strong>Couldn't post:</strong>
@@ -12,6 +14,29 @@
     </div>
   <% end %>
 
+  <div class="fc-composer-tabs" role="tablist" aria-label="What are you posting?">
+    <button type="button"
+            class="fc-composer-tab is-active"
+            data-mode="breath"
+            data-action="click->composer-mode#switch"
+            data-composer-mode-target="tab"
+            role="tab">
+      <%= render_icon("sparkles", classes: "h-4 w-4") %>
+      <span>Breathe</span>
+    </button>
+    <button type="button"
+            class="fc-composer-tab"
+            data-mode="thread"
+            data-action="click->composer-mode#switch"
+            data-composer-mode-target="tab"
+            role="tab">
+      <%= render_icon("message_circle", classes: "h-4 w-4") %>
+      <span>Start a thread</span>
+    </button>
+  </div>
+
+  <%= f.hidden_field :kind, value: mode, data: { composer_mode_target: "kindField" } %>
+
   <div class="fc-composer-head">
     <% if current_user.profile&.avatar&.attached? %>
       <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
@@ -20,7 +45,10 @@
     <% end %>
     <div class="fc-composer-author">
       <p class="fc-composer-name"><%= current_user.username %></p>
-      <p class="fc-composer-handle">breathing into the community</p>
+      <p class="fc-composer-handle"
+         data-composer-mode-target="handle"
+         data-handle-breath="breathing into the community"
+         data-handle-thread="opening a thread for the community">breathing into the community</p>
     </div>
   </div>
 
@@ -28,7 +56,12 @@
       class: "fc-composer-title",
       placeholder: "Title — what is this breath about?",
       maxlength: 200,
-      required: true %>
+      required: true,
+      data: {
+        composer_mode_target: "title",
+        title_breath: "Title — what is this breath about?",
+        title_thread: "What do you want to discuss?"
+      } %>
 
   <div data-controller="emoji-picker">
     <%= f.rich_text_area :content,
@@ -36,7 +69,10 @@
         placeholder: "What's on your heart? Breathe it out...",
         data: {
           emoji_picker_target: "editor",
-          controller: "mentions"
+          controller: "mentions",
+          composer_mode_target: "body",
+          body_breath: "What's on your heart? Breathe it out...",
+          body_thread: "Pose a question. Invite the community in."
         } %>
 
     <div class="fc-composer-toolbar">
@@ -89,6 +125,12 @@
   <div class="fc-composer-footer">
     <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
     <%= f.hidden_field :status, value: "published" %>
-    <%= f.submit post.persisted? ? "Update" : "Breathe", class: "fc-btn fc-btn-primary" %>
+    <%= f.submit (post.persisted? ? "Update" : "Breathe"),
+        class: "fc-btn fc-btn-primary",
+        data: {
+          composer_mode_target: "submit",
+          submit_breath: post.persisted? ? "Update" : "Breathe",
+          submit_thread: post.persisted? ? "Update thread" : "Open the thread"
+        } %>
   </div>
 <% end %>

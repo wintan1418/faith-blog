@@ -9710,3 +9710,66 @@ form.inline {
   }
   .post-title { line-height: 1.12; }
 }
+
+/* ============================================================
+   ✦ THREAD MODE — composer tabs, thread chip, action highlight
+   ============================================================ */
+
+.fc-composer-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  margin: 0 0 0.85rem;
+  align-self: flex-start;
+}
+.fc-composer-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--fc-muted);
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+.fc-composer-tab:hover { color: var(--fc-ink); }
+.fc-composer-tab.is-active {
+  background: var(--fc-accent);
+  color: #042f1d;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.30);
+}
+
+.fc-thread-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 0.5rem;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--fc-accent-soft);
+  border: 1px solid rgba(52, 211, 153, 0.24);
+  color: var(--fc-accent-2);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.fc-breath-action.is-thread {
+  color: var(--fc-accent-2);
+  font-weight: 800;
+}
+.fc-breath-action.is-thread:hover {
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent);
+}

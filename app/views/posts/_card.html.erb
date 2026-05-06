@@ -54,6 +54,12 @@
           <% if post.featured? %>
             <span class="fc-featured-tag">★ Featured</span>
           <% end %>
+          <% if post.threaded? %>
+            <span class="fc-thread-chip" title="Open thread">
+              <%= render_icon("message_circle", classes: "h-3 w-3") %>
+              Thread
+            </span>
+          <% end %>
         </div>
         <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
           <%= link_to edit_post_path(post), class: "fc-action", title: "Edit breath" do %>
@@ -85,14 +91,18 @@
         <%= render "posts/reactions", post: post %>
 
         <button type="button"
-                class="fc-breath-action"
+                class="fc-breath-action<%= ' is-thread' if post.threaded? %>"
                 data-controller="thread-toggle"
                 data-thread-toggle-url-value="<%= inline_thread_post_path(post) %>"
                 data-thread-toggle-frame-value="<%= dom_id(post, :thread) %>"
                 data-action="click->thread-toggle#toggle"
-                aria-label="Reply">
+                aria-label="<%= post.threaded? ? "Open thread" : "Reply" %>">
           <%= render_icon("message_circle", classes: "h-4 w-4") %>
-          <span><%= post.comments_count.positive? ? post.comments_count : "Reply" %></span>
+          <% if post.threaded? %>
+            <span>Open thread<% if post.comments_count.positive? %> · <%= pluralize(post.comments_count, "voice") %><% end %></span>
+          <% else %>
+            <span>Reply</span>
+          <% end %>
         </button>
 
         <%= render "reshares/button", post: post %>
