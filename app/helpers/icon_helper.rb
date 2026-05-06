@@ -91,6 +91,8 @@ module IconHelper
       icon_svg("M20 6 9 17l-5-5", classes)
     when "smile"
       icon_svg("<circle cx='12' cy='12' r='10' /><path d='M8 14s1.5 2 4 2 4-2 4-2' /><line x1='9' y1='9' x2='9.01' y2='9' /><line x1='15' y1='9' x2='15.01' y2='9' />", classes)
+    when "repeat", "reshare", "retweet"
+      icon_svg("<polyline points='17 1 21 5 17 9' /><path d='M3 11V9a4 4 0 0 1 4-4h14' /><polyline points='7 23 3 19 7 15' /><path d='M21 13v2a4 4 0 0 1-4 4H3' />", classes)
     when "x", "close", "xmark"
       icon_svg("M18 6 6 18 M6 6l12 12", classes)
     else

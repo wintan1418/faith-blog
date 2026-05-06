@@ -3,7 +3,7 @@
     <%= render "posts/reactions", post: @likeable %>
   <% end %>
 <% else %>
-  <%= turbo_stream.replace dom_id(@likeable, :reaction) do %>
+  <%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
     <%= render "comments/reaction", comment: @likeable %>
   <% end %>
 <% end %>

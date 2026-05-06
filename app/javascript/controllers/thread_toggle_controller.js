@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Click → if the linked turbo-frame is empty, fetch the inline thread
-// and reveal it. Click again → collapse.
+// Toggle a turbo-frame open/closed.
+// First click: set src (Turbo loads it) + remove .hidden
+// Subsequent clicks: just toggle .hidden so we don't refetch.
 export default class extends Controller {
   static values = { url: String, frame: String }
 
@@ -10,21 +11,15 @@ export default class extends Controller {
     const frame = document.getElementById(this.frameValue)
     if (!frame) return
 
-    const isHidden = frame.classList.contains("hidden")
-    if (isHidden) {
-      if (!frame.src && !frame.hasAttribute("complete")) {
+    const isClosed = frame.classList.contains("is-closed") || frame.children.length === 0
+
+    if (isClosed) {
+      if (!frame.src && frame.children.length === 0) {
         frame.src = this.urlValue
       }
-      frame.classList.remove("hidden")
-      // Focus the reply input once the frame finishes loading.
-      const onLoad = () => {
-        frame.removeEventListener("turbo:frame-load", onLoad)
-        const editor = frame.querySelector("trix-editor")
-        if (editor) editor.focus()
-      }
-      frame.addEventListener("turbo:frame-load", onLoad)
+      frame.classList.remove("is-closed")
     } else {
-      frame.classList.add("hidden")
+      frame.classList.add("is-closed")
     }
   }
 }

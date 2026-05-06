@@ -2,18 +2,18 @@
   <% if user_signed_in? %>
     <% if current_user.has_reshared?(post) %>
       <%= button_to post_reshare_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove reshare" do %>
-        <%= render_icon("send", classes: "h-4 w-4") %>
+        <%= render_icon("repeat", classes: "h-4 w-4") %>
         <%= post.reshares_count %>
       <% end %>
     <% else %>
       <%= button_to post_reshare_path(post), class: "fc-action", title: "Reshare this post" do %>
-        <%= render_icon("send", classes: "h-4 w-4") %>
+        <%= render_icon("repeat", classes: "h-4 w-4") %>
         <%= post.reshares_count %>
       <% end %>
     <% end %>
   <% else %>
     <%= link_to new_user_session_path, class: "fc-action" do %>
-      <%= render_icon("send", classes: "h-4 w-4") %>
+      <%= render_icon("repeat", classes: "h-4 w-4") %>
       <%= post.reshares_count %>
     <% end %>
   <% end %>

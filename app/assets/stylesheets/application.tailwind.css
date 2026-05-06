@@ -8333,6 +8333,10 @@ html.theme-dark .fc-held-banner {
 turbo-frame.fc-breath-thread:not([complete]):empty {
   display: none;
 }
+/* Closed-state lets the user collapse a thread after it's loaded. */
+.fc-breath-thread.is-closed {
+  display: none !important;
+}
 
 .fc-inline-reply {
   display: flex;

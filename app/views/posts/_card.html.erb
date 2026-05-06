@@ -76,13 +76,16 @@
       <footer class="fc-breath-actions">
         <%= render "posts/reactions", post: post %>
 
-        <%= link_to inline_thread_post_path(post),
-            class: "fc-breath-action",
-            data: { turbo_frame: dom_id(post, :thread) },
-            aria: { label: "Reply" } do %>
+        <button type="button"
+                class="fc-breath-action"
+                data-controller="thread-toggle"
+                data-thread-toggle-url-value="<%= inline_thread_post_path(post) %>"
+                data-thread-toggle-frame-value="<%= dom_id(post, :thread) %>"
+                data-action="click->thread-toggle#toggle"
+                aria-label="Reply">
           <%= render_icon("message_circle", classes: "h-4 w-4") %>
           <span><%= post.comments_count.positive? ? post.comments_count : "Reply" %></span>
-        <% end %>
+        </button>
 
         <%= render "reshares/button", post: post %>
         <%= render "posts/share_button", post: post %>

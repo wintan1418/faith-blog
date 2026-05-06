@@ -62,13 +62,22 @@ export default class extends Controller {
       const response = await fetch(this.urlValue, {
         method: "POST",
         body: form,
-        headers: { "Accept": "text/html" },
+        headers: { "Accept": "text/vnd.turbo-stream.html, text/html" },
         credentials: "same-origin"
       })
-      if (response.ok || response.redirected) {
-        window.location.reload()
-      } else {
+
+      if (!response.ok && !response.redirected) {
         console.error("Reaction failed:", response.status, await response.text())
+        return
+      }
+
+      const text = await response.text()
+      const ct = response.headers.get("content-type") || ""
+      if (ct.includes("turbo-stream") && window.Turbo) {
+        window.Turbo.renderStreamMessage(text)
+      } else {
+        // Fallback: full reload if the server didn't return a stream.
+        window.location.reload()
       }
     } catch (err) {
       console.error(err)
