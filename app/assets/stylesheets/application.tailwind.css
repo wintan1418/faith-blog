@@ -9289,19 +9289,41 @@ form.inline {
 .post-body ul, .post-body ol { margin: 1em 0 1em 1.5em; padding: 0; }
 .post-body li { margin: 0.45em 0; }
 
-/* Scripture blockquote */
-.post-body blockquote {
-  position: relative;
-  margin: 1.6em 0;
-  padding: 22px 26px 22px 30px;
-  background: var(--post-gold-soft);
-  border-left: 3px solid var(--post-gold);
-  border-radius: 0 var(--post-radius) var(--post-radius) 0;
-  font-style: italic;
-  font-family: var(--post-serif);
-  font-size: 19px;
-  color: var(--post-ink);
-  line-height: 1.55;
+/* Reset every block inside the post body so nothing inherits a stray
+   border from earlier passes (notably actiontext.css's
+   .trix-content blockquote and .trix-content .attachment--file). */
+.post-body,
+.post-body > .trix-content,
+.post-body p,
+.post-body div,
+.post-body section,
+.post-body article,
+.post-body figure,
+.post-body ul,
+.post-body ol,
+.post-body li {
+  border: 0 !important;
+  background: transparent !important;
+}
+/* …but keep our intentional accents on h2 / blockquote / scripture, etc. */
+
+/* Scripture blockquote — wins over actiontext.css's .trix-content blockquote
+   because actiontext loads AFTER application.css. !important is the
+   reliable hammer here. */
+.post-body blockquote,
+.post-body .trix-content blockquote {
+  position: relative !important;
+  margin: 1.6em 0 !important;
+  padding: 22px 26px 22px 30px !important;
+  background: var(--post-gold-soft) !important;
+  border: 0 !important;
+  border-left: 3px solid var(--post-gold) !important;
+  border-radius: 0 var(--post-radius) var(--post-radius) 0 !important;
+  font-style: italic !important;
+  font-family: var(--post-serif) !important;
+  font-size: 19px !important;
+  color: var(--post-ink) !important;
+  line-height: 1.55 !important;
 }
 .post-body blockquote::before {
   content: "\201C";
