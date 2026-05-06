@@ -1,12 +1,12 @@
 <span id="<%= dom_id(post, :reshare) %>">
   <% if user_signed_in? %>
     <% if current_user.has_reshared?(post) %>
-      <%= button_to post_reshare_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove reshare" do %>
+      <%= button_to post_reshare_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove reshare", data: { turbo_frame: "_top" } do %>
         <%= render_icon("repeat", classes: "h-4 w-4") %>
         <%= post.reshares_count %>
       <% end %>
     <% else %>
-      <%= button_to post_reshare_path(post), class: "fc-action", title: "Reshare this post" do %>
+      <%= button_to post_reshare_path(post), class: "fc-action", title: "Reshare this post", data: { turbo_frame: "_top" } do %>
         <%= render_icon("repeat", classes: "h-4 w-4") %>
         <%= post.reshares_count %>
       <% end %>

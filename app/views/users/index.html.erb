@@ -1,7 +1,7 @@
 <% content_for(:title) { "People - Brethreign" } %>
 
 <div class="mystic-shell py-8">
-  <div class="mystic-container max-w-6xl">
+  <div class="mystic-container max-w-3xl">
     <div class="mb-8">
       <span class="mystic-kicker">Community</span>
       <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Find people walking the same road.</h1>
@@ -26,46 +26,47 @@
     <% end %>
 
     <% if @users.any? %>
-      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <ul class="fc-people-list">
         <% @users.each do |user| %>
-          <article class="mystic-panel flex min-w-0 gap-4 p-5">
-            <%= link_to user_path(user.username), class: "shrink-0" do %>
+          <li class="fc-people-row">
+            <%= link_to user_path(user.username), class: "fc-people-avatar" do %>
               <% if user.profile&.avatar&.attached? %>
-                <%= image_tag user.profile.avatar, class: "mystic-avatar h-14 w-14 object-cover" %>
+                <%= image_tag user.profile.avatar, class: "object-cover", alt: user.username %>
               <% else %>
-                <span class="mystic-avatar mystic-avatar-fallback grid h-14 w-14 place-items-center text-lg font-black">
-                  <%= user.username.first.upcase %>
-                </span>
+                <span><%= user.username.first.upcase %></span>
               <% end %>
             <% end %>
 
-            <div class="min-w-0 flex-1">
-              <div class="flex items-start justify-between gap-3">
-                <div class="min-w-0">
-                  <%= link_to user.display_name, user_path(user.username), class: "block truncate text-base font-black text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" %>
-                  <p class="truncate text-sm font-semibold text-[var(--fc-muted)]">@<%= user.username %></p>
-                </div>
-                <%= render "users/follow_actions",
-                           user: user,
-                           follow_class: "fc-btn fc-btn-primary min-h-9 px-3 text-xs",
-                           following_class: "btn btn-secondary btn-sm" %>
+            <div class="fc-people-body">
+              <div class="fc-people-head">
+                <%= link_to user.display_name, user_path(user.username), class: "fc-people-name" %>
+                <span class="fc-people-handle">@<%= user.username %></span>
               </div>
 
               <% if user.profile&.bio.present? %>
-                <p class="mystic-copy mt-3 line-clamp-3 text-sm"><%= user.profile.bio %></p>
+                <p class="fc-people-bio"><%= truncate(user.profile.bio, length: 180) %></p>
               <% end %>
 
-              <div class="mt-4 flex flex-wrap gap-2 text-xs font-bold text-[var(--fc-muted)]">
-                <span><%= pluralize(user.posts.published.count, "post") %></span>
-                <span><%= pluralize(user.connections_count, "connection") %></span>
+              <div class="fc-people-meta">
+                <span><%= pluralize(user.posts.published.count, "breath") %></span>
+                <span class="fc-people-dot">·</span>
+                <span><%= pluralize(user.followers_count, "follower") %></span>
                 <% if user.profile&.location.present? %>
+                  <span class="fc-people-dot">·</span>
                   <span><%= user.profile.location %></span>
                 <% end %>
               </div>
             </div>
-          </article>
+
+            <div class="fc-people-actions">
+              <%= render "users/follow_actions",
+                         user: user,
+                         follow_class: "fc-btn fc-btn-primary",
+                         following_class: "fc-btn" %>
+            </div>
+          </li>
         <% end %>
-      </div>
+      </ul>
 
       <% if @pagy.pages > 1 %>
         <div class="mt-8">

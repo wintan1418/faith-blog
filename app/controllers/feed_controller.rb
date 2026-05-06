@@ -83,6 +83,16 @@ class FeedController < ApplicationController
                             .order(Arel.sql("COUNT(*) DESC"))
                             .limit(3)
                             .pluck(:user_id)
-    @who_to_brethren = User.where(id: active_author_ids).includes(:profile)
+    @who_to_brethren = User.where(id: active_author_ids).includes(:profile).to_a
+
+    # Fallback: if no recent authors among non-followed, show 3 newest
+    # active members so the widget never disappears.
+    if @who_to_brethren.size < 3
+      need = 3 - @who_to_brethren.size
+      already_ids = following_ids + @who_to_brethren.map(&:id)
+      fillers = User.respond_to?(:active) ? User.active : User.all
+      fillers = fillers.where.not(id: already_ids).order(created_at: :desc).limit(need).includes(:profile)
+      @who_to_brethren += fillers.to_a
+    end
   end
 end

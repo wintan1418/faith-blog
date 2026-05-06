@@ -7334,7 +7334,8 @@ html:not(.theme-dark) {
 @media (max-width: 760px) {
   .home-feed-page .home-public-shell {
     grid-template-columns: minmax(0, 1fr);
-    width: min(100% - 1rem, 720px);
+    width: calc(100% - 0.75rem);
+    padding: 0.75rem 0 2rem;
   }
 
   .home-feed-page .home-rail-section-label {
@@ -7349,6 +7350,142 @@ html:not(.theme-dark) {
 
   .home-feed-page .home-room-filter {
     justify-content: center;
+  }
+
+  /* ── Public feed cards on mobile ── */
+  .home-feed-card-head {
+    padding: 0.75rem 0.75rem 0.4rem;
+    gap: 0.55rem;
+  }
+  .home-author-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 0.78rem;
+  }
+  .home-author-copy > div {
+    gap: 0.35rem;
+  }
+  .home-author-copy strong {
+    font-size: 0.85rem;
+  }
+  .home-author-copy > span {
+    font-size: 0.72rem;
+  }
+  .home-room-pill {
+    font-size: 0.65rem;
+    padding: 0 0.4rem;
+    min-height: 1.25rem;
+  }
+
+  .home-feed-card-body {
+    padding: 0 0.75rem 0.65rem;
+  }
+  .home-feed-card h2 {
+    font-size: 1.2rem;
+    line-height: 1.2;
+  }
+  .home-feed-card p {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin-top: 0.4rem;
+  }
+
+  .home-tag-row {
+    padding: 0 0.75rem 0.6rem;
+    gap: 0.3rem;
+  }
+  .home-tag-row span {
+    font-size: 0.68rem;
+    padding: 0.12rem 0.4rem;
+  }
+
+  .home-feed-actions {
+    padding: 0.5rem 0.75rem;
+    gap: 0.75rem;
+  }
+  .home-feed-actions a {
+    font-size: 0.78rem;
+    gap: 0.3rem;
+  }
+  .home-feed-actions svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* ── Inline rooms card ── */
+  .home-inline-rooms {
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0 0.75rem 0.65rem;
+    padding: 0.7rem;
+  }
+
+  /* ── Public composer ── */
+  .home-public-composer {
+    padding: 0.6rem;
+    gap: 0.45rem;
+  }
+  .home-public-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 0.7rem;
+  }
+  .home-composer-prompt {
+    font-size: 0.82rem;
+    height: 34px;
+  }
+  .home-composer-post {
+    height: 32px;
+    padding: 0 0.6rem;
+    font-size: 0.78rem;
+  }
+
+  /* ── Public tabs ── */
+  .home-public-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .home-public-tabs::-webkit-scrollbar { display: none; }
+  .home-public-tabs a {
+    white-space: nowrap;
+    font-size: 0.84rem;
+    padding: 0.6rem 0.5rem;
+  }
+
+  /* ── Feed images ── */
+  .home-feed-card img,
+  .fc-post-media-image {
+    max-height: 280px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  /* ── Side panels (right rail, if somehow visible) ── */
+  .home-mini-panel {
+    padding: 0.75rem;
+  }
+}
+
+/* ── Public feed extra-small phones ── */
+@media (max-width: 400px) {
+  .home-feed-page .home-public-shell {
+    width: calc(100% - 0.35rem);
+  }
+
+  .home-feed-card h2 {
+    font-size: 1.05rem;
+  }
+  .home-feed-card p {
+    font-size: 0.82rem;
+  }
+  .home-feed-card-head {
+    padding: 0.65rem 0.6rem 0.35rem;
+  }
+  .home-feed-card-body {
+    padding: 0 0.6rem 0.55rem;
+  }
+  .home-feed-actions {
+    padding: 0.45rem 0.6rem;
   }
 }
 
@@ -9713,19 +9850,233 @@ html.dark nav.post-toc {
 }
 
 @media (max-width: 700px) {
-  .post-card { padding: 32px 28px 28px; }
-  .post-conversation { padding: 28px 24px 24px; }
-  .post-body { font-size: 17px; line-height: 1.7; }
-  .post-body > p:first-of-type { font-size: 19px; }
+  /* ── Post page mobile ── */
+  .post-card { padding: 28px 18px 24px; }
+  .post-conversation { padding: 24px 16px 20px; }
+  .post-body { font-size: 16.5px; line-height: 1.72; }
+  .post-body > p:first-of-type { font-size: 18px; }
   .post-body > p:first-of-type::first-letter {
-    font-size: 3.2em;
-    padding: 4px 10px 0 0;
+    font-size: 3em;
+    padding: 3px 8px 0 0;
   }
   .post-body h2 {
-    font-size: 22px;
-    margin: 1.8em 0 0.7em;
+    font-size: 21px;
+    margin: 1.6em 0 0.6em;
   }
-  .post-title { line-height: 1.12; }
+  .post-title { line-height: 1.12; font-size: 1.6rem; }
+  .post-page-grid { padding: 12px; gap: 16px; }
+  .post-header { margin-bottom: 24px; }
+}
+
+/* ============================================================
+   ✦ MOBILE EXPERIENCE — Feed, Cards, Navbar, Layout
+   ============================================================ */
+
+@media (max-width: 760px) {
+  /* ── Page shell ── */
+  .fc-shell {
+    width: 100%;
+    padding: 0.75rem 0.5rem 2rem;
+    gap: 0.75rem;
+  }
+
+  .fc-app {
+    overflow-x: hidden;
+  }
+
+  /* ── Topbar ── */
+  .fc-topbar-inner {
+    height: 44px;
+    width: calc(100% - 0.75rem);
+    gap: 0.5rem;
+  }
+
+  .fc-btn.fc-btn-primary {
+    padding: 0 0.65rem;
+    font-size: 0.78rem;
+    height: 30px;
+  }
+
+  .fc-icon-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* ── Composer bar ── */
+  .fc-composer {
+    padding: 0.6rem;
+    gap: 0.5rem;
+  }
+  .fc-composer .fc-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+  .fc-composer-input {
+    height: 34px;
+    font-size: 0.82rem;
+  }
+  .fc-composer .fc-btn {
+    height: 32px;
+    font-size: 0.78rem;
+    padding: 0 0.65rem;
+  }
+
+  /* ── Tabs (scrollable on mobile) ── */
+  .fc-tabs {
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-top: 0.65rem;
+  }
+  .fc-tabs::-webkit-scrollbar { display: none; }
+  .fc-tab {
+    white-space: nowrap;
+    padding: 0.7rem 0.65rem;
+    font-size: 0.84rem;
+  }
+  .fc-tabs .ml-auto {
+    display: none;
+  }
+
+  /* ── Feed cards ── */
+  .fc-breath {
+    border-radius: 12px;
+    padding: 1rem 0.9rem 0.85rem;
+  }
+  .fc-breath-grid {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+  .fc-breath-avatar .fc-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+  }
+  .fc-breath-head-author {
+    font-size: 0.78rem;
+    gap: 0.3rem;
+  }
+  .fc-breath-title {
+    font-size: 0.98rem;
+    margin-top: 0.2rem;
+  }
+  .fc-breath-copy {
+    font-size: 0.86rem;
+    -webkit-line-clamp: 3;
+    margin-top: 0.35rem;
+    line-height: 1.55;
+  }
+  .fc-breath-tags {
+    margin-top: 0.55rem;
+    gap: 0.3rem 0.5rem;
+  }
+  .fc-breath-tag { font-size: 0.75rem; }
+
+  /* ── Card media ── */
+  .fc-breath-media {
+    border-radius: 10px;
+    margin-top: 0.65rem;
+  }
+  .fc-breath-media-image {
+    max-height: 280px;
+  }
+
+  /* ── Card actions ── */
+  .fc-breath-actions {
+    margin-top: 0.55rem;
+    padding-top: 0.5rem;
+    gap: 0.15rem;
+    flex-wrap: wrap;
+  }
+  .fc-breath-action {
+    height: 28px;
+    padding: 0 0.4rem;
+    font-size: 0.72rem;
+    gap: 0.25rem;
+    border-radius: 6px;
+  }
+  .fc-breath-action svg {
+    width: 14px;
+    height: 14px;
+  }
+  .fc-breath-actions-end {
+    gap: 0.15rem;
+  }
+
+  /* ── Side cards (when visible) ── */
+  .fc-side-card {
+    border-radius: 10px;
+    padding: 0.85rem;
+  }
+
+  /* ── Space between cards ── */
+  .mt-4.space-y-3 > * + * {
+    margin-top: 0.5rem;
+  }
+
+  /* ── Post page rail blocks ── */
+  .post-rail-block {
+    padding: 12px 14px;
+  }
+
+  /* ── Related card ── */
+  .post-related {
+    padding: 16px;
+  }
+
+  /* ── Thread chip (in card header) ── */
+  .fc-thread-chip {
+    font-size: 0.62rem;
+    height: 18px;
+    padding: 1px 6px;
+  }
+
+  /* ── Featured tag ── */
+  .fc-featured-tag {
+    font-size: 0.68rem;
+  }
+
+  /* ── Badge (room tag in header) ── */
+  .fc-badge {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    height: 20px;
+  }
+}
+
+/* ── Extra small phones (< 400px) ── */
+@media (max-width: 400px) {
+  .fc-shell {
+    padding: 0.5rem 0.25rem 2rem;
+  }
+
+  .fc-topbar-inner {
+    width: calc(100% - 0.5rem);
+  }
+
+  .fc-breath {
+    padding: 0.85rem 0.75rem 0.75rem;
+    border-radius: 10px;
+  }
+
+  .fc-breath-title { font-size: 0.92rem; }
+  .fc-breath-copy { font-size: 0.82rem; }
+
+  .fc-breath-action span {
+    display: none;
+  }
+  .fc-breath-action svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .post-card { padding: 22px 14px 20px; }
+  .post-conversation { padding: 20px 12px 16px; }
+  .post-page-grid { padding: 8px; gap: 12px; }
+  .post-title { font-size: 1.4rem; }
+  .post-body { font-size: 15.5px; }
 }
 
 /* ============================================================
@@ -9824,4 +10175,111 @@ html.dark nav.post-toc {
 .fc-breath-action.is-thread:hover {
   background: var(--fc-accent-soft);
   color: var(--fc-accent);
+}
+
+/* ============================================================
+   ✦ PEOPLE LIST — single-column directory view
+   ============================================================ */
+
+.fc-people-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fc-people-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.fc-people-row:hover {
+  background: var(--fc-surface-2);
+  border-color: var(--fc-line-strong);
+}
+
+.fc-people-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line-strong);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--fc-soft);
+  font-weight: 800;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.fc-people-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fc-people-avatar span { display: block; }
+
+.fc-people-body { min-width: 0; }
+
+.fc-people-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.fc-people-name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--fc-ink);
+  letter-spacing: -0.005em;
+}
+.fc-people-name:hover { color: var(--fc-accent); }
+.fc-people-handle {
+  font-size: 0.85rem;
+  color: var(--fc-muted);
+  font-weight: 600;
+}
+.fc-people-bio {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  color: var(--fc-soft);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fc-people-meta {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--fc-muted);
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.fc-people-dot { color: var(--fc-faint); }
+
+.fc-people-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.fc-people-actions form.inline { margin: 0; }
+
+@media (max-width: 600px) {
+  .fc-people-row {
+    grid-template-columns: 48px 1fr;
+    gap: 12px;
+  }
+  .fc-people-avatar { width: 48px; height: 48px; font-size: 16px; }
+  .fc-people-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
 }

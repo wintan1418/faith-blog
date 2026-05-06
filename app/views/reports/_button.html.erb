@@ -6,7 +6,7 @@
       reason: local_assigns.fetch(:reason, "Submitted for moderator review.")
     },
     class: local_assigns.fetch(:classes, "fc-action text-[var(--fc-muted)] hover:text-red-600"),
-    data: { turbo_confirm: "Report this for moderator review?" },
+    data: { turbo_confirm: "Report this for moderator review?", turbo_frame: "_top" },
     title: "Report" do %>
   <%= local_assigns[:label] || "Report" %>
 <% end %>

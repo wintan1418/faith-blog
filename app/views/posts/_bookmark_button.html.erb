@@ -1,12 +1,12 @@
 <span id="<%= dom_id(post, :bookmark) %>">
   <% if user_signed_in? %>
     <% if current_user.has_bookmarked?(post) %>
-      <%= button_to post_bookmark_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove bookmark" do %>
+      <%= button_to post_bookmark_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove bookmark", data: { turbo_frame: "_top" } do %>
         <%= render_icon("bookmark", classes: "h-4 w-4") %>
         Saved
       <% end %>
     <% else %>
-      <%= button_to post_bookmark_path(post), class: "fc-action", title: "Save post" do %>
+      <%= button_to post_bookmark_path(post), class: "fc-action", title: "Save post", data: { turbo_frame: "_top" } do %>
         <%= render_icon("bookmark", classes: "h-4 w-4") %>
         Save
       <% end %>
