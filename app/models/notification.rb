@@ -17,7 +17,8 @@ class Notification < ApplicationRecord
     connection_accepted: 11,
     post_reshared: 12,
     direct_message: 13,
-    breath_from_followee: 14
+    breath_from_followee: 14,
+    everyone_mention:     15
   }
 
   # Associations
@@ -81,6 +82,8 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} sent you a message"
     when :breath_from_followee
       "#{actor&.display_name || 'Someone'} breathed"
+    when :everyone_mention
+      "#{actor&.display_name || 'Someone'} mentioned everyone"
     else
       "You have a new notification"
     end
@@ -92,7 +95,7 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.post_path(notifiable.post)
     when :new_follower
       Rails.application.routes.url_helpers.user_path(actor.username)
-    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee
+    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention
       post = notifiable.respond_to?(:post) ? notifiable.post : notifiable
       Rails.application.routes.url_helpers.post_path(post)
     when :new_post_in_room

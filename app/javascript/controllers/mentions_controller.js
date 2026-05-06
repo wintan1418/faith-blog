@@ -22,6 +22,18 @@ export default class extends Controller {
       fillAttr: "username",
       noMatchTemplate: () => '<div class="mention-empty">No matching people</div>',
       menuItemTemplate: function (item) {
+        if (item.original.broadcast) {
+          const cls = item.original.platform ? "mention-broadcast-icon is-platform" : "mention-broadcast-icon"
+          return `
+            <div class="mention-option mention-option-broadcast">
+              <div class="${cls}">@</div>
+              <div class="mention-copy">
+                <span>@${item.original.username}</span>
+                <small>${item.original.name || ""}</small>
+              </div>
+            </div>
+          `
+        }
         return `
           <div class="mention-option">
             ${item.original.avatar_url

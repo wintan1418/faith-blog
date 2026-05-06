@@ -6,7 +6,7 @@
         <span class="hidden text-base font-extrabold sm:inline">Faith Community</span>
       <% end %>
 
-      <div class="hidden items-center gap-1 md:flex">
+      <div class="hidden items-center gap-0.5 md:flex">
         <% if user_signed_in? %>
           <%= link_to feed_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/feed')}" do %>
             <%= render_icon("message_circle", classes: "h-4 w-4") %>
@@ -47,7 +47,7 @@
         <% end %>
 
         <button type="button"
-                class="fc-btn fc-btn-primary"
+                class="fc-btn fc-btn-primary hidden sm:inline-flex"
                 data-action="click->composer-modal#open">
           <span class="text-lg leading-none">+</span>
           Breathe
@@ -60,7 +60,7 @@
           <% end %>
         <% end %>
 
-        <%= link_to conversations_path, class: "fc-icon-btn relative", title: "Inbox" do %>
+        <%= link_to conversations_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Inbox" do %>
           <%= render_icon("mail", classes: "h-4 w-4") %>
           <% if current_user.unread_conversations_count.positive? %>
             <span class="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[var(--fc-accent)]"></span>
@@ -72,7 +72,7 @@
           <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
         </button>
 
-        <%= link_to bookmarks_path, class: "fc-icon-btn", title: "Bookmarks" do %>
+        <%= link_to bookmarks_path, class: "fc-icon-btn hidden sm:inline-flex", title: "Bookmarks" do %>
           <%= render_icon("bookmark", classes: "h-4 w-4") %>
         <% end %>
 
@@ -103,10 +103,6 @@
           </div>
         </div>
       <% else %>
-        <%= form_with url: search_path, method: :get, class: "relative hidden lg:block" do %>
-          <%= render_icon("search", classes: "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#75847a]") %>
-          <input type="text" name="q" placeholder="Search posts, people, resources..." class="fc-search">
-        <% end %>
         <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
           <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
           <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
@@ -117,3 +113,51 @@
     </div>
   </div>
 </nav>
+
+<%# ── Mobile bottom navigation bar ── %>
+<nav class="fc-bottom-nav" aria-label="Mobile navigation">
+  <% if user_signed_in? %>
+    <%= link_to feed_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/feed')}" do %>
+      <%= render_icon("message_circle", classes: "h-5 w-5") %>
+      <span>Feed</span>
+    <% end %>
+    <%= link_to rooms_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/rooms')}" do %>
+      <%= render_icon("users", classes: "h-5 w-5") %>
+      <span>Rooms</span>
+    <% end %>
+    <button type="button" class="fc-bottom-nav-item fc-bottom-nav-compose" data-action="click->composer-modal#open">
+      <%= render_icon("send", classes: "h-5 w-5") %>
+      <span>Breathe</span>
+    </button>
+    <%= link_to resources_root_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/resources')}" do %>
+      <%= render_icon("bookopen", classes: "h-5 w-5") %>
+      <span>Library</span>
+    <% end %>
+    <%= link_to user_path(current_user.username), class: "fc-bottom-nav-item #{'is-active' if request.path == user_path(current_user.username)}" do %>
+      <%= render_icon("users", classes: "h-5 w-5") %>
+      <span>Profile</span>
+    <% end %>
+  <% else %>
+    <%= link_to root_path, class: "fc-bottom-nav-item #{'is-active' if current_page?(root_path)}" do %>
+      <%= render_icon("message_circle", classes: "h-5 w-5") %>
+      <span>Feed</span>
+    <% end %>
+    <%= link_to rooms_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/rooms')}" do %>
+      <%= render_icon("users", classes: "h-5 w-5") %>
+      <span>Rooms</span>
+    <% end %>
+    <%= link_to resources_root_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/resources')}" do %>
+      <%= render_icon("bookopen", classes: "h-5 w-5") %>
+      <span>Library</span>
+    <% end %>
+    <%= link_to search_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/search')}" do %>
+      <%= render_icon("search", classes: "h-5 w-5") %>
+      <span>Search</span>
+    <% end %>
+    <%= link_to new_user_session_path, class: "fc-bottom-nav-item" do %>
+      <%= render_icon("users", classes: "h-5 w-5") %>
+      <span>Sign In</span>
+    <% end %>
+  <% end %>
+</nav>
+

@@ -36,23 +36,46 @@ class UsersController < ApplicationController
   end
 
   def mentions
-    query = params[:query].to_s.strip
-    return render json: [] if query.length < 1
+    query = params[:query].to_s.strip.downcase
+    suggestions = []
 
-    users = User
-      .active
-      .includes(:profile)
-      .where("username ILIKE ?", "%#{query}%")
-      .order(:username)
-      .limit(10)
-
-    render json: users.map { |u|
-      {
-        username: u.username,
-        name: u.display_name,
-        avatar_url: u.profile&.avatar&.attached? ? url_for(u.profile.avatar) : nil
+    # Special @everyone token — anyone can use to ping their room
+    if query.empty? || "everyone".start_with?(query)
+      suggestions << {
+        username:   "everyone",
+        name:       "Notify everyone in this room",
+        avatar_url: nil,
+        broadcast:  true
       }
-    }
+    end
+
+    # Super-admin only @all token — platform-wide ping
+    if (current_user.respond_to?(:super_admin?) && current_user.super_admin?) &&
+       (query.empty? || "all".start_with?(query))
+      suggestions << {
+        username:   "all",
+        name:       "Notify every member of the platform",
+        avatar_url: nil,
+        broadcast:  true,
+        platform:   true
+      }
+    end
+
+    if query.length >= 1
+      users = User.active.includes(:profile)
+                  .where("username ILIKE ?", "%#{query}%")
+                  .order(:username)
+                  .limit(10)
+      suggestions += users.map do |u|
+        {
+          username:   u.username,
+          name:       u.display_name,
+          avatar_url: u.profile&.avatar&.attached? ? url_for(u.profile.avatar) : nil
+        }
+      end
+    end
+
+    render json: suggestions
   end
 
   def follow

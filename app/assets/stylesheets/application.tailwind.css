@@ -1669,15 +1669,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .fc-topbar {
-  background: rgba(255, 255, 255, 0.92) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   border-bottom: 1px solid var(--fc-line) !important;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
 }
 
 .fc-topbar-inner {
-  width: min(1180px, calc(100% - 1.5rem));
-  height: 42px;
+  width: min(1180px, calc(100% - 2rem));
+  height: 48px;
   margin-inline: auto;
   display: flex;
   align-items: center;
@@ -1686,69 +1686,180 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .fc-brand-mark {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
-  border-radius: 6px;
-  background: #5f9870;
+  border-radius: 8px;
+  background: var(--fc-accent, #5f9870);
   color: #ffffff;
+  flex-shrink: 0;
 }
 
 .fc-nav-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  height: 32px;
-  padding: 0 0.75rem;
-  border-radius: 6px;
-  color: var(--fc-soft);
-  font-size: 0.88rem;
-  font-weight: 760;
+  gap: 0.4rem;
+  height: 34px;
+  padding: 0 0.6rem;
+  border-radius: 8px;
+  color: var(--fc-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: color 140ms ease, background 140ms ease;
 }
 
-.fc-nav-link:hover,
-.fc-nav-link.is-active {
+.fc-nav-link:hover {
   color: var(--fc-ink);
   background: var(--fc-surface-2);
 }
 
+.fc-nav-link.is-active {
+  color: var(--fc-ink);
+  font-weight: 700;
+  background: transparent;
+  position: relative;
+}
+.fc-nav-link.is-active::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--fc-accent, #5f9870);
+}
+
 .fc-search {
-  height: 32px;
-  width: clamp(15rem, 26vw, 22rem);
+  height: 34px;
+  width: clamp(14rem, 24vw, 20rem);
   max-width: 100%;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--fc-line);
-  background: #eef4f0;
+  background: var(--fc-surface-2);
   color: var(--fc-ink);
   padding: 0 0.85rem 0 2.15rem;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.fc-search:focus {
+  border-color: var(--fc-accent, #5f9870);
+  box-shadow: 0 0 0 3px rgba(95, 152, 112, 0.12);
+  outline: none;
 }
 
 .fc-search::placeholder {
-  color: #7b897f;
+  color: var(--fc-muted);
 }
 
 .fc-icon-btn,
 .fc-btn {
-  height: 32px;
-  border-radius: 6px;
+  height: 34px;
+  border-radius: 8px;
   border: 1px solid var(--fc-line);
   background: var(--fc-surface-2);
   color: var(--fc-ink);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0 0.75rem;
+  gap: 0.4rem;
+  padding: 0 0.7rem;
   font-size: 0.84rem;
-  font-weight: 760;
+  font-weight: 650;
+  transition: background 140ms ease, border-color 140ms ease;
+  cursor: pointer;
+}
+
+.fc-icon-btn {
+  width: 34px;
+  padding: 0;
+}
+
+.fc-icon-btn:hover,
+.fc-btn:hover {
+  background: var(--fc-surface);
+  border-color: var(--fc-line-strong);
 }
 
 .fc-btn-primary {
-  background: #5f9870;
-  border-color: #5f9870;
+  background: var(--fc-accent, #5f9870);
+  border-color: var(--fc-accent, #5f9870);
   color: #ffffff;
+  font-weight: 700;
+}
+.fc-btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* ── Mobile bottom navigation bar ── */
+.fc-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .fc-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--fc-surface);
+    border-top: 1px solid var(--fc-line);
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    align-items: stretch;
+    justify-content: space-around;
+  }
+
+  .fc-bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    color: var(--fc-muted);
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px 0;
+    transition: color 140ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fc-bottom-nav-item svg {
+    width: 22px;
+    height: 22px;
+  }
+  .fc-bottom-nav-item.is-active {
+    color: var(--fc-accent, #5f9870);
+    font-weight: 700;
+  }
+  .fc-bottom-nav-item:active {
+    color: var(--fc-ink);
+  }
+
+  .fc-bottom-nav-compose {
+    color: var(--fc-accent, #5f9870);
+    font-weight: 700;
+  }
+
+  /* Add bottom padding to body so content isn't hidden behind bottom nav */
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Slim down the top nav on mobile since bottom nav handles navigation */
+  .fc-topbar-inner {
+    height: 42px;
+    width: calc(100% - 0.75rem);
+  }
 }
 
 .fc-shell {
@@ -10435,4 +10546,48 @@ html.theme-light .google-auth-button {
   box-shadow:
     0 1px 2px rgba(15, 23, 42, 0.06),
     0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+/* ============================================================
+   ✦ MENTIONS — @everyone / @all broadcast pills + dropdown rows
+   ============================================================ */
+
+.mention-broadcast {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--fc-accent-soft);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  color: var(--fc-accent-2);
+  font-weight: 800;
+  font-size: 0.92em;
+  letter-spacing: -0.005em;
+}
+.mention-broadcast-platform {
+  background: rgba(212, 168, 90, 0.14);
+  border-color: rgba(212, 168, 90, 0.36);
+  color: #d4a85a;
+}
+
+.mention-option-broadcast {
+  border-bottom: 1px dashed var(--fc-line);
+  padding-bottom: 0.55rem !important;
+  margin-bottom: 0.25rem;
+}
+.mention-broadcast-icon {
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: none;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--fc-accent);
+  color: #042f1d;
+  font-weight: 900;
+  font-size: 0.92rem;
+}
+.mention-broadcast-icon.is-platform {
+  background: linear-gradient(135deg, #d4a85a, #c08e3a);
+  color: #1a1300;
 }
