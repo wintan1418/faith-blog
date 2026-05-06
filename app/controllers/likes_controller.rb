@@ -21,6 +21,7 @@ class LikesController < ApplicationController
     if @like.save
       @likeable.reload
       create_notification if new_reaction
+      broadcast_message_reaction(@likeable) if @likeable.is_a?(Message)
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path }
         format.turbo_stream
@@ -35,6 +36,7 @@ class LikesController < ApplicationController
 
     if @like&.destroy
       @likeable.reload
+      broadcast_message_reaction(@likeable) if @likeable.is_a?(Message)
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path }
         format.turbo_stream
@@ -59,6 +61,7 @@ class LikesController < ApplicationController
   end
 
   def create_notification
+    return if @likeable.is_a?(Message)
     return if @likeable.user == current_user
 
     notification_type = @likeable.is_a?(Post) ? :post_liked : :comment_liked
@@ -69,5 +72,19 @@ class LikesController < ApplicationController
       notifiable: @like,
       notification_type: notification_type
     )
+  end
+
+  # Push the updated message bubble to every participant's existing
+  # cable subscription on [conversation, user_id, :messages] so reactions
+  # appear live for both sides without a page refresh.
+  def broadcast_message_reaction(message)
+    message.conversation.conversation_participants.find_each do |participant|
+      Turbo::StreamsChannel.broadcast_replace_later_to(
+        [ message.conversation, participant.user_id, :messages ],
+        target: ActionView::RecordIdentifier.dom_id(message),
+        partial: "conversations/message",
+        locals: { message: message, viewer_id: participant.user_id }
+      )
+    end
   end
 end
