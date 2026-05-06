@@ -129,18 +129,48 @@
         </div>
       <% end %>
 
-      <% if @daily_breath %>
-        <div class="fc-side-card fc-golden-card">
-          <p class="fc-golden-kicker">Golden Breath</p>
-          <p class="fc-golden-quote">"<%= @daily_breath.text %>"</p>
-          <div class="fc-golden-foot">
-            <% if @daily_breath.author_name.present? %>
-              <span class="fc-golden-author">— <%= @daily_breath.author_name %></span>
+      <% if @daily_breaths.any? %>
+        <div class="fc-side-card fc-golden-card"
+             data-controller="golden-carousel"
+             data-golden-carousel-interval-value="7000">
+          <header class="fc-golden-head">
+            <p class="fc-golden-kicker">Golden Breaths</p>
+            <% if @daily_breaths.size > 1 %>
+              <div class="fc-golden-controls">
+                <button type="button" class="fc-golden-arrow" data-action="click->golden-carousel#prev" aria-label="Previous">‹</button>
+                <button type="button" class="fc-golden-arrow" data-action="click->golden-carousel#next" aria-label="Next">›</button>
+              </div>
             <% end %>
-            <% if @daily_breath.reference.present? %>
-              <span class="fc-golden-ref"><%= @daily_breath.reference %></span>
+          </header>
+
+          <div class="fc-golden-track" data-golden-carousel-target="track">
+            <% @daily_breaths.each_with_index do |breath, i| %>
+              <article class="fc-golden-slide<%= ' is-active' if i.zero? %>" data-golden-carousel-target="slide">
+                <p class="fc-golden-quote">"<%= breath.text %>"</p>
+                <div class="fc-golden-foot">
+                  <% if breath.author_name.present? %>
+                    <span class="fc-golden-author">— <%= breath.author_name %></span>
+                  <% end %>
+                  <% if breath.reference.present? %>
+                    <span class="fc-golden-ref"><%= breath.reference %></span>
+                  <% end %>
+                </div>
+              </article>
             <% end %>
           </div>
+
+          <% if @daily_breaths.size > 1 %>
+            <div class="fc-golden-dots" role="tablist" aria-label="Golden breath slides">
+              <% @daily_breaths.each_with_index do |_, i| %>
+                <button type="button"
+                        class="fc-golden-dot<%= ' is-active' if i.zero? %>"
+                        data-action="click->golden-carousel#goto"
+                        data-index="<%= i %>"
+                        data-golden-carousel-target="dot"
+                        aria-label="Slide <%= i + 1 %>"></button>
+              <% end %>
+            </div>
+          <% end %>
         </div>
       <% end %>
 

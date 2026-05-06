@@ -51,3 +51,6 @@ application.register("toc", TocController)
 
 import ComposerModeController from "./composer_mode_controller"
 application.register("composer-mode", ComposerModeController)
+
+import GoldenCarouselController from "./golden_carousel_controller"
+application.register("golden-carousel", GoldenCarouselController)

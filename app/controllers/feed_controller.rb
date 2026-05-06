@@ -69,8 +69,8 @@ class FeedController < ApplicationController
     @open_prayer_requests_count = prayer_posts.count
     @open_prayer_requests = prayer_posts.limit(3)
 
-    @daily_verse  = BibleVerse.of_the_day
-    @daily_breath = GoldenBreath.of_the_day
+    @daily_verse   = BibleVerse.of_the_day
+    @daily_breaths = GoldenBreath.active.ordered.limit(20).to_a
 
     @trending_breaths = Post.published
                             .where("published_at > ?", 7.days.ago)

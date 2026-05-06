@@ -10775,3 +10775,76 @@ dialog .tribute-container {
   font-weight: 700;
   letter-spacing: 0.03em;
 }
+
+/* ── Carousel: head row, arrows, track, dots ── */
+.fc-golden-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+}
+.fc-golden-head .fc-golden-kicker { margin: 0; }
+
+.fc-golden-controls {
+  display: inline-flex;
+  gap: 4px;
+}
+.fc-golden-arrow {
+  appearance: none;
+  border: 0;
+  background: rgba(212, 168, 90, 0.10);
+  color: #d4a85a;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  font-size: 16px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+.fc-golden-arrow:hover { background: rgba(212, 168, 90, 0.22); }
+
+.fc-golden-track {
+  position: relative;
+  min-height: 110px;
+}
+.fc-golden-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity 380ms ease, transform 380ms ease;
+}
+.fc-golden-slide.is-active {
+  position: relative;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.fc-golden-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 0.85rem;
+}
+.fc-golden-dot {
+  appearance: none;
+  border: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(212, 168, 90, 0.25);
+  padding: 0;
+  cursor: pointer;
+  transition: background 140ms ease, transform 140ms ease;
+}
+.fc-golden-dot:hover { background: rgba(212, 168, 90, 0.45); }
+.fc-golden-dot.is-active {
+  background: #d4a85a;
+  transform: scaleX(2.5);
+  border-radius: 4px;
+}
