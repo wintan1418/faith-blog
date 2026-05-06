@@ -73,11 +73,15 @@ class ConversationsController < ApplicationController
   end
 
   def conversation_scope
-    current_user.conversations
-                .joins(:conversation_participants)
-                .where(conversation_participants: { user_id: current_user.id, archived_at: nil })
+    # Use a subquery instead of joins + DISTINCT. Postgres rejects
+    # SELECT DISTINCT when ORDER BY references a column outside the
+    # select list (we order by COALESCE(last_message_at, created_at)).
+    active_ids = ConversationParticipant.where(
+      user_id: current_user.id, archived_at: nil
+    ).select(:conversation_id)
+
+    Conversation.where(id: active_ids)
                 .includes(conversation_participants: { user: { profile: { avatar_attachment: :blob } } })
-                .distinct
                 .recent
   end
 end
