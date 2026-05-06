@@ -10,7 +10,7 @@
       <%= button_to unlike_path(likeable_type: likeable.class.name, likeable_id: likeable.id), 
           method: :delete, 
           class: "reaction-btn reaction-btn-active",
-          data: { turbo_frame: dom_id(likeable, :reactions) } do %>
+          data: { turbo_stream: true } do %>
         <span class="text-lg"><%= Like.reaction_emoji(user_like.reaction_type) %></span>
         <span class="font-semibold"><%= likeable.likes_count %></span>
       <% end %>
@@ -27,7 +27,7 @@
           <%= button_to likes_path(likeable_type: likeable.class.name, likeable_id: likeable.id, reaction_type: reaction),
               class: "reaction-emoji",
               title: Like.reaction_label(reaction),
-              data: { turbo_frame: dom_id(likeable, :reactions) } do %>
+              data: { turbo_stream: true } do %>
             <%= Like.reaction_emoji(reaction) %>
           <% end %>
         <% end %>
