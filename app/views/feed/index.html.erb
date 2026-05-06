@@ -1,7 +1,7 @@
 <% content_for(:title) { "Feed - Faith Community" } %>
 
 <div class="fc-app">
-  <div class="fc-shell">
+  <div class="fc-shell" data-controller="discover">
     <aside class="fc-sidebar">
       <div class="fc-section-label">Your Space</div>
       <nav class="space-y-1">
@@ -82,7 +82,11 @@
         <%= link_to "Threads", feed_threads_path, class: "fc-tab #{current_page?(feed_threads_path) ? 'is-active' : ''}" %>
         <%= link_to "Trending", feed_trending_path, class: "fc-tab #{current_page?(feed_trending_path) ? 'is-active' : ''}" %>
         <%= link_to "Following", feed_following_path, class: "fc-tab #{current_page?(feed_following_path) ? 'is-active' : ''}" %>
-        <div class="ml-auto">
+        <button type="button" class="fc-discover-trigger" data-action="click->discover#open" aria-label="Open discover panel">
+          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          <span>Discover</span>
+        </button>
+        <div class="ml-auto hidden sm:block">
           <%= link_to "All rooms", rooms_path, class: "fc-btn" %>
         </div>
       </div>
@@ -112,7 +116,11 @@
       </div>
     </main>
 
-    <aside class="fc-aside space-y-3">
+    <aside class="fc-aside space-y-3" data-discover-target="panel">
+      <header class="fc-discover-head">
+        <span>Discover</span>
+        <button type="button" class="fc-discover-close" data-action="click->discover#close" aria-label="Close">×</button>
+      </header>
       <% if @daily_verse %>
         <div class="fc-side-card">
           <h3 class="mb-3 text-sm font-extrabold text-[var(--fc-ink)]">Today's verse</h3>

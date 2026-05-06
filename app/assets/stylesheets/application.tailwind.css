@@ -2304,14 +2304,26 @@ h1, h2, h3, h4, h5, h6 {
   .fc-shell {
     grid-template-columns: 190px minmax(0, 1fr);
   }
-  /* Stack the right rail UNDER the main feed instead of hiding it. */
+  /* Below 1100px the rail moves into the Discover bottom-sheet on tap.
+     Hidden by default; .is-open reveals it as a fixed overlay. */
   .fc-aside {
-    grid-column: 1 / -1;
-    margin-top: 1.25rem;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: none;
+  }
+  .fc-aside.is-open {
+    display: flex;
+    flex-direction: column;
     gap: 0.75rem;
-    align-items: start;
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 70;
+    max-height: 88vh;
+    background: var(--fc-bg);
+    border-top: 1px solid var(--fc-line-strong);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -28px 60px -20px rgba(0, 0, 0, 0.55);
+    padding: 0 1rem 1.25rem;
+    overflow-y: auto;
+    animation: fc-discover-rise 280ms cubic-bezier(0.2, 0.9, 0.2, 1);
   }
 }
 
@@ -2325,9 +2337,6 @@ h1, h2, h3, h4, h5, h6 {
   }
   .fc-search {
     display: none;
-  }
-  .fc-aside {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .fc-post-media-image {
@@ -10856,4 +10865,98 @@ dialog .tribute-container {
   background: #d4a85a;
   transform: scaleX(2.5);
   border-radius: 4px;
+}
+
+/* ============================================================
+   ✦ DISCOVER — mobile bottom-sheet for sidebar cards
+   ============================================================ */
+
+.fc-discover-trigger {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--fc-accent-soft);
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-2);
+  font-weight: 800;
+  font-size: 0.82rem;
+  cursor: pointer;
+  margin-left: auto;
+  transition: background 140ms ease, transform 140ms ease;
+}
+.fc-discover-trigger:hover {
+  background: var(--fc-accent);
+  color: #042f1d;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1100px) {
+  .fc-discover-trigger { display: inline-flex; }
+}
+
+@keyframes fc-discover-rise {
+  from { transform: translateY(8%); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+/* Backdrop is added on the body when sheet is open. Tap to close.
+   We can't put it inside the aside because the aside IS the sheet. */
+body.fc-discover-open::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 14, 12, 0.62);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 65;
+}
+@media (min-width: 1101px) {
+  body.fc-discover-open::before { display: none; }
+}
+
+.fc-discover-head {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 -1rem 0;
+  padding: 14px 16px 12px;
+  background: var(--fc-bg);
+  border-bottom: 1px solid var(--fc-line);
+}
+.fc-discover-head > span {
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+.fc-discover-close {
+  appearance: none;
+  border: 0;
+  background: var(--fc-surface-2);
+  color: var(--fc-soft);
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  font-size: 22px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.fc-discover-close:hover { background: var(--fc-surface-3); color: var(--fc-ink); }
+
+@media (max-width: 1100px) {
+  .fc-aside.is-open .fc-discover-head { display: flex; }
+}
+
+/* Tappable backdrop layer for closing — placed before the aside. */
+@media (max-width: 1100px) {
+  .fc-aside.is-open + .fc-aside-backdrop,
+  body.fc-discover-open .fc-aside { /* no-op */ }
 }

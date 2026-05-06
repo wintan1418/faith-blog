@@ -54,3 +54,6 @@ application.register("composer-mode", ComposerModeController)
 
 import GoldenCarouselController from "./golden_carousel_controller"
 application.register("golden-carousel", GoldenCarouselController)
+
+import DiscoverController from "./discover_controller"
+application.register("discover", DiscoverController)
