@@ -1710,10 +1710,13 @@ h1, h2, h3, h4, h5, h6 {
   height: 34px;
   padding: 0 0.6rem;
   border-radius: 8px;
-  color: var(--fc-muted);
+  color: var(--fc-soft);
   font-size: 0.86rem;
   font-weight: 600;
   transition: color 140ms ease, background 140ms ease;
+}
+.fc-nav-link svg {
+  color: var(--fc-accent, #5f9870);
 }
 
 .fc-nav-link:hover {
@@ -1767,7 +1770,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 8px;
   border: 1px solid var(--fc-line);
   background: var(--fc-surface-2);
-  color: var(--fc-ink);
+  color: var(--fc-accent, #5f9870);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1775,7 +1778,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 0.7rem;
   font-size: 0.84rem;
   font-weight: 650;
-  transition: background 140ms ease, border-color 140ms ease;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
   cursor: pointer;
 }
 
@@ -1788,6 +1791,7 @@ h1, h2, h3, h4, h5, h6 {
 .fc-btn:hover {
   background: var(--fc-surface);
   border-color: var(--fc-line-strong);
+  color: var(--fc-ink);
 }
 
 .fc-btn-primary {

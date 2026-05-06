@@ -1,25 +1,57 @@
-<div style="font-family: Inter, Arial, sans-serif; color: #17251d; line-height: 1.6;">
-  <p style="margin: 0 0 12px;">Peace,</p>
+<div style="max-width: 560px; margin: 0 auto; padding: 32px 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Arial, sans-serif; color: #f4faf7; background: linear-gradient(160deg, #0b0f10 0%, #11181c 60%, #0e1f1a 100%); border-radius: 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0;">
+    <tr>
+      <td style="padding-bottom: 24px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="vertical-align: middle;">
+              <div style="width: 40px; height: 40px; border-radius: 12px; background: #34d399; color: #042f1d; font-weight: 900; font-size: 22px; line-height: 40px; text-align: center;">B</div>
+            </td>
+            <td style="padding-left: 12px; vertical-align: middle; color: #c8d3cf; font-weight: 700; font-size: 15px;">
+              Brethreign
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
 
-  <h1 style="font-size: 24px; line-height: 1.2; margin: 0 0 14px;">
-    <%= @inviter.display_name %> invited you to Brethreign.
-  </h1>
+    <tr>
+      <td>
+        <p style="margin: 0 0 6px; font-size: 14px; font-weight: 700; color: #34d399; letter-spacing: 0.18em; text-transform: uppercase;">
+          Hey,
+        </p>
+        <h1 style="margin: 0 0 16px; font-size: 30px; line-height: 1.15; font-weight: 800; color: #ffffff; letter-spacing: -0.015em;">
+          Glad to invite you to a calmer corner of the internet.
+        </h1>
+        <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.65; color: #d8d0c2;">
+          <strong style="color: #ffffff;"><%= @inviter.display_name %></strong> thought you'd love this. Brethreign is where people share testimonies, prayer requests, doubts, and quiet faith-filled conversation — without the noise.
+        </p>
 
-  <p style="margin: 0 0 16px; color: #52665a;">
-    Brethreign is a calmer home for testimonies, prayer, rooms, resources, and thoughtful faith-filled conversation.
-  </p>
+        <% if @invitation.message.present? %>
+          <div style="margin: 18px 0; padding: 14px 16px; background: rgba(212, 168, 90, 0.10); border-left: 3px solid #d4a85a; border-radius: 0 12px 12px 0; color: #efe5cc; font-style: italic; font-size: 15px; line-height: 1.55;">
+            "<%= simple_format(@invitation.message, {}, sanitize: true) %>"
+            <div style="margin-top: 8px; font-style: normal; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #d4a85a; font-weight: 800;">— a note from <%= @inviter.display_name %></div>
+          </div>
+        <% end %>
 
-  <% if @invitation.message.present? %>
-    <div style="border-left: 3px solid #10b981; padding-left: 12px; margin: 0 0 20px; color: #27382e;">
-      <%= simple_format(@invitation.message) %>
-    </div>
-  <% end %>
+        <p style="margin: 22px 0 8px; font-size: 18px; font-weight: 800; color: #ffffff;">
+          Come and breathe.
+        </p>
+        <p style="margin: 0 0 26px; font-size: 14px; color: #97917f;">
+          Pick a username, find a room, join the first thread that catches you.
+        </p>
 
-  <p style="margin: 0 0 24px;">
-    <%= link_to "Join Brethreign", @join_url, style: "display: inline-block; background: #10b981; color: #052016; font-weight: 800; padding: 11px 16px; border-radius: 8px; text-decoration: none;" %>
-  </p>
+        <p style="margin: 0 0 28px;">
+          <a href="<%= @join_url %>" style="display: inline-block; background: #34d399; color: #042f1d; font-weight: 800; padding: 14px 22px; border-radius: 999px; text-decoration: none; font-size: 15px; letter-spacing: -0.005em; box-shadow: 0 8px 22px rgba(16, 185, 129, 0.4);">
+            Accept invite & join Brethreign →
+          </a>
+        </p>
 
-  <p style="margin: 0; color: #6c7c72; font-size: 13px;">
-    This invite was sent by <%= @inviter.display_name %> from Brethreign.
-  </p>
+        <p style="margin: 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); color: #97917f; font-size: 12px; line-height: 1.5;">
+          Invited by <%= @inviter.display_name %> on Brethreign. If this wasn't meant for you, no worries — just ignore this email.
+          <br>Or paste this into your browser: <span style="color: #c8d3cf; word-break: break-all;"><%= @join_url %></span>
+        </p>
+      </td>
+    </tr>
+  </table>
 </div>

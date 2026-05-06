@@ -8,7 +8,7 @@ class InvitationMailer < ApplicationMailer
 
     mail(
       to: @invitation.email,
-      subject: "#{@inviter.display_name} invited you to Brethreign"
+      subject: "Hey — #{@inviter.display_name} invited you to come and breathe."
     )
   end
 end

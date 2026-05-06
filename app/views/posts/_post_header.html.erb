@@ -30,9 +30,9 @@
       </div>
       <% if user_signed_in? && post.user != current_user %>
         <% if current_user.following?(post.user) %>
-          <%= button_to "Following", unfollow_user_path(post.user.username), method: :delete, form_class: "inline", class: "post-follow-pill is-following" %>
+          <%= button_to "Following", unfollow_user_path(post.user.username), method: :delete, form_class: "inline", class: "post-follow-pill is-following", data: { turbo_frame: "_top" } %>
         <% else %>
-          <%= button_to "+ Follow", follow_user_path(post.user.username), form_class: "inline", class: "post-follow-pill" %>
+          <%= button_to "+ Follow", follow_user_path(post.user.username), form_class: "inline", class: "post-follow-pill", data: { turbo_frame: "_top" } %>
         <% end %>
       <% end %>
     <% end %>

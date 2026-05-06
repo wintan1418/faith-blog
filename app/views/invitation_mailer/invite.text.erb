@@ -1,13 +1,22 @@
-Peace,
+Hey,
 
-<%= @inviter.display_name %> invited you to Brethreign.
+Glad to invite you to a calmer corner of the internet.
 
-Brethreign is a calmer home for testimonies, prayer, rooms, resources, and thoughtful faith-filled conversation.
+<%= @inviter.display_name %> thought you'd love this. Brethreign is where
+people share testimonies, prayer requests, doubts, and quiet faith-filled
+conversation — without the noise.
 
 <% if @invitation.message.present? %>
-Message from <%= @inviter.display_name %>:
-<%= @invitation.message %>
+A note from <%= @inviter.display_name %>:
+"<%= @invitation.message %>"
 
 <% end %>
-Join here:
+Come and breathe.
+
+Pick a username, find a room, join the first thread that catches you.
+
+Accept invite & join Brethreign:
 <%= @join_url %>
+
+—
+If this wasn't meant for you, just ignore this email.

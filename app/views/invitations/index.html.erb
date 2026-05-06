@@ -8,9 +8,45 @@
       <p class="mystic-copy mt-2 max-w-2xl">Send a personal invitation link by email and track who has joined.</p>
     </div>
 
+    <section class="mystic-panel-strong mb-6 p-6">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-black text-[var(--fc-ink)]">Bulk invite — come and breathe</h2>
+          <p class="mystic-copy mt-1 text-sm">Paste any number of emails (commas, spaces, or new lines). Each one gets the warm "Hey, glad to invite you" email with your optional note.</p>
+        </div>
+      </div>
+
+      <%= form_with url: bulk_invitations_path, method: :post, class: "mt-5 space-y-4" do %>
+        <label class="fc-cms-label">
+          <span>Emails (up to 100 per batch)</span>
+          <%= text_area_tag :bulk_emails, params[:bulk_emails],
+              rows: 6,
+              class: "fc-cms-input font-mono text-sm",
+              placeholder: "abby@example.com, ben@example.com\ncara@example.com\ndan@example.com" %>
+        </label>
+
+        <label class="fc-cms-label">
+          <span>Personal note (optional, sent to all)</span>
+          <%= text_area_tag :bulk_message, params[:bulk_message],
+              rows: 3,
+              maxlength: 1_000,
+              class: "fc-cms-input",
+              placeholder: "I thought this community would bless you..." %>
+        </label>
+
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-xs font-bold text-[var(--fc-muted)]">Capped at 300 invites per 24 hours.</p>
+          <%= button_tag class: "fc-btn fc-btn-primary" do %>
+            <%= render_icon("send", classes: "h-4 w-4") %>
+            Send the batch
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
     <div class="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
       <section class="mystic-panel-strong p-6">
-        <h2 class="text-xl font-black text-[var(--fc-ink)]">Send invite</h2>
+        <h2 class="text-xl font-black text-[var(--fc-ink)]">Send a single invite</h2>
         <p class="mystic-copy mt-1 text-sm">The recipient will get a signed join link.</p>
 
         <%= form_with model: @invitation, url: invitations_path, class: "mt-6 space-y-5" do |f| %>

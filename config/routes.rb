@@ -90,6 +90,9 @@ Rails.application.routes.draw do
     member do
       post :resend
     end
+    collection do
+      post :bulk
+    end
   end
 
   # Search
