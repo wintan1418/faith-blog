@@ -7592,3 +7592,191 @@ html:not(.theme-dark) {
     min-height: 34rem;
   }
 }
+
+/* ============================================================
+   ✦ MODERN HEADER LAYER — final pass, source-order wins
+   Replaces the cramped 42px black slab with a proper sticky
+   header that lifts off the body in both themes.
+   ============================================================ */
+
+.fc-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+}
+
+.fc-topbar-inner {
+  width: min(1200px, calc(100% - 2rem));
+  height: 60px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding-inline: 0.25rem;
+}
+
+.fc-topbar .fc-brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.fc-topbar .fc-brand {
+  font-size: 0.98rem;
+  letter-spacing: -0.01em;
+  font-weight: 800;
+}
+
+.fc-topbar .fc-nav-link {
+  height: 36px;
+  padding: 0 0.85rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 650;
+  letter-spacing: 0.005em;
+  gap: 0.5rem;
+}
+
+.fc-topbar .fc-search {
+  height: 36px;
+  border-radius: 8px;
+  padding: 0 0.95rem 0 2.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.fc-topbar .fc-icon-btn,
+.fc-topbar .fc-btn {
+  height: 36px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 650;
+  padding: 0 0.85rem;
+}
+
+.fc-topbar .fc-icon-btn {
+  width: 36px;
+  padding: 0;
+}
+
+.fc-topbar .fc-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 0.78rem;
+}
+
+/* Pull body content down so the taller topbar doesn't crowd it */
+.fc-app {
+  min-height: calc(100vh - 60px);
+}
+
+.fc-shell {
+  padding: 1.75rem 0 3rem;
+}
+
+/* ── Dark mode header — surface ABOVE the body, not below it ── */
+html.theme-dark .fc-topbar,
+html.theme-dark nav.fc-topbar {
+  background: rgba(22, 29, 34, 0.82) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: saturate(160%) blur(18px) !important;
+  -webkit-backdrop-filter: saturate(160%) blur(18px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 1px 0 rgba(0, 0, 0, 0.45),
+    0 12px 28px -18px rgba(0, 0, 0, 0.7) !important;
+}
+
+html.theme-dark .fc-topbar .fc-search {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: var(--fc-ink) !important;
+}
+
+html.theme-dark .fc-topbar .fc-search:focus {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.18) !important;
+}
+
+html.theme-dark .fc-topbar .fc-icon-btn,
+html.theme-dark .fc-topbar .fc-btn:not(.fc-btn-primary) {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark .fc-topbar .fc-icon-btn:hover,
+html.theme-dark .fc-topbar .fc-btn:not(.fc-btn-primary):hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(52, 211, 153, 0.28) !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .fc-topbar .fc-nav-link {
+  color: var(--fc-soft) !important;
+}
+
+html.theme-dark .fc-topbar .fc-nav-link:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .fc-topbar .fc-nav-link.is-active {
+  background: rgba(52, 211, 153, 0.12) !important;
+  color: var(--fc-accent-2) !important;
+  box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.22) !important;
+}
+
+/* ── Light mode header — clean white lift, soft shadow ── */
+html.theme-light .fc-topbar,
+html.theme-light nav.fc-topbar {
+  background: rgba(255, 255, 255, 0.86) !important;
+  border-bottom: 1px solid rgba(16, 50, 36, 0.06) !important;
+  backdrop-filter: saturate(160%) blur(18px) !important;
+  -webkit-backdrop-filter: saturate(160%) blur(18px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 1px 0 rgba(15, 30, 22, 0.04),
+    0 8px 24px -16px rgba(15, 30, 22, 0.18) !important;
+}
+
+html.theme-light .fc-topbar .fc-search {
+  background: #f1f6f3 !important;
+  border: 1px solid rgba(16, 50, 36, 0.08) !important;
+}
+
+html.theme-light .fc-topbar .fc-search:focus {
+  background: #ffffff !important;
+  border-color: var(--fc-accent) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16) !important;
+}
+
+html.theme-light .fc-topbar .fc-icon-btn,
+html.theme-light .fc-topbar .fc-btn:not(.fc-btn-primary) {
+  background: #ffffff !important;
+  border: 1px solid rgba(16, 50, 36, 0.08) !important;
+  color: var(--fc-soft) !important;
+}
+
+html.theme-light .fc-topbar .fc-icon-btn:hover,
+html.theme-light .fc-topbar .fc-btn:not(.fc-btn-primary):hover {
+  background: #f1f6f3 !important;
+  border-color: rgba(16, 185, 129, 0.30) !important;
+  color: var(--fc-ink) !important;
+}
+
+@media (max-width: 768px) {
+  .fc-topbar-inner {
+    height: 56px;
+    gap: 0.75rem;
+  }
+  .fc-app {
+    min-height: calc(100vh - 56px);
+  }
+}
