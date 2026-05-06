@@ -74,12 +74,7 @@
 
           <% if user_signed_in? && @user != current_user %>
             <div class="mt-6 flex flex-wrap items-center gap-3">
-              <% if current_user.following?(@user) %>
-                <%= button_to "Following", unfollow_user_path(@user.username), method: :delete, class: "btn btn-secondary" %>
-              <% else %>
-                <%= button_to "Follow", follow_user_path(@user.username), class: "btn btn-primary" %>
-              <% end %>
-
+              <%= render "users/follow_actions", user: @user %>
               <%= render "users/connection_actions", user: @user %>
             </div>
           <% end %>

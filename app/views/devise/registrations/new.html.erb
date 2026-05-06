@@ -20,6 +20,8 @@
         <p class="mt-1 text-sm text-faith-muted">Start participating in Faith Community.</p>
       </div>
 
+      <%= render "devise/shared/google_sign_in" %>
+
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
         <% if resource.errors.any? %>
           <div class="rounded-2xl border border-red-200 bg-red-50 p-4">

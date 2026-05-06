@@ -18,6 +18,14 @@ Devise.setup do |config|
   config.responder.error_status = :unprocessable_entity
   config.responder.redirect_status = :see_other
 
+  if ENV["GOOGLE_CLIENT_ID"].present? && ENV["GOOGLE_CLIENT_SECRET"].present?
+    config.omniauth :google_oauth2,
+                    ENV.fetch("GOOGLE_CLIENT_ID"),
+                    ENV.fetch("GOOGLE_CLIENT_SECRET"),
+                    scope: "email,profile",
+                    prompt: "select_account"
+  end
+
   # Turbo compatibility
   config.navigational_formats = [ "*/*", :html, :turbo_stream ]
 end

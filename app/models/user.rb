@@ -4,7 +4,8 @@ class User < ApplicationRecord
   # Devise modules
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :trackable
+         :trackable, :omniauthable,
+         omniauth_providers: [ :google_oauth2 ]
 
   # Enums
   enum :role, { member: 0, moderator: 1, admin: 2, super_admin: 3 }
@@ -62,6 +63,18 @@ class User < ApplicationRecord
   # Instance methods
   def display_name
     username
+  end
+
+  def self.from_google(auth)
+    email = auth.info.email.to_s.downcase
+    user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: email)
+
+    user ||= new(email: email, username: unique_username_from(auth), password: Devise.friendly_token.first(32))
+    user.provider = auth.provider
+    user.uid = auth.uid
+    user.password = Devise.friendly_token.first(32) if user.encrypted_password.blank?
+    user.save!
+    user
   end
 
   def admin_or_moderator?
@@ -158,6 +171,21 @@ class User < ApplicationRecord
   end
 
   private
+
+  def self.unique_username_from(auth)
+    base = auth.info.name.presence || auth.info.email.to_s.split("@").first || "brethren"
+    username = base.parameterize(separator: "_").gsub(/[^a-zA-Z0-9_]/, "").presence || "brethren"
+    username = username.first(24)
+    candidate = username
+    suffix = 2
+
+    while exists?(username: candidate)
+      candidate = "#{username.first(24)}_#{suffix}"
+      suffix += 1
+    end
+
+    candidate
+  end
 
   def create_profile
     build_profile.save

@@ -20,6 +20,8 @@
         <p class="mt-1 text-sm text-faith-muted">Continue to Faith Community.</p>
       </div>
 
+      <%= render "devise/shared/google_sign_in" %>
+
       <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5" }) do |f| %>
         <div>
           <%= f.label :email, class: "label" %>

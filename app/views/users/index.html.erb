@@ -45,11 +45,10 @@
                   <%= link_to user.display_name, user_path(user.username), class: "block truncate text-base font-black text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" %>
                   <p class="truncate text-sm font-semibold text-[var(--fc-muted)]">@<%= user.username %></p>
                 </div>
-                <% if current_user.following?(user) %>
-                  <%= button_to "Following", unfollow_user_path(user.username), method: :delete, class: "btn btn-secondary btn-sm" %>
-                <% else %>
-                  <%= button_to "Follow", follow_user_path(user.username), class: "fc-btn fc-btn-primary min-h-9 px-3 text-xs" %>
-                <% end %>
+                <%= render "users/follow_actions",
+                           user: user,
+                           follow_class: "fc-btn fc-btn-primary min-h-9 px-3 text-xs",
+                           following_class: "btn btn-secondary btn-sm" %>
               </div>
 
               <% if user.profile&.bio.present? %>

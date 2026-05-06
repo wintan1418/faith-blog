@@ -1,0 +1,7 @@
+<%= turbo_frame_tag dom_id(user, :follow_actions), class: "inline-flex" do %>
+  <% if current_user.following?(user) %>
+    <%= button_to "Following", unfollow_user_path(user.username), method: :delete, class: local_assigns.fetch(:following_class, "btn btn-secondary") %>
+  <% else %>
+    <%= button_to "Follow", follow_user_path(user.username), class: local_assigns.fetch(:follow_class, "btn btn-primary") %>
+  <% end %>
+<% end %>

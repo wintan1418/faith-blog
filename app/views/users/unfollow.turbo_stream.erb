@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@user, :follow_actions),
+                         partial: "users/follow_actions",
+                         locals: { user: @user } %>
