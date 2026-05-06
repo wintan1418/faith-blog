@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_06_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_06_124423) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,6 +50,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_000001) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_moderation_reviews", force: :cascade do |t|
+    t.string "reviewable_type", null: false
+    t.bigint "reviewable_id", null: false
+    t.bigint "user_id"
+    t.integer "status", default: 0, null: false
+    t.string "severity", default: "none", null: false
+    t.string "recommended_action", default: "allow", null: false
+    t.string "categories", default: [], null: false, array: true
+    t.float "score", default: 0.0, null: false
+    t.string "summary"
+    t.string "model"
+    t.jsonb "raw_response", default: {}, null: false
+    t.datetime "reviewed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["categories"], name: "index_ai_moderation_reviews_on_categories", using: :gin
+    t.index ["reviewable_type", "reviewable_id"], name: "index_ai_moderation_reviews_on_reviewable"
+    t.index ["reviewed_at"], name: "index_ai_moderation_reviews_on_reviewed_at"
+    t.index ["severity"], name: "index_ai_moderation_reviews_on_severity"
+    t.index ["status"], name: "index_ai_moderation_reviews_on_status"
+    t.index ["user_id"], name: "index_ai_moderation_reviews_on_user_id"
   end
 
   create_table "bookmarks", force: :cascade do |t|
@@ -220,7 +243,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_000001) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "ai_moderation_review_id"
     t.index ["action"], name: "index_moderation_logs_on_action"
+    t.index ["ai_moderation_review_id"], name: "index_moderation_logs_on_ai_moderation_review_id"
     t.index ["created_at"], name: "index_moderation_logs_on_created_at"
     t.index ["moderator_id"], name: "index_moderation_logs_on_moderator_id"
     t.index ["target_type", "target_id"], name: "index_moderation_logs_on_target"
@@ -416,6 +441,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_000001) do
     t.index ["usage_count"], name: "index_tags_on_usage_count"
   end
 
+  create_table "user_risk_profiles", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "risk_level", default: 0, null: false
+    t.float "risk_score", default: 0.0, null: false
+    t.integer "flagged_reviews_count", default: 0, null: false
+    t.integer "confirmed_violations_count", default: 0, null: false
+    t.integer "dismissed_flags_count", default: 0, null: false
+    t.datetime "last_flagged_at"
+    t.datetime "last_action_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_flagged_at"], name: "index_user_risk_profiles_on_last_flagged_at"
+    t.index ["risk_level"], name: "index_user_risk_profiles_on_risk_level"
+    t.index ["user_id"], name: "index_user_risk_profiles_on_user_id", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -451,6 +492,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_000001) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_moderation_reviews", "users"
   add_foreign_key "bookmarks", "posts"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "brethren_cards", "users"
@@ -471,6 +513,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_000001) do
   add_foreign_key "message_blocks", "users", column: "blocker_id"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "moderation_logs", "ai_moderation_reviews"
   add_foreign_key "moderation_logs", "users", column: "moderator_id"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "actor_id"
@@ -490,4 +533,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_06_000001) do
   add_foreign_key "resources", "users", column: "approved_by_id"
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
+  add_foreign_key "user_risk_profiles", "users"
 end

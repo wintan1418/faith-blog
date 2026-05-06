@@ -28,6 +28,7 @@ class Post < ApplicationRecord
   has_many :tags, through: :post_tags
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
+  has_one  :ai_moderation_review, as: :reviewable, dependent: :destroy
 
   # Post linking (outbound = posts this links TO, inbound = posts that link TO this)
   has_many :outbound_links, class_name: "PostLink", foreign_key: :source_post_id, dependent: :destroy

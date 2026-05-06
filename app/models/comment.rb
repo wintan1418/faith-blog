@@ -14,6 +14,7 @@ class Comment < ApplicationRecord
   has_many :likes, as: :likeable, dependent: :destroy
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
+  has_one  :ai_moderation_review, as: :reviewable, dependent: :destroy
 
   # Validations
   validates :content, presence: true

@@ -23,6 +23,8 @@ class User < ApplicationRecord
   has_many :notifications, dependent: :destroy
   has_many :reports, foreign_key: :reporter_id, dependent: :destroy
   has_many :moderation_logs, foreign_key: :moderator_id, dependent: :nullify
+  has_one  :risk_profile, class_name: "UserRiskProfile", dependent: :destroy
+  has_many :ai_moderation_reviews, dependent: :nullify
   has_many :conversation_participants, dependent: :destroy
   has_many :conversations, through: :conversation_participants
   has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy
@@ -55,6 +57,7 @@ class User < ApplicationRecord
   # Callbacks
   after_create :create_profile
   after_create :create_brethren_card
+  after_create :ensure_risk_profile
 
   # Scopes
   scope :active, -> { where(active: true) }
@@ -193,5 +196,9 @@ class User < ApplicationRecord
 
   def create_brethren_card
     build_brethren_card.save(validate: false)
+  end
+
+  def ensure_risk_profile
+    build_risk_profile.save unless risk_profile
   end
 end

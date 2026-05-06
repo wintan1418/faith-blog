@@ -4,6 +4,7 @@ class ModerationLog < ApplicationRecord
   # Associations
   belongs_to :moderator, class_name: "User"
   belongs_to :target, polymorphic: true
+  belongs_to :ai_moderation_review, optional: true
 
   # Validations
   validates :action, presence: true
