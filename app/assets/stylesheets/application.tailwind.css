@@ -8502,3 +8502,278 @@ html.theme-dark .fc-held-banner {
   color: var(--fc-muted);
   font-weight: 700;
 }
+
+/* ============================================================
+   ✦ ARTICLE PAGE — post show, modern reading layout
+   ============================================================ */
+
+.fc-article-shell {
+  min-height: calc(100vh - 60px);
+  background: var(--fc-bg);
+  padding: 1.75rem 1rem 4rem;
+}
+
+.fc-article-wrap {
+  max-width: 700px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fc-article {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.fc-article-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.fc-article-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.fc-article-author .fc-avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 1rem;
+}
+
+.fc-article-author-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.fc-article-author-actions form.inline { margin: 0; }
+
+.fc-article-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.83rem;
+  color: var(--fc-muted);
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.fc-article-meta-dot {
+  color: var(--fc-faint);
+}
+
+.fc-article-title {
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+  color: var(--fc-ink);
+  margin: 0 0 1rem;
+}
+
+.fc-article-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.fc-article-media {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1.25rem;
+}
+.fc-article-media:has(figure:nth-child(2)) {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.fc-article-figure {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--fc-line);
+  background: var(--fc-bg);
+}
+
+.fc-article-figure img {
+  width: 100%;
+  max-height: 520px;
+  object-fit: cover;
+  display: block;
+}
+
+.fc-article-body {
+  color: var(--fc-soft);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.fc-article-body p {
+  margin: 0 0 1.05em;
+}
+.fc-article-body p:last-child { margin-bottom: 0; }
+
+.fc-article-body h1,
+.fc-article-body h2,
+.fc-article-body h3,
+.fc-article-body h4 {
+  color: var(--fc-ink);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+.fc-article-body h1 { font-size: 1.65rem; }
+.fc-article-body h2 { font-size: 1.4rem; }
+.fc-article-body h3 { font-size: 1.2rem; }
+.fc-article-body h4 { font-size: 1.05rem; }
+
+.fc-article-body strong, .fc-article-body b {
+  color: var(--fc-ink);
+  font-weight: 800;
+}
+
+.fc-article-body a {
+  color: var(--fc-accent-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.fc-article-body a:hover { color: var(--fc-accent); }
+
+.fc-article-body ul,
+.fc-article-body ol {
+  margin: 1em 0 1em 1.4em;
+  padding: 0;
+}
+.fc-article-body li { margin: 0.35em 0; }
+
+.fc-article-body blockquote {
+  border-left: 3px solid var(--fc-accent);
+  padding: 0.85rem 1rem;
+  background: var(--fc-accent-soft);
+  border-radius: 0 8px 8px 0;
+  color: var(--fc-soft);
+  margin: 1.25em 0;
+}
+
+.fc-article-body code {
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+  font-size: 0.92em;
+}
+
+.fc-article-body hr {
+  border: 0;
+  border-top: 1px solid var(--fc-line);
+  margin: 2em 0;
+}
+
+.fc-article-mentioned,
+.fc-article-related {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--fc-line);
+}
+
+.fc-article-related {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 700px) {
+  .fc-article-related {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.fc-article-related-card {
+  display: block;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.fc-article-related-card:hover {
+  background: var(--fc-surface-3);
+  border-color: var(--fc-accent-soft);
+}
+
+.fc-article-related-title {
+  font-weight: 700;
+  color: var(--fc-ink);
+  font-size: 0.92rem;
+  margin: 0;
+}
+.fc-article-related-by {
+  font-size: 0.78rem;
+  color: var(--fc-muted);
+  margin: 0.2rem 0 0;
+}
+
+.fc-article-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--fc-line);
+}
+
+.fc-article-comments {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.fc-article-comments-head {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--fc-line);
+  font-weight: 800;
+  color: var(--fc-ink);
+}
+
+.fc-article-comments-form,
+.fc-article-comments-empty {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--fc-line);
+}
+
+.fc-article-comments-empty {
+  text-align: center;
+  color: var(--fc-muted);
+  font-weight: 600;
+}
+
+/* Apply the same tokenized colors to the legacy .prose-faith
+   wherever it still appears in the dark theme. */
+html.theme-dark .prose-faith,
+html.theme-dark .prose,
+html.theme-dark .trix-content {
+  color: var(--fc-soft) !important;
+}
+html.theme-dark .prose-faith a,
+html.theme-dark .prose a {
+  color: var(--fc-accent-2) !important;
+}
+html.theme-light .prose-faith,
+html.theme-light .prose {
+  color: var(--fc-soft);
+}

@@ -52,23 +52,23 @@ export default class extends Controller {
 
   async choose(emoji) {
     this.hide()
-    const url = new URL(this.urlValue, window.location.origin)
-    url.searchParams.set("reaction_emoji", emoji)
 
     const form = new FormData()
     form.set("authenticity_token", this.tokenValue)
     form.set("reaction_emoji", emoji)
 
     try {
-      const response = await fetch(url.pathname, {
+      // urlValue already carries likeable_type/id as query params; preserve them.
+      const response = await fetch(this.urlValue, {
         method: "POST",
         body: form,
         headers: { "Accept": "text/html" },
         credentials: "same-origin"
       })
-      if (response.ok) {
-        // Cheap and reliable: reload to re-render counts in their new positions.
+      if (response.ok || response.redirected) {
         window.location.reload()
+      } else {
+        console.error("Reaction failed:", response.status, await response.text())
       }
     } catch (err) {
       console.error(err)

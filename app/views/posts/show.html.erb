@@ -9,8 +9,8 @@
   <% content_for(:og_image) { url_for(@post.images.first) } %>
 <% end %>
 
-<div class="mystic-shell py-8">
-  <div class="mystic-container max-w-4xl">
+<div class="fc-article-shell">
+  <div class="fc-article-wrap">
     <% if @post.held_for_review? && !@post.visible_to?(current_user) %>
       <article class="fc-card fc-card-held">
         <div class="fc-held-placeholder">
@@ -19,98 +19,99 @@
         </div>
       </article>
     <% else %>
-    <% if @post.held_for_review? && current_user == @post.user %>
-      <div class="fc-held-banner mb-4">
-        <%= render_icon("shield", classes: "h-4 w-4") %>
-        <span>Held for moderator review — only you and moderators can see this right now.</span>
-      </div>
-    <% end %>
-    <article class="mystic-panel-strong overflow-hidden">
-      <header class="border-b border-faith-green/10 p-6 sm:p-8">
-        <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
-          <div class="flex min-w-0 items-start gap-4">
-            <% if @post.anonymous? %>
-              <span class="grid h-12 w-12 place-items-center rounded-full bg-white/75 text-faith-muted border border-faith-green/10">
-                <%= render_icon("users", classes: "w-5 h-5") %>
-              </span>
-            <% elsif @post.user.profile&.avatar&.attached? %>
-              <%= link_to user_path(@post.user.username), class: "shrink-0" do %>
-                <%= image_tag @post.user.profile.avatar, class: "mystic-avatar h-12 w-12 object-cover" %>
-              <% end %>
-            <% else %>
-              <%= link_to user_path(@post.user.username), class: "mystic-avatar mystic-avatar-fallback grid h-12 w-12 shrink-0 place-items-center text-lg font-bold" do %>
-                <%= @post.user.username.first.upcase %>
-              <% end %>
-            <% end %>
-
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <% if @post.anonymous? %>
-                  <span class="font-bold text-faith-dark">Anonymous</span>
-                <% else %>
-                  <%= link_to @post.user.username, user_path(@post.user.username), class: "font-bold text-faith-dark hover:text-faith-green" %>
-                  <% if user_signed_in? && @post.user != current_user %>
-                    <% if current_user.following?(@post.user) %>
-                      <%= button_to "Following", unfollow_user_path(@post.user.username), method: :delete, class: "mystic-badge px-3 py-1" %>
-                    <% else %>
-                      <%= button_to "Follow", follow_user_path(@post.user.username), class: "mystic-badge px-3 py-1" %>
-                    <% end %>
-                  <% end %>
-                <% end %>
-              </div>
-              <div class="mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold text-faith-muted">
-                <%= link_to @post.room.name, room_path(@post.room), class: "mystic-badge px-3 py-1" %>
-                <span>•</span>
-                <time datetime="<%= @post.published_at&.iso8601 %>"><%= @post.published_at&.strftime("%B %d, %Y") || @post.created_at.strftime("%B %d, %Y") %></time>
-                <span>•</span>
-                <span><%= @post.reading_time %> min read</span>
-              </div>
-            </div>
-          </div>
-
-          <% if @post.featured? %>
-            <span class="mystic-badge px-3 py-1 text-faith-accent">Featured</span>
-          <% end %>
-        </div>
-
-        <h1 class="mystic-title text-4xl sm:text-5xl"><%= @post.title %></h1>
-
-        <% if @post.tags.any? %>
-          <div class="mt-5 flex flex-wrap gap-2">
-            <% @post.tags.each do |tag| %>
-              <%= link_to search_path(q: tag.name, type: "posts"), class: "tag-badge px-3 py-1" do %>
-                #<%= tag.name %>
-              <% end %>
-            <% end %>
-          </div>
-        <% end %>
-      </header>
-
-      <% if @post.has_images? %>
-        <div class="px-6 pt-6 sm:px-8">
-          <div class="grid gap-4 <%= @post.images.count > 1 ? 'sm:grid-cols-2' : '' %>">
-            <% @post.images.each_with_index do |image, index| %>
-              <figure class="<%= 'sm:col-span-2' if index == 0 && @post.images.count.odd? && @post.images.count > 1 %> overflow-hidden rounded-2xl border border-faith-green/10 bg-white/60">
-                <%= image_tag image, class: "h-auto max-h-[520px] w-full object-cover", alt: @post.title %>
-              </figure>
-            <% end %>
-          </div>
+      <% if @post.held_for_review? && current_user == @post.user %>
+        <div class="fc-held-banner mb-4">
+          <%= render_icon("shield", classes: "h-4 w-4") %>
+          <span>Held for moderator review — only you and moderators can see this right now.</span>
         </div>
       <% end %>
 
-      <div class="px-6 py-8 sm:px-8">
-        <div class="prose-faith mx-auto max-w-3xl">
+      <article class="fc-article">
+        <header class="fc-article-head">
+          <div class="fc-article-author">
+            <% if @post.anonymous? %>
+              <span class="fc-avatar"><%= render_icon("users", classes: "h-5 w-5") %></span>
+            <% elsif @post.user.profile&.avatar&.attached? %>
+              <%= link_to user_path(@post.user.username) do %>
+                <%= image_tag @post.user.profile.avatar, class: "fc-avatar object-cover", alt: @post.user.username %>
+              <% end %>
+            <% else %>
+              <%= link_to user_path(@post.user.username), class: "fc-avatar" do %>
+                <%= @post.user.username.first.upcase %>
+              <% end %>
+            <% end %>
+            <div class="min-w-0">
+              <% if @post.anonymous? %>
+                <p class="fc-breath-name">Anonymous</p>
+              <% else %>
+                <%= link_to @post.user.username, user_path(@post.user.username), class: "fc-breath-name block" %>
+                <p class="fc-breath-handle">@<%= @post.user.username %></p>
+              <% end %>
+            </div>
+          </div>
+          <div class="fc-article-author-actions">
+            <% if user_signed_in? && @post.user != current_user && !@post.anonymous? %>
+              <% if current_user.following?(@post.user) %>
+                <%= button_to "Following", unfollow_user_path(@post.user.username), method: :delete, form_class: "inline", class: "fc-btn" %>
+              <% else %>
+                <%= button_to "Follow", follow_user_path(@post.user.username), form_class: "inline", class: "fc-btn fc-btn-primary" %>
+              <% end %>
+            <% end %>
+            <% if user_signed_in? && (@post.user == current_user || current_user_admin?) %>
+              <%= link_to edit_post_path(@post), class: "fc-icon-btn", title: "Edit breath" do %>
+                <%= render_icon("pencil", classes: "h-4 w-4") %>
+              <% end %>
+            <% end %>
+          </div>
+        </header>
+
+        <div class="fc-article-meta">
+          <%= link_to @post.room.name, room_path(@post.room), class: "fc-badge" %>
+          <span class="fc-article-meta-dot">·</span>
+          <time datetime="<%= @post.published_at&.iso8601 %>">
+            <%= (@post.published_at || @post.created_at).strftime("%B %-d, %Y") %>
+          </time>
+          <% if @post.respond_to?(:reading_time) && @post.reading_time.to_i.positive? %>
+            <span class="fc-article-meta-dot">·</span>
+            <span><%= @post.reading_time %> min read</span>
+          <% end %>
+          <% if @post.featured? %>
+            <span class="fc-featured-tag ml-2">★ Featured</span>
+          <% end %>
+        </div>
+
+        <h1 class="fc-article-title"><%= @post.title %></h1>
+
+        <% if @post.tags.any? %>
+          <div class="fc-article-tags">
+            <% @post.tags.each do |tag| %>
+              <%= link_to "##{tag.name}", search_path(q: tag.name, type: "posts"), class: "fc-breath-tag" %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if @post.has_images? %>
+          <div class="fc-article-media">
+            <% @post.images.each do |image| %>
+              <figure class="fc-article-figure">
+                <%= image_tag image, alt: @post.title %>
+              </figure>
+            <% end %>
+          </div>
+        <% end %>
+
+        <div class="fc-article-body">
           <%= render_with_mentions(@post.content) %>
         </div>
 
         <% if @post.mentioned_users.any? %>
-          <div class="mx-auto mt-8 max-w-3xl border-t border-faith-green/10 pt-5">
-            <p class="mb-3 text-sm font-bold text-faith-muted">Mentioned</p>
+          <div class="fc-article-mentioned">
+            <p class="fc-section-label">Mentioned</p>
             <div class="flex flex-wrap gap-2">
               <% @post.mentioned_users.each do |user| %>
-                <%= link_to user_path(user.username), class: "mystic-badge px-3 py-1" do %>
+                <%= link_to user_path(user.username), class: "fc-badge inline-flex items-center gap-1.5" do %>
                   <% if user.profile&.avatar&.attached? %>
-                    <%= image_tag user.profile.avatar, class: "h-5 w-5 rounded-full object-cover" %>
+                    <%= image_tag user.profile.avatar, class: "h-4 w-4 rounded-full object-cover" %>
                   <% end %>
                   @<%= user.username %>
                 <% end %>
@@ -118,99 +119,87 @@
             </div>
           </div>
         <% end %>
-      </div>
 
-      <% if @post.linked_posts.any? || @post.linking_posts.any? %>
-        <div class="border-t border-faith-green/10 px-6 py-6 sm:px-8">
-          <div class="grid gap-4 md:grid-cols-2">
+        <% if @post.linked_posts.any? || @post.linking_posts.any? %>
+          <div class="fc-article-related">
             <% if @post.linked_posts.any? %>
               <div>
-                <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-faith-muted">Related Posts</h3>
+                <p class="fc-section-label">Related</p>
                 <div class="space-y-2">
                   <% @post.linked_posts.each do |linked| %>
-                    <%= link_to post_path(linked), class: "block rounded-2xl bg-white/65 p-4 transition hover:bg-white" do %>
-                      <p class="font-bold text-faith-dark"><%= linked.title %></p>
-                      <p class="text-sm text-faith-muted">by <%= linked.user.username %></p>
+                    <%= link_to post_path(linked), class: "fc-article-related-card" do %>
+                      <p class="fc-article-related-title"><%= linked.title %></p>
+                      <p class="fc-article-related-by">by <%= linked.user.username %></p>
                     <% end %>
                   <% end %>
                 </div>
               </div>
             <% end %>
-
             <% if @post.linking_posts.any? %>
               <div>
-                <h3 class="mb-3 text-sm font-bold uppercase tracking-wide text-faith-muted">Posts That Link Here</h3>
+                <p class="fc-section-label">Linked here</p>
                 <div class="space-y-2">
                   <% @post.linking_posts.each do |linking| %>
-                    <%= link_to post_path(linking), class: "block rounded-2xl bg-white/65 p-4 transition hover:bg-white" do %>
-                      <p class="font-bold text-faith-dark"><%= linking.title %></p>
-                      <p class="text-sm text-faith-muted">by <%= linking.user.username %></p>
+                    <%= link_to post_path(linking), class: "fc-article-related-card" do %>
+                      <p class="fc-article-related-title"><%= linking.title %></p>
+                      <p class="fc-article-related-by">by <%= linking.user.username %></p>
                     <% end %>
                   <% end %>
                 </div>
               </div>
             <% end %>
           </div>
-        </div>
-      <% end %>
+        <% end %>
 
-      <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-faith-green/10 bg-white/35 px-6 py-4 sm:px-8">
-        <div class="flex flex-wrap items-center gap-2">
-          <%= render "posts/reactions", post: @post %>
-          <%= render "posts/comment_count", post: @post %>
-          <%= render "posts/impressions", post: @post %>
-          <%= render "reshares/button", post: @post %>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <%= render "posts/bookmark_button", post: @post %>
-
-          <% if user_signed_in? && (@post.user == current_user || current_user_admin?) %>
-            <%= link_to "Edit", edit_post_path(@post), class: "btn btn-secondary" %>
-          <% end %>
-
-          <% if user_signed_in? && current_user.admin_or_moderator? %>
-            <% if @post.featured? %>
-              <%= button_to "Unfeature", unfeature_post_path(@post), class: "btn btn-secondary" %>
-            <% else %>
-              <%= button_to "Feature", feature_post_path(@post), class: "btn btn-secondary" %>
+        <footer class="fc-article-actions">
+          <div class="flex flex-wrap items-center gap-2">
+            <%= render "posts/reactions", post: @post %>
+            <%= render "posts/comment_count", post: @post %>
+            <%= render "posts/impressions", post: @post %>
+            <%= render "reshares/button", post: @post %>
+            <%= render "posts/share_button", post: @post %>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <%= render "posts/bookmark_button", post: @post %>
+            <% if user_signed_in? && current_user.admin_or_moderator? %>
+              <% if @post.featured? %>
+                <%= button_to "Unfeature", unfeature_post_path(@post), form_class: "inline", class: "fc-btn" %>
+              <% else %>
+                <%= button_to "Feature", feature_post_path(@post), form_class: "inline", class: "fc-btn" %>
+              <% end %>
             <% end %>
-          <% end %>
+            <% if user_signed_in? && @post.user != current_user %>
+              <%= render "reports/button", reportable: @post, label: "Report" %>
+            <% end %>
+          </div>
+        </footer>
+      </article>
 
-          <% if user_signed_in? && @post.user != current_user %>
-            <%= render "reports/button", reportable: @post, label: "Report", classes: "btn btn-secondary text-red-600" %>
-          <% end %>
-        </div>
-      </footer>
-    </article>
-
-    <section id="comments" class="mt-8">
-      <div class="mystic-panel overflow-hidden">
-        <div class="border-b border-faith-green/10 p-6">
+      <section id="comments" class="fc-article-comments">
+        <header class="fc-article-comments-head">
           <%= render "comments/count", post: @post %>
-        </div>
-
+        </header>
         <% if @post.allow_comments? %>
           <% if user_signed_in? %>
-            <div class="border-b border-faith-green/10 bg-white/35 p-6">
+            <div class="fc-article-comments-form">
               <%= render "comments/form", post: @post, comment: @new_comment %>
             </div>
           <% else %>
-            <div class="border-b border-faith-green/10 bg-white/35 p-6 text-center">
-              <p class="text-faith-muted">
-                <%= link_to "Sign in", new_user_session_path, class: "font-bold text-faith-green hover:text-faith-dark" %> to join the conversation.
+            <div class="fc-article-comments-empty">
+              <p>
+                <%= link_to "Sign in", new_user_session_path, class: "font-bold text-[var(--fc-accent-2)] hover:text-[var(--fc-ink)]" %>
+                to join the conversation.
               </p>
             </div>
           <% end %>
 
           <%= render "comments/list", post: @post %>
         <% else %>
-          <div class="p-8 text-center">
-            <p class="text-faith-muted">Comments are disabled for this post.</p>
+          <div class="fc-article-comments-empty">
+            <p>Comments are disabled for this breath.</p>
           </div>
         <% end %>
-      </div>
-    </section>
+      </section>
     <% end %>
   </div>
 </div>
