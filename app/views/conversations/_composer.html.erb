@@ -5,16 +5,31 @@
     </div>
   <% end %>
 
-  <div class="flex items-end gap-2">
+  <div class="flex items-end gap-2 relative" data-controller="emoji-picker">
+    <button type="button"
+            data-emoji-picker-target="button"
+            data-action="click->emoji-picker#toggle"
+            class="inbox-emoji-btn"
+            title="Add emoji"
+            aria-label="Add emoji">
+      <%= render_icon("smile", classes: "h-5 w-5") %>
+    </button>
+
     <%= f.text_area :body,
                     rows: 2,
                     class: "inbox-input",
                     maxlength: 4000,
                     placeholder: "Write a thoughtful message...",
-                    data: { typing_target: "input", action: "input->typing#input" } %>
+                    data: { typing_target: "input", action: "input->typing#input", emoji_picker_target: "editor" } %>
+
     <%= f.button class: "fc-btn fc-btn-primary min-h-11" do %>
       <%= render_icon("send", classes: "h-4 w-4") %>
       Send
     <% end %>
+
+    <div data-emoji-picker-target="picker"
+         class="hidden absolute bottom-full left-0 z-50 mb-2">
+      <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
+    </div>
   </div>
 <% end %>

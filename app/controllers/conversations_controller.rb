@@ -36,6 +36,22 @@ class ConversationsController < ApplicationController
     redirect_to conversations_path, notice: "Conversation archived."
   end
 
+  def search
+    @query = params[:q].to_s.strip
+    if @query.length >= 2
+      conversation_ids = current_user.conversations.pluck(:id)
+      messages = Message.visible
+                        .where(conversation_id: conversation_ids)
+                        .where("body ILIKE ?", "%#{@query}%")
+                        .includes(:sender, conversation: :conversation_participants)
+                        .order(created_at: :desc)
+      @pagy, @results = pagy(messages, items: 25)
+    else
+      @pagy = nil
+      @results = []
+    end
+  end
+
   def mark_read
     @conversation.mark_read_for!(current_user)
     redirect_to conversation_path(@conversation)

@@ -28,9 +28,14 @@
     </div>
   </header>
 
+  <% last_mine_id = messages.reverse.find { |m| m.sender_id == current_user.id }&.id %>
+
   <div id="messages" class="inbox-messages">
     <% if messages.any? %>
-      <%= render partial: "conversations/message", collection: messages, as: :message, locals: { viewer_id: current_user.id } %>
+      <%= render partial: "conversations/message",
+                 collection: messages,
+                 as: :message,
+                 locals: { viewer_id: current_user.id, last_mine_id: last_mine_id, conversation: conversation } %>
     <% else %>
       <div class="inbox-empty-card">
         <%= render_icon("mail", classes: "h-9 w-9") %>

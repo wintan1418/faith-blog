@@ -44,6 +44,17 @@ class Conversation < ApplicationRecord
     participant_for(user)&.unread? || false
   end
 
+  def unread_count_for(user)
+    participant = participant_for(user)
+    return 0 unless participant
+
+    scope = messages.visible.where.not(sender_id: user.id)
+    if participant.last_read_at.present?
+      scope = scope.where("created_at > ?", participant.last_read_at)
+    end
+    scope.count
+  end
+
   def blocked_for?(user)
     other_user = other_participant_for(user)
     other_user.present? && MessageBlock.between?(user, other_user)

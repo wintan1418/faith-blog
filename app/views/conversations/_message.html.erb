@@ -1,7 +1,11 @@
 <% message = local_assigns.fetch(:message) %>
 <% viewer_id = local_assigns.fetch(:viewer_id, current_user&.id) %>
+<% last_mine_id = local_assigns[:last_mine_id] %>
+<% conversation_local = local_assigns[:conversation] || message.conversation %>
 <% mine = message.sender_id == viewer_id %>
 <% deleted = message.deleted? %>
+<% show_status = mine && !deleted && message.id == last_mine_id %>
+<% seen_by_other = show_status && conversation_local.read_by_other?(message) %>
 
 <%
   loaded_likes = message.likes.includes(:user).to_a
@@ -32,6 +36,15 @@
         <%= message.created_at.strftime("%I:%M %p") %>
         <% if message.respond_to?(:edited?) && message.edited? %>
           <span class="message-edited">· edited</span>
+        <% end %>
+        <% if show_status %>
+          <span class="message-status<%= ' is-seen' if seen_by_other %>">
+            <% if seen_by_other %>
+              · Seen
+            <% else %>
+              · Delivered
+            <% end %>
+          </span>
         <% end %>
       </span>
 

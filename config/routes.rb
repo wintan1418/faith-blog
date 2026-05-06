@@ -120,6 +120,7 @@ Rails.application.routes.draw do
   end
   get "my-connections", to: "connection_requests#connections", as: :my_connections
 
+  get "inbox/search", to: "conversations#search", as: :inbox_search
   resources :conversations, path: "inbox", only: [ :index, :show, :create ] do
     member do
       post :archive
