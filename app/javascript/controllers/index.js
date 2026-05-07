@@ -69,3 +69,6 @@ application.register("scripture", ScriptureController)
 
 import ComposerAssistantController from "./composer_assistant_controller"
 application.register("composer-assistant", ComposerAssistantController)
+
+import PwaController from "./pwa_controller"
+application.register("pwa", PwaController)

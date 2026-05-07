@@ -22,6 +22,14 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%# PWA %>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <meta name="theme-color" content="#0b1417">
+    <% if user_signed_in? && WebPushConfig.configured? %>
+      <meta name="vapid-public-key" content="<%= WebPushConfig.public_key %>">
+    <% end %>
+
     <%# Social share / Open Graph %>
     <% og_title       = content_for?(:og_title)       ? content_for(:og_title)       : (content_for(:title) || "Faith Community") %>
     <% og_description = content_for?(:og_description) ? content_for(:og_description) : "Breathe into the faith community." %>
@@ -54,7 +62,9 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="h-full bg-stone-50 font-sans antialiased theme-light">
+  <body class="h-full bg-stone-50 font-sans antialiased theme-light"
+        data-controller="<%= 'pwa' if user_signed_in? %>"
+        data-pwa-vapid-key-value="<%= WebPushConfig.public_key if user_signed_in? && WebPushConfig.configured? %>">
     <script>
       (function() {
         var dark = document.documentElement.classList.contains('theme-dark');

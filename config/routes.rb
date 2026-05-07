@@ -193,6 +193,16 @@ Rails.application.routes.draw do
     end
   end
 
+  # Web Push subscriptions — endpoint-keyed (client doesn't know its row id).
+  post   "/push_subscriptions",     to: "push_subscriptions#create",  as: :push_subscriptions
+  delete "/push_subscriptions",     to: "push_subscriptions#destroy"
+  get    "/push_subscriptions/key", to: "push_subscriptions#key",     as: :push_subscriptions_key
+
+  # PWA
+  get "/manifest.webmanifest", to: "pwa#manifest", defaults: { format: :json }, as: :pwa_manifest
+  get "/service-worker.js",    to: "pwa#service_worker"
+  get "/offline",              to: "pwa#offline", as: :offline
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end

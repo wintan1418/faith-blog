@@ -98,16 +98,13 @@ class PostsController < ApplicationController
     @post.update!(prayer_status: :prayer_answered, prayer_answered_at: Time.current)
 
     intercessor_ids = @post.prayer_intercessions.where.not(user_id: current_user.id).pluck(:user_id)
-    if intercessor_ids.any?
-      rows = intercessor_ids.map do |uid|
-        {
-          user_id: uid, actor_id: current_user.id,
-          notifiable_type: "Post", notifiable_id: @post.id,
-          notification_type: Notification.notification_types[:prayer_answered],
-          created_at: Time.current, updated_at: Time.current
-        }
-      end
-      Notification.insert_all(rows)
+    intercessor_ids.each do |uid|
+      Notification.create(
+        user_id: uid,
+        actor: current_user,
+        notifiable: @post,
+        notification_type: :prayer_answered
+      )
     end
 
     redirect_back fallback_location: post_path(@post), notice: "Marked answered. 🌟"

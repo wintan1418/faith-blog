@@ -10,6 +10,32 @@
 
     <%= render "settings/tabs", active: :notifications %>
 
+    <div class="mystic-panel-strong overflow-hidden mb-6">
+      <div class="border-b border-faith-green/10 p-6">
+        <h2 class="text-xl font-bold text-faith-dark">Browser push & install</h2>
+        <p class="mystic-copy text-sm">Get a tap on the shoulder when someone replies, joins your prayer chain, or sends a DM. Works on this device only — turn it on per phone or laptop.</p>
+      </div>
+      <div class="p-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
+        <button type="button"
+                class="fc-btn fc-btn-primary"
+                data-pwa-target="enableBtn"
+                data-action="click->pwa#enablePush">
+          🔕 Turn on push
+        </button>
+        <button type="button"
+                class="fc-btn hidden"
+                data-pwa-target="installBtn"
+                data-action="click->pwa#installApp">
+          📲 Install Brethreign as an app
+        </button>
+        <button type="button"
+                class="fc-btn"
+                data-action="click->pwa#disablePush">
+          Turn off push
+        </button>
+      </div>
+    </div>
+
     <div class="mystic-panel-strong overflow-hidden">
       <div class="border-b border-faith-green/10 p-6">
         <h2 class="text-xl font-bold text-faith-dark">Email & Room Notifications</h2>

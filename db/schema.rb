@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_07_210524) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_07_214118) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -374,6 +374,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_210524) do
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "endpoint", limit: 1024, null: false
+    t.string "p256dh_key", null: false
+    t.string "auth_key", null: false
+    t.string "user_agent"
+    t.datetime "last_pushed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
   create_table "reports", force: :cascade do |t|
     t.bigint "reporter_id", null: false
     t.string "reportable_type", null: false
@@ -587,6 +600,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_210524) do
   add_foreign_key "prayer_intercessions", "posts"
   add_foreign_key "prayer_intercessions", "users"
   add_foreign_key "profiles", "users"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "reports", "users", column: "reporter_id"
   add_foreign_key "reports", "users", column: "reviewed_by_id"
   add_foreign_key "reshares", "posts"

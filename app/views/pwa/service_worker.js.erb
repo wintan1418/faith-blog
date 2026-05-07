@@ -1,0 +1,84 @@
+// Brethreign service worker — versioned by deploy timestamp so changes
+// roll out cleanly across browsers.
+const CACHE_VERSION = "brethreign-v<%= ENV.fetch('SW_VERSION', Time.current.to_i.to_s) %>";
+const APP_SHELL = ["/feed", "/offline", "/icon.png", "/icon.svg"];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_VERSION).then((cache) =>
+      Promise.all(APP_SHELL.map((url) => cache.add(url).catch(() => null)))
+    )
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+// Network-first for navigation requests, cache-fallback for offline.
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+  if (req.method !== "GET") return;
+  if (req.mode !== "navigate" && req.destination !== "document") return;
+
+  event.respondWith(
+    fetch(req).catch(() =>
+      caches.match(req).then((cached) => cached || caches.match("/offline"))
+    )
+  );
+});
+
+// Web Push payload shape (sent from PushSubscription#deliver):
+//   { title, body, url, icon, tag }
+self.addEventListener("push", (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch (_) { data = {}; }
+
+  const title = data.title || "Brethreign";
+  const options = {
+    body: data.body || "",
+    icon: data.icon || "/icon.png",
+    badge: "/icon.png",
+    tag: data.tag || "brethreign",
+    data: { url: data.url || "/feed" },
+    renotify: false,
+    requireInteraction: false
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/feed";
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((wins) => {
+      for (const win of wins) {
+        if (win.url.includes(target) && "focus" in win) return win.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+    })
+  );
+});
+
+self.addEventListener("pushsubscriptionchange", (event) => {
+  // Browser rotated keys — re-subscribe and POST the new credentials.
+  event.waitUntil(
+    self.registration.pushManager
+      .getSubscription()
+      .then((sub) => sub && sub.toJSON())
+      .then((sub) => sub && fetch("/push_subscriptions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ subscription: sub })
+      }))
+  );
+});

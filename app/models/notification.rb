@@ -32,6 +32,7 @@ class Notification < ApplicationRecord
   validates :notification_type, presence: true
 
   after_create_commit :deliver_email_notification
+  after_create_commit :deliver_push_notification
 
   # Scopes
   scope :unread, -> { where(read_at: nil) }
@@ -131,5 +132,12 @@ class Notification < ApplicationRecord
     return unless user.email_notifications_enabled?
 
     NotificationMailer.with(notification: self).community_notification.deliver_later
+  end
+
+  def deliver_push_notification
+    return unless WebPushConfig.configured?
+    return if user.push_subscriptions.none?
+
+    PushNotificationJob.perform_later(self)
   end
 end

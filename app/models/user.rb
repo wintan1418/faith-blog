@@ -28,6 +28,7 @@ class User < ApplicationRecord
   has_many :prayer_intercessions, dependent: :destroy
   has_many :prayed_for_posts, through: :prayer_intercessions, source: :post
   has_many :user_reading_plans, dependent: :destroy
+  has_many :push_subscriptions, dependent: :destroy
   has_many :conversation_participants, dependent: :destroy
   has_many :conversations, through: :conversation_participants
   has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy
