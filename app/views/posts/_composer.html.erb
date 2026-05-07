@@ -109,6 +109,16 @@
           <%= f.check_box :anonymous, class: "fc-composer-checkbox" %>
           <span>Anonymous</span>
         </label>
+
+        <label class="fc-composer-toggle">
+          <%= f.check_box :prayer_status,
+              {
+                checked: post.prayer_status_prayer_pending? || post.prayer_status_prayer_answered?,
+                class: "fc-composer-checkbox"
+              },
+              "prayer_pending", "not_a_prayer" %>
+          <span>🙏 Prayer request</span>
+        </label>
       </div>
     </div>
 

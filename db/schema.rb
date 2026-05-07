@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_07_200430) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_07_204734) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -335,8 +335,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_200430) do
     t.datetime "updated_at", null: false
     t.integer "reshares_count", default: 0, null: false
     t.integer "kind", default: 0, null: false
+    t.integer "prayer_status", default: 0, null: false
+    t.integer "intercessions_count", default: 0, null: false
+    t.datetime "prayer_answered_at"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
+    t.index ["prayer_status"], name: "index_posts_on_prayer_status"
     t.index ["published_at"], name: "index_posts_on_published_at"
     t.index ["room_id", "status", "published_at"], name: "index_posts_on_room_id_and_status_and_published_at"
     t.index ["room_id"], name: "index_posts_on_room_id"
@@ -345,6 +349,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_200430) do
     t.index ["user_id", "status"], name: "index_posts_on_user_id_and_status"
     t.index ["user_id"], name: "index_posts_on_user_id"
     t.index ["views_count"], name: "index_posts_on_views_count"
+  end
+
+  create_table "prayer_intercessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "post_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_prayer_intercessions_on_post_id"
+    t.index ["user_id", "post_id"], name: "index_prayer_intercessions_on_user_id_and_post_id", unique: true
+    t.index ["user_id"], name: "index_prayer_intercessions_on_user_id"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -470,6 +484,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_200430) do
     t.index ["usage_count"], name: "index_tags_on_usage_count"
   end
 
+  create_table "user_reading_plans", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "plan_slug", null: false
+    t.integer "current_day", default: 1, null: false
+    t.date "started_on"
+    t.date "last_completed_on"
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "plan_slug"], name: "index_user_reading_plans_on_user_id_and_plan_slug", unique: true
+    t.index ["user_id"], name: "index_user_reading_plans_on_user_id"
+  end
+
   create_table "user_risk_profiles", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.integer "risk_level", default: 0, null: false
@@ -557,6 +584,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_200430) do
   add_foreign_key "post_tags", "tags"
   add_foreign_key "posts", "rooms"
   add_foreign_key "posts", "users"
+  add_foreign_key "prayer_intercessions", "posts"
+  add_foreign_key "prayer_intercessions", "users"
   add_foreign_key "profiles", "users"
   add_foreign_key "reports", "users", column: "reporter_id"
   add_foreign_key "reports", "users", column: "reviewed_by_id"
@@ -567,5 +596,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_200430) do
   add_foreign_key "resources", "users", column: "approved_by_id"
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
+  add_foreign_key "user_reading_plans", "users"
   add_foreign_key "user_risk_profiles", "users"
 end

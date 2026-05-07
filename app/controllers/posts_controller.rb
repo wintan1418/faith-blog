@@ -2,7 +2,8 @@
 
 class PostsController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show ]
-  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature, :inline_thread ]
+  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature, :inline_thread,
+                                    :join_prayer_chain, :leave_prayer_chain, :mark_prayer_answered ]
   before_action :authorize_post!, only: [ :edit, :update, :destroy ]
   before_action :authorize_feature!, only: [ :feature, :unfeature ]
   before_action :enforce_rate_limit!, only: [ :create ]
@@ -75,6 +76,43 @@ class PostsController < ApplicationController
     redirect_to @post, notice: "Post has been unfeatured."
   end
 
+  def join_prayer_chain
+    return redirect_back(fallback_location: post_path(@post), alert: "This isn't a prayer request.") unless @post.prayer?
+
+    intercession = current_user.prayer_intercessions.find_or_create_by(post: @post)
+    if intercession.persisted? && @post.user_id != current_user.id
+      Notification.create(user: @post.user, actor: current_user, notifiable: @post, notification_type: :prayer_joined)
+    end
+
+    redirect_back fallback_location: post_path(@post), notice: "Praying with you."
+  end
+
+  def leave_prayer_chain
+    current_user.prayer_intercessions.where(post: @post).destroy_all
+    redirect_back fallback_location: post_path(@post), notice: "Removed from chain."
+  end
+
+  def mark_prayer_answered
+    return redirect_back(fallback_location: post_path(@post), alert: "Only the author can do this.") unless @post.user_id == current_user.id
+
+    @post.update!(prayer_status: :prayer_answered, prayer_answered_at: Time.current)
+
+    intercessor_ids = @post.prayer_intercessions.where.not(user_id: current_user.id).pluck(:user_id)
+    if intercessor_ids.any?
+      rows = intercessor_ids.map do |uid|
+        {
+          user_id: uid, actor_id: current_user.id,
+          notifiable_type: "Post", notifiable_id: @post.id,
+          notification_type: Notification.notification_types[:prayer_answered],
+          created_at: Time.current, updated_at: Time.current
+        }
+      end
+      Notification.insert_all(rows)
+    end
+
+    redirect_back fallback_location: post_path(@post), notice: "Marked answered. 🌟"
+  end
+
   private
 
   def set_post
@@ -82,7 +120,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :anonymous, :allow_comments, :tag_list, images: [])
+    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, images: [])
   end
 
   def handle_post_links

@@ -1,0 +1,57 @@
+<% content_for(:title) { "#{@plan.title} - Faith Community" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 700px;">
+    <main class="fc-main">
+      <%= link_to reading_plans_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+        ← All plans
+      <% end %>
+
+      <div class="mt-3 mb-6">
+        <h1 class="text-3xl font-extrabold text-[var(--fc-ink)]"><%= @plan.title %></h1>
+        <p class="mt-2 text-sm text-[var(--fc-muted)]"><%= @plan.description %></p>
+        <p class="mt-2 text-xs font-extrabold uppercase tracking-wider text-[var(--fc-accent-2)]"><%= @plan.length_label %></p>
+      </div>
+
+      <% if @user_plan && !@user_plan.completed %>
+        <div class="fc-plan-today" data-controller="scripture">
+          <p class="fc-plan-today-kicker">Day <%= @user_plan.current_day %> of <%= @user_plan.days_total %></p>
+          <h2 class="fc-plan-today-ref"><%= @user_plan.today_reading[:reference] %></h2>
+          <div class="fc-plan-progress mt-3">
+            <div class="fc-plan-progress-bar" style="width: <%= @user_plan.progress_percent %>%"></div>
+          </div>
+          <% if @user_plan.can_check_in_today? %>
+            <%= button_to "Mark today done", check_in_reading_plan_path(@plan.slug), method: :post, form_class: "inline mt-4", class: "fc-btn fc-btn-primary" %>
+          <% else %>
+            <p class="mt-4 text-sm font-bold text-[var(--fc-accent-2)]">✓ Done for today. See you tomorrow.</p>
+          <% end %>
+        </div>
+      <% elsif @user_plan&.completed %>
+        <div class="fc-plan-today is-done">
+          <p class="fc-plan-today-kicker">Plan complete</p>
+          <p class="text-base text-[var(--fc-soft)] mt-2">🌟 You finished this plan on <%= @user_plan.last_completed_on.strftime("%B %-d, %Y") %>. Want to take it again?</p>
+          <%= button_to "Restart plan", leave_reading_plan_path(@plan.slug), method: :delete, form_class: "inline mt-3", class: "fc-btn" %>
+        </div>
+      <% else %>
+        <div class="fc-plan-today">
+          <p class="fc-plan-today-kicker">Not started yet</p>
+          <%= button_to "Start this plan", start_reading_plan_path(@plan.slug), method: :post, form_class: "inline mt-3", class: "fc-btn fc-btn-primary" %>
+        </div>
+      <% end %>
+
+      <h3 class="mt-8 mb-3 text-xs font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">All days</h3>
+      <ol class="fc-plan-day-list" data-controller="scripture">
+        <% @plan.days.each do |day| %>
+          <% done = @user_plan && (@user_plan.completed || @user_plan.current_day > day[:day].to_i) %>
+          <li class="fc-plan-day<%= ' is-done' if done %>">
+            <span class="fc-plan-day-num">Day <%= day[:day] %></span>
+            <span class="fc-plan-day-ref"><%= day[:reference] %></span>
+            <% if done %>
+              <span class="fc-plan-day-check">✓</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ol>
+    </main>
+  </div>
+</div>

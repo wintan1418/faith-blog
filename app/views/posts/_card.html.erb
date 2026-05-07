@@ -7,7 +7,7 @@
     </div>
   </article>
 <% else %>
-<article class="fc-breath<%= ' fc-card-held-author' if post.held_for_review? %>" id="<%= dom_id(post) %>">
+<article class="fc-breath<%= ' fc-card-held-author' if post.held_for_review? %><%= ' is-prayer' if post.prayer_status_prayer_pending? %><%= ' is-answered' if post.prayer_status_prayer_answered? %>" id="<%= dom_id(post) %>">
   <% if reshared_by %>
     <div class="fc-breath-attribution">
       <%= render_icon("repeat", classes: "h-3.5 w-3.5") %>
@@ -60,6 +60,15 @@
               <span>Thread</span>
             </span>
           <% end %>
+          <% if post.prayer_status_prayer_pending? %>
+            <span class="fc-prayer-chip" title="Prayer request">
+              🙏 <span>Prayer</span>
+            </span>
+          <% elsif post.prayer_status_prayer_answered? %>
+            <span class="fc-prayer-chip is-answered" title="Answered">
+              🌟 <span>Answered</span>
+            </span>
+          <% end %>
         </div>
         <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
           <%= link_to edit_post_path(post), class: "fc-action", title: "Edit breath" do %>
@@ -104,6 +113,35 @@
 
         <%= render "reshares/button", post: post %>
         <%= render "posts/share_button", post: post %>
+
+        <% if post.prayer_status_prayer_pending? && user_signed_in? %>
+          <% mine = post.user_id == current_user.id %>
+          <% joined = !mine && current_user.prayer_intercessions.where(post_id: post.id).exists? %>
+          <% if mine %>
+            <%= button_to mark_prayer_answered_post_path(post),
+                method: :post,
+                form_class: "inline",
+                class: "fc-breath-action is-prayer-action",
+                data: { turbo_confirm: "Mark this prayer answered? Everyone in the chain will be notified." } do %>
+              🌟 <span>Mark answered</span>
+            <% end %>
+          <% elsif joined %>
+            <%= button_to leave_prayer_chain_post_path(post),
+                method: :delete,
+                form_class: "inline",
+                class: "fc-breath-action is-prayer-action is-joined",
+                title: "Leave the prayer chain" do %>
+              🙏 <span>Praying<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
+            <% end %>
+          <% else %>
+            <%= button_to join_prayer_chain_post_path(post),
+                method: :post,
+                form_class: "inline",
+                class: "fc-breath-action is-prayer-action" do %>
+              🙏 <span>Join chain<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
+            <% end %>
+          <% end %>
+        <% end %>
 
         <div class="fc-breath-actions-end">
           <%= render "posts/impressions", post: post %>

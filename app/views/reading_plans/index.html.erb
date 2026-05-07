@@ -1,0 +1,47 @@
+<% content_for(:title) { "Reading Plans - Faith Community" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 760px;">
+    <main class="fc-main">
+      <div class="mb-6">
+        <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-accent-2)]">Reading plans</p>
+        <h1 class="mt-2 text-3xl font-extrabold text-[var(--fc-ink)]">Slow rhythms in scripture</h1>
+        <p class="mt-2 text-sm text-[var(--fc-muted)]">Pick a plan, get one passage a day. Check in to keep your rhythm.</p>
+      </div>
+
+      <ul class="fc-plan-grid">
+        <% @plans.each do |plan| %>
+          <% mine = @user_plans[plan.slug] %>
+          <li class="fc-plan-card<%= ' is-active' if mine %>">
+            <div class="fc-plan-head">
+              <h2><%= plan.title %></h2>
+              <span class="fc-plan-length"><%= plan.length_label %></span>
+            </div>
+            <p class="fc-plan-desc"><%= plan.description %></p>
+
+            <% if mine %>
+              <% if mine.completed %>
+                <p class="fc-plan-status is-done">🌟 Completed on <%= mine.last_completed_on.strftime("%b %-d") %></p>
+              <% else %>
+                <div class="fc-plan-progress">
+                  <div class="fc-plan-progress-bar" style="width: <%= mine.progress_percent %>%"></div>
+                </div>
+                <p class="fc-plan-status">Day <%= mine.current_day %> of <%= mine.days_total %></p>
+              <% end %>
+
+              <div class="fc-plan-actions">
+                <%= link_to "Open today's reading", reading_plan_path(plan.slug), class: "fc-btn fc-btn-primary" %>
+                <%= button_to "Leave plan", leave_reading_plan_path(plan.slug), method: :delete, form_class: "inline", class: "fc-btn", data: { turbo_confirm: "Leave this plan? Your progress will be lost." } %>
+              </div>
+            <% else %>
+              <div class="fc-plan-actions">
+                <%= button_to "Start this plan", start_reading_plan_path(plan.slug), method: :post, form_class: "inline", class: "fc-btn fc-btn-primary" %>
+                <%= link_to "Preview", reading_plan_path(plan.slug), class: "fc-btn" %>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </main>
+  </div>
+</div>

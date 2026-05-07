@@ -1,0 +1,98 @@
+# Bible reading plans. Each item is a static plan with a list of
+# day -> reference entries. UserReadingPlan tracks per-user progress.
+- slug: psalms-30
+  title: 30 Days in the Psalms
+  description: One Psalm a day. Sweet, slow, ancient. Good for a calm rhythm.
+  days:
+    - { day: 1,  reference: "Psalm 1" }
+    - { day: 2,  reference: "Psalm 23" }
+    - { day: 3,  reference: "Psalm 27" }
+    - { day: 4,  reference: "Psalm 34" }
+    - { day: 5,  reference: "Psalm 37" }
+    - { day: 6,  reference: "Psalm 42" }
+    - { day: 7,  reference: "Psalm 46" }
+    - { day: 8,  reference: "Psalm 51" }
+    - { day: 9,  reference: "Psalm 62" }
+    - { day: 10, reference: "Psalm 63" }
+    - { day: 11, reference: "Psalm 73" }
+    - { day: 12, reference: "Psalm 84" }
+    - { day: 13, reference: "Psalm 86" }
+    - { day: 14, reference: "Psalm 91" }
+    - { day: 15, reference: "Psalm 95" }
+    - { day: 16, reference: "Psalm 100" }
+    - { day: 17, reference: "Psalm 103" }
+    - { day: 18, reference: "Psalm 116" }
+    - { day: 19, reference: "Psalm 121" }
+    - { day: 20, reference: "Psalm 130" }
+    - { day: 21, reference: "Psalm 131" }
+    - { day: 22, reference: "Psalm 133" }
+    - { day: 23, reference: "Psalm 138" }
+    - { day: 24, reference: "Psalm 139" }
+    - { day: 25, reference: "Psalm 141" }
+    - { day: 26, reference: "Psalm 143" }
+    - { day: 27, reference: "Psalm 145" }
+    - { day: 28, reference: "Psalm 146" }
+    - { day: 29, reference: "Psalm 148" }
+    - { day: 30, reference: "Psalm 150" }
+
+- slug: john-21
+  title: John in 21 Days
+  description: One chapter a day through John's gospel. The portrait of Jesus painted slow.
+  days:
+    - { day: 1,  reference: "John 1" }
+    - { day: 2,  reference: "John 2" }
+    - { day: 3,  reference: "John 3" }
+    - { day: 4,  reference: "John 4" }
+    - { day: 5,  reference: "John 5" }
+    - { day: 6,  reference: "John 6" }
+    - { day: 7,  reference: "John 7" }
+    - { day: 8,  reference: "John 8" }
+    - { day: 9,  reference: "John 9" }
+    - { day: 10, reference: "John 10" }
+    - { day: 11, reference: "John 11" }
+    - { day: 12, reference: "John 12" }
+    - { day: 13, reference: "John 13" }
+    - { day: 14, reference: "John 14" }
+    - { day: 15, reference: "John 15" }
+    - { day: 16, reference: "John 16" }
+    - { day: 17, reference: "John 17" }
+    - { day: 18, reference: "John 18" }
+    - { day: 19, reference: "John 19" }
+    - { day: 20, reference: "John 20" }
+    - { day: 21, reference: "John 21" }
+
+- slug: proverbs-31
+  title: Proverbs in 31 Days
+  description: One chapter for every day of the month. Wisdom on the daily.
+  days:
+    - { day: 1,  reference: "Proverbs 1" }
+    - { day: 2,  reference: "Proverbs 2" }
+    - { day: 3,  reference: "Proverbs 3" }
+    - { day: 4,  reference: "Proverbs 4" }
+    - { day: 5,  reference: "Proverbs 5" }
+    - { day: 6,  reference: "Proverbs 6" }
+    - { day: 7,  reference: "Proverbs 7" }
+    - { day: 8,  reference: "Proverbs 8" }
+    - { day: 9,  reference: "Proverbs 9" }
+    - { day: 10, reference: "Proverbs 10" }
+    - { day: 11, reference: "Proverbs 11" }
+    - { day: 12, reference: "Proverbs 12" }
+    - { day: 13, reference: "Proverbs 13" }
+    - { day: 14, reference: "Proverbs 14" }
+    - { day: 15, reference: "Proverbs 15" }
+    - { day: 16, reference: "Proverbs 16" }
+    - { day: 17, reference: "Proverbs 17" }
+    - { day: 18, reference: "Proverbs 18" }
+    - { day: 19, reference: "Proverbs 19" }
+    - { day: 20, reference: "Proverbs 20" }
+    - { day: 21, reference: "Proverbs 21" }
+    - { day: 22, reference: "Proverbs 22" }
+    - { day: 23, reference: "Proverbs 23" }
+    - { day: 24, reference: "Proverbs 24" }
+    - { day: 25, reference: "Proverbs 25" }
+    - { day: 26, reference: "Proverbs 26" }
+    - { day: 27, reference: "Proverbs 27" }
+    - { day: 28, reference: "Proverbs 28" }
+    - { day: 29, reference: "Proverbs 29" }
+    - { day: 30, reference: "Proverbs 30" }
+    - { day: 31, reference: "Proverbs 31" }

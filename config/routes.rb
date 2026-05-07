@@ -36,6 +36,9 @@ Rails.application.routes.draw do
       post :feature
       post :unfeature
       get  :inline_thread
+      post :join_prayer_chain
+      delete :leave_prayer_chain
+      post :mark_prayer_answered
     end
     resources :comments, only: [ :create, :update, :destroy ] do
       member do
@@ -78,6 +81,14 @@ Rails.application.routes.draw do
   get "bookmarks", to: "bookmarks#index"
   get "drafts", to: "drafts#index", as: :drafts
   get "scripture/lookup", to: "scripture#show", as: :scripture_lookup
+
+  resources :reading_plans, only: [ :index, :show ], param: :slug do
+    member do
+      post :start
+      post :check_in
+      delete :leave
+    end
+  end
 
   # Notifications
   resources :notifications, only: [ :index ] do

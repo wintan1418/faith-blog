@@ -227,6 +227,29 @@
         </div>
       <% end %>
 
+      <% if @user_reading_plan %>
+        <div class="fc-side-card fc-plan-side">
+          <p class="fc-plan-side-kicker">📖 <%= @user_reading_plan.plan&.title %></p>
+          <p class="fc-plan-side-day">Day <%= @user_reading_plan.current_day %> of <%= @user_reading_plan.days_total %></p>
+          <p class="fc-plan-side-ref"><%= @user_reading_plan.today_reading&.dig(:reference) %></p>
+          <div class="fc-plan-progress">
+            <div class="fc-plan-progress-bar" style="width: <%= @user_reading_plan.progress_percent %>%"></div>
+          </div>
+          <% if @user_reading_plan.can_check_in_today? %>
+            <%= button_to "Mark today done", check_in_reading_plan_path(@user_reading_plan.plan_slug), method: :post, form_class: "inline mt-3", class: "fc-btn fc-btn-primary w-full" %>
+          <% else %>
+            <p class="mt-3 text-xs font-bold text-[var(--fc-accent-2)]">✓ Done for today</p>
+          <% end %>
+          <%= link_to "Open plan →", reading_plan_path(@user_reading_plan.plan_slug), class: "mt-2 inline-block text-xs font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
+        </div>
+      <% else %>
+        <div class="fc-side-card">
+          <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">📖 Reading plan</p>
+          <p class="mt-2 text-sm text-[var(--fc-soft)]">Pick a slow rhythm in scripture — psalms, John, or Proverbs.</p>
+          <%= link_to "Browse plans", reading_plans_path, class: "mt-3 inline-block text-sm font-bold text-[var(--fc-accent-2)] hover:text-[var(--fc-ink)]" %>
+        </div>
+      <% end %>
+
       <div class="fc-side-card">
         <div class="mb-3 flex items-center justify-between">
           <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Open prayer requests</h3>

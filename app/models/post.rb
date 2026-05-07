@@ -16,6 +16,18 @@ class Post < ApplicationRecord
   # Enums
   enum :status, { draft: 0, published: 1, archived: 2 }
   enum :kind,   { breath: 0, thread: 1 }, prefix: :kind
+  enum :prayer_status, { not_a_prayer: 0, prayer_pending: 1, prayer_answered: 2 }, prefix: :prayer_status
+
+  has_many :prayer_intercessions, dependent: :destroy
+  has_many :intercessors, through: :prayer_intercessions, source: :user
+
+  scope :prayer_requests,   -> { where(prayer_status: %i[prayer_pending prayer_answered]) }
+  scope :pending_prayers,   -> { where(prayer_status: :prayer_pending) }
+  scope :answered_prayers,  -> { where(prayer_status: :prayer_answered) }
+
+  def prayer?
+    prayer_status_prayer_pending? || prayer_status_prayer_answered?
+  end
 
   scope :threads_or_active, -> { where(kind: :thread).or(where("comments_count > 0")) }
 

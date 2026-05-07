@@ -12225,3 +12225,217 @@ html.theme-light .inbox-thread-head {
   color: #f59e0b;
   font-weight: 800;
 }
+
+/* ============================================================
+   ✦ PRAYER CHAIN — chip + button + answered breath glow
+   ============================================================ */
+
+.fc-prayer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(167, 139, 250, 0.14);
+  border: 1px solid rgba(167, 139, 250, 0.34);
+  color: #a78bfa;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+}
+.fc-prayer-chip.is-answered {
+  background: rgba(212, 168, 90, 0.14);
+  border-color: rgba(212, 168, 90, 0.40);
+  color: #d4a85a;
+}
+
+.fc-breath.is-prayer {
+  border-left: 3px solid rgba(167, 139, 250, 0.55);
+}
+.fc-breath.is-answered {
+  background: linear-gradient(180deg, rgba(212, 168, 90, 0.06), transparent 60%), var(--fc-surface);
+  border-color: rgba(212, 168, 90, 0.32);
+  box-shadow: 0 0 0 1px rgba(212, 168, 90, 0.10);
+}
+
+.fc-breath-action.is-prayer-action {
+  color: #a78bfa !important;
+  font-weight: 800;
+}
+.fc-breath-action.is-prayer-action:hover {
+  background: rgba(167, 139, 250, 0.10) !important;
+  color: #c4b5fd !important;
+}
+.fc-breath-action.is-prayer-action.is-joined {
+  background: rgba(167, 139, 250, 0.14) !important;
+  color: #c4b5fd !important;
+}
+
+/* ============================================================
+   ✦ READING PLANS — index + show + sidebar card
+   ============================================================ */
+
+.fc-plan-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.fc-plan-card {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.fc-plan-card.is-active {
+  border-color: rgba(52, 211, 153, 0.38);
+  background: linear-gradient(160deg, var(--fc-accent-soft), transparent 50%), var(--fc-surface);
+}
+
+.fc-plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.fc-plan-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+}
+.fc-plan-length {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fc-accent-2);
+}
+
+.fc-plan-desc {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--fc-soft);
+  line-height: 1.5;
+}
+
+.fc-plan-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--fc-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.fc-plan-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--fc-accent), var(--fc-accent-2));
+  transition: width 280ms ease;
+}
+
+.fc-plan-status {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--fc-muted);
+}
+.fc-plan-status.is-done { color: #d4a85a; }
+
+.fc-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.fc-plan-actions form.inline { margin: 0; }
+
+.fc-plan-today {
+  background: linear-gradient(160deg, var(--fc-accent-soft), transparent 70%), var(--fc-surface);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 16px;
+  padding: 22px 24px;
+}
+.fc-plan-today.is-done {
+  background: linear-gradient(160deg, rgba(212, 168, 90, 0.10), transparent 70%), var(--fc-surface);
+  border-color: rgba(212, 168, 90, 0.32);
+}
+.fc-plan-today-kicker {
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fc-accent-2);
+  margin: 0 0 6px;
+}
+.fc-plan-today-ref {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--fc-ink);
+  margin: 0;
+}
+
+.fc-plan-day-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fc-plan-day {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  font-size: 0.88rem;
+}
+.fc-plan-day.is-done {
+  background: var(--fc-accent-soft);
+  border-color: rgba(52, 211, 153, 0.28);
+}
+.fc-plan-day-num {
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+.fc-plan-day.is-done .fc-plan-day-num { color: var(--fc-accent-2); }
+.fc-plan-day-ref { color: var(--fc-soft); font-weight: 700; }
+.fc-plan-day-check { color: var(--fc-accent); font-weight: 900; }
+
+/* Sidebar card */
+.fc-plan-side .fc-plan-side-kicker {
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fc-accent-2);
+  margin: 0 0 4px;
+}
+.fc-plan-side .fc-plan-side-day {
+  font-size: 0.78rem;
+  color: var(--fc-muted);
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.fc-plan-side .fc-plan-side-ref {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.05rem;
+  color: var(--fc-ink);
+  margin: 0 0 6px;
+}
+.fc-plan-side .fc-btn { width: 100%; justify-content: center; }
+.fc-plan-side form.inline { width: 100%; margin: 0; }

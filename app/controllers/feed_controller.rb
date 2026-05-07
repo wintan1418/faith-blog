@@ -71,6 +71,7 @@ class FeedController < ApplicationController
 
     @daily_verses  = BibleVerse.active.ordered.limit(20).to_a
     @daily_breaths = GoldenBreath.active.ordered.limit(20).to_a
+    @user_reading_plan = current_user.user_reading_plans.where(completed: false).order(updated_at: :desc).first
 
     @trending_breaths = Post.published
                             .where("published_at > ?", 7.days.ago)
