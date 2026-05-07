@@ -5,7 +5,7 @@ class Post < ApplicationRecord
   include PgSearch::Model
   include Mentionable
 
-  friendly_id :title, use: :slugged
+  friendly_id :slug_source, use: :slugged
 
   # Rich text content
   has_rich_text :content
@@ -57,8 +57,10 @@ class Post < ApplicationRecord
   has_many :linked_posts, through: :outbound_links, source: :target_post
   has_many :linking_posts, through: :inbound_links, source: :source_post
 
-  # Validations
-  validates :title, presence: true, length: { minimum: 5, maximum: 200 }
+  # Validations — title is optional for breaths (Twitter-style quick breath)
+  # but still required for threads, where the title acts as the prompt.
+  validates :title, length: { maximum: 200 }
+  validates :title, presence: true, length: { minimum: 5 }, if: :kind_thread?
   validates :content, presence: true
   validates :slug, presence: true, uniqueness: true
   validate :max_images_count
@@ -122,6 +124,21 @@ class Post < ApplicationRecord
 
   def cover_image
     images.first
+  end
+
+  # FriendlyId source: prefer the explicit title, otherwise fall back to the
+  # first chunk of the breath body so untitled breaths still get a slug.
+  def slug_source
+    return title if title.present?
+    text = content&.to_plain_text.to_s.strip
+    return "breath-#{Time.current.to_i}" if text.blank?
+    text.first(60)
+  end
+
+  # Display title for the card heading: real title if present, otherwise nil
+  # so the card hides the heading and just shows the body.
+  def display_title
+    title.presence
   end
 
   def has_images?

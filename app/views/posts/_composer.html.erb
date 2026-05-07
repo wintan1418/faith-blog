@@ -54,12 +54,12 @@
 
   <%= f.text_field :title,
       class: "fc-composer-title",
-      placeholder: "Title — what is this breath about?",
+      placeholder: mode == "thread" ? "What do you want to discuss?" : "Add a title (optional)",
       maxlength: 200,
-      required: true,
+      required: mode == "thread",
       data: {
         composer_mode_target: "title",
-        title_breath: "Title — what is this breath about?",
+        title_breath: "Add a title (optional)",
         title_thread: "What do you want to discuss?"
       } %>
 

@@ -53,7 +53,9 @@
     <% end %>
   </div>
 
-  <h1 class="post-title"><%= post.title %></h1>
+  <% if post.display_title %>
+    <h1 class="post-title"><%= post.display_title %></h1>
+  <% end %>
 
   <% if post.tags.any? %>
     <div class="post-hashtags">

@@ -27,6 +27,8 @@ export default class extends Controller {
     if (this.hasTitleTarget) {
       const placeholder = this.titleTarget.dataset[`title${this.cap(mode)}`]
       if (placeholder) this.titleTarget.placeholder = placeholder
+      // Title is required only for threads — breaths can post without one.
+      this.titleTarget.required = mode === "thread"
     }
 
     if (this.hasBodyTarget) {

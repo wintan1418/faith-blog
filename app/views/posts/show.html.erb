@@ -1,7 +1,8 @@
-<% content_for(:title) { "#{@post.title} - Faith Community" } %>
+<% page_title = @post.display_title || truncate(@post.content.to_plain_text.to_s.strip, length: 60, separator: " ") %>
+<% content_for(:title) { "#{page_title} - Faith Community" } %>
 <% post_excerpt = truncate(@post.content.to_plain_text.to_s.strip, length: 200, separator: " ") %>
 <% content_for(:meta_description) { post_excerpt } %>
-<% content_for(:og_title) { @post.title } %>
+<% content_for(:og_title) { page_title } %>
 <% content_for(:og_description) { post_excerpt } %>
 <% content_for(:og_url) { post_url(@post) } %>
 <% content_for(:og_type) { "article" } %>

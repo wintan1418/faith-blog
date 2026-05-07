@@ -78,8 +78,10 @@
       </header>
 
       <%= link_to post_path(post), class: "fc-breath-body group block" do %>
-        <h2 class="fc-breath-title group-hover:text-[var(--fc-accent)]"><%= post.title %></h2>
-        <p class="fc-breath-copy"><%= truncate(post.content.to_plain_text, length: 240) %></p>
+        <% if post.display_title %>
+          <h2 class="fc-breath-title group-hover:text-[var(--fc-accent)]"><%= post.display_title %></h2>
+        <% end %>
+        <p class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>"><%= truncate(post.content.to_plain_text, length: 240) %></p>
       <% end %>
 
       <% if post.has_images? %>
