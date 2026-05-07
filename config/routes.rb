@@ -32,6 +32,10 @@ Rails.application.routes.draw do
 
   # Posts
   resources :posts do
+    collection do
+      post :check_gentleness
+      post :suggest_scripture
+    end
     member do
       post :feature
       post :unfeature

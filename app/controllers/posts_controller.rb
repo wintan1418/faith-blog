@@ -113,7 +113,49 @@ class PostsController < ApplicationController
     redirect_back fallback_location: post_path(@post), notice: "Marked answered. 🌟"
   end
 
+  # Composer assistants — author-facing, never block publish.
+
+  def check_gentleness
+    text = composer_text
+    return render json: { ok: false, error: "Add a few words first." }, status: :unprocessable_entity if text.length < 20
+
+    result = Ai::Composer::GentlenessCheck.call(content: text)
+    render json: {
+      ok: true,
+      tone: result.tone,
+      confidence: result.confidence,
+      summary: result.summary,
+      nudge: result.nudge,
+      suggestion: result.suggestion
+    }
+  rescue Ai::Composer::GentlenessCheck::ParseError, Ai::Moderation::Client::Error => e
+    Rails.logger.warn("[GentlenessCheck] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Couldn't reach the gentleness check. Try again in a moment." }, status: :bad_gateway
+  end
+
+  def suggest_scripture
+    text = composer_text
+    return render json: { ok: false, error: "Add a few sentences first." }, status: :unprocessable_entity if text.length < 40
+
+    result = Ai::Composer::ScriptureSuggester.call(content: text)
+    render json: {
+      ok: true,
+      verses: result.verses.map { |v| { reference: v.reference, reason: v.reason } }
+    }
+  rescue Ai::Composer::ScriptureSuggester::ParseError, Ai::Moderation::Client::Error => e
+    Rails.logger.warn("[ScriptureSuggester] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Couldn't reach the scripture suggester. Try again in a moment." }, status: :bad_gateway
+  end
+
   private
+
+  # Pulls draft text from JSON or form params for the composer assistants.
+  # Strips HTML so a Trix-rendered body comes through as plain words.
+  def composer_text
+    raw = params[:content].to_s
+    raw = params.dig(:post, :content).to_s if raw.blank?
+    ActionController::Base.helpers.strip_tags(raw).to_s.squish
+  end
 
   def set_post
     @post = Post.friendly.find(params[:id])

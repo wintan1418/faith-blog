@@ -66,3 +66,6 @@ application.register("notifications-modal", NotificationsModalController)
 
 import ScriptureController from "./scripture_controller"
 application.register("scripture", ScriptureController)
+
+import ComposerAssistantController from "./composer_assistant_controller"
+application.register("composer-assistant", ComposerAssistantController)

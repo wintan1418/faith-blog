@@ -2,7 +2,12 @@
     Locals: post, rooms %>
 <% mode = local_assigns.fetch(:mode, post.kind || "breath").to_s %>
 <%= form_with model: post,
-    html: { class: "fc-composer-form", multipart: true, data: { controller: "post-form composer-mode", composer_mode_initial_value: mode } } do |f| %>
+    html: { class: "fc-composer-form", multipart: true, data: {
+      controller: "post-form composer-mode composer-assistant",
+      composer_mode_initial_value: mode,
+      composer_assistant_gentleness_url_value: check_gentleness_posts_path,
+      composer_assistant_scripture_url_value: suggest_scripture_posts_path
+    } } do |f| %>
   <% if post.errors.any? %>
     <div class="fc-composer-errors">
       <strong>Couldn't post:</strong>
@@ -94,6 +99,21 @@
               class: "sr-only",
               data: { action: "change->post-form#previewImages" } %>
         </label>
+
+        <button type="button"
+                class="fc-composer-asst-btn"
+                data-composer-assistant-target="gentlenessBtn"
+                data-action="click->composer-assistant#checkGentleness"
+                title="Run a quick tone check">
+          🕊️ <span>Check tone</span>
+        </button>
+        <button type="button"
+                class="fc-composer-asst-btn"
+                data-composer-assistant-target="scriptureBtn"
+                data-action="click->composer-assistant#suggestScripture"
+                title="Suggest a fitting scripture">
+          📖 <span>Suggest scripture</span>
+        </button>
       </div>
 
       <div class="fc-composer-meta">
@@ -126,6 +146,12 @@
       <div data-emoji-picker-target="picker" class="hidden absolute right-0 z-50 mt-2">
         <emoji-picker style="width: 320px; height: 380px;"></emoji-picker>
       </div>
+    </div>
+
+    <div class="fc-asst-panel hidden"
+         data-composer-assistant-target="panel"
+         aria-live="polite">
+      <div data-composer-assistant-target="panelContent"></div>
     </div>
   </div>
 
