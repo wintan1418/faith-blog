@@ -191,6 +191,11 @@ Rails.application.routes.draw do
         post :copilot
       end
     end
+    resources :broadcasts do
+      member do
+        post :send_now
+      end
+    end
   end
 
   # Web Push subscriptions — endpoint-keyed (client doesn't know its row id).

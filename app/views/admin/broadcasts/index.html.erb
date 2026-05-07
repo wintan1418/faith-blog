@@ -1,0 +1,48 @@
+<% content_for(:page_title) { "Broadcasts" } %>
+
+<div class="mb-6 flex items-center justify-between">
+  <p class="text-sm text-[var(--fc-muted)]">
+    <%= pluralize(@broadcasts.size, "broadcast") %>
+    · <strong><%= number_with_delimiter(@eligible_user_count) %></strong> users currently eligible to receive
+  </p>
+  <%= link_to "+ New broadcast", new_admin_broadcast_path, class: "fc-btn fc-btn-primary" %>
+</div>
+
+<% if @broadcasts.any? %>
+  <ul class="fc-cms-list">
+    <% @broadcasts.each do |broadcast| %>
+      <li class="fc-cms-row">
+        <div class="fc-cms-body">
+          <p class="fc-cms-text"><strong><%= broadcast.subject %></strong></p>
+          <p class="fc-cms-meta">
+            <%= broadcast.created_at.strftime("%b %-d, %Y") %>
+            · by <%= broadcast.sender.display_name %>
+            <% if broadcast.sent? %>· sent to <%= number_with_delimiter(broadcast.recipients_count) %><% end %>
+          </p>
+        </div>
+        <div class="fc-cms-actions">
+          <span class="fc-cms-status<%= ' is-on' if broadcast.sent? %>">
+            <%= broadcast.status.capitalize %>
+          </span>
+          <%= link_to "Open", admin_broadcast_path(broadcast), class: "fc-btn" %>
+          <% if broadcast.draft? %>
+            <%= button_to "Delete",
+                admin_broadcast_path(broadcast),
+                method: :delete,
+                form_class: "inline",
+                class: "fc-btn",
+                data: { turbo_confirm: "Delete this draft?" } %>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
+    <p class="text-base font-bold text-[var(--fc-ink)]">No broadcasts yet.</p>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">Start with the launch announcement template — it's pre-filled with everything new on Brethreign.</p>
+    <p class="mt-4">
+      <%= link_to "+ New broadcast", new_admin_broadcast_path, class: "fc-btn fc-btn-primary" %>
+    </p>
+  </div>
+<% end %>

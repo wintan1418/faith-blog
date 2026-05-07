@@ -1,0 +1,14 @@
+Brethreign — Announcement
+=========================
+
+<%= @broadcast.subject %>
+
+<%= @broadcast.body.to_plain_text %>
+
+—
+
+Open Brethreign: <%= @feed_url %>
+
+Sent to <%= @user.email %>.
+Unsubscribe: <%= @unsubscribe_url %>
+Notification settings: https://<%= @host %>/settings/notifications/edit

@@ -1,0 +1,10 @@
+<% content_for(:page_title) { "New broadcast" } %>
+
+<div class="mb-6">
+  <p class="text-sm text-[var(--fc-muted)]">
+    Pre-filled with the launch announcement template covering everything that's shipped recently.
+    On send, the email will reach <strong><%= number_with_delimiter(@eligible_user_count) %></strong> users with email notifications enabled.
+  </p>
+</div>
+
+<%= render "form", broadcast: @broadcast %>

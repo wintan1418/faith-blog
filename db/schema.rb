@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_07_214118) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_07_232211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -107,6 +107,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_214118) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_brethren_cards_on_user_id", unique: true
+  end
+
+  create_table "broadcasts", force: :cascade do |t|
+    t.string "subject", limit: 200, null: false
+    t.string "preheader", limit: 200
+    t.bigint "sender_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "sent_at"
+    t.integer "recipients_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sender_id"], name: "index_broadcasts_on_sender_id"
+    t.index ["status"], name: "index_broadcasts_on_status"
   end
 
   create_table "comments", force: :cascade do |t|
@@ -570,6 +583,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_07_214118) do
   add_foreign_key "bookmarks", "posts"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "brethren_cards", "users"
+  add_foreign_key "broadcasts", "users", column: "sender_id"
   add_foreign_key "comments", "comments", column: "parent_comment_id"
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users"

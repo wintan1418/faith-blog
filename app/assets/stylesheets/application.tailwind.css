@@ -12649,3 +12649,62 @@ html.theme-light .inbox-thread-head {
   margin-bottom: 6px;
   height: 36px;
 }
+
+/* Admin broadcast / form styles */
+.fc-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 14px;
+  padding: 24px;
+}
+.fc-admin-field { display: flex; flex-direction: column; gap: 6px; }
+.fc-admin-label {
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+.fc-admin-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 10px;
+  background: var(--fc-card);
+  color: var(--fc-ink);
+  font-size: 0.95rem;
+}
+.fc-admin-input:focus {
+  outline: none;
+  border-color: var(--fc-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--fc-accent) 24%, transparent);
+}
+.fc-admin-hint { font-size: 0.78rem; color: var(--fc-muted); margin: 0; }
+.fc-admin-trix {
+  background: var(--fc-card);
+  border-radius: 10px;
+  padding: 6px;
+  min-height: 320px;
+}
+.fc-admin-trix trix-toolbar {
+  border-bottom: 1px solid var(--fc-line);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+.fc-admin-trix trix-editor {
+  min-height: 280px;
+  font-size: 0.96rem;
+  line-height: 1.6;
+  color: var(--fc-ink);
+}
+.fc-admin-form-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 6px;
+  border-top: 1px solid var(--fc-line);
+}

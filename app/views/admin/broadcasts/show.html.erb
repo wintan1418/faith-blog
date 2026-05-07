@@ -1,0 +1,59 @@
+<% content_for(:page_title) { @broadcast.subject } %>
+
+<div class="mb-4 flex items-center gap-2 text-sm text-[var(--fc-muted)]">
+  <span class="fc-cms-status<%= ' is-on' if @broadcast.sent? %>">
+    <%= @broadcast.status.capitalize %>
+  </span>
+  <span>·</span>
+  <span>by <%= @broadcast.sender.display_name %></span>
+  <span>·</span>
+  <span><%= @broadcast.created_at.strftime("%b %-d, %Y · %I:%M %p") %></span>
+  <% if @broadcast.sent_at %>
+    <span>·</span>
+    <span>sent <%= time_ago_in_words(@broadcast.sent_at) %> ago to <strong><%= number_with_delimiter(@broadcast.recipients_count) %></strong> users</span>
+  <% end %>
+</div>
+
+<div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6 mb-6">
+  <% if @broadcast.preheader.present? %>
+    <p class="text-xs uppercase tracking-wider text-[var(--fc-muted)] font-bold mb-2">Preview text</p>
+    <p class="text-sm text-[var(--fc-soft)] mb-4 italic">"<%= @broadcast.preheader %>"</p>
+  <% end %>
+
+  <h1 class="text-2xl font-serif text-[var(--fc-ink)] mb-4"><%= @broadcast.subject %></h1>
+
+  <div class="trix-content text-[var(--fc-soft)] prose max-w-none">
+    <%= @broadcast.body %>
+  </div>
+</div>
+
+<div class="flex flex-wrap gap-3">
+  <% if @broadcast.draft? %>
+    <%= button_to send_now_admin_broadcast_path(@broadcast),
+        method: :post,
+        form_class: "inline",
+        class: "fc-btn fc-btn-primary",
+        data: { turbo_confirm: "Send this broadcast to every user with email notifications on (#{number_with_delimiter(Broadcast.eligible_user_count)} people)? This can't be undone." } do %>
+      📨 Send to all users now
+    <% end %>
+    <%= link_to "Edit", edit_admin_broadcast_path(@broadcast), class: "fc-btn" %>
+    <%= button_to "Delete draft",
+        admin_broadcast_path(@broadcast),
+        method: :delete,
+        form_class: "inline",
+        class: "fc-btn",
+        data: { turbo_confirm: "Delete this draft?" } %>
+  <% elsif @broadcast.sending? %>
+    <p class="text-sm text-[var(--fc-muted)]">Currently sending — the page will catch up once the fanout job finishes.</p>
+  <% elsif @broadcast.sent? %>
+    <p class="text-sm text-[var(--fc-muted)]">Sent to <strong><%= number_with_delimiter(@broadcast.recipients_count) %></strong> users on <%= @broadcast.sent_at.strftime("%b %-d, %Y at %I:%M %p") %>.</p>
+  <% elsif @broadcast.failed? %>
+    <p class="text-sm text-red-600">Send failed — check the job logs and try again.</p>
+    <%= button_to "Retry send",
+        send_now_admin_broadcast_path(@broadcast),
+        method: :post,
+        form_class: "inline",
+        class: "fc-btn fc-btn-primary" %>
+  <% end %>
+  <%= link_to "Back", admin_broadcasts_path, class: "fc-btn" %>
+</div>

@@ -1,0 +1,30 @@
+<%= form_with model: [:admin, broadcast], local: true, class: "fc-admin-form" do |f| %>
+  <% if broadcast.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800 mb-4">
+      <%= broadcast.errors.full_messages.to_sentence %>
+    </div>
+  <% end %>
+
+  <div class="fc-admin-field">
+    <%= f.label :subject, class: "fc-admin-label" %>
+    <%= f.text_field :subject, class: "fc-admin-input", maxlength: 200, required: true %>
+    <p class="fc-admin-hint">Shows as the email subject line. Keep it under ~70 characters for mobile inboxes.</p>
+  </div>
+
+  <div class="fc-admin-field">
+    <%= f.label :preheader, "Preview text", class: "fc-admin-label" %>
+    <%= f.text_field :preheader, class: "fc-admin-input", maxlength: 200, placeholder: "One sentence shown next to the subject in the inbox preview." %>
+    <p class="fc-admin-hint">Optional. Most clients show the first ~80 chars next to the subject — fill it for a stronger open rate.</p>
+  </div>
+
+  <div class="fc-admin-field">
+    <%= f.label :body, class: "fc-admin-label" %>
+    <%= f.rich_text_area :body, class: "fc-admin-trix" %>
+    <p class="fc-admin-hint">Bold, italics, lists, and links all carry through to the email. Pre-filled with the launch announcement — edit freely.</p>
+  </div>
+
+  <div class="fc-admin-form-actions">
+    <%= f.submit (broadcast.persisted? ? "Save changes" : "Save as draft"), class: "fc-btn fc-btn-primary" %>
+    <%= link_to "Cancel", admin_broadcasts_path, class: "fc-btn" %>
+  </div>
+<% end %>

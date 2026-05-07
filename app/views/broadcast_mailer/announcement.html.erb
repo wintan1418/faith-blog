@@ -1,0 +1,30 @@
+<% if @broadcast.preheader.present? %>
+  <%# Preheader text — shown in the inbox preview, hidden in the email body %>
+  <div style="display: none; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0; max-height: 0; max-width: 0; overflow: hidden;">
+    <%= @broadcast.preheader %>
+  </div>
+<% end %>
+
+<div style="font-family: Inter, Arial, sans-serif; color: #17251d; line-height: 1.6; max-width: 640px; margin: 0 auto; padding: 12px;">
+  <p style="margin: 0 0 6px; color: #6c7c72; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800;">Brethreign &middot; Announcement</p>
+
+  <h1 style="font-family: 'Fraunces', Georgia, serif; font-size: 26px; line-height: 1.2; margin: 0 0 16px; color: #17251d;">
+    <%= @broadcast.subject %>
+  </h1>
+
+  <div style="color: #2b3a30; font-size: 15.5px; line-height: 1.65;">
+    <%= @broadcast.body %>
+  </div>
+
+  <p style="margin: 28px 0 12px;">
+    <%= link_to "Open Brethreign", @feed_url, style: "display: inline-block; background: #10b981; color: #052016; font-weight: 800; padding: 12px 18px; border-radius: 10px; text-decoration: none;" %>
+  </p>
+
+  <hr style="border: none; border-top: 1px solid #e6ece8; margin: 28px 0 16px;">
+  <p style="margin: 0; color: #6c7c72; font-size: 12px;">
+    Sent to <strong><%= @user.email %></strong> because email notifications are on for your Brethreign account.
+    <%= link_to "Unsubscribe from these announcements", @unsubscribe_url, style: "color: #6c7c72;" %>
+    &middot;
+    <%= link_to "Notification settings", "https://#{@host}/settings/notifications/edit", style: "color: #6c7c72;" %>
+  </p>
+</div>
