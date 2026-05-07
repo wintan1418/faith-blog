@@ -96,13 +96,10 @@
                 data-thread-toggle-url-value="<%= inline_thread_post_path(post) %>"
                 data-thread-toggle-frame-value="<%= dom_id(post, :thread) %>"
                 data-action="click->thread-toggle#toggle"
-                aria-label="<%= post.threaded? ? "Open thread" : "Reply" %>">
+                aria-label="<%= post.threaded? ? "Open thread (#{post.comments_count})" : "Reply" %>"
+                title="<%= post.threaded? ? "Open thread" : "Reply" %>">
           <%= render_icon("message_circle", classes: "h-4 w-4") %>
-          <% if post.threaded? %>
-            <span data-count="<%= post.comments_count %>">Open thread<% if post.comments_count.positive? %> · <%= pluralize(post.comments_count, "voice") %><% end %></span>
-          <% else %>
-            <span data-count="0">Reply</span>
-          <% end %>
+          <span data-count="<%= post.comments_count %>"><%= post.comments_count.positive? ? post.comments_count : "" %></span>
         </button>
 
         <%= render "reshares/button", post: post %>

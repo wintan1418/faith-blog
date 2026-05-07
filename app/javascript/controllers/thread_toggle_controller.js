@@ -50,14 +50,11 @@ export default class extends Controller {
     const span = button.querySelector("span")
     if (!span) return
 
-    // If we already have "Open thread · N voices", increment N.
     const current = parseInt(span.dataset.count || "0", 10)
     const next = (Number.isFinite(current) ? current : 0) + 1
-
     span.dataset.count = String(next)
-    span.textContent = `Open thread · ${next} ${next === 1 ? "voice" : "voices"}`
+    span.textContent = String(next)
 
-    // Make sure the parent card now reads as a thread visually.
     button.classList.add("is-thread")
   }
 }

@@ -11816,3 +11816,40 @@ html.theme-light .inbox-thread-head {
 /* Hide leftover .fc-brand styles by overriding their layout when present.
    The brand markup no longer uses .fc-brand-mark, but old templates
    elsewhere might. */
+
+/* ============================================================
+   ✦ BREATH CARD ACTION ICONS — mint tint everywhere
+   ============================================================ */
+
+/* Every action icon in the breath card footer takes on the mint
+   accent. Active states (bookmark saved / reshare done) override
+   to gold or accent variants. */
+.fc-breath-actions .fc-breath-action svg,
+.fc-breath-actions .fc-action svg,
+.fc-breath-action svg {
+  color: var(--fc-accent-2) !important;
+  transition: color 140ms ease, transform 140ms ease;
+}
+.fc-breath-actions .fc-breath-action:hover svg,
+.fc-breath-actions .fc-action:hover svg {
+  color: var(--fc-accent) !important;
+  transform: scale(1.06);
+}
+/* Active states keep their gold tint. */
+.fc-breath-actions .fc-action.text-\[var\(--fc-gold\)\] svg,
+.fc-breath-actions .text-\[var\(--fc-gold\)\] svg {
+  color: var(--fc-gold) !important;
+}
+
+/* Compact reply button — count next to the icon, no verbose label */
+.fc-breath-action span {
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--fc-soft);
+}
+.fc-breath-action.is-thread span {
+  color: var(--fc-accent-2);
+}
+.fc-breath-action span:empty {
+  display: none;
+}
