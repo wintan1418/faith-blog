@@ -1,0 +1,74 @@
+<div style="font-family: Inter, Arial, sans-serif; color: #17251d; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+  <p style="margin: 0 0 6px; color: #6c7c72; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800;">Brethreign — your week</p>
+
+  <h1 style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; line-height: 1.2; margin: 0 0 14px; color: #17251d;">
+    Hi <%= @user.display_name %> — here's the week.
+  </h1>
+
+  <% if @user_breaths.positive? %>
+    <p style="margin: 0 0 18px; color: #52665a;">
+      You breathed <strong><%= @user_breaths %></strong> time<%= @user_breaths == 1 ? "" : "s" %> this week.
+      <% if @streak.positive? %>You're on a <strong><%= @streak %>-day streak</strong>.<% end %>
+    </p>
+  <% elsif @streak.positive? %>
+    <p style="margin: 0 0 18px; color: #52665a;">
+      Your streak is at <strong><%= @streak %></strong> day<%= @streak == 1 ? "" : "s" %>. Want to keep it going? <%= link_to "Open the feed", @feed_url, style: "color: #10b981; font-weight: 800;" %>.
+    </p>
+  <% else %>
+    <p style="margin: 0 0 18px; color: #52665a;">
+      It's been quiet from your side this week. The community is here whenever you're ready to come back in.
+    </p>
+  <% end %>
+
+  <% if @top_breaths.any? %>
+    <h2 style="font-family: 'Fraunces', Georgia, serif; font-size: 18px; margin: 24px 0 10px; color: #17251d;">
+      What your circle has been breathing
+    </h2>
+    <% @top_breaths.each do |post| %>
+      <div style="border: 1px solid #e6ece8; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;">
+        <p style="margin: 0 0 4px; font-size: 13px; color: #6c7c72;">
+          <strong style="color: #17251d;"><%= post.user.display_name %></strong>
+          <% if post.room %> · <%= post.room.name %><% end %>
+          · <%= post.published_at.strftime("%b %-d") %>
+        </p>
+        <% if post.title.present? %>
+          <p style="margin: 0 0 6px; font-weight: 800; color: #17251d;">
+            <%= link_to post.title, Rails.application.routes.url_helpers.post_url(post, host: @host), style: "color: #17251d; text-decoration: none;" %>
+          </p>
+        <% end %>
+        <p style="margin: 0; color: #52665a;">
+          <%= truncate(post.content.to_plain_text, length: 180) %>
+        </p>
+        <p style="margin: 6px 0 0; font-size: 12px; color: #6c7c72;">
+          🤍 <%= post.likes_count %> · 💬 <%= post.comments_count %>
+        </p>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if @open_prayers.any? %>
+    <h2 style="font-family: 'Fraunces', Georgia, serif; font-size: 18px; margin: 24px 0 10px; color: #17251d;">
+      🙏 Prayer chains still in motion
+    </h2>
+    <% @open_prayers.each do |post| %>
+      <div style="border-left: 3px solid #a78bfa; padding: 6px 12px; margin-bottom: 8px;">
+        <p style="margin: 0; color: #52665a; font-size: 14px;">
+          <strong style="color: #17251d;"><%= post.user.display_name %></strong> — <%= truncate(post.content.to_plain_text, length: 140) %>
+        </p>
+      </div>
+    <% end %>
+    <p style="margin: 8px 0 0; color: #6c7c72; font-size: 13px;">
+      Tap into Brethreign to keep praying with them.
+    </p>
+  <% end %>
+
+  <p style="margin: 28px 0 12px;">
+    <%= link_to "Open the feed", @feed_url, style: "display: inline-block; background: #10b981; color: #052016; font-weight: 800; padding: 12px 18px; border-radius: 10px; text-decoration: none;" %>
+  </p>
+
+  <hr style="border: none; border-top: 1px solid #e6ece8; margin: 28px 0 16px;">
+  <p style="margin: 0; color: #6c7c72; font-size: 12px;">
+    You're receiving this because weekly digests are on for your Brethreign account.
+    <%= link_to "Unsubscribe from these digests", @unsubscribe_url, style: "color: #6c7c72;" %> · <%= link_to "Notification settings", "https://#{@host}/settings/notifications/edit", style: "color: #6c7c72;" %>
+  </p>
+</div>

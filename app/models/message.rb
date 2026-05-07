@@ -1,18 +1,40 @@
 # frozen_string_literal: true
 
 class Message < ApplicationRecord
+  MAX_IMAGES = 4
+
   belongs_to :conversation
   belongs_to :sender, class_name: "User"
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
 
+  has_many_attached :images
+  has_one_attached  :voice_note
+
   def edited?
     edited_at.present?
   end
 
-  validates :body, presence: true, length: { maximum: 4_000 }
-  validate :sender_is_participant
-  validate :sender_is_not_blocked
+  # Body is optional when the message carries an image or a voice note.
+  # When neither attachment is present, body must be there.
+  validates :body, length: { maximum: 4_000 }, presence: true, unless: :has_attachments?
+  validates :body, length: { maximum: 4_000 }, allow_blank: true
+  validate  :sender_is_participant
+  validate  :sender_is_not_blocked
+  validate  :max_images_count
+
+  def has_attachments?
+    (images.respond_to?(:attached?) && images.attached?) ||
+      (voice_note.respond_to?(:attached?) && voice_note.attached?)
+  end
+
+  def has_images?
+    images.attached? && images.any?
+  end
+
+  def has_voice_note?
+    voice_note.attached?
+  end
 
   scope :visible, -> { where(deleted_at: nil) }
   scope :oldest_first, -> { order(created_at: :asc) }
@@ -44,6 +66,13 @@ class Message < ApplicationRecord
     return unless recipient && MessageBlock.between?(sender, recipient)
 
     errors.add(:base, "Messaging is blocked for this conversation")
+  end
+
+  def max_images_count
+    return unless images.attached?
+    return if images.count <= MAX_IMAGES
+
+    errors.add(:images, "cannot exceed #{MAX_IMAGES} images per message")
   end
 
   def broadcast_to_participants

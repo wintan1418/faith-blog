@@ -29,7 +29,24 @@
       <% if deleted %>
         <div class="message-deleted">— message deleted —</div>
       <% else %>
-        <div class="message-body"><%= simple_format(message.body) %></div>
+        <% if message.has_images? %>
+          <div class="message-images <%= "is-grid-#{[message.images.count, 4].min}" %>">
+            <% message.images.each do |img| %>
+              <a href="<%= url_for(img) %>" target="_blank" rel="noopener" class="message-image-link">
+                <%= image_tag img, class: "message-image", loading: "lazy", alt: "Attachment" %>
+              </a>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if message.has_voice_note? %>
+          <audio controls preload="metadata" class="message-voice"
+                 src="<%= url_for(message.voice_note) %>"></audio>
+        <% end %>
+
+        <% if message.body.present? %>
+          <div class="message-body"><%= simple_format(message.body) %></div>
+        <% end %>
       <% end %>
 
       <span class="message-meta">

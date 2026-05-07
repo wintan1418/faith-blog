@@ -1,9 +1,18 @@
-<%= form_with model: [conversation, message], class: "inbox-composer", id: "new_message" do |f| %>
+<%= form_with model: [conversation, message], class: "inbox-composer", id: "new_message",
+              html: { multipart: true, data: { controller: "dm-composer" } } do |f| %>
   <% if message.errors.any? %>
     <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
       <%= message.errors.full_messages.to_sentence %>
     </div>
   <% end %>
+
+  <div data-dm-composer-target="previews" class="dm-previews hidden"></div>
+
+  <div data-dm-composer-target="voicePreview" class="dm-voice-preview hidden">
+    <span class="dm-voice-preview-label">🎙️ Voice note ready</span>
+    <span data-dm-composer-target="voiceLength">0s</span>
+    <button type="button" class="dm-voice-clear" data-action="click->dm-composer#clearVoice" aria-label="Discard voice note">✕</button>
+  </div>
 
   <div class="flex items-end gap-2 relative" data-controller="emoji-picker">
     <button type="button"
@@ -14,6 +23,26 @@
             aria-label="Add emoji">
       <%= render_icon("smile", classes: "h-5 w-5") %>
     </button>
+
+    <label class="inbox-emoji-btn cursor-pointer" title="Add images" aria-label="Add images">
+      <%= render_icon("image", classes: "h-5 w-5") %>
+      <%= f.file_field :images,
+          multiple: true,
+          accept: "image/*",
+          class: "sr-only",
+          data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
+    </label>
+
+    <button type="button"
+            class="inbox-emoji-btn"
+            data-dm-composer-target="recordBtn"
+            data-action="click->dm-composer#toggleRecord"
+            title="Record voice note"
+            aria-label="Record voice note">
+      🎙️
+    </button>
+
+    <%= f.hidden_field :voice_note, data: { dm_composer_target: "voiceField" } %>
 
     <%= f.text_area :body,
                     rows: 2,

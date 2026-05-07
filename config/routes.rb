@@ -203,6 +203,11 @@ Rails.application.routes.draw do
   get "/service-worker.js",    to: "pwa#service_worker"
   get "/offline",              to: "pwa#offline", as: :offline
 
+  # Token-signed email unsubscribe links (no auth required)
+  get "/email/unsubscribe/weekly-digest/:token",
+      to: "email_unsubscribes#weekly_digest",
+      as: :email_unsubscribes_weekly_digest
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end

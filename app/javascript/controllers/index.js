@@ -72,3 +72,6 @@ application.register("composer-assistant", ComposerAssistantController)
 
 import PwaController from "./pwa_controller"
 application.register("pwa", PwaController)
+
+import DmComposerController from "./dm_composer_controller"
+application.register("dm-composer", DmComposerController)

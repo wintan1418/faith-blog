@@ -1,0 +1,40 @@
+Brethreign — your week
+======================
+
+Hi <%= @user.display_name %>,
+
+<% if @user_breaths.positive? %>
+You breathed <%= @user_breaths %> time<%= @user_breaths == 1 ? "" : "s" %> this week.<% if @streak.positive? %> You're on a <%= @streak %>-day streak.<% end %>
+<% elsif @streak.positive? %>
+Your streak is at <%= @streak %> day<%= @streak == 1 ? "" : "s" %>. Open the feed to keep it going.
+<% else %>
+Quiet week from your side. The community is here when you're ready.
+<% end %>
+
+<% if @top_breaths.any? %>
+What your circle has been breathing
+-----------------------------------
+<% @top_breaths.each do |post| %>
+- <%= post.user.display_name %><% if post.room %> · <%= post.room.name %><% end %> · <%= post.published_at.strftime("%b %-d") %>
+  <% if post.title.present? %><%= post.title %>
+  <% end %><%= truncate(post.content.to_plain_text, length: 180) %>
+  Likes <%= post.likes_count %>, comments <%= post.comments_count %>
+  <%= Rails.application.routes.url_helpers.post_url(post, host: @host) %>
+
+<% end %>
+<% end %>
+
+<% if @open_prayers.any? %>
+Prayer chains still in motion
+-----------------------------
+<% @open_prayers.each do |post| %>
+- <%= post.user.display_name %>: <%= truncate(post.content.to_plain_text, length: 140) %>
+<% end %>
+<% end %>
+
+Open the feed: <%= @feed_url %>
+
+—
+
+Unsubscribe from these digests: <%= @unsubscribe_url %>
+Notification settings: https://<%= @host %>/settings/notifications/edit

@@ -1,0 +1,19 @@
+<% content_for(:title) { "Unsubscribed — Brethreign" } %>
+<div class="fc-offline">
+  <div class="fc-offline-card">
+    <% if @result == :ok %>
+      <div class="fc-offline-icon">📭</div>
+      <h1>Unsubscribed.</h1>
+      <p>We won't send <strong><%= @user.email %></strong> the weekly Brethreign digest anymore. You can re-enable email anytime in <a href="/settings/notifications/edit">notification settings</a>.</p>
+    <% elsif @result == :missing %>
+      <div class="fc-offline-icon">🤔</div>
+      <h1>Account not found.</h1>
+      <p>That link points to an account we can't find. If you still want to unsubscribe, log in and toggle email notifications off in settings.</p>
+    <% else %>
+      <div class="fc-offline-icon">🔗</div>
+      <h1>Link expired.</h1>
+      <p>This unsubscribe link is invalid or expired. Open the most recent digest and try again, or sign in and adjust settings directly.</p>
+    <% end %>
+    <a href="/feed" class="fc-btn">Back to Brethreign</a>
+  </div>
+</div>
