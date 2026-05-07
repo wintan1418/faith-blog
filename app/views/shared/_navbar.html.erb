@@ -109,6 +109,7 @@
               <p class="truncate text-xs text-[var(--fc-muted)]"><%= current_user.email %></p>
             </div>
             <%= link_to "Profile", user_path(current_user.username), class: "fc-dropdown-item" %>
+            <%= link_to "Drafts", drafts_path, class: "fc-dropdown-item" %>
             <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>
             <%= link_to "Invites", invitations_path, class: "fc-dropdown-item" %>
             <%= link_to "People", people_path, class: "fc-dropdown-item" %>

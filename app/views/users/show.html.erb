@@ -68,8 +68,14 @@
             <% end %>
             <div class="profile-stat">
               <span><%= @user.posts.published.count %></span>
-              <small>Posts</small>
+              <small>Breaths</small>
             </div>
+            <% if @user.current_breath_streak.to_i.positive? %>
+              <div class="profile-stat profile-stat-streak" title="Current breath streak">
+                <span>🔥 <%= @user.current_breath_streak %></span>
+                <small><%= @user.current_breath_streak == 1 ? "day" : "days" %> streak</small>
+              </div>
+            <% end %>
           </div>
 
           <% if user_signed_in? && @user != current_user %>

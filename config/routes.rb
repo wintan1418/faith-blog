@@ -76,6 +76,8 @@ Rails.application.routes.draw do
 
   # Bookmarks
   get "bookmarks", to: "bookmarks#index"
+  get "drafts", to: "drafts#index", as: :drafts
+  get "scripture/lookup", to: "scripture#show", as: :scripture_lookup
 
   # Notifications
   resources :notifications, only: [ :index ] do

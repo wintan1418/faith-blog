@@ -22,7 +22,7 @@
       <% if comment.deleted? %>
         <p class="fc-comment-deleted"><%= comment.content %></p>
       <% else %>
-        <div class="fc-comment-body">
+        <div class="fc-comment-body" data-controller="scripture">
           <%= render_with_mentions(comment.content) %>
         </div>
 

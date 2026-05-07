@@ -123,8 +123,12 @@
 
   <div class="fc-composer-footer">
     <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
-    <%= f.hidden_field :status, value: "published" %>
+    <% unless post.persisted? %>
+      <%= f.submit "Save draft", name: "post[status]", value: "draft", class: "fc-btn" %>
+    <% end %>
     <%= f.submit (post.persisted? ? "Update" : "Breathe"),
+        name: "post[status]",
+        value: post.persisted? ? (post.draft? ? "draft" : "published") : "published",
         class: "fc-btn fc-btn-primary",
         data: {
           composer_mode_target: "submit",

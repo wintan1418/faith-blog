@@ -78,6 +78,8 @@ class Post < ApplicationRecord
   after_update_commit :enqueue_ai_moderation_review_on_publish
   after_commit :fanout_to_followers, on: :create, if: :published?
   after_update_commit :fanout_to_followers_on_publish
+  after_commit :bump_author_streak, on: :create, if: :published?
+  after_update_commit :bump_author_streak_on_publish
 
   # Instance methods
   def engagement_score
@@ -165,5 +167,15 @@ class Post < ApplicationRecord
     return unless saved_change_to_status? && published?
 
     fanout_to_followers
+  end
+
+  def bump_author_streak
+    user&.bump_breath_streak!
+  end
+
+  def bump_author_streak_on_publish
+    return unless saved_change_to_status? && published?
+
+    bump_author_streak
   end
 end

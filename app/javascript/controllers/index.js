@@ -63,3 +63,6 @@ application.register("message-edit", MessageEditController)
 
 import NotificationsModalController from "./notifications_modal_controller"
 application.register("notifications-modal", NotificationsModalController)
+
+import ScriptureController from "./scripture_controller"
+application.register("scripture", ScriptureController)

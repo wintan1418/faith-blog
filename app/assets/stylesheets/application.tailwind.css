@@ -12145,3 +12145,83 @@ html.theme-light .inbox-thread-head {
   border-color: rgba(52, 211, 153, 0.30);
   color: var(--fc-accent-2);
 }
+
+/* ============================================================
+   ✦ INLINE SCRIPTURE — auto-linked references with hover tooltip
+   ============================================================ */
+
+.scripture-ref {
+  color: var(--fc-accent-2);
+  font-weight: 700;
+  border-bottom: 1px dotted rgba(52, 211, 153, 0.55);
+  cursor: help;
+  transition: color 140ms ease, background 140ms ease;
+  padding: 0 2px;
+  border-radius: 3px;
+}
+.scripture-ref:hover,
+.scripture-ref:focus-visible {
+  color: var(--fc-accent);
+  background: var(--fc-accent-soft);
+  outline: none;
+}
+
+.scripture-tip {
+  position: fixed;
+  z-index: 9999;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-accent-soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 18px 44px -10px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  font-family: 'Fraunces', Georgia, serif;
+}
+.scripture-tip.hidden { display: none; }
+.scripture-tip-ref {
+  margin: 0 0 6px;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fc-accent-2);
+}
+.scripture-tip-text {
+  margin: 0;
+  color: var(--fc-ink);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.scripture-tip-translation {
+  margin: 8px 0 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.7rem;
+  color: var(--fc-muted);
+  font-weight: 700;
+}
+.scripture-tip-loading {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--fc-muted);
+  font-style: italic;
+}
+
+/* ============================================================
+   ✦ STREAK — gradient chip on profile
+   ============================================================ */
+
+.profile-stat-streak span {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 900;
+}
+.profile-stat-streak small {
+  color: #f59e0b;
+  font-weight: 800;
+}

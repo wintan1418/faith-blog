@@ -1,0 +1,41 @@
+<% content_for(:title) { "Drafts - Faith Community" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 720px;">
+    <main class="fc-main">
+      <div class="mb-6">
+        <%= link_to feed_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+          ← Back to feed
+        <% end %>
+        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">Drafts</h1>
+        <p class="text-sm text-[var(--fc-muted)]">Breaths you've started but haven't published. Edit and ship when you're ready.</p>
+      </div>
+
+      <% if @drafts.any? %>
+        <ul class="fc-cms-list">
+          <% @drafts.each do |draft| %>
+            <li class="fc-cms-row">
+              <div class="fc-cms-body">
+                <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= draft.title.presence || "Untitled" %></p>
+                <p class="fc-cms-text"><%= truncate(draft.content.to_plain_text.to_s.strip, length: 200) %></p>
+                <p class="fc-cms-meta">Saved <%= time_ago_in_words(draft.updated_at) %> ago</p>
+              </div>
+              <div class="fc-cms-actions">
+                <%= link_to "Continue", edit_post_path(draft), class: "fc-btn fc-btn-primary" %>
+                <%= button_to "Delete", post_path(draft), method: :delete, form_class: "inline", class: "fc-btn", data: { turbo_confirm: "Discard this draft?" } %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+        <% if @pagy.pages > 1 %>
+          <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+        <% end %>
+      <% else %>
+        <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
+          <p class="text-base font-bold text-[var(--fc-ink)]">No drafts yet.</p>
+          <p class="mt-1 text-sm text-[var(--fc-muted)]">Open the composer, write something, and tap "Save draft" to come back later.</p>
+        </div>
+      <% end %>
+    </main>
+  </div>
+</div>

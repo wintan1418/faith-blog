@@ -145,6 +145,33 @@ class User < ApplicationRecord
     bookmarks.exists?(post: post)
   end
 
+  # Update breath streak after a published post lands.
+  # Today already counted? Skip. Yesterday? Increment. Older? Reset to 1.
+  def bump_breath_streak!
+    today = Date.current
+    return if streak_updated_on == today
+
+    new_current = if streak_updated_on == today - 1
+                    current_breath_streak.to_i + 1
+                  else
+                    1
+                  end
+    new_longest = [ longest_breath_streak.to_i, new_current ].max
+
+    update_columns(
+      current_breath_streak: new_current,
+      longest_breath_streak: new_longest,
+      streak_updated_on: today
+    )
+  end
+
+  def streak_label
+    n = current_breath_streak.to_i
+    return nil if n.zero?
+    return "#{n} day streak" if n == 1
+    "#{n} days streaking"
+  end
+
   def has_reshared?(post)
     reshares.exists?(post: post)
   end
