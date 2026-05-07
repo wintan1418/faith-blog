@@ -11854,3 +11854,88 @@ html.theme-light .inbox-thread-head {
 .fc-breath-action span:empty {
   display: none;
 }
+
+/* ============================================================
+   ✦ LIVING SCRIPTURES — animated verse carousel (sidebar)
+   Mint-tinted cousin of the Golden Breath card.
+   ============================================================ */
+
+.fc-living-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg,
+    rgba(52, 211, 153, 0.10),
+    rgba(52, 211, 153, 0.04) 70%,
+    transparent
+  ), var(--fc-surface) !important;
+  border: 1px solid rgba(52, 211, 153, 0.28) !important;
+}
+.fc-living-card::before {
+  content: "\201C";
+  position: absolute;
+  top: 4px;
+  right: 16px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 56px;
+  line-height: 1;
+  color: rgba(52, 211, 153, 0.30);
+  pointer-events: none;
+}
+
+.fc-living-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+}
+.fc-living-kicker {
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fc-accent-2);
+  margin: 0;
+}
+
+.fc-living-arrow {
+  appearance: none;
+  border: 0;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-2);
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  font-size: 16px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+.fc-living-arrow:hover { background: rgba(52, 211, 153, 0.22); }
+
+.fc-living-quote {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--fc-ink);
+}
+.fc-living-ref {
+  margin-top: 0.85rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fc-accent-2);
+  font-weight: 800;
+}
+
+/* Mint dots (override the gold ones from the Golden Breath carousel) */
+.fc-living-dots .fc-golden-dot {
+  background: rgba(52, 211, 153, 0.25);
+}
+.fc-living-dots .fc-golden-dot:hover { background: rgba(52, 211, 153, 0.45); }
+.fc-living-dots .fc-golden-dot.is-active {
+  background: var(--fc-accent);
+}

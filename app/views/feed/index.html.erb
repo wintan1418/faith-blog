@@ -121,21 +121,51 @@
         <span>Discover</span>
         <button type="button" class="fc-discover-close" data-action="click->discover#close" aria-label="Close">×</button>
       </header>
-      <% if @daily_verse %>
-        <div class="fc-side-card">
-          <h3 class="mb-3 text-sm font-extrabold text-[var(--fc-ink)]">Today's verse</h3>
-          <p class="font-serif text-lg leading-7 text-[var(--fc-soft)]">"<%= @daily_verse.text %>"</p>
-          <% if @daily_verse.reference.present? %>
-            <p class="mt-3 text-sm text-[var(--fc-muted)]"><%= @daily_verse.reference %></p>
+      <%
+        verses = @daily_verses.presence || [
+          OpenStruct.new(
+            text: "He gives strength to the weary, and increases the power of the weak.",
+            reference: "Isaiah 40:29"
+          )
+        ]
+      %>
+      <div class="fc-side-card fc-living-card"
+           data-controller="golden-carousel"
+           data-golden-carousel-interval-value="9000">
+        <header class="fc-living-head">
+          <p class="fc-living-kicker">Living Scriptures</p>
+          <% if verses.size > 1 %>
+            <div class="fc-golden-controls">
+              <button type="button" class="fc-living-arrow" data-action="click->golden-carousel#prev" aria-label="Previous">‹</button>
+              <button type="button" class="fc-living-arrow" data-action="click->golden-carousel#next" aria-label="Next">›</button>
+            </div>
+          <% end %>
+        </header>
+
+        <div class="fc-golden-track" data-golden-carousel-target="track">
+          <% verses.each_with_index do |verse, i| %>
+            <article class="fc-golden-slide<%= ' is-active' if i.zero? %>" data-golden-carousel-target="slide">
+              <p class="fc-living-quote">"<%= verse.text %>"</p>
+              <% if verse.reference.present? %>
+                <p class="fc-living-ref"><%= verse.reference %></p>
+              <% end %>
+            </article>
           <% end %>
         </div>
-      <% else %>
-        <div class="fc-side-card">
-          <h3 class="mb-3 text-sm font-extrabold text-[var(--fc-ink)]">Today's verse</h3>
-          <p class="font-serif text-lg leading-7 text-[var(--fc-soft)]">"He gives strength to the weary, and increases the power of the weak."</p>
-          <p class="mt-3 text-sm text-[var(--fc-muted)]">Isaiah 40:29</p>
-        </div>
-      <% end %>
+
+        <% if verses.size > 1 %>
+          <div class="fc-golden-dots fc-living-dots" role="tablist" aria-label="Living Scriptures">
+            <% verses.each_with_index do |_, i| %>
+              <button type="button"
+                      class="fc-golden-dot<%= ' is-active' if i.zero? %>"
+                      data-action="click->golden-carousel#goto"
+                      data-index="<%= i %>"
+                      data-golden-carousel-target="dot"
+                      aria-label="Slide <%= i + 1 %>"></button>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
 
       <% if @daily_breaths.any? %>
         <div class="fc-side-card fc-golden-card"
