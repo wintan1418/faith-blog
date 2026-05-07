@@ -7,6 +7,15 @@ class NotificationsController < ApplicationController
     @pagy, @notifications = pagy(current_user.notifications.recent)
   end
 
+  # Lazy-loaded fragment for the navbar bell modal. Renders without
+  # the application layout. Opening the panel marks everything read
+  # as a side effect.
+  def popover
+    @notifications = current_user.notifications.recent.limit(20)
+    Notification.mark_all_as_read!(current_user)
+    render layout: false
+  end
+
   def mark_read
     notification = current_user.notifications.find(params[:id])
     notification.mark_as_read!

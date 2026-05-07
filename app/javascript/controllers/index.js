@@ -60,3 +60,6 @@ application.register("discover", DiscoverController)
 
 import MessageEditController from "./message_edit_controller"
 application.register("message-edit", MessageEditController)
+
+import NotificationsModalController from "./notifications_modal_controller"
+application.register("notifications-modal", NotificationsModalController)

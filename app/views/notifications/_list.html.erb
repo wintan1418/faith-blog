@@ -1,0 +1,32 @@
+<% if notifications.any? %>
+  <ul class="fc-notif-list">
+    <% notifications.each do |notification| %>
+      <%= link_to notification.target_path, class: "fc-notif-row#{' is-unread' unless notification.read?}" do %>
+        <% if notification.actor %>
+          <% if notification.actor.profile&.avatar&.attached? %>
+            <%= image_tag notification.actor.profile.avatar, class: "fc-avatar object-cover", alt: notification.actor.username %>
+          <% else %>
+            <span class="fc-avatar"><%= notification.actor.username.first.upcase %></span>
+          <% end %>
+        <% else %>
+          <span class="fc-avatar"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
+        <% end %>
+
+        <div class="fc-notif-body">
+          <p class="fc-notif-text"><%= notification.message %></p>
+          <p class="fc-notif-time"><%= time_ago_in_words(notification.created_at) %> ago</p>
+        </div>
+
+        <% unless notification.read? %>
+          <span class="fc-notif-pulse" aria-hidden="true"></span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="fc-notif-empty">
+    <%= render_icon("sparkles", classes: "h-7 w-7") %>
+    <p>All caught up.</p>
+    <small>New activity will land here as it happens.</small>
+  </div>
+<% end %>

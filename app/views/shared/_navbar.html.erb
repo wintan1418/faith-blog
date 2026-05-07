@@ -71,17 +71,17 @@
           Breathe
         </button>
 
-        <%= link_to notifications_path, class: "fc-icon-btn relative", title: "Notifications" do %>
+        <button type="button" class="fc-icon-btn relative" title="Notifications" data-action="click->notifications-modal#open">
           <%= render_icon("sparkles", classes: "h-4 w-4") %>
           <% if current_user.unread_notifications_count.positive? %>
-            <span class="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#a87932]"></span>
+            <span class="fc-notif-pulse-badge"></span>
           <% end %>
-        <% end %>
+        </button>
 
         <%= link_to conversations_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Inbox" do %>
           <%= render_icon("mail", classes: "h-4 w-4") %>
           <% if current_user.unread_conversations_count.positive? %>
-            <span class="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[var(--fc-accent)]"></span>
+            <span class="fc-notif-pulse-badge is-mint"></span>
           <% end %>
         <% end %>
 

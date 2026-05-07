@@ -62,9 +62,9 @@
         document.body.classList.toggle('theme-light', !dark);
       })();
     </script>
-    <div class="min-h-full" data-controller="<%= "composer-modal" if user_signed_in? %>">
+    <div class="min-h-full" data-controller="<%= "composer-modal notifications-modal" if user_signed_in? %>">
       <%= render "shared/navbar" %>
-      
+
       <div id="flash_messages"><%= render "shared/flash" %></div>
 
       <main>
@@ -73,6 +73,7 @@
 
       <% if user_signed_in? %>
         <%= render "shared/composer_modal" %>
+        <%= render "shared/notifications_modal" %>
       <% end %>
 
       <%= render "shared/footer" %>

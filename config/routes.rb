@@ -81,6 +81,7 @@ Rails.application.routes.draw do
   resources :notifications, only: [ :index ] do
     collection do
       post :mark_all_read
+      get  :popover
     end
     member do
       post :mark_read

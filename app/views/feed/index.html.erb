@@ -121,6 +121,21 @@
         <span>Discover</span>
         <button type="button" class="fc-discover-close" data-action="click->discover#close" aria-label="Close">×</button>
       </header>
+
+      <nav class="fc-discover-quicklinks">
+        <%= link_to people_path, class: "fc-discover-quicklink" do %>
+          <%= render_icon("users", classes: "h-4 w-4") %>
+          <span>People</span>
+        <% end %>
+        <%= link_to bookmarks_path, class: "fc-discover-quicklink" do %>
+          <%= render_icon("bookmark", classes: "h-4 w-4") %>
+          <span>Bookmarks</span>
+        <% end %>
+        <%= link_to search_path, class: "fc-discover-quicklink" do %>
+          <%= render_icon("search", classes: "h-4 w-4") %>
+          <span>Search</span>
+        <% end %>
+      </nav>
       <%
         verses = @daily_verses.presence || [
           OpenStruct.new(

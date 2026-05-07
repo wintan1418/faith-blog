@@ -11943,3 +11943,205 @@ html.theme-light .inbox-thread-head {
 .fc-living-dots .fc-golden-dot.is-active {
   background: var(--fc-accent);
 }
+
+/* ============================================================
+   ✦ NOTIFICATIONS — pulsing badge, modal popover, discover quicklinks
+   ============================================================ */
+
+/* Pulsing dot on the bell + inbox icon */
+.fc-notif-pulse-badge {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #ef4444;
+  border: 2px solid var(--fc-bg);
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
+  animation: fc-notif-pulse 1.4s ease-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+.fc-notif-pulse-badge.is-mint {
+  background: var(--fc-accent);
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+  animation-name: fc-notif-pulse-mint;
+}
+@keyframes fc-notif-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(239, 68, 68, 0.55); transform: scale(1); }
+  60%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);   transform: scale(1.15); }
+  100% { box-shadow: 0 0 0 0   rgba(239, 68, 68, 0);   transform: scale(1); }
+}
+@keyframes fc-notif-pulse-mint {
+  0%   { box-shadow: 0 0 0 0   rgba(52, 211, 153, 0.55); transform: scale(1); }
+  60%  { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);   transform: scale(1.15); }
+  100% { box-shadow: 0 0 0 0   rgba(52, 211, 153, 0);   transform: scale(1); }
+}
+
+/* Notifications modal */
+.fc-notif-dialog {
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  max-width: 440px;
+  width: calc(100% - 2rem);
+  margin: auto;
+}
+.fc-notif-dialog::backdrop {
+  background: rgba(8, 14, 12, 0.62);
+  backdrop-filter: blur(6px);
+}
+.fc-notif-panel {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 16px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+.fc-notif-popover {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  min-height: 200px;
+}
+.fc-notif-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--fc-line);
+}
+.fc-notif-head h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+  letter-spacing: -0.01em;
+}
+.fc-notif-mark-all {
+  appearance: none;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-2);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.fc-notif-mark-all:hover { background: var(--fc-accent); color: #042f1d; }
+
+.fc-notif-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+.fc-notif-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--fc-line);
+  text-decoration: none;
+  transition: background 120ms ease;
+}
+.fc-notif-row:hover { background: var(--fc-surface-2); }
+.fc-notif-row.is-unread { background: rgba(52, 211, 153, 0.06); }
+.fc-notif-row .fc-avatar { width: 36px; height: 36px; font-size: 0.78rem; }
+
+.fc-notif-body { min-width: 0; }
+.fc-notif-text {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--fc-ink);
+}
+.fc-notif-time {
+  margin: 2px 0 0;
+  font-size: 0.7rem;
+  color: var(--fc-muted);
+  font-weight: 600;
+}
+.fc-notif-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--fc-accent);
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+  animation: fc-notif-pulse-mint 1.4s ease-out infinite;
+  flex-shrink: 0;
+}
+
+.fc-notif-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--fc-muted);
+}
+.fc-notif-empty svg { color: var(--fc-accent-2); }
+.fc-notif-empty p {
+  margin: 0;
+  font-weight: 800;
+  color: var(--fc-soft);
+}
+.fc-notif-empty small { font-size: 0.78rem; }
+
+.fc-notif-foot {
+  border-top: 1px solid var(--fc-line);
+  padding: 10px 18px;
+  text-align: center;
+  background: var(--fc-bg);
+}
+.fc-notif-foot-link {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--fc-accent-2);
+}
+.fc-notif-foot-link:hover { color: var(--fc-accent); }
+
+.fc-notif-loading {
+  padding: 32px;
+  text-align: center;
+  color: var(--fc-muted);
+  font-weight: 700;
+}
+
+/* Discover quicklinks (mobile People + Bookmarks + Search shortcut row) */
+.fc-discover-quicklinks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 10px 0 6px;
+}
+.fc-discover-quicklink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  color: var(--fc-soft);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.fc-discover-quicklink svg { color: var(--fc-accent-2); }
+.fc-discover-quicklink:hover {
+  background: var(--fc-accent-soft);
+  border-color: rgba(52, 211, 153, 0.30);
+  color: var(--fc-accent-2);
+}
