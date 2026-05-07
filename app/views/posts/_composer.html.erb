@@ -124,16 +124,16 @@
   <div class="fc-composer-footer">
     <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
     <% unless post.persisted? %>
-      <%= f.submit "Save draft", name: "post[status]", value: "draft", class: "fc-btn" %>
+      <button type="submit" name="post[status]" value="draft" class="fc-btn">Save draft</button>
     <% end %>
-    <%= f.submit (post.persisted? ? "Update" : "Breathe"),
-        name: "post[status]",
-        value: post.persisted? ? (post.draft? ? "draft" : "published") : "published",
-        class: "fc-btn fc-btn-primary",
-        data: {
-          composer_mode_target: "submit",
-          submit_breath: post.persisted? ? "Update" : "Breathe",
-          submit_thread: post.persisted? ? "Update thread" : "Open the thread"
-        } %>
+    <button type="submit"
+            name="post[status]"
+            value="<%= post.persisted? ? (post.draft? ? "draft" : "published") : "published" %>"
+            class="fc-btn fc-btn-primary"
+            data-composer-mode-target="submit"
+            data-submit-breath="<%= post.persisted? ? "Update" : "Breathe" %>"
+            data-submit-thread="<%= post.persisted? ? "Update thread" : "Open the thread" %>">
+      <%= post.persisted? ? "Update" : "Breathe" %>
+    </button>
   </div>
 <% end %>

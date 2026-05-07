@@ -42,7 +42,15 @@ export default class extends Controller {
 
     if (this.hasSubmitTarget) {
       const label = this.submitTarget.dataset[`submit${this.cap(mode)}`]
-      if (label) this.submitTarget.value = label
+      if (label) {
+        // Works for both <input type=submit> (legacy, uses .value) and
+        // <button type=submit> (current, uses textContent).
+        if (this.submitTarget.tagName === "BUTTON") {
+          this.submitTarget.textContent = label
+        } else {
+          this.submitTarget.value = label
+        }
+      }
     }
 
     if (this.hasHandleTarget) {
