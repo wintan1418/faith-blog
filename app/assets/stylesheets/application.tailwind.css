@@ -11827,12 +11827,16 @@ html.theme-light .inbox-thread-head {
    to gold or accent variants. */
 .fc-breath-actions .fc-breath-action svg,
 .fc-breath-actions .fc-action svg,
-.fc-breath-action svg {
+.fc-breath-actions .fc-reaction-add svg,
+.fc-breath-action svg,
+.fc-reactions .fc-reaction-add svg {
   color: var(--fc-accent-2) !important;
   transition: color 140ms ease, transform 140ms ease;
 }
 .fc-breath-actions .fc-breath-action:hover svg,
-.fc-breath-actions .fc-action:hover svg {
+.fc-breath-actions .fc-action:hover svg,
+.fc-breath-actions .fc-reaction-add:hover svg,
+.fc-reactions .fc-reaction-add:hover svg {
   color: var(--fc-accent) !important;
   transform: scale(1.06);
 }
