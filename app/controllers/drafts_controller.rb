@@ -5,5 +5,6 @@ class DraftsController < ApplicationController
 
   def index
     @pagy, @drafts = pagy(current_user.posts.where(status: :draft).order(updated_at: :desc), items: 30)
+    @scheduled = current_user.posts.where(status: :scheduled).order(:scheduled_for)
   end
 end

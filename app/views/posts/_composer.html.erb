@@ -139,6 +139,14 @@
               "prayer_pending", "not_a_prayer" %>
           <span>🙏 Prayer request</span>
         </label>
+
+        <label class="fc-composer-pill" title="Pick a future date/time to auto-publish this breath">
+          <span class="fc-composer-pill-label">⏱️ Schedule</span>
+          <%= f.datetime_local_field :scheduled_for,
+              value: post.scheduled_for&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"),
+              min: Time.current.strftime("%Y-%m-%dT%H:%M"),
+              class: "fc-composer-pill-select" %>
+        </label>
       </div>
     </div>
 

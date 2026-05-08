@@ -11,6 +11,30 @@
         <p class="text-sm text-[var(--fc-muted)]">Breaths you've started but haven't published. Edit and ship when you're ready.</p>
       </div>
 
+      <% if @scheduled.any? %>
+        <section class="mb-8">
+          <h2 class="mb-3 text-sm font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">⏱️ Scheduled — <%= @scheduled.size %></h2>
+          <ul class="fc-cms-list">
+            <% @scheduled.each do |sp| %>
+              <li class="fc-cms-row">
+                <div class="fc-cms-body">
+                  <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= sp.title.presence || "Untitled" %></p>
+                  <p class="fc-cms-text"><%= truncate(sp.content.to_plain_text.to_s.strip, length: 200) %></p>
+                  <p class="fc-cms-meta">
+                    Goes live <%= sp.scheduled_for.in_time_zone.strftime("%a %b %-d, %l:%M %p") %>
+                    (<%= time_ago_in_words(sp.scheduled_for) %><%= sp.scheduled_for.future? ? " from now" : " ago" %>)
+                  </p>
+                </div>
+                <div class="fc-cms-actions">
+                  <%= link_to "Edit", edit_post_path(sp), class: "fc-btn" %>
+                  <%= button_to "Cancel", post_path(sp), method: :delete, form_class: "inline", class: "fc-btn", data: { turbo_confirm: "Cancel this scheduled breath?" } %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </section>
+      <% end %>
+
       <% if @drafts.any? %>
         <ul class="fc-cms-list">
           <% @drafts.each do |draft| %>

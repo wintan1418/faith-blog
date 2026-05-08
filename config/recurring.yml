@@ -18,3 +18,8 @@ production:
     class: WeeklyDigestFanoutJob
     queue: default
     schedule: every Sunday at 8am
+
+  scheduled_post_publisher:
+    class: ScheduledPostPublisherJob
+    queue: default
+    schedule: every 5 minutes
