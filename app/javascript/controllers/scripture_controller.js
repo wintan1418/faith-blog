@@ -105,7 +105,7 @@ export default class extends Controller {
       tip.innerHTML = `
         <p class="scripture-tip-ref">${payload.reference || ref}</p>
         <p class="scripture-tip-text">${this.escape(payload.text)}</p>
-        <p class="scripture-tip-translation">${payload.translation || "WEB"}</p>
+        <p class="scripture-tip-translation">${payload.translation || "KJV"}</p>
       `
     } else {
       tip.innerHTML = `<p class="scripture-tip-loading">Couldn't load ${ref}.</p>`

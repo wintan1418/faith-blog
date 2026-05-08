@@ -8,9 +8,10 @@ require "uri"
 # via bible-api.com. Free, no key. Cached aggressively because verses
 # don't change.
 class ScriptureLookup
-  ENDPOINT = "https://bible-api.com"
-  TIMEOUT  = 4
-  CACHE_TTL = 7.days
+  ENDPOINT    = "https://bible-api.com"
+  TRANSLATION = "kjv"
+  TIMEOUT     = 4
+  CACHE_TTL   = 7.days
 
   REFERENCE_REGEX = /
     \b
@@ -49,7 +50,7 @@ class ScriptureLookup
   end
 
   def self.lookup(reference)
-    key = "scripture:#{reference.to_s.strip.downcase}"
+    key = "scripture:#{TRANSLATION}:#{reference.to_s.strip.downcase}"
     cached = (Rails.cache.read(key) rescue nil)
     return cached if cached
 
@@ -66,7 +67,7 @@ class ScriptureLookup
 
   def self.fetch(reference)
     encoded = URI.encode_www_form_component(reference.to_s.strip)
-    uri = URI("#{ENDPOINT}/#{encoded}?translation=web")
+    uri = URI("#{ENDPOINT}/#{encoded}?translation=#{TRANSLATION}")
 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -80,7 +81,7 @@ class ScriptureLookup
     {
       reference: payload["reference"],
       text: payload["text"].to_s.strip,
-      translation: payload["translation_name"] || "WEB"
+      translation: payload["translation_name"] || "KJV"
     }
   rescue StandardError => e
     Rails.logger.warn "[scripture] lookup failed for #{reference.inspect}: #{e.message}"
