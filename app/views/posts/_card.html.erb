@@ -84,7 +84,7 @@
         # very likely to overflow and need a "…more" affordance.
         likely_overflow = plain_text.length > 150
       %>
-      <div class="fc-breath-body" data-controller="expand-text">
+      <div class="fc-breath-body" data-controller="expand-text scripture">
         <% if post.display_title %>
           <%= link_to post.display_title, post_path(post), class: "fc-breath-title hover:text-[var(--fc-accent)]" %>
         <% end %>
