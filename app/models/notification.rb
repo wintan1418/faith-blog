@@ -20,7 +20,10 @@ class Notification < ApplicationRecord
     breath_from_followee: 14,
     everyone_mention:     15,
     prayer_joined:        16,
-    prayer_answered:      17
+    prayer_answered:      17,
+    post_blocked:         18,
+    post_held_for_review: 19,
+    post_moderation_approved: 20
   }
 
   # Associations
@@ -91,6 +94,12 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} joined your prayer chain"
     when :prayer_answered
       "A prayer you joined was just marked answered 🌟"
+    when :post_blocked
+      "Your post couldn't be published — it appears to violate our community guidelines."
+    when :post_held_for_review
+      "Your post is held for moderator review — we'll get back to you shortly."
+    when :post_moderation_approved
+      "Good news — your post passed moderation review and is now live."
     else
       "You have a new notification"
     end
@@ -102,7 +111,7 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.post_path(notifiable.post)
     when :new_follower
       Rails.application.routes.url_helpers.user_path(actor.username)
-    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered
+    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved
       post = notifiable.respond_to?(:post) ? notifiable.post : notifiable
       Rails.application.routes.url_helpers.post_path(post)
     when :new_post_in_room

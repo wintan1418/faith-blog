@@ -99,10 +99,44 @@ class Admin::ModerationReviewsController < ApplicationController
     case decision
     when "approve", "dismiss"
       @review.dismissed!
+      release_post_if_post!(decision)
     when "hide", "warn", "restrict", "suspend"
       @review.actioned!
+      block_post_if_post!
       apply_user_action!(decision)
     end
+  end
+
+  # When the moderator approves/dismisses a Post review, flip the post back to
+  # :approved, run the publish-time side effects (fanout, streak), and let the
+  # author know it's live now.
+  def release_post_if_post!(decision)
+    post = @review.reviewable
+    return unless post.is_a?(Post)
+    return if post.moderation_approved?
+
+    post.update_columns(moderation_status: Post.moderation_statuses[:approved], moderation_blocked_reason: nil)
+    BreathFanoutJob.perform_later(post.id) if post.published?
+    post.user&.bump_breath_streak!
+
+    Notification.create(
+      user: post.user,
+      actor: current_user,
+      notifiable: post,
+      notification_type: :post_moderation_approved
+    ) if post.user && decision == "approve"
+  rescue StandardError => e
+    Rails.logger.warn("[ModerationDecide release] #{e.class}: #{e.message}")
+  end
+
+  def block_post_if_post!
+    post = @review.reviewable
+    return unless post.is_a?(Post)
+    return if post.moderation_blocked?
+
+    post.update_columns(moderation_status: Post.moderation_statuses[:blocked])
+  rescue StandardError => e
+    Rails.logger.warn("[ModerationDecide block] #{e.class}: #{e.message}")
   end
 
   def apply_user_action!(decision)

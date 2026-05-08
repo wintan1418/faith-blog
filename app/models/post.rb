@@ -14,9 +14,10 @@ class Post < ApplicationRecord
   has_many_attached :images
 
   # Enums
-  enum :status, { draft: 0, published: 1, archived: 2 }
+  enum :status, { draft: 0, published: 1, archived: 2, scheduled: 3 }
   enum :kind,   { breath: 0, thread: 1 }, prefix: :kind
   enum :prayer_status, { not_a_prayer: 0, prayer_pending: 1, prayer_answered: 2 }, prefix: :prayer_status
+  enum :moderation_status, { approved: 0, pending_review: 1, blocked: 2 }, prefix: :moderation
 
   has_many :prayer_intercessions, dependent: :destroy
   has_many :intercessors, through: :prayer_intercessions, source: :user
@@ -76,7 +77,14 @@ class Post < ApplicationRecord
                   }
 
   # Scopes
-  scope :published, -> { where(status: :published).where("published_at <= ?", Time.current) }
+  scope :published_status, -> { where(status: :published).where("published_at <= ?", Time.current) }
+  scope :moderation_visible, -> { where(moderation_status: :approved) }
+  scope :scheduled_due,    -> { where(status: :scheduled).where("scheduled_for <= ?", Time.current) }
+  scope :upcoming_for,     ->(user) { where(user: user, status: :scheduled).order(:scheduled_for) }
+  # Public "published" feed — must be both published-status AND moderation-approved.
+  # Held / blocked posts deliberately stay out of feeds; authors and admins reach
+  # them via direct links (see Post#visible_to?).
+  scope :published, -> { published_status.moderation_visible }
   scope :drafts, -> { where(status: :draft) }
   scope :featured, -> { where(featured: true) }
   scope :recent, -> { order(published_at: :desc) }
@@ -88,11 +96,11 @@ class Post < ApplicationRecord
   # Callbacks
   before_save :set_published_at, if: -> { status_changed? && published? }
   after_save :process_mentions_after_save
-  after_commit :enqueue_ai_moderation_review, on: :create, if: :published?
+  after_commit :enqueue_ai_moderation_review, on: :create, if: -> { published? && moderation_approved? }
   after_update_commit :enqueue_ai_moderation_review_on_publish
-  after_commit :fanout_to_followers, on: :create, if: :published?
+  after_commit :fanout_to_followers, on: :create, if: -> { published? && moderation_approved? }
   after_update_commit :fanout_to_followers_on_publish
-  after_commit :bump_author_streak, on: :create, if: :published?
+  after_commit :bump_author_streak, on: :create, if: -> { published? && moderation_approved? }
   after_update_commit :bump_author_streak_on_publish
 
   # Instance methods
@@ -146,11 +154,7 @@ class Post < ApplicationRecord
   end
 
   def held_for_review?
-    review = ai_moderation_review
-    return false unless review
-    return false unless review.severity == "high"
-
-    !%w[dismissed cleared].include?(review.status)
+    moderation_pending_review? || moderation_blocked? || legacy_held_for_review?
   end
 
   def visible_to?(viewer)
@@ -160,6 +164,16 @@ class Post < ApplicationRecord
     viewer == user ||
       (viewer.respond_to?(:admin?) && (viewer.admin? || viewer.super_admin?)) ||
       (viewer.respond_to?(:moderator?) && viewer.moderator?)
+  end
+
+  # Pre-existing logic kept as a fallback for older records that have an
+  # AiModerationReview but no moderation_status set yet.
+  def legacy_held_for_review?
+    review = ai_moderation_review
+    return false unless review
+    return false unless review.severity == "high"
+
+    !%w[dismissed cleared].include?(review.status)
   end
 
   private
@@ -183,7 +197,7 @@ class Post < ApplicationRecord
   end
 
   def enqueue_ai_moderation_review_on_publish
-    return unless saved_change_to_status? && published?
+    return unless saved_change_to_status? && published? && moderation_approved?
 
     enqueue_ai_moderation_review
   end
@@ -193,7 +207,7 @@ class Post < ApplicationRecord
   end
 
   def fanout_to_followers_on_publish
-    return unless saved_change_to_status? && published?
+    return unless saved_change_to_status? && published? && moderation_approved?
 
     fanout_to_followers
   end
@@ -203,7 +217,7 @@ class Post < ApplicationRecord
   end
 
   def bump_author_streak_on_publish
-    return unless saved_change_to_status? && published?
+    return unless saved_change_to_status? && published? && moderation_approved?
 
     bump_author_streak
   end

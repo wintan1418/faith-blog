@@ -28,10 +28,21 @@ class PostsController < ApplicationController
   def create
     @post = current_user.posts.build(post_params)
 
+    if scheduled_in_future?(@post)
+      @post.status = :scheduled
+      @post.published_at = nil
+    end
+
+    verdict = run_post_gatekeeper(@post)
+    apply_moderation_verdict(@post, verdict)
+
     if @post.save
       handle_post_links
-      # Mentions are processed in after_save callback, no need to call again
-      redirect_to @post, notice: "Post created successfully!"
+      verdict.persist_review!(@post)
+      notify_author_of_moderation(@post, verdict) unless verdict.allow?
+      redirect_to redirect_target_after_create(@post, verdict),
+                  notice: flash_notice_for(verdict, post: @post),
+                  alert:  flash_alert_for(verdict)
     else
       @rooms = Room.public_rooms.ordered
       render :new, status: :unprocessable_entity
@@ -159,7 +170,11 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, images: [])
+    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, images: [])
+  end
+
+  def scheduled_in_future?(post)
+    post.scheduled_for.present? && post.scheduled_for > Time.current
   end
 
   def handle_post_links
@@ -184,6 +199,63 @@ class PostsController < ApplicationController
     unless current_user.admin_or_moderator?
       redirect_to @post, alert: "You're not authorized to perform this action."
     end
+  end
+
+  # Synchronous AI gate. Returns a Verdict; never raises (fail-open inside).
+  # Drafts and scheduled posts skip the gate — scheduled posts get classified
+  # later when ScheduledPostPublisherJob actually publishes them.
+  def run_post_gatekeeper(post)
+    return Ai::Moderation::PostGatekeeper::Verdict.new(decision: :allow, result: nil) if post.draft? || post.scheduled?
+
+    Ai::Moderation::PostGatekeeper.call(post: post)
+  end
+
+  def apply_moderation_verdict(post, verdict)
+    case verdict.decision
+    when :block
+      post.moderation_status = :blocked
+      post.moderation_blocked_reason = verdict.reason
+    when :hold
+      post.moderation_status = :pending_review
+      post.moderation_blocked_reason = verdict.reason
+    else
+      post.moderation_status = :approved
+    end
+  end
+
+  def notify_author_of_moderation(post, verdict)
+    type = verdict.block? ? :post_blocked : :post_held_for_review
+    Notification.create(
+      user: post.user,
+      actor: post.user,
+      notifiable: post,
+      notification_type: type
+    )
+  rescue StandardError => e
+    Rails.logger.warn("[ModerationNotify] #{e.class}: #{e.message}")
+  end
+
+  def redirect_target_after_create(post, verdict)
+    return feed_path if verdict.block?
+
+    post
+  end
+
+  def flash_notice_for(verdict, post: nil)
+    if post&.scheduled?
+      return "Scheduled for #{post.scheduled_for.in_time_zone.strftime("%a %b %-d, %l:%M %p")}."
+    end
+
+    case verdict.decision
+    when :hold then "Your post is held for a moderator to take a look — we do this for delicate topics so we can support the conversation well."
+    when :allow then "Posted."
+    end
+  end
+
+  def flash_alert_for(verdict)
+    return nil unless verdict.block?
+
+    "We couldn't publish this — it looks like it crosses our community guidelines. If you believe this is wrong, reply to this message and we'll review."
   end
 
   # New accounts that have been flagged once or more get rate-limited:
