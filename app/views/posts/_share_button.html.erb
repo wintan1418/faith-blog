@@ -1,6 +1,6 @@
 <%# Share menu trigger for a single breath. Local: post %>
 <%
-  snippet = truncate(post.content.to_plain_text.to_s.strip, length: 180, separator: " ")
+  snippet = truncate(post.content.to_plain_text.to_s.strip, length: 1500, separator: " ")
   author  = post.anonymous? ? "anonymous" : post.user.username
   cover   = post.has_images? ? url_for(post.images.first) : ""
 %>

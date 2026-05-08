@@ -145,6 +145,21 @@ export default class extends Controller {
     `
 
     const safe = (s) => (s || "").replace(/[<>]/g, "")
+    const title   = safe(this.titleValue)
+    const snippet = safe(this.snippetValue)
+
+    // Scale the body font so longer breaths still fit a single 1080×1350 frame
+    // without overflowing. Numbers chosen empirically against ~920px line width.
+    const len = snippet.length
+    const bodyFont = len > 1100 ? 22 : len > 700 ? 26 : len > 400 ? 30 : 34
+    const bodyLine = bodyFont >= 30 ? 1.45 : 1.4
+    const titleFont = title ? (title.length > 60 ? 48 : 64) : 0
+
+    const titleBlock = title
+      ? `<h1 style="margin:18px 0 0;font-size:${titleFont}px;line-height:1.1;font-weight:900;color:#ffffff;">${title}</h1>`
+      : ""
+    const headerSpacing = title ? 90 : 60
+    const bodyTopMargin = title ? 36 : 28
 
     wrap.innerHTML = `
       <div>
@@ -152,13 +167,9 @@ export default class extends Controller {
           <div style="width:48px;height:48px;border-radius:12px;background:#34d399;display:flex;align-items:center;justify-content:center;color:#042f1d;font-weight:900;font-size:24px;">B</div>
           <div style="font-size:24px;color:#c8d3cf;">Faith Community</div>
         </div>
-        <div style="margin-top:90px;font-size:18px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#34d399;">A Breath</div>
-        <h1 style="margin:18px 0 0;font-size:64px;line-height:1.1;font-weight:900;color:#ffffff;">
-          ${safe(this.titleValue)}
-        </h1>
-        <p style="margin-top:36px;font-size:30px;line-height:1.45;color:#c8d3cf;font-weight:400;">
-          ${safe(this.snippetValue)}
-        </p>
+        <div style="margin-top:${headerSpacing}px;font-size:18px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#34d399;">A Breath</div>
+        ${titleBlock}
+        <p style="margin-top:${bodyTopMargin}px;font-size:${bodyFont}px;line-height:${bodyLine};color:#c8d3cf;font-weight:400;white-space:pre-wrap;">${snippet}</p>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.10);padding-top:28px;">
         <div style="display:flex;align-items:center;gap:14px;">

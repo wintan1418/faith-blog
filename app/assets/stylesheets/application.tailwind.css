@@ -12543,6 +12543,21 @@ html.theme-light .inbox-thread-head {
   color: var(--fc-ink);
 }
 
+/* Inline "Read more" button — sits at the end of the truncated paragraph,
+   expands the full body in place via the expand-text Stimulus controller. */
+.fc-breath-readmore {
+  display: inline;
+  margin-left: 0.25rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  color: var(--fc-accent);
+}
+.fc-breath-readmore:hover { text-decoration: underline; }
+
 /* Offline page */
 .fc-offline {
   min-height: 70vh;

@@ -4,59 +4,47 @@
 
 import { application } from "./application"
 
-import DropdownController from "./dropdown_controller"
-application.register("dropdown", DropdownController)
-
-import FlashController from "./flash_controller"
-application.register("flash", FlashController)
-
-import ReplyToggleController from "./reply_toggle_controller"
-application.register("reply-toggle", ReplyToggleController)
-
-import ThemeController from "./theme_controller"
-application.register("theme", ThemeController)
-
-import ReactionsController from "./reactions_controller"
-application.register("reactions", ReactionsController)
-
-import PostFormController from "./post_form_controller"
-application.register("post-form", PostFormController)
-
-import EmojiPickerController from "./emoji_picker_controller"
-application.register("emoji-picker", EmojiPickerController)
-
-import MentionsController from "./mentions_controller"
-application.register("mentions", MentionsController)
-
-import TypingController from "./typing_controller"
-application.register("typing", TypingController)
-
-import ComposerModalController from "./composer_modal_controller"
-application.register("composer-modal", ComposerModalController)
-
-import ShareController from "./share_controller"
-application.register("share", ShareController)
-
-import ThreadToggleController from "./thread_toggle_controller"
-application.register("thread-toggle", ThreadToggleController)
-
-import EmojiReactionsController from "./emoji_reactions_controller"
-application.register("emoji-reactions", EmojiReactionsController)
+import ComposerAssistantController from "./composer_assistant_controller"
+application.register("composer-assistant", ComposerAssistantController)
 
 import ComposerController from "./composer_controller"
 application.register("composer", ComposerController)
 
-import TocController from "./toc_controller"
-application.register("toc", TocController)
+import ComposerModalController from "./composer_modal_controller"
+application.register("composer-modal", ComposerModalController)
 
 import ComposerModeController from "./composer_mode_controller"
 application.register("composer-mode", ComposerModeController)
 
+import DiscoverController from "./discover_controller"
+application.register("discover", DiscoverController)
+
+import DmComposerController from "./dm_composer_controller"
+application.register("dm-composer", DmComposerController)
+
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
+import EmojiPickerController from "./emoji_picker_controller"
+application.register("emoji-picker", EmojiPickerController)
+
+import EmojiReactionsController from "./emoji_reactions_controller"
+application.register("emoji-reactions", EmojiReactionsController)
+
+import ExpandTextController from "./expand_text_controller"
+application.register("expand-text", ExpandTextController)
+
+import FlashController from "./flash_controller"
+application.register("flash", FlashController)
+
 import GoldenCarouselController from "./golden_carousel_controller"
 application.register("golden-carousel", GoldenCarouselController)
 
-import DiscoverController from "./discover_controller"
-application.register("discover", DiscoverController)
+import HelloController from "./hello_controller"
+application.register("hello", HelloController)
+
+import MentionsController from "./mentions_controller"
+application.register("mentions", MentionsController)
 
 import MessageEditController from "./message_edit_controller"
 application.register("message-edit", MessageEditController)
@@ -64,14 +52,32 @@ application.register("message-edit", MessageEditController)
 import NotificationsModalController from "./notifications_modal_controller"
 application.register("notifications-modal", NotificationsModalController)
 
-import ScriptureController from "./scripture_controller"
-application.register("scripture", ScriptureController)
-
-import ComposerAssistantController from "./composer_assistant_controller"
-application.register("composer-assistant", ComposerAssistantController)
+import PostFormController from "./post_form_controller"
+application.register("post-form", PostFormController)
 
 import PwaController from "./pwa_controller"
 application.register("pwa", PwaController)
 
-import DmComposerController from "./dm_composer_controller"
-application.register("dm-composer", DmComposerController)
+import ReactionsController from "./reactions_controller"
+application.register("reactions", ReactionsController)
+
+import ReplyToggleController from "./reply_toggle_controller"
+application.register("reply-toggle", ReplyToggleController)
+
+import ScriptureController from "./scripture_controller"
+application.register("scripture", ScriptureController)
+
+import ShareController from "./share_controller"
+application.register("share", ShareController)
+
+import ThemeController from "./theme_controller"
+application.register("theme", ThemeController)
+
+import ThreadToggleController from "./thread_toggle_controller"
+application.register("thread-toggle", ThreadToggleController)
+
+import TocController from "./toc_controller"
+application.register("toc", TocController)
+
+import TypingController from "./typing_controller"
+application.register("typing", TypingController)
