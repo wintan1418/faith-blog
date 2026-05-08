@@ -76,7 +76,9 @@
                 <div class="home-author-copy">
                   <div>
                     <strong><%= post.anonymous? ? "Anonymous" : post.user.display_name %></strong>
-                    <%= link_to post.room.name, room_path(post.room), class: "home-room-pill" %>
+                    <% if post.room %>
+                      <%= link_to post.room.name, room_path(post.room), class: "home-room-pill" %>
+                    <% end %>
                   </div>
                   <span><%= time_ago_short(post.published_at || post.created_at) %> ago · <%= pluralize(post.reading_time, "min") %> read</span>
                 </div>
