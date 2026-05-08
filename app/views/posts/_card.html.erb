@@ -78,16 +78,19 @@
       </header>
 
       <%
-        plain_text  = post.content.to_plain_text.to_s
-        needs_clamp = plain_text.length > 240
+        plain_text   = post.content.to_plain_text.to_s
+        # Body is clamped to 3 lines by the base .fc-breath-copy rule. Roughly
+        # 50 chars per line on the card width, so anything over ~150 chars is
+        # very likely to overflow and need a "…more" affordance.
+        likely_overflow = plain_text.length > 150
       %>
       <div class="fc-breath-body" data-controller="expand-text">
         <% if post.display_title %>
           <%= link_to post.display_title, post_path(post), class: "fc-breath-title hover:text-[var(--fc-accent)]" %>
         <% end %>
-        <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %><%= ' is-clamped' if needs_clamp %>"
+        <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>"
              data-expand-text-target="copy"><%= simple_format(plain_text, {}, sanitize: false) %></div>
-        <% if needs_clamp %>
+        <% if likely_overflow %>
           <button type="button"
                   class="fc-breath-readmore"
                   data-expand-text-target="toggle"

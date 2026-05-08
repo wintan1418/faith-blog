@@ -9,7 +9,7 @@ export default class extends Controller {
   expand(event) {
     event.preventDefault()
     event.stopPropagation()
-    if (this.hasCopyTarget) this.copyTarget.classList.remove("is-clamped")
+    if (this.hasCopyTarget) this.copyTarget.classList.add("is-expanded")
     if (this.hasToggleTarget) this.toggleTarget.remove()
   }
 }

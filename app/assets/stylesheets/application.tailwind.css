@@ -12558,14 +12558,13 @@ html.theme-light .inbox-thread-head {
 }
 .fc-breath-readmore:hover { text-decoration: underline; }
 
-/* LinkedIn-style line clamp. Full content stays in the DOM; only the visual
-   is truncated. Clicking "…more" removes this class to reveal everything. */
-.fc-breath-copy.is-clamped {
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* The base .fc-breath-copy rule already clamps to 3 lines via -webkit-box.
+   Clicking "…more" adds .is-expanded to fully reveal the content in place. */
+.fc-breath-copy.is-expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow: visible;
 }
 
 /* Offline page */
