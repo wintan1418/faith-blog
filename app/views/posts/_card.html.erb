@@ -78,24 +78,20 @@
       </header>
 
       <%
-        plain_text   = post.content.to_plain_text.to_s
-        short_text   = plain_text.length > 240 ? plain_text[0, 240].rstrip + "…" : plain_text
-        is_truncated = plain_text.length > 240
+        plain_text  = post.content.to_plain_text.to_s
+        needs_clamp = plain_text.length > 240
       %>
       <div class="fc-breath-body" data-controller="expand-text">
         <% if post.display_title %>
           <%= link_to post.display_title, post_path(post), class: "fc-breath-title hover:text-[var(--fc-accent)]" %>
         <% end %>
-        <% if is_truncated %>
-          <p class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>" data-expand-text-target="short"><%= short_text %>
-            <button type="button"
-                    class="fc-breath-readmore"
-                    data-expand-text-target="toggle"
-                    data-action="click->expand-text#expand">Read more</button>
-          </p>
-          <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>" data-expand-text-target="full" style="display: none;"><%= simple_format(plain_text, {}, sanitize: false) %></div>
-        <% else %>
-          <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>"><%= simple_format(plain_text, {}, sanitize: false) %></div>
+        <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %><%= ' is-clamped' if needs_clamp %>"
+             data-expand-text-target="copy"><%= simple_format(plain_text, {}, sanitize: false) %></div>
+        <% if needs_clamp %>
+          <button type="button"
+                  class="fc-breath-readmore"
+                  data-expand-text-target="toggle"
+                  data-action="click->expand-text#expand">…more</button>
         <% end %>
       </div>
 

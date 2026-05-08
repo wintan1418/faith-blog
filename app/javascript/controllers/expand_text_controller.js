@@ -1,22 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Toggles between a truncated breath body and the full version, in place,
-// without leaving the feed. Uses inline style.display so site CSS for
-// .fc-breath-copy can't beat the hide rule on specificity.
+// LinkedIn-style "…more" expander. The full content is always in the DOM;
+// CSS clamps the visible height. Click removes the clamp class and the
+// button. No display:none, no duplicate nodes, no nesting traps.
 export default class extends Controller {
-  static targets = ["short", "full", "toggle"]
-
-  connect() {
-    if (this.hasFullTarget) this.fullTarget.style.display = "none"
-  }
+  static targets = ["copy", "toggle"]
 
   expand(event) {
     event.preventDefault()
     event.stopPropagation()
-    if (!this.hasShortTarget || !this.hasFullTarget) return
-
-    this.shortTarget.style.display = "none"
-    this.fullTarget.style.display = ""
+    if (this.hasCopyTarget) this.copyTarget.classList.remove("is-clamped")
     if (this.hasToggleTarget) this.toggleTarget.remove()
   }
 }

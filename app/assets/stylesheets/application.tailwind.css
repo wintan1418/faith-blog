@@ -12543,11 +12543,11 @@ html.theme-light .inbox-thread-head {
   color: var(--fc-ink);
 }
 
-/* Inline "Read more" button — sits at the end of the truncated paragraph,
-   expands the full body in place via the expand-text Stimulus controller. */
+/* Inline "…more" button — sits below the clamped breath copy and removes
+   the clamp on click via the expand-text Stimulus controller. */
 .fc-breath-readmore {
-  display: inline;
-  margin-left: 0.25rem;
+  display: inline-block;
+  margin-top: 0.25rem;
   padding: 0;
   background: none;
   border: 0;
@@ -12557,6 +12557,16 @@ html.theme-light .inbox-thread-head {
   color: var(--fc-accent);
 }
 .fc-breath-readmore:hover { text-decoration: underline; }
+
+/* LinkedIn-style line clamp. Full content stays in the DOM; only the visual
+   is truncated. Clicking "…more" removes this class to reveal everything. */
+.fc-breath-copy.is-clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* Offline page */
 .fc-offline {
