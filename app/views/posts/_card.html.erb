@@ -93,9 +93,9 @@
                     data-expand-text-target="toggle"
                     data-action="click->expand-text#expand">Read more</button>
           </p>
-          <p class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>" data-expand-text-target="full" style="display: none;"><%= simple_format(plain_text, {}, sanitize: false) %></p>
+          <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>" data-expand-text-target="full" style="display: none;"><%= simple_format(plain_text, {}, sanitize: false) %></div>
         <% else %>
-          <p class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>"><%= simple_format(plain_text, {}, sanitize: false) %></p>
+          <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>"><%= simple_format(plain_text, {}, sanitize: false) %></div>
         <% end %>
       </div>
 
