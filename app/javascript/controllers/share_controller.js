@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import html2canvas from "html2canvas"
 
 export default class extends Controller {
   static values = {
@@ -91,44 +90,24 @@ export default class extends Controller {
   async snapshot(event) {
     event.preventDefault()
     this.hide()
-    this.openProgress("Preparing snapshot…", "Laying out your breath at 1080×1350")
-
-    const node = this.buildSnapshotNode()
-    document.body.appendChild(node)
+    this.openProgress("Preparing snapshot…", "Drawing your breath")
 
     try {
-      // Give the browser two frames so the overlay paints and the snapshot
-      // node lays out fonts before we hand the main thread to html2canvas.
-      await this.nextFrame()
-      await this.nextFrame()
-
-      // If the post has an image, wait for it to actually decode before we
-      // capture — otherwise html2canvas snapshots an empty box. Hard-cap
-      // the wait so a missing/blocked image can't stall the whole share.
-      const img = node.querySelector("img")
-      if (img && !img.complete) {
-        this.updateProgress("Loading attachment…", "Waiting for the image to decode")
-        await new Promise((resolve) => {
-          const t = setTimeout(resolve, 4000)
-          img.onload  = () => { clearTimeout(t); resolve() }
-          img.onerror = () => { clearTimeout(t); resolve() }
-        })
+      let postImage = null
+      if (this.imageValue && this.imageValue.length > 1) {
+        this.updateProgress("Loading attachment…", "Fetching the image")
+        await this.nextFrame()
+        try {
+          postImage = await this.loadImage(this.imageValue)
+        } catch (e) {
+          console.warn("Snapshot: image failed to load, continuing without it", e)
+        }
       }
 
-      this.updateProgress("Rendering image…", "This can take a few seconds")
-      // One more frame so the "Rendering" text is on screen before html2canvas
-      // takes over the main thread.
+      this.updateProgress("Rendering image…", "Almost there")
       await this.nextFrame()
 
-      const canvas = await html2canvas(node, {
-        backgroundColor: "#0b0f10",
-        scale: 1,
-        useCORS: true,
-        logging: false,
-        imageTimeout: 4000,
-        windowWidth: 1080,
-        windowHeight: 1350
-      })
+      const canvas = this.drawSnapshotCanvas(postImage)
 
       this.updateProgress("Saving file…", "Almost done")
       await this.nextFrame()
@@ -151,9 +130,18 @@ export default class extends Controller {
       console.error("Snapshot error:", err)
       this.closeProgress()
       this.flash(`Snapshot failed: ${err.message || err}`, true)
-    } finally {
-      node.remove()
     }
+  }
+
+  loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.crossOrigin = "anonymous"
+      const timer = setTimeout(() => reject(new Error("image load timeout")), 6000)
+      img.onload  = () => { clearTimeout(timer); resolve(img) }
+      img.onerror = (e) => { clearTimeout(timer); reject(e) }
+      img.src = src
+    })
   }
 
   nextFrame() {
@@ -194,76 +182,208 @@ export default class extends Controller {
     if (overlay) overlay.remove()
   }
 
-  buildSnapshotNode() {
-    const wrap = document.createElement("div")
-    wrap.style.cssText = `
-      position: fixed; top: 0; left: 0;
-      width: 1080px; height: 1350px;
-      transform: translate(-200vw, 0);
-      background: linear-gradient(160deg, #0b0f10 0%, #111a18 60%, #0e1f1a 100%);
-      color: #f4faf7;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      padding: 72px 72px 88px;
-      box-sizing: border-box;
-      display: flex; flex-direction: column; gap: 28px;
-    `
+  drawSnapshotCanvas(postImage) {
+    const W = 1080, H = 1350
+    const PAD_X = 72, PAD_TOP = 72, PAD_BOTTOM = 88
+    const innerW = W - PAD_X * 2
+    const FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
 
-    const safe = (s) => (s || "").replace(/[<>]/g, "")
-    const title   = safe(this.titleValue)
-    const snippet = safe(this.snippetValue)
-    const author  = safe(this.authorValue || "anonymous")
-    const hasImage = !!(this.imageValue && this.imageValue.length > 1)
+    const canvas = document.createElement("canvas")
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext("2d")
 
-    // Scale the body font so longer breaths still fit a single 1080×1350 frame
-    // without overflowing. Tighter ramp when an image takes ~460px of vertical.
-    const len = snippet.length
-    let bodyFont, bodyLine
-    if (hasImage) {
-      bodyFont = len > 700 ? 22 : len > 400 ? 26 : len > 200 ? 28 : 30
-      bodyLine = 1.4
-    } else {
-      bodyFont = len > 1100 ? 22 : len > 700 ? 26 : len > 400 ? 30 : 34
-      bodyLine = bodyFont >= 30 ? 1.45 : 1.4
+    // Background — diagonal gradient matching the previous look.
+    const bg = ctx.createLinearGradient(0, 0, W, H)
+    bg.addColorStop(0,   "#0b0f10")
+    bg.addColorStop(0.6, "#111a18")
+    bg.addColorStop(1,   "#0e1f1a")
+    ctx.fillStyle = bg
+    ctx.fillRect(0, 0, W, H)
+
+    const title   = (this.titleValue   || "").replace(/[<>]/g, "")
+    const snippet = (this.snippetValue || "").replace(/[<>]/g, "")
+    const author  = (this.authorValue  || "anonymous").replace(/[<>]/g, "")
+    const hasImage = !!postImage
+
+    let y = PAD_TOP
+
+    // Brand badge + name
+    const badge = 44
+    this.roundedRectPath(ctx, PAD_X, y, badge, badge, 12)
+    ctx.fillStyle = "#34d399"
+    ctx.fill()
+    ctx.fillStyle = "#042f1d"
+    ctx.font = `900 22px ${FONT}`
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+    ctx.fillText("B", PAD_X + badge / 2, y + badge / 2 + 2)
+
+    ctx.fillStyle = "#c8d3cf"
+    ctx.font = `800 22px ${FONT}`
+    ctx.textAlign = "left"
+    ctx.textBaseline = "middle"
+    ctx.fillText("Faith Community", PAD_X + badge + 14, y + badge / 2 + 1)
+
+    y += badge + 28
+
+    // Eyebrow — "A BREATH" with letter-spacing
+    ctx.fillStyle = "#34d399"
+    ctx.font = `800 16px ${FONT}`
+    ctx.textAlign = "left"
+    ctx.textBaseline = "top"
+    this.drawTrackedText(ctx, "A BREATH", PAD_X, y, 16 * 0.22)
+    y += 16 + 18
+
+    // Title (optional)
+    if (title) {
+      const titleSize = title.length > 60 ? 44 : 56
+      ctx.fillStyle = "#ffffff"
+      ctx.font = `900 ${titleSize}px ${FONT}`
+      const lines = this.wrapText(ctx, title, innerW)
+      const lh = titleSize * 1.12
+      lines.forEach((line, i) => ctx.fillText(line, PAD_X, y + i * lh))
+      y += lines.length * lh + 18
     }
-    const titleFont = title ? (title.length > 60 ? 44 : 56) : 0
 
-    const titleBlock = title
-      ? `<h1 style="margin:0;font-size:${titleFont}px;line-height:1.12;font-weight:900;color:#ffffff;flex-shrink:0;">${title}</h1>`
-      : ""
+    // Image (optional) — cover-fit into rounded box.
+    if (hasImage) {
+      const imgH = 460
+      ctx.save()
+      this.roundedRectPath(ctx, PAD_X, y, innerW, imgH, 18)
+      ctx.fillStyle = "#0f1c19"
+      ctx.fill()
+      ctx.clip()
+      const ratio = postImage.naturalWidth / postImage.naturalHeight
+      const target = innerW / imgH
+      let dw, dh, dx, dy
+      if (ratio > target) {
+        dh = imgH; dw = imgH * ratio
+        dx = PAD_X - (dw - innerW) / 2; dy = y
+      } else {
+        dw = innerW; dh = innerW / ratio
+        dx = PAD_X; dy = y - (dh - imgH) / 2
+      }
+      ctx.drawImage(postImage, dx, dy, dw, dh)
+      ctx.restore()
+      y += imgH + 18
+    }
 
-    const imageBlock = hasImage
-      ? `<div style="border-radius:18px;overflow:hidden;height:460px;background:#0f1c19;flex-shrink:0;">
-           <img src="${this.imageValue}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;display:block;" />
-         </div>`
-      : ""
+    // Footer geometry — compute first so body knows where to stop.
+    const avatarSize = 48
+    const footerTop = H - PAD_BOTTOM - avatarSize           // top of avatar
+    const dividerY  = footerTop - 24                        // 24px padding-top
+    const bodyMaxBottom = dividerY - 14
 
-    wrap.innerHTML = `
-      <div style="display:flex;align-items:center;gap:14px;font-weight:800;flex-shrink:0;">
-        <div style="width:44px;height:44px;border-radius:12px;background:#34d399;display:flex;align-items:center;justify-content:center;color:#042f1d;font-weight:900;font-size:22px;">B</div>
-        <div style="font-size:22px;color:#c8d3cf;">Faith Community</div>
-      </div>
+    // Body text
+    const len = snippet.length
+    let bodySize, bodyLineMul
+    if (hasImage) {
+      bodySize    = len > 700 ? 22 : len > 400 ? 26 : len > 200 ? 28 : 30
+      bodyLineMul = 1.4
+    } else {
+      bodySize    = len > 1100 ? 22 : len > 700 ? 26 : len > 400 ? 30 : 34
+      bodyLineMul = bodySize >= 30 ? 1.45 : 1.4
+    }
 
-      <div style="display:flex;flex-direction:column;gap:18px;flex:1 1 auto;min-height:0;">
-        <div style="font-size:16px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:#34d399;flex-shrink:0;">A Breath</div>
-        ${titleBlock}
-        ${imageBlock}
-        <div style="font-size:${bodyFont}px;line-height:${bodyLine};color:#dde6e2;font-weight:400;white-space:pre-wrap;overflow:hidden;flex:1 1 auto;">${snippet}</div>
-      </div>
+    ctx.fillStyle = "#dde6e2"
+    ctx.font = `400 ${bodySize}px ${FONT}`
+    ctx.textBaseline = "top"
+    const bodyLines = this.wrapText(ctx, snippet, innerW)
+    const lh = bodySize * bodyLineMul
+    const maxLines = Math.max(1, Math.floor((bodyMaxBottom - y) / lh))
+    const display  = bodyLines.slice(0, maxLines)
+    if (bodyLines.length > maxLines && display.length) {
+      let last = display[display.length - 1]
+      while (ctx.measureText(last + "…").width > innerW && last.length > 1) {
+        last = last.slice(0, -1)
+      }
+      display[display.length - 1] = last.replace(/\s+$/, "") + "…"
+    }
+    display.forEach((line, i) => ctx.fillText(line, PAD_X, y + i * lh))
 
-      <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.10);padding-top:24px;flex-shrink:0;">
-        <div style="display:flex;align-items:center;gap:14px;">
-          <div style="width:48px;height:48px;border-radius:50%;background:#34d399;color:#042f1d;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;">
-            ${safe(author.charAt(0).toUpperCase())}
-          </div>
-          <div>
-            <div style="font-weight:800;font-size:22px;color:#ffffff;">@${author}</div>
-            <div style="color:#8a9893;font-size:16px;">read more on Faith Community</div>
-          </div>
-        </div>
-        <div style="font-size:16px;color:#8a9893;font-weight:700;">Tap to read →</div>
-      </div>
-    `
-    return wrap
+    // Divider
+    ctx.strokeStyle = "rgba(255,255,255,0.10)"
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(PAD_X, dividerY)
+    ctx.lineTo(W - PAD_X, dividerY)
+    ctx.stroke()
+
+    // Avatar
+    ctx.fillStyle = "#34d399"
+    ctx.beginPath()
+    ctx.arc(PAD_X + avatarSize / 2, footerTop + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = "#042f1d"
+    ctx.font = `900 22px ${FONT}`
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+    ctx.fillText(author.charAt(0).toUpperCase(), PAD_X + avatarSize / 2, footerTop + avatarSize / 2 + 2)
+
+    // Author handle + read-more line
+    ctx.textAlign = "left"
+    ctx.textBaseline = "top"
+    ctx.fillStyle = "#ffffff"
+    ctx.font = `800 22px ${FONT}`
+    ctx.fillText("@" + author, PAD_X + avatarSize + 14, footerTop + 2)
+    ctx.fillStyle = "#8a9893"
+    ctx.font = `600 16px ${FONT}`
+    ctx.fillText("read more on Faith Community", PAD_X + avatarSize + 14, footerTop + 28)
+
+    // CTA
+    ctx.textAlign = "right"
+    ctx.fillStyle = "#8a9893"
+    ctx.font = `700 16px ${FONT}`
+    ctx.fillText("Tap to read →", W - PAD_X, footerTop + 16)
+
+    return canvas
+  }
+
+  roundedRectPath(ctx, x, y, w, h, r) {
+    ctx.beginPath()
+    ctx.moveTo(x + r, y)
+    ctx.lineTo(x + w - r, y)
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+    ctx.lineTo(x + w, y + h - r)
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+    ctx.lineTo(x + r, y + h)
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+    ctx.lineTo(x, y + r)
+    ctx.quadraticCurveTo(x, y, x + r, y)
+    ctx.closePath()
+  }
+
+  drawTrackedText(ctx, text, x, y, spacing) {
+    let cx = x
+    for (const ch of text) {
+      ctx.fillText(ch, cx, y)
+      cx += ctx.measureText(ch).width + spacing
+    }
+  }
+
+  wrapText(ctx, text, maxWidth) {
+    const out = []
+    const paragraphs = String(text).split(/\n/)
+    paragraphs.forEach((para, idx) => {
+      if (!para.trim()) {
+        if (idx !== paragraphs.length - 1) out.push("")
+        return
+      }
+      const words = para.split(/\s+/).filter(Boolean)
+      let line = ""
+      for (const w of words) {
+        const test = line ? `${line} ${w}` : w
+        if (ctx.measureText(test).width > maxWidth && line) {
+          out.push(line)
+          line = w
+        } else {
+          line = test
+        }
+      }
+      if (line) out.push(line)
+    })
+    return out
   }
 
   flash(text, error = false) {

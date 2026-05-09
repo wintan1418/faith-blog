@@ -2,7 +2,7 @@
 <%
   snippet = truncate(post.content.to_plain_text.to_s.strip, length: 1500, separator: " ")
   author  = post.anonymous? ? "anonymous" : post.user.username
-  cover   = post.has_images? ? url_for(post.images.first) : ""
+  cover   = post.has_images? ? rails_storage_proxy_url(post.images.first) : ""
 %>
 <div class="fc-share" data-controller="share"
      data-share-url-value="<%= post_url(post) %>"
