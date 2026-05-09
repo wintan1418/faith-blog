@@ -103,6 +103,14 @@ class Post < ApplicationRecord
   after_commit :bump_author_streak, on: :create, if: -> { published? && moderation_approved? }
   after_update_commit :bump_author_streak_on_publish
 
+  # Live "new breaths" pill on the public feed. Drops a hidden marker into
+  # #feed_incoming for anyone subscribed; a Stimulus controller counts the
+  # markers and shows the pill. Fires on initial publish and on moderator
+  # release.
+  after_commit :broadcast_to_public_feed, on: :create, if: :feed_visible?
+  after_update_commit :broadcast_to_public_feed,
+                      if: -> { saved_change_to_moderation_status? && feed_visible? }
+
   # Instance methods
   def engagement_score
     likes_count * 2 + comments_count * 3 + views_count * 0.1
@@ -151,6 +159,10 @@ class Post < ApplicationRecord
 
   def has_images?
     images.attached? && images.any?
+  end
+
+  def feed_visible?
+    published? && published_at.present? && published_at <= Time.current && moderation_approved?
   end
 
   def held_for_review?
@@ -204,6 +216,16 @@ class Post < ApplicationRecord
 
   def fanout_to_followers
     BreathFanoutJob.perform_later(id)
+  end
+
+  def broadcast_to_public_feed
+    Turbo::StreamsChannel.broadcast_prepend_to(
+      "feed:public",
+      target: "feed_incoming",
+      html: %(<div data-post-arrival="#{id}" hidden></div>).html_safe
+    )
+  rescue StandardError => e
+    Rails.logger.warn "[feed-pill] broadcast failed for post #{id}: #{e.message}"
   end
 
   def fanout_to_followers_on_publish

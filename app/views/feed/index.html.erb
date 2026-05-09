@@ -91,28 +91,43 @@
         </div>
       </div>
 
-      <div class="mt-4 space-y-3">
-        <% if @items.any? %>
-          <% @items.each do |item| %>
-            <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
-          <% end %>
+      <div data-controller="new-posts-pill">
+        <%= turbo_stream_from "feed:public" %>
+        <div id="feed_incoming" hidden data-new-posts-pill-target="bucket"></div>
 
-          <% if @pagy.pages > 1 %>
-            <div class="pt-4">
-              <%== pagy_nav(@pagy) %>
+        <button type="button"
+                class="fc-new-posts-pill hidden"
+                data-new-posts-pill-target="pill"
+                data-action="click->new-posts-pill#flush"
+                aria-live="polite">
+          <%= render_icon("sparkles", classes: "h-3.5 w-3.5") %>
+          <span data-new-posts-pill-target="count">0</span>
+          <span data-new-posts-pill-target="label">new breaths</span>
+        </button>
+
+        <div class="mt-4 space-y-3">
+          <% if @items.any? %>
+            <% @items.each do |item| %>
+              <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+            <% end %>
+
+            <% if @pagy.pages > 1 %>
+              <div class="pt-4">
+                <%== pagy_nav(@pagy) %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="fc-panel p-8 text-center">
+              <h2 class="text-lg font-bold text-[var(--fc-ink)]">No breaths yet</h2>
+              <p class="mt-2 text-sm text-[var(--fc-muted)]">Start the first conversation.</p>
+              <button type="button"
+                      class="fc-btn fc-btn-primary mt-5"
+                      data-action="click->composer-modal#open">
+                Take a breath
+              </button>
             </div>
           <% end %>
-        <% else %>
-          <div class="fc-panel p-8 text-center">
-            <h2 class="text-lg font-bold text-[var(--fc-ink)]">No breaths yet</h2>
-            <p class="mt-2 text-sm text-[var(--fc-muted)]">Start the first conversation.</p>
-            <button type="button"
-                    class="fc-btn fc-btn-primary mt-5"
-                    data-action="click->composer-modal#open">
-              Take a breath
-            </button>
-          </div>
-        <% end %>
+        </div>
       </div>
     </main>
 

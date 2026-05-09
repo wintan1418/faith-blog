@@ -48,8 +48,22 @@
           <% end %>
           <span class="fc-breath-dot">·</span>
           <span class="fc-breath-time"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
+        </div>
+        <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
+          <%= link_to edit_post_path(post), class: "fc-action", title: "Edit breath" do %>
+            <%= render_icon("pencil", classes: "h-4 w-4") %>
+          <% end %>
+        <% end %>
+      </header>
+
+      <%
+        has_meta = post.room || post.featured? || post.threaded? ||
+                   post.prayer_status_prayer_pending? || post.prayer_status_prayer_answered?
+      %>
+      <% if has_meta %>
+        <div class="fc-breath-meta">
           <% if post.room %>
-            <%= link_to post.room.name, room_path(post.room), class: "fc-badge ml-1" %>
+            <%= link_to post.room.name, room_path(post.room), class: "fc-badge" %>
           <% end %>
           <% if post.featured? %>
             <span class="fc-featured-tag">★ Featured</span>
@@ -70,12 +84,7 @@
             </span>
           <% end %>
         </div>
-        <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
-          <%= link_to edit_post_path(post), class: "fc-action", title: "Edit breath" do %>
-            <%= render_icon("pencil", classes: "h-4 w-4") %>
-          <% end %>
-        <% end %>
-      </header>
+      <% end %>
 
       <%
         plain_text   = post.content.to_plain_text.to_s
@@ -99,8 +108,14 @@
       </div>
 
       <% if post.has_images? %>
-        <%= link_to post_path(post), class: "fc-breath-media" do %>
-          <%= image_tag post.images.first, class: "fc-breath-media-image", alt: post.title %>
+        <%
+          imgs = post.images.first(4)
+          grid_class = "fc-breath-media-grid is-#{imgs.size}"
+        %>
+        <%= link_to post_path(post), class: grid_class do %>
+          <% imgs.each do |img| %>
+            <%= image_tag img, class: "fc-breath-media-image", alt: post.title, loading: "lazy" %>
+          <% end %>
         <% end %>
       <% end %>
 

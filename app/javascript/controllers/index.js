@@ -49,6 +49,9 @@ application.register("mentions", MentionsController)
 import MessageEditController from "./message_edit_controller"
 application.register("message-edit", MessageEditController)
 
+import NewPostsPillController from "./new_posts_pill_controller"
+application.register("new-posts-pill", NewPostsPillController)
+
 import NotificationsModalController from "./notifications_modal_controller"
 application.register("notifications-modal", NotificationsModalController)
 

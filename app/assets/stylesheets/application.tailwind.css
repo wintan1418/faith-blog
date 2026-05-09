@@ -8613,6 +8613,39 @@ html.theme-dark .fc-held-banner {
   to   { opacity: 1; }
 }
 
+.fc-new-posts-pill {
+  position: fixed;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+  font-size: 0.82rem;
+  font-weight: 800;
+  border: 0;
+  cursor: pointer;
+  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.45);
+  animation: fc-new-pill-pop 220ms ease-out;
+  transition: filter 140ms ease;
+}
+
+.fc-new-posts-pill.hidden { display: none; }
+
+.fc-new-posts-pill:hover { filter: brightness(1.06); }
+
+.fc-new-posts-pill svg { flex-shrink: 0; }
+
+@keyframes fc-new-pill-pop {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
 /* ============================================================
    ✦ BREATH CARD — Twitter-style two-column layout
    Avatar in left rail, content right.
@@ -8684,6 +8717,24 @@ html.theme-dark .fc-held-banner {
   font-weight: 700;
 }
 
+.fc-breath-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.05rem 0 0.4rem;
+  opacity: 0.92;
+}
+
+.fc-breath-meta .fc-badge,
+.fc-breath-meta .fc-featured-tag,
+.fc-breath-meta .fc-thread-chip,
+.fc-breath-meta .fc-prayer-chip {
+  font-size: 0.72rem;
+  padding-block: 0.18rem;
+  padding-inline: 0.5rem;
+}
+
 .fc-breath-body {
   display: block;
   color: var(--fc-ink);
@@ -8724,6 +8775,50 @@ html.theme-dark .fc-held-banner {
   max-height: 420px;
   object-fit: cover;
   display: block;
+}
+
+.fc-breath-media-grid {
+  display: grid;
+  margin-top: 0.9rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--fc-line);
+  max-width: 100%;
+  gap: 3px;
+  background: var(--fc-line);
+}
+
+.fc-breath-media-grid .fc-breath-media-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  max-height: none;
+}
+
+.fc-breath-media-grid.is-1 .fc-breath-media-image {
+  max-height: 420px;
+  height: auto;
+}
+
+.fc-breath-media-grid.is-2 {
+  grid-template-columns: 1fr 1fr;
+  aspect-ratio: 16 / 9;
+}
+
+.fc-breath-media-grid.is-3 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  aspect-ratio: 4 / 3;
+}
+.fc-breath-media-grid.is-3 .fc-breath-media-image:first-child {
+  grid-row: 1 / span 2;
+}
+
+.fc-breath-media-grid.is-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  aspect-ratio: 1 / 1;
 }
 
 .fc-breath-tags {
