@@ -8553,6 +8553,66 @@ html.theme-dark .fc-held-banner {
   color: #fff;
 }
 
+.fc-snapshot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 12, 14, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fc-snap-fade 140ms ease-out;
+}
+
+.fc-snapshot-overlay.is-hidden { display: none; }
+
+.fc-snapshot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 240px;
+  max-width: 320px;
+  padding: 1.5rem 1.75rem 1.6rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+
+.fc-snapshot-spinner {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 3px solid var(--fc-line);
+  border-top-color: var(--fc-accent);
+  animation: fc-snap-spin 800ms linear infinite;
+}
+
+.fc-snapshot-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--fc-ink);
+}
+
+.fc-snapshot-detail {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--fc-ink-muted, #8a9893);
+}
+
+@keyframes fc-snap-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fc-snap-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* ============================================================
    ✦ BREATH CARD — Twitter-style two-column layout
    Avatar in left rail, content right.

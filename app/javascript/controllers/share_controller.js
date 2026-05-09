@@ -91,14 +91,21 @@ export default class extends Controller {
   async snapshot(event) {
     event.preventDefault()
     this.hide()
-    this.flash("Rendering snapshot...")
+    this.openProgress("Preparing snapshot…", "Laying out your breath at 1080×1350")
 
     const node = this.buildSnapshotNode()
     document.body.appendChild(node)
 
     try {
-      // Give the browser one frame to lay out fonts before capturing.
-      await new Promise(r => requestAnimationFrame(() => r()))
+      // Give the browser two frames so the overlay paints and the snapshot
+      // node lays out fonts before we hand the main thread to html2canvas.
+      await this.nextFrame()
+      await this.nextFrame()
+
+      this.updateProgress("Rendering image…", "This can take a few seconds")
+      // One more frame so the "Rendering" text is on screen before html2canvas
+      // takes over the main thread.
+      await this.nextFrame()
 
       const canvas = await html2canvas(node, {
         backgroundColor: "#0b0f10",
@@ -108,6 +115,9 @@ export default class extends Controller {
         windowWidth: 1080,
         windowHeight: 1350
       })
+
+      this.updateProgress("Saving file…", "Almost done")
+      await this.nextFrame()
 
       const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"))
       if (!blob) throw new Error("toBlob returned null")
@@ -121,13 +131,53 @@ export default class extends Controller {
       a.remove()
       URL.revokeObjectURL(url)
 
+      this.closeProgress()
       this.flash("Saved to your downloads")
     } catch (err) {
       console.error("Snapshot error:", err)
+      this.closeProgress()
       this.flash(`Snapshot failed: ${err.message || err}`, true)
     } finally {
       node.remove()
     }
+  }
+
+  nextFrame() {
+    return new Promise(r => requestAnimationFrame(() => r()))
+  }
+
+  openProgress(title, detail) {
+    let overlay = document.getElementById("fc-snapshot-overlay")
+    if (!overlay) {
+      overlay = document.createElement("div")
+      overlay.id = "fc-snapshot-overlay"
+      overlay.className = "fc-snapshot-overlay"
+      overlay.innerHTML = `
+        <div class="fc-snapshot-card" role="dialog" aria-live="polite" aria-busy="true">
+          <div class="fc-snapshot-spinner" aria-hidden="true"></div>
+          <div class="fc-snapshot-title">${title}</div>
+          <div class="fc-snapshot-detail">${detail}</div>
+        </div>
+      `
+      document.body.appendChild(overlay)
+    } else {
+      this.updateProgress(title, detail)
+      overlay.classList.remove("is-hidden")
+    }
+  }
+
+  updateProgress(title, detail) {
+    const overlay = document.getElementById("fc-snapshot-overlay")
+    if (!overlay) return
+    const t = overlay.querySelector(".fc-snapshot-title")
+    const d = overlay.querySelector(".fc-snapshot-detail")
+    if (t) t.textContent = title
+    if (d) d.textContent = detail
+  }
+
+  closeProgress() {
+    const overlay = document.getElementById("fc-snapshot-overlay")
+    if (overlay) overlay.remove()
   }
 
   buildSnapshotNode() {
