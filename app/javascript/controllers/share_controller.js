@@ -102,6 +102,19 @@ export default class extends Controller {
       await this.nextFrame()
       await this.nextFrame()
 
+      // If the post has an image, wait for it to actually decode before we
+      // capture — otherwise html2canvas snapshots an empty box. Hard-cap
+      // the wait so a missing/blocked image can't stall the whole share.
+      const img = node.querySelector("img")
+      if (img && !img.complete) {
+        this.updateProgress("Loading attachment…", "Waiting for the image to decode")
+        await new Promise((resolve) => {
+          const t = setTimeout(resolve, 4000)
+          img.onload  = () => { clearTimeout(t); resolve() }
+          img.onerror = () => { clearTimeout(t); resolve() }
+        })
+      }
+
       this.updateProgress("Rendering image…", "This can take a few seconds")
       // One more frame so the "Rendering" text is on screen before html2canvas
       // takes over the main thread.
@@ -109,9 +122,10 @@ export default class extends Controller {
 
       const canvas = await html2canvas(node, {
         backgroundColor: "#0b0f10",
-        scale: 2,
+        scale: 1,
         useCORS: true,
         logging: false,
+        imageTimeout: 4000,
         windowWidth: 1080,
         windowHeight: 1350
       })
@@ -189,49 +203,64 @@ export default class extends Controller {
       background: linear-gradient(160deg, #0b0f10 0%, #111a18 60%, #0e1f1a 100%);
       color: #f4faf7;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      padding: 80px 80px 100px;
+      padding: 72px 72px 88px;
       box-sizing: border-box;
-      display: flex; flex-direction: column; justify-content: space-between;
+      display: flex; flex-direction: column; gap: 28px;
     `
 
     const safe = (s) => (s || "").replace(/[<>]/g, "")
     const title   = safe(this.titleValue)
     const snippet = safe(this.snippetValue)
+    const author  = safe(this.authorValue || "anonymous")
+    const hasImage = !!(this.imageValue && this.imageValue.length > 1)
 
     // Scale the body font so longer breaths still fit a single 1080×1350 frame
-    // without overflowing. Numbers chosen empirically against ~920px line width.
+    // without overflowing. Tighter ramp when an image takes ~460px of vertical.
     const len = snippet.length
-    const bodyFont = len > 1100 ? 22 : len > 700 ? 26 : len > 400 ? 30 : 34
-    const bodyLine = bodyFont >= 30 ? 1.45 : 1.4
-    const titleFont = title ? (title.length > 60 ? 48 : 64) : 0
+    let bodyFont, bodyLine
+    if (hasImage) {
+      bodyFont = len > 700 ? 22 : len > 400 ? 26 : len > 200 ? 28 : 30
+      bodyLine = 1.4
+    } else {
+      bodyFont = len > 1100 ? 22 : len > 700 ? 26 : len > 400 ? 30 : 34
+      bodyLine = bodyFont >= 30 ? 1.45 : 1.4
+    }
+    const titleFont = title ? (title.length > 60 ? 44 : 56) : 0
 
     const titleBlock = title
-      ? `<h1 style="margin:18px 0 0;font-size:${titleFont}px;line-height:1.1;font-weight:900;color:#ffffff;">${title}</h1>`
+      ? `<h1 style="margin:0;font-size:${titleFont}px;line-height:1.12;font-weight:900;color:#ffffff;flex-shrink:0;">${title}</h1>`
       : ""
-    const headerSpacing = title ? 90 : 60
-    const bodyTopMargin = title ? 36 : 28
+
+    const imageBlock = hasImage
+      ? `<div style="border-radius:18px;overflow:hidden;height:460px;background:#0f1c19;flex-shrink:0;">
+           <img src="${this.imageValue}" crossorigin="anonymous" style="width:100%;height:100%;object-fit:cover;display:block;" />
+         </div>`
+      : ""
 
     wrap.innerHTML = `
-      <div>
-        <div style="display:flex;align-items:center;gap:14px;font-weight:800;">
-          <div style="width:48px;height:48px;border-radius:12px;background:#34d399;display:flex;align-items:center;justify-content:center;color:#042f1d;font-weight:900;font-size:24px;">B</div>
-          <div style="font-size:24px;color:#c8d3cf;">Faith Community</div>
-        </div>
-        <div style="margin-top:${headerSpacing}px;font-size:18px;font-weight:800;letter-spacing:0.2em;text-transform:uppercase;color:#34d399;">A Breath</div>
-        ${titleBlock}
-        <p style="margin-top:${bodyTopMargin}px;font-size:${bodyFont}px;line-height:${bodyLine};color:#c8d3cf;font-weight:400;white-space:pre-wrap;">${snippet}</p>
+      <div style="display:flex;align-items:center;gap:14px;font-weight:800;flex-shrink:0;">
+        <div style="width:44px;height:44px;border-radius:12px;background:#34d399;display:flex;align-items:center;justify-content:center;color:#042f1d;font-weight:900;font-size:22px;">B</div>
+        <div style="font-size:22px;color:#c8d3cf;">Faith Community</div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.10);padding-top:28px;">
+
+      <div style="display:flex;flex-direction:column;gap:18px;flex:1 1 auto;min-height:0;">
+        <div style="font-size:16px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:#34d399;flex-shrink:0;">A Breath</div>
+        ${titleBlock}
+        ${imageBlock}
+        <div style="font-size:${bodyFont}px;line-height:${bodyLine};color:#dde6e2;font-weight:400;white-space:pre-wrap;overflow:hidden;flex:1 1 auto;">${snippet}</div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.10);padding-top:24px;flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:14px;">
-          <div style="width:52px;height:52px;border-radius:50%;background:#34d399;color:#042f1d;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:24px;">
-            ${safe((this.authorValue || "?").charAt(0).toUpperCase())}
+          <div style="width:48px;height:48px;border-radius:50%;background:#34d399;color:#042f1d;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;">
+            ${safe(author.charAt(0).toUpperCase())}
           </div>
           <div>
-            <div style="font-weight:800;font-size:24px;color:#ffffff;">@${safe(this.authorValue || "anonymous")}</div>
-            <div style="color:#8a9893;font-size:18px;">read more on Faith Community</div>
+            <div style="font-weight:800;font-size:22px;color:#ffffff;">@${author}</div>
+            <div style="color:#8a9893;font-size:16px;">read more on Faith Community</div>
           </div>
         </div>
-        <div style="font-size:18px;color:#8a9893;font-weight:700;">Tap to read →</div>
+        <div style="font-size:16px;color:#8a9893;font-weight:700;">Tap to read →</div>
       </div>
     `
     return wrap
