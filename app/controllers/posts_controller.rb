@@ -238,11 +238,14 @@ class PostsController < ApplicationController
 
   def redirect_target_after_create(post, verdict)
     return feed_path if verdict.block?
+    return drafts_path if post.draft?
 
     post
   end
 
   def flash_notice_for(verdict, post: nil)
+    return "Draft saved — find it under Drafts when you're ready to come back." if post&.draft?
+
     if post&.scheduled?
       return "Scheduled for #{post.scheduled_for.in_time_zone.strftime("%a %b %-d, %l:%M %p")}."
     end
