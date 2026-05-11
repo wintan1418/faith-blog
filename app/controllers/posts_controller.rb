@@ -147,10 +147,18 @@ class PostsController < ApplicationController
     return render json: { ok: false, error: "Add a few sentences first." }, status: :unprocessable_entity if text.length < 40
 
     result = Ai::Composer::ScriptureSuggester.call(content: text)
-    render json: {
-      ok: true,
-      verses: result.verses.map { |v| { reference: v.reference, reason: v.reason } }
-    }
+    # Hydrate each suggestion with the actual verse text (KJV, cached) so the
+    # composer can show the scripture itself instead of just the AI's summary.
+    verses = result.verses.map do |v|
+      payload = ScriptureLookup.lookup(v.reference) rescue nil
+      {
+        reference: payload&.dig(:reference).presence || v.reference,
+        reason:    v.reason,
+        text:      payload&.dig(:text).to_s,
+        translation: payload&.dig(:translation).presence || "KJV"
+      }
+    end
+    render json: { ok: true, verses: verses }
   rescue Ai::Composer::ScriptureSuggester::ParseError, Ai::Moderation::Client::Error => e
     Rails.logger.warn("[ScriptureSuggester] #{e.class}: #{e.message}")
     render json: { ok: false, error: "Couldn't reach the scripture suggester. Try again in a moment." }, status: :bad_gateway

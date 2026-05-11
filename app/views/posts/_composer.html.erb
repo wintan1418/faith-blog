@@ -101,6 +101,14 @@
         </label>
 
         <button type="button"
+                class="fc-composer-icon-btn"
+                title="Open Bible"
+                aria-label="Open Bible"
+                data-action="click->bible-drawer#open">
+          <%= render_icon("bookopen", classes: "h-5 w-5") %>
+        </button>
+
+        <button type="button"
                 class="fc-composer-asst-btn"
                 data-composer-assistant-target="gentlenessBtn"
                 data-action="click->composer-assistant#checkGentleness"

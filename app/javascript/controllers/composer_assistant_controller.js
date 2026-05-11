@@ -137,8 +137,18 @@ export default class extends Controller {
     }
     let html = `<div class="fc-asst-result is-scripture"><p class="fc-asst-headline">📖 Suggested scripture</p><ul class="fc-asst-verses">`
     for (const v of verses) {
-      html += `<li><a href="/scripture/lookup?reference=${encodeURIComponent(v.reference)}" data-controller="scripture" data-action="mouseenter->scripture#hoverPreview" class="fc-asst-verse-ref">${this.escape(v.reference)}</a>`
-      if (v.reason) html += ` — <span class="fc-asst-verse-reason">${this.escape(v.reason)}</span>`
+      const text = (v.text || "").trim()
+      html += `<li class="fc-asst-verse">
+        <div class="fc-asst-verse-head">
+          <span class="fc-asst-verse-ref">${this.escape(v.reference)}</span>
+          <span class="fc-asst-verse-trans">${this.escape(v.translation || "KJV")}</span>
+        </div>`
+      if (text) {
+        html += `<blockquote class="fc-asst-verse-text">${this.escape(text)}</blockquote>`
+      }
+      if (v.reason) {
+        html += `<p class="fc-asst-verse-reason">${this.escape(v.reason)}</p>`
+      }
       html += `</li>`
     }
     html += `</ul></div>`

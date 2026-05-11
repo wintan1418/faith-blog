@@ -13728,25 +13728,60 @@ html.theme-light .inbox-thread-head {
 
 .fc-asst-verses {
   list-style: none;
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
-.fc-asst-verses li {
-  font-size: 0.88rem;
-  color: var(--fc-soft);
-  line-height: 1.45;
+
+.fc-asst-verse {
+  padding: 0.65rem 0.8rem;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  border-left: 3px solid var(--fc-accent);
+  border-radius: 8px;
 }
+
+.fc-asst-verse-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
 .fc-asst-verse-ref {
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 700;
+  font-size: 0.95rem;
   color: var(--fc-accent-2);
-  text-decoration: none;
 }
-.fc-asst-verse-ref:hover { color: var(--fc-accent); text-decoration: underline; }
-.fc-asst-verse-reason { color: var(--fc-soft); }
+
+.fc-asst-verse-trans {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+
+.fc-asst-verse-text {
+  margin: 0 0 0.35rem;
+  padding: 0;
+  border: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--fc-ink);
+}
+
+.fc-asst-verse-reason {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--fc-muted);
+  line-height: 1.45;
+}
 
 /* Untitled breath body sits a touch larger so it carries the card alone */
 .fc-breath-copy.is-untitled {
