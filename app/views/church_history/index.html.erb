@@ -12,7 +12,8 @@
       </header>
 
       <section data-controller="history-arena"
-               data-history-arena-figure-url-value="<%= church_history_figure_path('SLUG') %>">
+               data-history-arena-figure-url-value="<%= church_history_figure_path('SLUG') %>"
+               data-history-arena-chronicle-url-value="<%= church_history_chronicle_path('ERA') %>">
 
         <%# ── Era tabs ─────────────────────────────────────────── %>
         <nav class="fc-era-tabs" aria-label="Eras">
@@ -35,6 +36,20 @@
               <h2 class="fc-era-title"><%= ChurchHistoryFigure::ERA_LABELS[era] %></h2>
               <p class="fc-era-desc"><%= ChurchHistoryFigure::ERA_DESCRIPTIONS[era] %></p>
             </header>
+
+            <article class="fc-era-chronicle"
+                     data-history-arena-target="chronicle"
+                     data-era="<%= era %>">
+              <% if @chronicles[era]&.summary.present? %>
+                <% @chronicles[era].summary.split(/\n\n+/).each do |para| %>
+                  <p><%= para.strip %></p>
+                <% end %>
+              <% else %>
+                <p class="fc-era-chronicle-loading">The chronicle is being written…</p>
+              <% end %>
+            </article>
+
+            <h3 class="fc-era-figures-heading">The witnesses</h3>
 
             <div class="fc-figure-grid">
               <% (@figures_by_era[era] || []).each do |fig| %>

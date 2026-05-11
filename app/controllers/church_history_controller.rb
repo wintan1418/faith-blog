@@ -9,6 +9,24 @@ class ChurchHistoryController < ApplicationController
     @figures_by_era = ChurchHistoryFigure.ordered.group_by(&:era)
     @era            = params[:era].to_s.presence || "apostolic"
     @era            = "apostolic" unless ERA_ORDER.include?(@era)
+    @chronicles     = ChurchHistoryEra.all.index_by(&:slug)
+  end
+
+  # GET /history/era/:era/chronicle — lazy AI generation
+  def chronicle
+    era = params[:era].to_s
+    return render(json: { ok: false, error: "Bad era." }, status: :bad_request) unless ERA_ORDER.include?(era)
+
+    row = ChurchHistoryEra.find_or_initialize_by(slug: era)
+    if row.summary.blank?
+      row.summary = Ai::Christian::EraChronicle.call(era: era)
+      row.generated_at = Time.current
+      row.save!
+    end
+    render json: { ok: true, chronicle: row.summary }
+  rescue Ai::Christian::EraChronicle::ParseError, Ai::Moderation::Client::Error => e
+    Rails.logger.warn("[EraChronicle] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Couldn't fetch the chronicle right now." }, status: :bad_gateway
   end
 
   # Returns the figure's bio JSON. Generates and caches on first request.

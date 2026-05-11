@@ -4,11 +4,14 @@ import { Controller } from "@hotwired/stimulus"
 // Bios are AI-generated server-side on first request and cached on the row,
 // so tapping a figure twice is instant after the first time.
 export default class extends Controller {
-  static targets = ["panel", "drawer", "drawerTitle", "drawerBody"]
-  static values  = { figureUrl: String }
+  static targets = ["panel", "drawer", "drawerTitle", "drawerBody", "chronicle"]
+  static values  = { figureUrl: String, chronicleUrl: String }
 
   connect() {
     this.boundEsc = (e) => { if (e.key === "Escape") this.closeFigure() }
+    // Lazy-load the chronicle for the currently-active era.
+    const active = this.chronicleTargets.find(c => c.closest(".fc-era-panel")?.classList.contains("is-active"))
+    if (active) this.ensureChronicle(active)
   }
 
   disconnect() {
@@ -25,6 +28,34 @@ export default class extends Controller {
     this.panelTargets.forEach(p => {
       p.classList.toggle("is-active", p.dataset.era === era)
     })
+    // Make sure this era's chronicle is loaded.
+    const chronicle = this.chronicleTargets.find(c => c.dataset.era === era)
+    if (chronicle) this.ensureChronicle(chronicle)
+  }
+
+  async ensureChronicle(el) {
+    if (el.dataset.loaded === "1") return
+    if (!el.querySelector(".fc-era-chronicle-loading")) {
+      // Already has server-rendered content.
+      el.dataset.loaded = "1"
+      return
+    }
+    const era = el.dataset.era
+    if (!era) return
+    el.dataset.loaded = "1"
+    try {
+      const url = this.chronicleUrlValue.replace("ERA", encodeURIComponent(era))
+      const response = await fetch(url, { headers: { "Accept": "application/json" } })
+      const payload = await response.json()
+      if (!payload.ok) {
+        el.innerHTML = `<p class="fc-era-chronicle-loading">${this.escape(payload.error || "Couldn't load this chronicle.")}</p>`
+        return
+      }
+      const paragraphs = String(payload.chronicle || "").split(/\n\n+/).map(s => s.trim()).filter(Boolean)
+      el.innerHTML = paragraphs.map(p => `<p>${this.escape(p)}</p>`).join("")
+    } catch {
+      el.innerHTML = `<p class="fc-era-chronicle-loading">Network error.</p>`
+    }
   }
 
   async openFigure(event) {

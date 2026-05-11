@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_11_200000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_11_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -150,6 +150,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_200000) do
     t.datetime "updated_at", null: false
     t.index ["sender_id"], name: "index_broadcasts_on_sender_id"
     t.index ["status"], name: "index_broadcasts_on_status"
+  end
+
+  create_table "church_history_eras", force: :cascade do |t|
+    t.string "slug", limit: 32, null: false
+    t.text "summary"
+    t.datetime "generated_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_church_history_eras_on_slug", unique: true
   end
 
   create_table "church_history_figures", force: :cascade do |t|

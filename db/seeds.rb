@@ -1162,3 +1162,6 @@ puts "  • Login as RachelLight - has pending request to EmilyPrayer"
 puts "  • Login as any user with complete card to send new requests"
 
 puts "\n✨ Your Faith Community is ready to grow!"
+
+puts "\n📖 Seeding church history figures…"
+load Rails.root.join("db/seeds/church_history_figures.rb")
