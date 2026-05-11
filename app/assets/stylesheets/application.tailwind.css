@@ -14217,33 +14217,27 @@ html.theme-light .inbox-thread-head {
 
 /* Discover quicklinks (mobile People + Bookmarks + Search shortcut row) */
 .fc-discover-quicklinks {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  padding: 12px 0 6px;
-}
-@media (min-width: 600px) {
-  .fc-discover-quicklinks { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 0 10px;
 }
 .fc-discover-quicklink {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-height: 64px;
-  padding: 10px 4px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
   background: var(--fc-surface-2);
   border: 1px solid var(--fc-line);
   color: var(--fc-soft);
   text-decoration: none;
-  font-size: 0.74rem;
-  font-weight: 800;
-  text-align: center;
-  line-height: 1.2;
-  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 90ms ease;
 }
+.fc-discover-quicklink:active { transform: scale(0.94); }
+.fc-discover-quicklink-emoji { font-size: 1.15rem; line-height: 1; }
 .fc-discover-quicklink svg { color: var(--fc-accent-2); }
 .fc-discover-quicklink:hover {
   background: var(--fc-accent-soft);
