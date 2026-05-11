@@ -97,8 +97,15 @@
         <% if post.display_title %>
           <%= link_to post.display_title, post_path(post), class: "fc-breath-title hover:text-[var(--fc-accent)]" %>
         <% end %>
+        <%
+          # Collapse soft single newlines into spaces so pasted text flows
+          # naturally; keep double newlines as paragraph breaks (rendered
+          # via white-space: pre-wrap below — no <p> tags inside the
+          # -webkit-box line-clamp, which would wrap unpredictably).
+          card_text = plain_text.gsub(/(?<!\n)\n(?!\n)/, " ").gsub(/[ \t]+/, " ").strip
+        %>
         <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>"
-             data-expand-text-target="copy"><%= simple_format(plain_text, {}, sanitize: false) %></div>
+             data-expand-text-target="copy"><%= card_text %></div>
         <% if likely_overflow %>
           <button type="button"
                   class="fc-breath-readmore"

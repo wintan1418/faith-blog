@@ -9828,6 +9828,9 @@ body.fc-lightbox-open { overflow: hidden; }
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .fc-breath-media {
