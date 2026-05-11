@@ -98,6 +98,10 @@ Rails.application.routes.draw do
   post "games/history/generate", to: "games#history_generate", as: :games_history_generate
   post "games/history/submit",   to: "games#history_submit",   as: :games_history_submit
 
+  # Church History Arena — explore figures across eras
+  get  "history",                to: "church_history#index",   as: :church_history
+  get  "history/figure/:slug",   to: "church_history#figure",  as: :church_history_figure
+
   resources :reading_plans, only: [ :index, :show ], param: :slug do
     member do
       post :start

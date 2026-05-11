@@ -9886,6 +9886,213 @@ html.theme-dark .fc-held-banner {
   border-radius: 6px;
 }
 
+/* ── Church History Arena ──────────────────────────────────────────── */
+
+.fc-era-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding: 0.3rem;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  overflow-x: auto;
+}
+.fc-era-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--fc-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 140ms ease, background 140ms ease;
+}
+.fc-era-tab:hover { color: var(--fc-ink); }
+.fc-era-tab.is-active {
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+}
+
+.fc-era-panel { display: none; }
+.fc-era-panel.is-active { display: block; }
+
+.fc-era-head { margin-bottom: 0.85rem; }
+.fc-era-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--fc-ink);
+}
+.fc-era-desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.86rem;
+  color: var(--fc-muted);
+  line-height: 1.55;
+}
+
+.fc-figure-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.55rem;
+}
+@media (min-width: 560px) {
+  .fc-figure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 880px) {
+  .fc-figure-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.fc-figure-card {
+  appearance: none;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease, transform 90ms ease;
+}
+.fc-figure-card:hover {
+  border-color: var(--fc-accent);
+  background: color-mix(in oklch, var(--fc-accent) 4%, var(--fc-surface));
+}
+.fc-figure-card:active { transform: scale(0.99); }
+
+.fc-figure-name {
+  margin: 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--fc-ink);
+  letter-spacing: -0.005em;
+}
+.fc-figure-years {
+  margin: 0.1rem 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--fc-accent-2);
+}
+.fc-figure-claim {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--fc-muted);
+  line-height: 1.5;
+}
+
+.fc-arena-footer {
+  margin-top: 1.6rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* Figure detail drawer — reuses .fc-bible-drawer-* sizing for consistency */
+.fc-figure-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+.fc-figure-drawer.hidden { display: none; }
+
+.fc-figure-drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 12, 14, 0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+  animation: fc-bible-fade 180ms ease-out;
+}
+
+.fc-figure-drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(520px, 100vw);
+  background: var(--fc-surface);
+  border-left: 1px solid var(--fc-line-strong);
+  box-shadow: -24px 0 60px -20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  animation: fc-bible-slide 240ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.fc-figure-drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--fc-line);
+}
+.fc-figure-drawer-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--fc-ink);
+  letter-spacing: -0.01em;
+}
+
+.fc-figure-drawer-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1.1rem 1.3rem 2rem;
+}
+
+.fc-figure-drawer-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin: 0 0 0.4rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.fc-figure-drawer-era { color: var(--fc-accent-2); }
+.fc-figure-drawer-years { color: var(--fc-muted); }
+
+.fc-figure-drawer-claim {
+  margin: 0 0 0.9rem;
+  font-size: 0.95rem;
+  color: var(--fc-soft);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.fc-figure-drawer-quote {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--fc-accent);
+  background: color-mix(in oklch, var(--fc-accent) 6%, var(--fc-surface-2));
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 0.98rem;
+  color: var(--fc-ink);
+  line-height: 1.55;
+  border-radius: 0 8px 8px 0;
+}
+
+.fc-figure-drawer-bio p {
+  margin: 0 0 0.85rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--fc-ink);
+}
+.fc-figure-drawer-bio p:last-child { margin-bottom: 0; }
+
+@media (max-width: 540px) {
+  .fc-figure-drawer-panel { width: 100vw; border-left: 0; }
+}
+
 .fc-toast-stack {
   position: fixed;
   top: 64px;

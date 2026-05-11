@@ -1,0 +1,81 @@
+<% content_for(:title) { "Church History Arena · Faith Community" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 900px;">
+    <main class="fc-main">
+      <header class="mb-5">
+        <%= link_to feed_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+          ← Back to feed
+        <% end %>
+        <h1 class="mt-2 text-3xl font-extrabold text-[var(--fc-ink)]">⛪ Church History Arena</h1>
+        <p class="text-sm text-[var(--fc-muted)]">From the upper room to the modern moves of God — 60 of the church's witnesses, in their order.</p>
+      </header>
+
+      <section data-controller="history-arena"
+               data-history-arena-figure-url-value="<%= church_history_figure_path('SLUG') %>">
+
+        <%# ── Era tabs ─────────────────────────────────────────── %>
+        <nav class="fc-era-tabs" aria-label="Eras">
+          <% ChurchHistoryController::ERA_ORDER.each do |era| %>
+            <button type="button"
+                    class="fc-era-tab<%= ' is-active' if era == @era %>"
+                    data-action="click->history-arena#showEra"
+                    data-era="<%= era %>">
+              <%= ChurchHistoryFigure::ERA_LABELS[era].split(' ').first %>
+            </button>
+          <% end %>
+        </nav>
+
+        <%# ── Era panels ─────────────────────────────────────── %>
+        <% ChurchHistoryController::ERA_ORDER.each do |era| %>
+          <div class="fc-era-panel<%= ' is-active' if era == @era %>"
+               data-history-arena-target="panel"
+               data-era="<%= era %>">
+            <header class="fc-era-head">
+              <h2 class="fc-era-title"><%= ChurchHistoryFigure::ERA_LABELS[era] %></h2>
+              <p class="fc-era-desc"><%= ChurchHistoryFigure::ERA_DESCRIPTIONS[era] %></p>
+            </header>
+
+            <div class="fc-figure-grid">
+              <% (@figures_by_era[era] || []).each do |fig| %>
+                <button type="button"
+                        class="fc-figure-card"
+                        data-action="click->history-arena#openFigure"
+                        data-slug="<%= fig.slug %>">
+                  <h3 class="fc-figure-name"><%= fig.name %></h3>
+                  <% if fig.years %>
+                    <p class="fc-figure-years"><%= fig.years %></p>
+                  <% end %>
+                  <p class="fc-figure-claim"><%= fig.claim %></p>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <%# ── Detail drawer (right-side slide-in, mounts on demand) %>
+        <aside class="fc-figure-drawer hidden" data-history-arena-target="drawer" aria-hidden="true">
+          <div class="fc-figure-drawer-backdrop" data-action="click->history-arena#closeFigure"></div>
+          <div class="fc-figure-drawer-panel" role="dialog" aria-labelledby="figure_drawer_title">
+            <header class="fc-figure-drawer-head">
+              <span id="figure_drawer_title" class="fc-figure-drawer-title" data-history-arena-target="drawerTitle">Loading…</span>
+              <button type="button"
+                      class="fc-bible-drawer-close"
+                      data-action="click->history-arena#closeFigure"
+                      aria-label="Close">×</button>
+            </header>
+            <div class="fc-figure-drawer-body" data-history-arena-target="drawerBody">
+              <p class="fc-bible-drawer-loading">Pulling the story…</p>
+            </div>
+          </div>
+        </aside>
+
+        <footer class="fc-arena-footer">
+          <%= link_to games_history_path, class: "fc-btn fc-btn-primary" do %>
+            ⚔️ Test me on church history
+          <% end %>
+        </footer>
+      </section>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,147 @@
+# frozen_string_literal: true
+
+# Curated roll of ~55 figures across the church's 2,000-year story.
+# Idempotent — re-runs only update the `claim` and `featured_quote` if you
+# tweak them; bios stay cached until cleared by hand.
+
+FIGURES = [
+  # ── APOSTOLIC (33–100) ─────────────────────────────────────────────
+  { name: "Peter the Apostle",       era: :apostolic, birth_year: 1,   death_year: 64,
+    claim: "Foundational apostle, first to confess Christ as the Son of the living God." },
+  { name: "Paul the Apostle",        era: :apostolic, birth_year: 5,   death_year: 67,
+    claim: "Apostle to the Gentiles. Wrote 13 letters that still shape the church." },
+  { name: "John the Apostle",        era: :apostolic, birth_year: 6,   death_year: 100,
+    claim: "Beloved disciple. Wrote a Gospel, three letters, and the Revelation on Patmos." },
+  { name: "James the Just",          era: :apostolic, birth_year: 1,   death_year: 62,
+    claim: "Brother of the Lord. Led the Jerusalem council; wrote the epistle of James." },
+  { name: "Stephen",                 era: :apostolic, birth_year: 5,   death_year: 36,
+    claim: "First Christian martyr. His last sight was Jesus standing at God's right hand." },
+  { name: "Polycarp of Smyrna",      era: :apostolic, birth_year: 69,  death_year: 155,
+    claim: "Disciple of John. 'Eighty and six years have I served Him, and He never did me wrong.'" },
+
+  # ── PATRISTIC (100–500) ────────────────────────────────────────────
+  { name: "Ignatius of Antioch",     era: :patristic, birth_year: 35,  death_year: 108,
+    claim: "Bishop and martyr. Wrote seven letters on the way to Rome and the lions." },
+  { name: "Justin Martyr",           era: :patristic, birth_year: 100, death_year: 165,
+    claim: "Philosopher who found Christ. First great Christian apologist." },
+  { name: "Irenaeus of Lyon",        era: :patristic, birth_year: 130, death_year: 202,
+    claim: "Refuted Gnosticism. 'The glory of God is a man fully alive.'" },
+  { name: "Tertullian",              era: :patristic, birth_year: 155, death_year: 220,
+    claim: "Latin theologian who coined the word 'Trinity' (trinitas)." },
+  { name: "Origen of Alexandria",    era: :patristic, birth_year: 184, death_year: 253,
+    claim: "Brilliant, controversial scholar. Wrote the Hexapla, an Old Testament in six versions." },
+  { name: "Athanasius of Alexandria", era: :patristic, birth_year: 296, death_year: 373,
+    claim: "Defended Christ's full divinity against Arianism. 'Athanasius contra mundum.'" },
+  { name: "Augustine of Hippo",      era: :patristic, birth_year: 354, death_year: 430,
+    claim: "Wrote Confessions and City of God. 'You have made us for yourself, and our hearts are restless until they rest in you.'" },
+  { name: "John Chrysostom",         era: :patristic, birth_year: 347, death_year: 407,
+    claim: "Golden-mouthed preacher of Constantinople. Exiled for telling the truth to power." },
+  { name: "Jerome",                  era: :patristic, birth_year: 347, death_year: 420,
+    claim: "Translated the Bible into Latin — the Vulgate. The standard for a thousand years." },
+  { name: "Patrick of Ireland",      era: :patristic, birth_year: 387, death_year: 461,
+    claim: "Brought the gospel to Ireland. Was once a slave there himself." },
+
+  # ── MEDIEVAL (500–1500) ────────────────────────────────────────────
+  { name: "Benedict of Nursia",      era: :medieval, birth_year: 480,  death_year: 547,
+    claim: "Father of Western monasticism. His Rule shaped Christian community for 1,500 years." },
+  { name: "Boniface",                era: :medieval, birth_year: 675,  death_year: 754,
+    claim: "Apostle to the Germans. Cut down Thor's sacred oak and lived to plant a church." },
+  { name: "Bernard of Clairvaux",    era: :medieval, birth_year: 1090, death_year: 1153,
+    claim: "Cistercian abbot, mystic, preacher of the Second Crusade. Wrote 'Jesus, the Very Thought of Thee.'" },
+  { name: "Francis of Assisi",       era: :medieval, birth_year: 1181, death_year: 1226,
+    claim: "Left wealth for radical poverty. 'Preach the gospel always — use words when necessary.'" },
+  { name: "Thomas Aquinas",          era: :medieval, birth_year: 1225, death_year: 1274,
+    claim: "Synthesised faith and reason in the Summa Theologiae. Doctor of the church." },
+  { name: "Catherine of Siena",      era: :medieval, birth_year: 1347, death_year: 1380,
+    claim: "Mystic, reformer, peacemaker. Convinced the pope to return from Avignon to Rome." },
+  { name: "John Wycliffe",           era: :medieval, birth_year: 1328, death_year: 1384,
+    claim: "Morning star of the Reformation. Translated the Bible into English a century before Tyndale." },
+  { name: "John Hus",                era: :medieval, birth_year: 1372, death_year: 1415,
+    claim: "Bohemian reformer. Burned for preaching scripture in the vernacular — 100 years before Luther." },
+
+  # ── REFORMATION (1500–1700) ────────────────────────────────────────
+  { name: "Martin Luther",           era: :reformation, birth_year: 1483, death_year: 1546,
+    claim: "Nailed 95 Theses to Wittenberg's door. 'Here I stand, I can do no other.'" },
+  { name: "Ulrich Zwingli",          era: :reformation, birth_year: 1484, death_year: 1531,
+    claim: "Swiss reformer of Zurich. Died on the battlefield, sword in hand, Bible in his cloak." },
+  { name: "William Tyndale",         era: :reformation, birth_year: 1494, death_year: 1536,
+    claim: "Translated the New Testament into plain English. 'Lord, open the King of England's eyes.'" },
+  { name: "Menno Simons",            era: :reformation, birth_year: 1496, death_year: 1561,
+    claim: "Anabaptist who gave the Mennonites their name. Peace, believer's baptism, and a quiet life." },
+  { name: "Thomas Cranmer",          era: :reformation, birth_year: 1489, death_year: 1556,
+    claim: "Archbishop of Canterbury. Wrote the Book of Common Prayer; burned under Mary I." },
+  { name: "John Calvin",             era: :reformation, birth_year: 1509, death_year: 1564,
+    claim: "Geneva's reformer. The Institutes of the Christian Religion is still in print." },
+  { name: "John Knox",               era: :reformation, birth_year: 1514, death_year: 1572,
+    claim: "Scottish reformer. 'Give me Scotland or I die.'" },
+  { name: "George Fox",              era: :reformation, birth_year: 1624, death_year: 1691,
+    claim: "Founder of the Quakers (Religious Society of Friends). Heard 'a voice which said, There is one, even Christ Jesus, that can speak to thy condition.'" },
+
+  # ── MODERN (1700–1900) ─────────────────────────────────────────────
+  { name: "Jonathan Edwards",        era: :modern, birth_year: 1703, death_year: 1758,
+    claim: "Pastor of the Great Awakening. Preached 'Sinners in the Hands of an Angry God.'" },
+  { name: "George Whitefield",       era: :modern, birth_year: 1714, death_year: 1770,
+    claim: "Field preacher. Crossed the Atlantic 13 times; preached to crowds of 20,000 without a microphone." },
+  { name: "John Wesley",             era: :modern, birth_year: 1703, death_year: 1791,
+    claim: "Founder of Methodism. 'I look upon all the world as my parish.'" },
+  { name: "Charles Wesley",          era: :modern, birth_year: 1707, death_year: 1788,
+    claim: "John's brother. Wrote 6,500+ hymns — 'And Can It Be,' 'O for a Thousand Tongues,' 'Hark! the Herald.'" },
+  { name: "Isaac Watts",             era: :modern, birth_year: 1674, death_year: 1748,
+    claim: "Father of English hymnody. Wrote 'When I Survey the Wondrous Cross' and 'Joy to the World.'" },
+  { name: "William Carey",           era: :modern, birth_year: 1761, death_year: 1834,
+    claim: "Father of modern missions. To India. 'Expect great things from God; attempt great things for God.'" },
+  { name: "Hudson Taylor",           era: :modern, birth_year: 1832, death_year: 1905,
+    claim: "Founder of the China Inland Mission. Wore Chinese dress; gave his life to the unreached." },
+  { name: "David Livingstone",       era: :modern, birth_year: 1813, death_year: 1873,
+    claim: "Scottish missionary and explorer of Africa. Found dead on his knees in prayer." },
+  { name: "Mary Slessor",            era: :modern, birth_year: 1848, death_year: 1915,
+    claim: "Scottish mill-girl turned missionary to Calabar. Stopped the killing of twins." },
+  { name: "Charles Finney",          era: :modern, birth_year: 1792, death_year: 1875,
+    claim: "Lawyer turned revivalist. Father of modern revival method." },
+  { name: "Charles Spurgeon",        era: :modern, birth_year: 1834, death_year: 1892,
+    claim: "Prince of preachers. London's Metropolitan Tabernacle filled twice every Sunday for decades." },
+  { name: "D. L. Moody",             era: :modern, birth_year: 1837, death_year: 1899,
+    claim: "American evangelist. 'The world has yet to see what God can do with a man fully consecrated to him.'" },
+  { name: "George Müller",           era: :modern, birth_year: 1805, death_year: 1898,
+    claim: "Cared for 10,000+ orphans in Bristol — funded by prayer alone, never asking for money." },
+
+  # ── REVIVALISTS / 20th C. WITNESSES (1900–today) ───────────────────
+  { name: "Charles F. Parham",       era: :revivalists, birth_year: 1873, death_year: 1929,
+    claim: "Father of Pentecostalism. Topeka, Kansas, 1901 — students sought the baptism of the Spirit." },
+  { name: "William J. Seymour",      era: :revivalists, birth_year: 1870, death_year: 1922,
+    claim: "Son of slaves; led the Azusa Street Revival, 1906. The fire that became global Pentecostalism." },
+  { name: "Evan Roberts",            era: :revivalists, birth_year: 1878, death_year: 1951,
+    claim: "Welsh revivalist. The 1904–05 Welsh Revival closed pubs and reopened souls." },
+  { name: "John G. Lake",            era: :revivalists, birth_year: 1870, death_year: 1935,
+    claim: "Healing apostle to South Africa and Spokane. Founded the Apostolic Faith Mission." },
+  { name: "Smith Wigglesworth",      era: :revivalists, birth_year: 1859, death_year: 1947,
+    claim: "Yorkshire plumber turned 'apostle of faith.' Raised the dead more than once." },
+  { name: "Maria Woodworth-Etter",   era: :revivalists, birth_year: 1844, death_year: 1924,
+    claim: "Pre-Azusa revivalist. People fell under the power of God by the hundreds in her tent meetings." },
+  { name: "Aimee Semple McPherson",  era: :revivalists, birth_year: 1890, death_year: 1944,
+    claim: "Founded the Foursquare Church and Angelus Temple in Los Angeles. A pioneer in radio preaching." },
+  { name: "Kathryn Kuhlman",         era: :revivalists, birth_year: 1907, death_year: 1976,
+    claim: "Healing minister. 'I Believe in Miracles' on TV; tens of thousands testified to healings." },
+  { name: "William Branham",         era: :revivalists, birth_year: 1909, death_year: 1965,
+    claim: "Healing-revivalist who sparked the post-WWII healing wave; controversial later in life." },
+  { name: "Oral Roberts",            era: :revivalists, birth_year: 1918, death_year: 2009,
+    claim: "Tent-meeting healer who built a university. Pioneered Pentecostal television." },
+  { name: "Reinhard Bonnke",         era: :revivalists, birth_year: 1940, death_year: 2019,
+    claim: "Evangelist to Africa. 'CfaN' crusades reached over 70 million decisions for Christ." },
+  { name: "Billy Graham",            era: :revivalists, birth_year: 1918, death_year: 2018,
+    claim: "Preached the gospel to more people in person than anyone in history — over 200 million." },
+  { name: "Dietrich Bonhoeffer",     era: :revivalists, birth_year: 1906, death_year: 1945,
+    claim: "German pastor executed by the Nazis. 'When Christ calls a man, he bids him come and die.'" },
+  { name: "C. S. Lewis",             era: :revivalists, birth_year: 1898, death_year: 1963,
+    claim: "Oxford don and 'most reluctant convert in all England.' Wrote Mere Christianity and Narnia." },
+  { name: "Corrie ten Boom",         era: :revivalists, birth_year: 1892, death_year: 1983,
+    claim: "Dutch watchmaker who hid Jews. Survived Ravensbrück. 'There is no pit so deep that He is not deeper still.'" }
+]
+
+FIGURES.each_with_index do |attrs, idx|
+  fig = ChurchHistoryFigure.find_or_initialize_by(slug: attrs[:name].parameterize)
+  fig.assign_attributes(attrs.merge(sort_order: idx))
+  fig.save!
+end
+
+puts "Seeded #{ChurchHistoryFigure.count} figures across #{ChurchHistoryFigure.distinct.count(:era)} eras."
