@@ -14282,6 +14282,46 @@ html.theme-light .inbox-thread-head {
 }
 .fc-discover-quicklink:active { transform: scale(0.94); }
 .fc-discover-quicklink-emoji { font-size: 1.15rem; line-height: 1; }
+
+/* ── Emoji picker popover ─────────────────────────────────────────── */
+
+.fc-emoji-anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.fc-emoji-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 9999;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45);
+  padding: 4px;
+  animation: fc-emoji-pop 160ms ease-out;
+}
+.fc-emoji-popover.hidden { display: none; }
+.fc-emoji-popover emoji-picker {
+  display: block;
+  width: min(320px, calc(100vw - 32px));
+  height: 360px;
+}
+
+@media (max-width: 480px) {
+  .fc-emoji-popover {
+    /* On narrow screens, pin to the right edge of the anchor so the
+       picker doesn't go off-screen left. */
+    left: auto;
+    right: 0;
+  }
+}
+
+@keyframes fc-emoji-pop {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
 .fc-discover-quicklink svg { color: var(--fc-accent-2); }
 .fc-discover-quicklink:hover {
   background: var(--fc-accent-soft);
