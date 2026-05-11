@@ -1,14 +1,28 @@
-<li class="fc-inline-comment" id="<%= dom_id(comment) %>">
-  <% if comment.user.profile&.avatar&.attached? %>
-    <%= image_tag comment.user.profile.avatar, class: "fc-avatar object-cover" %>
-  <% else %>
-    <span class="fc-avatar"><%= comment.user.username.first.upcase %></span>
-  <% end %>
-  <div class="fc-inline-comment-body">
-    <div class="fc-inline-comment-head">
-      <%= link_to comment.user.username, user_path(comment.user.username), class: "fc-breath-name" %>
-      <span class="fc-breath-time">· <%= time_ago_in_words(comment.created_at) %> ago</span>
+<% if comment.held_for_review? && !comment.visible_to?(current_user) %>
+  <li class="fc-inline-comment fc-inline-comment-held" id="<%= dom_id(comment) %>">
+    <span class="fc-avatar"><%= render_icon("shield", classes: "h-4 w-4") %></span>
+    <div class="fc-inline-comment-body">
+      <p class="fc-inline-comment-text fc-inline-comment-text--muted">
+        This reply is held for moderator review.
+      </p>
     </div>
-    <div class="fc-inline-comment-text"><%= comment.content %></div>
-  </div>
-</li>
+  </li>
+<% else %>
+  <li class="fc-inline-comment<%= ' fc-inline-comment-held-author' if comment.held_for_review? %>" id="<%= dom_id(comment) %>">
+    <% if comment.user.profile&.avatar&.attached? %>
+      <%= image_tag comment.user.profile.avatar, class: "fc-avatar object-cover" %>
+    <% else %>
+      <span class="fc-avatar"><%= comment.user.username.first.upcase %></span>
+    <% end %>
+    <div class="fc-inline-comment-body">
+      <div class="fc-inline-comment-head">
+        <%= link_to comment.user.username, user_path(comment.user.username), class: "fc-breath-name" %>
+        <span class="fc-breath-time">· <%= time_ago_in_words(comment.created_at) %> ago</span>
+        <% if comment.held_for_review? %>
+          <span class="fc-inline-comment-flag" title="Held for moderator review">⏳ held</span>
+        <% end %>
+      </div>
+      <div class="fc-inline-comment-text"><%= comment.content %></div>
+    </div>
+  </li>
+<% end %>

@@ -16,16 +16,20 @@ class Comment < ApplicationRecord
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_one  :ai_moderation_review, as: :reviewable, dependent: :destroy
 
+  # Enums
+  enum :moderation_status, { approved: 0, pending_review: 1, blocked: 2 }, prefix: :moderation
+
   # Validations
   validates :content, presence: true
 
   # Callbacks
   after_save :process_mentions_after_save
-  after_commit :enqueue_ai_moderation_review, on: :create
+  after_commit :enqueue_ai_moderation_review, on: :create, if: :moderation_approved?
 
   # Scopes
   scope :root_comments, -> { where(parent_comment_id: nil) }
   scope :active, -> { where(deleted_at: nil) }
+  scope :moderation_visible, -> { where(moderation_status: :approved) }
   scope :flagged, -> { where(flagged: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :oldest_first, -> { order(created_at: :asc) }
@@ -58,6 +62,19 @@ class Comment < ApplicationRecord
 
   def reply?
     parent_comment_id.present?
+  end
+
+  def held_for_review?
+    moderation_pending_review? || moderation_blocked?
+  end
+
+  def visible_to?(viewer)
+    return true unless held_for_review?
+    return false unless viewer
+    return true if viewer == user
+    return true if viewer.respond_to?(:admin?) && (viewer.admin? || viewer.super_admin?)
+    return true if viewer.respond_to?(:moderator?) && viewer.moderator?
+    false
   end
 
   private

@@ -1,0 +1,11 @@
+<%# Reply failed validation — re-render the thread frame so the form stays
+    in place; the error rendered into the assistant panel client-side. %>
+<%
+  comments = @post.comments.root_comments.active
+                  .includes(:user, :replies)
+                  .order(created_at: :desc)
+                  .limit(3)
+%>
+<%= turbo_stream.replace dom_id(@post, :thread) do %>
+  <%= render "posts/inline_thread", post: @post, comments: comments, new_comment: @comment %>
+<% end %>

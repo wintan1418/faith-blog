@@ -1,0 +1,106 @@
+<%#
+  Locals:
+    post         — Post being viewed
+    comments     — newest top-level comments to show inline (limit 3)
+    new_comment  — fresh Comment.new for the reply form
+%>
+<%= turbo_frame_tag dom_id(post, :thread), class: "fc-breath-thread" do %>
+  <header class="fc-inline-thread-bar">
+    <span>Thread · <%= pluralize(post.comments_count, "voice") %></span>
+    <button type="button"
+            class="fc-inline-thread-close"
+            data-frame-id="<%= dom_id(post, :thread) %>"
+            onclick="document.getElementById(this.dataset.frameId)?.classList.add('is-closed')"
+            aria-label="Close thread">
+      <%= render_icon("x", classes: "h-4 w-4") %>
+    </button>
+  </header>
+
+  <% if user_signed_in? && post.allow_comments? %>
+    <%= form_with model: [ post, new_comment ],
+        id: dom_id(post, :inline_form),
+        class: "fc-inline-reply",
+        data: {
+          turbo_frame: dom_id(post, :thread),
+          controller: "composer-assistant",
+          composer_assistant_gentleness_url_value: check_gentleness_posts_path,
+          composer_assistant_scripture_url_value:  suggest_scripture_posts_path
+        } do |f| %>
+      <% if current_user.profile&.avatar&.attached? %>
+        <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+      <% else %>
+        <span class="fc-avatar"><%= current_user.username.first.upcase %></span>
+      <% end %>
+
+      <div class="fc-inline-reply-body" data-controller="emoji-picker">
+        <%= f.rich_text_area :content,
+            class: "fc-inline-reply-input",
+            placeholder: "Reply with encouragement, prayer, or a word...",
+            data: { controller: "mentions", emoji_picker_target: "editor" } %>
+
+        <div class="fc-inline-reply-actions">
+          <button type="button"
+                  data-emoji-picker-target="button"
+                  data-action="click->emoji-picker#toggle"
+                  class="fc-composer-icon-btn"
+                  title="Add emoji"
+                  aria-label="Add emoji">
+            <%= render_icon("smile", classes: "h-5 w-5") %>
+          </button>
+
+          <button type="button"
+                  class="fc-composer-asst-btn"
+                  data-composer-assistant-target="gentlenessBtn"
+                  data-action="click->composer-assistant#checkGentleness"
+                  title="Run a quick tone check">
+            🕊️ <span>Check tone</span>
+          </button>
+
+          <button type="button"
+                  class="fc-composer-asst-btn"
+                  data-composer-assistant-target="scriptureBtn"
+                  data-action="click->composer-assistant#suggestScripture"
+                  title="Suggest a fitting scripture">
+            📖 <span>Suggest scripture</span>
+          </button>
+
+          <button type="button"
+                  class="fc-composer-asst-btn fc-composer-asst-toggle"
+                  data-composer-assistant-target="scriptureAutoBtn"
+                  data-action="click->composer-assistant#toggleAutoScripture"
+                  title="Suggest scripture automatically as you type"
+                  aria-pressed="false">
+            ⚡ <span class="fc-composer-asst-label">Auto: off</span>
+          </button>
+
+          <%= f.submit "Reply", class: "fc-btn fc-btn-primary" %>
+        </div>
+
+        <div class="fc-asst-panel hidden" data-composer-assistant-target="panel">
+          <div class="fc-asst-panel-content" data-composer-assistant-target="panelContent"></div>
+        </div>
+
+        <div class="relative">
+          <div data-emoji-picker-target="picker" class="hidden absolute right-0 z-50 mt-2">
+            <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if comments.any? %>
+    <ol class="fc-inline-thread-list" id="<%= dom_id(post, :inline_list) %>">
+      <% comments.each do |comment| %>
+        <%= render "posts/inline_comment", comment: comment %>
+      <% end %>
+    </ol>
+    <% if post.comments_count > comments.size %>
+      <%= link_to "View all #{post.comments_count} replies →", post_path(post, anchor: "comments"),
+          class: "fc-inline-thread-more",
+          data: { turbo_frame: "_top" } %>
+    <% end %>
+  <% else %>
+    <p class="fc-inline-thread-empty">No replies yet — be the first to breathe back.</p>
+  <% end %>
+<% end %>

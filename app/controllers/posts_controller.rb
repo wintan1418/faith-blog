@@ -76,9 +76,10 @@ class PostsController < ApplicationController
   end
 
   def inline_thread
-    @comments = @post.comments.root_comments.active.includes(:user, :replies).order(created_at: :desc).limit(3)
-    @new_comment = Comment.new
-    render layout: false
+    comments = @post.comments.root_comments.active.includes(:user, :replies).order(created_at: :desc).limit(3)
+    render partial: "posts/inline_thread",
+           locals: { post: @post, comments: comments, new_comment: Comment.new },
+           layout: false
   end
 
   def unfeature

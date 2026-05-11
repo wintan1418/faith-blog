@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_08_160414) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_11_101500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -134,8 +134,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_08_160414) do
     t.integer "replies_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "moderation_status", default: 0, null: false
+    t.string "moderation_blocked_reason", limit: 280
     t.index ["deleted_at"], name: "index_comments_on_deleted_at"
     t.index ["flagged"], name: "index_comments_on_flagged"
+    t.index ["moderation_status"], name: "index_comments_on_moderation_status"
     t.index ["parent_comment_id"], name: "index_comments_on_parent_comment_id"
     t.index ["post_id", "created_at"], name: "index_comments_on_post_id_and_created_at"
     t.index ["post_id"], name: "index_comments_on_post_id"

@@ -12,11 +12,16 @@ class CommentsController < ApplicationController
     @comment = @post.comments.build(comment_params)
     @comment.user = current_user
 
+    verdict = Ai::Moderation::CommentGatekeeper.call(comment: @comment)
+    apply_verdict_to_comment(@comment, verdict)
+
     if @comment.save
-      create_notification
-      # Mentions are processed in after_save callback, no need to call again
+      verdict.persist_review!(@comment)
+      create_notification if @comment.moderation_approved?
+
       respond_to do |format|
         if from_inline_thread?
+          format.turbo_stream { render :create_inline }
           format.html { redirect_to inline_thread_post_path(@post) }
         else
           format.html { redirect_to @post, notice: "Comment added!" }
@@ -26,6 +31,7 @@ class CommentsController < ApplicationController
     else
       respond_to do |format|
         if from_inline_thread?
+          format.turbo_stream { render :create_inline_error, status: :unprocessable_entity }
           format.html { redirect_to inline_thread_post_path(@post) }
         else
           format.html { redirect_to @post, alert: "Unable to add comment." }
@@ -97,6 +103,17 @@ class CommentsController < ApplicationController
 
   def comment_params
     params.require(:comment).permit(:content)
+  end
+
+  def apply_verdict_to_comment(comment, verdict)
+    if verdict.block?
+      comment.moderation_status = :blocked
+      comment.moderation_blocked_reason = verdict.reason
+    elsif verdict.hold?
+      comment.moderation_status = :pending_review
+    else
+      comment.moderation_status = :approved
+    end
   end
 
   def authorize_comment!

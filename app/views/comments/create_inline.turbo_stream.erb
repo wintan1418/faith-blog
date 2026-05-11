@@ -1,0 +1,10 @@
+<%# Replace the thread frame with refreshed content showing the new reply. %>
+<%
+  comments = @post.comments.root_comments.active
+                  .includes(:user, :replies)
+                  .order(created_at: :desc)
+                  .limit(3)
+%>
+<%= turbo_stream.replace dom_id(@post, :thread) do %>
+  <%= render "posts/inline_thread", post: @post, comments: comments, new_comment: Comment.new %>
+<% end %>

@@ -1,4 +1,18 @@
-<div class="fc-comment" id="<%= dom_id(comment) %>" data-controller="reply-toggle">
+<% if comment.held_for_review? && !comment.visible_to?(current_user) %>
+  <div class="fc-comment fc-comment-held" id="<%= dom_id(comment) %>">
+    <div class="fc-held-placeholder">
+      <%= render_icon("shield", classes: "h-5 w-5") %>
+      <p>This reply is held for moderator review.</p>
+    </div>
+  </div>
+<% else %>
+<div class="fc-comment<%= ' fc-comment-held-author' if comment.held_for_review? %>" id="<%= dom_id(comment) %>" data-controller="reply-toggle">
+  <% if comment.held_for_review? && current_user == comment.user %>
+    <div class="fc-held-banner">
+      <%= render_icon("shield", classes: "h-4 w-4") %>
+      <span>Held for moderator review — only you and moderators can see this reply for now.</span>
+    </div>
+  <% end %>
   <div class="fc-comment-grid">
     <%= link_to user_path(comment.user.username), class: "fc-comment-avatar" do %>
       <% if comment.user.profile&.avatar&.attached? %>
@@ -87,3 +101,4 @@
     </div>
   </div>
 </div>
+<% end %>
