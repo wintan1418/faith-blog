@@ -1,0 +1,51 @@
+<% content_for(:page_title) { "New announcement" } %>
+
+<div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+  <%= form_with model: @announcement, url: admin_announcements_path, class: "space-y-4" do |f| %>
+    <% if @announcement.errors.any? %>
+      <div class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <%= @announcement.errors.full_messages.to_sentence %>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :kind, class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+      <%= f.select :kind, [["Release / what's new", "release"], ["Custom", "custom"]],
+                   {}, class: "mt-1 w-full rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :kicker, "Tag (small label above the title)", class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+      <%= f.text_field :kicker, placeholder: "Just shipped", class: "mt-1 w-full rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :title, class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+      <%= f.text_field :title, required: true, placeholder: "What's new this week",
+                       class: "mt-1 w-full rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :body, "Details (one paragraph or short bullet list)", class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+      <%= f.text_area :body, rows: 5,
+                      placeholder: "We just shipped a Bible drawer with browsing + search, image lightbox on the feed, and live scripture suggestions while you compose. Try them and tell us what to build next.",
+                      class: "mt-1 w-full rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-3 py-2 text-sm" %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <%= f.label :published_at, "Publish at (blank = now)", class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+        <%= f.datetime_local_field :published_at, class: "mt-1 w-full rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-3 py-2 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :expires_at, "Hide after (optional)", class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+        <%= f.datetime_local_field :expires_at, class: "mt-1 w-full rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-3 py-2 text-sm" %>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <%= link_to "Cancel", admin_announcements_path, class: "fc-btn" %>
+      <%= f.submit "Publish", class: "fc-btn fc-btn-primary" %>
+    </div>
+  <% end %>
+</div>

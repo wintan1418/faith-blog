@@ -197,6 +197,7 @@ Rails.application.routes.draw do
         post :send_now
       end
     end
+    resources :announcements, only: [ :index, :new, :create, :destroy ]
   end
 
   # Web Push subscriptions — endpoint-keyed (client doesn't know its row id).

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_11_101500) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_11_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -73,6 +73,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_101500) do
     t.index ["severity"], name: "index_ai_moderation_reviews_on_severity"
     t.index ["status"], name: "index_ai_moderation_reviews_on_status"
     t.index ["user_id"], name: "index_ai_moderation_reviews_on_user_id"
+  end
+
+  create_table "announcements", force: :cascade do |t|
+    t.integer "kind", default: 0, null: false
+    t.string "kicker", limit: 80
+    t.string "title", limit: 160, null: false
+    t.text "body"
+    t.bigint "user_id"
+    t.datetime "published_at"
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kind"], name: "index_announcements_on_kind"
+    t.index ["published_at"], name: "index_announcements_on_published_at"
+    t.index ["user_id"], name: "index_announcements_on_user_id"
   end
 
   create_table "bible_verses", force: :cascade do |t|
@@ -587,6 +602,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_101500) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_moderation_reviews", "users"
+  add_foreign_key "announcements", "users"
   add_foreign_key "bookmarks", "posts"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "brethren_cards", "users"

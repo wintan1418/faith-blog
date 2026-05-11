@@ -97,6 +97,47 @@
         </div>
       </div>
 
+      <% if @new_member_announcements&.any? %>
+        <div class="space-y-2 mb-3">
+          <% @new_member_announcements.each do |joiner| %>
+            <% next unless joiner.user %>
+            <div class="fc-join-card">
+              <% if joiner.user.profile&.avatar&.attached? %>
+                <%= image_tag joiner.user.profile.avatar, class: "fc-avatar object-cover" %>
+              <% else %>
+                <span class="fc-avatar" style="<%= avatar_tint_style(joiner.user.username) %>">
+                  <%= joiner.user.username.first.upcase %>
+                </span>
+              <% end %>
+              <p class="fc-join-card-text">
+                <%= link_to joiner.user.username, user_path(joiner.user.username), class: "fc-breath-name" %>
+                just joined us
+                <span class="fc-breath-time">· <%= time_ago_in_words(joiner.published_at) %> ago</span>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @release_announcement %>
+        <section class="fc-release-banner"
+                 data-controller="onboarding"
+                 data-onboarding-key-value="fc:release-<%= @release_announcement.id %>"
+                 aria-label="Latest update">
+          <button type="button"
+                  class="fc-release-banner-close"
+                  data-action="click->onboarding#dismiss"
+                  aria-label="Dismiss">×</button>
+          <% if @release_announcement.kicker.present? %>
+            <p class="fc-release-banner-kicker">✦ <%= @release_announcement.kicker %></p>
+          <% end %>
+          <h2 class="fc-release-banner-title"><%= @release_announcement.title %></h2>
+          <% if @release_announcement.body.present? %>
+            <div class="fc-release-banner-body"><%= simple_format(@release_announcement.body, {}, sanitize: false) %></div>
+          <% end %>
+        </section>
+      <% end %>
+
       <% if @show_onboarding %>
         <section class="fc-onboarding"
                  data-controller="onboarding"

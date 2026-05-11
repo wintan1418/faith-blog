@@ -111,5 +111,8 @@ class FeedController < ApplicationController
     # take their first action the condition flips and the card stops rendering.
     @show_onboarding = current_user.posts.none? && current_user.following.empty?
     @onboarding_rooms = Room.public_rooms.ordered.limit(3) if @show_onboarding
+
+    @release_announcement = Announcement.latest_release
+    @new_member_announcements = Announcement.recent_new_members(limit: 4)
   end
 end

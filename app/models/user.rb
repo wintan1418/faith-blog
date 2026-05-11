@@ -13,6 +13,7 @@ class User < ApplicationRecord
   # Associations
   has_one :profile, dependent: :destroy
   has_many :posts, dependent: :destroy
+  has_many :announcements, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :bookmarks, dependent: :destroy
@@ -62,6 +63,7 @@ class User < ApplicationRecord
   after_create :create_profile
   after_create :create_brethren_card
   after_create :ensure_risk_profile
+  after_create_commit :announce_join
 
   # Scopes
   scope :active, -> { where(active: true) }
@@ -254,5 +256,17 @@ class User < ApplicationRecord
 
   def ensure_risk_profile
     build_risk_profile.save unless risk_profile
+  end
+
+  def announce_join
+    Announcement.create(
+      kind: :new_member,
+      user: self,
+      title: "#{username} just joined Brethreign",
+      published_at: Time.current,
+      expires_at: 14.days.from_now
+    )
+  rescue StandardError => e
+    Rails.logger.warn("[User##{id}] announce_join failed: #{e.class}: #{e.message}")
   end
 end

@@ -1,0 +1,40 @@
+<% content_for(:page_title) { "Announcements" } %>
+
+<div class="mb-4 flex items-center justify-between">
+  <p class="text-sm text-[var(--fc-muted)]">Release banners on the feed + new-member welcome events.</p>
+  <%= link_to "+ New release", new_admin_announcement_path, class: "fc-btn fc-btn-primary" %>
+</div>
+
+<% if @announcements.any? %>
+  <ul class="fc-cms-list">
+    <% @announcements.each do |a| %>
+      <li class="fc-cms-row">
+        <div class="fc-cms-body">
+          <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-accent-2)]">
+            <%= a.kind.humanize %><%= " · #{a.kicker}" if a.kicker.present? %>
+          </p>
+          <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= a.title %></p>
+          <% if a.body.present? %>
+            <p class="fc-cms-text"><%= truncate(a.body, length: 220) %></p>
+          <% end %>
+          <p class="fc-cms-meta">
+            <%= a.published_at ? "Published #{time_ago_in_words(a.published_at)} ago" : "Draft" %>
+            <% if a.expires_at %> · expires <%= time_ago_in_words(a.expires_at) %><%= a.expires_at.future? ? " from now" : " ago" %><% end %>
+          </p>
+        </div>
+        <div class="fc-cms-actions">
+          <%= button_to "Delete", admin_announcement_path(a),
+              method: :delete,
+              form_class: "inline",
+              class: "fc-btn",
+              data: { turbo_confirm: "Delete this announcement?" } %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
+    <p class="text-base font-bold text-[var(--fc-ink)]">No announcements yet.</p>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">Publish one after the next deploy so users see what's new.</p>
+  </div>
+<% end %>
