@@ -1,0 +1,68 @@
+<% content_for(:title) { "Chess Puzzle · Faith Community" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 640px;">
+    <main class="fc-main">
+      <header class="mb-5">
+        <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+          ← Back to games
+        <% end %>
+        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">♚ Chess Puzzle of the Day</h1>
+        <p class="text-sm text-[var(--fc-muted)]">Today's puzzle from Lichess. Solve on Lichess, then come back and claim your points.</p>
+      </header>
+
+      <% if @puzzle %>
+        <section class="fc-chess-card"
+                 data-controller="chess-puzzle"
+                 data-chess-puzzle-solved-url-value="<%= games_chess_solved_path %>"
+                 data-chess-puzzle-csrf-value="<%= form_authenticity_token %>"
+                 data-chess-puzzle-already-value="<%= @already_solved_today %>">
+          <div class="fc-chess-head">
+            <div>
+              <p class="fc-quiz-kicker">Daily puzzle · <%= @puzzle[:side_to_move].titleize %> to move</p>
+              <h2 class="fc-chess-rating">Rating <%= @puzzle[:rating] %></h2>
+              <p class="fc-chess-themes"><%= @puzzle[:themes].first(4).map(&:titleize).join(" · ") %></p>
+            </div>
+            <div class="fc-chess-score-tier">
+              <% tier = case @puzzle[:rating] when 0..1499 then 1 when 1500..1999 then 2 when 2000..2499 then 3 else 5 end %>
+              <span class="fc-chess-score-num">+<%= tier %></span>
+              <span class="fc-chess-score-label">points<br>if solved</span>
+            </div>
+          </div>
+
+          <div class="fc-chess-actions">
+            <a href="<%= @puzzle[:link] %>"
+               target="_blank"
+               rel="noopener"
+               class="fc-btn fc-btn-primary"
+               data-action="click->chess-puzzle#openedExternal">
+              ♟️ Solve on Lichess →
+            </a>
+            <button type="button"
+                    class="fc-btn fc-chess-solved-btn"
+                    data-chess-puzzle-target="solveBtn"
+                    data-action="click->chess-puzzle#markSolved"
+                    <%= "disabled" if @already_solved_today %>>
+              <%= @already_solved_today ? "✓ Already solved today" : "✓ I solved it" %>
+            </button>
+          </div>
+
+          <p class="fc-chess-fine">
+            Puzzles update once a day. Played <%= number_with_delimiter(@puzzle[:plays]) %> times on Lichess.
+          </p>
+
+          <div class="fc-chess-feedback hidden" data-chess-puzzle-target="feedback"></div>
+        </section>
+      <% else %>
+        <div class="fc-empty">
+          <div class="fc-empty-mark" aria-hidden="true">♟️</div>
+          <h3 class="fc-empty-title">Couldn't reach Lichess.</h3>
+          <p class="fc-empty-text">Try again in a moment — the API is occasionally rate-limited.</p>
+          <div class="fc-empty-actions">
+            <%= link_to "Back to Games", games_path, class: "fc-btn" %>
+          </div>
+        </div>
+      <% end %>
+    </main>
+  </div>
+</div>

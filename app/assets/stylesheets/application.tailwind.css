@@ -9744,6 +9744,81 @@ html.theme-dark .fc-held-banner {
   margin-top: 0.4rem;
 }
 
+/* ── Chess puzzle card ─────────────────────────────────────────────── */
+
+.fc-chess-card {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 18px;
+  padding: 1.3rem 1.4rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.fc-chess-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.fc-chess-rating {
+  margin: 0.2rem 0 0.15rem;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+}
+.fc-chess-themes {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--fc-muted);
+  letter-spacing: 0.04em;
+}
+.fc-chess-score-tier {
+  text-align: right;
+  flex-shrink: 0;
+}
+.fc-chess-score-num {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--fc-accent-2);
+  line-height: 1;
+}
+.fc-chess-score-label {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+  line-height: 1.2;
+}
+.fc-chess-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.fc-chess-solved-btn.is-primary {
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+  border-color: var(--fc-accent);
+}
+.fc-chess-fine {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--fc-muted);
+}
+.fc-chess-feedback {
+  padding: 0.6rem 0.85rem;
+  background: color-mix(in oklch, var(--fc-accent) 10%, var(--fc-surface));
+  border: 1px solid color-mix(in oklch, var(--fc-accent) 30%, var(--fc-line));
+  border-radius: 10px;
+  color: var(--fc-ink);
+  font-size: 0.85rem;
+}
+.fc-chess-feedback.hidden { display: none; }
+
 .fc-toast-stack {
   position: fixed;
   top: 64px;

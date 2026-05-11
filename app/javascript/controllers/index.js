@@ -52,6 +52,9 @@ application.register("hello", HelloController)
 import BibleDrawerController from "./bible_drawer_controller"
 application.register("bible-drawer", BibleDrawerController)
 
+import ChessPuzzleController from "./chess_puzzle_controller"
+application.register("chess-puzzle", ChessPuzzleController)
+
 import MentionsController from "./mentions_controller"
 application.register("mentions", MentionsController)
 

@@ -88,10 +88,15 @@ Rails.application.routes.draw do
   post "bible/search", to: "bible#search", as: :bible_search
 
   # Games / leaderboard
-  get  "games",                to: "games#index",         as: :games
-  get  "games/quiz",           to: "games#quiz",          as: :games_quiz
-  post "games/quiz/generate",  to: "games#quiz_generate", as: :games_quiz_generate
-  post "games/quiz/submit",    to: "games#quiz_submit",   as: :games_quiz_submit
+  get  "games",                  to: "games#index",            as: :games
+  get  "games/quiz",             to: "games#quiz",             as: :games_quiz
+  post "games/quiz/generate",    to: "games#quiz_generate",    as: :games_quiz_generate
+  post "games/quiz/submit",      to: "games#quiz_submit",      as: :games_quiz_submit
+  get  "games/chess",            to: "games#chess",            as: :games_chess
+  post "games/chess/solved",     to: "games#chess_solved",     as: :games_chess_solved
+  get  "games/trivia",           to: "games#trivia",           as: :games_trivia
+  post "games/trivia/generate",  to: "games#trivia_generate",  as: :games_trivia_generate
+  post "games/trivia/submit",    to: "games#trivia_submit",    as: :games_trivia_submit
 
   resources :reading_plans, only: [ :index, :show ], param: :slug do
     member do
