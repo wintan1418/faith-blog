@@ -70,6 +70,9 @@ application.register("notifications-modal", NotificationsModalController)
 import PostFormController from "./post_form_controller"
 application.register("post-form", PostFormController)
 
+import QuizController from "./quiz_controller"
+application.register("quiz", QuizController)
+
 import PwaController from "./pwa_controller"
 application.register("pwa", PwaController)
 

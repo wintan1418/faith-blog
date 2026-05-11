@@ -87,6 +87,12 @@ Rails.application.routes.draw do
   get "scripture/lookup", to: "scripture#show", as: :scripture_lookup
   post "bible/search", to: "bible#search", as: :bible_search
 
+  # Games / leaderboard
+  get  "games",                to: "games#index",         as: :games
+  get  "games/quiz",           to: "games#quiz",          as: :games_quiz
+  post "games/quiz/generate",  to: "games#quiz_generate", as: :games_quiz_generate
+  post "games/quiz/submit",    to: "games#quiz_submit",   as: :games_quiz_submit
+
   resources :reading_plans, only: [ :index, :show ], param: :slug do
     member do
       post :start

@@ -15,6 +15,10 @@
           <%= render_icon("bookopen", classes: "h-4 w-4") %>
           Open Bible
         </button>
+        <%= link_to games_path, class: "fc-rail-link" do %>
+          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          Games
+        <% end %>
         <%= link_to bookmarks_path, class: "fc-rail-link" do %>
           <%= render_icon("bookmark", classes: "h-4 w-4") %>
           Bookmarks

@@ -1,0 +1,114 @@
+<% content_for(:title) { "Games · Faith Community" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 820px;">
+    <main class="fc-main">
+      <header class="mb-5">
+        <%= link_to feed_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+          ← Back to feed
+        <% end %>
+        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">Games</h1>
+        <p class="text-sm text-[var(--fc-muted)]">Sharpen your scripture, climb the leaderboard.</p>
+      </header>
+
+      <%# ── Stats strip ─────────────────────────────────────────── %>
+      <section class="fc-stats-strip mb-5">
+        <div class="fc-stat">
+          <span class="fc-stat-num"><%= @my_stats[:score_this_week] %></span>
+          <span class="fc-stat-label">Score this week</span>
+        </div>
+        <div class="fc-stat">
+          <span class="fc-stat-num"><%= @my_stats[:plays_this_week] %></span>
+          <span class="fc-stat-label">Plays this week</span>
+        </div>
+        <div class="fc-stat">
+          <span class="fc-stat-num"><%= @my_stats[:best_ever] %></span>
+          <span class="fc-stat-label">Best single run</span>
+        </div>
+        <div class="fc-stat">
+          <span class="fc-stat-num"><%= @my_rank ? "##{@my_rank}" : "—" %></span>
+          <span class="fc-stat-label">Your rank (week)</span>
+        </div>
+      </section>
+
+      <%# ── Game cards ──────────────────────────────────────────── %>
+      <section class="mb-6">
+        <h2 class="mb-3 text-sm font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">Play</h2>
+        <div class="fc-game-grid">
+          <%= link_to games_quiz_path, class: "fc-game-card is-active" do %>
+            <div class="fc-game-card-icon">📖</div>
+            <h3>Bible Quiz</h3>
+            <p>5 multi-choice questions on books, characters, and verses. Counts toward the leaderboard.</p>
+            <span class="fc-game-card-cta">Play →</span>
+          <% end %>
+
+          <div class="fc-game-card is-soon">
+            <div class="fc-game-card-icon">🧠</div>
+            <h3>Verse Memory</h3>
+            <p>Reveal a verse one word at a time and recite it back.</p>
+            <span class="fc-game-card-cta is-soon">Coming soon</span>
+          </div>
+
+          <div class="fc-game-card is-soon">
+            <div class="fc-game-card-icon">👤</div>
+            <h3>Character Match</h3>
+            <p>Match a description to the right biblical figure.</p>
+            <span class="fc-game-card-cta is-soon">Coming soon</span>
+          </div>
+
+          <div class="fc-game-card is-soon">
+            <div class="fc-game-card-icon">🔤</div>
+            <h3>Reference Scramble</h3>
+            <p>Read the verse — guess the chapter and verse before time runs out.</p>
+            <span class="fc-game-card-cta is-soon">Coming soon</span>
+          </div>
+        </div>
+      </section>
+
+      <%# ── Leaderboard ─────────────────────────────────────────── %>
+      <section>
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-sm font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">Leaderboard</h2>
+          <nav class="fc-window-tabs">
+            <%= link_to "Week",  games_path(window: "week"),  class: "fc-window-tab #{'is-active' if @window == 'week'}" %>
+            <%= link_to "Month", games_path(window: "month"), class: "fc-window-tab #{'is-active' if @window == 'month'}" %>
+            <%= link_to "All time", games_path(window: "all"), class: "fc-window-tab #{'is-active' if @window == 'all'}" %>
+          </nav>
+        </div>
+
+        <% if @leaderboard.any? %>
+          <ol class="fc-leaderboard">
+            <% @leaderboard.each_with_index do |row, i| %>
+              <li class="fc-lb-row<%= ' is-me' if row[:user].id == current_user.id %>">
+                <span class="fc-lb-rank"><%= i + 1 %></span>
+                <% if row[:user].profile&.avatar&.attached? %>
+                  <%= image_tag row[:user].profile.avatar, class: "fc-avatar object-cover" %>
+                <% else %>
+                  <span class="fc-avatar" style="<%= avatar_tint_style(row[:user].username) %>">
+                    <%= row[:user].username.first.upcase %>
+                  </span>
+                <% end %>
+                <div class="fc-lb-body">
+                  <%= link_to row[:user].username, user_path(row[:user].username), class: "fc-lb-name" %>
+                  <span class="fc-lb-meta">
+                    <%= pluralize(row[:plays], "play") %> · best <%= row[:best] %>
+                  </span>
+                </div>
+                <span class="fc-lb-score"><%= row[:total_score] %></span>
+              </li>
+            <% end %>
+          </ol>
+        <% else %>
+          <div class="fc-empty">
+            <div class="fc-empty-mark" aria-hidden="true">🏆</div>
+            <h3 class="fc-empty-title">No one has played yet this <%= @window == 'all' ? 'season' : @window %>.</h3>
+            <p class="fc-empty-text">Be the first.</p>
+            <div class="fc-empty-actions">
+              <%= link_to "Take the quiz", games_quiz_path, class: "fc-btn fc-btn-primary" %>
+            </div>
+          </div>
+        <% end %>
+      </section>
+    </main>
+  </div>
+</div>

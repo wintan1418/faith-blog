@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_11_160000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_11_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -202,6 +202,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_160000) do
     t.index ["follower_id", "following_id"], name: "index_follows_on_follower_id_and_following_id", unique: true
     t.index ["follower_id"], name: "index_follows_on_follower_id"
     t.index ["following_id"], name: "index_follows_on_following_id"
+  end
+
+  create_table "game_attempts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "kind", default: 0, null: false
+    t.integer "score", default: 0, null: false
+    t.integer "max_score", default: 0, null: false
+    t.integer "duration_ms"
+    t.jsonb "details", default: {}, null: false
+    t.datetime "played_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kind"], name: "index_game_attempts_on_kind"
+    t.index ["played_at"], name: "index_game_attempts_on_played_at"
+    t.index ["user_id", "kind"], name: "index_game_attempts_on_user_id_and_kind"
+    t.index ["user_id"], name: "index_game_attempts_on_user_id"
   end
 
   create_table "golden_breaths", force: :cascade do |t|
@@ -616,6 +632,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_160000) do
   add_foreign_key "conversation_participants", "users"
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "follows", "users", column: "following_id"
+  add_foreign_key "game_attempts", "users"
   add_foreign_key "invitations", "users", column: "invited_user_id"
   add_foreign_key "invitations", "users", column: "inviter_id"
   add_foreign_key "likes", "users"

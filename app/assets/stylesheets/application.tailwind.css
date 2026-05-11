@@ -9398,6 +9398,352 @@ html.theme-dark .fc-held-banner {
 }
 .fc-join-card-text strong { color: var(--fc-ink); }
 
+/* ── Games hub + leaderboard ───────────────────────────────────────── */
+
+.fc-stats-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+@media (min-width: 560px) {
+  .fc-stats-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.fc-stat {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+}
+.fc-stat-num {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+  letter-spacing: -0.01em;
+}
+.fc-stat-label {
+  margin-top: 0.1rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+
+.fc-game-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.7rem;
+}
+@media (min-width: 560px) {
+  .fc-game-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.fc-game-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  color: var(--fc-ink);
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.fc-game-card:hover { border-color: var(--fc-accent); }
+.fc-game-card.is-active { border-color: color-mix(in oklch, var(--fc-accent) 40%, var(--fc-line)); }
+.fc-game-card.is-soon { opacity: 0.72; cursor: not-allowed; }
+.fc-game-card.is-soon:hover { border-color: var(--fc-line); }
+
+.fc-game-card-icon { font-size: 1.6rem; line-height: 1; }
+.fc-game-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+}
+.fc-game-card p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--fc-muted);
+  line-height: 1.45;
+}
+
+.fc-game-card-cta {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--fc-accent-2);
+}
+.fc-game-card-cta.is-soon { color: var(--fc-muted); }
+
+.fc-window-tabs {
+  display: inline-flex;
+  gap: 0.1rem;
+  padding: 0.2rem;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  border-radius: 999px;
+}
+.fc-window-tab {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--fc-muted);
+  border-radius: 999px;
+}
+.fc-window-tab:hover { color: var(--fc-ink); }
+.fc-window-tab.is-active {
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+}
+
+.fc-leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fc-lb-row {
+  display: grid;
+  grid-template-columns: 32px auto 1fr auto;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 12px;
+}
+.fc-lb-row.is-me {
+  border-color: color-mix(in oklch, var(--fc-accent) 50%, var(--fc-line));
+  background: color-mix(in oklch, var(--fc-accent) 6%, var(--fc-surface));
+}
+
+.fc-lb-rank {
+  font-weight: 900;
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--fc-muted);
+}
+.fc-lb-row:nth-child(1) .fc-lb-rank { color: #d4a85a; }
+.fc-lb-row:nth-child(2) .fc-lb-rank { color: #9ca3af; }
+.fc-lb-row:nth-child(3) .fc-lb-rank { color: #a26d3a; }
+
+.fc-lb-body { display: flex; flex-direction: column; min-width: 0; }
+.fc-lb-name {
+  font-weight: 800;
+  color: var(--fc-ink);
+  font-size: 0.92rem;
+}
+.fc-lb-meta {
+  font-size: 0.74rem;
+  color: var(--fc-muted);
+}
+.fc-lb-score {
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: var(--fc-accent-2);
+}
+
+/* ── Quiz play ─────────────────────────────────────────────────────── */
+
+.fc-quiz {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.fc-quiz-screen {
+  padding: 1.4rem 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.fc-quiz-kicker {
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fc-accent-2);
+  margin: 0;
+}
+
+.fc-quiz-headline {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+  letter-spacing: -0.01em;
+}
+
+.fc-quiz-sub {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--fc-muted);
+  line-height: 1.5;
+}
+
+.fc-quiz-start { align-self: flex-start; }
+
+.fc-quiz-progress {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+}
+.fc-quiz-score { color: var(--fc-accent-2); }
+
+.fc-quiz-bar {
+  height: 4px;
+  width: 100%;
+  background: var(--fc-surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.fc-quiz-bar span {
+  display: block;
+  height: 100%;
+  background: var(--fc-accent);
+  transition: width 300ms ease;
+}
+
+.fc-quiz-prompt {
+  margin: 0.3rem 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--fc-ink);
+  line-height: 1.4;
+}
+
+.fc-quiz-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fc-quiz-choice {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  border-radius: 10px;
+  text-align: left;
+  color: var(--fc-ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.fc-quiz-choice:hover:not(:disabled) {
+  border-color: var(--fc-accent);
+  background: var(--fc-surface);
+}
+.fc-quiz-choice:disabled { cursor: default; }
+.fc-quiz-choice.is-correct {
+  background: color-mix(in oklch, #10b981 14%, var(--fc-surface));
+  border-color: #10b981;
+}
+.fc-quiz-choice.is-wrong {
+  background: color-mix(in oklch, #dc2626 12%, var(--fc-surface));
+  border-color: #dc2626;
+}
+
+.fc-quiz-choice-letter {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  display: grid;
+  place-items: center;
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--fc-muted);
+  flex-shrink: 0;
+}
+.fc-quiz-choice.is-correct .fc-quiz-choice-letter { background: #10b981; color: #fff; border-color: #10b981; }
+.fc-quiz-choice.is-wrong .fc-quiz-choice-letter   { background: #dc2626; color: #fff; border-color: #dc2626; }
+.fc-quiz-choice-text { flex: 1; line-height: 1.4; }
+
+.fc-quiz-explanation {
+  margin-top: 0.3rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  border-radius: 10px;
+}
+.fc-quiz-explanation.hidden { display: none; }
+.fc-quiz-verdict { margin: 0; font-weight: 900; font-size: 0.92rem; }
+.fc-quiz-verdict.is-right { color: #10b981; }
+.fc-quiz-verdict.is-miss  { color: #dc2626; }
+.fc-quiz-ref {
+  margin: 0.25rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--fc-accent-2);
+  letter-spacing: 0.05em;
+}
+.fc-quiz-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+  color: var(--fc-muted);
+  line-height: 1.5;
+}
+
+.fc-quiz-next.hidden { display: none; }
+
+.fc-quiz-skel { border-radius: 8px; margin-bottom: 0.4rem; }
+
+/* Result screen */
+.fc-quiz-result {
+  align-items: center;
+  text-align: center;
+}
+.fc-quiz-result-badge {
+  width: 84px;
+  height: 84px;
+  border-radius: 999px;
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 1.8rem;
+  letter-spacing: -0.02em;
+}
+.fc-quiz-share {
+  margin: 0.5rem 0 0.2rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  border-radius: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+  color: var(--fc-ink);
+}
+.fc-quiz-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
 .fc-toast-stack {
   position: fixed;
   top: 64px;
