@@ -52,17 +52,33 @@ class CommentsController < ApplicationController
     @reply.user = current_user
     @reply.parent_comment = @comment
 
+    verdict = Ai::Moderation::CommentGatekeeper.call(comment: @reply)
+    apply_verdict_to_comment(@reply, verdict)
+
     if @reply.save
-      create_reply_notification
-      # Mentions are processed in after_save callback, no need to call again
+      verdict.persist_review!(@reply)
+      create_reply_notification if @reply.moderation_approved?
+
       respond_to do |format|
-        format.html { redirect_to @post, notice: "Reply added!" }
-        format.turbo_stream
+        if from_inline_thread?
+          @comment = @reply   # so create_inline.turbo_stream.erb has @comment too
+          format.turbo_stream { render :create_inline }
+          format.html { redirect_to inline_thread_post_path(@post) }
+        else
+          format.html { redirect_to @post, notice: "Reply added!" }
+          format.turbo_stream
+        end
       end
     else
       respond_to do |format|
-        format.html { redirect_to @post, alert: "Unable to add reply." }
-        format.turbo_stream
+        if from_inline_thread?
+          @comment = @reply
+          format.turbo_stream { render :create_inline_error, status: :unprocessable_entity }
+          format.html { redirect_to inline_thread_post_path(@post) }
+        else
+          format.html { redirect_to @post, alert: "Unable to add reply." }
+          format.turbo_stream
+        end
       end
     end
   end

@@ -92,7 +92,7 @@
   <% if comments.any? %>
     <ol class="fc-inline-thread-list" id="<%= dom_id(post, :inline_list) %>">
       <% comments.each do |comment| %>
-        <%= render "posts/inline_comment", comment: comment %>
+        <%= render "posts/inline_comment", comment: comment, post: post %>
       <% end %>
     </ol>
     <% if post.comments_count > comments.size %>

@@ -9523,6 +9523,82 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
   word-wrap: break-word;
 }
 
+.fc-inline-comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.fc-inline-comment-replybtn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.3rem;
+  margin-left: -0.3rem;
+  border-radius: 6px;
+  color: var(--fc-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 140ms ease, background 140ms ease;
+}
+.fc-inline-comment-replybtn:hover {
+  color: var(--fc-accent);
+  background: var(--fc-surface-2);
+}
+.fc-inline-comment-replybtn svg {
+  flex-shrink: 0;
+}
+
+.fc-inline-comment-replyform {
+  margin-top: 0.4rem;
+}
+.fc-inline-comment-replyform.hidden { display: none; }
+
+.fc-inline-reply.is-nested {
+  margin-top: 0;
+}
+.fc-inline-reply.is-nested .fc-avatar {
+  width: 28px;
+  height: 28px;
+}
+.fc-inline-reply.is-nested .fc-inline-reply-input {
+  min-height: 60px;
+  font-size: 0.85rem;
+}
+
+.fc-inline-comment-replies {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  position: relative;
+  padding-left: 0.85rem;
+  border-left: 2px solid var(--fc-line);
+}
+
+.fc-inline-comment-replies .fc-inline-comment {
+  gap: 0.5rem;
+}
+.fc-inline-comment-replies .fc-inline-comment .fc-avatar {
+  width: 26px;
+  height: 26px;
+}
+.fc-inline-comment-replies .fc-inline-comment-text {
+  font-size: 0.82rem;
+}
+
+.fc-inline-comment-more {
+  list-style: none;
+  font-size: 0.78rem;
+}
+
 .fc-inline-thread-empty {
   font-size: 0.85rem;
   color: var(--fc-muted);

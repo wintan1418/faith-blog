@@ -1,3 +1,8 @@
+<%#
+  Locals:
+    comment — the Comment to render
+    post    — the Post the comment belongs to
+%>
 <% if comment.held_for_review? && !comment.visible_to?(current_user) %>
   <li class="fc-inline-comment fc-inline-comment-held" id="<%= dom_id(comment) %>">
     <span class="fc-avatar"><%= render_icon("shield", classes: "h-4 w-4") %></span>
@@ -8,7 +13,9 @@
     </div>
   </li>
 <% else %>
-  <li class="fc-inline-comment<%= ' fc-inline-comment-held-author' if comment.held_for_review? %>" id="<%= dom_id(comment) %>">
+  <li class="fc-inline-comment<%= ' fc-inline-comment-held-author' if comment.held_for_review? %>"
+      id="<%= dom_id(comment) %>"
+      data-controller="reply-toggle">
     <% if comment.user.profile&.avatar&.attached? %>
       <%= image_tag comment.user.profile.avatar, class: "fc-avatar object-cover" %>
     <% else %>
@@ -23,6 +30,60 @@
         <% end %>
       </div>
       <div class="fc-inline-comment-text"><%= comment.content %></div>
+
+      <% if user_signed_in? && post.allow_comments? && comment.depth < 2 %>
+        <div class="fc-inline-comment-actions">
+          <button type="button"
+                  class="fc-inline-comment-replybtn"
+                  data-action="click->reply-toggle#toggle">
+            <%= render_icon("message_circle", classes: "h-3.5 w-3.5") %>
+            <span>Reply</span>
+          </button>
+        </div>
+
+        <div class="fc-inline-comment-replyform hidden" data-reply-toggle-target="form">
+          <%= form_with url: reply_post_comment_path(post, comment),
+              scope: :comment,
+              class: "fc-inline-reply is-nested",
+              data: { turbo_frame: dom_id(post, :thread) } do |f| %>
+            <% if current_user.profile&.avatar&.attached? %>
+              <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+            <% else %>
+              <span class="fc-avatar"><%= current_user.username.first.upcase %></span>
+            <% end %>
+            <div class="fc-inline-reply-body">
+              <%= f.text_area :content,
+                  class: "fc-inline-reply-input",
+                  rows: 2,
+                  placeholder: "Reply to @#{comment.user.username}…" %>
+              <div class="fc-inline-reply-actions">
+                <span></span>
+                <%= f.submit "Reply", class: "fc-btn fc-btn-primary" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <%
+        replies = comment.replies.active.oldest_first.limit(3)
+        more_replies = comment.replies.active.count - replies.size
+      %>
+      <% if replies.any? %>
+        <ul class="fc-inline-comment-replies">
+          <% replies.each do |reply| %>
+            <%= render "posts/inline_comment", comment: reply, post: post %>
+          <% end %>
+          <% if more_replies > 0 %>
+            <li class="fc-inline-comment-more">
+              <%= link_to "View all #{pluralize(more_replies, 'more reply')} →",
+                  post_path(post, anchor: dom_id(comment)),
+                  class: "fc-inline-thread-more",
+                  data: { turbo_frame: "_top" } %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
     </div>
   </li>
 <% end %>
