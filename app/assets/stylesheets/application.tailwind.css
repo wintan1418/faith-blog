@@ -1190,7 +1190,7 @@ html.dark [data-dropdown-target="menu"] .text-gray-500 {
   max-width: 100%;
   font-size: 1.125rem;
   line-height: 1.78;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .prose-faith .trix-content {
@@ -6738,7 +6738,7 @@ html.theme-dark .profile-card-panel {
 
 .profile-card-value {
   margin-top: 0.35rem;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   color: var(--fc-ink);
   font-size: 0.94rem;
   font-weight: 750;
@@ -10324,7 +10324,7 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
   font-size: 1.05rem;
   line-height: 1.75;
   word-wrap: break-word;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .fc-article-body p {
@@ -10528,7 +10528,7 @@ form.inline {
   font-size: 0.95rem;
   line-height: 1.55;
   word-wrap: break-word;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .fc-comment-body p { margin: 0.25rem 0; }
@@ -10928,7 +10928,7 @@ html.dark nav.post-toc {
   margin-inline: auto;
   font-variation-settings: "opsz" 12;
   word-wrap: break-word;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .post-body p { margin: 0 0 1.05em; }

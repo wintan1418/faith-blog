@@ -133,7 +133,13 @@
           <% end %>
           <h2 class="fc-release-banner-title"><%= @release_announcement.title %></h2>
           <% if @release_announcement.body.present? %>
-            <div class="fc-release-banner-body"><%= simple_format(@release_announcement.body, {}, sanitize: false) %></div>
+            <%
+              # Collapse single newlines (soft-wrap from paste) into spaces,
+              # keep double newlines as paragraph breaks. Avoids one ragged
+              # <br> after every line when admins paste pre-wrapped text.
+              clean_body = @release_announcement.body.to_s.gsub(/(?<!\n)\n(?!\n)/, " ").gsub(/[ \t]+/, " ").strip
+            %>
+            <div class="fc-release-banner-body"><%= simple_format(clean_body, {}, sanitize: false) %></div>
           <% end %>
         </section>
       <% end %>
