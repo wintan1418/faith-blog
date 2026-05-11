@@ -78,9 +78,17 @@ class ScriptureLookup
     return nil unless response.is_a?(Net::HTTPSuccess)
 
     payload = JSON.parse(response.body)
+    verses = (payload["verses"] || []).map do |v|
+      {
+        chapter: v["chapter"],
+        verse: v["verse"],
+        text: v["text"].to_s.strip
+      }
+    end
     {
       reference: payload["reference"],
       text: payload["text"].to_s.strip,
+      verses: verses,
       translation: payload["translation_name"] || "KJV"
     }
   rescue StandardError => e

@@ -4,11 +4,73 @@ import { Controller } from "@hotwired/stimulus"
 // scripture suggestion. Both POST the current draft to a JSON endpoint and
 // render the result in the panel below the toolbar. Neither blocks publish.
 export default class extends Controller {
-  static targets = ["panel", "panelContent", "gentlenessBtn", "scriptureBtn"]
+  static targets = ["panel", "panelContent", "gentlenessBtn", "scriptureBtn", "scriptureAutoBtn"]
   static values  = {
     gentlenessUrl: String,
     scriptureUrl:  String,
     csrf:          String
+  }
+
+  connect() {
+    this.liveActive = localStorage.getItem("fc:liveScripture") === "1"
+    this.updateAutoBtn()
+    this.onDraftChange = this.onDraftChange.bind(this)
+    this.element.addEventListener("input", this.onDraftChange)
+  }
+
+  disconnect() {
+    if (this.onDraftChange) this.element.removeEventListener("input", this.onDraftChange)
+    if (this._liveTimer) clearTimeout(this._liveTimer)
+  }
+
+  toggleAutoScripture(event) {
+    event.preventDefault()
+    this.liveActive = !this.liveActive
+    localStorage.setItem("fc:liveScripture", this.liveActive ? "1" : "0")
+    this.updateAutoBtn()
+    if (this.liveActive) this.maybeAutoSuggest()
+  }
+
+  updateAutoBtn() {
+    if (!this.hasScriptureAutoBtnTarget) return
+    const btn = this.scriptureAutoBtnTarget
+    btn.classList.toggle("is-on", this.liveActive)
+    btn.setAttribute("aria-pressed", this.liveActive ? "true" : "false")
+    const label = btn.querySelector(".fc-composer-asst-label")
+    if (label) label.textContent = this.liveActive ? "Auto: on" : "Auto: off"
+  }
+
+  onDraftChange() {
+    if (!this.liveActive) return
+    if (this._liveTimer) clearTimeout(this._liveTimer)
+    this._liveTimer = setTimeout(() => this.maybeAutoSuggest(), 1300)
+  }
+
+  async maybeAutoSuggest() {
+    const text = this.draftText()
+    if (text.length < 50) return
+    // Cooldown — never fire more than once per ~8s, and skip if the manual
+    // button is mid-flight so we don't double-spend on OpenAI.
+    const now = Date.now()
+    if (this._lastAutoAt && now - this._lastAutoAt < 8000) return
+    if (this.hasScriptureBtnTarget && this.scriptureBtnTarget.disabled) return
+    this._lastAutoAt = now
+
+    this.markAutoBusy(true)
+    try {
+      const data = await this.post(this.scriptureUrlValue, { content: text })
+      if (data && data.ok) this.renderScripture(data.verses || [])
+      // Stay silent on errors in auto mode — the manual button is still there.
+    } catch (e) {
+      // silent
+    } finally {
+      this.markAutoBusy(false)
+    }
+  }
+
+  markAutoBusy(busy) {
+    if (!this.hasScriptureAutoBtnTarget) return
+    this.scriptureAutoBtnTarget.classList.toggle("is-busy", busy)
   }
 
   async checkGentleness() {

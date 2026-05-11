@@ -1,0 +1,61 @@
+<aside class="fc-bible-drawer hidden"
+       data-bible-drawer-target="panel"
+       aria-hidden="true">
+  <div class="fc-bible-drawer-backdrop" data-action="click->bible-drawer#close"></div>
+
+  <div class="fc-bible-drawer-panel" role="dialog" aria-labelledby="bible_drawer_title">
+    <header class="fc-bible-drawer-head">
+      <span id="bible_drawer_title" class="fc-bible-drawer-title">
+        <%= render_icon("bookopen", classes: "h-4 w-4") %>
+        <span>Open Bible</span>
+        <span class="fc-bible-drawer-trans-tag">KJV</span>
+      </span>
+      <button type="button"
+              class="fc-bible-drawer-close"
+              data-action="click->bible-drawer#close"
+              aria-label="Close Bible">×</button>
+    </header>
+
+    <form class="fc-bible-drawer-search"
+          data-action="submit->bible-drawer#search"
+          autocomplete="off">
+      <input type="text"
+             name="reference"
+             data-bible-drawer-target="input"
+             placeholder="John 3 or Psalm 23:1-6"
+             aria-label="Scripture reference"
+             autocomplete="off"
+             autocapitalize="words"
+             spellcheck="false">
+      <button type="submit" class="fc-btn fc-btn-primary">Open</button>
+    </form>
+
+    <div class="fc-bible-drawer-quicklinks">
+      <%
+        quick = [
+          ["Psalm 23", "Shepherd"],
+          ["John 3", "Born again"],
+          ["Romans 8", "No condemnation"],
+          ["Philippians 4", "Peace"],
+          ["Isaiah 40", "Strength"],
+          ["Matthew 5", "Beatitudes"]
+        ]
+      %>
+      <% quick.each do |ref, label| %>
+        <button type="button"
+                class="fc-bible-quicklink"
+                data-action="click->bible-drawer#quicklink"
+                data-reference="<%= ref %>">
+          <span class="fc-bible-quicklink-ref"><%= ref %></span>
+          <span class="fc-bible-quicklink-label"><%= label %></span>
+        </button>
+      <% end %>
+    </div>
+
+    <div class="fc-bible-drawer-body" data-bible-drawer-target="output">
+      <p class="fc-bible-drawer-empty">
+        Search a chapter or verse — or tap a quick link above.
+      </p>
+    </div>
+  </div>
+</aside>

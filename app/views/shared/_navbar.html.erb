@@ -71,6 +71,14 @@
           Breathe
         </button>
 
+        <button type="button"
+                class="fc-icon-btn"
+                title="Open Bible (KJV)"
+                aria-label="Open Bible"
+                data-action="click->bible-drawer#open">
+          <%= render_icon("bookopen", classes: "h-4 w-4") %>
+        </button>
+
         <button type="button" class="fc-icon-btn relative" title="Notifications" data-action="click->notifications-modal#open">
           <%= render_icon("sparkles", classes: "h-4 w-4") %>
           <% if current_user.unread_notifications_count.positive? %>

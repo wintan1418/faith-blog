@@ -43,6 +43,9 @@ application.register("golden-carousel", GoldenCarouselController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import BibleDrawerController from "./bible_drawer_controller"
+application.register("bible-drawer", BibleDrawerController)
+
 import MentionsController from "./mentions_controller"
 application.register("mentions", MentionsController)
 
