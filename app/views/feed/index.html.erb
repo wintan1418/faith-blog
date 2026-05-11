@@ -132,7 +132,9 @@
             <% next unless joiner.user %>
             <div class="fc-join-card"
                  data-controller="auto-dismiss"
-                 data-auto-dismiss-after-ms-value="30000">
+                 data-auto-dismiss-after-ms-value="30000"
+                 data-auto-dismiss-persist-key-value="join-<%= joiner.id %>"
+                 data-auto-dismiss-store-key-value="fc:joins-dismissed">
               <% if joiner.user.profile&.avatar&.attached? %>
                 <%= image_tag joiner.user.profile.avatar, class: "fc-avatar object-cover" %>
               <% else %>
