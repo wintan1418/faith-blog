@@ -72,10 +72,10 @@
           <% @posts.each_with_index do |post, index| %>
             <article class="home-feed-card">
               <header class="home-feed-card-head">
-                <div class="home-author-avatar"><%= post.anonymous? ? "A" : post.user.username.first.upcase %></div>
+                <div class="home-author-avatar"><%= post.anonymous? || post.user.blank? ? "A" : post.user.username.first.upcase %></div>
                 <div class="home-author-copy">
                   <div>
-                    <strong><%= post.anonymous? ? "Anonymous" : post.user.display_name %></strong>
+                    <strong><%= post.anonymous? || post.user.blank? ? "Anonymous" : post.user.display_name %></strong>
                     <% if post.room %>
                       <%= link_to post.room.name, room_path(post.room), class: "home-room-pill" %>
                     <% end %>
@@ -154,7 +154,7 @@
           <% if @prayer_posts.any? %>
             <% @prayer_posts.each do |post| %>
               <%= link_to post_path(post), class: "home-prayer-row" do %>
-                <span><%= post.anonymous? ? "A" : post.user.username.first.upcase %></span>
+                <span><%= post.anonymous? || post.user.blank? ? "A" : post.user.username.first.upcase %></span>
                 <div>
                   <strong><%= post.title.truncate(42) %></strong>
                   <small><%= post.content.to_plain_text.truncate(58) %></small>
@@ -175,7 +175,7 @@
         <div class="home-trend-list">
           <% @trending_posts.first(4).each do |post| %>
             <%= link_to post_path(post), class: "home-trend-row" do %>
-              <small><%= post.room.name %></small>
+              <small><%= post.room ? post.room.name : "Open feed" %></small>
               <strong><%= post.title.truncate(58) %></strong>
               <span><%= pluralize(post.comments_count, "comment") %></span>
             <% end %>

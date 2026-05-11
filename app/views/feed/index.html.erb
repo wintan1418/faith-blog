@@ -349,6 +349,14 @@
           <%= render_icon("search", classes: "h-4 w-4") %>
           <span>Search</span>
         <% end %>
+        <%= link_to church_history_path, class: "fc-discover-quicklink" do %>
+          <span class="text-base leading-none">⛪</span>
+          <span>History</span>
+        <% end %>
+        <%= link_to games_path, class: "fc-discover-quicklink" do %>
+          <span class="text-base leading-none">🎯</span>
+          <span>Games</span>
+        <% end %>
       </nav>
       <%
         verses = @daily_verses.presence || [

@@ -9963,6 +9963,29 @@ html.theme-dark .fc-held-banner {
   color: var(--fc-muted);
   margin: 0 0 0.65rem;
 }
+
+/* ── Turbo page-transition progress bar (top of the page) ─────────── */
+
+.turbo-progress-bar {
+  position: fixed;
+  display: block;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--fc-accent) 30%,
+    color-mix(in oklch, var(--fc-accent) 60%, #ffffff) 70%,
+    var(--fc-accent) 100%);
+  background-size: 200% 100%;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.55);
+  z-index: 9999;
+  transition: width 300ms ease-out, opacity 150ms 150ms ease-in;
+  animation: fc-turbo-shimmer 1.4s linear infinite;
+}
+@keyframes fc-turbo-shimmer {
+  from { background-position: 0% 50%; }
+  to   { background-position: 200% 50%; }
+}
 .fc-era-title {
   margin: 0;
   font-size: 1.2rem;
@@ -14172,9 +14195,15 @@ html.theme-light .inbox-thread-head {
 /* Discover quicklinks (mobile People + Bookmarks + Search shortcut row) */
 .fc-discover-quicklinks {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
   padding: 10px 0 6px;
+}
+@media (min-width: 380px) {
+  .fc-discover-quicklinks { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 480px) {
+  .fc-discover-quicklinks { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 }
 .fc-discover-quicklink {
   display: flex;

@@ -111,7 +111,7 @@
                 <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
               </button>
               <div class="fc-avatar" title="<%= current_user.username %>">
-                <% if current_user.profile.avatar.attached? %>
+                <% if current_user.profile&.avatar&.attached? %>
                   <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover", alt: current_user.username %>
                 <% else %>
                   <%= current_user.username.first.upcase %>

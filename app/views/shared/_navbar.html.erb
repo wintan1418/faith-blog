@@ -84,7 +84,7 @@
 
         <div class="relative" data-controller="dropdown">
           <button type="button" data-action="click->dropdown#toggle" class="fc-avatar" aria-label="Open account menu">
-            <% if current_user.profile.avatar.attached? %>
+            <% if current_user.profile&.avatar&.attached? %>
               <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover" %>
             <% else %>
               <%= current_user.username.first.upcase %>
@@ -110,6 +110,7 @@
             </button>
             <%= link_to "Library", resources_root_path, class: "fc-dropdown-item" %>
             <%= link_to "🎯 Games", games_path, class: "fc-dropdown-item" %>
+            <%= link_to "⛪ Church History", church_history_path, class: "fc-dropdown-item" %>
             <%= link_to "Drafts", drafts_path, class: "fc-dropdown-item" %>
             <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>
             <%= link_to "Invites", invitations_path, class: "fc-dropdown-item" %>
