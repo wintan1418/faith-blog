@@ -1,4 +1,4 @@
-<% content_for(:title) { "Religion Trivia · Faith Community" } %>
+<% content_for(:title) { "Church History Quiz · Faith Community" } %>
 
 <div class="fc-app">
   <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 640px;">
@@ -7,23 +7,23 @@
         <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
           ← Back to games
         <% end %>
-        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">🌍 Religion Trivia</h1>
-        <p class="text-sm text-[var(--fc-muted)]">Five multi-choice questions from Open Trivia DB. Wider than just the Bible — religions, history, traditions.</p>
+        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">⛪ Church History</h1>
+        <p class="text-sm text-[var(--fc-muted)]">5 questions on the people and moments that shaped the church — fathers, reformers, missionaries, hymn writers.</p>
       </header>
 
       <section data-controller="quiz"
-               data-quiz-generate-url-value="<%= games_trivia_generate_path %>"
-               data-quiz-submit-url-value="<%= games_trivia_submit_path %>"
+               data-quiz-generate-url-value="<%= games_history_generate_path %>"
+               data-quiz-submit-url-value="<%= games_history_submit_path %>"
                data-quiz-csrf-value="<%= form_authenticity_token %>">
         <div class="fc-quiz" data-quiz-target="stage">
           <div class="fc-quiz-screen" data-quiz-target="ring">
-            <p class="fc-quiz-kicker">Trivia · 5 questions</p>
-            <h2 class="fc-quiz-headline">Test your reach.</h2>
-            <p class="fc-quiz-sub">Questions span world religions, scripture, and history. Counts toward the leaderboard.</p>
+            <p class="fc-quiz-kicker">Church history · 5 questions</p>
+            <h2 class="fc-quiz-headline">Walk through the centuries.</h2>
+            <p class="fc-quiz-sub">From the apostolic fathers to 20th-century witnesses. Counts toward the leaderboard.</p>
             <button type="button"
                     class="fc-btn fc-btn-primary fc-quiz-start"
                     data-action="click->quiz#start">
-              Start trivia
+              Start quiz
             </button>
           </div>
         </div>

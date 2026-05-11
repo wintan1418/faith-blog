@@ -75,22 +75,27 @@ class GamesController < ApplicationController
     render json: { ok: true, score: score, attempt_id: attempt.id }
   end
 
-  # GET /games/trivia
-  def trivia
+  # GET /games/history — Church History trivia play page
+  def history
   end
 
-  # POST /games/trivia/generate — pull 5 religion questions from Open Trivia DB
-  def trivia_generate
-    questions = Trivia::Religion.fetch_batch(5)
-    render json: { ok: true, questions: questions }
-  rescue Trivia::Religion::Error => e
-    Rails.logger.warn("[Trivia::Religion] #{e.class}: #{e.message}")
-    render json: { ok: false, error: "Couldn't fetch trivia right now. Try again in a moment." }, status: :bad_gateway
+  # POST /games/history/generate — 5 AI-generated church history questions
+  def history_generate
+    questions = Ai::Christian::HistoryQuiz.call
+    render json: {
+      ok: true,
+      questions: questions.map { |q| { kind: q.kind, prompt: q.prompt, choices: q.choices,
+                                       correct_index: q.correct_index, reference: q.reference,
+                                       explanation: q.explanation } }
+    }
+  rescue Ai::Christian::HistoryQuiz::ParseError, Ai::Moderation::Client::Error => e
+    Rails.logger.warn("[HistoryQuiz] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Couldn't fetch a fresh quiz. Try again in a moment." }, status: :bad_gateway
   end
 
-  # POST /games/trivia/submit
-  def trivia_submit
-    record_attempt(kind: :religion_trivia, max_cap: 50)
+  # POST /games/history/submit
+  def history_submit
+    record_attempt(kind: :church_history, max_cap: 50)
   end
 
   private

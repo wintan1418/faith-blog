@@ -94,9 +94,9 @@ Rails.application.routes.draw do
   post "games/quiz/submit",      to: "games#quiz_submit",      as: :games_quiz_submit
   get  "games/chess",            to: "games#chess",            as: :games_chess
   post "games/chess/solved",     to: "games#chess_solved",     as: :games_chess_solved
-  get  "games/trivia",           to: "games#trivia",           as: :games_trivia
-  post "games/trivia/generate",  to: "games#trivia_generate",  as: :games_trivia_generate
-  post "games/trivia/submit",    to: "games#trivia_submit",    as: :games_trivia_submit
+  get  "games/history",          to: "games#history",          as: :games_history
+  post "games/history/generate", to: "games#history_generate", as: :games_history_generate
+  post "games/history/submit",   to: "games#history_submit",   as: :games_history_submit
 
   resources :reading_plans, only: [ :index, :show ], param: :slug do
     member do
