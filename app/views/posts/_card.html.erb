@@ -31,7 +31,7 @@
           <%= image_tag post.user.profile.avatar, class: "fc-avatar object-cover", alt: post.user.username %>
         <% end %>
       <% else %>
-        <%= link_to user_path(post.user.username), class: "fc-avatar" do %>
+        <%= link_to user_path(post.user.username), class: "fc-avatar", style: avatar_tint_style(post.user.username) do %>
           <%= post.user.username.first.upcase %>
         <% end %>
       <% end %>
@@ -112,11 +112,11 @@
           imgs = post.images.first(4)
           grid_class = "fc-breath-media-grid is-#{imgs.size}"
         %>
-        <%= link_to post_path(post), class: grid_class do %>
+        <div class="<%= grid_class %>" data-controller="lightbox">
           <% imgs.each do |img| %>
             <%= image_tag img, class: "fc-breath-media-image", alt: post.title, loading: "lazy" %>
           <% end %>
-        <% end %>
+        </div>
       <% end %>
 
       <% if post.tags.any? %>

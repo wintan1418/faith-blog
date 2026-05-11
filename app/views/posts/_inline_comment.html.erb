@@ -19,7 +19,7 @@
     <% if comment.user.profile&.avatar&.attached? %>
       <%= image_tag comment.user.profile.avatar, class: "fc-avatar object-cover" %>
     <% else %>
-      <span class="fc-avatar"><%= comment.user.username.first.upcase %></span>
+      <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
     <% end %>
     <div class="fc-inline-comment-body">
       <div class="fc-inline-comment-head">

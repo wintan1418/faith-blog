@@ -8,6 +8,15 @@ module ApplicationHelper
     title.present? ? "#{title} - #{base_title}" : base_title
   end
 
+  # Deterministic muted background + readable foreground for avatar fallbacks
+  # without a photo. Same username → same hue every time. Light enough to
+  # work as a backdrop for a single capital letter in both themes.
+  def avatar_tint_style(seed)
+    return "" if seed.blank?
+    hue = seed.to_s.bytes.sum % 360
+    "background: hsl(#{hue} 38% 72%); color: hsl(#{hue} 55% 18%);"
+  end
+
   def preview_for(reviewable)
     case reviewable
     when Post
