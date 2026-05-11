@@ -130,7 +130,9 @@
         <div class="space-y-2 mb-3">
           <% @new_member_announcements.each do |joiner| %>
             <% next unless joiner.user %>
-            <div class="fc-join-card">
+            <div class="fc-join-card"
+                 data-controller="auto-dismiss"
+                 data-auto-dismiss-after-ms-value="30000">
               <% if joiner.user.profile&.avatar&.attached? %>
                 <%= image_tag joiner.user.profile.avatar, class: "fc-avatar object-cover" %>
               <% else %>
@@ -143,6 +145,10 @@
                 just joined us
                 <span class="fc-breath-time">· <%= time_ago_in_words(joiner.published_at) %> ago</span>
               </p>
+              <button type="button"
+                      class="fc-join-card-close"
+                      data-action="click->auto-dismiss#dismiss"
+                      aria-label="Dismiss">×</button>
             </div>
           <% end %>
         </div>

@@ -12,7 +12,7 @@
     </header>
     <%= render "notifications/list", notifications: @notifications %>
     <footer class="fc-notif-foot">
-      <%= link_to "Open notifications page", notifications_path, class: "fc-notif-foot-link" %>
+      <%= link_to "Open notifications page", notifications_path, class: "fc-notif-foot-link", data: { turbo_frame: "_top" } %>
     </footer>
   </div>
 <% end %>

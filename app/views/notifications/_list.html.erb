@@ -1,7 +1,9 @@
 <% if notifications.any? %>
   <ul class="fc-notif-list">
     <% notifications.each do |notification| %>
-      <%= link_to notification.target_path, class: "fc-notif-row#{' is-unread' unless notification.read?}" do %>
+      <%= link_to notification.target_path,
+          class: "fc-notif-row#{' is-unread' unless notification.read?}",
+          data: { turbo_frame: "_top" } do %>
         <% if notification.actor %>
           <% if notification.actor.profile&.avatar&.attached? %>
             <%= image_tag notification.actor.profile.avatar, class: "fc-avatar object-cover", alt: notification.actor.username %>

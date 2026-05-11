@@ -52,6 +52,9 @@ application.register("lightbox", LightboxController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import AutoDismissController from "./auto_dismiss_controller"
+application.register("auto-dismiss", AutoDismissController)
+
 import BibleDrawerController from "./bible_drawer_controller"
 application.register("bible-drawer", BibleDrawerController)
 
