@@ -8976,6 +8976,57 @@ html.theme-dark .fc-held-banner {
 }
 .fc-bible-share-btn:hover { filter: brightness(1.06); }
 
+/* ── Copy buttons (verse / passage / suggested-scripture) ─────────── */
+
+.fc-copy-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--fc-line-strong);
+  background: var(--fc-surface-2);
+  color: var(--fc-ink);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.fc-copy-btn:hover {
+  border-color: var(--fc-accent);
+  color: var(--fc-accent-2);
+}
+.fc-copy-btn.is-copied {
+  background: var(--fc-accent);
+  border-color: var(--fc-accent);
+  color: var(--fc-bg);
+}
+
+/* Tighter inline copy chip used per-verse in the Bible reader. */
+.fc-copy-btn--inline {
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  font-size: 0.72rem;
+  margin-left: 0.4rem;
+  vertical-align: baseline;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 120ms ease, background 140ms ease,
+              border-color 140ms ease, color 140ms ease;
+}
+.fc-bible-verse:hover .fc-copy-btn--inline,
+.fc-copy-btn--inline:focus-visible,
+.fc-copy-btn--inline.is-copied {
+  opacity: 1;
+}
+
+/* Touch devices: no hover — always show the inline chip. */
+@media (hover: none) {
+  .fc-copy-btn--inline { opacity: 1; }
+}
+
 /* ── Empty state pattern ────────────────────────────────────────────── */
 
 .fc-empty {

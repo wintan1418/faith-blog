@@ -201,20 +201,28 @@ export default class extends Controller {
     let bodyHtml = ""
     let plainText = ""
     if (Array.isArray(payload.verses) && payload.verses.length > 0) {
-      bodyHtml = payload.verses.map(v => `
-        <p class="fc-bible-verse">
-          <span class="fc-bible-verse-num">${this.escape(String(v.verse))}</span>
-          <span class="fc-bible-verse-text">${this.escape(v.text)}</span>
-        </p>
-      `).join("")
+      bodyHtml = payload.verses.map(v => {
+        const verseClip = `"${v.text.trim()}"\n— ${ref.split(/\s+/).slice(0, -1).concat([`${v.chapter || ""}:${v.verse}`]).join(" ").trim()} (${trans})`
+        return `
+          <p class="fc-bible-verse">
+            <span class="fc-bible-verse-num">${this.escape(String(v.verse))}</span>
+            <span class="fc-bible-verse-text">${this.escape(v.text)}</span>
+            <button type="button"
+                    class="fc-copy-btn fc-copy-btn--inline"
+                    data-action="click->bible-drawer#copyVerse"
+                    data-copy-text="${this.escape(verseClip)}"
+                    title="Copy verse"
+                    aria-label="Copy verse">⎘</button>
+          </p>
+        `
+      }).join("")
       plainText = payload.verses.map(v => v.text).join(" ").trim()
     } else {
       const lines = String(payload.text || "").split(/\n+/).map(s => s.trim()).filter(Boolean)
       bodyHtml = lines.map(l => `<p class="fc-bible-verse"><span class="fc-bible-verse-text">${this.escape(l)}</span></p>`).join("")
       plainText = lines.join(" ")
     }
-    // Store the plain-text body on a data attr for the share button.
-    const shareText = `"${plainText}"\n— ${ref} (${trans})`
+    const passageClip = `"${plainText}"\n— ${ref} (${trans})`
 
     output.innerHTML = `
       <header class="fc-bible-read-head">
@@ -223,15 +231,43 @@ export default class extends Controller {
       </header>
       <div class="fc-bible-read-actions">
         <button type="button"
+                class="fc-copy-btn"
+                data-action="click->bible-drawer#copyVerse"
+                data-copy-text="${this.escape(passageClip)}"
+                title="Copy passage">
+          ⎘ Copy passage
+        </button>
+        <button type="button"
                 class="fc-bible-share-btn"
                 data-action="click->bible-drawer#shareVerse"
-                data-share-text="${this.escape(shareText)}">
+                data-share-text="${this.escape(passageClip)}">
           ✦ Share as a breath
         </button>
       </div>
       <div class="fc-bible-read-body">${bodyHtml}</div>
     `
     output.scrollTop = 0
+  }
+
+  async copyVerse(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    const btn = event.currentTarget
+    const text = btn.dataset.copyText || ""
+    if (!text) return
+    try {
+      await navigator.clipboard.writeText(text)
+      const original = btn.innerHTML
+      btn.classList.add("is-copied")
+      btn.innerHTML = btn.classList.contains("fc-copy-btn--inline") ? "✓" : "✓ Copied"
+      setTimeout(() => {
+        btn.classList.remove("is-copied")
+        btn.innerHTML = original
+      }, 1400)
+    } catch {
+      btn.innerHTML = btn.classList.contains("fc-copy-btn--inline") ? "✗" : "✗ Failed"
+      setTimeout(() => { btn.innerHTML = "⎘" }, 1400)
+    }
   }
 
   shareVerse(event) {

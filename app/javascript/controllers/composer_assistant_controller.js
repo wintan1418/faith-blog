@@ -138,10 +138,20 @@ export default class extends Controller {
     let html = `<div class="fc-asst-result is-scripture"><p class="fc-asst-headline">📖 Suggested scripture</p><ul class="fc-asst-verses">`
     for (const v of verses) {
       const text = (v.text || "").trim()
+      const trans = v.translation || "KJV"
+      const clip = text ? `"${text}"\n— ${v.reference} (${trans})` : `${v.reference} (${trans})`
       html += `<li class="fc-asst-verse">
         <div class="fc-asst-verse-head">
           <span class="fc-asst-verse-ref">${this.escape(v.reference)}</span>
-          <span class="fc-asst-verse-trans">${this.escape(v.translation || "KJV")}</span>
+          <span class="fc-asst-verse-trans">${this.escape(trans)}</span>
+          <button type="button"
+                  class="fc-copy-btn ml-auto"
+                  data-action="click->composer-assistant#copyVerse"
+                  data-copy-text="${this.escape(clip)}"
+                  title="Copy verse"
+                  aria-label="Copy verse">
+            ⎘ Copy
+          </button>
         </div>`
       if (text) {
         html += `<blockquote class="fc-asst-verse-text">${this.escape(text)}</blockquote>`
@@ -153,6 +163,26 @@ export default class extends Controller {
     }
     html += `</ul></div>`
     this.show(html)
+  }
+
+  async copyVerse(event) {
+    event.preventDefault()
+    const btn = event.currentTarget
+    const text = btn.dataset.copyText || ""
+    if (!text) return
+    try {
+      await navigator.clipboard.writeText(text)
+      const original = btn.innerHTML
+      btn.classList.add("is-copied")
+      btn.innerHTML = "✓ Copied"
+      setTimeout(() => {
+        btn.classList.remove("is-copied")
+        btn.innerHTML = original
+      }, 1400)
+    } catch {
+      btn.innerHTML = "✗ Failed"
+      setTimeout(() => { btn.innerHTML = "⎘ Copy" }, 1400)
+    }
   }
 
   showError(msg) {
