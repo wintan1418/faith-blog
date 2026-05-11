@@ -8955,6 +8955,113 @@ html.theme-dark .fc-held-banner {
   margin-bottom: 0.4rem;
 }
 
+.fc-bible-read-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 0.7rem;
+}
+
+.fc-bible-share-btn {
+  appearance: none;
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+  border: 0;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: filter 140ms ease;
+}
+.fc-bible-share-btn:hover { filter: brightness(1.06); }
+
+/* ── Empty state pattern ────────────────────────────────────────────── */
+
+.fc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1.5rem 2.8rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 16px;
+}
+
+.fc-empty-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-2);
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.fc-empty-title {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.fc-empty-text {
+  font-size: 0.88rem;
+  color: var(--fc-muted);
+  margin: 0;
+  max-width: 32rem;
+  line-height: 1.5;
+}
+
+.fc-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.8rem;
+}
+
+/* ── Skeleton primitives ────────────────────────────────────────────── */
+
+.fc-skel {
+  position: relative;
+  background: var(--fc-surface-2);
+  overflow: hidden;
+  border-radius: 6px;
+}
+.fc-skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 100%);
+  animation: fc-skel-shimmer 1300ms ease-in-out infinite;
+}
+@keyframes fc-skel-shimmer {
+  to { transform: translateX(100%); }
+}
+
+.fc-skel-card {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 0.85rem;
+  padding: 1.2rem 1.4rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 16px;
+}
+.fc-skel-card .fc-skel-avatar { width: 44px; height: 44px; border-radius: 50%; }
+.fc-skel-card .fc-skel-line { height: 12px; border-radius: 999px; margin-bottom: 8px; }
+.fc-skel-card .fc-skel-line.is-short { width: 35%; }
+.fc-skel-card .fc-skel-line.is-mid   { width: 70%; }
+.fc-skel-card .fc-skel-line.is-long  { width: 95%; }
+
 .fc-toast-stack {
   position: fixed;
   top: 64px;

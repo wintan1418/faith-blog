@@ -123,14 +123,24 @@
               </div>
             <% end %>
           <% else %>
-            <div class="fc-panel p-8 text-center">
-              <h2 class="text-lg font-bold text-[var(--fc-ink)]">No breaths yet</h2>
-              <p class="mt-2 text-sm text-[var(--fc-muted)]">Start the first conversation.</p>
-              <button type="button"
-                      class="fc-btn fc-btn-primary mt-5"
-                      data-action="click->composer-modal#open">
-                Take a breath
-              </button>
+            <div class="fc-empty">
+              <div class="fc-empty-mark" aria-hidden="true">
+                <%= render_icon("message_circle", classes: "h-7 w-7") %>
+              </div>
+              <h2 class="fc-empty-title">Quiet here for now.</h2>
+              <p class="fc-empty-text">Be the first to take a breath — share a verse, a prayer, or what's on your heart.</p>
+              <div class="fc-empty-actions">
+                <button type="button"
+                        class="fc-btn fc-btn-primary"
+                        data-action="click->composer-modal#open">
+                  Take a breath
+                </button>
+                <button type="button"
+                        class="fc-btn"
+                        data-action="click->bible-drawer#open">
+                  📖 Open Bible
+                </button>
+              </div>
             </div>
           <% end %>
         </div>

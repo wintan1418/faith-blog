@@ -199,6 +199,7 @@ export default class extends Controller {
     const ref = payload.reference || ""
     const trans = payload.translation || "KJV"
     let bodyHtml = ""
+    let plainText = ""
     if (Array.isArray(payload.verses) && payload.verses.length > 0) {
       bodyHtml = payload.verses.map(v => `
         <p class="fc-bible-verse">
@@ -206,18 +207,39 @@ export default class extends Controller {
           <span class="fc-bible-verse-text">${this.escape(v.text)}</span>
         </p>
       `).join("")
+      plainText = payload.verses.map(v => v.text).join(" ").trim()
     } else {
       const lines = String(payload.text || "").split(/\n+/).map(s => s.trim()).filter(Boolean)
       bodyHtml = lines.map(l => `<p class="fc-bible-verse"><span class="fc-bible-verse-text">${this.escape(l)}</span></p>`).join("")
+      plainText = lines.join(" ")
     }
+    // Store the plain-text body on a data attr for the share button.
+    const shareText = `"${plainText}"\n— ${ref} (${trans})`
+
     output.innerHTML = `
       <header class="fc-bible-read-head">
         <h2 class="fc-bible-read-ref">${this.escape(ref)}</h2>
         <span class="fc-bible-read-trans">${this.escape(trans)}</span>
       </header>
+      <div class="fc-bible-read-actions">
+        <button type="button"
+                class="fc-bible-share-btn"
+                data-action="click->bible-drawer#shareVerse"
+                data-share-text="${this.escape(shareText)}">
+          ✦ Share as a breath
+        </button>
+      </div>
       <div class="fc-bible-read-body">${bodyHtml}</div>
     `
     output.scrollTop = 0
+  }
+
+  shareVerse(event) {
+    event.preventDefault()
+    const text = event.currentTarget.dataset.shareText
+    if (!text) return
+    this.close()
+    document.dispatchEvent(new CustomEvent("composer:prefill", { detail: { text } }))
   }
 
   // ── Natural-language search ─────────────────────────────────────────────

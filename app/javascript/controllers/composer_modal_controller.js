@@ -8,11 +8,28 @@ export default class extends Controller {
 
   connect() {
     this.handleSubmitEnd = this.handleSubmitEnd.bind(this)
+    this.handlePrefill = this.handlePrefill.bind(this)
     document.addEventListener("turbo:submit-end", this.handleSubmitEnd)
+    document.addEventListener("composer:prefill", this.handlePrefill)
   }
 
   disconnect() {
     document.removeEventListener("turbo:submit-end", this.handleSubmitEnd)
+    document.removeEventListener("composer:prefill", this.handlePrefill)
+  }
+
+  handlePrefill(event) {
+    const text = event.detail && event.detail.text
+    if (!text) return
+    this.open()
+    // Two frames so the dialog is open and trix is mounted before we touch it.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const editor = this.dialogTarget.querySelector("trix-editor")
+      if (editor && editor.editor) {
+        editor.editor.loadHTML("")
+        editor.editor.insertString(text)
+      }
+    }))
   }
 
   open(event) {
