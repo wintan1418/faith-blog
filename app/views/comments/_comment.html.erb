@@ -18,7 +18,7 @@
       <% if comment.user.profile&.avatar&.attached? %>
         <%= image_tag comment.user.profile.avatar, class: "fc-avatar object-cover", alt: comment.user.username %>
       <% else %>
-        <span class="fc-avatar"><%= comment.user.username.first.upcase %></span>
+        <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
       <% end %>
     <% end %>
 
@@ -73,7 +73,7 @@
               <% if current_user.profile&.avatar&.attached? %>
                 <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
               <% else %>
-                <span class="fc-avatar"><%= current_user.username.first.upcase %></span>
+                <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
               <% end %>
               <div class="fc-inline-reply-body">
                 <%= f.text_area :content,

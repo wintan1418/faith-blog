@@ -3194,13 +3194,13 @@ html.theme-dark .fc-search {
 }
 
 .fc-avatar {
-  background: #e5dced !important;
-  color: #3a294b !important;
+  background: var(--fc-avatar-bg, #e5dced) !important;
+  color: var(--fc-avatar-fg, #3a294b) !important;
 }
 
 html.theme-dark .fc-avatar {
-  background: #ded0ee !important;
-  color: #241832 !important;
+  background: var(--fc-avatar-bg, #ded0ee) !important;
+  color: var(--fc-avatar-fg, #241832) !important;
 }
 
 .fc-badge,
@@ -4791,10 +4791,11 @@ html.theme-dark .fc-card footer {
   color: var(--fc-muted) !important;
 }
 
-/* Avatars — solid mint, dark text. High contrast, no muddy gradient. */
+/* Avatars — per-user tint via CSS vars (set inline by avatar_tint_style).
+   Falls back to mint when the variable isn't set. */
 html.theme-dark .fc-avatar {
-  background: var(--fc-accent) !important;
-  color: #042f1d !important;
+  background: var(--fc-avatar-bg, var(--fc-accent)) !important;
+  color: var(--fc-avatar-fg, #042f1d) !important;
   font-weight: 800 !important;
   box-shadow: 0 0 0 2px var(--fc-surface) !important;
 }

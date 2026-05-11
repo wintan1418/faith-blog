@@ -9,12 +9,14 @@ module ApplicationHelper
   end
 
   # Deterministic muted background + readable foreground for avatar fallbacks
-  # without a photo. Same username → same hue every time. Light enough to
-  # work as a backdrop for a single capital letter in both themes.
+  # without a photo. Same username → same hue every time. Sets CSS vars
+  # (rather than background directly) because the base .fc-avatar rule uses
+  # !important to lock the mint default — the !important rule reads these
+  # vars so per-user inline values win.
   def avatar_tint_style(seed)
     return "" if seed.blank?
     hue = seed.to_s.bytes.sum % 360
-    "background: hsl(#{hue} 38% 72%); color: hsl(#{hue} 55% 18%);"
+    "--fc-avatar-bg: hsl(#{hue} 42% 72%); --fc-avatar-fg: hsl(#{hue} 55% 18%);"
   end
 
   def preview_for(reviewable)

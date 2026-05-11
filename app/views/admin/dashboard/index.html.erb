@@ -96,7 +96,7 @@
           <% if user.profile.avatar.attached? %>
             <%= image_tag user.profile.avatar, class: "fc-avatar object-cover" %>
           <% else %>
-            <span class="fc-avatar"><%= user.username.first.upcase %></span>
+            <span class="fc-avatar" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
           <% end %>
           <span class="min-w-0 flex-1">
             <span class="block truncate text-sm font-extrabold text-[var(--fc-ink)]"><%= user.username %></span>

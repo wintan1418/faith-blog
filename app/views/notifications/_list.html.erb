@@ -6,7 +6,7 @@
           <% if notification.actor.profile&.avatar&.attached? %>
             <%= image_tag notification.actor.profile.avatar, class: "fc-avatar object-cover", alt: notification.actor.username %>
           <% else %>
-            <span class="fc-avatar"><%= notification.actor.username.first.upcase %></span>
+            <span class="fc-avatar" style="<%= avatar_tint_style(notification.actor.username) %>"><%= notification.actor.username.first.upcase %></span>
           <% end %>
         <% else %>
           <span class="fc-avatar"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
