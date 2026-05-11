@@ -5,9 +5,15 @@
 
   <div class="fc-bible-drawer-panel" role="dialog" aria-labelledby="bible_drawer_title">
     <header class="fc-bible-drawer-head">
+      <button type="button"
+              class="fc-bible-drawer-back hidden"
+              data-bible-drawer-target="backBtn"
+              data-action="click->bible-drawer#back"
+              aria-label="Back">
+        <%= render_icon("chevron_left", classes: "h-4 w-4") %>
+      </button>
       <span id="bible_drawer_title" class="fc-bible-drawer-title">
-        <%= render_icon("bookopen", classes: "h-4 w-4") %>
-        <span>Open Bible</span>
+        <span data-bible-drawer-target="title">Open Bible</span>
         <span class="fc-bible-drawer-trans-tag">KJV</span>
       </span>
       <button type="button"
@@ -16,46 +22,86 @@
               aria-label="Close Bible">×</button>
     </header>
 
-    <form class="fc-bible-drawer-search"
-          data-action="submit->bible-drawer#search"
-          autocomplete="off">
-      <input type="text"
-             name="reference"
-             data-bible-drawer-target="input"
-             placeholder="John 3 or Psalm 23:1-6"
-             aria-label="Scripture reference"
-             autocomplete="off"
-             autocapitalize="words"
-             spellcheck="false">
-      <button type="submit" class="fc-btn fc-btn-primary">Open</button>
-    </form>
+    <nav class="fc-bible-tabs" data-bible-drawer-target="tabs">
+      <button type="button"
+              class="fc-bible-tab is-active"
+              data-bible-drawer-target="browseTab"
+              data-action="click->bible-drawer#showBrowse">
+        Browse
+      </button>
+      <button type="button"
+              class="fc-bible-tab"
+              data-bible-drawer-target="searchTab"
+              data-action="click->bible-drawer#showSearch">
+        Search
+      </button>
+    </nav>
 
-    <div class="fc-bible-drawer-quicklinks">
-      <%
-        quick = [
-          ["Psalm 23", "Shepherd"],
-          ["John 3", "Born again"],
-          ["Romans 8", "No condemnation"],
-          ["Philippians 4", "Peace"],
-          ["Isaiah 40", "Strength"],
-          ["Matthew 5", "Beatitudes"]
-        ]
-      %>
-      <% quick.each do |ref, label| %>
-        <button type="button"
-                class="fc-bible-quicklink"
-                data-action="click->bible-drawer#quicklink"
-                data-reference="<%= ref %>">
-          <span class="fc-bible-quicklink-ref"><%= ref %></span>
-          <span class="fc-bible-quicklink-label"><%= label %></span>
-        </button>
-      <% end %>
+    <%# ── BROWSE VIEW ── %>
+    <div class="fc-bible-view" data-bible-drawer-target="browseView">
+      <section class="fc-bible-section">
+        <h3 class="fc-bible-section-title">Old Testament</h3>
+        <div class="fc-bible-book-grid">
+          <% Bible::Books::OLD_TESTAMENT.each do |name, chapters| %>
+            <button type="button"
+                    class="fc-bible-book"
+                    data-action="click->bible-drawer#openBook"
+                    data-book="<%= name %>"
+                    data-chapters="<%= chapters %>">
+              <%= name %>
+            </button>
+          <% end %>
+        </div>
+      </section>
+      <section class="fc-bible-section">
+        <h3 class="fc-bible-section-title">New Testament</h3>
+        <div class="fc-bible-book-grid">
+          <% Bible::Books::NEW_TESTAMENT.each do |name, chapters| %>
+            <button type="button"
+                    class="fc-bible-book"
+                    data-action="click->bible-drawer#openBook"
+                    data-book="<%= name %>"
+                    data-chapters="<%= chapters %>">
+              <%= name %>
+            </button>
+          <% end %>
+        </div>
+      </section>
     </div>
 
-    <div class="fc-bible-drawer-body" data-bible-drawer-target="output">
-      <p class="fc-bible-drawer-empty">
-        Search a chapter or verse — or tap a quick link above.
+    <%# ── SEARCH VIEW ── %>
+    <div class="fc-bible-view hidden" data-bible-drawer-target="searchView">
+      <form class="fc-bible-drawer-search"
+            data-action="submit->bible-drawer#runSearch"
+            autocomplete="off">
+        <input type="text"
+               name="query"
+               data-bible-drawer-target="searchInput"
+               placeholder="Ask anything — 'when David spared Saul'…"
+               aria-label="Search the Bible"
+               autocomplete="off"
+               spellcheck="false">
+        <button type="submit" class="fc-btn fc-btn-primary">Search</button>
+      </form>
+      <p class="fc-bible-search-hint">
+        Tip: ask in plain words — "where Paul talks about love",
+        "Jesus calms the storm", "Jonathan and David's covenant".
       </p>
+      <div class="fc-bible-drawer-body" data-bible-drawer-target="searchOutput">
+        <p class="fc-bible-drawer-empty">Results will show here.</p>
+      </div>
+    </div>
+
+    <%# ── CHAPTER PICKER (for a selected book) ── %>
+    <div class="fc-bible-view hidden" data-bible-drawer-target="chapterView">
+      <div class="fc-bible-chapter-grid" data-bible-drawer-target="chapterGrid"></div>
+    </div>
+
+    <%# ── READER VIEW ── %>
+    <div class="fc-bible-view hidden" data-bible-drawer-target="readerView">
+      <div class="fc-bible-drawer-body" data-bible-drawer-target="output">
+        <p class="fc-bible-drawer-empty">Pick a chapter to start reading.</p>
+      </div>
     </div>
   </div>
 </aside>

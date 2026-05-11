@@ -8689,9 +8689,189 @@ html.theme-dark .fc-held-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   padding: 0.95rem 1.1rem;
   border-bottom: 1px solid var(--fc-line);
   flex-shrink: 0;
+}
+
+.fc-bible-drawer-back {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--fc-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fc-bible-drawer-back:hover {
+  color: var(--fc-ink);
+  background: var(--fc-surface-2);
+}
+.fc-bible-drawer-back.hidden { display: none; }
+
+.fc-bible-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 1.1rem;
+  border-bottom: 1px solid var(--fc-line);
+  flex-shrink: 0;
+}
+.fc-bible-tabs.hidden { display: none; }
+
+.fc-bible-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--fc-muted);
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.fc-bible-tab:hover { color: var(--fc-ink); }
+.fc-bible-tab.is-active {
+  color: var(--fc-ink);
+  border-bottom-color: var(--fc-accent);
+}
+
+.fc-bible-view {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0.8rem 1.1rem 1.5rem;
+}
+.fc-bible-view.hidden { display: none; }
+
+.fc-bible-section {
+  margin-bottom: 1.2rem;
+}
+.fc-bible-section-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fc-muted);
+  margin: 0.4rem 0 0.55rem;
+}
+
+.fc-bible-book-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+@media (min-width: 380px) {
+  .fc-bible-book-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.fc-bible-book {
+  appearance: none;
+  border: 1px solid var(--fc-line);
+  border-radius: 10px;
+  background: var(--fc-surface-2);
+  color: var(--fc-ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.fc-bible-book:hover {
+  border-color: var(--fc-accent);
+  background: var(--fc-surface);
+}
+
+.fc-bible-chapter-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+@media (min-width: 380px) {
+  .fc-bible-chapter-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+}
+
+.fc-bible-chapter {
+  appearance: none;
+  border: 1px solid var(--fc-line);
+  border-radius: 8px;
+  background: var(--fc-surface-2);
+  color: var(--fc-ink);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.fc-bible-chapter:hover {
+  border-color: var(--fc-accent);
+  background: var(--fc-surface);
+}
+
+.fc-bible-search-hint {
+  font-size: 0.74rem;
+  color: var(--fc-muted);
+  margin: 0.5rem 0 0.6rem;
+  line-height: 1.5;
+}
+
+.fc-bible-hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fc-bible-hit {
+  appearance: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--fc-line);
+  border-radius: 10px;
+  background: var(--fc-surface-2);
+  color: var(--fc-ink);
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.fc-bible-hit:hover {
+  border-color: var(--fc-accent);
+  background: var(--fc-surface);
+}
+.fc-bible-hit-ref {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--fc-ink);
+}
+.fc-bible-hit-reason {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--fc-muted);
+  line-height: 1.45;
+}
+
+.fc-bible-view .fc-bible-drawer-body {
+  padding: 0;
+  flex: initial;
+  overflow: visible;
+}
+
+.fc-bible-view .fc-bible-drawer-search {
+  padding: 0;
+  border: 0;
+  margin-bottom: 0.4rem;
 }
 
 .fc-bible-drawer-title {

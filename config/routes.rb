@@ -85,6 +85,7 @@ Rails.application.routes.draw do
   get "bookmarks", to: "bookmarks#index"
   get "drafts", to: "drafts#index", as: :drafts
   get "scripture/lookup", to: "scripture#show", as: :scripture_lookup
+  post "bible/search", to: "bible#search", as: :bible_search
 
   resources :reading_plans, only: [ :index, :show ], param: :slug do
     member do
