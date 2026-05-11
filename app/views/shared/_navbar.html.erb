@@ -102,6 +102,12 @@
                     data-action="click->bible-drawer#open click->dropdown#close">
               📖 Open Bible
             </button>
+            <button type="button"
+                    class="fc-dropdown-item w-full text-left"
+                    data-pwa-target="enableBtn"
+                    data-action="click->pwa#togglePush click->dropdown#close">
+              🔕 Turn on push
+            </button>
             <%= link_to "Library", resources_root_path, class: "fc-dropdown-item" %>
             <%= link_to "Drafts", drafts_path, class: "fc-dropdown-item" %>
             <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>

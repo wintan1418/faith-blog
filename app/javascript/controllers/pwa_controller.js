@@ -40,6 +40,12 @@ export default class extends Controller {
     if (this.hasInstallBtnTarget) this.installBtnTarget.classList.add("hidden")
   }
 
+  async togglePush() {
+    const state = this.hasEnableBtnTarget ? this.enableBtnTarget.dataset.pushState : "off"
+    if (state === "on") return this.disablePush()
+    return this.enablePush()
+  }
+
   async enablePush() {
     if (!this.registration) {
       alert("Service worker isn't ready yet — refresh and try again.")
