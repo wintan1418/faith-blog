@@ -102,6 +102,7 @@
                     data-action="click->bible-drawer#open click->dropdown#close">
               📖 Open Bible
             </button>
+            <%= link_to "Library", resources_root_path, class: "fc-dropdown-item" %>
             <%= link_to "Drafts", drafts_path, class: "fc-dropdown-item" %>
             <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>
             <%= link_to "Invites", invitations_path, class: "fc-dropdown-item" %>
@@ -141,10 +142,12 @@
       <%= render_icon("send", classes: "h-5 w-5") %>
       <span>Breathe</span>
     </button>
-    <%= link_to resources_root_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/resources')}" do %>
+    <button type="button"
+            class="fc-bottom-nav-item"
+            data-action="click->bible-drawer#open">
       <%= render_icon("bookopen", classes: "h-5 w-5") %>
-      <span>Library</span>
-    <% end %>
+      <span>Bible</span>
+    </button>
     <%= link_to user_path(current_user.username), class: "fc-bottom-nav-item #{'is-active' if request.path == user_path(current_user.username)}" do %>
       <%= render_icon("users", classes: "h-5 w-5") %>
       <span>Profile</span>

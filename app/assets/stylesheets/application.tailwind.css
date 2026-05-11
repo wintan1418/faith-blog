@@ -2370,7 +2370,11 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 -28px 60px -20px rgba(0, 0, 0, 0.55);
     padding: 0 1rem 1.25rem;
     overflow-y: auto;
+    overscroll-behavior: contain;
     animation: fc-discover-rise 280ms cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+  .fc-aside.is-open .fc-side-card {
+    padding: 0.85rem;
   }
 }
 
@@ -11645,7 +11649,10 @@ dialog .tribute-container {
 
 .fc-golden-track {
   position: relative;
-  min-height: 110px;
+  min-height: 140px;
+}
+@media (max-width: 760px) {
+  .fc-golden-track { min-height: 120px; }
 }
 .fc-golden-slide {
   position: absolute;
@@ -12580,13 +12587,23 @@ html.theme-light .inbox-thread-head {
 .fc-living-card::before {
   content: "\201C";
   position: absolute;
-  top: 4px;
-  right: 16px;
+  top: -4px;
+  right: 14px;
   font-family: 'Fraunces', Georgia, serif;
   font-size: 56px;
   line-height: 1;
-  color: rgba(52, 211, 153, 0.30);
+  color: rgba(52, 211, 153, 0.22);
   pointer-events: none;
+  z-index: 0;
+}
+.fc-living-card > * { position: relative; z-index: 1; }
+
+@media (max-width: 760px) {
+  .fc-living-card::before {
+    font-size: 38px;
+    top: -2px;
+    right: 10px;
+  }
 }
 
 .fc-living-head {
@@ -12823,7 +12840,7 @@ html.theme-light .inbox-thread-head {
 /* Discover quicklinks (mobile People + Bookmarks + Search shortcut row) */
 .fc-discover-quicklinks {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
   padding: 10px 0 6px;
 }
@@ -12847,6 +12864,19 @@ html.theme-light .inbox-thread-head {
   background: var(--fc-accent-soft);
   border-color: rgba(52, 211, 153, 0.30);
   color: var(--fc-accent-2);
+}
+
+/* Bible quicklink is the lead — emphasize so users find it on mobile. */
+.fc-discover-quicklink.is-bible {
+  background: var(--fc-accent);
+  border-color: var(--fc-accent);
+  color: var(--fc-bg);
+}
+.fc-discover-quicklink.is-bible svg { color: var(--fc-bg); }
+.fc-discover-quicklink.is-bible:hover {
+  filter: brightness(1.06);
+  background: var(--fc-accent);
+  color: var(--fc-bg);
 }
 
 /* ============================================================

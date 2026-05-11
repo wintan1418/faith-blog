@@ -144,6 +144,12 @@
       </header>
 
       <nav class="fc-discover-quicklinks">
+        <button type="button"
+                class="fc-discover-quicklink is-bible"
+                data-action="click->bible-drawer#open click->discover#close">
+          <%= render_icon("bookopen", classes: "h-4 w-4") %>
+          <span>Bible</span>
+        </button>
         <%= link_to people_path, class: "fc-discover-quicklink" do %>
           <%= render_icon("users", classes: "h-4 w-4") %>
           <span>People</span>
