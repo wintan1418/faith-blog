@@ -15,43 +15,45 @@
         document.documentElement.classList.toggle('theme-light', !dark);
       })();
     </script>
-    <title><%= content_for(:title) || "Faith Community" %></title>
+    <title><%= content_for(:title) || "Brethreign — breathe" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : "A faith-based community platform for sharing testimonies, struggles, victories, and spiritual resources." %>">
+    <meta name="description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : "A community where Christians breathe — share testimonies, read scripture, pray for one another." %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Brethreign">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%# PWA %>
     <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <link rel="apple-touch-icon" href="/icon.png">
-    <meta name="theme-color" content="#0b1417">
+    <meta name="theme-color" content="#0b0f10">
     <% if user_signed_in? && WebPushConfig.configured? %>
       <meta name="vapid-public-key" content="<%= WebPushConfig.public_key %>">
     <% end %>
 
     <%# Social share / Open Graph %>
-    <% og_title       = content_for?(:og_title)       ? content_for(:og_title)       : (content_for(:title) || "Faith Community") %>
-    <% og_description = content_for?(:og_description) ? content_for(:og_description) : "Breathe into the faith community." %>
-    <% og_image       = content_for?(:og_image)       ? content_for(:og_image)       : asset_url("og-default.png") rescue nil %>
+    <% og_title       = content_for?(:og_title)       ? content_for(:og_title)       : (content_for(:title) || "Brethreign") %>
+    <% og_description = content_for?(:og_description) ? content_for(:og_description) : "A community where Christians breathe — share testimonies, read scripture, pray together." %>
+    <% og_image       = content_for?(:og_image)       ? content_for(:og_image)       : "#{request.base_url}/og-default.svg" %>
     <% og_url         = content_for?(:og_url)         ? content_for(:og_url)         : request.original_url %>
     <% og_type        = content_for?(:og_type)        ? content_for(:og_type)        : "website" %>
-    <meta property="og:site_name" content="Faith Community" />
+    <meta property="og:site_name" content="Brethreign" />
     <meta property="og:title" content="<%= og_title %>" />
     <meta property="og:description" content="<%= og_description %>" />
     <meta property="og:url" content="<%= og_url %>" />
     <meta property="og:type" content="<%= og_type %>" />
-    <% if og_image.present? %>
-      <meta property="og:image" content="<%= og_image %>" />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:image" content="<%= og_image %>" />
-    <% else %>
-      <meta name="twitter:card" content="summary" />
-    <% end %>
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="<%= og_image %>" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Brethreign — a community where Christians breathe" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@brethreign" />
     <meta name="twitter:title" content="<%= og_title %>" />
     <meta name="twitter:description" content="<%= og_description %>" />
+    <meta name="twitter:image" content="<%= og_image %>" />
+    <meta name="twitter:image:alt" content="Brethreign — a community where Christians breathe" />
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,6 +72,43 @@
         var dark = document.documentElement.classList.contains('theme-dark');
         document.body.classList.toggle('theme-dark', dark);
         document.body.classList.toggle('theme-light', !dark);
+      })();
+    </script>
+
+    <%# First-load splash. Visible until DOMContentLoaded, then fades out.
+        Brand mark with a soft scale-up — X-style entry. Only renders on
+        full HTML loads, not Turbo navigations (the Turbo progress bar
+        handles those). %>
+    <div id="fc-splash" aria-hidden="true">
+      <div class="fc-splash-mark">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="56" height="56" aria-hidden="true">
+          <defs>
+            <linearGradient id="splashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stop-color="#34d399"/>
+              <stop offset="100%" stop-color="#059669"/>
+            </linearGradient>
+          </defs>
+          <circle cx="16" cy="16" r="15" fill="url(#splashGrad)"/>
+          <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19"
+                fill="none" stroke="#042f1d" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="22" cy="11" r="1.6" fill="#042f1d"/>
+        </svg>
+      </div>
+    </div>
+    <script>
+      (function() {
+        var splash = document.getElementById('fc-splash');
+        if (!splash) return;
+        var hide = function() {
+          splash.classList.add('is-leaving');
+          setTimeout(function() { splash.remove(); }, 360);
+        };
+        if (document.readyState === 'complete') {
+          setTimeout(hide, 280);
+        } else {
+          window.addEventListener('load', function() { setTimeout(hide, 280); });
+        }
       })();
     </script>
     <div class="min-h-full" data-controller="<%= "composer-modal notifications-modal bible-drawer" if user_signed_in? %>">

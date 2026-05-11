@@ -1,3 +1,13 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="brthGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#brthGrad)"/>
+  <path d="M112 304 C 176 208, 224 208, 256 304 C 288 400, 336 400, 400 304"
+        fill="none" stroke="#042f1d" stroke-width="38"
+        stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="352" cy="176" r="26" fill="#042f1d"/>
 </svg>
