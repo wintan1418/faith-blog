@@ -93,6 +93,11 @@
             </div>
 
             <div class="flex shrink-0 items-center gap-2">
+              <%= link_to feed_path, class: "admin-back-to-app", title: "Back to app", aria: { label: "Back to app" } do %>
+                <%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") %>
+                <span class="admin-back-to-app-label">App</span>
+              <% end %>
+
               <nav class="admin-mobile-nav" aria-label="Admin navigation">
                 <% admin_nav_items.each do |label, path, icon, active| %>
                   <%= link_to path, class: "admin-mobile-link #{'is-active' if active}", title: label, aria: { label: label } do %>

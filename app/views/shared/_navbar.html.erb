@@ -44,20 +44,10 @@
           <%= render_icon("bookopen", classes: "h-4 w-4") %>
           Library
         <% end %>
-        <%= link_to search_path, class: "fc-nav-link hidden xl:inline-flex #{'is-active' if request.path.start_with?('/search')}" do %>
-          <%= render_icon("search", classes: "h-4 w-4") %>
-          Search
-        <% end %>
-        <% if user_signed_in? %>
-          <%= link_to people_path, class: "fc-nav-link hidden xl:inline-flex #{'is-active' if request.path.start_with?('/people')}" do %>
-            <%= render_icon("users", classes: "h-4 w-4") %>
-            People
-          <% end %>
-        <% end %>
       </div>
     </div>
 
-    <div class="flex min-w-0 items-center gap-2">
+    <div class="fc-topbar-actions">
       <% if user_signed_in? %>
         <%= form_with url: search_path, method: :get, class: "relative hidden min-w-0 lg:block" do %>
           <%= render_icon("search", classes: "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#75847a]") %>
@@ -71,28 +61,26 @@
           Breathe
         </button>
 
-        <button type="button" class="fc-icon-btn relative" title="Notifications" data-action="click->notifications-modal#open">
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
-          <% if current_user.unread_notifications_count.positive? %>
-            <span class="fc-notif-pulse-badge"></span>
+        <div class="fc-topbar-icons">
+          <button type="button" class="fc-icon-btn relative" title="Notifications" data-action="click->notifications-modal#open">
+            <%= render_icon("sparkles", classes: "h-4 w-4") %>
+            <% if current_user.unread_notifications_count.positive? %>
+              <span class="fc-notif-pulse-badge"></span>
+            <% end %>
+          </button>
+
+          <%= link_to conversations_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Inbox" do %>
+            <%= render_icon("mail", classes: "h-4 w-4") %>
+            <% if current_user.unread_conversations_count.positive? %>
+              <span class="fc-notif-pulse-badge is-mint"></span>
+            <% end %>
           <% end %>
-        </button>
 
-        <%= link_to conversations_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Inbox" do %>
-          <%= render_icon("mail", classes: "h-4 w-4") %>
-          <% if current_user.unread_conversations_count.positive? %>
-            <span class="fc-notif-pulse-badge is-mint"></span>
-          <% end %>
-        <% end %>
-
-        <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
-          <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
-          <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
-        </button>
-
-        <%= link_to bookmarks_path, class: "fc-icon-btn hidden xl:inline-flex", title: "Bookmarks" do %>
-          <%= render_icon("bookmark", classes: "h-4 w-4") %>
-        <% end %>
+          <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
+            <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
+            <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
+          </button>
+        </div>
 
         <div class="relative" data-controller="dropdown">
           <button type="button" data-action="click->dropdown#toggle" class="fc-avatar" aria-label="Open account menu">
