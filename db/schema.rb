@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_11_180000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_11_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,6 +88,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_11_180000) do
     t.index ["kind"], name: "index_announcements_on_kind"
     t.index ["published_at"], name: "index_announcements_on_published_at"
     t.index ["user_id"], name: "index_announcements_on_user_id"
+  end
+
+  create_table "bible_quiz_questions", force: :cascade do |t|
+    t.string "kind", limit: 32, null: false
+    t.text "prompt", null: false
+    t.jsonb "choices", default: [], null: false
+    t.integer "correct_index", null: false
+    t.string "reference", limit: 80
+    t.text "explanation"
+    t.string "difficulty", limit: 16, default: "medium"
+    t.string "fingerprint", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fingerprint"], name: "index_bible_quiz_questions_on_fingerprint", unique: true
+    t.index ["kind"], name: "index_bible_quiz_questions_on_kind"
   end
 
   create_table "bible_verses", force: :cascade do |t|

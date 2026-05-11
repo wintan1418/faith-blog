@@ -15,15 +15,28 @@ class GamesController < ApplicationController
   def quiz
   end
 
-  # POST /games/quiz/generate — JSON: returns the 5 questions for this play
+  # POST /games/quiz/generate — JSON: returns 5 questions shuffled from the
+  # BibleQuizQuestion pool. Falls back to on-demand AI generation only if
+  # the pool is empty (first install, before the seed task runs).
   def quiz_generate
-    questions = Ai::Bible::QuizGenerator.call
-    render json: {
-      ok: true,
-      questions: questions.map { |q| { kind: q.kind, prompt: q.prompt, choices: q.choices,
-                                       correct_index: q.correct_index, reference: q.reference,
-                                       explanation: q.explanation } }
-    }
+    rows = BibleQuizQuestion.sample(5)
+    if rows.size < 5
+      generated = Ai::Bible::QuizGenerator.call
+      BibleQuizQuestion.import_from_generator!(generated)
+      rows = BibleQuizQuestion.sample(5)
+    end
+
+    questions = rows.map do |r|
+      {
+        kind: r.kind,
+        prompt: r.prompt,
+        choices: r.choices,
+        correct_index: r.correct_index,
+        reference: r.reference,
+        explanation: r.explanation
+      }
+    end
+    render json: { ok: true, questions: questions }
   rescue Ai::Bible::QuizGenerator::ParseError, Ai::Moderation::Client::Error => e
     Rails.logger.warn("[QuizGenerator] #{e.class}: #{e.message}")
     render json: { ok: false, error: "Couldn't fetch a fresh quiz. Try again in a moment." }, status: :bad_gateway

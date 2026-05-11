@@ -45,8 +45,32 @@ module Ai
 
       Question = Struct.new(:kind, :prompt, :choices, :correct_index, :reference, :explanation, keyword_init: true)
 
-      def self.call
-        new.call
+      TOPICS = [
+        "Genesis and the patriarchs (Abraham, Isaac, Jacob, Joseph)",
+        "Exodus and the wilderness wanderings",
+        "Judges and Ruth — the chaotic period before the kings",
+        "King David — his rise, sins, psalms, family",
+        "King Solomon and the divided kingdom",
+        "The prophets of Israel and Judah (Isaiah, Jeremiah, Ezekiel)",
+        "Minor prophets (Hosea through Malachi)",
+        "Daniel and the exile in Babylon",
+        "The four Gospels — life and teachings of Jesus",
+        "Parables of Jesus",
+        "Miracles of Jesus",
+        "The Sermon on the Mount",
+        "The early church in Acts",
+        "Paul's missionary journeys and letters",
+        "Hebrews, the general epistles, and Revelation",
+        "Bible women (Sarah, Rebekah, Esther, Ruth, Mary, etc.)",
+        "Bible numbers, geography, and lesser-known facts"
+      ].freeze
+
+      def self.call(topic: nil)
+        new(topic: topic || TOPICS.sample).call
+      end
+
+      def initialize(topic:)
+        @topic = topic
       end
 
       def call
@@ -73,7 +97,13 @@ module Ai
       private
 
       def user_prompt
-        "#{TASK_MARKER}\nGenerate 5 fresh questions. Seed: #{SecureRandom.hex(4)}"
+        <<~PROMPT
+          #{TASK_MARKER}
+          Topic focus for this batch: #{@topic}
+          Generate 5 fresh questions, all centered on that topic.
+          Make them specific (named people, places, events) rather than
+          generic. Seed: #{SecureRandom.hex(4)}
+        PROMPT
       end
 
       def extract_payload(raw)

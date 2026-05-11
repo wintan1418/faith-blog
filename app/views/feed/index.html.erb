@@ -43,6 +43,27 @@
         <% end %>
       </nav>
 
+      <div class="fc-rail-games-card">
+        <div class="fc-rail-games-head">
+          <span class="fc-rail-games-kicker">🎯 Play</span>
+          <%= link_to "Leaderboard →", games_path, class: "fc-rail-games-link" %>
+        </div>
+        <div class="fc-rail-games-list">
+          <%= link_to games_quiz_path, class: "fc-rail-games-item" do %>
+            <span class="fc-rail-games-icon">📖</span>
+            <span class="fc-rail-games-label">Bible Quiz</span>
+          <% end %>
+          <%= link_to games_chess_path, class: "fc-rail-games-item" do %>
+            <span class="fc-rail-games-icon">♚</span>
+            <span class="fc-rail-games-label">Chess Puzzle</span>
+          <% end %>
+          <%= link_to games_trivia_path, class: "fc-rail-games-item" do %>
+            <span class="fc-rail-games-icon">🌍</span>
+            <span class="fc-rail-games-label">Trivia</span>
+          <% end %>
+        </div>
+      </div>
+
       <div class="fc-section-label">Your Rooms</div>
       <nav class="space-y-1">
         <% Room.public_rooms.ordered.limit(6).each do |room| %>

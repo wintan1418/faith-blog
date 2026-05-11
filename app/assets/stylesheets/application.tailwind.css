@@ -9819,6 +9819,73 @@ html.theme-dark .fc-held-banner {
 }
 .fc-chess-feedback.hidden { display: none; }
 
+/* ── Rail games card (feed left sidebar) ──────────────────────────── */
+
+.fc-rail-games-card {
+  margin: 1rem 0 0.5rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  background: linear-gradient(135deg,
+    color-mix(in oklch, var(--fc-accent) 16%, var(--fc-surface)) 0%,
+    var(--fc-surface) 80%);
+  border: 1px solid color-mix(in oklch, var(--fc-accent) 30%, var(--fc-line));
+  border-radius: 14px;
+}
+
+.fc-rail-games-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+}
+
+.fc-rail-games-kicker {
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fc-ink);
+}
+
+.fc-rail-games-link {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--fc-accent-2);
+}
+.fc-rail-games-link:hover { color: var(--fc-accent); }
+
+.fc-rail-games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.fc-rail-games-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  border-radius: 8px;
+  color: var(--fc-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+.fc-rail-games-item:hover {
+  border-color: var(--fc-accent);
+  background: var(--fc-surface-2);
+}
+.fc-rail-games-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  background: var(--fc-surface-2);
+  border-radius: 6px;
+}
+
 .fc-toast-stack {
   position: fixed;
   top: 64px;
