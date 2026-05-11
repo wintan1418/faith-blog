@@ -106,5 +106,10 @@ class FeedController < ApplicationController
       fillers = fillers.where.not(id: already_ids).order(created_at: :desc).limit(need).includes(:profile)
       @who_to_brethren += fillers.to_a
     end
+
+    # Brand-new users see an onboarding card: no posts, no follows. Once they
+    # take their first action the condition flips and the card stops rendering.
+    @show_onboarding = current_user.posts.none? && current_user.following.empty?
+    @onboarding_rooms = Room.public_rooms.ordered.limit(3) if @show_onboarding
   end
 end

@@ -97,6 +97,96 @@
         </div>
       </div>
 
+      <% if @show_onboarding %>
+        <section class="fc-onboarding"
+                 data-controller="onboarding"
+                 data-onboarding-key-value="fc:onboard-feed">
+          <header class="fc-onboarding-head">
+            <div>
+              <p class="fc-onboarding-kicker">Welcome to Brethreign</p>
+              <h2 class="fc-onboarding-title">Three quick steps to make your feed feel like home.</h2>
+            </div>
+            <button type="button"
+                    class="fc-onboarding-close"
+                    data-action="click->onboarding#dismiss"
+                    aria-label="Dismiss welcome">×</button>
+          </header>
+
+          <ol class="fc-onboarding-steps">
+            <li class="fc-onboarding-step">
+              <div class="fc-onboarding-step-num">1</div>
+              <div class="fc-onboarding-step-body">
+                <h3>Brethren a few people</h3>
+                <p>Their breaths will start showing up in your feed.</p>
+                <% if @who_to_brethren.any? %>
+                  <ul class="fc-onboarding-people">
+                    <% @who_to_brethren.first(3).each do |u| %>
+                      <li>
+                        <% if u.profile&.avatar&.attached? %>
+                          <%= image_tag u.profile.avatar, class: "fc-avatar object-cover" %>
+                        <% else %>
+                          <span class="fc-avatar" style="<%= avatar_tint_style(u.username) %>"><%= u.username.first.upcase %></span>
+                        <% end %>
+                        <%= link_to u.username, user_path(u.username), class: "fc-onboarding-person-name" %>
+                        <%= button_to follow_user_path(u.username),
+                            method: :post,
+                            form_class: "inline ml-auto",
+                            class: "fc-btn fc-btn-primary",
+                            data: { turbo: false } do %>
+                          Brethren
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </div>
+            </li>
+
+            <li class="fc-onboarding-step">
+              <div class="fc-onboarding-step-num">2</div>
+              <div class="fc-onboarding-step-body">
+                <h3>Step into a room</h3>
+                <p>Rooms are smaller spaces for specific kinds of breaths.</p>
+                <% if @onboarding_rooms&.any? %>
+                  <ul class="fc-onboarding-rooms">
+                    <% @onboarding_rooms.each do |room| %>
+                      <li>
+                        <%= link_to room_path(room), class: "fc-onboarding-room" do %>
+                          <% if room.icon.present? %>
+                            <span class="fc-onboarding-room-icon"><%= render_icon(room.icon, classes: "h-4 w-4") %></span>
+                          <% end %>
+                          <span><%= room.name %></span>
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </div>
+            </li>
+
+            <li class="fc-onboarding-step">
+              <div class="fc-onboarding-step-num">3</div>
+              <div class="fc-onboarding-step-body">
+                <h3>Take your first breath</h3>
+                <p>A verse, a prayer, or just what's on your heart.</p>
+                <div class="fc-onboarding-cta">
+                  <button type="button"
+                          class="fc-btn fc-btn-primary"
+                          data-action="click->composer-modal#open click->onboarding#dismiss">
+                    Take a breath
+                  </button>
+                  <button type="button"
+                          class="fc-btn"
+                          data-action="click->bible-drawer#open">
+                    📖 Read scripture
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ol>
+        </section>
+      <% end %>
+
       <div data-controller="new-posts-pill">
         <%= turbo_stream_from "feed:public" %>
         <div id="feed_incoming" hidden data-new-posts-pill-target="bucket"></div>
