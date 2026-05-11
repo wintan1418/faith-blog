@@ -40,6 +40,9 @@ application.register("flash", FlashController)
 import GoldenCarouselController from "./golden_carousel_controller"
 application.register("golden-carousel", GoldenCarouselController)
 
+import InfiniteScrollController from "./infinite_scroll_controller"
+application.register("infinite-scroll", InfiniteScrollController)
+
 import LightboxController from "./lightbox_controller"
 application.register("lightbox", LightboxController)
 

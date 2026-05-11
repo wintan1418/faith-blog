@@ -113,13 +113,24 @@
 
         <div class="mt-4 space-y-3">
           <% if @items.any? %>
-            <% @items.each do |item| %>
-              <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
-            <% end %>
+            <div id="feed_list" class="space-y-3">
+              <% @items.each do |item| %>
+                <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+              <% end %>
+            </div>
 
-            <% if @pagy.pages > 1 %>
-              <div class="pt-4">
-                <%== pagy_nav(@pagy) %>
+            <% if @pagy.next %>
+              <div id="feed_more"
+                   data-controller="infinite-scroll"
+                   data-infinite-scroll-url-value="<%= url_for(page: @pagy.next) %>">
+                <div class="fc-skel-card">
+                  <div class="fc-skel fc-skel-avatar"></div>
+                  <div>
+                    <div class="fc-skel fc-skel-line is-short"></div>
+                    <div class="fc-skel fc-skel-line is-long"></div>
+                    <div class="fc-skel fc-skel-line is-mid"></div>
+                  </div>
+                </div>
               </div>
             <% end %>
           <% else %>

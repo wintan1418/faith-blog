@@ -1,0 +1,24 @@
+<%= turbo_stream.append "feed_list" do %>
+  <% @items.each do |item| %>
+    <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+  <% end %>
+<% end %>
+
+<% if @pagy.next %>
+  <%= turbo_stream.replace "feed_more" do %>
+    <div id="feed_more"
+         data-controller="infinite-scroll"
+         data-infinite-scroll-url-value="<%= url_for(page: @pagy.next) %>">
+      <div class="fc-skel-card">
+        <div class="fc-skel fc-skel-avatar"></div>
+        <div>
+          <div class="fc-skel fc-skel-line is-short"></div>
+          <div class="fc-skel fc-skel-line is-long"></div>
+          <div class="fc-skel fc-skel-line is-mid"></div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <%= turbo_stream.remove "feed_more" %>
+<% end %>

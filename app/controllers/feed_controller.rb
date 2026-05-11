@@ -15,6 +15,7 @@ class FeedController < ApplicationController
                       .limit(RESHARES_BUFFER)
 
     @pagy, @items = pagy_array(FeedItem.merge(posts: posts, reshares: reshares), items: PER_PAGE)
+    respond_to_feed
   end
 
   def threads
@@ -25,7 +26,7 @@ class FeedController < ApplicationController
                 .limit(POSTS_BUFFER)
 
     @pagy, @items = pagy_array(posts.map { |p| FeedItem.from_post(p) }, items: PER_PAGE)
-    render :index
+    respond_to_feed
   end
 
   def trending
@@ -36,7 +37,7 @@ class FeedController < ApplicationController
                 .limit(POSTS_BUFFER)
 
     @pagy, @items = pagy_array(posts.map { |p| FeedItem.from_post(p) }, items: PER_PAGE)
-    render :index
+    respond_to_feed
   end
 
   def following
@@ -53,10 +54,17 @@ class FeedController < ApplicationController
                       .limit(RESHARES_BUFFER)
 
     @pagy, @items = pagy_array(FeedItem.merge(posts: posts, reshares: reshares), items: PER_PAGE)
-    render :index
+    respond_to_feed
   end
 
   private
+
+  def respond_to_feed
+    respond_to do |format|
+      format.html { render :index }
+      format.turbo_stream { render :paginate }
+    end
+  end
 
   def load_sidebar_context
     @prayer_room = Room.prayers.public_rooms.ordered.first
