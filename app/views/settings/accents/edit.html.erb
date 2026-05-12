@@ -1,0 +1,40 @@
+<% content_for(:title) { "Accent color · Settings · Faith Community" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Settings</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Accent color</h1>
+      <p class="mystic-copy mt-2">Pick the color that paints your buttons, badges, and highlights across the app.</p>
+    </div>
+
+    <%= render "settings/tabs", active: :accent %>
+
+    <div class="mystic-panel-strong overflow-hidden">
+      <div class="border-b border-faith-green/10 p-6">
+        <h2 class="text-xl font-bold text-faith-dark">Choose your accent</h2>
+        <p class="mystic-copy text-sm">Tap a swatch to apply it. The change saves immediately and applies wherever you're signed in.</p>
+      </div>
+
+      <%= form_with url: settings_accent_path, method: :patch, class: "p-6", local: true do |f| %>
+        <div class="fc-accent-swatches">
+          <% AccentPalette::PALETTE.each do |slug, swatch| %>
+            <label class="fc-accent-swatch<%= ' is-selected' if @current == slug %>"
+                   style="--swatch: <%= swatch[:accent] %>; --swatch-2: <%= swatch[:accent_2] %>;">
+              <%= f.radio_button :accent_color, slug, checked: (@current == slug), class: "sr-only" %>
+              <span class="fc-accent-swatch-dot" aria-hidden="true"></span>
+              <span class="fc-accent-swatch-name"><%= swatch[:name] %></span>
+              <% if @current == slug %>
+                <span class="fc-accent-swatch-check" aria-hidden="true">✓</span>
+              <% end %>
+            </label>
+          <% end %>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+          <%= f.submit "Save accent", class: "fc-btn fc-btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

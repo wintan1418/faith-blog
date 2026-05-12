@@ -66,7 +66,8 @@
 
   <body class="h-full bg-stone-50 font-sans antialiased theme-light"
         data-controller="<%= 'pwa' if user_signed_in? %>"
-        data-pwa-vapid-key-value="<%= WebPushConfig.public_key if user_signed_in? && WebPushConfig.configured? %>">
+        data-pwa-vapid-key-value="<%= WebPushConfig.public_key if user_signed_in? && WebPushConfig.configured? %>"
+        style="<%= AccentPalette.css_vars(current_user&.accent_color) %>">
     <script>
       (function() {
         var dark = document.documentElement.classList.contains('theme-dark');

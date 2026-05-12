@@ -10,7 +10,35 @@
 
   <header class="inbox-thread-head">
     <%= link_to conversations_path, class: "inbox-thread-back", title: "Back to inbox" do %>
-      <%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") rescue "‹" %>
+      <span class="inbox-thread-back-arrow">‹</span>
+      <span class="inbox-thread-back-label">Inbox</span>
+    <% end %>
+
+    <% if defined?(@conversations) && @conversations.present? %>
+      <div class="inbox-thread-switcher" data-controller="dropdown">
+        <button type="button"
+                class="inbox-thread-switcher-trigger"
+                data-action="click->dropdown#toggle"
+                aria-label="Switch conversation">
+          <%= render_icon("message_circle", classes: "h-4 w-4") %>
+          <span>Switch</span>
+        </button>
+        <div data-dropdown-target="menu" class="inbox-switcher-menu hidden">
+          <div class="inbox-switcher-head">Your conversations</div>
+          <% @conversations.first(8).each do |conv| %>
+            <% next if conv == conversation %>
+            <% other = conv.other_participant_for(current_user) %>
+            <%= link_to conversation_path(conv), class: "inbox-switcher-row", data: { turbo_frame: "_top" } do %>
+              <%= render "conversations/avatar", user: other, size: "h-8 w-8" %>
+              <div class="min-w-0">
+                <p class="inbox-switcher-row-name"><%= other.display_name %></p>
+                <p class="inbox-switcher-row-snippet">@<%= other.username %></p>
+              </div>
+            <% end %>
+          <% end %>
+          <%= link_to "See all in inbox →", conversations_path, class: "inbox-switcher-all" %>
+        </div>
+      </div>
     <% end %>
 
     <%= link_to user_path(other_user.username), class: "inbox-thread-identity" do %>

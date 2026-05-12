@@ -117,6 +117,7 @@
             <%= link_to "People", people_path, class: "fc-dropdown-item" %>
             <%= link_to "Connections", my_connections_path, class: "fc-dropdown-item" %>
             <%= link_to "Settings", edit_settings_profile_path, class: "fc-dropdown-item" %>
+            <%= link_to "🎨 Accent color", edit_settings_accent_path, class: "fc-dropdown-item" %>
             <% if current_user_admin? %>
               <%= link_to "Admin Dashboard", admin_root_path, class: "fc-dropdown-item" %>
             <% end %>

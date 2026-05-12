@@ -143,6 +143,7 @@ Rails.application.routes.draw do
     resource :privacy, only: [ :edit, :update ]
     resource :brethren_card, only: [ :edit, :update ]
     resource :dark_mode, only: [ :update ]
+    resource :accent,    only: [ :edit, :update ]
   end
 
   # Brethren Card & Connection Requests
