@@ -14307,16 +14307,16 @@ html.theme-light .inbox-thread-head {
 /* Pulsing dot on the bell + inbox icon */
 .fc-notif-pulse-badge {
   position: absolute;
-  right: 6px;
-  top: 6px;
-  width: 9px;
-  height: 9px;
+  right: 2px;
+  top: 2px;
+  width: 11px;
+  height: 11px;
   border-radius: 999px;
   background: #ef4444;
-  border: 2px solid var(--fc-bg);
+  border: 2px solid var(--fc-surface);
   box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
   animation: fc-notif-pulse 1.4s ease-out infinite;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
 }
 .fc-notif-pulse-badge.is-mint {
@@ -14325,14 +14325,14 @@ html.theme-light .inbox-thread-head {
   animation-name: fc-notif-pulse-mint;
 }
 @keyframes fc-notif-pulse {
-  0%   { box-shadow: 0 0 0 0   rgba(239, 68, 68, 0.55); transform: scale(1); }
-  60%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);   transform: scale(1.15); }
-  100% { box-shadow: 0 0 0 0   rgba(239, 68, 68, 0);   transform: scale(1); }
+  0%   { box-shadow: 0 0 0 0    rgba(239, 68, 68, 0.65); transform: scale(1); }
+  60%  { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0);    transform: scale(1.25); }
+  100% { box-shadow: 0 0 0 0    rgba(239, 68, 68, 0);    transform: scale(1); }
 }
 @keyframes fc-notif-pulse-mint {
-  0%   { box-shadow: 0 0 0 0   rgba(52, 211, 153, 0.55); transform: scale(1); }
-  60%  { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);   transform: scale(1.15); }
-  100% { box-shadow: 0 0 0 0   rgba(52, 211, 153, 0);   transform: scale(1); }
+  0%   { box-shadow: 0 0 0 0    rgba(52, 211, 153, 0.65); transform: scale(1); }
+  60%  { box-shadow: 0 0 0 14px rgba(52, 211, 153, 0);    transform: scale(1.25); }
+  100% { box-shadow: 0 0 0 0    rgba(52, 211, 153, 0);    transform: scale(1); }
 }
 
 /* Notifications modal */

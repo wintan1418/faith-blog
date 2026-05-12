@@ -112,7 +112,7 @@
         }
       })();
     </script>
-    <div class="min-h-full" data-controller="<%= "composer-modal notifications-modal bible-drawer" if user_signed_in? %>">
+    <div class="min-h-full" data-controller="<%= "composer-modal notifications-modal bible-drawer notification-sound" if user_signed_in? %>">
       <%= render "shared/navbar" %>
 
       <div id="flash_messages"><%= render "shared/flash" %></div>

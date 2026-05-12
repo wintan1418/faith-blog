@@ -108,6 +108,14 @@
                     data-action="click->pwa#togglePush click->dropdown#close">
               🔕 Turn on push
             </button>
+            <button type="button"
+                    class="fc-dropdown-item w-full text-left"
+                    data-notification-sound-toggle
+                    data-on-label="🔔 Sounds on"
+                    data-off-label="🔇 Sounds muted"
+                    data-action="click->notification-sound#toggle">
+              🔔 Sounds on
+            </button>
             <%= link_to "Library", resources_root_path, class: "fc-dropdown-item" %>
             <%= link_to "🎯 Games", games_path, class: "fc-dropdown-item" %>
             <%= link_to "⛪ Church History", church_history_path, class: "fc-dropdown-item" %>
