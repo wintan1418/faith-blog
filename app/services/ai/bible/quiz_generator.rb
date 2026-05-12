@@ -2,37 +2,83 @@
 
 module Ai
   module Bible
-    # Generates a 5-question Bible quiz from the AI. Each question is a
-    # multiple-choice with one correct answer index. Mix of: which book,
-    # who said it, fill-in-the-blank, character match, event order.
+    # Formation-themed Bible quiz generator. Each batch draws on a SPECIFIC
+    # spiritual theme (salvation, eternal life, brotherly love, charity,
+    # etc.) and a SPECIFIC difficulty so the resulting question matches
+    # both the theme and the difficulty the player picked. A random
+    # epistle/book hint per batch keeps the model from looping on the
+    # same handful of famous verses.
     class QuizGenerator
       class ParseError < StandardError; end
 
       TASK_MARKER = "[TASK:BIBLE_QUIZ]"
 
+      # Formation themes we want the quiz to be ABOUT — not "name the king
+      # in 2 Kings", but the spiritual realities themselves.
+      THEMES = {
+        "salvation"      => "the way of salvation — repentance, faith, justification, new birth",
+        "eternal_life"   => "eternal life — the believer's hope, inheritance, and assurance",
+        "brethren_love"  => "love among the brethren — fellowship, unity, bearing one another",
+        "charity"        => "charity / agape — 1 Corinthians 13 and the love commands of Christ",
+        "faith"          => "faith — what it is, how it works, examples in the epistles",
+        "epistles"       => "the apostolic epistles — doctrine and practice for the church",
+        "grace"          => "grace — unmerited favor, sufficient grace, growing in grace",
+        "repentance"     => "repentance — turning, godly sorrow, fruits of repentance",
+        "holiness"       => "holiness and sanctification — walking in the Spirit, being set apart",
+        "prayer"         => "prayer — how to pray, what to pray for, the Lord's prayer",
+        "forgiveness"    => "forgiveness — Christ's forgiveness of us and ours of one another",
+        "the_cross"      => "the cross — atonement, propitiation, the finished work of Christ",
+        "holy_spirit"    => "the Holy Spirit — fruit, gifts, indwelling, walking by the Spirit",
+        "hope_of_glory"  => "hope of glory — second coming, resurrection, heaven",
+        "obedience"      => "obedience to Christ — fearing God, keeping his commandments",
+        "bible_history"  => "Bible history — events, places, and figures across the canon"
+      }.freeze
+
+      DIFFICULTIES = %w[easy medium hard].freeze
+
+      # Epistles + Gospels rotation hint so the model spreads across the
+      # New Testament instead of recycling famous Romans / 1 Cor / John verses.
+      BOOK_HINTS = [
+        "Matthew", "Mark", "Luke", "John", "Acts",
+        "Romans", "1 Corinthians", "2 Corinthians", "Galatians",
+        "Ephesians", "Philippians", "Colossians",
+        "1 Thessalonians", "2 Thessalonians",
+        "1 Timothy", "2 Timothy", "Titus", "Philemon",
+        "Hebrews", "James", "1 Peter", "2 Peter",
+        "1 John", "2 John", "3 John", "Jude", "Revelation"
+      ].freeze
+
       SYSTEM_PROMPT = <<~PROMPT.freeze
         #{TASK_MARKER}
-        You write Bible trivia questions for a Christian community app.
+        You write Bible quiz questions that form Christians spiritually.
 
-        Generate exactly 5 multiple-choice questions on the canonical 66-book
-        Protestant Bible (KJV phrasing where verses are quoted). Mix the kinds:
-        - "which_book": quote a verse, ask which book it's from.
-        - "fill_blank": one short verse with a key word blanked out.
-        - "character": short description, ask who it is.
-        - "event_book": describe a famous event, ask which book it's recorded in.
-        - "reference": quote a famous verse, ask the correct chapter:verse.
+        Each question must connect to the assigned THEME (a spiritual reality
+        the question is about) and the assigned DIFFICULTY level.
+
+        Difficulty calibration:
+          - easy: an attentive Sunday-school answer; one well-known verse.
+          - medium: knows the NT well; can connect 2-3 passages or terms.
+          - hard: serious student; lesser-quoted verses, doctrinal nuance.
+
+        Mix the kinds of questions:
+          - "which_book": quote a verse, ask which book it's from.
+          - "fill_blank": one short verse with a key word blanked.
+          - "what_does": quote a verse and ask what it means (multiple choice).
+          - "true_phrase": which of these is a verse / phrase Scripture actually uses.
+          - "reference": quote a famous verse, ask its chapter:verse.
 
         Rules:
-        - 4 choices per question, exactly ONE correct.
-        - Question prompt ≤ 240 chars; each choice ≤ 80 chars.
-        - Factually correct — do not invent verses or wrong books.
-        - Vary difficulty: 2 easy, 2 medium, 1 hard.
+          - 4 choices per question, exactly ONE correct.
+          - Prompt ≤ 240 chars; each choice ≤ 80 chars.
+          - Factually accurate; never invent verses or wrong books.
+          - Use canonical 66-book Protestant references in KJV-friendly form.
+          - The 5 questions in a batch should feel different from each other.
 
         Return ONLY a single JSON object, no prose, no markdown fences:
         {
           "questions": [
             {
-              "kind": "which_book"|"fill_blank"|"character"|"event_book"|"reference",
+              "kind": "which_book"|"fill_blank"|"what_does"|"true_phrase"|"reference",
               "prompt": string,
               "choices": [string, string, string, string],
               "correct_index": 0|1|2|3,
@@ -43,34 +89,21 @@ module Ai
         }
       PROMPT
 
-      Question = Struct.new(:kind, :prompt, :choices, :correct_index, :reference, :explanation, keyword_init: true)
+      Question = Struct.new(:kind, :prompt, :choices, :correct_index,
+                            :reference, :explanation, :theme, :difficulty,
+                            keyword_init: true)
 
-      TOPICS = [
-        "Genesis and the patriarchs (Abraham, Isaac, Jacob, Joseph)",
-        "Exodus and the wilderness wanderings",
-        "Judges and Ruth — the chaotic period before the kings",
-        "King David — his rise, sins, psalms, family",
-        "King Solomon and the divided kingdom",
-        "The prophets of Israel and Judah (Isaiah, Jeremiah, Ezekiel)",
-        "Minor prophets (Hosea through Malachi)",
-        "Daniel and the exile in Babylon",
-        "The four Gospels — life and teachings of Jesus",
-        "Parables of Jesus",
-        "Miracles of Jesus",
-        "The Sermon on the Mount",
-        "The early church in Acts",
-        "Paul's missionary journeys and letters",
-        "Hebrews, the general epistles, and Revelation",
-        "Bible women (Sarah, Rebekah, Esther, Ruth, Mary, etc.)",
-        "Bible numbers, geography, and lesser-known facts"
-      ].freeze
-
-      def self.call(topic: nil)
-        new(topic: topic || TOPICS.sample).call
+      def self.call(theme: nil, difficulty: nil, book: nil)
+        theme      = theme.to_s.presence || THEMES.keys.sample
+        difficulty = difficulty.to_s.presence_in(DIFFICULTIES) || DIFFICULTIES.sample
+        book       = book.presence || BOOK_HINTS.sample
+        new(theme: theme, difficulty: difficulty, book: book).call
       end
 
-      def initialize(topic:)
-        @topic = topic
+      def initialize(theme:, difficulty:, book:)
+        @theme      = theme
+        @difficulty = difficulty
+        @book       = book
       end
 
       def call
@@ -87,7 +120,9 @@ module Ai
             choices: choices,
             correct_index: correct,
             reference: q["reference"].to_s.strip,
-            explanation: q["explanation"].to_s.strip
+            explanation: q["explanation"].to_s.strip,
+            theme: @theme,
+            difficulty: @difficulty
           )
         end
         raise ParseError, "no valid questions" if questions.empty?
@@ -99,10 +134,12 @@ module Ai
       def user_prompt
         <<~PROMPT
           #{TASK_MARKER}
-          Topic focus for this batch: #{@topic}
-          Generate 5 fresh questions, all centered on that topic.
-          Make them specific (named people, places, events) rather than
-          generic. Seed: #{SecureRandom.hex(4)}
+          THEME: #{@theme} — #{THEMES[@theme]}
+          DIFFICULTY: #{@difficulty}
+          DRAW FROM (preferred): #{@book}
+
+          Generate 5 questions on this theme at this difficulty. Vary the
+          kinds. Seed: #{SecureRandom.hex(4)}
         PROMPT
       end
 

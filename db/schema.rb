@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_12_100000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_12_170100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -101,8 +101,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_100000) do
     t.string "fingerprint", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "theme", limit: 32
     t.index ["fingerprint"], name: "index_bible_quiz_questions_on_fingerprint", unique: true
     t.index ["kind"], name: "index_bible_quiz_questions_on_kind"
+    t.index ["theme", "difficulty"], name: "index_bible_quiz_questions_on_theme_and_difficulty"
+    t.index ["theme"], name: "index_bible_quiz_questions_on_theme"
   end
 
   create_table "bible_verses", force: :cascade do |t|
@@ -618,6 +621,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_100000) do
     t.index ["user_id"], name: "index_user_risk_profiles_on_user_id", unique: true
   end
 
+  create_table "user_seen_quiz_questions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "bible_quiz_question_id", null: false
+    t.datetime "last_seen_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bible_quiz_question_id"], name: "idx_seen_quiz_q"
+    t.index ["user_id", "bible_quiz_question_id"], name: "idx_seen_user_q", unique: true
+    t.index ["user_id", "last_seen_at"], name: "idx_seen_user_recent"
+    t.index ["user_id"], name: "index_user_seen_quiz_questions_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -709,4 +724,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_100000) do
   add_foreign_key "room_memberships", "users"
   add_foreign_key "user_reading_plans", "users"
   add_foreign_key "user_risk_profiles", "users"
+  add_foreign_key "user_seen_quiz_questions", "bible_quiz_questions"
+  add_foreign_key "user_seen_quiz_questions", "users"
 end

@@ -17,6 +17,7 @@ class User < ApplicationRecord
 
   validates :accent_color, inclusion: { in: -> (_) { AccentPalette.slugs } }, allow_blank: true
   has_many :game_attempts, dependent: :destroy
+  has_many :user_seen_quiz_questions, dependent: :delete_all
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :bookmarks, dependent: :destroy

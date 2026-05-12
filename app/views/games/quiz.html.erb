@@ -1,14 +1,14 @@
-<% content_for(:title) { "Bible Quiz · Faith Community" } %>
+<% content_for(:title) { "Bible Quiz · Brethreign" } %>
 
 <div class="fc-app">
-  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 640px;">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 720px;">
     <main class="fc-main">
       <header class="mb-5">
         <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
           ← Back to games
         <% end %>
         <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">📖 Bible Quiz</h1>
-        <p class="text-sm text-[var(--fc-muted)]">5 questions. One try at each. Don't sweat it — you can play again.</p>
+        <p class="text-sm text-[var(--fc-muted)]">Pick a theme, a difficulty, a length — go.</p>
       </header>
 
       <section data-controller="quiz"
@@ -16,15 +16,52 @@
                data-quiz-submit-url-value="<%= games_quiz_submit_path %>"
                data-quiz-csrf-value="<%= form_authenticity_token %>">
         <div class="fc-quiz" data-quiz-target="stage">
-          <%# initial state: ready button %>
-          <div class="fc-quiz-screen" data-quiz-target="ready">
-            <p class="fc-quiz-kicker">Daily-feel · timed for under 2 minutes</p>
-            <h2 class="fc-quiz-headline">Ready when you are.</h2>
-            <p class="fc-quiz-sub">Each question is multiple choice. Quick taps, no penalty for getting it wrong.</p>
+          <%# ── Mode select (starting screen) ─────────────────────── %>
+          <div class="fc-quiz-screen fc-quiz-modeselect" data-quiz-target="modeSelect">
+            <p class="fc-quiz-kicker">Set your round</p>
+            <h2 class="fc-quiz-headline">What kind of round?</h2>
+
+            <div class="fc-quiz-field">
+              <label class="fc-quiz-field-label">Theme</label>
+              <div class="fc-quiz-themegrid" data-quiz-target="themeGrid">
+                <button type="button"
+                        class="fc-quiz-themepill is-selected"
+                        data-theme="">
+                  ✦ Any
+                </button>
+                <% @themes.each do |slug, label| %>
+                  <button type="button"
+                          class="fc-quiz-themepill"
+                          data-theme="<%= slug %>">
+                    <%= slug.titleize %>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="fc-quiz-field">
+              <label class="fc-quiz-field-label">Difficulty</label>
+              <div class="fc-quiz-diffrow" data-quiz-target="diffRow">
+                <button type="button" class="fc-quiz-diffpill is-selected" data-difficulty="">Mixed</button>
+                <button type="button" class="fc-quiz-diffpill is-easy"   data-difficulty="easy">Easy</button>
+                <button type="button" class="fc-quiz-diffpill is-medium" data-difficulty="medium">Medium</button>
+                <button type="button" class="fc-quiz-diffpill is-hard"   data-difficulty="hard">Hard</button>
+              </div>
+            </div>
+
+            <div class="fc-quiz-field">
+              <label class="fc-quiz-field-label">Length</label>
+              <div class="fc-quiz-lengthrow" data-quiz-target="lengthRow">
+                <button type="button" class="fc-quiz-lengthpill is-selected" data-length="5">5 questions</button>
+                <button type="button" class="fc-quiz-lengthpill"             data-length="10">10 questions</button>
+                <button type="button" class="fc-quiz-lengthpill"             data-length="20">20 questions</button>
+              </div>
+            </div>
+
             <button type="button"
-                    class="fc-btn fc-btn-primary fc-quiz-start"
+                    class="fc-btn fc-btn-primary fc-quiz-startbtn"
                     data-action="click->quiz#start">
-              Start quiz
+              ▶ Start the round
             </button>
           </div>
         </div>
