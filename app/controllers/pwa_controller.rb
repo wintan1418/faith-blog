@@ -2,6 +2,10 @@
 
 class PwaController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
+  # The service worker is fetched cross-origin by the browser's worker
+  # runtime — Rails' default CSRF rejects it as 422. None of these PWA
+  # endpoints have side effects, so skipping the CSRF check is safe.
+  skip_forgery_protection only: [ :service_worker, :manifest, :offline ]
 
   def manifest
     render json: {

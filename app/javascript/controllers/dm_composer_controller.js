@@ -6,7 +6,39 @@ import { Controller } from "@hotwired/stimulus"
 //      to the form via a DataTransfer-backed FileList so submitting the
 //      form ships it like any other file upload.
 export default class extends Controller {
-  static targets = ["previews", "imageInput", "recordBtn", "voicePreview", "voiceLength", "voiceField"]
+  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput"]
+
+  connect() {
+    // Hide mic if browser can't record; force send-button visibility.
+    if (this.hasRecordBtnTarget && !(navigator.mediaDevices && window.MediaRecorder)) {
+      this.recordBtnTarget.classList.add("hidden")
+      if (this.hasSendBtnTarget) this.sendBtnTarget.classList.remove("hidden")
+    }
+    this.syncTrailingAction()
+  }
+
+  onInput() {
+    this.syncTrailingAction()
+  }
+
+  onKeydown(event) {
+    // Cmd/Ctrl + Enter sends. Plain Enter inserts a newline.
+    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+      event.preventDefault()
+      this.element.requestSubmit()
+    }
+  }
+
+  syncTrailingAction() {
+    if (!this.hasRecordBtnTarget || !this.hasSendBtnTarget) return
+    const hasText  = this.hasBodyInputTarget && this.bodyInputTarget.value.trim().length > 0
+    const hasFiles = this.hasImageInputTarget && this.imageInputTarget.files && this.imageInputTarget.files.length > 0
+    const hasVoice = this.hasVoicePreviewTarget && !this.voicePreviewTarget.classList.contains("hidden")
+    const showSend = hasText || hasFiles || hasVoice
+
+    this.recordBtnTarget.classList.toggle("hidden", showSend)
+    this.sendBtnTarget.classList.toggle("hidden", !showSend)
+  }
 
   // ---- Image previews -----------------------------------------------------
 
@@ -24,6 +56,7 @@ export default class extends Controller {
       .slice(0, 4)
       .map(f => `<div class="dm-preview"><img src="${URL.createObjectURL(f)}" alt=""></div>`)
       .join("")
+    this.syncTrailingAction()
   }
 
   // ---- Voice notes --------------------------------------------------------
@@ -110,6 +143,7 @@ export default class extends Controller {
       this.voicePreviewTarget.classList.remove("hidden")
       if (this.hasVoiceLengthTarget) this.voiceLengthTarget.textContent = `${seconds}s`
     }
+    this.syncTrailingAction()
   }
 
   clearVoice(event) {
@@ -123,5 +157,6 @@ export default class extends Controller {
       this.voiceFieldTarget.replaceWith(hidden)
       hidden.setAttribute("data-dm-composer-target", "voiceField")
     }
+    this.syncTrailingAction()
   }
 }

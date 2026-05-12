@@ -13861,24 +13861,142 @@ html.theme-light .inbox-thread-head {
   bottom: 0;
   border-top: 1px solid var(--fc-line);
   background: var(--fc-surface);
-  padding: 12px 18px 14px;
+  padding: 10px 14px 12px;
   z-index: 4;
 }
-.inbox-input {
-  border: 1px solid var(--fc-line-strong) !important;
-  background: var(--fc-bg) !important;
-  border-radius: 999px !important;
-  padding: 10px 16px !important;
-  font-size: 0.95rem !important;
-  resize: none !important;
-  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
-  min-height: 44px !important;
-  line-height: 1.4 !important;
+.inbox-composer-errors {
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
 }
-.inbox-input:focus {
-  border-color: var(--fc-accent) !important;
-  box-shadow: 0 0 0 4px var(--fc-accent-soft) !important;
-  background: var(--fc-surface) !important;
+
+.dm-previews-row { display: contents; }
+
+.inbox-composer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* Pill: the rounded container holding emoji, the textarea, and attach. */
+.inbox-composer-pill {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 44px;
+  padding: 0 4px;
+  background: var(--fc-bg);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.inbox-composer-pill:focus-within {
+  border-color: var(--fc-accent);
+  box-shadow: 0 0 0 4px var(--fc-accent-soft);
+}
+
+.inbox-composer-iconbtn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fc-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 140ms ease, background 140ms ease;
+}
+.inbox-composer-iconbtn:hover {
+  color: var(--fc-accent-2);
+  background: var(--fc-surface-2);
+}
+
+/* The textarea itself — borderless inside the pill, autogrows up to 5 rows. */
+.inbox-composer-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 10px 8px !important;
+  font-size: 0.95rem !important;
+  line-height: 1.4 !important;
+  color: var(--fc-ink) !important;
+  resize: none !important;
+  min-height: 24px !important;
+  max-height: 120px;
+  font-family: inherit;
+}
+.inbox-composer-input::placeholder { color: var(--fc-muted); }
+
+/* The trailing button — mic OR send. Round, accent-filled. */
+.inbox-composer-action {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+  border: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: filter 140ms ease, transform 90ms ease;
+}
+.inbox-composer-action:hover { filter: brightness(1.06); }
+.inbox-composer-action:active { transform: scale(0.94); }
+.inbox-composer-action.hidden { display: none; }
+.inbox-composer-action.is-recording {
+  background: #dc2626;
+  animation: fc-mic-pulse 1.2s ease-in-out infinite;
+}
+@keyframes fc-mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55); }
+  50%       { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+}
+
+.inbox-composer-emoji-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 60;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 12px;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.45);
+  padding: 4px;
+}
+.inbox-composer-emoji-popover.hidden { display: none; }
+.inbox-composer-emoji-popover emoji-picker {
+  display: block;
+  width: min(320px, calc(100vw - 32px));
+  height: 360px;
+}
+
+/* Keep the legacy .inbox-input class working for any stragglers. */
+.inbox-input {
+  border: 1px solid var(--fc-line-strong);
+  background: var(--fc-bg);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  resize: none;
+  min-height: 44px;
+  line-height: 1.4;
 }
 
 .inbox-blocked-note {

@@ -1,64 +1,82 @@
-<%= form_with model: [conversation, message], class: "inbox-composer", id: "new_message",
+<%= form_with model: [conversation, message],
+              class: "inbox-composer",
+              id: "new_message",
               html: { multipart: true, data: { controller: "dm-composer" } } do |f| %>
+
   <% if message.errors.any? %>
-    <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800">
+    <div class="inbox-composer-errors">
       <%= message.errors.full_messages.to_sentence %>
     </div>
   <% end %>
 
-  <div data-dm-composer-target="previews" class="dm-previews hidden"></div>
-
-  <div data-dm-composer-target="voicePreview" class="dm-voice-preview hidden">
-    <span class="dm-voice-preview-label">🎙️ Voice note ready</span>
-    <span data-dm-composer-target="voiceLength">0s</span>
-    <button type="button" class="dm-voice-clear" data-action="click->dm-composer#clearVoice" aria-label="Discard voice note">✕</button>
+  <%# Inline previews (images + recorded voice note) sit ABOVE the row %>
+  <div class="dm-previews-row">
+    <div data-dm-composer-target="previews" class="dm-previews hidden"></div>
+    <div data-dm-composer-target="voicePreview" class="dm-voice-preview hidden">
+      <span class="dm-voice-preview-label">🎙️ Voice note ready</span>
+      <span data-dm-composer-target="voiceLength">0s</span>
+      <button type="button"
+              class="dm-voice-clear"
+              data-action="click->dm-composer#clearVoice"
+              aria-label="Discard voice note">✕</button>
+    </div>
   </div>
 
-  <div class="flex items-end gap-2 relative" data-controller="emoji-picker">
-    <button type="button"
-            data-emoji-picker-target="button"
-            data-action="click->emoji-picker#toggle"
-            class="inbox-emoji-btn"
-            title="Add emoji"
-            aria-label="Add emoji">
-      <%= render_icon("smile", classes: "h-5 w-5") %>
-    </button>
+  <div class="inbox-composer-row" data-controller="emoji-picker">
+    <%# The input pill — emoji on the left, textarea in the middle, attach on the right %>
+    <div class="inbox-composer-pill">
+      <button type="button"
+              data-emoji-picker-target="button"
+              data-action="click->emoji-picker#toggle"
+              class="inbox-composer-iconbtn"
+              title="Add emoji"
+              aria-label="Add emoji">
+        <%= render_icon("smile", classes: "h-5 w-5") %>
+      </button>
 
-    <label class="inbox-emoji-btn cursor-pointer" title="Add images" aria-label="Add images">
-      <%= render_icon("image", classes: "h-5 w-5") %>
-      <%= f.file_field :images,
-          multiple: true,
-          accept: "image/*",
-          class: "sr-only",
-          data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
-    </label>
+      <%= f.text_area :body,
+                      rows: 1,
+                      class: "inbox-composer-input",
+                      maxlength: 4000,
+                      placeholder: "Message…",
+                      data: {
+                        typing_target: "input",
+                        emoji_picker_target: "editor",
+                        dm_composer_target: "bodyInput",
+                        action: "input->typing#input input->dm-composer#onInput keydown->dm-composer#onKeydown"
+                      } %>
 
+      <label class="inbox-composer-iconbtn cursor-pointer" title="Add images" aria-label="Add images">
+        <%= render_icon("image", classes: "h-5 w-5") %>
+        <%= f.file_field :images,
+            multiple: true,
+            accept: "image/*",
+            class: "sr-only",
+            data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
+      </label>
+    </div>
+
+    <%= f.hidden_field :voice_note, data: { dm_composer_target: "voiceField" } %>
+
+    <%# Single trailing action — mic when input is empty, send when there's text %>
     <button type="button"
-            class="inbox-emoji-btn"
+            class="inbox-composer-action"
             data-dm-composer-target="recordBtn"
             data-action="click->dm-composer#toggleRecord"
             title="Record voice note"
             aria-label="Record voice note">
-      🎙️
+      <%= render_icon("mic", classes: "h-5 w-5") rescue "🎙️" %>
     </button>
 
-    <%= f.hidden_field :voice_note, data: { dm_composer_target: "voiceField" } %>
-
-    <%= f.text_area :body,
-                    rows: 2,
-                    class: "inbox-input",
-                    maxlength: 4000,
-                    placeholder: "Write a thoughtful message...",
-                    data: { typing_target: "input", action: "input->typing#input", emoji_picker_target: "editor" } %>
-
-    <%= f.button class: "fc-btn fc-btn-primary min-h-11" do %>
-      <%= render_icon("send", classes: "h-4 w-4") %>
-      Send
+    <%= f.button type: "submit",
+                 class: "inbox-composer-action is-send hidden",
+                 data: { dm_composer_target: "sendBtn" } do %>
+      <%= render_icon("send", classes: "h-5 w-5") %>
     <% end %>
 
     <div data-emoji-picker-target="picker"
-         class="hidden absolute bottom-full left-0 z-50 mb-2">
-      <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
+         class="inbox-composer-emoji-popover hidden">
+      <emoji-picker></emoji-picker>
     </div>
   </div>
 <% end %>
