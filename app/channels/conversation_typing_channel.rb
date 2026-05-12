@@ -15,5 +15,11 @@ class ConversationTypingChannel < ApplicationCable::Channel
       username: current_user.display_name,
       typing: ActiveModel::Type::Boolean.new.cast(data["typing"])
     )
+  rescue StandardError => e
+    # Typing pings fire on every keystroke — if the cable adapter throws
+    # (solid_cable has been flaky with upsert on certain schemas), don't
+    # spam exception backtraces into the log. The user-visible cost of a
+    # missed typing indicator is zero.
+    Rails.logger.warn("[ConversationTypingChannel] #{e.class}: #{e.message}")
   end
 end

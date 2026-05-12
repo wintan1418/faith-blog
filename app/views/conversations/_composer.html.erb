@@ -56,7 +56,13 @@
       </label>
     </div>
 
-    <%= f.hidden_field :voice_note, data: { dm_composer_target: "voiceField" } %>
+    <%# IMPORTANT: explicitly pass value: "" so Rails doesn't serialize the
+        ActiveStorage::Attached::One proxy as its #inspect string —
+        otherwise the param arrives as "#<ActiveStorage::Attached::One:…>"
+        and Active Storage 500s trying to verify it as a signed_id. The JS
+        controller swaps this element for a real <input type=\"file\"> the
+        moment a voice note is finalised. %>
+    <%= f.hidden_field :voice_note, value: "", data: { dm_composer_target: "voiceField" } %>
 
     <%# Single trailing action — mic when input is empty, send when there's text %>
     <button type="button"
