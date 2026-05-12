@@ -1,64 +1,101 @@
-<% content_for(:title) { "Community Rooms - Faith Community" } %>
+<% content_for(:title) { "Rooms · Brethreign" } %>
 
-<div class="mystic-shell">
-  <section class="mystic-hero">
-    <div class="mystic-container py-14 sm:py-18">
-      <div class="max-w-3xl space-y-5">
-        <span class="mystic-kicker">
-          <%= render_icon("users", classes: "w-4 h-4") %>
-          Community Rooms
-        </span>
-        <h1 class="mystic-title text-4xl sm:text-6xl">Focused spaces for real conversation.</h1>
-        <p class="mystic-copy text-lg">
-          Each room keeps a topic clear so prayer requests, testimonies, questions, and resources do not collapse into one noisy stream.
-        </p>
-      </div>
-    </div>
-  </section>
+<%
+  rooms_total   = @rooms.size
+  posts_total   = @rooms.sum { |r| r.posts_count.to_i }
+  members_total = @rooms.sum { |r| r.members_count.to_i }
 
-  <section class="mystic-container py-10">
-    <div class="mb-8 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-      <div class="mystic-panel p-4">
-        <div class="flex flex-wrap gap-2">
-          <span class="mystic-badge px-4 py-2">All Rooms</span>
-          <span class="mystic-badge px-4 py-2"><%= pluralize(@rooms.size, "room") %></span>
-          <span class="mystic-badge px-4 py-2"><%= pluralize(@rooms.sum(&:posts_count), "post") %></span>
+  # Map a room slug → a tint palette key. Keeps each card visually distinct.
+  tint_for = ->(slug) {
+    case slug.to_s
+    when /prayer/  then "prayer"
+    when /testim/  then "testimony"
+    when /bible/   then "bible"
+    when /quest/   then "questions"
+    when /encour/  then "encourage"
+    when /youth/   then "youth"
+    when /worship/ then "worship"
+    when /family/  then "family"
+    else "default"
+    end
+  }
+%>
+
+<div class="fc-page">
+  <header class="fc-page-hero">
+    <div class="fc-page-hero-inner">
+      <span class="fc-page-kicker">
+        <%= render_icon("users", classes: "h-3.5 w-3.5") %>
+        Community Rooms
+      </span>
+      <h1 class="fc-page-title">Step into a room — focused spaces for breath.</h1>
+      <p class="fc-page-sub">
+        Prayer requests stay in prayer, testimonies in testimony, questions in questions.
+        Each room keeps a topic clear so it doesn't all collapse into one noisy stream.
+      </p>
+
+      <div class="fc-page-stats">
+        <div class="fc-page-stat">
+          <span class="fc-page-stat-num"><%= rooms_total %></span>
+          <span class="fc-page-stat-label">Rooms</span>
         </div>
+        <div class="fc-page-stat">
+          <span class="fc-page-stat-num"><%= number_with_delimiter(members_total) %></span>
+          <span class="fc-page-stat-label">Members</span>
+        </div>
+        <div class="fc-page-stat">
+          <span class="fc-page-stat-num"><%= number_with_delimiter(posts_total) %></span>
+          <span class="fc-page-stat-label">Breaths</span>
+        </div>
+        <% if user_signed_in? %>
+          <button type="button"
+                  class="fc-btn fc-btn-primary fc-page-cta"
+                  data-action="click->composer-modal#open">
+            ✦ Take a breath
+          </button>
+        <% end %>
       </div>
-      <% if user_signed_in? %>
-        <%= link_to "Start a Post", new_post_path, class: "btn btn-primary" %>
-      <% end %>
     </div>
+  </header>
 
+  <section class="fc-page-body">
     <% if @rooms.any? %>
-      <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <div class="fc-room-grid">
         <% @rooms.each do |room| %>
-          <%= link_to room_path(room), class: "mystic-card-link mystic-panel p-6" do %>
-            <div class="flex items-start justify-between gap-4">
-              <div class="grid h-14 w-14 place-items-center rounded-2xl bg-white/75 text-faith-green">
-                <%= render_icon(room.icon || "sparkles", classes: "w-7 h-7") %>
-              </div>
-              <% if room.posts_count.to_i > 50 %>
-                <span class="mystic-badge px-3 py-1 text-faith-accent">Active</span>
+          <%= link_to room_path(room),
+                      class: "fc-room-card tint-#{tint_for.call(room.slug)}" do %>
+            <div class="fc-room-card-band"></div>
+            <div class="fc-room-card-head">
+              <span class="fc-room-card-icon">
+                <%= render_icon(room.icon || "sparkles", classes: "h-6 w-6") %>
+              </span>
+              <% if room.posts_count.to_i >= 30 %>
+                <span class="fc-room-card-badge">Active</span>
               <% end %>
             </div>
-
-            <div class="mt-6">
-              <h2 class="text-2xl font-bold leading-tight text-faith-dark"><%= room.name %></h2>
-              <p class="mystic-copy mt-3 line-clamp-3 text-sm"><%= room.description %></p>
-            </div>
-
-            <div class="mt-6 flex flex-wrap gap-4 border-t border-faith-green/10 pt-4">
-              <span class="mystic-stat"><%= render_icon("message_circle", classes: "w-4 h-4") %><%= pluralize(room.posts_count, "post") %></span>
-              <span class="mystic-stat"><%= render_icon("users", classes: "w-4 h-4") %><%= pluralize(room.members_count, "member") %></span>
-            </div>
+            <h2 class="fc-room-card-name"><%= room.name %></h2>
+            <p class="fc-room-card-desc"><%= truncate(room.description.to_s, length: 140) %></p>
+            <footer class="fc-room-card-foot">
+              <span class="fc-room-card-stat">
+                <%= render_icon("message_circle", classes: "h-3.5 w-3.5") %>
+                <%= pluralize(room.posts_count.to_i, "breath") %>
+              </span>
+              <span class="fc-room-card-stat">
+                <%= render_icon("users", classes: "h-3.5 w-3.5") %>
+                <%= pluralize(room.members_count.to_i, "member") %>
+              </span>
+              <span class="fc-room-card-enter">Enter →</span>
+            </footer>
           <% end %>
         <% end %>
       </div>
     <% else %>
-      <div class="mystic-panel p-10 text-center">
-        <h2 class="text-xl font-bold text-faith-dark">No rooms yet</h2>
-        <p class="mystic-copy mt-2">Rooms will appear here once they are created.</p>
+      <div class="fc-empty">
+        <div class="fc-empty-mark" aria-hidden="true">
+          <%= render_icon("users", classes: "h-7 w-7") %>
+        </div>
+        <h2 class="fc-empty-title">No rooms yet.</h2>
+        <p class="fc-empty-text">Rooms will appear here once they're created.</p>
       </div>
     <% end %>
   </section>

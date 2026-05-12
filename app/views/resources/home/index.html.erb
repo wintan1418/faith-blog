@@ -1,133 +1,162 @@
-<% content_for(:title) { "Resource Library - Faith Community" } %>
+<% content_for(:title) { "Library · Brethreign" } %>
 
-<div class="mystic-shell">
-  <section class="mystic-hero">
-    <div class="mystic-container py-14 sm:py-18">
-      <div class="grid gap-8 lg:grid-cols-[1fr_360px] lg:items-end">
-        <div class="space-y-5">
-          <span class="mystic-kicker">
-            <%= render_icon("library", classes: "w-4 h-4") %>
-            Resource Library
-          </span>
-          <h1 class="mystic-title text-4xl sm:text-6xl">Keep helpful teaching close.</h1>
-          <p class="mystic-copy max-w-2xl text-lg">
-            Curated articles, books, videos, audio, and guides for study, prayer, growth, and practical Christian living.
-          </p>
-        </div>
+<%
+  type_tint = ->(t) {
+    case t.to_s
+    when /article|blog/   then "article"
+    when /video/          then "video"
+    when /audio|podcast|sermon/ then "audio"
+    when /book|ebook/     then "book"
+    when /guide|study/    then "guide"
+    else "default"
+    end
+  }
 
-        <div class="mystic-panel p-5">
-          <%= form_with url: resources_items_path, method: :get, class: "relative" do %>
-            <%= render_icon("search", classes: "absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-faith-muted") %>
-            <input name="q" type="text" placeholder="Search resources" class="input h-12 rounded-full pl-12 pr-4 py-0">
+  total_resources = (@featured_resources&.size.to_i) + (@recent_resources&.size.to_i)
+%>
+
+<div class="fc-page">
+  <header class="fc-page-hero">
+    <div class="fc-page-hero-inner">
+      <span class="fc-page-kicker">
+        <%= render_icon("bookopen", classes: "h-3.5 w-3.5") %>
+        Library
+      </span>
+      <h1 class="fc-page-title">Keep helpful teaching close.</h1>
+      <p class="fc-page-sub">
+        Curated articles, books, videos, audio, and study guides for prayer,
+        growth, and practical Christian living.
+      </p>
+
+      <%= form_with url: resources_items_path, method: :get, class: "fc-page-search" do %>
+        <%= render_icon("search", classes: "fc-page-search-icon h-5 w-5") %>
+        <input name="q"
+               type="text"
+               value="<%= params[:q] %>"
+               placeholder="Search the library — try “prayer” or “Wesley”"
+               class="fc-page-search-input">
+        <button type="submit" class="fc-btn fc-btn-primary">Search</button>
+      <% end %>
+
+      <% if @categories&.any? %>
+        <nav class="fc-page-chips" aria-label="Categories">
+          <%= link_to "All", resources_root_path, class: "fc-page-chip is-active" %>
+          <% @categories.first(8).each do |category| %>
+            <%= link_to resource_category_path(category), class: "fc-page-chip" do %>
+              <%= category.name %>
+              <span class="fc-page-chip-count"><%= category.resources.size %></span>
+            <% end %>
           <% end %>
-        </div>
-      </div>
+        </nav>
+      <% end %>
     </div>
-  </section>
+  </header>
 
-  <section class="mystic-container py-10">
-    <% if @categories.any? %>
-      <div class="mb-10 flex gap-3 overflow-x-auto pb-2">
-        <%= link_to "All Resources", resources_root_path, class: "mystic-badge px-4 py-2" %>
-        <% @categories.each do |category| %>
-          <%= link_to resource_category_path(category), class: "mystic-badge px-4 py-2 whitespace-nowrap" do %>
-            <%= category.name %>
-            <span class="text-faith-muted"><%= category.resources.size %></span>
+  <section class="fc-page-body">
+    <% if @featured_resources&.any? %>
+      <div class="fc-section-head">
+        <div>
+          <span class="fc-page-kicker">Featured</span>
+          <h2 class="fc-section-title">Start here.</h2>
+        </div>
+        <%= link_to "View all →", resources_items_path, class: "fc-section-link" %>
+      </div>
+
+      <div class="fc-resource-grid">
+        <% @featured_resources.each do |resource| %>
+          <%
+            tint = type_tint.call(resource.resource_type)
+            cover = resource.respond_to?(:cover_image) && resource.cover_image&.attached? ? resource.cover_image : nil
+          %>
+          <%= link_to resources_item_path(resource),
+                      class: "fc-resource-card tint-#{tint}" do %>
+            <% if cover %>
+              <div class="fc-resource-cover">
+                <%= image_tag cover, class: "fc-resource-cover-img", alt: resource.title %>
+              </div>
+            <% else %>
+              <div class="fc-resource-cover fc-resource-cover-placeholder">
+                <%= render_icon(resource.type_icon, classes: "h-9 w-9") %>
+              </div>
+            <% end %>
+            <div class="fc-resource-body">
+              <span class="fc-resource-type"><%= resource.resource_type.to_s.titleize %></span>
+              <h3 class="fc-resource-title"><%= resource.title %></h3>
+              <p class="fc-resource-desc"><%= truncate(resource.description.to_s, length: 140) %></p>
+              <footer class="fc-resource-foot">
+                <span><%= resource.user&.username || "Community" %></span>
+                <span class="fc-resource-foot-sep">·</span>
+                <span><%= pluralize(resource.downloads_count.to_i, "download") %></span>
+              </footer>
+            </div>
           <% end %>
         <% end %>
       </div>
     <% end %>
 
-    <% if @featured_resources.any? %>
-      <div class="mb-12">
-        <div class="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <span class="mystic-kicker">Featured</span>
-            <h2 class="mystic-title mt-3 text-3xl sm:text-5xl">Start here.</h2>
-          </div>
-          <%= link_to "View all", resources_items_path, class: "btn btn-secondary" %>
-        </div>
-
-        <div class="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <% @featured_resources.each do |resource| %>
-            <%= link_to resources_item_path(resource), class: "mystic-card-link mystic-panel p-6" do %>
-              <div class="mb-5 flex items-start justify-between gap-4">
-                <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white/80 text-faith-green">
-                  <%= render_icon(resource.type_icon, classes: "w-6 h-6") %>
-                </span>
-                <span class="mystic-badge px-3 py-1"><%= resource.resource_type.titleize %></span>
-              </div>
-              <p class="text-xs font-bold uppercase tracking-wide text-faith-muted"><%= resource.resource_category.name %></p>
-              <h3 class="mt-2 text-2xl font-bold leading-tight text-faith-dark"><%= resource.title %></h3>
-              <p class="mystic-copy mt-3 line-clamp-3 text-sm"><%= resource.description %></p>
-              <div class="mt-5 flex items-center justify-between border-t border-faith-green/10 pt-4 text-sm font-semibold text-faith-muted">
-                <span><%= resource.user&.username || "Community" %></span>
-                <span><%= pluralize(resource.downloads_count, "download") %></span>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
+    <div class="fc-resource-split">
       <main>
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="fc-section-head">
           <div>
-            <span class="mystic-kicker">Recent</span>
-            <h2 class="mystic-title mt-3 text-3xl sm:text-4xl">Recently added</h2>
+            <span class="fc-page-kicker">Recent</span>
+            <h2 class="fc-section-title">Just added</h2>
           </div>
           <% if user_signed_in? %>
-            <%= link_to "Submit", new_resources_item_path, class: "btn btn-primary" %>
+            <%= link_to "Submit a resource →", new_resources_item_path, class: "fc-section-link" %>
           <% end %>
         </div>
 
-        <div class="mystic-panel overflow-hidden">
-          <% if @recent_resources.any? %>
-            <div class="divide-y divide-faith-green/10">
-              <% @recent_resources.each do |resource| %>
-                <%= link_to resources_item_path(resource), class: "flex gap-4 p-5 transition hover:bg-white/55" do %>
-                  <span class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white/80 text-faith-green">
-                    <%= render_icon(resource.type_icon, classes: "w-5 h-5") %>
+        <% if @recent_resources&.any? %>
+          <ul class="fc-resource-list">
+            <% @recent_resources.each do |resource| %>
+              <% tint = type_tint.call(resource.resource_type) %>
+              <li class="fc-resource-row tint-<%= tint %>">
+                <%= link_to resources_item_path(resource), class: "fc-resource-row-link" do %>
+                  <span class="fc-resource-row-icon">
+                    <%= render_icon(resource.type_icon, classes: "h-5 w-5") %>
                   </span>
-                  <span class="min-w-0 flex-1">
-                    <span class="block text-base font-bold text-faith-dark"><%= resource.title %></span>
-                    <span class="mystic-copy mt-1 line-clamp-2 text-sm"><%= resource.description %></span>
-                    <span class="mt-2 flex flex-wrap gap-2 text-xs font-semibold text-faith-muted">
-                      <span><%= resource.resource_category.name %></span>
-                      <span>•</span>
-                      <span><%= time_ago_in_words(resource.created_at) %> ago</span>
+                  <span class="fc-resource-row-body">
+                    <span class="fc-resource-row-title"><%= resource.title %></span>
+                    <span class="fc-resource-row-desc"><%= truncate(resource.description.to_s, length: 110) %></span>
+                    <span class="fc-resource-row-meta">
+                      <%= resource.resource_category.name %>
+                      ·
+                      <%= time_ago_in_words(resource.created_at) %> ago
                     </span>
                   </span>
                 <% end %>
-              <% end %>
-            </div>
-          <% else %>
-            <div class="p-10 text-center">
-              <h3 class="text-xl font-bold text-faith-dark">No resources yet</h3>
-              <p class="mystic-copy mt-2">Approved resources will appear here.</p>
-            </div>
-          <% end %>
-        </div>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <div class="fc-empty">
+            <div class="fc-empty-mark" aria-hidden="true">📚</div>
+            <h3 class="fc-empty-title">No resources yet.</h3>
+            <p class="fc-empty-text">Approved resources will appear here as people contribute.</p>
+          </div>
+        <% end %>
       </main>
 
-      <aside class="space-y-5">
-        <div class="mystic-panel p-6">
-          <h3 class="text-xl font-bold text-faith-dark">Library Stats</h3>
-          <div class="mt-5 space-y-3">
-            <div class="flex justify-between text-sm"><span class="text-faith-muted">Categories</span><span class="font-bold text-faith-dark"><%= @categories.size %></span></div>
-            <div class="flex justify-between text-sm"><span class="text-faith-muted">Featured</span><span class="font-bold text-faith-dark"><%= @featured_resources.size %></span></div>
-            <div class="flex justify-between text-sm"><span class="text-faith-muted">Recent</span><span class="font-bold text-faith-dark"><%= @recent_resources.size %></span></div>
+      <aside class="fc-resource-aside">
+        <div class="fc-side-card">
+          <p class="fc-page-kicker">Library at a glance</p>
+          <div class="fc-aside-stats">
+            <div><span><%= @categories&.size.to_i %></span><small>Categories</small></div>
+            <div><span><%= @featured_resources&.size.to_i %></span><small>Featured</small></div>
+            <div><span><%= total_resources %></span><small>Loaded</small></div>
           </div>
         </div>
 
-        <div class="mystic-panel-strong p-6">
-          <h3 class="text-xl font-bold text-faith-dark">Share a Resource</h3>
-          <p class="mystic-copy mt-2 text-sm">Submit material that has helped your walk. Moderators can review it before it reaches the library.</p>
+        <div class="fc-side-card fc-side-card--accent">
+          <h3 class="fc-side-card-title">Share something good</h3>
+          <p class="fc-side-card-text">
+            Submit a piece that's helped your walk — articles, books, talks. A moderator
+            reviews each one before it lands here.
+          </p>
           <% if user_signed_in? %>
-            <%= link_to "Submit Resource", new_resources_item_path, class: "btn btn-primary mt-5 w-full" %>
+            <%= link_to "Submit a resource", new_resources_item_path, class: "fc-btn fc-btn-primary mt-3 inline-flex" %>
           <% else %>
-            <%= link_to "Sign in to submit", new_user_session_path, class: "btn btn-secondary mt-5 w-full" %>
+            <%= link_to "Sign in to submit", new_user_session_path, class: "fc-btn mt-3 inline-flex" %>
           <% end %>
         </div>
       </aside>
