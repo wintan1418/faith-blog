@@ -62,17 +62,30 @@
         </button>
 
         <div class="fc-topbar-icons">
-          <button type="button" class="fc-icon-btn relative" title="Notifications" data-action="click->notifications-modal#open">
+          <%
+            n_notif    = current_user.unread_notifications_count.to_i
+            n_inbox    = current_user.unread_conversations_count.to_i
+            n_requests = current_user.pending_connection_requests_count.to_i
+          %>
+
+          <button type="button" class="fc-icon-btn relative" title="Notifications (#{n_notif})" data-action="click->notifications-modal#open">
             <%= render_icon("sparkles", classes: "h-4 w-4") %>
-            <% if current_user.unread_notifications_count.positive? %>
-              <span class="fc-notif-pulse-badge"></span>
+            <% if n_notif.positive? %>
+              <span class="fc-count-badge"><%= n_notif > 99 ? "99+" : n_notif %></span>
             <% end %>
           </button>
 
-          <%= link_to conversations_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Inbox" do %>
+          <%= link_to conversations_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Inbox (#{n_inbox})" do %>
             <%= render_icon("mail", classes: "h-4 w-4") %>
-            <% if current_user.unread_conversations_count.positive? %>
-              <span class="fc-notif-pulse-badge is-mint"></span>
+            <% if n_inbox.positive? %>
+              <span class="fc-count-badge is-mint"><%= n_inbox > 99 ? "99+" : n_inbox %></span>
+            <% end %>
+          <% end %>
+
+          <%= link_to connection_requests_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Connection requests (#{n_requests})" do %>
+            <%= render_icon("users", classes: "h-4 w-4") %>
+            <% if n_requests.positive? %>
+              <span class="fc-count-badge"><%= n_requests > 99 ? "99+" : n_requests %></span>
             <% end %>
           <% end %>
 
@@ -83,11 +96,19 @@
         </div>
 
         <div class="relative" data-controller="dropdown">
-          <button type="button" data-action="click->dropdown#toggle" class="fc-avatar" aria-label="Open account menu">
+          <%
+            attn_total = current_user.unread_notifications_count.to_i +
+                         current_user.unread_conversations_count.to_i +
+                         current_user.pending_connection_requests_count.to_i
+          %>
+          <button type="button" data-action="click->dropdown#toggle" class="fc-avatar relative" aria-label="Open account menu">
             <% if current_user.profile&.avatar&.attached? %>
               <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover" %>
             <% else %>
               <%= current_user.username.first.upcase %>
+            <% end %>
+            <% if attn_total.positive? %>
+              <span class="fc-avatar-attention"><%= attn_total > 99 ? "99+" : attn_total %></span>
             <% end %>
           </button>
 
@@ -120,7 +141,18 @@
             <%= link_to "🎯 Games", games_path, class: "fc-dropdown-item" %>
             <%= link_to "⛪ Church History", church_history_path, class: "fc-dropdown-item" %>
             <%= link_to "Drafts", drafts_path, class: "fc-dropdown-item" %>
-            <%= link_to "Inbox", conversations_path, class: "fc-dropdown-item" %>
+            <%= link_to conversations_path, class: "fc-dropdown-item flex items-center justify-between" do %>
+              <span>Inbox</span>
+              <% if (n = current_user.unread_conversations_count.to_i).positive? %>
+                <span class="fc-count-chip is-mint"><%= n > 99 ? "99+" : n %></span>
+              <% end %>
+            <% end %>
+            <%= link_to connection_requests_path, class: "fc-dropdown-item flex items-center justify-between" do %>
+              <span>Connection requests</span>
+              <% if (n = current_user.pending_connection_requests_count.to_i).positive? %>
+                <span class="fc-count-chip"><%= n > 99 ? "99+" : n %></span>
+              <% end %>
+            <% end %>
             <%= link_to "Invites", invitations_path, class: "fc-dropdown-item" %>
             <%= link_to "People", people_path, class: "fc-dropdown-item" %>
             <%= link_to "Connections", my_connections_path, class: "fc-dropdown-item" %>

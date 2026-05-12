@@ -233,6 +233,12 @@ class User < ApplicationRecord
     sent_connection_requests.accepted.count + received_connection_requests.accepted.count
   end
 
+  # Number of incoming connection requests waiting on this user's reply.
+  # Used by the navbar badge.
+  def pending_connection_requests_count
+    received_connection_requests.pending.count
+  end
+
   private
 
   def self.unique_username_from(auth)

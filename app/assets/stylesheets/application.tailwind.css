@@ -14556,6 +14556,75 @@ html.theme-light .inbox-thread-head {
   z-index: 2;
   pointer-events: none;
 }
+
+/* LinkedIn-style numeric count badge on an icon button. */
+.fc-count-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--fc-surface);
+  box-shadow: 0 4px 10px -3px rgba(239, 68, 68, 0.55);
+  z-index: 2;
+  pointer-events: none;
+  letter-spacing: -0.01em;
+}
+.fc-count-badge.is-mint {
+  background: var(--fc-accent);
+  color: var(--fc-bg);
+  box-shadow: 0 4px 10px -3px rgba(52, 211, 153, 0.55);
+}
+
+/* Same number, inline inside dropdown rows. */
+.fc-count-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+.fc-count-chip.is-mint { background: var(--fc-accent); color: var(--fc-bg); }
+
+/* Catch-all badge on the avatar (visible on mobile where topbar icons hide). */
+.fc-avatar-attention {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--fc-surface);
+  box-shadow: 0 4px 10px -3px rgba(239, 68, 68, 0.55);
+  z-index: 2;
+  pointer-events: none;
+}
 .fc-notif-pulse-badge.is-mint {
   background: var(--fc-accent);
   box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
