@@ -1,0 +1,31 @@
+<% content_for(:title) { "Character Match · Brethreign" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 720px;">
+    <main class="fc-main">
+      <header class="mb-5">
+        <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+          ← Back to games
+        <% end %>
+        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">👤 Character Match</h1>
+        <p class="text-sm text-[var(--fc-muted)]">Read the description — name the biblical figure.</p>
+      </header>
+
+      <section data-controller="quiz"
+               data-quiz-generate-url-value="<%= games_character_match_generate_path %>"
+               data-quiz-submit-url-value="<%= games_character_match_submit_path %>"
+               data-quiz-csrf-value="<%= form_authenticity_token %>">
+        <div class="fc-quiz" data-quiz-target="stage">
+          <div class="fc-quiz-screen">
+            <p class="fc-quiz-kicker">Character match · 5 in a row</p>
+            <h2 class="fc-quiz-headline">Can you name them?</h2>
+            <p class="fc-quiz-sub">Short bio of a biblical figure — pick the right name from four options.</p>
+            <button type="button" class="fc-btn fc-btn-primary fc-quiz-start" data-action="click->quiz#start">
+              ▶ Start round
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

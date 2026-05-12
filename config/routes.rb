@@ -98,6 +98,22 @@ Rails.application.routes.draw do
   post "games/history/generate", to: "games#history_generate", as: :games_history_generate
   post "games/history/submit",   to: "games#history_submit",   as: :games_history_submit
 
+  get  "games/character_match",          to: "games#character_match",          as: :games_character_match
+  post "games/character_match/generate", to: "games#character_match_generate", as: :games_character_match_generate
+  post "games/character_match/submit",   to: "games#character_match_submit",   as: :games_character_match_submit
+
+  get  "games/reference_scramble",          to: "games#reference_scramble",          as: :games_reference_scramble
+  post "games/reference_scramble/generate", to: "games#reference_scramble_generate", as: :games_reference_scramble_generate
+  post "games/reference_scramble/submit",   to: "games#reference_scramble_submit",   as: :games_reference_scramble_submit
+
+  get  "games/verse_memory",          to: "games#verse_memory",          as: :games_verse_memory
+  post "games/verse_memory/generate", to: "games#verse_memory_generate", as: :games_verse_memory_generate
+  post "games/verse_memory/submit",   to: "games#verse_memory_submit",   as: :games_verse_memory_submit
+
+  get  "games/pic_word",          to: "games#pic_word",          as: :games_pic_word
+  post "games/pic_word/generate", to: "games#pic_word_generate", as: :games_pic_word_generate
+  post "games/pic_word/submit",   to: "games#pic_word_submit",   as: :games_pic_word_submit
+
   # Church History Arena — explore figures across eras
   get  "history",                to: "church_history#index",     as: :church_history
   get  "history/figure/:slug",   to: "church_history#figure",    as: :church_history_figure

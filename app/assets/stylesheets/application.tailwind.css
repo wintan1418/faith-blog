@@ -10004,6 +10004,19 @@ html.theme-dark .fc-held-banner {
   color: var(--fc-muted);
 }
 
+/* 4 Pics 1 Word — emoji prompt rendered HUGE so the puzzle reads. */
+.fc-quiz-picword .fc-quiz-prompt {
+  font-size: 3rem;
+  line-height: 1.1;
+  text-align: center;
+  letter-spacing: 0.25rem;
+  padding: 0.6rem 0;
+  word-spacing: 0.2rem;
+}
+@media (min-width: 560px) {
+  .fc-quiz-picword .fc-quiz-prompt { font-size: 4rem; }
+}
+
 /* ── Chess puzzle card ─────────────────────────────────────────────── */
 
 .fc-chess-card {

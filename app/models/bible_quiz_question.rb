@@ -12,13 +12,14 @@ class BibleQuizQuestion < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :by_theme,      ->(theme)      { theme.present?      ? where(theme: theme)           : all }
   scope :by_difficulty, ->(difficulty) { difficulty.present? ? where(difficulty: difficulty) : all }
+  scope :by_kind,       ->(kind)       { kind.present?       ? where(kind: kind)             : all }
 
   # Pull N random questions — preferring questions THIS USER hasn't seen in
   # the last 30 days. Falls back to least-recently-seen when the unseen
-  # pool is exhausted so the round is never short. theme/difficulty are
-  # optional filters; pass nil/"" to sample across all.
-  def self.sample_for(user:, theme: nil, difficulty: nil, count: 5)
-    candidates = by_theme(theme).by_difficulty(difficulty)
+  # pool is exhausted so the round is never short. theme/difficulty/kind
+  # are optional filters; pass nil/"" to sample across all.
+  def self.sample_for(user:, theme: nil, difficulty: nil, kind: nil, count: 5)
+    candidates = by_theme(theme).by_difficulty(difficulty).by_kind(kind)
     return [] if candidates.none?
 
     seen_ids = UserSeenQuizQuestion

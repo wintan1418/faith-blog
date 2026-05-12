@@ -9,7 +9,8 @@ class GameAttempt < ApplicationRecord
     character_match: 2,
     reference_scramble: 3,
     chess_puzzle: 4,
-    church_history: 5
+    church_history: 5,
+    pic_word: 6
   }, prefix: :game
 
   validates :score, :max_score, presence: true, numericality: { greater_than_or_equal_to: 0 }

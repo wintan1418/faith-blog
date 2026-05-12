@@ -1,0 +1,31 @@
+<% content_for(:title) { "Reference Scramble · Brethreign" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 720px;">
+    <main class="fc-main">
+      <header class="mb-5">
+        <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+          ← Back to games
+        <% end %>
+        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">🔤 Reference Scramble</h1>
+        <p class="text-sm text-[var(--fc-muted)]">Read the verse — pick the right chapter:verse from four.</p>
+      </header>
+
+      <section data-controller="quiz"
+               data-quiz-generate-url-value="<%= games_reference_scramble_generate_path %>"
+               data-quiz-submit-url-value="<%= games_reference_scramble_submit_path %>"
+               data-quiz-csrf-value="<%= form_authenticity_token %>">
+        <div class="fc-quiz" data-quiz-target="stage">
+          <div class="fc-quiz-screen">
+            <p class="fc-quiz-kicker">Reference scramble · 5 rounds</p>
+            <h2 class="fc-quiz-headline">Place the verse.</h2>
+            <p class="fc-quiz-sub">A famous verse, four possible references — pick where it lives in scripture.</p>
+            <button type="button" class="fc-btn fc-btn-primary fc-quiz-start" data-action="click->quiz#start">
+              ▶ Start round
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

@@ -56,26 +56,33 @@
             <span class="fc-game-card-cta">Play →</span>
           <% end %>
 
-          <div class="fc-game-card is-soon">
+          <%= link_to games_verse_memory_path, class: "fc-game-card is-active" do %>
             <div class="fc-game-card-icon">🧠</div>
             <h3>Verse Memory</h3>
-            <p>Reveal a verse one word at a time and recite it back.</p>
-            <span class="fc-game-card-cta is-soon">Coming soon</span>
-          </div>
+            <p>One well-known verse with 5 blanks — pick the right keyword for each. Counts toward the leaderboard.</p>
+            <span class="fc-game-card-cta">Play →</span>
+          <% end %>
 
-          <div class="fc-game-card is-soon">
+          <%= link_to games_character_match_path, class: "fc-game-card is-active" do %>
             <div class="fc-game-card-icon">👤</div>
             <h3>Character Match</h3>
-            <p>Match a description to the right biblical figure.</p>
-            <span class="fc-game-card-cta is-soon">Coming soon</span>
-          </div>
+            <p>Short bio of a biblical figure — pick the right name from four options.</p>
+            <span class="fc-game-card-cta">Play →</span>
+          <% end %>
 
-          <div class="fc-game-card is-soon">
+          <%= link_to games_reference_scramble_path, class: "fc-game-card is-active" do %>
             <div class="fc-game-card-icon">🔤</div>
             <h3>Reference Scramble</h3>
-            <p>Read the verse — guess the chapter and verse before time runs out.</p>
-            <span class="fc-game-card-cta is-soon">Coming soon</span>
-          </div>
+            <p>Read a famous verse — pick the right chapter:verse from four. Fast rounds.</p>
+            <span class="fc-game-card-cta">Play →</span>
+          <% end %>
+
+          <%= link_to games_pic_word_path, class: "fc-game-card is-active" do %>
+            <div class="fc-game-card-icon">🖼️</div>
+            <h3>4 Pics 1 Word</h3>
+            <p>Four emoji hint at a Bible story or concept. Decode the puzzle.</p>
+            <span class="fc-game-card-cta">Play →</span>
+          <% end %>
         </div>
       </section>
 

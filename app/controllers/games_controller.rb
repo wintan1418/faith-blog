@@ -95,6 +95,50 @@ class GamesController < ApplicationController
     render json: { ok: true, score: score, attempt_id: attempt.id }
   end
 
+  # ──────── Character Match ────────
+  def character_match; end
+  def character_match_generate
+    play_filtered_round(kind: "character")
+  end
+  def character_match_submit
+    record_attempt(kind: :character_match, max_cap: 50)
+  end
+
+  # ──────── Reference Scramble ────────
+  def reference_scramble; end
+  def reference_scramble_generate
+    play_filtered_round(kind: "reference")
+  end
+  def reference_scramble_submit
+    record_attempt(kind: :reference_scramble, max_cap: 50)
+  end
+
+  # ──────── Verse Memory ────────
+  def verse_memory; end
+  def verse_memory_generate
+    rows = Ai::Bible::VerseMemoryRound.call
+    render json: { ok: true, questions: rows }
+  rescue Ai::Bible::VerseMemoryRound::Error => e
+    Rails.logger.warn("[VerseMemoryRound] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Couldn't fetch a verse right now." }, status: :bad_gateway
+  end
+  def verse_memory_submit
+    record_attempt(kind: :verse_memory, max_cap: 20)
+  end
+
+  # ──────── 4 Pics 1 Word ────────
+  def pic_word; end
+  def pic_word_generate
+    rows = Ai::Bible::PicWordRound.call
+    render json: { ok: true, questions: rows }
+  rescue Ai::Bible::PicWordRound::Error => e
+    Rails.logger.warn("[PicWordRound] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Couldn't fetch puzzles right now." }, status: :bad_gateway
+  end
+  def pic_word_submit
+    record_attempt(kind: :pic_word, max_cap: 20)
+  end
+
   # GET /games/history — Church History trivia play page
   def history
   end
@@ -119,6 +163,41 @@ class GamesController < ApplicationController
   end
 
   private
+
+  # Generate a round filtered by a SINGLE question kind (used by Character
+  # Match + Reference Scramble — same gamy quiz UI, different filter).
+  def play_filtered_round(kind:)
+    length = params[:length].to_i
+    length = 5 unless QUIZ_LENGTHS.include?(length)
+    difficulty = params[:difficulty].to_s.presence
+    difficulty = nil unless difficulty.nil? || Ai::Bible::QuizGenerator::DIFFICULTIES.include?(difficulty)
+
+    rows = BibleQuizQuestion.sample_for(user: current_user, kind: kind, difficulty: difficulty, count: length)
+
+    # Pool too thin? Generate on demand.
+    if rows.size < length
+      attempts = 0
+      while rows.size < length && attempts < 3
+        begin
+          generated = Ai::Bible::QuizGenerator.call(difficulty: difficulty)
+          # Keep only matching kind from the AI batch.
+          BibleQuizQuestion.import_from_generator!(generated.select { |q| q.kind == kind })
+        rescue Ai::Bible::QuizGenerator::ParseError, Ai::Moderation::Client::Error => e
+          Rails.logger.warn("[FilteredQuiz #{kind}] #{e.class}: #{e.message}")
+        end
+        attempts += 1
+        rows = BibleQuizQuestion.sample_for(user: current_user, kind: kind, difficulty: difficulty, count: length)
+      end
+    end
+
+    BibleQuizQuestion.mark_seen!(user: current_user, question_ids: rows.map(&:id))
+
+    questions = rows.map do |r|
+      { kind: r.kind, prompt: r.prompt, choices: r.choices, correct_index: r.correct_index,
+        reference: r.reference, explanation: r.explanation, theme: r.theme, difficulty: r.difficulty }
+    end
+    render json: { ok: true, questions: questions, difficulty: difficulty }
+  end
 
   def record_attempt(kind:, max_cap:)
     score     = params[:score].to_i
