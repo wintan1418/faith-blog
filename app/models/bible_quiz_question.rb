@@ -48,6 +48,8 @@ class BibleQuizQuestion < ApplicationRecord
   end
 
   # Record that the given user saw these questions right now.
+  # Note: do NOT include :updated_at in update_only — Rails auto-appends
+  # it on upsert and PG rejects 'SET updated_at = …, updated_at = …'.
   def self.mark_seen!(user:, question_ids:)
     return if question_ids.blank?
 
@@ -56,7 +58,7 @@ class BibleQuizQuestion < ApplicationRecord
       { user_id: user.id, bible_quiz_question_id: qid, last_seen_at: now, created_at: now, updated_at: now }
     end
     UserSeenQuizQuestion.upsert_all(rows, unique_by: :idx_seen_user_q,
-                                          update_only: [ :last_seen_at, :updated_at ])
+                                          update_only: [ :last_seen_at ])
   end
 
   def self.import_from_generator!(questions)
