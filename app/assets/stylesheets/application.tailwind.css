@@ -14571,6 +14571,71 @@ html.theme-light .inbox-thread-head {
   color: var(--swatch-2);
 }
 
+/* Inline composer-assistant toolbar under the Trix editor on /posts/:id/edit */
+.fc-form-assistant-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+/* Invite link copy row */
+.fc-invite-link-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.fc-invite-link-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.85rem;
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  color: var(--fc-ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+.fc-invite-link-input:focus {
+  outline: none;
+  border-color: var(--fc-accent);
+  box-shadow: 0 0 0 3px var(--fc-accent-soft);
+}
+.fc-invite-share-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.6rem;
+}
+
+/* Restore list markers inside Trix — Tailwind preflight strips them
+   globally so .trix-content ul/ol come out as plain indented text.
+   Apply to both the editor itself and the rendered action_text body. */
+trix-editor ul,
+trix-editor ol,
+.trix-content ul,
+.trix-content ol,
+.fc-breath-copy ul,
+.fc-breath-copy ol {
+  padding-left: 1.5rem;
+  margin: 0.4rem 0;
+}
+trix-editor ul,
+.trix-content ul,
+.fc-breath-copy ul { list-style: disc outside; }
+
+trix-editor ol,
+.trix-content ol,
+.fc-breath-copy ol { list-style: decimal outside; }
+
+trix-editor li,
+.trix-content li,
+.fc-breath-copy li {
+  margin: 0.18rem 0;
+}
+
 @media (max-width: 480px) {
   .fc-emoji-popover {
     /* On narrow screens, pin to the right edge of the anchor so the

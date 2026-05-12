@@ -1,4 +1,10 @@
-<%= form_with model: post, class: "space-y-6", data: { controller: "post-form" } do |f| %>
+<%= form_with model: post,
+              class: "space-y-6",
+              data: {
+                controller: "post-form composer-assistant",
+                composer_assistant_gentleness_url_value: check_gentleness_posts_path,
+                composer_assistant_scripture_url_value:  suggest_scripture_posts_path
+              } do |f| %>
   <% if post.errors.any? %>
     <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
       <div class="flex items-start gap-3">
@@ -58,13 +64,53 @@
       </div>
     </div>
     
-    <%= f.rich_text_area :content, 
-        class: "input min-h-[300px]", 
+    <%= f.rich_text_area :content,
+        class: "input min-h-[300px]",
         placeholder: "Share your testimony, thoughts, or prayer request...",
-        data: { 
+        data: {
           emoji_picker_target: "editor",
-          controller: "mentions" 
+          controller: "mentions"
         } %>
+
+    <%# Composer assistants — same buttons as the modal composer %>
+    <div class="fc-form-assistant-row">
+      <button type="button"
+              class="fc-composer-icon-btn"
+              title="Open Bible"
+              aria-label="Open Bible"
+              data-action="click->bible-drawer#open">
+        <%= render_icon("bookopen", classes: "h-5 w-5") %>
+      </button>
+
+      <button type="button"
+              class="fc-composer-asst-btn"
+              data-composer-assistant-target="gentlenessBtn"
+              data-action="click->composer-assistant#checkGentleness"
+              title="Run a quick tone check">
+        🕊️ <span>Check tone</span>
+      </button>
+
+      <button type="button"
+              class="fc-composer-asst-btn"
+              data-composer-assistant-target="scriptureBtn"
+              data-action="click->composer-assistant#suggestScripture"
+              title="Suggest a fitting scripture">
+        📖 <span>Suggest scripture</span>
+      </button>
+
+      <button type="button"
+              class="fc-composer-asst-btn fc-composer-asst-toggle"
+              data-composer-assistant-target="scriptureAutoBtn"
+              data-action="click->composer-assistant#toggleAutoScripture"
+              title="Suggest scripture automatically as you type"
+              aria-pressed="false">
+        ⚡ <span class="fc-composer-asst-label">Auto: off</span>
+      </button>
+    </div>
+
+    <div class="fc-asst-panel hidden mt-3" data-composer-assistant-target="panel">
+      <div class="fc-asst-panel-content" data-composer-assistant-target="panelContent"></div>
+    </div>
   </div>
 
   <!-- Image Upload Section -->
@@ -217,13 +263,28 @@
     </div>
   </div>
 
-  <div class="flex items-center gap-3 pt-4">
-    <%= f.hidden_field :status, value: "published" %>
-    <%= f.submit post.persisted? ? "Update Post" : "Publish Post", class: "btn btn-primary btn-lg" %>
+  <div class="flex flex-wrap items-center gap-3 pt-4">
+    <%# Two submit paths: Save as draft OR Publish. Each carries its own
+        status value in the submit's `name` so the controller sees the
+        intent without us forcing a hidden field. %>
+    <button type="submit"
+            name="post[status]"
+            value="draft"
+            class="fc-btn">
+      💾 Save draft
+    </button>
+
+    <button type="submit"
+            name="post[status]"
+            value="published"
+            class="fc-btn fc-btn-primary">
+      <%= post.persisted? && post.published? ? "Update post" : "Publish" %>
+    </button>
+
     <% if post.persisted? %>
-      <%= link_to "Cancel", post_path(post), class: "btn btn-secondary" %>
+      <%= link_to "Cancel", (post.draft? ? drafts_path : post_path(post)), class: "fc-btn" %>
     <% else %>
-      <%= link_to "Cancel", feed_path, class: "btn btn-secondary" %>
+      <%= link_to "Cancel", feed_path, class: "fc-btn" %>
     <% end %>
   </div>
 <% end %>

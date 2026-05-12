@@ -56,8 +56,11 @@ class PostsController < ApplicationController
   def update
     if @post.update(post_params)
       handle_post_links
-      # Mentions are processed in after_save callback, no need to call again
-      redirect_to @post, notice: "Post updated successfully!"
+      if @post.draft?
+        redirect_to drafts_path, notice: "Draft saved — pick it back up under Drafts when you're ready."
+      else
+        redirect_to @post, notice: "Post updated successfully!"
+      end
     else
       @rooms = Room.public_rooms.ordered
       render :edit, status: :unprocessable_entity

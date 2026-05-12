@@ -5,8 +5,45 @@
     <div class="mb-8">
       <span class="mystic-kicker">Invites</span>
       <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Invite someone into the community.</h1>
-      <p class="mystic-copy mt-2 max-w-2xl">Send a personal invitation link by email and track who has joined.</p>
+      <p class="mystic-copy mt-2 max-w-2xl">Send a personal invitation link by email, or grab your shareable link and drop it anywhere.</p>
     </div>
+
+    <% invite_link = new_user_registration_url(invite: current_user.username) %>
+    <section class="mystic-panel-strong mb-6 p-6"
+             data-controller="invite-link">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <div>
+          <h2 class="text-xl font-black text-[var(--fc-ink)]">🔗 Your invite link</h2>
+          <p class="mystic-copy mt-1 text-sm">Paste it on WhatsApp, X, anywhere — anyone who signs up through this link is associated with you.</p>
+        </div>
+      </div>
+      <div class="fc-invite-link-row">
+        <input type="text"
+               class="fc-invite-link-input"
+               data-invite-link-target="input"
+               value="<%= invite_link %>"
+               readonly
+               aria-label="Your invite link">
+        <button type="button"
+                class="fc-btn fc-btn-primary"
+                data-invite-link-target="copyBtn"
+                data-action="click->invite-link#copy">
+          ⎘ Copy
+        </button>
+      </div>
+      <div class="fc-invite-share-row">
+        <%= link_to "Share on WhatsApp",
+            "https://api.whatsapp.com/send?text=#{CGI.escape("Join me on Brethreign — a community where Christians breathe. #{invite_link}")}",
+            target: "_blank",
+            rel: "noopener",
+            class: "fc-btn" %>
+        <%= link_to "Share on X",
+            "https://twitter.com/intent/tweet?#{ {text: "Join me on Brethreign — a community where Christians breathe.", url: invite_link}.to_query}",
+            target: "_blank",
+            rel: "noopener",
+            class: "fc-btn" %>
+      </div>
+    </section>
 
     <section class="mystic-panel-strong mb-6 p-6">
       <div class="flex items-center justify-between gap-3">

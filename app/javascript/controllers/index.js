@@ -46,6 +46,9 @@ application.register("history-arena", HistoryArenaController)
 import InfiniteScrollController from "./infinite_scroll_controller"
 application.register("infinite-scroll", InfiniteScrollController)
 
+import InviteLinkController from "./invite_link_controller"
+application.register("invite-link", InviteLinkController)
+
 import LightboxController from "./lightbox_controller"
 application.register("lightbox", LightboxController)
 
