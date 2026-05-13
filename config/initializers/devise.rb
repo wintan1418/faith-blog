@@ -11,6 +11,12 @@ Devise.setup do |config|
   config.stretches = Rails.env.test? ? 1 : 12
   config.reconfirmable = true
   config.expire_all_remember_me_on_sign_out = true
+  # Stay signed in for 6 months (LinkedIn / X feel). The remember-me cookie
+  # is auto-set on every sign-in (form defaults remember_me to checked);
+  # extend_remember_period bumps the cookie expiry on each visit so an
+  # active user effectively never gets signed out.
+  config.remember_for = 6.months
+  config.extend_remember_period = true
   config.password_length = 8..128
   config.email_regexp = /\A[^@\s]+@[^@\s]+\z/
   config.reset_password_within = 6.hours

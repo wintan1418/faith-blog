@@ -61,7 +61,8 @@ class User < ApplicationRecord
   # Validations
   validates :username, presence: true, uniqueness: { case_sensitive: false },
                        length: { minimum: 3, maximum: 30 },
-                       format: { with: /\A[a-zA-Z0-9_]+\z/, message: "can only contain letters, numbers, and underscores" }
+                       format: { with: /\A[a-zA-Z0-9_]+\z/,
+                                 message: "may only use letters, numbers, or underscores — no spaces, hyphens, or punctuation" }
 
   # Callbacks
   after_create :create_profile

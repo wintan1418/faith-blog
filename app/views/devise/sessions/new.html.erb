@@ -22,7 +22,7 @@
 
       <%= render "devise/shared/google_sign_in" %>
 
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5", data: { turbo: false } }) do |f| %>
         <div>
           <%= f.label :email, class: "label" %>
           <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input", placeholder: "you@example.com" %>
@@ -35,8 +35,8 @@
 
         <div class="flex items-center justify-between gap-3">
           <label class="flex items-center gap-2 text-sm font-semibold text-faith-muted">
-            <%= f.check_box :remember_me, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
-            Remember me
+            <%= f.check_box :remember_me, { checked: true, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" } %>
+            Keep me signed in
           </label>
           <%= link_to "Forgot password?", new_password_path(resource_name), class: "text-sm font-bold text-faith-green hover:text-faith-dark" %>
         </div>

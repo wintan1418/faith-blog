@@ -22,7 +22,7 @@
 
       <%= render "devise/shared/google_sign_in" %>
 
-      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5", data: { turbo: false } }) do |f| %>
         <% if resource.errors.any? %>
           <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
             <ul class="list-inside list-disc text-sm text-red-700">

@@ -13,7 +13,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   def create
     super do |resource|
-      accept_invitation_for(resource) if resource.persisted?
+      if resource.persisted?
+        # Default new accounts to "stay signed in" — same UX as LinkedIn / X.
+        # The session cookie is 6mo (config/initializers/session_store.rb)
+        # and the remember-me cookie extends every visit.
+        resource.remember_me = true
+        accept_invitation_for(resource)
+      end
     end
   end
 
