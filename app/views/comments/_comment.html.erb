@@ -82,14 +82,16 @@
                     placeholder: "Write a reply...",
                     data: { controller: "mentions" } %>
                 <div class="fc-inline-reply-actions">
-                  <button type="button"
-                          class="fc-composer-icon-btn"
-                          title="Open Bible"
-                          aria-label="Open Bible"
-                          data-action="click->bible-drawer#open">
-                    <%= render_icon("bookopen", classes: "h-4 w-4") %>
-                  </button>
-                  <%= f.submit "Reply", class: "fc-btn fc-btn-primary" %>
+                  <div class="fc-inline-reply-tools">
+                    <button type="button"
+                            class="fc-composer-icon-btn"
+                            title="Open Bible"
+                            aria-label="Open Bible"
+                            data-action="click->bible-drawer#open">
+                      <%= render_icon("bookopen", classes: "h-4 w-4") %>
+                    </button>
+                  </div>
+                  <%= f.submit "Reply", class: "fc-btn fc-btn-primary fc-inline-reply-submit" %>
                 </div>
               </div>
             <% end %>

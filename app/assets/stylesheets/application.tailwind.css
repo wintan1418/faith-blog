@@ -11192,7 +11192,21 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+.fc-inline-reply-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.fc-inline-reply-submit {
+  flex-shrink: 0;
 }
 
 .fc-inline-thread-list {
@@ -11281,6 +11295,95 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
 .fc-inline-reply.is-nested .fc-inline-reply-input {
   min-height: 60px;
   font-size: 0.85rem;
+}
+
+/* ── Mobile inline reply — keep the Reply button reachable.
+   The desktop layout puts 5 tool buttons on the left and Reply on
+   the right of a single row. On phones the row overflows and the
+   Reply button gets pushed off-screen / under the soft keyboard.
+   Stack instead: tool icons wrap into chips, then a full-width
+   Reply submit row, padded for iOS safe area. */
+@media (max-width: 640px) {
+  .fc-inline-reply {
+    gap: 0.45rem;
+  }
+  .fc-inline-reply > .fc-avatar { display: none; }
+
+  .fc-inline-reply-input {
+    min-height: 80px;
+    font-size: 16px; /* prevent iOS zoom-on-focus */
+  }
+  .fc-inline-reply.is-nested .fc-inline-reply-input {
+    font-size: 16px;
+    min-height: 64px;
+  }
+
+  .fc-inline-reply-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.55rem;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .fc-inline-reply-tools {
+    gap: 0.3rem;
+    justify-content: flex-start;
+  }
+  .fc-inline-reply-tools .fc-composer-icon-btn {
+    width: 38px;
+    height: 38px;
+  }
+  .fc-inline-reply-tools .fc-composer-asst-btn {
+    padding: 7px 9px;
+    font-size: 0.74rem;
+  }
+  /* Collapse verbose tool labels — emoji prefix carries meaning. */
+  .fc-inline-reply-tools .fc-composer-asst-btn .fc-composer-asst-label {
+    display: none;
+  }
+  /* The auto toggle still needs an on/off cue — show a tiny dot instead. */
+  .fc-inline-reply-tools .fc-composer-asst-toggle::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.5;
+    display: inline-block;
+    margin-left: 2px;
+  }
+  .fc-inline-reply-tools .fc-composer-asst-toggle.is-on::after {
+    opacity: 1;
+  }
+
+  /* Big, full-width, fingerprint-friendly Reply button. */
+  .fc-inline-reply-submit {
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+    order: 2;
+  }
+  .fc-inline-reply-tools { order: 1; }
+
+  /* Post-show page top-level comment form — same treatment so the
+     Post Comment button doesn't hide behind iOS keyboards either. */
+  .fc-comment-submit {
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+  }
+  .fc-comment-submit {
+    display: block;
+  }
+  /* Stretch the wrapper so the full-width submit lays out cleanly. */
+  #comment_form .justify-end {
+    justify-content: stretch !important;
+  }
+  #comment_form .justify-end > .fc-comment-submit {
+    flex: 1;
+  }
 }
 
 .fc-inline-comment-replies {
