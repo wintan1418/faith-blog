@@ -8,6 +8,21 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user_admin?, :current_user_moderator?, :current_user_super_admin?
 
+  # Stale CSRF tokens (page cached with old token, session expired, etc.)
+  # used to dump the 422 backtrace at the user — which looked like a server
+  # error. Send them to sign-in if they're not authenticated, otherwise
+  # bounce them back to where they came from with a friendly hint.
+  rescue_from ActionController::InvalidAuthenticityToken do
+    if user_signed_in?
+      redirect_back fallback_location: root_path,
+                    alert: "That action expired — please try again."
+    else
+      session[:user_return_to] = request.referer if request.referer.present?
+      redirect_to new_user_session_path,
+                  alert: "Your session expired. Sign in again to continue."
+    end
+  end
+
   protected
 
   def configure_permitted_parameters
