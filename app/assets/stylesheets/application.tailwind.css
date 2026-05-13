@@ -12733,27 +12733,44 @@ html.dark nav.post-toc {
     max-height: 280px;
   }
 
-  /* ── Card actions ── */
+  /* ── Card actions ──
+     On mobile, the view/save/report row would wrap onto a second line
+     because of the text labels (Save, Report). We hide labels via
+     .fc-action-label, give Report its own flag icon, and force the row
+     to stay single-line. Labels return at >= 641px. */
   .fc-breath-actions {
     margin-top: 0.55rem;
     padding-top: 0.5rem;
-    gap: 0.15rem;
-    flex-wrap: wrap;
+    gap: 0.1rem;
+    flex-wrap: nowrap;
+    min-width: 0;
   }
   .fc-breath-action {
-    height: 28px;
+    height: 30px;
     padding: 0 0.4rem;
     font-size: 0.72rem;
     gap: 0.25rem;
-    border-radius: 6px;
+    border-radius: 8px;
+    min-width: 0;
   }
-  .fc-breath-action svg {
-    width: 14px;
-    height: 14px;
+  .fc-breath-action svg,
+  .fc-breath-actions .fc-action svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
   }
   .fc-breath-actions-end {
-    gap: 0.15rem;
+    gap: 0.05rem;
+    flex-shrink: 0;
   }
+  .fc-breath-actions-end .fc-action {
+    padding: 0 0.45rem;
+    gap: 0;
+    min-width: 30px;
+    justify-content: center;
+  }
+  /* Hide verbose labels on mobile — icons + counts stay. */
+  .fc-breath-actions .fc-action-label { display: none; }
 
   /* ── Side cards (when visible) ── */
   .fc-side-card {

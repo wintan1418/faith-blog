@@ -3,18 +3,18 @@
     <% if current_user.has_bookmarked?(post) %>
       <%= button_to post_bookmark_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove bookmark", data: { turbo_frame: "_top" } do %>
         <%= render_icon("bookmark", classes: "h-4 w-4") %>
-        Saved
+        <span class="fc-action-label">Saved</span>
       <% end %>
     <% else %>
       <%= button_to post_bookmark_path(post), class: "fc-action", title: "Save post", data: { turbo_frame: "_top" } do %>
         <%= render_icon("bookmark", classes: "h-4 w-4") %>
-        Save
+        <span class="fc-action-label">Save</span>
       <% end %>
     <% end %>
   <% else %>
-    <%= link_to new_user_session_path, class: "fc-action" do %>
+    <%= link_to new_user_session_path, class: "fc-action", title: "Save post" do %>
       <%= render_icon("bookmark", classes: "h-4 w-4") %>
-      Save
+      <span class="fc-action-label">Save</span>
     <% end %>
   <% end %>
 </span>

@@ -8,5 +8,6 @@
     class: local_assigns.fetch(:classes, "fc-action text-[var(--fc-muted)] hover:text-red-600"),
     data: { turbo_confirm: "Report this for moderator review?", turbo_frame: "_top" },
     title: "Report" do %>
-  <%= local_assigns[:label] || "Report" %>
+  <%= render_icon("flag", classes: "h-4 w-4") %>
+  <span class="fc-action-label"><%= local_assigns[:label] || "Report" %></span>
 <% end %>

@@ -1,0 +1,62 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ogBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0e1f1a"/>
+      <stop offset="60%"  stop-color="#0b0f10"/>
+      <stop offset="100%" stop-color="#070b0c"/>
+    </linearGradient>
+    <radialGradient id="ogGlow" cx="22%" cy="-10%" r="60%">
+      <stop offset="0%"   stop-color="rgba(<%= @rgb.join(', ') %>, 0.32)"/>
+      <stop offset="100%" stop-color="rgba(<%= @rgb.join(', ') %>, 0)"/>
+    </radialGradient>
+    <radialGradient id="ogGlow2" cx="92%" cy="108%" r="55%">
+      <stop offset="0%"   stop-color="rgba(<%= @rgb.join(', ') %>, 0.18)"/>
+      <stop offset="100%" stop-color="rgba(<%= @rgb.join(', ') %>, 0)"/>
+    </radialGradient>
+    <linearGradient id="ogMark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="<%= @swatch[:accent] %>"/>
+      <stop offset="100%" stop-color="<%= @swatch[:accent_2] %>"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#ogBg)"/>
+  <rect width="1200" height="630" fill="url(#ogGlow)"/>
+  <rect width="1200" height="630" fill="url(#ogGlow2)"/>
+
+  <g transform="translate(96, 188)">
+    <rect x="0" y="0" width="120" height="120" rx="32" fill="url(#ogMark)"/>
+    <path d="M26 70 C 41 47, 52 47, 60 70 C 68 93, 79 93, 94 70"
+          fill="none" stroke="#042f1d" stroke-width="9"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="84" cy="41" r="6" fill="#042f1d"/>
+  </g>
+
+  <text x="248" y="262"
+        font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        font-size="56" font-weight="900" fill="#f4faf7" letter-spacing="-1">
+    Brethre<tspan fill="<%= @swatch[:accent] %>">i</tspan>gn
+  </text>
+  <text x="248" y="296"
+        font-family="ui-sans-serif, system-ui, sans-serif"
+        font-size="22" font-weight="700" fill="#8a9893" letter-spacing="3"
+        text-transform="uppercase">
+    BREATHE
+  </text>
+
+  <text x="96" y="430"
+        font-family="ui-serif, Georgia, serif"
+        font-size="48" font-weight="500" fill="#f4faf7" letter-spacing="-0.5">
+    A community where Christians breathe —
+  </text>
+  <text x="96" y="486"
+        font-family="ui-serif, Georgia, serif"
+        font-size="48" font-weight="500" fill="#f4faf7" letter-spacing="-0.5">
+    share, read scripture, pray together.
+  </text>
+
+  <text x="96" y="568"
+        font-family="ui-sans-serif, sans-serif"
+        font-size="22" font-weight="800" fill="<%= @swatch[:accent] %>" letter-spacing="0.5">
+    brethreign.com
+  </text>
+</svg>

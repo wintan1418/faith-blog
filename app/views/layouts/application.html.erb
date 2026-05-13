@@ -35,7 +35,8 @@
     <%# Social share / Open Graph %>
     <% og_title       = content_for?(:og_title)       ? content_for(:og_title)       : (content_for(:title) || "Brethreign") %>
     <% og_description = content_for?(:og_description) ? content_for(:og_description) : "A community where Christians breathe — share testimonies, read scripture, pray together." %>
-    <% og_image       = content_for?(:og_image)       ? content_for(:og_image)       : "#{request.base_url}/og-default.svg" %>
+    <% og_accent      = content_for?(:og_accent)      ? content_for(:og_accent)      : current_user&.accent_color.presence %>
+    <% og_image       = content_for?(:og_image)       ? content_for(:og_image)       : "#{request.base_url}/og.svg#{"?accent=#{og_accent}" if og_accent.present?}" %>
     <% og_url         = content_for?(:og_url)         ? content_for(:og_url)         : request.original_url %>
     <% og_type        = content_for?(:og_type)        ? content_for(:og_type)        : "website" %>
     <meta property="og:site_name" content="Brethreign" />

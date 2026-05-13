@@ -8,6 +8,8 @@
 <% content_for(:og_type) { "article" } %>
 <% if @post.has_images? %>
   <% content_for(:og_image) { url_for(@post.images.first) } %>
+<% else %>
+  <% content_for(:og_accent) { @post.user&.accent_color } %>
 <% end %>
 
 <% if @post.held_for_review? && !@post.visible_to?(current_user) %>
