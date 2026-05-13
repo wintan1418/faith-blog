@@ -77,38 +77,54 @@
     </script>
 
     <%# First-load splash. Visible until DOMContentLoaded, then fades out.
-        Brand mark with a soft scale-up — X-style entry. Only renders on
-        full HTML loads, not Turbo navigations (the Turbo progress bar
-        handles those). %>
+        Accent-tinted background, brand mark with orbital rings, and a
+        3D "breathe breathe breathe" stagger. Only renders on full HTML
+        loads, not Turbo navigations (Turbo's progress bar handles those). %>
     <div id="fc-splash" aria-hidden="true">
-      <div class="fc-splash-mark">
-        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="56" height="56" aria-hidden="true">
-          <defs>
-            <linearGradient id="splashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"   stop-color="#34d399"/>
-              <stop offset="100%" stop-color="#059669"/>
-            </linearGradient>
-          </defs>
-          <circle cx="16" cy="16" r="15" fill="url(#splashGrad)"/>
-          <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19"
-                fill="none" stroke="#042f1d" stroke-width="2.4"
-                stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="22" cy="11" r="1.6" fill="#042f1d"/>
-        </svg>
+      <div class="fc-splash-stage">
+        <span class="fc-splash-orbit fc-splash-orbit--1"></span>
+        <span class="fc-splash-orbit fc-splash-orbit--2"></span>
+        <span class="fc-splash-orbit fc-splash-orbit--3"></span>
+        <div class="fc-splash-mark">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="56" height="56" aria-hidden="true">
+            <defs>
+              <linearGradient id="splashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   style="stop-color: var(--fc-accent, #34d399)"/>
+                <stop offset="100%" style="stop-color: var(--fc-accent-2, #059669)"/>
+              </linearGradient>
+            </defs>
+            <circle cx="16" cy="16" r="15" fill="url(#splashGrad)"/>
+            <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19"
+                  fill="none" stroke="#042f1d" stroke-width="2.4"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="22" cy="11" r="1.6" fill="#042f1d"/>
+          </svg>
+        </div>
+      </div>
+      <div class="fc-splash-words">
+        <span class="fc-splash-word" style="--i: 0">breathe</span>
+        <span class="fc-splash-word" style="--i: 1">breathe</span>
+        <span class="fc-splash-word" style="--i: 2">breathe</span>
       </div>
     </div>
     <script>
       (function() {
         var splash = document.getElementById('fc-splash');
         if (!splash) return;
+        var startedAt = Date.now();
+        var MIN_VISIBLE = 720; // let the 3D breathe stagger play through
         var hide = function() {
-          splash.classList.add('is-leaving');
-          setTimeout(function() { splash.remove(); }, 360);
+          var elapsed = Date.now() - startedAt;
+          var wait = Math.max(0, MIN_VISIBLE - elapsed);
+          setTimeout(function() {
+            splash.classList.add('is-leaving');
+            setTimeout(function() { splash.remove(); }, 420);
+          }, wait);
         };
         if (document.readyState === 'complete') {
-          setTimeout(hide, 280);
+          hide();
         } else {
-          window.addEventListener('load', function() { setTimeout(hide, 280); });
+          window.addEventListener('load', hide);
         }
       })();
     </script>

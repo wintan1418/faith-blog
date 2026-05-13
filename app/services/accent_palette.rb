@@ -36,6 +36,19 @@ module AccentPalette
   def self.css_vars(slug)
     return "" if slug.blank? || slug == DEFAULT
     swatch = self.for(slug)
-    "--fc-accent: #{swatch[:accent]}; --fc-accent-2: #{swatch[:accent_2]}; --fc-accent-soft: #{swatch[:accent_soft]};"
+    rgb = hex_to_rgb(swatch[:accent])
+    glow = "rgba(#{rgb.join(', ')}, 0.45)"
+    [
+      "--fc-accent: #{swatch[:accent]}",
+      "--fc-accent-2: #{swatch[:accent_2]}",
+      "--fc-accent-deep: #{swatch[:accent_2]}",
+      "--fc-accent-soft: #{swatch[:accent_soft]}",
+      "--fc-accent-glow: #{glow}"
+    ].join("; ") + ";"
+  end
+
+  def self.hex_to_rgb(hex)
+    h = hex.to_s.delete_prefix("#")
+    [ h[0..1], h[2..3], h[4..5] ].map { |c| c.to_i(16) }
   end
 end
