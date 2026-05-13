@@ -15,7 +15,7 @@
 <% else %>
   <li class="fc-inline-comment<%= ' fc-inline-comment-held-author' if comment.held_for_review? %>"
       id="<%= dom_id(comment) %>"
-      data-controller="reply-toggle">
+      data-controller="reply-toggle comment-edit">
     <% if comment.user.profile&.avatar&.attached? %>
       <%= image_tag comment.user.profile.avatar, class: "fc-avatar object-cover" %>
     <% else %>
@@ -25,20 +25,59 @@
       <div class="fc-inline-comment-head">
         <%= link_to comment.user.username, user_path(comment.user.username), class: "fc-breath-name" %>
         <span class="fc-breath-time">· <%= time_ago_in_words(comment.created_at) %> ago</span>
+        <% if comment.edited? %><span class="fc-breath-time">(edited)</span><% end %>
         <% if comment.held_for_review? %>
           <span class="fc-inline-comment-flag" title="Held for moderator review">⏳ held</span>
         <% end %>
       </div>
-      <div class="fc-inline-comment-text"><%= comment.content %></div>
+      <div class="fc-inline-comment-text" data-comment-edit-target="display"><%= comment.content %></div>
 
-      <% if user_signed_in? && post.allow_comments? && comment.depth < 2 %>
+      <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
+        <%= form_with model: [ post, comment ], method: :patch, local: true,
+                      class: "fc-inline-comment-editform hidden",
+                      data: { comment_edit_target: "form", turbo_frame: dom_id(post, :thread) } do |f| %>
+          <%= f.text_area :content,
+              value: comment.content.to_plain_text,
+              class: "fc-inline-reply-input",
+              rows: 2,
+              data: { comment_edit_target: "textarea" } %>
+          <div class="fc-inline-reply-actions">
+            <div class="fc-inline-reply-tools">
+              <button type="button" class="fc-btn" data-action="click->comment-edit#cancel">Cancel</button>
+            </div>
+            <%= f.submit "Save", class: "fc-btn fc-btn-primary fc-inline-reply-submit" %>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% if user_signed_in? && post.allow_comments? %>
         <div class="fc-inline-comment-actions">
-          <button type="button"
-                  class="fc-inline-comment-replybtn"
-                  data-action="click->reply-toggle#toggle">
-            <%= render_icon("message_circle", classes: "h-3.5 w-3.5") %>
-            <span>Reply</span>
-          </button>
+          <% if comment.depth < 2 %>
+            <button type="button"
+                    class="fc-inline-comment-replybtn"
+                    data-action="click->reply-toggle#toggle">
+              <%= render_icon("message_circle", classes: "h-3.5 w-3.5") %>
+              <span>Reply</span>
+            </button>
+          <% end %>
+          <% if comment.user == current_user || current_user.admin_or_moderator? %>
+            <button type="button"
+                    class="fc-inline-comment-replybtn"
+                    data-action="click->comment-edit#edit"
+                    title="Edit comment">
+              <%= render_icon("edit", classes: "h-3.5 w-3.5") %>
+              <span>Edit</span>
+            </button>
+            <%= button_to post_comment_path(post, comment),
+                method: :delete,
+                form_class: "inline",
+                class: "fc-inline-comment-replybtn",
+                data: { turbo_confirm: "Delete this reply?", turbo_frame: dom_id(post, :thread) },
+                title: "Delete comment" do %>
+              <%= render_icon("trash", classes: "h-3.5 w-3.5") %>
+              <span>Delete</span>
+            <% end %>
+          <% end %>
         </div>
 
         <div class="fc-inline-comment-replyform hidden" data-reply-toggle-target="form">

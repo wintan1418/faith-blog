@@ -88,12 +88,17 @@ class CommentsController < ApplicationController
       @comment.mark_as_edited!
       # Mentions are processed in after_save callback, no need to call again
       respond_to do |format|
-        format.html { redirect_to @post, notice: "Comment updated!" }
-        format.turbo_stream
+        if from_inline_thread?
+          format.turbo_stream { render :update_inline }
+          format.html { redirect_back fallback_location: @post, notice: "Comment updated!" }
+        else
+          format.html { redirect_to @post, notice: "Comment updated!" }
+          format.turbo_stream
+        end
       end
     else
       respond_to do |format|
-        format.html { redirect_to @post, alert: "Unable to update comment." }
+        format.html { redirect_back fallback_location: @post, alert: "Unable to update comment." }
         format.turbo_stream
       end
     end
@@ -102,8 +107,13 @@ class CommentsController < ApplicationController
   def destroy
     @comment.soft_delete!
     respond_to do |format|
-      format.html { redirect_to @post, notice: "Comment deleted." }
-      format.turbo_stream
+      if from_inline_thread?
+        format.turbo_stream { render :update_inline }
+        format.html { redirect_back fallback_location: @post, notice: "Comment deleted." }
+      else
+        format.html { redirect_to @post, notice: "Comment deleted." }
+        format.turbo_stream
+      end
     end
   end
 

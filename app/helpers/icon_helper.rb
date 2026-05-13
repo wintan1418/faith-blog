@@ -85,8 +85,10 @@ module IconHelper
       icon_svg("M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", classes)
     when "externallink", "external_link"
       icon_svg("M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6 M15 3h6v6 M10 14 21 3", classes)
-    when "pencil"
+    when "pencil", "edit"
       icon_svg("M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z M15 5l4 4", classes)
+    when "trash", "trash_2"
+      icon_svg("M3 6h18 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2", classes)
     when "checkmark", "check"
       icon_svg("M20 6 9 17l-5-5", classes)
     when "smile"

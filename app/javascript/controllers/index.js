@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import CommentEditController from "./comment_edit_controller"
+application.register("comment-edit", CommentEditController)
+
 import ComposerAssistantController from "./composer_assistant_controller"
 application.register("composer-assistant", ComposerAssistantController)
 
@@ -99,6 +102,9 @@ application.register("reactions", ReactionsController)
 
 import ReplyToggleController from "./reply_toggle_controller"
 application.register("reply-toggle", ReplyToggleController)
+
+import RepostMenuController from "./repost_menu_controller"
+application.register("repost-menu", RepostMenuController)
 
 import ScriptureController from "./scripture_controller"
 application.register("scripture", ScriptureController)

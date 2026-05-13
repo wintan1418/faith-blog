@@ -1,0 +1,5 @@
+<% @post.reload %>
+
+<%= turbo_stream.replace dom_id(@comment) do %>
+  <%= render "comments/comment", comment: @comment, post: @post %>
+<% end %>

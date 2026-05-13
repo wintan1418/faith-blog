@@ -6,7 +6,7 @@
     </div>
   </div>
 <% else %>
-<div class="fc-comment<%= ' fc-comment-held-author' if comment.held_for_review? %>" id="<%= dom_id(comment) %>" data-controller="reply-toggle">
+<div class="fc-comment<%= ' fc-comment-held-author' if comment.held_for_review? %>" id="<%= dom_id(comment) %>" data-controller="reply-toggle comment-edit">
   <% if comment.held_for_review? && current_user == comment.user %>
     <div class="fc-held-banner">
       <%= render_icon("shield", classes: "h-4 w-4") %>
@@ -36,9 +36,27 @@
       <% if comment.deleted? %>
         <p class="fc-comment-deleted"><%= comment.content %></p>
       <% else %>
-        <div class="fc-comment-body" data-controller="scripture">
+        <div class="fc-comment-body" data-comment-edit-target="display" data-controller="scripture">
           <%= render_with_mentions(comment.content) %>
         </div>
+
+        <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
+          <%= form_with model: [ post, comment ], method: :patch, local: true,
+                        class: "fc-comment-editform hidden",
+                        data: { comment_edit_target: "form" } do |f| %>
+            <%= f.text_area :content,
+                value: comment.content.to_plain_text,
+                class: "fc-inline-reply-input",
+                rows: 3,
+                data: { comment_edit_target: "textarea" } %>
+            <div class="fc-inline-reply-actions">
+              <div class="fc-inline-reply-tools">
+                <button type="button" class="fc-btn" data-action="click->comment-edit#cancel">Cancel</button>
+              </div>
+              <%= f.submit "Save changes", class: "fc-btn fc-btn-primary fc-inline-reply-submit" %>
+            </div>
+          <% end %>
+        <% end %>
 
         <div class="fc-comment-actions">
           <%= render "comments/reaction", comment: comment %>
@@ -53,11 +71,19 @@
           <% end %>
 
           <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
+            <button type="button"
+                    class="fc-breath-action"
+                    data-action="click->comment-edit#edit"
+                    title="Edit comment">
+              <%= render_icon("edit", classes: "h-4 w-4") %>
+              <span>Edit</span>
+            </button>
             <%= button_to post_comment_path(post, comment),
                 method: :delete,
                 form_class: "inline",
                 class: "fc-breath-action",
                 data: { turbo_confirm: "Delete this comment?" } do %>
+              <%= render_icon("trash", classes: "h-4 w-4") %>
               <span>Delete</span>
             <% end %>
           <% end %>

@@ -8635,6 +8635,134 @@ html.theme-dark .fc-held-banner {
   color: #fff;
 }
 
+/* ── Repost menu (Quick repost / Repost with thought) ── */
+.fc-repost {
+  position: relative;
+  display: inline-flex;
+}
+
+.fc-repost-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  min-width: 260px;
+  padding: 0.35rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 14px;
+  box-shadow: 0 22px 50px -12px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  animation: fc-emoji-pop 160ms ease-out;
+}
+.fc-repost-menu.hidden { display: none !important; }
+
+.fc-repost-menu-form { margin: 0; }
+.fc-repost-menu-form > button.fc-repost-option { width: 100%; }
+
+.fc-repost-option {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  color: var(--fc-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.fc-repost-option:hover { background: var(--fc-accent-soft); }
+.fc-repost-option svg { color: var(--fc-accent); flex-shrink: 0; margin-top: 2px; }
+.fc-repost-option-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fc-repost-option-text strong {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--fc-ink);
+}
+.fc-repost-option-text span {
+  font-size: 0.78rem;
+  color: var(--fc-muted);
+  margin-top: 1px;
+}
+
+.fc-repost-composer {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  width: min(360px, calc(100vw - 24px));
+  padding: 0.65rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 14px;
+  box-shadow: 0 22px 50px -12px rgba(0, 0, 0, 0.45);
+  animation: fc-emoji-pop 160ms ease-out;
+}
+.fc-repost-composer.hidden { display: none !important; }
+
+.fc-repost-thought {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  border: 1px solid var(--fc-line);
+  background: var(--fc-bg);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.9rem;
+  color: var(--fc-ink);
+  font-family: inherit;
+}
+.fc-repost-thought:focus {
+  outline: none;
+  border-color: var(--fc-accent);
+}
+
+.fc-repost-composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+.fc-repost-composer-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+.fc-repost-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--fc-muted);
+}
+.fc-repost-count.is-near { color: var(--fc-warning); }
+
+/* On phones, pin both the menu and composer to viewport so they
+   never get clipped by the card edge. */
+@media (max-width: 640px) {
+  .fc-repost-menu,
+  .fc-repost-composer {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    top: auto;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+  .fc-repost-thought {
+    font-size: 16px; /* prevent iOS zoom */
+  }
+}
+
 .fc-snapshot-overlay {
   position: fixed;
   inset: 0;
@@ -11284,6 +11412,13 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
   margin-top: 0.4rem;
 }
 .fc-inline-comment-replyform.hidden { display: none; }
+
+.fc-inline-comment-editform,
+.fc-comment-editform {
+  margin-top: 0.4rem;
+}
+.fc-inline-comment-editform.hidden,
+.fc-comment-editform.hidden { display: none; }
 
 .fc-inline-reply.is-nested {
   margin-top: 0;
@@ -15713,13 +15848,31 @@ trix-editor li,
   margin: 0.18rem 0;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
+  /* On phones, lift the emoji picker out of its anchor and pin it to
+     the bottom of the viewport as a sheet so it's always fully on
+     screen — no more clipped/right-of-page popovers. */
   .fc-emoji-popover {
-    /* On narrow screens, pin to the right edge of the anchor so the
-       picker doesn't go off-screen left. */
-    left: auto;
-    right: 0;
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    top: auto;
+    width: auto;
+    max-width: none;
+    border-radius: 18px;
+    padding: 6px;
+    box-shadow: 0 -12px 40px -6px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--fc-line-strong);
+    animation: fc-emoji-pop-sheet 180ms cubic-bezier(0.2, 0.9, 0.2, 1);
   }
+  .fc-emoji-popover emoji-picker {
+    width: 100%;
+    height: min(380px, 52vh);
+  }
+}
+@keyframes fc-emoji-pop-sheet {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fc-emoji-pop {

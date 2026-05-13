@@ -6,10 +6,13 @@ class ResharesController < ApplicationController
 
   def create
     @reshare = current_user.reshares.find_or_initialize_by(post: @post)
+    thought_input = params.dig(:reshare, :thought).to_s.strip
+    @reshare.thought = thought_input if thought_input.present?
 
     if @reshare.save
+      msg = @reshare.with_thought? ? "Reposted with your thought." : "Post reshared!"
       respond_to do |format|
-        format.html { redirect_back fallback_location: @post, notice: "Post reshared!" }
+        format.html { redirect_back fallback_location: @post, notice: msg }
         format.turbo_stream
       end
     else

@@ -5,9 +5,14 @@ class Reshare < ApplicationRecord
   belongs_to :post, counter_cache: :reshares_count
 
   validates :user_id, uniqueness: { scope: :post_id, message: "has already reshared this post" }
+  validates :thought, length: { maximum: 280 }, allow_blank: true
   validate :cannot_reshare_own_post
 
   after_create :create_notification
+
+  def with_thought?
+    thought.present?
+  end
 
   private
 
