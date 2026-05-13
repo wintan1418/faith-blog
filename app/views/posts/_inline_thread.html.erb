@@ -36,7 +36,8 @@
         <%= f.rich_text_area :content,
             class: "fc-inline-reply-input",
             placeholder: "Reply with encouragement, prayer, or a word...",
-            data: { controller: "mentions", emoji_picker_target: "editor" } %>
+            autocomplete: "off",
+            data: { controller: "mentions", emoji_picker_target: "editor", form_type: "reply" } %>
 
         <div class="fc-inline-reply-actions">
           <div class="fc-inline-reply-tools">

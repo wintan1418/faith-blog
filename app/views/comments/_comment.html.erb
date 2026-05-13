@@ -48,7 +48,10 @@
                 value: comment.content.to_plain_text,
                 class: "fc-inline-reply-input",
                 rows: 3,
-                data: { comment_edit_target: "textarea" } %>
+                autocomplete: "off",
+                autocapitalize: "sentences",
+                spellcheck: true,
+                data: { comment_edit_target: "textarea", form_type: "edit" } %>
             <div class="fc-inline-reply-actions">
               <div class="fc-inline-reply-tools">
                 <button type="button" class="fc-btn" data-action="click->comment-edit#cancel">Cancel</button>
@@ -106,7 +109,10 @@
                     class: "fc-inline-reply-input",
                     rows: 2,
                     placeholder: "Write a reply...",
-                    data: { controller: "mentions" } %>
+                    autocomplete: "off",
+                    autocapitalize: "sentences",
+                    spellcheck: true,
+                    data: { controller: "mentions", form_type: "reply" } %>
                 <div class="fc-inline-reply-actions">
                   <div class="fc-inline-reply-tools">
                     <button type="button"

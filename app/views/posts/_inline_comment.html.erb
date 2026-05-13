@@ -40,7 +40,10 @@
               value: comment.content.to_plain_text,
               class: "fc-inline-reply-input",
               rows: 2,
-              data: { comment_edit_target: "textarea" } %>
+              autocomplete: "off",
+              autocapitalize: "sentences",
+              spellcheck: true,
+              data: { comment_edit_target: "textarea", form_type: "edit" } %>
           <div class="fc-inline-reply-actions">
             <div class="fc-inline-reply-tools">
               <button type="button" class="fc-btn" data-action="click->comment-edit#cancel">Cancel</button>
@@ -60,23 +63,31 @@
               <span>Reply</span>
             </button>
           <% end %>
+
           <% if comment.user == current_user || current_user.admin_or_moderator? %>
-            <button type="button"
-                    class="fc-inline-comment-replybtn"
-                    data-action="click->comment-edit#edit"
-                    title="Edit comment">
-              <%= render_icon("edit", classes: "h-3.5 w-3.5") %>
-              <span>Edit</span>
-            </button>
-            <%= button_to post_comment_path(post, comment),
-                method: :delete,
-                form_class: "inline",
-                class: "fc-inline-comment-replybtn",
-                data: { turbo_confirm: "Delete this reply?", turbo_frame: dom_id(post, :thread) },
-                title: "Delete comment" do %>
-              <%= render_icon("trash", classes: "h-3.5 w-3.5") %>
-              <span>Delete</span>
-            <% end %>
+            <div class="fc-inline-comment-overflow" data-controller="dropdown">
+              <button type="button"
+                      class="fc-inline-comment-overflow-btn"
+                      data-action="click->dropdown#toggle"
+                      aria-label="More actions"
+                      aria-haspopup="true">⋯</button>
+              <div data-dropdown-target="menu" class="fc-inline-comment-overflow-menu hidden" role="menu">
+                <button type="button"
+                        data-action="click->comment-edit#edit click->dropdown#close"
+                        class="fc-inline-comment-overflow-item">
+                  <%= render_icon("edit", classes: "h-3.5 w-3.5") %>
+                  Edit
+                </button>
+                <%= button_to post_comment_path(post, comment),
+                    method: :delete,
+                    form_class: "fc-inline-comment-overflow-form",
+                    class: "fc-inline-comment-overflow-item fc-inline-comment-overflow-danger",
+                    data: { turbo_confirm: "Delete this reply?", turbo_frame: dom_id(post, :thread) } do %>
+                  <%= render_icon("trash", classes: "h-3.5 w-3.5") %>
+                  Delete
+                <% end %>
+              </div>
+            </div>
           <% end %>
         </div>
 
@@ -94,7 +105,11 @@
               <%= f.text_area :content,
                   class: "fc-inline-reply-input",
                   rows: 2,
-                  placeholder: "Reply to @#{comment.user.username}…" %>
+                  placeholder: "Reply to @#{comment.user.username}…",
+                  autocomplete: "off",
+                  autocapitalize: "sentences",
+                  spellcheck: true,
+                  data: { form_type: "reply" } %>
               <div class="fc-inline-reply-actions">
                 <div class="fc-inline-reply-tools">
                   <button type="button"
