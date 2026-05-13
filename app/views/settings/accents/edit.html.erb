@@ -10,18 +10,25 @@
 
     <%= render "settings/tabs", active: :accent %>
 
-    <div class="mystic-panel-strong overflow-hidden">
+    <div class="mystic-panel-strong overflow-hidden" data-controller="accent-picker">
       <div class="border-b border-faith-green/10 p-6">
         <h2 class="text-xl font-bold text-faith-dark">Choose your accent</h2>
-        <p class="mystic-copy text-sm">Tap a swatch to apply it. The change saves immediately and applies wherever you're signed in.</p>
+        <p class="mystic-copy text-sm">Tap any swatch — it applies instantly and saves itself.</p>
+        <p class="fc-accent-status mt-2 text-sm font-semibold" data-accent-picker-target="status" role="status" aria-live="polite"></p>
       </div>
 
-      <%= form_with url: settings_accent_path, method: :patch, class: "p-6", local: true do |f| %>
+      <%= form_with url: settings_accent_path, method: :patch, class: "p-6", local: true,
+                    data: { accent_picker_target: "form" } do |f| %>
         <div class="fc-accent-swatches">
           <% AccentPalette::PALETTE.each do |slug, swatch| %>
             <label class="fc-accent-swatch<%= ' is-selected' if @current == slug %>"
+                   data-accent-picker-target="swatch"
+                   data-accent="<%= swatch[:accent] %>"
+                   data-accent-deep="<%= swatch[:accent_2] %>"
+                   data-name="<%= swatch[:name] %>"
+                   data-action="click->accent-picker#pick"
                    style="--swatch: <%= swatch[:accent] %>; --swatch-2: <%= swatch[:accent_2] %>;">
-              <%= f.radio_button :accent_color, slug, checked: (@current == slug), class: "sr-only" %>
+              <%= f.radio_button :accent_color, slug, checked: (@current == slug), class: "sr-only", tabindex: -1 %>
               <span class="fc-accent-swatch-dot" aria-hidden="true"></span>
               <span class="fc-accent-swatch-name"><%= swatch[:name] %></span>
               <% if @current == slug %>
@@ -31,9 +38,11 @@
           <% end %>
         </div>
 
-        <div class="mt-6 flex justify-end">
-          <%= f.submit "Save accent", class: "fc-btn fc-btn-primary" %>
-        </div>
+        <noscript>
+          <div class="mt-6 flex justify-end">
+            <%= f.submit "Save accent", class: "fc-btn fc-btn-primary" %>
+          </div>
+        </noscript>
       <% end %>
     </div>
   </div>

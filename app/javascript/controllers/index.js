@@ -55,6 +55,9 @@ application.register("lightbox", LightboxController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import AccentPickerController from "./accent_picker_controller"
+application.register("accent-picker", AccentPickerController)
+
 import AutoDismissController from "./auto_dismiss_controller"
 application.register("auto-dismiss", AutoDismissController)
 
