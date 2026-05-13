@@ -3,13 +3,16 @@
   snippet = truncate(post.content.to_plain_text.to_s.strip, length: 1500, separator: " ")
   author  = post.anonymous? ? "anonymous" : post.user.username
   cover   = post.has_images? ? rails_storage_proxy_url(post.images.first) : ""
+  swatch  = AccentPalette.for(post.user&.accent_color)
 %>
 <div class="fc-share" data-controller="share"
      data-share-url-value="<%= post_url(post) %>"
      data-share-title-value="<%= post.title %>"
      data-share-author-value="<%= author %>"
      data-share-snippet-value="<%= snippet %>"
-     data-share-image-value="<%= cover %>">
+     data-share-image-value="<%= cover %>"
+     data-share-accent-value="<%= swatch[:accent] %>"
+     data-share-accent-deep-value="<%= swatch[:accent_2] %>">
   <button type="button"
           class="fc-action"
           data-action="click->share#toggle"

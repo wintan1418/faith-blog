@@ -2,11 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = {
-    url:     String,
-    title:   String,
-    author:  String,
-    snippet: String,
-    image:   String
+    url:         String,
+    title:       String,
+    author:      String,
+    snippet:     String,
+    image:       String,
+    accent:      { type: String, default: "#34d399" },
+    accentDeep:  { type: String, default: "#10b981" }
   }
 
   static targets = ["menu", "toast"]
@@ -208,10 +210,14 @@ export default class extends Controller {
 
     let y = PAD_TOP
 
-    // Brand badge + name
+    // Brand badge + name — fill with the post author's accent
+    const accent = this.accentValue || "#34d399"
     const badge = 44
+    const badgeGrad = ctx.createLinearGradient(PAD_X, y, PAD_X + badge, y + badge)
+    badgeGrad.addColorStop(0, accent)
+    badgeGrad.addColorStop(1, this.accentDeepValue || accent)
     this.roundedRectPath(ctx, PAD_X, y, badge, badge, 12)
-    ctx.fillStyle = "#34d399"
+    ctx.fillStyle = badgeGrad
     ctx.fill()
     ctx.fillStyle = "#042f1d"
     ctx.font = `900 22px ${FONT}`
@@ -228,7 +234,7 @@ export default class extends Controller {
     y += badge + 28
 
     // Eyebrow — "A BREATH" with letter-spacing
-    ctx.fillStyle = "#34d399"
+    ctx.fillStyle = accent
     ctx.font = `800 16px ${FONT}`
     ctx.textAlign = "left"
     ctx.textBaseline = "top"
@@ -311,7 +317,7 @@ export default class extends Controller {
     ctx.stroke()
 
     // Avatar
-    ctx.fillStyle = "#34d399"
+    ctx.fillStyle = accent
     ctx.beginPath()
     ctx.arc(PAD_X + avatarSize / 2, footerTop + avatarSize / 2, avatarSize / 2, 0, Math.PI * 2)
     ctx.fill()
