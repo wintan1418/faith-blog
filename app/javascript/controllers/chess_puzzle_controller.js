@@ -18,11 +18,25 @@ export default class extends Controller {
   }
 
   connect() {
-    this.start()
+    try {
+      this.start()
+    } catch (err) {
+      console.error("[chess-puzzle] could not start:", err)
+      this.showLoadError()
+    }
   }
 
   start() {
-    this.game = new Chess(this.fenValue)
+    const fen = (this.fenValue || "").trim()
+    if (!fen) throw new Error("missing puzzle FEN")
+
+    // Stimulus Array values throw on malformed JSON — read defensively.
+    let solution = []
+    try { solution = this.solutionValue } catch { solution = [] }
+    this.solution = Array.isArray(solution) ? solution : []
+    if (this.solution.length === 0) throw new Error("missing puzzle solution")
+
+    this.game = new Chess(fen)
     this.solverColor = this.game.turn()         // side to move in the puzzle FEN
     this.idx = 0                                // index into the solution list
     this.selected = null
@@ -36,7 +50,20 @@ export default class extends Controller {
   }
 
   reset() {
-    this.start()
+    try {
+      this.start()
+    } catch (err) {
+      console.error("[chess-puzzle] could not reset:", err)
+      this.showLoadError()
+    }
+  }
+
+  showLoadError() {
+    if (this.hasStatusTarget) {
+      this.statusTarget.className = "fc-chess-status is-bad"
+      this.statusTarget.textContent =
+        "Couldn't load the board here — use “View on Lichess” below to solve today's puzzle."
+    }
   }
 
   // ─── Rendering ───────────────────────────────────────────────
@@ -104,7 +131,7 @@ export default class extends Controller {
   }
 
   tryUserMove(from, to) {
-    const expected = this.parseUci(this.solutionValue[this.idx])
+    const expected = this.parseUci(this.solution[this.idx])
     if (from !== expected.from || to !== expected.to) {
       this.clearSelection()
       this.renderBoard()
@@ -119,7 +146,7 @@ export default class extends Controller {
     this.renderBoard()
     this.updateProgress()
 
-    if (this.idx >= this.solutionValue.length) {
+    if (this.idx >= this.solution.length) {
       this.finish()
       return
     }
@@ -129,7 +156,7 @@ export default class extends Controller {
   }
 
   autoOpponentMove() {
-    const uci = this.solutionValue[this.idx]
+    const uci = this.solution[this.idx]
     if (!uci) return
     const m = this.parseUci(uci)
     this.game.move({ from: m.from, to: m.to, promotion: m.promotion || "q" })
@@ -138,7 +165,7 @@ export default class extends Controller {
     this.renderBoard()
     this.updateProgress()
 
-    if (this.idx >= this.solutionValue.length) {
+    if (this.idx >= this.solution.length) {
       this.finish()
     } else {
       this.setStatus("Your move.")
@@ -147,7 +174,7 @@ export default class extends Controller {
 
   showHint() {
     if (this.complete || this.game.turn() !== this.solverColor) return
-    const expected = this.parseUci(this.solutionValue[this.idx])
+    const expected = this.parseUci(this.solution[this.idx])
     this.select(expected.from)
     this.renderBoard()
     this.flash("hint", `Try the piece on ${expected.from}.`)
@@ -216,7 +243,7 @@ export default class extends Controller {
 
   updateProgress() {
     if (!this.hasProgressTarget) return
-    const total = this.solutionValue.length
+    const total = this.solution.length
     const done  = Math.min(this.idx, total)
     this.progressTarget.textContent = `Move ${Math.min(done + (this.complete ? 0 : 1), total)} of ${total}`
   }
