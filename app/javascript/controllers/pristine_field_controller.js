@@ -53,18 +53,31 @@ export default class extends Controller {
 
   markTouched() {
     this.touched = true
+    // Other controllers (emoji picker, mentions) check this flag before
+    // they mutate the field, and set it themselves when they do.
+    this.field?.setAttribute("data-pristine-touched", "1")
+    this.trix?.setAttribute("data-pristine-touched", "1")
   }
 
   // Autofill commonly fires the moment a field receives focus — give it
   // a couple of beats, then snap the value back if the user hasn't typed.
   onFocus() {
-    if (this.touched) return
+    if (this.released()) return
     setTimeout(() => this.enforce(), 50)
     setTimeout(() => this.enforce(), 250)
   }
 
+  // The field is "released" once the user — or a cooperating controller
+  // like the emoji picker — has legitimately put content in it.
+  released() {
+    if (this.touched) return true
+    if (this.field?.dataset.pristineTouched === "1") return true
+    if (this.trix?.dataset.pristineTouched === "1") return true
+    return false
+  }
+
   enforce() {
-    if (this.touched) return
+    if (this.released()) return
 
     if (this.field && this.field.value !== this.valueValue) {
       this.field.value = this.valueValue

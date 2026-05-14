@@ -103,7 +103,7 @@
             <% else %>
               <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
             <% end %>
-            <div class="fc-inline-reply-body">
+            <div class="fc-inline-reply-body" data-controller="emoji-picker">
               <%= f.text_area :content,
                   class: "fc-inline-reply-input",
                   rows: 2,
@@ -111,9 +111,22 @@
                   autocomplete: "off",
                   autocapitalize: "sentences",
                   spellcheck: true,
-                  data: { form_type: "reply", controller: "pristine-field" } %>
+                  data: { form_type: "reply", controller: "pristine-field mentions", emoji_picker_target: "editor" } %>
               <div class="fc-inline-reply-actions">
                 <div class="fc-inline-reply-tools">
+                  <div class="fc-emoji-anchor">
+                    <button type="button"
+                            data-emoji-picker-target="button"
+                            data-action="click->emoji-picker#toggle"
+                            class="fc-composer-icon-btn"
+                            title="Add emoji"
+                            aria-label="Add emoji">
+                      <%= render_icon("smile", classes: "h-4 w-4") %>
+                    </button>
+                    <div data-emoji-picker-target="picker" class="fc-emoji-popover hidden">
+                      <emoji-picker></emoji-picker>
+                    </div>
+                  </div>
                   <button type="button"
                           class="fc-composer-icon-btn"
                           title="Open Bible"

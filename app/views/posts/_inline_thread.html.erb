@@ -33,10 +33,14 @@
       <% end %>
 
       <div class="fc-inline-reply-body" data-controller="emoji-picker">
-        <%= f.rich_text_area :content,
+        <%= f.text_area :content,
+            value: new_comment.content&.to_plain_text,
             class: "fc-inline-reply-input",
+            rows: 2,
             placeholder: "Reply with encouragement, prayer, or a word...",
             autocomplete: "off",
+            autocapitalize: "sentences",
+            spellcheck: true,
             data: { controller: "mentions", emoji_picker_target: "editor", form_type: "reply" } %>
 
         <div class="fc-inline-reply-actions">

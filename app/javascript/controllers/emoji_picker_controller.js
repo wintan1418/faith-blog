@@ -58,26 +58,31 @@ export default class extends Controller {
   }
 
   insertEmoji(emoji) {
-    // Find Trix editor
-    const trixEditor = this.hasEditorTarget ? this.editorTarget : 
-      this.element.closest("form")?.querySelector("trix-editor")
-    
+    // Trix editor — only when the target actually is a trix-editor.
+    const trixEditor = this.element.closest("form")?.querySelector("trix-editor")
+
     if (trixEditor && trixEditor.editor) {
       trixEditor.editor.insertString(emoji + " ")
       trixEditor.focus()
+      // Tell pristine-field this content is intentional — don't wipe it.
+      trixEditor.setAttribute("data-pristine-touched", "1")
     } else {
-      // Fallback for regular textarea
-      const textarea = this.element.closest("form")?.querySelector("textarea")
+      // Regular textarea (the reply boxes).
+      const textarea = this.hasEditorTarget && this.editorTarget.tagName === "TEXTAREA"
+        ? this.editorTarget
+        : this.element.closest("form")?.querySelector("textarea")
       if (textarea) {
-        const start = textarea.selectionStart
-        const end = textarea.selectionEnd
+        const start = textarea.selectionStart ?? textarea.value.length
+        const end = textarea.selectionEnd ?? textarea.value.length
         const text = textarea.value
         textarea.value = text.substring(0, start) + emoji + " " + text.substring(end)
         textarea.selectionStart = textarea.selectionEnd = start + emoji.length + 1
+        textarea.setAttribute("data-pristine-touched", "1")
         textarea.focus()
+        textarea.dispatchEvent(new Event("input", { bubbles: true }))
       }
     }
-    
+
     this.hide()
   }
 }
