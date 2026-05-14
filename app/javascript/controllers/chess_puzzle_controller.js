@@ -22,7 +22,7 @@ export default class extends Controller {
       this.start()
     } catch (err) {
       console.error("[chess-puzzle] could not start:", err)
-      this.showLoadError()
+      this.showLoadError(err)
     }
   }
 
@@ -54,15 +54,21 @@ export default class extends Controller {
       this.start()
     } catch (err) {
       console.error("[chess-puzzle] could not reset:", err)
-      this.showLoadError()
+      this.showLoadError(err)
     }
   }
 
-  showLoadError() {
+  showLoadError(err) {
     if (this.hasStatusTarget) {
       this.statusTarget.className = "fc-chess-status is-bad"
       this.statusTarget.textContent =
         "Couldn't load the board here — use “View on Lichess” below to solve today's puzzle."
+    }
+    // Surface the real cause in-page (mobile users can't open a console).
+    if (this.hasFeedbackTarget) {
+      const detail = (err && (err.message || err.toString())) || "unknown error"
+      this.feedbackTarget.classList.remove("hidden")
+      this.feedbackTarget.textContent = `Diagnostic: ${detail}`
     }
   }
 
@@ -97,7 +103,10 @@ export default class extends Controller {
         frag.appendChild(sq)
       }
     }
-    this.boardTarget.replaceChildren(frag)
+    // textContent="" + appendChild instead of replaceChildren — the
+    // latter isn't available on older mobile browsers.
+    this.boardTarget.textContent = ""
+    this.boardTarget.appendChild(frag)
   }
 
   // ─── Interaction ─────────────────────────────────────────────
