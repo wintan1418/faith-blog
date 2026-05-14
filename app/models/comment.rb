@@ -23,6 +23,7 @@ class Comment < ApplicationRecord
   validates :content, presence: true
 
   # Callbacks
+  before_validation :unwrap_leaked_trix_html
   after_save :process_mentions_after_save
   after_commit :enqueue_ai_moderation_review, on: :create, if: :moderation_approved?
 
@@ -78,6 +79,22 @@ class Comment < ApplicationRecord
   end
 
   private
+
+  # Defense-in-depth against the mobile-browser autofill bug: it would
+  # refill a reply field with a previously submitted comment's raw Trix
+  # markup, so the body arrived as the literal string
+  # '<div class="trix-content">…</div>'. The client-side pristine-field
+  # controller stops it at the source; this catches anything that still
+  # slips through (or was already saved) and recovers the real text.
+  def unwrap_leaked_trix_html
+    return if content.blank?
+
+    plain = content.to_plain_text.to_s
+    return unless plain.include?("trix-content") && plain.match?(/<\s*\/?\s*(div|p|br|span)\b/i)
+
+    recovered = ActionText::Content.new(CGI.unescapeHTML(plain)).to_plain_text.strip
+    self.content = recovered if recovered.present?
+  end
 
   def process_mentions_after_save
     process_mentions!(user) if user.present?

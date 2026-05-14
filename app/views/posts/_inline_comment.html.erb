@@ -33,17 +33,19 @@
       <div class="fc-inline-comment-text" data-comment-edit-target="display"><%= comment.content %></div>
 
       <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
+        <% edit_plain = comment.content.to_plain_text %>
         <%= form_with model: [ post, comment ], method: :patch, local: true,
                       class: "fc-inline-comment-editform hidden",
                       data: { comment_edit_target: "form", turbo_frame: dom_id(post, :thread) } do |f| %>
           <%= f.text_area :content,
-              value: comment.content.to_plain_text,
+              value: edit_plain,
               class: "fc-inline-reply-input",
               rows: 2,
               autocomplete: "off",
               autocapitalize: "sentences",
               spellcheck: true,
-              data: { comment_edit_target: "textarea", form_type: "edit" } %>
+              data: { comment_edit_target: "textarea", form_type: "edit",
+                      controller: "pristine-field", pristine_field_value_value: edit_plain } %>
           <div class="fc-inline-reply-actions">
             <div class="fc-inline-reply-tools">
               <button type="button" class="fc-btn" data-action="click->comment-edit#cancel">Cancel</button>
@@ -109,7 +111,7 @@
                   autocomplete: "off",
                   autocapitalize: "sentences",
                   spellcheck: true,
-                  data: { form_type: "reply" } %>
+                  data: { form_type: "reply", controller: "pristine-field" } %>
               <div class="fc-inline-reply-actions">
                 <div class="fc-inline-reply-tools">
                   <button type="button"

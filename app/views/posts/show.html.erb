@@ -85,7 +85,8 @@
           <% if @post.allow_comments? %>
             <% if user_signed_in? %>
               <div class="post-conversation-composer" data-controller="composer">
-                <%= form_with model: [@post, @new_comment], id: "comment_form", class: "composer-form" do |f| %>
+                <%= form_with model: [@post, @new_comment], id: "comment_form", class: "composer-form",
+                              data: { controller: "pristine-field" } do |f| %>
                   <% if current_user.profile&.avatar&.attached? %>
                     <%= image_tag current_user.profile.avatar, class: "composer-avatar object-cover" %>
                   <% else %>
