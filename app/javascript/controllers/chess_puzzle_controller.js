@@ -40,7 +40,7 @@ export default class extends Controller {
     this.solverColor = this.game.turn()         // side to move in the puzzle FEN
     this.idx = 0                                // index into the solution list
     this.selected = null
-    this.targets = []
+    this.legalTargets = []
     this.lastMove = null
     this.complete = false
     this.renderBoard()
@@ -89,7 +89,7 @@ export default class extends Controller {
         sq.className = "fc-chess-sq " + (((r + f) % 2 === 0) ? "is-light" : "is-dark")
         sq.dataset.square = square
         if (this.selected === square)   sq.classList.add("is-selected")
-        if (this.targets.includes(square)) sq.classList.add(cell ? "is-capture" : "is-target")
+        if (this.legalTargets.includes(square)) sq.classList.add(cell ? "is-capture" : "is-target")
         if (this.lastMove && (this.lastMove.from === square || this.lastMove.to === square)) {
           sq.classList.add("is-lastmove")
         }
@@ -118,7 +118,7 @@ export default class extends Controller {
 
     if (this.selected) {
       if (square === this.selected) { this.clearSelection(); this.renderBoard(); return }
-      if (this.targets.includes(square)) { this.tryUserMove(this.selected, square); return }
+      if (this.legalTargets.includes(square)) { this.tryUserMove(this.selected, square); return }
       if (piece && piece.color === this.solverColor) { this.select(square); this.renderBoard(); return }
       this.clearSelection(); this.renderBoard(); return
     }
@@ -131,12 +131,12 @@ export default class extends Controller {
 
   select(square) {
     this.selected = square
-    this.targets = this.game.moves({ square, verbose: true }).map(m => m.to)
+    this.legalTargets = this.game.moves({ square, verbose: true }).map(m => m.to)
   }
 
   clearSelection() {
     this.selected = null
-    this.targets = []
+    this.legalTargets = []
   }
 
   tryUserMove(from, to) {
