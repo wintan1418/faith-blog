@@ -16,7 +16,8 @@ class PostsController < ApplicationController
 
   def show
     @post.increment_views! unless current_user == @post.user
-    @comments = @post.comments.root_comments.active.includes(:user, :replies).oldest_first
+    @comments = @post.comments.root_comments.active
+                     .includes(:user, :replies, likes: :user).oldest_first
     @new_comment = Comment.new
   end
 

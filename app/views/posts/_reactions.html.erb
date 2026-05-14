@@ -1,20 +1,21 @@
 <%
-  loaded_likes = post.likes.loaded? ? post.likes.to_a : post.likes.to_a
+  # Feed preloads `likes: :user`; the like turbo_stream re-render does not,
+  # so fall back to an eager include when the association isn't loaded.
+  loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
   user_like    = user_signed_in? ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
-  emoji_counts = loaded_likes
+  emoji_groups = loaded_likes
                    .reject { |l| l.reaction_emoji.to_s.empty? }
                    .group_by(&:reaction_emoji)
-                   .transform_values(&:size)
-                   .sort_by { |_, c| -c }
+                   .sort_by { |_, likes| -likes.size }
                    .first(4)
-                   .to_h
 %>
 
 <div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions"
      data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
      data-emoji-reactions-token-value="<%= form_authenticity_token %>">
-  <% emoji_counts.each do |emoji, count| %>
+  <% emoji_groups.each do |emoji, group| %>
     <% mine = user_like&.display_emoji == emoji %>
+    <% tip = reactor_names_label(group) %>
     <% if mine %>
       <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
           method: :delete,
@@ -22,20 +23,22 @@
           class: "fc-reaction-pill is-mine",
           title: "Remove your reaction" do %>
         <span class="fc-reaction-emoji"><%= emoji %></span>
-        <span class="fc-reaction-count"><%= count %></span>
+        <span class="fc-reaction-count"><%= group.size %></span>
+        <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
       <% end %>
     <% else %>
       <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_emoji: emoji),
           form_class: "inline",
           class: "fc-reaction-pill" do %>
         <span class="fc-reaction-emoji"><%= emoji %></span>
-        <span class="fc-reaction-count"><%= count %></span>
+        <span class="fc-reaction-count"><%= group.size %></span>
+        <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
       <% end %>
     <% end %>
   <% end %>
 
   <% if user_signed_in? %>
-    <% if emoji_counts.empty? && user_like.nil? %>
+    <% if emoji_groups.empty? && user_like.nil? %>
       <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_emoji: "🙏"),
           form_class: "inline",
           class: "fc-reaction-add",

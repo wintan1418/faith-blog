@@ -10,13 +10,11 @@
 <%
   loaded_likes = message.likes.includes(:user).to_a
   user_like    = current_user ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
-  emoji_counts = loaded_likes
+  emoji_groups = loaded_likes
                    .reject { |l| l.reaction_emoji.to_s.empty? }
                    .group_by(&:reaction_emoji)
-                   .transform_values(&:size)
-                   .sort_by { |_, c| -c }
+                   .sort_by { |_, likes| -likes.size }
                    .first(4)
-                   .to_h
 %>
 
 <div id="<%= dom_id(message) %>" class="message-row <%= mine ? 'is-mine' : 'is-theirs' %><%= ' is-deleted' if deleted %>">
@@ -112,10 +110,11 @@
       <% end %>
     </div>
 
-    <% if !deleted && (emoji_counts.any? || user_like) %>
+    <% if !deleted && (emoji_groups.any? || user_like) %>
       <div class="message-reactions">
-        <% emoji_counts.each do |emoji, count| %>
+        <% emoji_groups.each do |emoji, group| %>
           <% mine_emoji = user_like&.display_emoji == emoji %>
+          <% tip = reactor_names_label(group) %>
           <% if mine_emoji %>
             <%= button_to unlike_path(likeable_type: "Message", likeable_id: message.id),
                 method: :delete,
@@ -123,14 +122,16 @@
                 class: "fc-reaction-pill is-mine",
                 title: "Remove your reaction" do %>
               <span class="fc-reaction-emoji"><%= emoji %></span>
-              <span class="fc-reaction-count"><%= count %></span>
+              <span class="fc-reaction-count"><%= group.size %></span>
+              <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
             <% end %>
           <% else %>
             <%= button_to likes_path(likeable_type: "Message", likeable_id: message.id, reaction_emoji: emoji),
                 form_class: "inline",
                 class: "fc-reaction-pill" do %>
               <span class="fc-reaction-emoji"><%= emoji %></span>
-              <span class="fc-reaction-count"><%= count %></span>
+              <span class="fc-reaction-count"><%= group.size %></span>
+              <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
             <% end %>
           <% end %>
         <% end %>

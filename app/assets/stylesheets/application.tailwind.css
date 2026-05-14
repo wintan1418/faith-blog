@@ -11747,6 +11747,7 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
 }
 
 .fc-reaction-pill {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -11772,6 +11773,49 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
 }
 .fc-reaction-emoji { font-size: 1rem; line-height: 1; }
 .fc-reaction-count { font-size: 0.8rem; }
+
+/* Hover tooltip — who reacted (Facebook / LinkedIn style) */
+.fc-reaction-tip {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  z-index: 70;
+  width: max-content;
+  max-width: 230px;
+  padding: 0.42rem 0.62rem;
+  border-radius: 9px;
+  background: var(--fc-ink);
+  color: var(--fc-bg);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 10px 28px -8px rgba(0, 0, 0, 0.55);
+  transition: opacity 130ms ease, transform 130ms ease;
+}
+.fc-reaction-tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--fc-ink);
+}
+.fc-reaction-pill:hover .fc-reaction-tip,
+.fc-reaction-pill:focus-visible .fc-reaction-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* Touch devices can't hover — and a tap fires the reaction form — so
+   the tooltip would only flash. Hide it there to avoid the flicker. */
+@media (hover: none) {
+  .fc-reaction-tip { display: none; }
+}
 
 .fc-reaction-add {
   display: inline-flex;
