@@ -13,6 +13,7 @@
     "@hotwired/turbo-rails": "^8.0.20",
     "@rails/actiontext": "^8.1.100",
     "@tailwindcss/cli": "^4.1.17",
+    "chess.js": "^1.4.0",
     "emoji-picker-element": "^1.28.0",
     "html2canvas": "^1.4.1",
     "tailwindcss": "^4.1.17",

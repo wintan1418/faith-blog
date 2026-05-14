@@ -10220,6 +10220,103 @@ html.theme-dark .fc-held-banner {
 }
 .fc-chess-feedback.hidden { display: none; }
 
+/* ── In-app chess board ───────────────────────────────────────────── */
+.fc-chess-status {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--fc-soft);
+  min-height: 1.3em;
+  transition: color 140ms ease;
+}
+.fc-chess-status.is-good { color: var(--fc-success, #34d399); }
+.fc-chess-status.is-bad  { color: var(--fc-danger, #fb7185); }
+.fc-chess-status.is-hint { color: var(--fc-accent-2); }
+
+.fc-chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--fc-line-strong);
+  box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.fc-chess-sq {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  position: relative;
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  transition: background 120ms ease;
+}
+.fc-chess-sq.is-light { background: #ebe4d2; }
+.fc-chess-sq.is-dark  { background: #9a8a6b; }
+.fc-chess-sq.is-lastmove { background: #d6cf73; }
+.fc-chess-sq.is-lastmove.is-dark { background: #b6ab57; }
+.fc-chess-sq.is-selected {
+  background: #f2d479;
+  box-shadow: inset 0 0 0 3px var(--fc-accent-2);
+}
+
+/* Move dots — empty target vs. capturable square */
+.fc-chess-sq.is-target::after {
+  content: "";
+  position: absolute;
+  width: 28%;
+  height: 28%;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.32);
+}
+.fc-chess-sq.is-capture::after {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 999px;
+  border: 4px solid rgba(0, 0, 0, 0.32);
+}
+
+.fc-chess-piece {
+  font-size: clamp(1.6rem, 7.5vw, 2.6rem);
+  line-height: 1;
+  pointer-events: none;
+}
+.fc-chess-piece.is-w {
+  color: #fff;
+  text-shadow: 0 0 1px #000, 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 3px rgba(0, 0, 0, 0.4);
+}
+.fc-chess-piece.is-b {
+  color: #1a1a1a;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.fc-chess-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.fc-chess-progress {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: var(--fc-muted);
+}
+.fc-chess-control-btns {
+  display: flex;
+  gap: 0.4rem;
+}
+
 /* ── Rail games card (feed left sidebar) ──────────────────────────── */
 
 .fc-rail-games-card {

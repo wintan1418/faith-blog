@@ -8,12 +8,14 @@
           ← Back to games
         <% end %>
         <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">♚ Chess Puzzle of the Day</h1>
-        <p class="text-sm text-[var(--fc-muted)]">Today's puzzle from Lichess. Solve on Lichess, then come back and claim your points.</p>
+        <p class="text-sm text-[var(--fc-muted)]">Today's puzzle from Lichess — play it right here, claim your points when you solve it.</p>
       </header>
 
       <% if @puzzle %>
         <section class="fc-chess-card"
                  data-controller="chess-puzzle"
+                 data-chess-puzzle-fen-value="<%= @puzzle[:fen] %>"
+                 data-chess-puzzle-solution-value="<%= @puzzle[:solution].to_json %>"
                  data-chess-puzzle-solved-url-value="<%= games_chess_solved_path %>"
                  data-chess-puzzle-csrf-value="<%= form_authenticity_token %>"
                  data-chess-puzzle-already-value="<%= @already_solved_today %>">
@@ -30,28 +32,31 @@
             </div>
           </div>
 
-          <div class="fc-chess-actions">
-            <a href="<%= @puzzle[:link] %>"
-               target="_blank"
-               rel="noopener"
-               class="fc-btn fc-btn-primary"
-               data-action="click->chess-puzzle#openedExternal">
-              ♟️ Solve on Lichess →
-            </a>
-            <button type="button"
-                    class="fc-btn fc-chess-solved-btn"
-                    data-chess-puzzle-target="solveBtn"
-                    data-action="click->chess-puzzle#markSolved"
-                    <%= "disabled" if @already_solved_today %>>
-              <%= @already_solved_today ? "✓ Already solved today" : "✓ I solved it" %>
-            </button>
+          <p class="fc-chess-status" data-chess-puzzle-target="status">Loading board…</p>
+
+          <div class="fc-chess-board" data-chess-puzzle-target="board" role="grid" aria-label="Chess puzzle board"></div>
+
+          <div class="fc-chess-controls">
+            <span class="fc-chess-progress" data-chess-puzzle-target="progress"></span>
+            <div class="fc-chess-control-btns">
+              <button type="button"
+                      class="fc-btn"
+                      data-chess-puzzle-target="hintBtn"
+                      data-action="click->chess-puzzle#showHint">💡 Hint</button>
+              <button type="button"
+                      class="fc-btn"
+                      data-chess-puzzle-target="resetBtn"
+                      data-action="click->chess-puzzle#reset">↺ Restart</button>
+            </div>
           </div>
 
-          <p class="fc-chess-fine">
-            Puzzles update once a day. Played <%= number_with_delimiter(@puzzle[:plays]) %> times on Lichess.
-          </p>
-
           <div class="fc-chess-feedback hidden" data-chess-puzzle-target="feedback"></div>
+
+          <p class="fc-chess-fine">
+            Played <%= number_with_delimiter(@puzzle[:plays]) %> times on Lichess ·
+            <%= link_to "View on Lichess →", @puzzle[:link], target: "_blank", rel: "noopener",
+                class: "font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
+          </p>
         </section>
       <% else %>
         <div class="fc-empty">
