@@ -10507,6 +10507,14 @@ html.theme-dark .fc-held-banner {
   z-index: 1;
 }
 
+/* .fc-app paints var(--fc-bg) with !important, which sat opaque on top
+   of the rain. Make its background transparent — the body still owns
+   the page color (Tailwind bg-stone-50 in light, body.theme-dark rule
+   in dark), so the rain is now visible between body and content. */
+.fc-app {
+  background: transparent !important;
+}
+
 .fc-rain-drop {
   position: absolute;
   top: -10vh;
