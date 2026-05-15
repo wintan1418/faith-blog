@@ -16,13 +16,17 @@ export default class extends Controller {
     try { items = this.itemsValue } catch { items = [] }
     this.items = Array.isArray(items) ? items : []
     if (this.items.length === 0) return
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
     this.alive = true
     this.live = new Set()
 
-    this.spawnInterval = window.innerWidth < 640 ? 3400 : 2200
-    this.maxLive       = window.innerWidth < 640 ? 4    : 7
+    // Honour reduced-motion by SLOWING the rain, not killing it — the
+    // drift is already gentle and a missing ambient layer reads as
+    // "nothing is happening" to most users, which was the original
+    // complaint.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    this.spawnInterval = window.innerWidth < 640 ? (reduced ? 5200 : 3400) : (reduced ? 3600 : 2200)
+    this.maxLive       = window.innerWidth < 640 ? (reduced ? 3 : 4)       : (reduced ? 5 : 7)
 
     this.onVisibility = this.onVisibility.bind(this)
     document.addEventListener("visibilitychange", this.onVisibility)

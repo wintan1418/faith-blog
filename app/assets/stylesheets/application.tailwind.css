@@ -10507,12 +10507,17 @@ html.theme-dark .fc-held-banner {
   z-index: 1;
 }
 
-/* .fc-app paints var(--fc-bg) with !important, which sat opaque on top
-   of the rain. Make its background transparent — the body still owns
-   the page color (Tailwind bg-stone-50 in light, body.theme-dark rule
-   in dark), so the rain is now visible between body and content. */
+/* .fc-app paints var(--fc-bg) with !important under both themes
+   (html.theme-dark .fc-app, html.theme-light .fc-app rules with the
+   radial gradient on top), which sat opaque on top of the rain.
+   Match the theme-prefixed specificity to neutralise them — the body
+   still owns the page color in both themes, so the visible page
+   background is unchanged but the rain is no longer occluded. */
+html.theme-dark .fc-app,
+html.theme-light .fc-app,
 .fc-app {
   background: transparent !important;
+  background-image: none !important;
 }
 
 .fc-rain-drop {
@@ -10572,8 +10577,8 @@ html.theme-light .fc-rain-drop.is-golden {
 
 @keyframes fc-rain-fall {
   0%   { transform: translate3d(0, 0, 0);                    opacity: 0; }
-  10%  {                                                      opacity: 0.22; }
-  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.22; }
+  10%  {                                                      opacity: 0.32; }
+  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.32; }
   100% { transform: translate3d(var(--drift, 0), 115vh, 0);  opacity: 0; }
 }
 html.theme-light .fc-rain-drop {
@@ -10581,8 +10586,8 @@ html.theme-light .fc-rain-drop {
 }
 @keyframes fc-rain-fall-light {
   0%   { transform: translate3d(0, 0, 0);                    opacity: 0; }
-  10%  {                                                      opacity: 0.32; }
-  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.32; }
+  10%  {                                                      opacity: 0.45; }
+  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.45; }
   100% { transform: translate3d(var(--drift, 0), 115vh, 0);  opacity: 0; }
 }
 
@@ -10591,8 +10596,11 @@ html.theme-light .fc-rain-drop {
   .fc-rain-drop { max-width: 18rem; padding-inline: 0.4rem; }
 }
 
+/* Reduced motion: slow the rain animation rather than hide it — the
+   user explicitly asked for an ambient feel and a missing layer reads
+   as "broken" to most testers. Drift is already calm. */
 @media (prefers-reduced-motion: reduce) {
-  .fc-rain { display: none; }
+  .fc-rain-drop { animation-duration: 38s !important; }
 }
 
 /* ── First-load splash — accent-tinted, 3D breathe stagger ────────── */
