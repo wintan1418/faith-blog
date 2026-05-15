@@ -100,6 +100,9 @@ application.register("pwa", PwaController)
 import PristineFieldController from "./pristine_field_controller"
 application.register("pristine-field", PristineFieldController)
 
+import RainController from "./rain_controller"
+application.register("rain", RainController)
+
 import ReactionsController from "./reactions_controller"
 application.register("reactions", ReactionsController)
 
