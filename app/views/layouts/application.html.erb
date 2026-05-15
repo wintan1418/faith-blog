@@ -137,15 +137,7 @@
          class="fc-rain"
          aria-hidden="true"
          data-controller="rain"
-         data-rain-items-value="<%= BackgroundRain.items.to_json %>">
-      <%# Static debug drop pinned mid-viewport. If you can see this text
-          ('rain alive') drifting in the background, the layer renders and
-          the issue is the JS spawner. If you can't, the .fc-rain element
-          itself is being hidden/covered by something we haven't found. %>
-      <span class="fc-rain-drop" style="left: 50%; top: 30vh; transform: translateX(-50%); opacity: 1; animation: none; font-size: 1rem;">
-        <span class="fc-rain-text">rain alive — if you see this, the layer works</span>
-      </span>
-    </div>
+         data-rain-items-value="<%= BackgroundRain.items.to_json %>"></div>
 
     <div class="min-h-full fc-page" data-controller="<%= "composer-modal notifications-modal bible-drawer notification-sound" if user_signed_in? %>">
       <%= render "shared/navbar" %>

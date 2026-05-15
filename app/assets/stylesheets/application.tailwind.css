@@ -10495,29 +10495,13 @@ html.theme-dark .fc-held-banner {
 .fc-rain {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  /* Sit ABOVE content cards (which would otherwise occlude a rain
+     layer behind them), but BELOW modals/overlays/picker (z 9999+)
+     and the first-load splash (z 100000). pointer-events: none so
+     the layer never intercepts clicks. */
+  z-index: 9000;
   pointer-events: none;
   overflow: hidden;
-  contain: strict;
-}
-
-/* Lift the actual page so the rain sits behind it. */
-.fc-page {
-  position: relative;
-  z-index: 1;
-}
-
-/* .fc-app paints var(--fc-bg) with !important under both themes
-   (html.theme-dark .fc-app, html.theme-light .fc-app rules with the
-   radial gradient on top), which sat opaque on top of the rain.
-   Match the theme-prefixed specificity to neutralise them — the body
-   still owns the page color in both themes, so the visible page
-   background is unchanged but the rain is no longer occluded. */
-html.theme-dark .fc-app,
-html.theme-light .fc-app,
-.fc-app {
-  background: transparent !important;
-  background-image: none !important;
 }
 
 .fc-rain-drop {
@@ -10575,10 +10559,13 @@ html.theme-light .fc-rain-drop.is-golden {
   text-shadow: 0 0 10px rgba(212, 168, 90, 0.30), 0 1px 0 rgba(255,255,255,0.55);
 }
 
+/* Opacity is intentionally low — the layer sits IN FRONT of content
+   (cards would otherwise occlude a back layer) so we keep it ghostly
+   enough that nothing competes with reading the feed. */
 @keyframes fc-rain-fall {
   0%   { transform: translate3d(0, 0, 0);                    opacity: 0; }
-  10%  {                                                      opacity: 0.32; }
-  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.32; }
+  10%  {                                                      opacity: 0.22; }
+  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.22; }
   100% { transform: translate3d(var(--drift, 0), 115vh, 0);  opacity: 0; }
 }
 html.theme-light .fc-rain-drop {
@@ -10586,8 +10573,8 @@ html.theme-light .fc-rain-drop {
 }
 @keyframes fc-rain-fall-light {
   0%   { transform: translate3d(0, 0, 0);                    opacity: 0; }
-  10%  {                                                      opacity: 0.45; }
-  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.45; }
+  10%  {                                                      opacity: 0.28; }
+  88%  { transform: translate3d(var(--drift, 0), 100vh, 0);  opacity: 0.28; }
   100% { transform: translate3d(var(--drift, 0), 115vh, 0);  opacity: 0; }
 }
 
