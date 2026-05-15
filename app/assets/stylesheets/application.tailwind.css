@@ -1919,8 +1919,11 @@ h1, h2, h3, h4, h5, h6 {
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 4px;
+  padding-bottom: 1rem;
   scrollbar-width: thin;
   scrollbar-color: var(--fc-line) transparent;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .fc-sidebar::-webkit-scrollbar,
 .fc-aside::-webkit-scrollbar {
