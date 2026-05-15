@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_13_170000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_15_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -431,6 +431,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_13_170000) do
     t.datetime "prayer_answered_at"
     t.integer "moderation_status", default: 0, null: false
     t.string "moderation_blocked_reason", limit: 280
+    t.integer "voice_duration_ms"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
     t.index ["moderation_status"], name: "index_posts_on_moderation_status"

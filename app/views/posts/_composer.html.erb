@@ -105,6 +105,61 @@
               data: { action: "change->post-form#previewImages" } %>
         </label>
 
+        <div class="fc-voice-recorder" data-controller="voice-recorder">
+          <button type="button"
+                  class="fc-composer-icon-btn"
+                  data-voice-recorder-target="trigger"
+                  data-action="click->voice-recorder#togglePanel"
+                  title="Record voice note"
+                  aria-label="Record voice note">
+            🎙️
+          </button>
+
+          <%# Hidden inputs that the recorder fills in. %>
+          <%= f.file_field :voice_note,
+              accept: "audio/*",
+              class: "sr-only",
+              data: { voice_recorder_target: "fileInput" } %>
+          <%= f.hidden_field :voice_duration_ms,
+              data: { voice_recorder_target: "durationInput" } %>
+
+          <div class="fc-voice-recorder-panel hidden" data-voice-recorder-target="panel">
+            <div class="fc-voice-recorder-row">
+              <button type="button"
+                      class="fc-voice-recorder-record"
+                      data-voice-recorder-target="recordBtn"
+                      data-action="click->voice-recorder#record"
+                      title="Start recording">●</button>
+              <button type="button"
+                      class="fc-voice-recorder-stop hidden"
+                      data-voice-recorder-target="stopBtn"
+                      data-action="click->voice-recorder#stop"
+                      title="Stop">■</button>
+              <span class="fc-voice-recorder-timer" data-voice-recorder-target="timer">0:00</span>
+              <span class="fc-voice-recorder-max">/ 1:30 max</span>
+            </div>
+
+            <div class="fc-voice-recorder-preview hidden" data-voice-recorder-target="preview">
+              <audio controls preload="metadata" data-voice-recorder-target="previewAudio"></audio>
+              <div class="fc-voice-recorder-actions">
+                <button type="button" class="fc-btn" data-action="click->voice-recorder#retry">Re-record</button>
+                <button type="button" class="fc-btn" data-action="click->voice-recorder#discard">Discard</button>
+              </div>
+            </div>
+          </div>
+
+          <%# Inline summary chip shown after a successful recording so the
+              user can see (and remove) the attached note without re-opening
+              the panel. %>
+          <div class="fc-voice-recorder-summary hidden" data-voice-recorder-target="summary">
+            🎙️ Voice note attached · <span data-voice-recorder-target="summaryDuration">0:00</span>
+            <button type="button" class="fc-voice-recorder-remove"
+                    data-voice-recorder-target="removeBtn"
+                    data-action="click->voice-recorder#remove"
+                    aria-label="Remove voice note">×</button>
+          </div>
+        </div>
+
         <button type="button"
                 class="fc-composer-icon-btn"
                 title="Open Bible"

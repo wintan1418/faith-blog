@@ -114,6 +114,10 @@
         <% end %>
       </div>
 
+      <% if post.has_voice_note? %>
+        <%= render "posts/voice_note", post: post %>
+      <% end %>
+
       <% if post.has_images? %>
         <%
           imgs = post.images.first(4)

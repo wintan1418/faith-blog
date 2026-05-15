@@ -13,6 +13,24 @@ class Post < ApplicationRecord
   # Multiple images (up to 5)
   has_many_attached :images
 
+  # Optional voice note (max ~90s). Duration is stored client-side at
+  # upload so the player can show total time before the audio loads.
+  has_one_attached :voice_note
+
+  VOICE_MAX_MS    = 90_000
+  VOICE_MAX_BYTES = 6.megabytes
+
+  validate :voice_note_size_and_duration
+
+  def has_voice_note?
+    voice_note.attached?
+  end
+
+  def voice_duration_seconds
+    return 0 if voice_duration_ms.blank?
+    (voice_duration_ms.to_i / 1000.0).round
+  end
+
   # Enums
   enum :status, { draft: 0, published: 1, archived: 2, scheduled: 3 }
   enum :kind,   { breath: 0, thread: 1 }, prefix: :kind
@@ -197,6 +215,17 @@ class Post < ApplicationRecord
   def max_images_count
     if images.attached? && images.count > 5
       errors.add(:images, "cannot exceed 5 images per post")
+    end
+  end
+
+  def voice_note_size_and_duration
+    return unless voice_note.attached?
+
+    if voice_note.blob.byte_size > VOICE_MAX_BYTES
+      errors.add(:voice_note, "is too large (max #{VOICE_MAX_BYTES / 1.megabyte}MB)")
+    end
+    if voice_duration_ms.present? && voice_duration_ms.to_i > VOICE_MAX_MS
+      errors.add(:voice_note, "must be 1 minute 30 seconds or shorter")
     end
   end
 

@@ -1,0 +1,47 @@
+<%# Voice-note banner inside a breath card.
+    Locals: post — Post with voice_note attached %>
+<% display_user = post.anonymous? ? nil : post.user %>
+<div class="fc-voice-banner"
+     data-controller="voice-player"
+     data-voice-player-duration-value="<%= post.voice_duration_ms.to_i %>">
+  <audio data-voice-player-target="audio"
+         preload="metadata"
+         src="<%= url_for(post.voice_note) %>"></audio>
+
+  <div class="fc-voice-banner-dp">
+    <% if display_user&.profile&.avatar&.attached? %>
+      <%= image_tag display_user.profile.avatar, class: "fc-voice-banner-avatar object-cover", alt: display_user.username %>
+    <% elsif display_user %>
+      <span class="fc-voice-banner-avatar fc-voice-banner-avatar--fallback"
+            style="<%= avatar_tint_style(display_user.username) %>">
+        <%= display_user.username.first.upcase %>
+      </span>
+    <% else %>
+      <span class="fc-voice-banner-avatar fc-voice-banner-avatar--fallback">A</span>
+    <% end %>
+  </div>
+
+  <button type="button"
+          class="fc-voice-banner-play"
+          data-voice-player-target="playBtn"
+          data-action="click->voice-player#toggle"
+          aria-label="Play voice note">
+    <span class="fc-voice-banner-play-icon" aria-hidden="true"></span>
+  </button>
+
+  <div class="fc-voice-banner-body">
+    <div class="fc-voice-banner-meta">
+      <span class="fc-voice-banner-label">🎙️ Voice note</span>
+      <span class="fc-voice-banner-time">
+        <span data-voice-player-target="current">0:00</span>
+        <span class="fc-voice-banner-time-sep">/</span>
+        <span data-voice-player-target="total"><%= "%d:%02d" % [post.voice_duration_seconds / 60, post.voice_duration_seconds % 60] %></span>
+      </span>
+    </div>
+    <div class="fc-voice-banner-progress"
+         data-voice-player-target="progress"
+         data-action="click->voice-player#seek">
+      <span class="fc-voice-banner-progress-fill" data-voice-player-target="fill"></span>
+    </div>
+  </div>
+</div>

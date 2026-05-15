@@ -183,7 +183,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, images: [])
+    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, :voice_note, :voice_duration_ms, images: [])
   end
 
   def scheduled_in_future?(post)

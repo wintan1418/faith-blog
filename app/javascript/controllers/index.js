@@ -127,5 +127,11 @@ application.register("thread-toggle", ThreadToggleController)
 import TocController from "./toc_controller"
 application.register("toc", TocController)
 
+import VoicePlayerController from "./voice_player_controller"
+application.register("voice-player", VoicePlayerController)
+
+import VoiceRecorderController from "./voice_recorder_controller"
+application.register("voice-recorder", VoiceRecorderController)
+
 import TypingController from "./typing_controller"
 application.register("typing", TypingController)
