@@ -30,7 +30,9 @@
           <span class="fc-inline-comment-flag" title="Held for moderator review">⏳ held</span>
         <% end %>
       </div>
-      <div class="fc-inline-comment-text" data-comment-edit-target="display"><%= comment.content %></div>
+      <div class="fc-inline-comment-text" data-comment-edit-target="display">
+        <%= render_social_text(comment.content, class_name: "fc-social-text") %>
+      </div>
 
       <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
         <% edit_plain = comment.content.to_plain_text %>

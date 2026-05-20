@@ -1,67 +1,134 @@
 # frozen_string_literal: true
 
+require "cgi"
+
 module MentionsHelper
-  # Render content with mentions highlighted
-  # For ActionText, we need to process the HTML output
-  def render_with_mentions(content)
-    return "" if content.blank?
+  SOCIAL_TOKEN_REGEX = %r{https?://[^\s<]+|(?<![\w@])@[a-zA-Z0-9_]{3,30}}
 
-    # Get HTML content (works for both ActionText and regular text)
-    html = if content.is_a?(ActionText::Content)
-      content.to_s
-    elsif content.respond_to?(:to_s)
-      content.to_s
-    else
-      ""
-    end
+  # Render user-authored post/comment text the way social apps do:
+  # blank lines create paragraphs, single line breaks stay visible, URLs
+  # and mentions are linked, and unsafe markup is escaped.
+  def render_social_text(content, class_name: nil, paragraph_class: nil, data: nil)
+    text = social_plain_text(content)
+    return "" if text.blank?
 
-    return "" if html.blank?
-
-    usernames = html.scan(/@([a-zA-Z0-9_-]{3,30})/).flatten.map(&:downcase).uniq
-    users_by_username = usernames.any? ? User.where("LOWER(username) IN (?)", usernames).index_by { |user| user.username.downcase } : {}
-
-    # Process mentions in text content only (not inside HTML tag attributes)
-    # Split HTML into parts: tags and text content
-    result = ""
-    i = 0
-    while i < html.length
-      if html[i] == "<"
-        # Find the end of the tag
-        tag_end = html.index(">", i)
-        if tag_end
-          # Add the entire tag as-is
-          result += html[i..tag_end]
-          i = tag_end + 1
-        else
-          result += html[i]
-          i += 1
-        end
-      else
-        # Find the start of the next tag or end of string
-        next_tag = html.index("<", i)
-        text_content = next_tag ? html[i...next_tag] : html[i..-1]
-
-        # Process mentions in this text content
-        processed_text = text_content.gsub(/@([a-zA-Z0-9_-]{3,30})/) do |match|
-          username = $1
-          user = users_by_username[username.downcase]
-          if user
-            %(<a href="#{user_path(user.username)}" class="mention-link">@#{user.username}</a>)
-          else
-            match
-          end
-        end
-
-        result += processed_text
-        i = next_tag || html.length
+    users_by_username = social_mentioned_users(text)
+    paragraphs = text.split(/\n{2,}/).map do |paragraph|
+      lines = paragraph.split(/\n/, -1)
+      children = lines.each_with_index.flat_map do |line, index|
+        nodes = social_inline_nodes(line, users_by_username)
+        index.zero? ? nodes : [ tag.br, *nodes ]
       end
+
+      tag.p(safe_join(children), class: paragraph_class)
     end
 
-    result.html_safe
+    tag.div(safe_join(paragraphs), class: class_name, data: data)
+  end
+
+  def render_social_card_text(content, class_name: nil, data: nil)
+    text = social_plain_text(content)
+    return "" if text.blank?
+
+    users_by_username = social_mentioned_users(text)
+    children = text.split(/\n{2,}/).each_with_index.flat_map do |paragraph, paragraph_index|
+      nodes = social_inline_paragraph_nodes(paragraph, users_by_username)
+      paragraph_index.zero? ? nodes : [ tag.br, tag.br, *nodes ]
+    end
+
+    tag.div(safe_join(children), class: class_name, data: data)
+  end
+
+  # Backwards-compatible name used by older views.
+  def render_with_mentions(content)
+    render_social_text(content)
   end
 
   # Get list of mentioned users for display
   def mentioned_users_for(mentionable)
     mentionable.mentioned_users if mentionable.respond_to?(:mentioned_users)
+  end
+
+  private
+
+  def social_plain_text(content)
+    text =
+      if content.respond_to?(:to_plain_text)
+        content.to_plain_text
+      elsif content.is_a?(ActionText::Content)
+        content.to_plain_text
+      else
+        content.to_s
+      end
+
+    CGI.unescapeHTML(text.to_s).gsub(/\r\n?/, "\n").strip
+  end
+
+  def social_mentioned_users(text)
+    usernames = text.scan(/(?<![\w@])@([a-zA-Z0-9_]{3,30})/).flatten.map(&:downcase).uniq
+    usernames -= %w[everyone all here]
+    return {} if usernames.blank?
+
+    User.where("LOWER(username) IN (?)", usernames).index_by { |user| user.username.downcase }
+  end
+
+  def social_inline_nodes(line, users_by_username)
+    nodes = []
+    cursor = 0
+
+    line.to_enum(:scan, SOCIAL_TOKEN_REGEX).each do
+      match = Regexp.last_match
+      nodes << h(line[cursor...match.begin(0)]) if match.begin(0) > cursor
+      nodes.concat social_token_nodes(match[0], users_by_username)
+      cursor = match.end(0)
+    end
+
+    nodes << h(line[cursor..]) if cursor < line.length
+    nodes
+  end
+
+  def social_inline_paragraph_nodes(paragraph, users_by_username)
+    paragraph.split(/\n/, -1).each_with_index.flat_map do |line, index|
+      nodes = social_inline_nodes(line, users_by_username)
+      index.zero? ? nodes : [ tag.br, *nodes ]
+    end
+  end
+
+  def social_token_nodes(token, users_by_username)
+    if token.start_with?("@")
+      [ social_mention_node(token, users_by_username) ]
+    else
+      social_url_nodes(token)
+    end
+  end
+
+  def social_mention_node(token, users_by_username)
+    handle = token.delete_prefix("@")
+
+    case handle.downcase
+    when "everyone"
+      tag.span("@everyone", class: "mention-broadcast", data: { scope: "room" })
+    when "all"
+      tag.span("@all", class: "mention-broadcast mention-broadcast-platform", data: { scope: "platform" })
+    else
+      user = users_by_username[handle.downcase]
+      return h(token) unless user
+
+      link_to("@#{user.username}", user_path(user.username), class: "mention-link")
+    end
+  end
+
+  def social_url_nodes(token)
+    url = token.dup
+    trailing = +""
+
+    while url.match?(/[),.!?:;]\z/)
+      trailing.prepend(url.slice!(-1))
+    end
+
+    [
+      link_to(url, url, class: "fc-social-link", target: "_blank", rel: "noopener noreferrer"),
+      h(trailing)
+    ]
   end
 end

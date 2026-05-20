@@ -51,7 +51,7 @@
           <% end %>
 
           <div class="post-body" data-toc-target="body" data-controller="scripture">
-            <%= render_with_mentions(@post.content) %>
+            <%= render_social_text(@post.content, class_name: "fc-social-text") %>
           </div>
 
           <% if @post.linked_posts.any? || @post.linking_posts.any? %>

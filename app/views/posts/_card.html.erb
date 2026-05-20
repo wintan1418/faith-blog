@@ -91,21 +91,17 @@
         # Body is clamped to 3 lines by the base .fc-breath-copy rule. Roughly
         # 50 chars per line on the card width, so anything over ~150 chars is
         # very likely to overflow and need a "…more" affordance.
-        likely_overflow = plain_text.length > 150
+        likely_overflow = plain_text.length > 150 || plain_text.lines.size > 3
       %>
       <div class="fc-breath-body" data-controller="expand-text scripture">
         <% if post.display_title %>
           <%= link_to post.display_title, post_path(post), class: "fc-breath-title hover:text-[var(--fc-accent)]" %>
         <% end %>
-        <%
-          # Collapse soft single newlines into spaces so pasted text flows
-          # naturally; keep double newlines as paragraph breaks (rendered
-          # via white-space: pre-wrap below — no <p> tags inside the
-          # -webkit-box line-clamp, which would wrap unpredictably).
-          card_text = plain_text.gsub(/(?<!\n)\n(?!\n)/, " ").gsub(/[ \t]+/, " ").strip
-        %>
-        <div class="fc-breath-copy<%= ' is-untitled' unless post.display_title %>"
-             data-expand-text-target="copy"><%= card_text %></div>
+        <%= render_social_card_text(
+              post.content,
+              class_name: "fc-breath-copy#{' is-untitled' unless post.display_title}",
+              data: { expand_text_target: "copy" }
+            ) %>
         <% if likely_overflow %>
           <button type="button"
                   class="fc-breath-readmore"
