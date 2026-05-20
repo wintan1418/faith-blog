@@ -9,8 +9,8 @@ class FeedController < ApplicationController
   PER_PAGE        = 20
 
   def index
-    posts    = Post.published.includes(:user, :room, :tags, { likes: :user }).recent.limit(POSTS_BUFFER)
-    reshares = Reshare.includes(:user, post: [ :user, :room, :tags, { likes: :user } ])
+    posts    = feed_posts_scope.recent.limit(POSTS_BUFFER)
+    reshares = Reshare.includes(:user, post: feed_post_includes)
                       .order(created_at: :desc)
                       .limit(RESHARES_BUFFER)
 
@@ -21,7 +21,7 @@ class FeedController < ApplicationController
   def threads
     posts = Post.published
                 .threads_or_active
-                .includes(:user, :room, :tags, { likes: :user })
+                .includes(feed_post_includes)
                 .recent
                 .limit(POSTS_BUFFER)
 
@@ -30,8 +30,7 @@ class FeedController < ApplicationController
   end
 
   def trending
-    posts = Post.published
-                .includes(:user, :room, :tags, { likes: :user })
+    posts = feed_posts_scope
                 .where("published_at > ?", 7.days.ago)
                 .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
                 .limit(POSTS_BUFFER)
@@ -43,12 +42,11 @@ class FeedController < ApplicationController
   def following
     followed_user_ids = current_user.following.pluck(:id)
 
-    posts    = Post.published
-                   .includes(:user, :room, :tags, { likes: :user })
+    posts    = feed_posts_scope
                    .where(user_id: followed_user_ids)
                    .recent
                    .limit(POSTS_BUFFER)
-    reshares = Reshare.includes(:user, post: [ :user, :room, :tags, { likes: :user } ])
+    reshares = Reshare.includes(:user, post: feed_post_includes)
                       .where(user_id: followed_user_ids)
                       .order(created_at: :desc)
                       .limit(RESHARES_BUFFER)
@@ -58,6 +56,14 @@ class FeedController < ApplicationController
   end
 
   private
+
+  def feed_posts_scope
+    Post.published.includes(feed_post_includes)
+  end
+
+  def feed_post_includes
+    [ :user, :room, :tags, :rich_text_content, { likes: :user } ]
+  end
 
   def respond_to_feed
     respond_to do |format|

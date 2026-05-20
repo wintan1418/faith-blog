@@ -11352,7 +11352,8 @@ body.fc-lightbox-open { overflow: hidden; }
   overflow: hidden;
   white-space: normal;
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .fc-breath-media {
@@ -11773,7 +11774,8 @@ turbo-frame.fc-breath-thread:not([complete]):empty {
   color: var(--fc-soft);
   line-height: 1.45;
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .fc-inline-comment-actions {
@@ -12477,7 +12479,8 @@ form.inline {
   font-size: 0.95rem;
   line-height: 1.55;
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .fc-comment-body p { margin: 0.25rem 0; }
@@ -12877,13 +12880,15 @@ html.dark nav.post-toc {
   margin-inline: auto;
   font-variation-settings: "opsz" 12;
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .fc-social-text,
 .fc-social-text p {
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 
 .fc-social-text p { margin: 0 0 0.75em; }

@@ -78,12 +78,12 @@ module MentionsHelper
 
     line.to_enum(:scan, SOCIAL_TOKEN_REGEX).each do
       match = Regexp.last_match
-      nodes << h(line[cursor...match.begin(0)]) if match.begin(0) > cursor
+      nodes << escape_social_text(line[cursor...match.begin(0)]) if match.begin(0) > cursor
       nodes.concat social_token_nodes(match[0], users_by_username)
       cursor = match.end(0)
     end
 
-    nodes << h(line[cursor..]) if cursor < line.length
+    nodes << escape_social_text(line[cursor..]) if cursor < line.length
     nodes
   end
 
@@ -112,7 +112,7 @@ module MentionsHelper
       tag.span("@all", class: "mention-broadcast mention-broadcast-platform", data: { scope: "platform" })
     else
       user = users_by_username[handle.downcase]
-      return h(token) unless user
+      return escape_social_text(token) unless user
 
       link_to("@#{user.username}", user_path(user.username), class: "mention-link")
     end
@@ -128,7 +128,11 @@ module MentionsHelper
 
     [
       link_to(url, url, class: "fc-social-link", target: "_blank", rel: "noopener noreferrer"),
-      h(trailing)
+      escape_social_text(trailing)
     ]
+  end
+
+  def escape_social_text(text)
+    ERB::Util.html_escape(text.to_s)
   end
 end

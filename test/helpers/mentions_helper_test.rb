@@ -24,4 +24,12 @@ class MentionsHelperTest < ActionView::TestCase
     refute_includes html, "<script>"
     assert_includes html, "&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt;<br>plain"
   end
+
+  test "renders feed card text without block paragraphs" do
+    html = render_social_card_text("First line\nsame paragraph\n\nNext paragraph", class_name: "fc-breath-copy")
+
+    assert_includes html, %(class="fc-breath-copy")
+    refute_includes html, "<p"
+    assert_includes html, "First line<br>same paragraph<br><br>Next paragraph"
+  end
 end
