@@ -114,6 +114,10 @@
         <%= render "posts/voice_note", post: post %>
       <% end %>
 
+      <% if post.quote_repost? %>
+        <%= render "posts/embedded_quote", quoted: post.quoted_post %>
+      <% end %>
+
       <% if post.has_images? %>
         <%
           imgs = post.images.first(4)

@@ -8697,61 +8697,9 @@ html.theme-dark .fc-held-banner {
   margin-top: 1px;
 }
 
-.fc-repost-composer {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 0;
-  z-index: 50;
-  width: min(360px, calc(100vw - 24px));
-  padding: 0.65rem;
-  background: var(--fc-surface);
-  border: 1px solid var(--fc-line-strong);
-  border-radius: 14px;
-  box-shadow: 0 22px 50px -12px rgba(0, 0, 0, 0.45);
-  animation: fc-emoji-pop 160ms ease-out;
-}
-.fc-repost-composer.hidden { display: none !important; }
-
-.fc-repost-thought {
-  width: 100%;
-  min-height: 80px;
-  resize: vertical;
-  border: 1px solid var(--fc-line);
-  background: var(--fc-bg);
-  border-radius: 10px;
-  padding: 0.55rem 0.7rem;
-  font-size: 0.9rem;
-  color: var(--fc-ink);
-  font-family: inherit;
-}
-.fc-repost-thought:focus {
-  outline: none;
-  border-color: var(--fc-accent);
-}
-
-.fc-repost-composer-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.55rem;
-}
-.fc-repost-composer-buttons {
-  display: flex;
-  gap: 0.4rem;
-}
-.fc-repost-count {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--fc-muted);
-}
-.fc-repost-count.is-near { color: var(--fc-warning); }
-
-/* On phones, pin both the menu and composer to viewport so they
-   never get clipped by the card edge. */
+/* On phones, pin the menu to viewport so it never gets clipped by the card edge. */
 @media (max-width: 640px) {
-  .fc-repost-menu,
-  .fc-repost-composer {
+  .fc-repost-menu {
     position: fixed;
     left: 12px;
     right: 12px;
@@ -8761,9 +8709,137 @@ html.theme-dark .fc-held-banner {
     min-width: 0;
     max-width: none;
   }
-  .fc-repost-thought {
-    font-size: 16px; /* prevent iOS zoom */
-  }
+}
+
+/* ── Embedded quoted post (quote-repost preview) ── */
+.fc-embedded-quote {
+  display: block;
+  margin-top: 0.65rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  background: var(--fc-surface-elev, var(--fc-surface));
+  color: var(--fc-ink);
+  text-decoration: none;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.fc-embedded-quote:hover {
+  background: var(--fc-accent-soft);
+  border-color: var(--fc-line-strong);
+}
+.fc-embedded-quote.is-missing,
+.fc-embedded-quote.is-held {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--fc-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  cursor: default;
+  pointer-events: none;
+}
+.fc-embedded-quote.is-preview {
+  cursor: default;
+  pointer-events: none;
+  background: var(--fc-surface);
+}
+
+.fc-embedded-quote-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--fc-muted);
+  min-width: 0;
+}
+.fc-embedded-quote-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-strong, var(--fc-accent));
+  font-weight: 800;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.fc-embedded-quote-name {
+  font-weight: 700;
+  color: var(--fc-ink);
+  font-size: 0.86rem;
+}
+.fc-embedded-quote-handle,
+.fc-embedded-quote-dot,
+.fc-embedded-quote-time {
+  font-size: 0.78rem;
+  color: var(--fc-muted);
+}
+.fc-embedded-quote-title {
+  margin: 0.4rem 0 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--fc-ink);
+  line-height: 1.3;
+}
+.fc-embedded-quote-body {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--fc-ink-soft, var(--fc-ink));
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fc-embedded-quote-media {
+  margin-top: 0.45rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.fc-embedded-quote-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent-strong, var(--fc-accent));
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+/* Composer "Quoting" affordance — sits between the editor and the footer. */
+.fc-composer-quote {
+  margin: 0.6rem 1rem 0;
+}
+.fc-composer-quote-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fc-muted);
+  margin-bottom: 0.3rem;
+}
+
+/* The standalone embedded-quote container on /posts/:id (post show page). */
+.post-embedded-quote {
+  margin-top: 1rem;
+}
+
+/* "You can't reshare your own breath" — same look as fc-action but inert. */
+.fc-action.is-muted {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .fc-snapshot-overlay {

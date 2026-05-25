@@ -24,10 +24,12 @@ class PostsController < ApplicationController
   def new
     @post = current_user.posts.build
     @rooms = Room.public_rooms.ordered
+    preload_quoted_post(params[:quote])
   end
 
   def create
     @post = current_user.posts.build(post_params)
+    sanitize_quoted_post!(@post)
 
     if scheduled_in_future?(@post)
       @post.status = :scheduled
@@ -183,7 +185,32 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, :voice_note, :voice_duration_ms, images: [])
+    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, :voice_note, :voice_duration_ms, :quoted_post_id, images: [])
+  end
+
+  # Resolve ?quote=ID for the new-post flow. Only accept posts the viewer is
+  # actually allowed to see (drops held / blocked posts silently) and refuse
+  # quoting your own breath — that's just a thread, not a quote-repost.
+  def preload_quoted_post(id)
+    return unless id.present?
+
+    candidate = Post.friendly.find_by(slug: id) || Post.find_by(id: id)
+    return unless candidate
+    return unless candidate.visible_to?(current_user)
+    return if candidate.user_id == current_user.id
+
+    @post.quoted_post = candidate
+  end
+
+  # Defence-in-depth at submit time: only allow saving a quoted_post_id that
+  # the viewer can actually see and that isn't their own post.
+  def sanitize_quoted_post!(post)
+    return unless post.quoted_post_id.present?
+
+    target = Post.find_by(id: post.quoted_post_id)
+    if target.nil? || !target.visible_to?(current_user) || target.user_id == current_user.id
+      post.quoted_post_id = nil
+    end
   end
 
   def scheduled_in_future?(post)

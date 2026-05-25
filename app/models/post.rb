@@ -56,6 +56,10 @@ class Post < ApplicationRecord
     kind_thread? || comments_count.to_i > 0
   end
 
+  def quote_repost?
+    quoted_post_id.present?
+  end
+
   # Associations
   belongs_to :user
   belongs_to :room, counter_cache: :posts_count, optional: true
@@ -69,6 +73,17 @@ class Post < ApplicationRecord
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_one  :ai_moderation_review, as: :reviewable, dependent: :destroy
+
+  # Quote-repost: a post can quote another post (Twitter-style quote tweet).
+  # When the original is deleted, FK on_delete: :nullify keeps the quoting
+  # post around but drops the embed.
+  belongs_to :quoted_post, class_name: "Post", optional: true
+  has_many :quoting_posts, class_name: "Post", foreign_key: :quoted_post_id, dependent: :nullify
+
+  validate :cannot_quote_self
+  after_create  :bump_quoted_reshares_count, if: -> { quoted_post_id.present? }
+  after_create  :notify_quoted_post_author,  if: -> { quoted_post_id.present? }
+  after_destroy :drop_quoted_reshares_count, if: -> { quoted_post_id.present? }
 
   # Post linking (outbound = posts this links TO, inbound = posts that link TO this)
   has_many :outbound_links, class_name: "PostLink", foreign_key: :source_post_id, dependent: :destroy
@@ -216,6 +231,36 @@ class Post < ApplicationRecord
     if images.attached? && images.count > 5
       errors.add(:images, "cannot exceed 5 images per post")
     end
+  end
+
+  def cannot_quote_self
+    return unless quoted_post_id.present? && quoted_post_id == id
+    errors.add(:quoted_post_id, "can't be itself")
+  end
+
+  def bump_quoted_reshares_count
+    Post.where(id: quoted_post_id).update_all("reshares_count = COALESCE(reshares_count, 0) + 1")
+  end
+
+  def drop_quoted_reshares_count
+    Post.where(id: quoted_post_id)
+        .where("reshares_count > 0")
+        .update_all("reshares_count = reshares_count - 1")
+  end
+
+  def notify_quoted_post_author
+    target = quoted_post
+    return unless target
+    return if target.user_id == user_id
+
+    Notification.create(
+      user: target.user,
+      actor: user,
+      notifiable: self,
+      notification_type: :post_reshared
+    )
+  rescue StandardError => e
+    Rails.logger.warn "[quote-notification] failed for post #{id}: #{e.message}"
   end
 
   def voice_note_size_and_duration

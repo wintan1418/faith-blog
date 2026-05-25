@@ -1,11 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Controls the Repost dropdown (Quick repost vs Repost with thought)
-// and the inline composer that lets the user attach a short note
-// before resharing. Closes on outside click + Escape.
+// Controls the Repost dropdown (Quick repost vs Quote). The Quote option
+// is a regular link — it navigates to /posts/new?quote=ID where the full
+// composer opens with the original post embedded as a preview.
+// Closes on outside click + Escape.
 export default class extends Controller {
-  static targets = ["trigger", "menu", "composer", "thought", "count"]
-  static values  = { max: { type: Number, default: 280 } }
+  static targets = ["trigger", "menu"]
 
   connect() {
     this.boundOutside = this.outsideClick.bind(this)
@@ -28,7 +28,6 @@ export default class extends Controller {
   }
 
   openMenu() {
-    this.composerTarget.classList.add("hidden")
     this.menuTarget.classList.remove("hidden")
     this.triggerTarget?.setAttribute("aria-expanded", "true")
     setTimeout(() => {
@@ -37,22 +36,8 @@ export default class extends Controller {
     }, 0)
   }
 
-  openComposer(event) {
-    event?.preventDefault()
-    this.menuTarget.classList.add("hidden")
-    this.composerTarget.classList.remove("hidden")
-    this.updateCount()
-    setTimeout(() => this.thoughtTarget?.focus(), 50)
-  }
-
-  cancel(event) {
-    event?.preventDefault()
-    this.closeAll()
-  }
-
   closeAll() {
     this.menuTarget.classList.add("hidden")
-    this.composerTarget.classList.add("hidden")
     this.triggerTarget?.setAttribute("aria-expanded", "false")
     document.removeEventListener("mousedown", this.boundOutside, true)
     document.removeEventListener("keydown", this.boundEsc)
@@ -64,12 +49,5 @@ export default class extends Controller {
 
   onEsc(event) {
     if (event.key === "Escape") this.closeAll()
-  }
-
-  updateCount() {
-    if (!this.hasCountTarget || !this.hasThoughtTarget) return
-    const n = this.thoughtTarget.value.length
-    this.countTarget.textContent = `${n} / ${this.maxValue}`
-    this.countTarget.classList.toggle("is-near", n >= this.maxValue - 30)
   }
 }

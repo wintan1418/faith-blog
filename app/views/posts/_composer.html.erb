@@ -41,6 +41,9 @@
   </div>
 
   <%= f.hidden_field :kind, value: mode, data: { composer_mode_target: "kindField" } %>
+  <% if post.quoted_post.present? %>
+    <%= f.hidden_field :quoted_post_id %>
+  <% end %>
 
   <div class="fc-composer-head">
     <% if current_user.profile&.avatar&.attached? %>
@@ -235,6 +238,16 @@
   </div>
 
   <div id="image-previews" class="fc-composer-previews hidden" data-post-form-target="previews"></div>
+
+  <% if post.quoted_post.present? %>
+    <div class="fc-composer-quote">
+      <span class="fc-composer-quote-label">
+        <%= render_icon("repeat", classes: "h-3.5 w-3.5") %>
+        Quoting
+      </span>
+      <%= render "posts/embedded_quote", quoted: post.quoted_post, variant: :composer %>
+    </div>
+  <% end %>
 
   <div class="fc-composer-footer">
     <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>

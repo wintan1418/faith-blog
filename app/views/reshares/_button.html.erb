@@ -1,6 +1,6 @@
 <%# Reshare control. Two flavors:
-    - Quick repost (one click)
-    - Repost with thought (opens an inline composer)
+    - Quick repost (one click — creates a Reshare row)
+    - Quote — opens the full composer with this post embedded.
     Locals: post %>
 <% if user_signed_in? && current_user.has_reshared?(post) %>
   <span id="<%= dom_id(post, :reshare) %>">
@@ -12,6 +12,12 @@
       <%= render_icon("repeat", classes: "h-4 w-4") %>
       <%= post.reshares_count %>
     <% end %>
+  </span>
+<% elsif user_signed_in? && post.user == current_user %>
+  <%# You can't reshare your own post, but the count still belongs in the action row. %>
+  <span class="fc-action is-muted" id="<%= dom_id(post, :reshare) %>" title="You can't reshare your own breath">
+    <%= render_icon("repeat", classes: "h-4 w-4") %>
+    <%= post.reshares_count %>
   </span>
 <% elsif user_signed_in? %>
   <div class="fc-repost" id="<%= dom_id(post, :reshare) %>" data-controller="repost-menu">
@@ -39,35 +45,13 @@
         </div>
       <% end %>
 
-      <button type="button"
-              class="fc-repost-option"
-              data-action="click->repost-menu#openComposer"
-              role="menuitem">
+      <%= link_to new_post_path(quote: post.id),
+          class: "fc-repost-option",
+          role: "menuitem" do %>
         <%= render_icon("edit", classes: "h-4 w-4") %>
         <div class="fc-repost-option-text">
-          <strong>Repost with thought</strong>
-          <span>Add a note before sharing.</span>
-        </div>
-      </button>
-    </div>
-
-    <div class="fc-repost-composer hidden" data-repost-menu-target="composer">
-      <%= form_with url: post_reshare_path(post), method: :post, local: true,
-                    data: { turbo_frame: "_top" } do |f| %>
-        <%= f.text_area :thought,
-            class: "fc-repost-thought",
-            rows: 3,
-            maxlength: 280,
-            placeholder: "What's your thought on this breath? (optional)",
-            data: { repost_menu_target: "thought", action: "input->repost-menu#updateCount" } %>
-        <div class="fc-repost-composer-actions">
-          <span class="fc-repost-count" data-repost-menu-target="count">0 / 280</span>
-          <div class="fc-repost-composer-buttons">
-            <button type="button"
-                    class="fc-btn"
-                    data-action="click->repost-menu#cancel">Cancel</button>
-            <%= f.submit "Repost", class: "fc-btn fc-btn-primary" %>
-          </div>
+          <strong>Quote</strong>
+          <span>Write your own breath with this one embedded.</span>
         </div>
       <% end %>
     </div>

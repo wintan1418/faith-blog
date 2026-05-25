@@ -54,6 +54,12 @@
             <%= render_social_text(@post.content, class_name: "fc-social-text") %>
           </div>
 
+          <% if @post.quote_repost? %>
+            <div class="post-embedded-quote">
+              <%= render "posts/embedded_quote", quoted: @post.quoted_post %>
+            </div>
+          <% end %>
+
           <% if @post.linked_posts.any? || @post.linking_posts.any? %>
             <div class="post-linked">
               <% if @post.linked_posts.any? %>

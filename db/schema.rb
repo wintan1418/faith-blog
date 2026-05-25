@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_15_170000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_25_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -432,11 +432,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_15_170000) do
     t.integer "moderation_status", default: 0, null: false
     t.string "moderation_blocked_reason", limit: 280
     t.integer "voice_duration_ms"
+    t.bigint "quoted_post_id"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
     t.index ["moderation_status"], name: "index_posts_on_moderation_status"
     t.index ["prayer_status"], name: "index_posts_on_prayer_status"
     t.index ["published_at"], name: "index_posts_on_published_at"
+    t.index ["quoted_post_id"], name: "index_posts_on_quoted_post_id"
     t.index ["room_id", "status", "published_at"], name: "index_posts_on_room_id_and_status_and_published_at"
     t.index ["room_id"], name: "index_posts_on_room_id"
     t.index ["scheduled_for"], name: "index_posts_on_scheduled_for", where: "(scheduled_for IS NOT NULL)"
@@ -709,6 +711,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_15_170000) do
   add_foreign_key "post_links", "posts", column: "target_post_id"
   add_foreign_key "post_tags", "posts"
   add_foreign_key "post_tags", "tags"
+  add_foreign_key "posts", "posts", column: "quoted_post_id", on_delete: :nullify
   add_foreign_key "posts", "rooms"
   add_foreign_key "posts", "users"
   add_foreign_key "prayer_intercessions", "posts"

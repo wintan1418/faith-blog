@@ -1,0 +1,76 @@
+<%#
+  Renders a quoted post inline (Twitter-style quote-tweet embed).
+  Locals:
+    quoted   — the quoted Post, or nil if the original was deleted
+    variant  — optional. Defaults to :card. Use :composer when previewed
+               inside the composer so a "remove" affordance can appear.
+%>
+<% variant = local_assigns.fetch(:variant, :card).to_sym %>
+
+<% if quoted.nil? %>
+  <div class="fc-embedded-quote is-missing">
+    <%= render_icon("repeat", classes: "h-3.5 w-3.5") %>
+    <span>The original breath is no longer available.</span>
+  </div>
+<% elsif !quoted.visible_to?(current_user) %>
+  <div class="fc-embedded-quote is-held">
+    <%= render_icon("shield", classes: "h-3.5 w-3.5") %>
+    <span>This breath is held for moderator review.</span>
+  </div>
+<% else %>
+  <%
+    body_text    = quoted.content.to_plain_text.to_s.strip
+    body_snippet = truncate(body_text, length: 220, separator: " ")
+    has_image    = quoted.has_images?
+    has_voice    = quoted.has_voice_note?
+  %>
+  <%= link_to post_path(quoted),
+              class: "fc-embedded-quote#{variant == :composer ? ' is-preview' : ''}",
+              data: { turbo_frame: "_top" } do %>
+    <header class="fc-embedded-quote-head">
+      <% if quoted.anonymous? %>
+        <span class="fc-embedded-quote-avatar"><%= render_icon("users", classes: "h-3.5 w-3.5") %></span>
+        <span class="fc-embedded-quote-name">Anonymous</span>
+      <% else %>
+        <% if quoted.user.profile&.avatar&.attached? %>
+          <%= image_tag quoted.user.profile.avatar,
+                        class: "fc-embedded-quote-avatar object-cover",
+                        alt: quoted.user.username %>
+        <% else %>
+          <span class="fc-embedded-quote-avatar"
+                style="<%= avatar_tint_style(quoted.user.username) %>">
+            <%= quoted.user.username.first.upcase %>
+          </span>
+        <% end %>
+        <span class="fc-embedded-quote-name"><%= quoted.user.display_name %></span>
+        <span class="fc-embedded-quote-handle">@<%= quoted.user.username %></span>
+      <% end %>
+      <span class="fc-embedded-quote-dot">·</span>
+      <span class="fc-embedded-quote-time">
+        <%= time_ago_in_words(quoted.published_at || quoted.created_at) %> ago
+      </span>
+    </header>
+
+    <% if quoted.display_title %>
+      <p class="fc-embedded-quote-title"><%= quoted.display_title %></p>
+    <% end %>
+
+    <% if body_snippet.present? %>
+      <p class="fc-embedded-quote-body"><%= body_snippet %></p>
+    <% end %>
+
+    <% if has_voice || has_image %>
+      <div class="fc-embedded-quote-media">
+        <% if has_voice %>
+          <span class="fc-embedded-quote-badge">🎙️ Voice note</span>
+        <% end %>
+        <% if has_image %>
+          <span class="fc-embedded-quote-badge">
+            <%= render_icon("image", classes: "h-3.5 w-3.5") %>
+            <%= pluralize(quoted.images.count, "image") %>
+          </span>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>
