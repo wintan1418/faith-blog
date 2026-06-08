@@ -4,6 +4,7 @@ class Post < ApplicationRecord
   extend FriendlyId
   include PgSearch::Model
   include Mentionable
+  include AttachmentValidatable
 
   friendly_id :slug_source, use: :slugged
 
@@ -19,8 +20,14 @@ class Post < ApplicationRecord
 
   VOICE_MAX_MS    = 90_000
   VOICE_MAX_BYTES = 6.megabytes
+  IMAGE_MAX_BYTES = 10.megabytes
 
   validate :voice_note_size_and_duration
+  validate :images_content_type_and_size
+
+  def images_content_type_and_size
+    validate_image_attachment(:images, max_bytes: IMAGE_MAX_BYTES)
+  end
 
   def has_voice_note?
     voice_note.attached?
@@ -196,6 +203,38 @@ class Post < ApplicationRecord
 
   def feed_visible?
     published? && published_at.present? && published_at <= Time.current && moderation_approved?
+  end
+
+  # Applied by AiModerationGateJob once the async gate has classified a freshly
+  # created post (which is saved as :pending_review so it never reaches the feed
+  # unmoderated). Writes the moderation columns without re-running validations or
+  # the create callbacks, then fires the "released to the feed" side effects when
+  # the post becomes publicly visible. Idempotent — safe to re-run.
+  def apply_moderation_decision!(decision, reason: nil)
+    target = case decision.to_sym
+    when :block then "blocked"
+    when :hold  then "pending_review"
+    else             "approved"
+    end
+    return false if moderation_status == target
+
+    update_columns(
+      moderation_status: self.class.moderation_statuses.fetch(target),
+      moderation_blocked_reason: reason,
+      updated_at: Time.current
+    )
+    self.moderation_status = target # keep the in-memory record consistent
+
+    deliver_after_moderation_release! if feed_visible?
+    true
+  end
+
+  # Fire-once delivery for a post that just became publicly visible: notify
+  # followers, count the streak, and drop the live "new breaths" feed marker.
+  def deliver_after_moderation_release!
+    BreathFanoutJob.perform_later(id)
+    bump_author_streak
+    broadcast_to_public_feed
   end
 
   def held_for_review?

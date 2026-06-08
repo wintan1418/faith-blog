@@ -135,7 +135,12 @@
         <h2>Posts by <%= @user.display_name.presence || @user.username %></h2>
       </div>
 
-      <% if @items.any? %>
+      <% if @profile_private %>
+        <div class="mystic-panel profile-empty-posts p-12 text-center">
+          <h3>This profile is private</h3>
+          <p class="mystic-copy mt-2"><%= @user.display_name.presence || @user.username %> keeps their posts to themselves.</p>
+        </div>
+      <% elsif @items.any? %>
         <div class="space-y-5">
           <% @items.each do |item| %>
             <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>

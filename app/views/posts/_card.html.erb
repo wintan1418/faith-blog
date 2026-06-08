@@ -158,7 +158,7 @@
 
         <% if post.prayer_status_prayer_pending? && user_signed_in? %>
           <% mine = post.user_id == current_user.id %>
-          <% joined = !mine && current_user.prayer_intercessions.where(post_id: post.id).exists? %>
+          <% joined = !mine && joined_prayer_chain?(post) %>
           <% if mine %>
             <%= button_to mark_prayer_answered_post_path(post),
                 method: :post,

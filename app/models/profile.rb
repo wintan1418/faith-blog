@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Profile < ApplicationRecord
+  include AttachmentValidatable
+
+  AVATAR_MAX_BYTES = 10.megabytes
+
   # Associations
   belongs_to :user
   has_one_attached :avatar
@@ -10,6 +14,11 @@ class Profile < ApplicationRecord
   validates :location, length: { maximum: 100 }
   validates :faith_background, length: { maximum: 200 }
   validates :website, length: { maximum: 255 }
+  validate  :avatar_content_type_and_size
+
+  def avatar_content_type_and_size
+    validate_image_attachment(:avatar, max_bytes: AVATAR_MAX_BYTES)
+  end
 
   # Avatar variant helpers
   def avatar_thumbnail

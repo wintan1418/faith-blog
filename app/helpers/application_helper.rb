@@ -19,6 +19,16 @@ module ApplicationHelper
     "--fc-avatar-bg: hsl(#{hue} 42% 72%); --fc-avatar-fg: hsl(#{hue} 55% 18%);"
   end
 
+  # Whether the signed-in user has joined a post's prayer chain. The set of
+  # post ids the user interceded on is loaded once per request and memoized, so
+  # rendering a feed of prayer cards is a single query instead of one per card.
+  def joined_prayer_chain?(post)
+    return false unless user_signed_in?
+
+    @joined_prayer_post_ids ||= current_user.prayer_intercessions.pluck(:post_id).to_set
+    @joined_prayer_post_ids.include?(post.id)
+  end
+
   def preview_for(reviewable)
     case reviewable
     when Post
