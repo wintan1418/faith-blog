@@ -37,7 +37,19 @@ class Comment < ApplicationRecord
 
   # Instance methods
   def soft_delete!
-    update(deleted_at: Time.current)
+    return if deleted?
+
+    transaction do
+      update!(deleted_at: Time.current)
+      # Soft-delete bypasses counter_cache (it only fires on destroy), so the
+      # post's comments_count and parent's replies_count would drift high as
+      # deleted comments accumulate. Keep them in sync with the .active scope
+      # used for display.
+      Post.where(id: post_id).update_all("comments_count = GREATEST(comments_count - 1, 0)")
+      if parent_comment_id
+        Comment.where(id: parent_comment_id).update_all("replies_count = GREATEST(replies_count - 1, 0)")
+      end
+    end
     content.update(body: "[This comment has been deleted]") if content.present?
   end
 

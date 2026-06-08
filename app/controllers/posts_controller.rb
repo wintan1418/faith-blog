@@ -36,16 +36,18 @@ class PostsController < ApplicationController
       @post.published_at = nil
     end
 
-    verdict = run_post_gatekeeper(@post)
-    apply_moderation_verdict(@post, verdict)
+    # Published posts are saved as :pending_review and classified off the request
+    # path by AiModerationGateJob — the author sees their breath immediately, the
+    # rest of the community sees it once the gate clears (usually a second or two).
+    # Drafts and scheduled posts skip the gate; scheduled posts are classified by
+    # ScheduledPostPublisherJob when they actually publish.
+    needs_gate = @post.published?
+    @post.moderation_status = needs_gate ? :pending_review : :approved
 
     if @post.save
       handle_post_links
-      verdict.persist_review!(@post)
-      notify_author_of_moderation(@post, verdict) unless verdict.allow?
-      redirect_to redirect_target_after_create(@post, verdict),
-                  notice: flash_notice_for(verdict, post: @post),
-                  alert:  flash_alert_for(verdict)
+      AiModerationGateJob.perform_later(@post.id) if needs_gate
+      redirect_to redirect_target_after_create(@post), notice: flash_notice_for(@post)
     else
       @rooms = Room.public_rooms.ordered
       render :new, status: :unprocessable_entity
@@ -241,64 +243,20 @@ class PostsController < ApplicationController
     end
   end
 
-  # Synchronous AI gate. Returns a Verdict; never raises (fail-open inside).
-  # Drafts and scheduled posts skip the gate — scheduled posts get classified
-  # later when ScheduledPostPublisherJob actually publishes them.
-  def run_post_gatekeeper(post)
-    return Ai::Moderation::PostGatekeeper::Verdict.new(decision: :allow, result: nil) if post.draft? || post.scheduled?
-
-    Ai::Moderation::PostGatekeeper.call(post: post)
-  end
-
-  def apply_moderation_verdict(post, verdict)
-    case verdict.decision
-    when :block
-      post.moderation_status = :blocked
-      post.moderation_blocked_reason = verdict.reason
-    when :hold
-      post.moderation_status = :pending_review
-      post.moderation_blocked_reason = verdict.reason
-    else
-      post.moderation_status = :approved
-    end
-  end
-
-  def notify_author_of_moderation(post, verdict)
-    type = verdict.block? ? :post_blocked : :post_held_for_review
-    Notification.create(
-      user: post.user,
-      actor: post.user,
-      notifiable: post,
-      notification_type: type
-    )
-  rescue StandardError => e
-    Rails.logger.warn("[ModerationNotify] #{e.class}: #{e.message}")
-  end
-
-  def redirect_target_after_create(post, verdict)
-    return feed_path if verdict.block?
+  def redirect_target_after_create(post)
     return drafts_path if post.draft?
 
     post
   end
 
-  def flash_notice_for(verdict, post: nil)
-    return "Draft saved — find it under Drafts when you're ready to come back." if post&.draft?
+  def flash_notice_for(post)
+    return "Draft saved — find it under Drafts when you're ready to come back." if post.draft?
 
-    if post&.scheduled?
+    if post.scheduled?
       return "Scheduled for #{post.scheduled_for.in_time_zone.strftime("%a %b %-d, %l:%M %p")}."
     end
 
-    case verdict.decision
-    when :hold then "Your post is held for a moderator to take a look — we do this for delicate topics so we can support the conversation well."
-    when :allow then "Posted."
-    end
-  end
-
-  def flash_alert_for(verdict)
-    return nil unless verdict.block?
-
-    "We couldn't publish this — it looks like it crosses our community guidelines. If you believe this is wrong, reply to this message and we'll review."
+    "Posted."
   end
 
   # New accounts that have been flagged once or more get rate-limited:

@@ -6,7 +6,8 @@ class BreathFanoutJob < ApplicationJob
 
   def perform(post_id)
     post = Post.find_by(id: post_id)
-    return unless post && post.published? && post.user_id
+    # Defensive: never fan out a post that isn't publicly visible (held/blocked).
+    return unless post && post.published? && post.moderation_approved? && post.user_id
 
     author = post.user
     follower_ids = author.followers.pluck(:id)

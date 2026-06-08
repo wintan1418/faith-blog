@@ -22,6 +22,15 @@ class UsersController < ApplicationController
   end
 
   def show
+    @profile_private = !profile_visible_to_viewer?(@user)
+
+    if @profile_private
+      @items = []
+      @pagy, @items = pagy_array(@items, items: 20)
+      @posts = []
+      return
+    end
+
     posts    = @user.posts.published.includes(:room, :tags).recent.limit(60)
     reshares = Reshare.where(user: @user).includes(post: [ :user, :room, :tags ])
                       .order(created_at: :desc).limit(60)
@@ -31,7 +40,9 @@ class UsersController < ApplicationController
   end
 
   def posts
-    @pagy, @posts = pagy(@user.posts.published.includes(:room, :tags).recent)
+    @profile_private = !profile_visible_to_viewer?(@user)
+    scope = @profile_private ? @user.posts.none : @user.posts.published
+    @pagy, @posts = pagy(scope.includes(:room, :tags).recent)
     render :show
   end
 
@@ -112,5 +123,14 @@ class UsersController < ApplicationController
 
   def set_user
     @user = User.find_by!(username: params[:username])
+  end
+
+  # A private profile (public_profile = false) hides its posts from everyone
+  # except the owner and admins/moderators.
+  def profile_visible_to_viewer?(user)
+    return true if user.profile&.public_profile? != false
+    return false unless user_signed_in?
+
+    current_user == user || current_user.admin_or_moderator?
   end
 end

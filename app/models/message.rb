@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 class Message < ApplicationRecord
+  include AttachmentValidatable
+
   MAX_IMAGES = 4
+  IMAGE_MAX_BYTES = 10.megabytes
+  VOICE_MAX_BYTES = 6.megabytes
 
   belongs_to :conversation
   belongs_to :sender, class_name: "User"
@@ -22,6 +26,12 @@ class Message < ApplicationRecord
   validate  :sender_is_participant
   validate  :sender_is_not_blocked
   validate  :max_images_count
+  validate  :attachments_content_type_and_size
+
+  def attachments_content_type_and_size
+    validate_image_attachment(:images, max_bytes: IMAGE_MAX_BYTES)
+    validate_audio_attachment(:voice_note, max_bytes: VOICE_MAX_BYTES)
+  end
 
   def has_attachments?
     (images.respond_to?(:attached?) && images.attached?) ||

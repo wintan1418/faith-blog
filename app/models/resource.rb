@@ -16,12 +16,31 @@ class Resource < ApplicationRecord
   has_one_attached :file
   has_many :reports, as: :reportable, dependent: :destroy
 
+  FILE_MAX_BYTES = 25.megabytes
+  FILE_CONTENT_TYPES = %w[
+    application/pdf
+    audio/mpeg audio/mp3 audio/mp4 audio/aac audio/wav audio/ogg audio/webm audio/x-m4a
+    image/jpeg image/png image/webp
+  ].freeze
+
   # Validations
   validates :title, presence: true, length: { maximum: 200 }
   validates :description, length: { maximum: 1000 }
   validates :url, presence: true, if: -> { link? || video? }
   validates :file, presence: true, if: -> { pdf? || audio? }
   validates :slug, presence: true, uniqueness: true
+  validate  :file_content_type_and_size
+
+  def file_content_type_and_size
+    return unless file.attached? && file.blob
+
+    if file.blob.content_type.present? && FILE_CONTENT_TYPES.exclude?(file.blob.content_type)
+      errors.add(:file, "must be a PDF, audio, or image file")
+    end
+    if file.blob.byte_size.to_i > FILE_MAX_BYTES
+      errors.add(:file, "is too large (max #{FILE_MAX_BYTES / 1.megabyte}MB)")
+    end
+  end
 
   # Search
   pg_search_scope :search,
