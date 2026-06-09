@@ -1,0 +1,37 @@
+<%# Reaction summary strip — the emoji pills sit ABOVE the action bar (LinkedIn /
+    X style) so the bar itself stays a clean row of evenly-divided buttons. Tap a
+    pill you own to remove it. Local: post %>
+<%
+  loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
+  user_like    = user_signed_in? ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
+  emoji_groups = loaded_likes
+                   .reject { |l| l.reaction_emoji.to_s.empty? }
+                   .group_by(&:reaction_emoji)
+                   .sort_by { |_, likes| -likes.size }
+                   .first(6)
+%>
+<div class="fc-react-summary<%= ' is-empty' if emoji_groups.empty? %>" id="<%= dom_id(post, :reaction_summary) %>">
+  <% emoji_groups.each do |emoji, group| %>
+    <% mine = user_like&.display_emoji == emoji %>
+    <% tip = reactor_names_label(group) %>
+    <% if mine %>
+      <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
+          method: :delete,
+          form_class: "inline",
+          class: "fc-reaction-pill is-mine",
+          title: "Remove your reaction" do %>
+        <span class="fc-reaction-emoji"><%= emoji %></span>
+        <span class="fc-reaction-count"><%= group.size %></span>
+        <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
+      <% end %>
+    <% else %>
+      <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_emoji: emoji),
+          form_class: "inline",
+          class: "fc-reaction-pill" do %>
+        <span class="fc-reaction-emoji"><%= emoji %></span>
+        <span class="fc-reaction-count"><%= group.size %></span>
+        <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

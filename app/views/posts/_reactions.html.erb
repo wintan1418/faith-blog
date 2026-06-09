@@ -1,63 +1,30 @@
+<%# React button — one clean segment in the action bar (LinkedIn "Like" / X
+    like). Tap to open the emoji picker; your current reaction shows on the
+    button and as a pill in the summary strip above (tap the pill to remove).
+    Local: post %>
 <%
-  # Feed preloads `likes: :user`; the like turbo_stream re-render does not,
-  # so fall back to an eager include when the association isn't loaded.
   loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
   user_like    = user_signed_in? ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
-  emoji_groups = loaded_likes
-                   .reject { |l| l.reaction_emoji.to_s.empty? }
-                   .group_by(&:reaction_emoji)
-                   .sort_by { |_, likes| -likes.size }
-                   .first(4)
 %>
-
 <div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions"
      data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
      data-emoji-reactions-token-value="<%= form_authenticity_token %>">
-  <% emoji_groups.each do |emoji, group| %>
-    <% mine = user_like&.display_emoji == emoji %>
-    <% tip = reactor_names_label(group) %>
-    <% if mine %>
-      <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
-          method: :delete,
-          form_class: "inline",
-          class: "fc-reaction-pill is-mine",
-          title: "Remove your reaction" do %>
-        <span class="fc-reaction-emoji"><%= emoji %></span>
-        <span class="fc-reaction-count"><%= group.size %></span>
-        <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
-      <% end %>
-    <% else %>
-      <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_emoji: emoji),
-          form_class: "inline",
-          class: "fc-reaction-pill" do %>
-        <span class="fc-reaction-emoji"><%= emoji %></span>
-        <span class="fc-reaction-count"><%= group.size %></span>
-        <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
-      <% end %>
-    <% end %>
-  <% end %>
-
   <% if user_signed_in? %>
-    <% if emoji_groups.empty? && user_like.nil? %>
-      <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_emoji: "🙏"),
-          form_class: "inline",
-          class: "fc-reaction-add",
-          title: "Amen" do %>
-        <span class="fc-reaction-emoji">🙏</span>
-        <span class="fc-reaction-add-label">Amen</span>
-      <% end %>
-    <% end %>
     <button type="button"
-            class="fc-reaction-add"
+            class="fc-breath-action fc-react-btn<%= ' is-mine' if user_like %>"
             data-action="click->emoji-reactions#toggle"
-            aria-label="Add reaction"
-            title="Add a reaction">
-      <%= render_icon("smile", classes: "h-4 w-4") %>
+            aria-label="React to this breath"
+            title="React">
+      <span class="fc-react-emoji"><%= user_like&.display_emoji || "🙏" %></span>
+      <span class="fc-react-label">React</span>
     </button>
     <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker">
       <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
     </div>
   <% else %>
-    <%= link_to "React", new_user_session_path, class: "fc-reaction-add" %>
+    <%= link_to new_user_session_path, class: "fc-breath-action fc-react-btn", title: "React" do %>
+      <span class="fc-react-emoji">🙏</span>
+      <span class="fc-react-label">React</span>
+    <% end %>
   <% end %>
 </div>
