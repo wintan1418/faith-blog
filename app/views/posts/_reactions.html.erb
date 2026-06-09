@@ -1,7 +1,6 @@
-<%# React button — one clean segment in the action bar (LinkedIn "Like" / X
-    like). Tap to open the emoji picker; your current reaction shows on the
-    button and as a pill in the summary strip above (tap the pill to remove).
-    Local: post %>
+<%# "Like" segment of the action bar (LinkedIn). Tap to open the emoji picker;
+    when you've reacted it shows your emoji and highlights. Count lives in the
+    meta row above. Local: post %>
 <%
   loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
   user_like    = user_signed_in? ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
@@ -13,18 +12,22 @@
     <button type="button"
             class="fc-breath-action fc-react-btn<%= ' is-mine' if user_like %>"
             data-action="click->emoji-reactions#toggle"
-            aria-label="React to this breath"
-            title="React">
-      <span class="fc-react-emoji"><%= user_like&.display_emoji || "🙏" %></span>
-      <span class="fc-react-label">React</span>
+            aria-label="Like this breath"
+            title="Like">
+      <% if user_like %>
+        <span class="fc-react-emoji"><%= user_like.display_emoji %></span>
+      <% else %>
+        <%= render_icon("thumbsup", classes: "h-5 w-5") %>
+      <% end %>
+      <span class="fc-react-label">Like</span>
     </button>
     <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker">
       <emoji-picker style="width: 320px; height: 360px;"></emoji-picker>
     </div>
   <% else %>
-    <%= link_to new_user_session_path, class: "fc-breath-action fc-react-btn", title: "React" do %>
-      <span class="fc-react-emoji">🙏</span>
-      <span class="fc-react-label">React</span>
+    <%= link_to new_user_session_path, class: "fc-breath-action fc-react-btn", title: "Like" do %>
+      <%= render_icon("thumbsup", classes: "h-5 w-5") %>
+      <span class="fc-react-label">Like</span>
     <% end %>
   <% end %>
 </div>

@@ -1,4 +1,4 @@
-<%# Reshare control. Two flavors:
+<%# Repost control (LinkedIn "Repost"). Count lives in the meta row above.
     - Quick repost (one click — creates a Reshare row)
     - Quote — opens the full composer with this post embedded.
     Locals: post %>
@@ -6,30 +6,30 @@
   <span id="<%= dom_id(post, :reshare) %>">
     <%= button_to post_reshare_path(post),
         method: :delete,
-        class: "fc-action text-[var(--fc-gold)]",
-        title: "Remove reshare",
+        class: "fc-breath-action is-mine",
+        title: "Remove repost",
         data: { turbo_frame: "_top" } do %>
-      <%= render_icon("repeat", classes: "h-4 w-4") %>
-      <%= post.reshares_count %>
+      <%= render_icon("repeat", classes: "h-5 w-5") %>
+      <span class="fc-action-label">Repost</span>
     <% end %>
   </span>
 <% elsif user_signed_in? && post.user == current_user %>
-  <%# You can't reshare your own post, but the count still belongs in the action row. %>
-  <span class="fc-action is-muted" id="<%= dom_id(post, :reshare) %>" title="You can't reshare your own breath">
-    <%= render_icon("repeat", classes: "h-4 w-4") %>
-    <%= post.reshares_count %>
+  <%# You can't repost your own post. %>
+  <span class="fc-breath-action is-muted" id="<%= dom_id(post, :reshare) %>" title="You can't repost your own breath">
+    <%= render_icon("repeat", classes: "h-5 w-5") %>
+    <span class="fc-action-label">Repost</span>
   </span>
 <% elsif user_signed_in? %>
   <div class="fc-repost" id="<%= dom_id(post, :reshare) %>" data-controller="repost-menu">
     <button type="button"
-            class="fc-action"
+            class="fc-breath-action"
             data-action="click->repost-menu#toggleMenu"
             data-repost-menu-target="trigger"
             aria-haspopup="true"
             aria-expanded="false"
             title="Repost">
-      <%= render_icon("repeat", classes: "h-4 w-4") %>
-      <%= post.reshares_count %>
+      <%= render_icon("repeat", classes: "h-5 w-5") %>
+      <span class="fc-action-label">Repost</span>
     </button>
 
     <div class="fc-repost-menu hidden" data-repost-menu-target="menu" role="menu">
@@ -58,9 +58,9 @@
   </div>
 <% else %>
   <span id="<%= dom_id(post, :reshare) %>">
-    <%= link_to new_user_session_path, class: "fc-action" do %>
-      <%= render_icon("repeat", classes: "h-4 w-4") %>
-      <%= post.reshares_count %>
+    <%= link_to new_user_session_path, class: "fc-breath-action" do %>
+      <%= render_icon("repeat", classes: "h-5 w-5") %>
+      <span class="fc-action-label">Repost</span>
     <% end %>
   </span>
 <% end %>

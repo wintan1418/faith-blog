@@ -14,11 +14,12 @@
      data-share-accent-value="<%= swatch[:accent] %>"
      data-share-accent-deep-value="<%= swatch[:accent_2] %>">
   <button type="button"
-          class="fc-action"
+          class="fc-breath-action"
           data-action="click->share#toggle"
-          aria-label="Share this breath"
-          title="Share">
-    <%= render_icon("send", classes: "h-4 w-4") %>
+          aria-label="Send this breath"
+          title="Send">
+    <%= render_icon("send", classes: "h-5 w-5") %>
+    <span class="fc-action-label">Send</span>
   </button>
 
   <div data-share-target="menu" class="fc-share-menu hidden" role="menu">
