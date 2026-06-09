@@ -186,15 +186,7 @@
         <% end %>
 
         <div class="fc-breath-actions-end">
-          <%= render "posts/impressions", post: post %>
-          <% if user_signed_in? %>
-            <%= render "posts/bookmark_button", post: post %>
-            <% unless post.user == current_user %>
-              <%= render "reports/button", reportable: post, label: "Report" %>
-            <% end %>
-          <% else %>
-            <%= render "posts/bookmark_button", post: post %>
-          <% end %>
+          <%= render "posts/overflow_menu", post: post %>
         </div>
       </footer>
 
