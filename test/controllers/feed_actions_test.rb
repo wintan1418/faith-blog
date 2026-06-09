@@ -43,4 +43,29 @@ class FeedActionsTest < ActionDispatch::IntegrationTest
     # And they are no longer rendered directly in the action bar's end cluster.
     assert_select ".fc-breath-actions-end > form", false
   end
+
+  test "feed shows the reaction summary strip and a single React button" do
+    sign_in @reader
+    get feed_path
+    assert_response :success
+
+    # Pills strip lives above the bar; the bar holds one React button segment.
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@post, :reaction_summary)}.fc-react-summary"
+    assert_select ".fc-breath-actions .fc-reactions .fc-react-btn"
+    # Reply / reshare / share are still present as their own segments.
+    assert_select ".fc-breath-actions .fc-repost"
+    assert_select ".fc-breath-actions .fc-share"
+  end
+
+  test "reacting updates both the React button and the summary strip" do
+    sign_in @reader
+    post likes_path(likeable_type: "Post", likeable_id: @post.id, reaction_emoji: "🙏"),
+         headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_response :success
+
+    summary_id = ActionView::RecordIdentifier.dom_id(@post, :reaction_summary)
+    reactions_id = ActionView::RecordIdentifier.dom_id(@post, :reactions)
+    assert_select "turbo-stream[action='replace'][target='#{summary_id}']"
+    assert_select "turbo-stream[action='replace'][target='#{reactions_id}']"
+  end
 end

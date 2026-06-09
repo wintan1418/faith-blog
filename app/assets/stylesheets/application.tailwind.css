@@ -11704,66 +11704,76 @@ body.fc-lightbox-open { overflow: hidden; }
 }
 .fc-breath-tag:hover { opacity: 1; }
 
-/* Action bar — every control shares one height (--fc-act-h) so the row never
-   wobbles, and the bar wraps gracefully instead of overflowing. When a breath
-   has reaction pills, they're lifted onto their own full-width strip (see the
-   :has() rule below) so growing engagement never shoves the buttons around. */
-.fc-breath-actions {
-  --fc-act-h: 34px;
+/* Reaction summary strip — emoji pills sit ABOVE the action bar (LinkedIn / X),
+   so the bar below stays a clean row of evenly-divided buttons. */
+.fc-react-summary {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
-  gap: 0.15rem 0.2rem;
-  margin-top: 0.6rem;
-  padding-top: 0.55rem;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.65rem;
+}
+.fc-react-summary.is-empty { display: none; }
+
+/* Action bar — LinkedIn / X style: one row of evenly-divided buttons that fill
+   the full width, so it never looks warped to one side or airy. Every top-level
+   control is an equal segment; the clickable inside it fills and centres. */
+.fc-breath-actions {
+  --fc-act-h: 38px;
+  display: flex;
+  align-items: stretch;
+  gap: 0.1rem;
+  margin-top: 0.4rem;
+  padding-top: 0.35rem;
   border-top: 1px solid var(--fc-line);
 }
+.fc-breath-actions > .fc-reactions,
+.fc-breath-actions > .fc-breath-action,
+.fc-breath-actions > .fc-repost,
+.fc-breath-actions > .fc-share,
+.fc-breath-actions > .fc-breath-actions-end {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.fc-breath-actions > .fc-reactions,
+.fc-breath-actions > .fc-repost,
+.fc-breath-actions > .fc-share,
+.fc-breath-actions-end,
+.fc-breath-actions-end .fc-breath-more { display: flex; }
 
-.fc-breath-action {
+.fc-breath-action,
+.fc-breath-actions .fc-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
+  width: 100%;
   height: var(--fc-act-h);
-  padding: 0 0.55rem;
-  border-radius: 9px;
+  min-height: var(--fc-act-h);
+  padding: 0 0.5rem;
+  border-radius: 8px;
   background: transparent;
   border: 0;
   color: var(--fc-muted);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition: background 140ms ease, color 140ms ease;
 }
-.fc-breath-action:hover {
+.fc-breath-action:hover,
+.fc-breath-actions .fc-action:hover {
   background: var(--fc-accent-soft);
   color: var(--fc-accent);
 }
-/* Empty count spans shouldn't reserve a gap — keeps icon-only buttons tight. */
 .fc-breath-action span:empty { display: none; }
+.fc-breath-actions-end { margin-left: 0; }
+.fc-breath-actions-end .fc-breath-more,
+.fc-breath-actions-end .fc-breath-more > .fc-action { width: 100%; }
 
-/* Reactions + the add-reaction control sit at the same height as the buttons. */
-.fc-breath-actions .fc-reactions { align-items: center; min-height: var(--fc-act-h); }
-.fc-breath-actions .fc-reaction-add { height: calc(var(--fc-act-h) - 2px); }
-
-/* Once at least one reaction pill exists, give the whole reactions cluster its
-   own line so the pills can wrap freely above a stable, evenly-laid action row. */
-.fc-breath-actions:has(.fc-reaction-pill) .fc-reactions {
-  flex: 1 1 100%;
-  margin-bottom: 0.1rem;
-}
-
-/* Reshare / share / impressions buttons use .fc-action; align them to the same
-   height as .fc-breath-action so the row sits on one clean baseline. */
-.fc-breath-actions .fc-action { min-height: var(--fc-act-h); height: var(--fc-act-h); }
-
-.fc-breath-actions-end {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.1rem;
-}
+/* React button: emoji + label, highlights when it carries your reaction. */
+.fc-react-btn .fc-react-emoji { font-size: 1.05rem; line-height: 1; }
+.fc-react-btn.is-mine { color: var(--fc-accent); font-weight: 800; }
 
 /* ── Overflow "more" menu (view count / save / report) ──
    Folds the secondary actions behind a single ⋯ trigger so the bar stays
@@ -13668,56 +13678,28 @@ html.dark nav.post-toc {
   }
 
   /* ── Card actions ──
-     One clean, tight line: the primary buttons cluster on the left and the ⋯
-     overflow sits on the right. Reactions lift onto their own strip (base :has
-     rule) so the line never wraps. Verbose labels collapse to icons. */
+     Equal-segment bar fills the width (LinkedIn / X). Just tune sizing for
+     phones and drop the "React" text so segments stay icon-clean. */
   .fc-breath-actions {
-    --fc-act-h: 36px;
-    margin-top: 0.55rem;
-    padding-top: 0.5rem;
+    --fc-act-h: 38px;
+    margin-top: 0.5rem;
+    padding-top: 0.45rem;
     gap: 0.05rem;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    min-width: 0;
   }
-  /* Unify every control height so the baseline never wobbles. */
   .fc-breath-action,
   .fc-breath-actions .fc-action {
-    height: var(--fc-act-h);
-    min-height: var(--fc-act-h);
-    padding: 0 0.4rem;
-    font-size: 0.74rem;
-    gap: 0.25rem;
-    border-radius: 9px;
-    min-width: 0;
+    padding: 0 0.3rem;
+    font-size: 0.78rem;
+    gap: 0.3rem;
   }
   .fc-breath-action svg,
   .fc-breath-actions .fc-action svg {
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
   }
-  /* ⋯ overflow stays pinned to the right of the one-liner. */
-  .fc-breath-actions-end {
-    margin-left: auto;
-    gap: 0.05rem;
-    flex-shrink: 0;
-  }
-  /* Only the ⋯ trigger itself — never the menu rows nested inside it. */
-  .fc-breath-actions-end .fc-breath-more > .fc-action {
-    padding: 0 0.4rem;
-    gap: 0;
-    min-width: var(--fc-act-h);
-    justify-content: center;
-  }
-  /* Hide verbose labels on mobile — icons + counts stay. */
-  .fc-breath-actions .fc-action-label { display: none; }
-  /* A little more room around the reaction pills on their own strip. */
-  .fc-breath-actions:has(.fc-reaction-pill) .fc-reactions {
-    gap: 0.35rem;
-    margin-bottom: 0.3rem;
-  }
-  .fc-breath-actions .fc-reaction-pill { height: 30px; padding: 0 0.6rem; }
+  /* Icon-only segments on phones — the "React" word goes, the emoji stays. */
+  .fc-react-btn .fc-react-label { display: none; }
 
   /* ── Side cards (when visible) ── */
   .fc-side-card {
