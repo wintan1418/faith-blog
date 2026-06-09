@@ -33,15 +33,15 @@ class FeedActionsTest < ActionDispatch::IntegrationTest
     get feed_path
     assert_response :success
 
-    # The ⋯ trigger and its menu are present.
-    assert_select ".fc-breath-more [data-dropdown-target='menu'].fc-breath-menu" do
-      # Save / report live inside the menu now, not loose in the action bar.
+    # The ⋯ trigger and its menu live in the card header now.
+    assert_select ".fc-breath-head .fc-breath-more [data-dropdown-target='menu'].fc-breath-menu" do
+      # Save / report live inside the menu, not loose in the action bar.
       assert_select "form[action=?]", post_bookmark_path(@post)
       assert_select "form[action=?]", reports_path
     end
 
-    # And they are no longer rendered directly in the action bar's end cluster.
-    assert_select ".fc-breath-actions-end > form", false
+    # And they are not rendered inside the action bar.
+    assert_select ".fc-breath-actions form[action=?]", post_bookmark_path(@post), false
   end
 
   test "feed shows the reaction summary strip and a single React button" do
@@ -49,12 +49,12 @@ class FeedActionsTest < ActionDispatch::IntegrationTest
     get feed_path
     assert_response :success
 
-    # Pills strip lives above the bar; the bar holds one React button segment.
-    assert_select "##{ActionView::RecordIdentifier.dom_id(@post, :reaction_summary)}.fc-react-summary"
-    assert_select ".fc-breath-actions .fc-reactions .fc-react-btn"
-    # Reply / reshare / share are still present as their own segments.
+    # Engagement meta row lives above the bar; the bar holds the Like segment.
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@post, :reaction_summary)}.fc-breath-stats"
+    assert_select ".fc-breath-actions .fc-reactions .fc-react-btn .fc-react-label", text: "Like"
+    # Comment / repost / send are present as their own labelled segments.
     assert_select ".fc-breath-actions .fc-repost"
-    assert_select ".fc-breath-actions .fc-share"
+    assert_select ".fc-breath-actions .fc-share .fc-action-label", text: "Send"
   end
 
   test "reacting updates both the React button and the summary strip" do

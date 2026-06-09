@@ -11704,16 +11704,37 @@ body.fc-lightbox-open { overflow: hidden; }
 }
 .fc-breath-tag:hover { opacity: 1; }
 
-/* Reaction summary strip — emoji pills sit ABOVE the action bar (LinkedIn / X),
-   so the bar below stays a clean row of evenly-divided buttons. */
-.fc-react-summary {
+/* Engagement meta row (LinkedIn): overlapping reaction emojis + total on the
+   left, "N comments · N reposts" on the right. Hidden when a breath has no
+   engagement yet, so the action bar then sits right under the content. */
+.fc-breath-stats {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.3rem;
-  margin-top: 0.65rem;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+  font-size: 0.8rem;
+  color: var(--fc-muted);
 }
-.fc-react-summary.is-empty { display: none; }
+.fc-breath-stats.is-empty { display: none; }
+.fc-breath-stats-reactions { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; }
+.fc-breath-stats-emojis { display: inline-flex; }
+.fc-breath-stats-emoji {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.7rem;
+  border-radius: 50%;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  margin-right: -5px;
+}
+.fc-breath-stats-emoji:last-child { margin-right: 0; }
+.fc-breath-stats-count { font-weight: 600; }
+.fc-breath-stats-meta { display: inline-flex; gap: 0.3rem; white-space: nowrap; }
+.fc-breath-stats-link { color: inherit; }
+.fc-breath-stats-link:hover { color: var(--fc-accent); text-decoration: underline; }
 
 /* Action bar — LinkedIn / X style: one row of evenly-divided buttons that fill
    the full width, so it never looks warped to one side or airy. Every top-level
@@ -11727,19 +11748,20 @@ body.fc-lightbox-open { overflow: hidden; }
   padding-top: 0.35rem;
   border-top: 1px solid var(--fc-line);
 }
-.fc-breath-actions > .fc-reactions,
-.fc-breath-actions > .fc-breath-action,
-.fc-breath-actions > .fc-repost,
-.fc-breath-actions > .fc-share,
-.fc-breath-actions > .fc-breath-actions-end {
+/* Every direct child is an equal segment, whatever wrapper the partial used
+   (.fc-reactions, .fc-repost, .fc-share, a bare <span>, or the button itself). */
+.fc-breath-actions > * {
   flex: 1 1 0;
   min-width: 0;
+  display: flex;
 }
-.fc-breath-actions > .fc-reactions,
-.fc-breath-actions > .fc-repost,
-.fc-breath-actions > .fc-share,
-.fc-breath-actions-end,
-.fc-breath-actions-end .fc-breath-more { display: flex; }
+/* The single clickable inside each segment fills it. */
+.fc-breath-actions > * > form,
+.fc-breath-actions .fc-repost > form,
+.fc-breath-actions .fc-reactions { display: flex; }
+.fc-breath-actions form { width: 100%; margin: 0; }
+.fc-breath-actions .fc-breath-action,
+.fc-breath-actions .fc-action { width: 100%; }
 
 .fc-breath-action,
 .fc-breath-actions .fc-action {
@@ -11747,7 +11769,6 @@ body.fc-lightbox-open { overflow: hidden; }
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  width: 100%;
   height: var(--fc-act-h);
   min-height: var(--fc-act-h);
   padding: 0 0.5rem;
@@ -11756,8 +11777,7 @@ body.fc-lightbox-open { overflow: hidden; }
   border: 0;
   color: var(--fc-muted);
   font-size: 0.82rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  font-weight: 650;
   cursor: pointer;
   transition: background 140ms ease, color 140ms ease;
 }
@@ -11767,13 +11787,14 @@ body.fc-lightbox-open { overflow: hidden; }
   color: var(--fc-accent);
 }
 .fc-breath-action span:empty { display: none; }
-.fc-breath-actions-end { margin-left: 0; }
-.fc-breath-actions-end .fc-breath-more,
-.fc-breath-actions-end .fc-breath-more > .fc-action { width: 100%; }
+/* Muted (can't-repost-own) segment shouldn't look clickable. */
+.fc-breath-actions .fc-breath-action.is-muted { cursor: default; opacity: 0.6; }
+.fc-breath-actions .fc-breath-action.is-muted:hover { background: transparent; color: var(--fc-muted); }
 
-/* React button: emoji + label, highlights when it carries your reaction. */
-.fc-react-btn .fc-react-emoji { font-size: 1.05rem; line-height: 1; }
-.fc-react-btn.is-mine { color: var(--fc-accent); font-weight: 800; }
+/* Your active Like / Repost glows in the accent, like LinkedIn's blue. */
+.fc-react-btn .fc-react-emoji { font-size: 1.15rem; line-height: 1; }
+.fc-react-btn.is-mine,
+.fc-breath-actions .fc-breath-action.is-mine { color: var(--fc-accent); font-weight: 800; }
 
 /* ── Overflow "more" menu (view count / save / report) ──
    Folds the secondary actions behind a single ⋯ trigger so the bar stays
@@ -11782,12 +11803,26 @@ body.fc-lightbox-open { overflow: hidden; }
 .fc-breath-more {
   position: relative;
   display: inline-flex;
+  flex-shrink: 0;
 }
+/* Compact round ⋯ trigger that lives at the card's top-right. */
+.fc-breath-more-trigger {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  color: var(--fc-muted);
+}
+.fc-breath-more-trigger:hover {
+  background: var(--fc-surface-2);
+  color: var(--fc-ink);
+}
+/* Opens DOWNWARD from the header so it's never clipped on a short card. */
 .fc-breath-menu {
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 6px);
   right: 0;
-  z-index: 45;
+  z-index: 60;
   min-width: 196px;
   padding: 0.3rem;
   background: var(--fc-surface);
@@ -13678,18 +13713,18 @@ html.dark nav.post-toc {
   }
 
   /* ── Card actions ──
-     Equal-segment bar fills the width (LinkedIn / X). Just tune sizing for
-     phones and drop the "React" text so segments stay icon-clean. */
+     Equal-segment icon+label bar (LinkedIn). Tighten type so the four labels —
+     Like · Comment · Repost · Send — fit cleanly across a phone. */
   .fc-breath-actions {
-    --fc-act-h: 38px;
+    --fc-act-h: 40px;
     margin-top: 0.5rem;
     padding-top: 0.45rem;
     gap: 0.05rem;
   }
   .fc-breath-action,
   .fc-breath-actions .fc-action {
-    padding: 0 0.3rem;
-    font-size: 0.78rem;
+    padding: 0 0.2rem;
+    font-size: 0.72rem;
     gap: 0.3rem;
   }
   .fc-breath-action svg,
@@ -13698,8 +13733,14 @@ html.dark nav.post-toc {
     height: 18px;
     flex-shrink: 0;
   }
-  /* Icon-only segments on phones — the "React" word goes, the emoji stays. */
-  .fc-react-btn .fc-react-label { display: none; }
+  .fc-action-label,
+  .fc-react-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Engagement meta row stays readable on phones. */
+  .fc-breath-stats { font-size: 0.76rem; }
 
   /* ── Side cards (when visible) ── */
   .fc-side-card {

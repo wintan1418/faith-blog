@@ -49,11 +49,7 @@
           <span class="fc-breath-dot">·</span>
           <span class="fc-breath-time"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
         </div>
-        <% if user_signed_in? && (post.user == current_user || current_user_admin?) %>
-          <%= link_to edit_post_path(post), class: "fc-action", title: "Edit breath" do %>
-            <%= render_icon("pencil", classes: "h-4 w-4") %>
-          <% end %>
-        <% end %>
+        <%= render "posts/overflow_menu", post: post %>
       </header>
 
       <%
@@ -149,10 +145,10 @@
                 data-thread-toggle-url-value="<%= inline_thread_post_path(post) %>"
                 data-thread-toggle-frame-value="<%= dom_id(post, :thread) %>"
                 data-action="click->thread-toggle#toggle"
-                aria-label="<%= post.threaded? ? "Open thread (#{post.comments_count})" : "Reply" %>"
-                title="<%= post.threaded? ? "Open thread" : "Reply" %>">
-          <%= render_icon("message_circle", classes: "h-4 w-4") %>
-          <span data-count="<%= post.comments_count %>"><%= post.comments_count.positive? ? post.comments_count : "" %></span>
+                aria-label="Comment"
+                title="Comment">
+          <%= render_icon("message_circle", classes: "h-5 w-5") %>
+          <span class="fc-action-label">Comment</span>
         </button>
 
         <%= render "reshares/button", post: post %>
@@ -186,10 +182,6 @@
             <% end %>
           <% end %>
         <% end %>
-
-        <div class="fc-breath-actions-end">
-          <%= render "posts/overflow_menu", post: post %>
-        </div>
       </footer>
 
       <%= turbo_frame_tag dom_id(post, :thread), class: "fc-breath-thread" %>
