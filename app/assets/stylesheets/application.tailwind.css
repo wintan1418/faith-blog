@@ -13668,17 +13668,16 @@ html.dark nav.post-toc {
   }
 
   /* ── Card actions ──
-     Reactions lift onto their own wrapping strip (base :has rule), so the
-     button row stays stable as engagement grows. The primary buttons share
-     the width evenly and wrap if they must — no more cramming/overflow.
-     Verbose labels (Save, Report) collapse to icons; they return at >= 761px. */
+     One clean, tight line: the primary buttons cluster on the left and the ⋯
+     overflow sits on the right. Reactions lift onto their own strip (base :has
+     rule) so the line never wraps. Verbose labels collapse to icons. */
   .fc-breath-actions {
     --fc-act-h: 36px;
     margin-top: 0.55rem;
     padding-top: 0.5rem;
-    gap: 0.15rem;
+    gap: 0.05rem;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     min-width: 0;
   }
   /* Unify every control height so the baseline never wobbles. */
@@ -13698,10 +13697,9 @@ html.dark nav.post-toc {
     height: 17px;
     flex-shrink: 0;
   }
-  /* margin-left:auto would swallow the free space and defeat space-between,
-     so the end cluster joins the even spread on mobile instead. */
+  /* ⋯ overflow stays pinned to the right of the one-liner. */
   .fc-breath-actions-end {
-    margin-left: 0;
+    margin-left: auto;
     gap: 0.05rem;
     flex-shrink: 0;
   }
