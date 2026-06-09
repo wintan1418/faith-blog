@@ -11765,6 +11765,60 @@ body.fc-lightbox-open { overflow: hidden; }
   gap: 0.1rem;
 }
 
+/* ── Overflow "more" menu (view count / save / report) ──
+   Folds the secondary actions behind a single ⋯ trigger so the bar stays
+   light. The menu reuses the bookmark/report partials, restyling their
+   .fc-action buttons into full-width rows with always-visible labels. */
+.fc-breath-more {
+  position: relative;
+  display: inline-flex;
+}
+.fc-breath-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  z-index: 45;
+  min-width: 196px;
+  padding: 0.3rem;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.40);
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+.fc-breath-menu.hidden { display: none !important; }
+.fc-breath-more .fc-breath-menu > *,
+.fc-breath-more .fc-breath-menu form { width: 100%; margin: 0; }
+/* Selectors are prefixed with .fc-breath-more to outrank the action-bar height
+   rules (.fc-breath-actions .fc-action) that also match these descendants. */
+.fc-breath-more .fc-breath-menu .fc-action {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--fc-ink);
+}
+.fc-breath-more .fc-breath-menu .fc-action:hover {
+  background: var(--fc-surface-2);
+  color: var(--fc-accent-2);
+}
+.fc-breath-more .fc-breath-menu .fc-action-static,
+.fc-breath-more .fc-breath-menu .fc-action-static:hover {
+  color: var(--fc-muted);
+  cursor: default;
+  background: transparent;
+}
+/* Labels collapse to icons in the bar on mobile — but the menu always shows them. */
+.fc-breath-more .fc-breath-menu .fc-action-label { display: inline !important; }
+.fc-breath-more .fc-breath-menu .fc-action svg { width: 16px; height: 16px; flex-shrink: 0; }
+
 /* ── Inline reply thread ── */
 .fc-breath-thread {
   display: block;
@@ -13651,7 +13705,8 @@ html.dark nav.post-toc {
     gap: 0.05rem;
     flex-shrink: 0;
   }
-  .fc-breath-actions-end .fc-action {
+  /* Only the ⋯ trigger itself — never the menu rows nested inside it. */
+  .fc-breath-actions-end .fc-breath-more > .fc-action {
     padding: 0 0.4rem;
     gap: 0;
     min-width: var(--fc-act-h);

@@ -1,0 +1,25 @@
+<%# Overflow "more" menu — folds the secondary breath actions (view count,
+    save, report) behind a single ⋯ trigger so the action bar stays clean,
+    especially on mobile. Reuses the bookmark/report partials so their Turbo
+    re-render keeps working. Local: post %>
+<div class="fc-breath-more" data-controller="dropdown">
+  <button type="button"
+          class="fc-action"
+          data-action="click->dropdown#toggle"
+          aria-label="More actions"
+          title="More">
+    <%= render_icon("more", classes: "h-4 w-4") %>
+  </button>
+
+  <div data-dropdown-target="menu" class="fc-breath-menu hidden" role="menu">
+    <%= render "posts/impressions", post: post %>
+    <% if user_signed_in? %>
+      <%= render "posts/bookmark_button", post: post %>
+      <% unless post.user == current_user %>
+        <%= render "reports/button", reportable: post, label: "Report" %>
+      <% end %>
+    <% else %>
+      <%= render "posts/bookmark_button", post: post %>
+    <% end %>
+  </div>
+</div>

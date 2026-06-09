@@ -99,6 +99,8 @@ module IconHelper
       icon_svg("M18 6 6 18 M6 6l12 12", classes)
     when "flag", "report"
       icon_svg("M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z M4 22V15", classes)
+    when "more", "morehorizontal", "more_horizontal", "ellipsis", "dots"
+      icon_svg("<circle cx='5' cy='12' r='1' /><circle cx='12' cy='12' r='1' /><circle cx='19' cy='12' r='1' />", classes)
     else
       # Default Sparkles
       icon_svg("m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z", classes)
@@ -109,7 +111,7 @@ module IconHelper
 
   def icon_svg(path, classes)
     content_tag(:svg, class: classes, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round") do
-      raw(if path.include?("<path") then path else "<path d='#{path}' />" end)
+      raw(if path.include?("<") then path else "<path d='#{path}' />" end)
     end
   end
 
