@@ -37,6 +37,11 @@ class BookmarksController < ApplicationController
   private
 
   def set_post
-    @post = Post.friendly.find(params[:post_id]) if params[:post_id]
+    return unless params[:post_id]
+
+    @post = Post.friendly.find(params[:post_id])
+    return if @post.visible_to?(current_user)
+
+    redirect_back fallback_location: root_path, alert: "That post isn't available."
   end
 end

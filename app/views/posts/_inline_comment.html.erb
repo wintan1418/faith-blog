@@ -145,8 +145,8 @@
       <% end %>
 
       <%
-        replies = comment.replies.active.oldest_first.limit(3)
-        more_replies = comment.replies.active.count - replies.size
+        replies = comment.replies.active.visible_for(current_user).oldest_first.limit(3)
+        more_replies = comment.replies.active.visible_for(current_user).count - replies.size
       %>
       <% if replies.any? %>
         <ul class="fc-inline-comment-replies">

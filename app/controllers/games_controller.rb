@@ -203,7 +203,7 @@ class GamesController < ApplicationController
     score     = params[:score].to_i
     max_score = params[:max_score].to_i.clamp(1, max_cap)
     duration  = params[:duration_ms].to_i
-    details   = params[:details].is_a?(ActionController::Parameters) ? params[:details].permit!.to_h : {}
+    details   = sanitized_game_details
 
     attempt = current_user.game_attempts.create!(
       kind: kind,
@@ -218,6 +218,23 @@ class GamesController < ApplicationController
       attempt_id: attempt.id,
       rank: GameAttempt.user_rank(current_user, window: :week)
     }
+  end
+
+  # `details` is free-form per-game stats stored as jsonb. We don't trust the
+  # client, so instead of permit! (which let arbitrary nested structures in)
+  # we keep at most 50 keys mapped to scalar values, dropping nested
+  # hashes/arrays and truncating long strings.
+  def sanitized_game_details
+    raw = params[:details]
+    return {} unless raw.is_a?(ActionController::Parameters)
+
+    raw.to_unsafe_h.first(50).each_with_object({}) do |(key, value), acc|
+      acc[key.to_s] = case value
+      when String then value.first(1000)
+      when Numeric, true, false, nil then value
+      else value.to_s.first(1000)
+      end
+    end
   end
 
   def score_for_chess_rating(rating)

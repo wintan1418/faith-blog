@@ -16,7 +16,7 @@ class PostsController < ApplicationController
 
   def show
     @post.increment_views! unless current_user == @post.user
-    @comments = @post.comments.root_comments.active
+    @comments = @post.comments.root_comments.active.visible_for(current_user)
                      .includes(:user, :replies, likes: :user).oldest_first
     @new_comment = Comment.new
   end
@@ -84,7 +84,8 @@ class PostsController < ApplicationController
   end
 
   def inline_thread
-    comments = @post.comments.root_comments.active.includes(:user, :replies).order(created_at: :desc).limit(3)
+    comments = @post.comments.root_comments.active.visible_for(current_user)
+                    .includes(:user, :replies).order(created_at: :desc).limit(3)
     render partial: "posts/inline_thread",
            locals: { post: @post, comments: comments, new_comment: Comment.new },
            layout: false

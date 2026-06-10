@@ -1,5 +1,5 @@
 <div id="<%= dom_id(post, :comments_list) %>" class="divide-y divide-faith-green/10">
-  <% comments = post.comments.root_comments.active.includes(:user, :replies).oldest_first %>
+  <% comments = post.comments.root_comments.active.visible_for(current_user).includes(:user, :replies).oldest_first %>
   <% if comments.any? %>
     <% comments.each do |comment| %>
       <%= render "comments/comment", comment: comment, post: post %>

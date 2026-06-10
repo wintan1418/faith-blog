@@ -292,11 +292,16 @@ class Post < ApplicationRecord
     return unless target
     return if target.user_id == user_id
 
-    Notification.create(
+    notification = Notification.create(
       user: target.user,
       actor: user,
       notifiable: self,
       notification_type: :post_reshared
+    )
+    return if notification.persisted?
+
+    Rails.logger.warn(
+      "[quote-notification] not created for post #{id}: #{notification.errors.full_messages.join(', ')}"
     )
   rescue StandardError => e
     Rails.logger.warn "[quote-notification] failed for post #{id}: #{e.message}"

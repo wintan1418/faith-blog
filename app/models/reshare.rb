@@ -23,11 +23,16 @@ class Reshare < ApplicationRecord
   def create_notification
     return if post.user == user
 
-    Notification.create(
+    notification = Notification.create(
       user: post.user,
       actor: user,
       notifiable: post,
       notification_type: :post_reshared
+    )
+    return if notification.persisted?
+
+    Rails.logger.error(
+      "[Reshare ##{id}] notification not created: #{notification.errors.full_messages.join(', ')}"
     )
   end
 end

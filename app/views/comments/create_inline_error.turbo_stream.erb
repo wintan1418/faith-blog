@@ -1,7 +1,7 @@
 <%# Reply failed validation — re-render the thread frame so the form stays
     in place; the error rendered into the assistant panel client-side. %>
 <%
-  comments = @post.comments.root_comments.active
+  comments = @post.comments.root_comments.active.visible_for(current_user)
                   .includes(:user, :replies)
                   .order(created_at: :desc)
                   .limit(3)

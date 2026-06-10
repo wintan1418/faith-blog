@@ -21,6 +21,7 @@ class Comment < ApplicationRecord
 
   # Validations
   validates :content, presence: true
+  validate :parent_comment_belongs_to_same_post
 
   # Callbacks
   before_validation :unwrap_leaked_trix_html
@@ -34,6 +35,18 @@ class Comment < ApplicationRecord
   scope :flagged, -> { where(flagged: true) }
   scope :recent, -> { order(created_at: :desc) }
   scope :oldest_first, -> { order(created_at: :asc) }
+
+  # Comments that the given viewer is allowed to see: approved ones for
+  # everyone, plus a viewer's own held/blocked comments, plus everything for
+  # staff. Mirrors #visible_to? but as a query so list views don't leak
+  # pending_review/blocked comments to the whole world.
+  def self.visible_for(viewer)
+    return moderation_visible unless viewer
+    return all if viewer.respond_to?(:moderator?) &&
+                  (viewer.moderator? || viewer.admin? || viewer.super_admin?)
+
+    moderation_visible.or(where(user_id: viewer.id))
+  end
 
   # Instance methods
   def soft_delete!
@@ -91,6 +104,16 @@ class Comment < ApplicationRecord
   end
 
   private
+
+  # A reply must hang off a comment on the same post. Without this a crafted
+  # request could thread a reply under a comment from a different post and
+  # corrupt the tree the UI renders.
+  def parent_comment_belongs_to_same_post
+    return if parent_comment_id.blank?
+    return if parent_comment&.post_id == post_id
+
+    errors.add(:parent_comment, "must belong to the same post")
+  end
 
   # Defense-in-depth against the mobile-browser autofill bug: it would
   # refill a reply field with a previously submitted comment's raw Trix

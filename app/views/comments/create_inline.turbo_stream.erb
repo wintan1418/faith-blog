@@ -1,6 +1,6 @@
 <%# Replace the thread frame with refreshed content showing the new reply. %>
 <%
-  comments = @post.comments.root_comments.active
+  comments = @post.comments.root_comments.active.visible_for(current_user)
                   .includes(:user, :replies)
                   .order(created_at: :desc)
                   .limit(3)

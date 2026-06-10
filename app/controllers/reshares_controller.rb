@@ -37,5 +37,9 @@ class ResharesController < ApplicationController
 
   def set_post
     @post = Post.friendly.find(params[:post_id])
+    return if @post.visible_to?(current_user)
+
+    # Don't let a held/blocked post be resurfaced into feeds via a reshare.
+    redirect_back fallback_location: root_path, alert: "That post isn't available."
   end
 end

@@ -56,8 +56,23 @@ class LikesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless likeable_class
 
     @likeable = likeable_class.find(@likeable_id)
+    raise ActiveRecord::RecordNotFound unless likeable_visible_to_current_user?(@likeable)
   rescue ActiveRecord::RecordNotFound
     redirect_back fallback_location: root_path, alert: "Invalid content."
+  end
+
+  # Don't let people react to things they aren't allowed to see: messages in
+  # conversations they aren't part of (an IDOR that also broadcast the reaction
+  # into a private chat), or posts/comments still held for moderation.
+  def likeable_visible_to_current_user?(likeable)
+    case likeable
+    when Message
+      likeable.conversation.conversation_participants.exists?(user_id: current_user.id)
+    when Post, Comment
+      likeable.visible_to?(current_user)
+    else
+      true
+    end
   end
 
   def create_notification

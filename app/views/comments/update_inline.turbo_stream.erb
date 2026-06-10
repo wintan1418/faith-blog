@@ -1,6 +1,6 @@
 <%# Re-render the inline thread frame after an edit or delete from a feed card. %>
 <%
-  comments = @post.comments.root_comments.active
+  comments = @post.comments.root_comments.active.visible_for(current_user)
                   .includes(:user, :replies)
                   .order(created_at: :desc)
                   .limit(3)

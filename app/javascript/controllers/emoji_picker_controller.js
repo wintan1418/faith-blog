@@ -11,10 +11,20 @@ export default class extends Controller {
 
   setupPicker() {
     if (this.hasPickerTarget) {
-      // Configure emoji picker
-      this.pickerTarget.addEventListener("emoji-click", (event) => {
-        this.insertEmoji(event.detail.unicode)
-      })
+      // Configure emoji picker. Keep a bound reference so disconnect() can
+      // remove it — otherwise the listener (and the picker element) leaks on
+      // every Turbo navigation.
+      this.boundInsertEmoji = (event) => this.insertEmoji(event.detail.unicode)
+      this.pickerTarget.addEventListener("emoji-click", this.boundInsertEmoji)
+    }
+  }
+
+  disconnect() {
+    if (this.hasPickerTarget && this.boundInsertEmoji) {
+      this.pickerTarget.removeEventListener("emoji-click", this.boundInsertEmoji)
+    }
+    if (this.boundCloseOnOutside) {
+      document.removeEventListener("click", this.boundCloseOnOutside)
     }
   }
 

@@ -19,11 +19,16 @@ class Follow < ApplicationRecord
   end
 
   def create_notification
-    Notification.create(
+    notification = Notification.create(
       user: following,
       actor: follower,
       notifiable: self,
       notification_type: :new_follower
+    )
+    return if notification.persisted?
+
+    Rails.logger.error(
+      "[Follow ##{id}] notification not created: #{notification.errors.full_messages.join(', ')}"
     )
   end
 end

@@ -19,7 +19,14 @@ class Tag < ApplicationRecord
   # Class methods
   def self.find_or_create_by_names(names)
     names.map do |name|
-      find_or_create_by(name: name.strip.downcase)
+      normalized = name.strip.downcase
+      begin
+        find_or_create_by(name: normalized)
+      rescue ActiveRecord::RecordNotUnique
+        # Lost a race against a concurrent create for the same tag — the unique
+        # index on `name` did its job; just fetch the row the winner inserted.
+        find_by(name: normalized) || raise
+      end
     end
   end
 

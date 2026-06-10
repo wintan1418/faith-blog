@@ -146,9 +146,9 @@
         <% end %>
       <% end %>
 
-      <% if comment.replies.active.any? %>
+      <% if comment.replies.active.visible_for(current_user).any? %>
         <div class="fc-comment-replies">
-          <% comment.replies.active.oldest_first.each do |reply| %>
+          <% comment.replies.active.visible_for(current_user).oldest_first.each do |reply| %>
             <%= render "comments/comment", comment: reply, post: post %>
           <% end %>
         </div>

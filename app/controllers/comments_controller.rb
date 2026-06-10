@@ -5,6 +5,7 @@ class CommentsController < ApplicationController
   before_action :set_post
   before_action :set_comment, only: [ :update, :destroy, :reply ]
   before_action :authorize_comment!, only: [ :update, :destroy ]
+  before_action :enforce_comment_rate_limit!, only: [ :create, :reply ]
 
   def create
     return redirect_to(@post, alert: "Comments are disabled for this post.") unless @post.allow_comments?
@@ -121,6 +122,23 @@ class CommentsController < ApplicationController
 
   def set_post
     @post = Post.friendly.find(params[:post_id])
+  end
+
+  # Mirror the breath rate limit: a freshly-created, flagged account can post
+  # at most 10 comments an hour so it can't sidestep the post throttle by
+  # flooding the comment threads instead.
+  def enforce_comment_rate_limit!
+    profile = current_user.risk_profile
+    return unless profile
+
+    fresh_account = current_user.created_at && current_user.created_at > 24.hours.ago
+    risky = profile.respond_to?(:at_least?) && profile.at_least?(:watch)
+    return unless fresh_account && risky
+
+    recent_count = current_user.comments.where("created_at > ?", 1.hour.ago).count
+    return if recent_count < 10
+
+    redirect_to @post, alert: "Slow down — new accounts are limited to 10 comments an hour. Try again shortly."
   end
 
   def set_comment

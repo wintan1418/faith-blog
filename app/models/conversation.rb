@@ -19,7 +19,17 @@ class Conversation < ApplicationRecord
     existing = between(user, other_user)
     return existing if existing
 
+    # There is no DB-level uniqueness on the *pair* of participants (the unique
+    # index is per participant row), so two simultaneous first-messages could
+    # otherwise create two conversations for the same pair. Serialize creation
+    # on a per-pair Postgres advisory lock and re-check inside it.
+    lock_a, lock_b = [ user.id, other_user.id ].minmax
     transaction do
+      connection.execute("SELECT pg_advisory_xact_lock(#{lock_a.to_i}, #{lock_b.to_i})")
+
+      existing = between(user, other_user)
+      next existing if existing
+
       conversation = create!
       conversation.conversation_participants.create!(user: user)
       conversation.conversation_participants.create!(user: other_user)
