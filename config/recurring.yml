@@ -23,3 +23,8 @@ production:
     class: ScheduledPostPublisherJob
     queue: default
     schedule: every 5 minutes
+
+  moderation_backlog_sweep:
+    class: ModerationBacklogSweepJob
+    queue: default
+    schedule: every 5 minutes

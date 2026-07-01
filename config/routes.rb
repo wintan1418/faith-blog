@@ -42,6 +42,7 @@ Rails.application.routes.draw do
     member do
       post :feature
       post :unfeature
+      get  :reactions
       get  :inline_thread
       post :join_prayer_chain
       delete :leave_prayer_chain

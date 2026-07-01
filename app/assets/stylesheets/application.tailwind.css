@@ -11717,7 +11717,21 @@ body.fc-lightbox-open { overflow: hidden; }
   color: var(--fc-muted);
 }
 .fc-breath-stats.is-empty { display: none; }
-.fc-breath-stats-reactions { display: inline-flex; align-items: center; gap: 0.35rem; min-width: 0; }
+.fc-breath-stats-reactions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+button.fc-breath-stats-reactions:hover .fc-breath-stats-count { text-decoration: underline; }
 .fc-breath-stats-emojis { display: inline-flex; }
 .fc-breath-stats-emoji {
   width: 18px;
@@ -15787,6 +15801,95 @@ html.theme-light .inbox-thread-head {
   max-height: 80vh;
   min-height: 200px;
 }
+
+/* "Who reacted" dialog — reuses the notification dialog look. */
+.fc-reactors-dialog {
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  max-width: 420px;
+  width: calc(100% - 2rem);
+  margin: auto;
+}
+.fc-reactors-dialog::backdrop {
+  background: rgba(8, 14, 12, 0.62);
+  backdrop-filter: blur(6px);
+}
+.fc-reactors-panel {
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 16px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+.fc-reaction-viewers {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0 4px;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--fc-muted);
+  cursor: pointer;
+}
+.fc-reaction-viewers:hover { color: var(--fc-ink); text-decoration: underline; }
+
+.fc-reactors { display: flex; flex-direction: column; max-height: 80vh; }
+.fc-reactors-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--fc-line);
+}
+.fc-reactors-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--fc-ink);
+  letter-spacing: -0.01em;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+.fc-reactors-total { font-size: 0.85rem; font-weight: 700; color: var(--fc-muted); }
+.fc-reactors-close {
+  appearance: none;
+  background: none;
+  border: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--fc-muted);
+  cursor: pointer;
+  padding: 0 4px;
+}
+.fc-reactors-close:hover { color: var(--fc-ink); }
+.fc-reactors-empty { padding: 28px 18px; text-align: center; color: var(--fc-muted); }
+.fc-reactors-loading { padding: 28px 18px; text-align: center; color: var(--fc-muted); }
+.fc-reactors-list { list-style: none; margin: 0; padding: 6px; overflow-y: auto; }
+.fc-reactor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+}
+.fc-reactor:hover { background: var(--fc-surface-2, rgba(0, 0, 0, 0.04)); }
+.fc-reactor-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+.fc-reactor-name { font-weight: 700; color: var(--fc-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-reactor-emoji { font-size: 1.1rem; flex-shrink: 0; }
 .fc-notif-head {
   display: flex;
   align-items: center;

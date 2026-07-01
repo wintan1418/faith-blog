@@ -106,6 +106,9 @@ application.register("rain", RainController)
 import ReactionsController from "./reactions_controller"
 application.register("reactions", ReactionsController)
 
+import ReactorsModalController from "./reactors_modal_controller"
+application.register("reactors-modal", ReactorsModalController)
+
 import ReplyToggleController from "./reply_toggle_controller"
 application.register("reply-toggle", ReplyToggleController)
 

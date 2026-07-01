@@ -139,7 +139,7 @@
          data-controller="rain"
          data-rain-items-value="<%= BackgroundRain.items.to_json %>"></div>
 
-    <div class="min-h-full fc-page" data-controller="<%= "composer-modal notifications-modal bible-drawer notification-sound" if user_signed_in? %>">
+    <div class="min-h-full fc-page" data-controller="<%= ["reactors-modal", ("composer-modal notifications-modal bible-drawer notification-sound" if user_signed_in?)].compact.join(" ") %>">
       <%= render "shared/navbar" %>
 
       <div id="flash_messages"><%= render "shared/flash" %></div>
@@ -147,6 +147,8 @@
       <main>
         <%= yield %>
       </main>
+
+      <%= render "shared/reactors_modal" %>
 
       <% if user_signed_in? %>
         <%= render "shared/composer_modal" %>

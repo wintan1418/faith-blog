@@ -2,7 +2,7 @@
 
 class PostsController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show ]
-  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature, :inline_thread,
+  before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature, :reactions, :inline_thread,
                                     :join_prayer_chain, :leave_prayer_chain, :mark_prayer_answered ]
   before_action :authorize_post!, only: [ :edit, :update, :destroy ]
   before_action :authorize_feature!, only: [ :feature, :unfeature ]
@@ -19,6 +19,21 @@ class PostsController < ApplicationController
     @comments = @post.comments.root_comments.active.visible_for(current_user)
                      .includes(:user, :replies, likes: :user).oldest_first
     @new_comment = Comment.new
+  end
+
+  # "Who reacted" list for a breath, opened in the shared reactors modal.
+  # Grouped by emoji, most-used first, newest reactor first within each group.
+  def reactions
+    unless @post.visible_to?(current_user)
+      head :not_found
+      return
+    end
+
+    likes = @post.likes.includes(user: { profile: { avatar_attachment: :blob } })
+                 .order(created_at: :desc).to_a
+    @total_reactions = likes.size
+    @reaction_groups = likes.group_by(&:display_emoji)
+                            .sort_by { |_emoji, group| -group.size }
   end
 
   def new

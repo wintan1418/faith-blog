@@ -15,12 +15,15 @@
 %>
 <div class="fc-breath-stats<%= ' is-empty' unless has_any %>" id="<%= dom_id(post, :reaction_summary) %>">
   <% if total.positive? %>
-    <span class="fc-breath-stats-reactions">
+    <button type="button" class="fc-breath-stats-reactions"
+            data-action="reactors-modal#open"
+            data-reactors-modal-url-param="<%= reactions_post_path(post) %>"
+            title="See who reacted">
       <span class="fc-breath-stats-emojis">
         <% top_emojis.each do |emoji| %><span class="fc-breath-stats-emoji"><%= emoji %></span><% end %>
       </span>
       <span class="fc-breath-stats-count"><%= number_with_delimiter(total) %></span>
-    </span>
+    </button>
   <% else %>
     <span></span>
   <% end %>

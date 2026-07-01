@@ -1,0 +1,11 @@
+<%# Shared "who reacted" dialog. One per page; the reaction-count button on any
+    breath points its turbo-frame at that breath's reactions URL and opens it. %>
+<dialog data-reactors-modal-target="dialog"
+        data-action="mousedown->reactors-modal#backdropClick"
+        class="fc-reactors-dialog">
+  <div class="fc-reactors-panel">
+    <%= turbo_frame_tag "reactors_panel", src: nil, loading: "lazy" do %>
+      <div class="fc-reactors-loading">Loading…</div>
+    <% end %>
+  </div>
+</dialog>

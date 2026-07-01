@@ -59,6 +59,15 @@
       <%= link_to "React", new_user_session_path, class: "fc-reaction-add" %>
     <% end %>
 
+    <% if loaded_likes.any? %>
+      <button type="button" class="fc-reaction-viewers"
+              data-action="reactors-modal#open"
+              data-reactors-modal-url-param="<%= reactions_post_path(post) %>"
+              title="See who reacted">
+        <%= pluralize(loaded_likes.size, "reaction") %>
+      </button>
+    <% end %>
+
     <%= render "reshares/button", post: post %>
     <%= render "posts/share_button", post: post %>
   </div>

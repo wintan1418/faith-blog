@@ -33,8 +33,21 @@ port ENV.fetch("PORT", 3000)
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
-# Run the Solid Queue supervisor inside of Puma for single-server deployments
-plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
+# Run the Solid Queue supervisor inside of Puma for single-server deployments.
+#
+# Defaults ON in production: without a worker, background jobs never run and
+# newly created posts sit in :pending_review forever (the AI moderation gate
+# that releases them is an async job) while nothing ever reaches the moderation
+# board. Running the supervisor in Puma guarantees a worker wherever the web
+# process runs. Set SOLID_QUEUE_IN_PUMA=0 to opt out — e.g. when you run a
+# dedicated `bin/jobs` process instead.
+solid_queue_in_puma =
+  if ENV.key?("SOLID_QUEUE_IN_PUMA")
+    %w[0 false off no].exclude?(ENV["SOLID_QUEUE_IN_PUMA"].to_s.downcase)
+  else
+    ENV.fetch("RAILS_ENV", ENV.fetch("RACK_ENV", "development")) == "production"
+  end
+plugin :solid_queue if solid_queue_in_puma
 
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.

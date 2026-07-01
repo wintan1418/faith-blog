@@ -1,0 +1,33 @@
+<%# Reactor list for a breath, rendered inside the shared reactors modal's
+    turbo-frame. Grouped by emoji, most-used first. %>
+<%= turbo_frame_tag "reactors_panel" do %>
+  <div class="fc-reactors">
+    <header class="fc-reactors-head">
+      <h2 class="fc-reactors-title">
+        Reactions
+        <span class="fc-reactors-total"><%= number_with_delimiter(@total_reactions) %></span>
+      </h2>
+      <button type="button" class="fc-reactors-close"
+              data-action="reactors-modal#close" aria-label="Close">&times;</button>
+    </header>
+
+    <% if @total_reactions.zero? %>
+      <p class="fc-reactors-empty">No reactions yet.</p>
+    <% else %>
+      <ul class="fc-reactors-list">
+        <% @reaction_groups.each do |emoji, group| %>
+          <% group.each do |like| %>
+            <% next unless like.user %>
+            <li class="fc-reactor">
+              <%= link_to user_path(like.user.username), class: "fc-reactor-link" do %>
+                <span class="fc-reactor-avatar"><%= avatar_for(like.user, size: :small) %></span>
+                <span class="fc-reactor-name"><%= like.user.display_name %></span>
+              <% end %>
+              <span class="fc-reactor-emoji" title="<%= Like.reaction_label(like.reaction_type) %>"><%= emoji %></span>
+            </li>
+          <% end %>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+<% end %>
