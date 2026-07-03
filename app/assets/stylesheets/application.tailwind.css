@@ -14873,6 +14873,7 @@ body.fc-discover-open::before {
   display: grid;
   grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
   height: calc(100vh - 60px);
+  height: calc(100dvh - 60px); /* dvh tracks the visible viewport on mobile */
   overflow: hidden;
   background:
     radial-gradient(1200px 600px at 0% 0%, var(--fc-accent-soft), transparent 60%),
@@ -15449,11 +15450,24 @@ html.theme-light .inbox-thread-head {
 @media (max-width: 860px) {
   .inbox-shell {
     grid-template-columns: minmax(0, 1fr);
-    height: calc(100vh - 60px - 60px);
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
   }
   .inbox-list:not(.inbox-list--full) { display: none; }
   .inbox-thread .inbox-thread-back { display: inline-flex; }
   .inbox-thread .inbox-thread-switcher { display: inline-flex; }
+}
+
+/* At ≤760px the fixed bottom nav (56px + safe area) appears and the topbar
+   shrinks to 42px. Size the inbox to the visible viewport minus both bars so
+   the message composer sits exactly above the bottom nav instead of behind
+   it. A fixed-height, viewport-sized shell isn't protected by the global
+   body padding-bottom, so it must reserve the nav's height itself. */
+@media (max-width: 760px) {
+  .inbox-shell {
+    height: calc(100vh - 42px - 56px - env(safe-area-inset-bottom, 0px));
+    height: calc(100dvh - 42px - 56px - env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* ============================================================
