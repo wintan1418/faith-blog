@@ -15456,6 +15456,16 @@ html.theme-light .inbox-thread-head {
   .inbox-list:not(.inbox-list--full) { display: none; }
   .inbox-thread .inbox-thread-back { display: inline-flex; }
   .inbox-thread .inbox-thread-switcher { display: inline-flex; }
+
+  /* On the index (no conversation open) the shell collapses to one column.
+     Hide the "No conversation selected" placeholder so the conversation list
+     fills the screen — tapping a row opens the full-screen thread. Without
+     this the empty panel stacks below the list and squeezes it. */
+  .inbox-thread--empty { display: none; }
+  .inbox-list--full {
+    border-right: 0;
+    border-bottom: 0;
+  }
 }
 
 /* At ≤760px the fixed bottom nav (56px + safe area) appears and the topbar
