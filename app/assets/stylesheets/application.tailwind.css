@@ -15481,6 +15481,121 @@ html.theme-light .inbox-thread-head {
 }
 
 /* ============================================================
+   ✦ MOBILE INBOX — best-standard rebuild (source-order wins)
+   Phones only; desktop is untouched. Layout target is the
+   native-messaging model: a full-screen conversation list that
+   swaps to a full-screen thread, with a clean 3-part header
+   (back · who · actions) and a comfortable, thumb-reachable
+   composer that sits above the bottom nav.
+   ============================================================ */
+@media (max-width: 860px) {
+  /* Smooth, contained scrolling everywhere in the inbox */
+  .inbox-list-scroll,
+  .inbox-messages {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* ---- Conversation list (index) ---- */
+  .inbox-list-head {
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    min-height: 56px;
+    padding: 10px 16px;
+    background: color-mix(in srgb, var(--fc-surface) 90%, transparent);
+    backdrop-filter: saturate(1.5) blur(10px);
+    -webkit-backdrop-filter: saturate(1.5) blur(10px);
+    border-bottom: 1px solid var(--fc-line);
+  }
+  .inbox-list-head h2 { font-size: 1.4rem; font-weight: 900; letter-spacing: -0.02em; }
+  .inbox-list-head .fc-icon-btn { width: 40px; height: 40px; }
+
+  .inbox-list-scroll { padding: 4px 0 10px; }
+
+  /* Roomy, tappable rows; hairline separators instead of full borders */
+  .inbox-row {
+    gap: 12px;
+    padding: 11px 16px;
+    min-height: 74px;
+    align-items: center;
+    border-bottom: 1px solid color-mix(in srgb, var(--fc-line) 55%, transparent);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .inbox-row:last-child { border-bottom: 0; }
+  .inbox-row:active { background: var(--fc-surface-2); }
+  /* No persistent "active" highlight on mobile — the list is a launcher */
+  .inbox-row.is-active {
+    background: transparent;
+    border-left: 0;
+    padding-left: 16px;
+  }
+  /* Larger avatar for scannability */
+  .inbox-row > img:first-child,
+  .inbox-row > span:first-child {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  .inbox-row .font-extrabold { font-size: 0.98rem; }
+  .inbox-row .text-sm { font-size: 0.86rem; }
+  /* Unread: lean on bold text + the pill badge; drop the dated inset bar */
+  .inbox-row.is-unread { box-shadow: none; background: transparent; }
+
+  /* ---- Thread header: back · identity · actions ---- */
+  .inbox-thread-head {
+    min-height: 58px;
+    padding: 8px 10px;
+    gap: 8px;
+    box-shadow: 0 1px 0 var(--fc-line);
+  }
+  /* Back becomes a compact icon-only circle */
+  .inbox-thread .inbox-thread-back {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .inbox-thread-back-label { display: none; }
+  .inbox-thread-back-arrow { font-size: 1.6rem; line-height: 1; margin-top: -2px; }
+  /* The desktop "Switch" dropdown is redundant on mobile — back reaches the list */
+  .inbox-thread .inbox-thread-switcher { display: none !important; }
+  .inbox-thread-identity { gap: 10px; }
+  .inbox-thread-name { font-size: 0.98rem; }
+  .inbox-thread-handle { font-size: 0.74rem; }
+
+  /* ---- Messages ---- */
+  .inbox-messages { padding: 14px 12px 8px; gap: 7px; }
+  .message-stack { max-width: min(30rem, 84%); }
+  .message-bubble {
+    padding: 8px 12px !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10) !important;
+  }
+  .message-row.is-mine .message-bubble {
+    box-shadow: 0 2px 8px -3px rgba(16, 185, 129, 0.45) !important;
+  }
+  /* Touch devices don't hover — kill the lift so bubbles sit still */
+  .message-row:hover .message-bubble { transform: none; }
+  .message-body { font-size: 0.92rem; }
+
+  .read-receipt { padding: 0 14px 4px !important; }
+  .typing-indicator { padding: 0 14px 6px; }
+
+  /* ---- Composer ---- */
+  .inbox-composer { padding: 8px 10px 10px; }
+  .inbox-composer-pill { min-height: 42px; }
+  .inbox-composer-action { width: 42px; height: 42px; }
+}
+
+/* On very small screens tighten the list rows a touch more */
+@media (max-width: 400px) {
+  .inbox-row { padding: 10px 12px; gap: 10px; }
+  .inbox-row > img:first-child,
+  .inbox-row > span:first-child { width: 48px !important; height: 48px !important; }
+}
+
+/* ============================================================
    ✦ BRETHREIGN BRAND — custom navbar logo
    ============================================================ */
 
