@@ -14684,7 +14684,8 @@ body.fc-discover-open::before {
   left: 8px;
 }
 .message-bubble:hover .message-actions,
-.message-actions:focus-within {
+.message-actions:focus-within,
+.message-actions.is-open { /* tap-to-reveal on touch (message-menu controller) */
   display: inline-flex;
 }
 .message-actions form.inline { margin: 0; line-height: 0; display: inline-flex; }

@@ -23,7 +23,7 @@
   <% end %>
 
   <div class="message-stack">
-    <div class="message-bubble">
+    <div class="message-bubble" data-controller="message-menu" data-action="click->message-menu#toggle">
       <% if deleted %>
         <div class="message-deleted">— message deleted —</div>
       <% else %>
@@ -64,7 +64,8 @@
       </span>
 
       <% unless deleted %>
-        <div class="message-actions" data-controller="emoji-reactions message-edit"
+        <div class="message-actions" data-message-menu-target="actions"
+             data-controller="emoji-reactions message-edit"
              data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Message", likeable_id: message.id) %>"
              data-emoji-reactions-token-value="<%= form_authenticity_token %>">
           <button type="button"
