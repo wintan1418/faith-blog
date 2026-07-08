@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 //      to the form via a DataTransfer-backed FileList so submitting the
 //      form ships it like any other file upload.
 export default class extends Controller {
-  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput"]
+  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput"]
 
   connect() {
     // Hide mic if browser can't record; force send-button visibility.
@@ -34,10 +34,60 @@ export default class extends Controller {
     const hasText  = this.hasBodyInputTarget && this.bodyInputTarget.value.trim().length > 0
     const hasFiles = this.hasImageInputTarget && this.imageInputTarget.files && this.imageInputTarget.files.length > 0
     const hasVoice = this.hasVoicePreviewTarget && !this.voicePreviewTarget.classList.contains("hidden")
-    const showSend = hasText || hasFiles || hasVoice
+    const hasVerse = this.hasScriptureFieldTarget && this.scriptureFieldTarget.value.trim().length > 0
+    const showSend = hasText || hasFiles || hasVoice || hasVerse
 
     this.recordBtnTarget.classList.toggle("hidden", showSend)
     this.sendBtnTarget.classList.toggle("hidden", !showSend)
+  }
+
+  // ---- Shared scripture ---------------------------------------------------
+
+  toggleVersePanel(event) {
+    event.preventDefault()
+    if (!this.hasVersePanelTarget) return
+
+    const opening = this.versePanelTarget.classList.contains("hidden")
+    this.versePanelTarget.classList.toggle("hidden", !opening)
+    if (opening && this.hasVerseInputTarget) {
+      // Prefill with whatever verse is already attached, then focus.
+      this.verseInputTarget.value = this.hasScriptureFieldTarget ? this.scriptureFieldTarget.value : ""
+      this.verseInputTarget.focus()
+    }
+  }
+
+  verseKeydown(event) {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      this.attachVerse(event)
+    } else if (event.key === "Escape") {
+      this.versePanelTarget.classList.add("hidden")
+    }
+  }
+
+  attachVerse(event) {
+    if (event) event.preventDefault()
+    if (!this.hasVerseInputTarget || !this.hasScriptureFieldTarget) return
+
+    const ref = this.verseInputTarget.value.trim()
+    if (!ref) {
+      this.clearVerse()
+      return
+    }
+
+    this.scriptureFieldTarget.value = ref
+    if (this.hasScriptureLabelTarget) this.scriptureLabelTarget.textContent = ref
+    if (this.hasScripturePreviewTarget) this.scripturePreviewTarget.classList.remove("hidden")
+    if (this.hasVersePanelTarget) this.versePanelTarget.classList.add("hidden")
+    this.syncTrailingAction()
+  }
+
+  clearVerse(event) {
+    if (event) event.preventDefault()
+    if (this.hasScriptureFieldTarget) this.scriptureFieldTarget.value = ""
+    if (this.hasScripturePreviewTarget) this.scripturePreviewTarget.classList.add("hidden")
+    if (this.hasVerseInputTarget) this.verseInputTarget.value = ""
+    this.syncTrailingAction()
   }
 
   // ---- Image previews -----------------------------------------------------

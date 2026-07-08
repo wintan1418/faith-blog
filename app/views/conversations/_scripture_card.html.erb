@@ -1,0 +1,12 @@
+<% ref = message.scripture_ref %>
+<% verse = (ScriptureLookup.lookup(ref) rescue nil) %>
+<div class="dm-scripture-card">
+  <div class="dm-scripture-head">
+    <%= render_icon("book_open", classes: "h-4 w-4") %>
+    <span class="dm-scripture-ref"><%= verse&.dig(:reference).presence || ref %></span>
+  </div>
+  <% if verse && verse[:text].present? %>
+    <p class="dm-scripture-text"><%= verse[:text] %></p>
+    <div class="dm-scripture-tr"><%= verse[:translation].presence || "KJV" %></div>
+  <% end %>
+</div>

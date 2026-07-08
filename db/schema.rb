@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_25_170000) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_08_170641) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -345,6 +345,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_25_170000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "likes_count", default: 0, null: false
+    t.string "scripture_ref"
     t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["deleted_at"], name: "index_messages_on_deleted_at"

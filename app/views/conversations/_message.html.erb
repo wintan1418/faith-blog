@@ -27,6 +27,10 @@
       <% if deleted %>
         <div class="message-deleted">— message deleted —</div>
       <% else %>
+        <% if message.has_scripture? %>
+          <%= render "conversations/scripture_card", message: message %>
+        <% end %>
+
         <% if message.has_images? %>
           <div class="message-images <%= "is-grid-#{[message.images.count, 4].min}" %>">
             <% message.images.each do |img| %>

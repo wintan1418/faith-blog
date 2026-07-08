@@ -79,6 +79,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:body, :voice_note, images: [])
+    params.require(:message).permit(:body, :voice_note, :scripture_ref, images: [])
   end
 end

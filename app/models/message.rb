@@ -19,14 +19,21 @@ class Message < ApplicationRecord
     edited_at.present?
   end
 
-  # Body is optional when the message carries an image or a voice note.
-  # When neither attachment is present, body must be there.
-  validates :body, length: { maximum: 4_000 }, presence: true, unless: :has_attachments?
+  # Body is optional when the message carries an image, a voice note, or a
+  # shared scripture. When none of those are present, body must be there.
+  before_validation :normalize_scripture_ref
+  # body is NOT NULL at the DB level; a message carried only by an image,
+  # voice note, or verse still needs an empty string rather than nil.
+  before_validation { self.body = body.to_s }
+
+  validates :body, presence: true, unless: :body_optional?
   validates :body, length: { maximum: 4_000 }, allow_blank: true
+  validates :scripture_ref, length: { maximum: 120 }, allow_blank: true
   validate  :sender_is_participant
   validate  :sender_is_not_blocked
   validate  :max_images_count
   validate  :attachments_content_type_and_size
+  validate  :scripture_ref_looks_like_a_reference
 
   def attachments_content_type_and_size
     validate_image_attachment(:images, max_bytes: IMAGE_MAX_BYTES)
@@ -46,6 +53,10 @@ class Message < ApplicationRecord
     voice_note.attached?
   end
 
+  def has_scripture?
+    scripture_ref.present?
+  end
+
   scope :visible, -> { where(deleted_at: nil) }
   scope :oldest_first, -> { order(created_at: :asc) }
 
@@ -58,6 +69,29 @@ class Message < ApplicationRecord
   end
 
   private
+
+  # A body isn't required when the message already carries something to say:
+  # an image, a voice note, or a shared verse.
+  def body_optional?
+    has_attachments? || scripture_ref.present?
+  end
+
+  # Accept free-form input like "read John 3:16 today" and keep just the
+  # reference. Blank stays blank; unrecognised text is left as-is so the
+  # validation below can reject it.
+  def normalize_scripture_ref
+    return if scripture_ref.blank?
+
+    detected = ScriptureLookup.find_references(scripture_ref).first
+    self.scripture_ref = (detected || scripture_ref).to_s.strip
+  end
+
+  def scripture_ref_looks_like_a_reference
+    return if scripture_ref.blank?
+    return if ScriptureLookup.find_references(scripture_ref).present?
+
+    errors.add(:scripture_ref, "should look like a verse reference, e.g. John 3:16")
+  end
 
   def sender_is_participant
     return if conversation&.conversation_participants&.exists?(user: sender)

@@ -20,6 +20,15 @@
               data-action="click->dm-composer#clearVoice"
               aria-label="Discard voice note">✕</button>
     </div>
+
+    <div data-dm-composer-target="scripturePreview" class="dm-scripture-chip hidden">
+      <%= render_icon("book_open", classes: "h-4 w-4") %>
+      <span data-dm-composer-target="scriptureLabel"></span>
+      <button type="button"
+              class="dm-scripture-clear"
+              data-action="click->dm-composer#clearVerse"
+              aria-label="Remove verse">✕</button>
+    </div>
   </div>
 
   <div class="inbox-composer-row" data-controller="emoji-picker">
@@ -54,6 +63,14 @@
             class: "sr-only",
             data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
       </label>
+
+      <button type="button"
+              class="inbox-composer-iconbtn"
+              data-action="click->dm-composer#toggleVersePanel"
+              title="Share a verse"
+              aria-label="Share a verse">
+        <%= render_icon("book_open", classes: "h-5 w-5") %>
+      </button>
     </div>
 
     <%# IMPORTANT: explicitly pass value: "" so Rails doesn't serialize the
@@ -63,6 +80,19 @@
         controller swaps this element for a real <input type=\"file\"> the
         moment a voice note is finalised. %>
     <%= f.hidden_field :voice_note, value: "", data: { dm_composer_target: "voiceField" } %>
+
+    <%# Shared scripture reference — set by the verse panel, cleared with the chip. %>
+    <%= f.hidden_field :scripture_ref, value: "", data: { dm_composer_target: "scriptureField" } %>
+
+    <%# Verse panel: type a reference (e.g. John 3:16) and attach it to the message. %>
+    <div class="dm-verse-panel hidden" data-dm-composer-target="versePanel">
+      <input type="text"
+             class="dm-verse-input"
+             placeholder="e.g. John 3:16"
+             data-dm-composer-target="verseInput"
+             data-action="keydown->dm-composer#verseKeydown">
+      <button type="button" class="dm-verse-add" data-action="click->dm-composer#attachVerse">Add</button>
+    </div>
 
     <%# Single trailing action — mic when input is empty, send when there's text %>
     <button type="button"
