@@ -125,22 +125,30 @@ class Message < ApplicationRecord
       # create.turbo_stream response — skip them to avoid duplicates.
       next if participant.user_id == sender_id
 
-      # Broadcast synchronously (not the _later variants) so delivery never
-      # waits on a Solid Queue worker — otherwise a message doesn't reach the
-      # open conversation until the recipient re-renders the thread. Typing
-      # indicators already push over the cable directly; messages now match.
-      broadcast_append_to(
-        [ conversation, participant.user_id, :messages ],
-        target: "messages",
-        partial: "conversations/message",
-        locals: { message: self, viewer_id: participant.user_id }
-      )
-      broadcast_replace_to(
-        [ conversation, participant.user_id, :read_receipt ],
-        target: "read_receipt",
-        partial: "conversations/read_receipt",
-        locals: { conversation: conversation, viewer_id: participant.user_id }
-      )
+      begin
+        # Broadcast synchronously (not the _later variants) so delivery never
+        # waits on a Solid Queue worker — otherwise a message doesn't reach the
+        # open conversation until the recipient re-renders the thread.
+        broadcast_append_to(
+          [ conversation, participant.user_id, :messages ],
+          target: "messages",
+          partial: "conversations/message",
+          locals: { message: self, viewer_id: participant.user_id }
+        )
+        broadcast_replace_to(
+          [ conversation, participant.user_id, :read_receipt ],
+          target: "read_receipt",
+          partial: "conversations/read_receipt",
+          locals: { conversation: conversation, viewer_id: participant.user_id }
+        )
+      rescue StandardError => e
+        # A cable-layer failure (e.g. a misconfigured Solid Cable database)
+        # must NEVER break sending the message. The message is already saved;
+        # the recipient still sees it when the thread re-renders. Log and move on.
+        Rails.logger.error(
+          "[Message##{id}] broadcast to user #{participant.user_id} failed: #{e.class}: #{e.message}"
+        )
+      end
     end
   end
 
