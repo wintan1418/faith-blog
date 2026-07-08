@@ -1,7 +1,11 @@
 <%= form_with model: [conversation, message],
               class: "inbox-composer",
               id: "new_message",
-              html: { multipart: true, data: { controller: "dm-composer" } } do |f| %>
+              html: { multipart: true, data: {
+                controller: "dm-composer",
+                action: "submit->dm-composer#onSubmit",
+                dm_composer_gentleness_url_value: check_gentleness_posts_path
+              } } do |f| %>
 
   <% if message.errors.any? %>
     <div class="inbox-composer-errors">
@@ -28,6 +32,20 @@
               class="dm-scripture-clear"
               data-action="click->dm-composer#clearVerse"
               aria-label="Remove verse">✕</button>
+    </div>
+  </div>
+
+  <%# Kindness nudge — shown only when the tone check reads as harsh. %>
+  <div class="dm-nudge hidden" data-dm-composer-target="nudge">
+    <div class="dm-nudge-head">
+      <span class="dm-nudge-title">⚠️ This might land harder than you mean</span>
+      <button type="button" class="dm-nudge-close" data-action="click->dm-composer#dismissNudge" aria-label="Keep editing">✕</button>
+    </div>
+    <p class="dm-nudge-text" data-dm-composer-target="nudgeText"></p>
+    <blockquote class="dm-nudge-suggestion hidden" data-dm-composer-target="nudgeSuggestion"></blockquote>
+    <div class="dm-nudge-actions">
+      <button type="button" class="dm-nudge-soften" data-action="click->dm-composer#useSuggestion">Use softer wording</button>
+      <button type="button" class="dm-nudge-send" data-action="click->dm-composer#sendAnyway">Send anyway</button>
     </div>
   </div>
 

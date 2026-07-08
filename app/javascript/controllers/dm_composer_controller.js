@@ -6,7 +6,8 @@ import { Controller } from "@hotwired/stimulus"
 //      to the form via a DataTransfer-backed FileList so submitting the
 //      form ships it like any other file upload.
 export default class extends Controller {
-  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput"]
+  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput", "nudge", "nudgeText", "nudgeSuggestion"]
+  static values  = { gentlenessUrl: String }
 
   connect() {
     // Hide mic if browser can't record; force send-button visibility.
@@ -39,6 +40,114 @@ export default class extends Controller {
 
     this.recordBtnTarget.classList.toggle("hidden", showSend)
     this.sendBtnTarget.classList.toggle("hidden", !showSend)
+  }
+
+  // ---- Kindness nudge -----------------------------------------------------
+  // Before sending a longer text message, quietly check its tone. Only a
+  // confident "harsh" reading pauses to offer a gentler rephrase — anything
+  // else (gentle, firm, an error, a timeout) sends straight through.
+
+  onSubmit(event) {
+    if (this.toneApproved) return                       // already cleared this text
+    if (!this.hasGentlenessUrlValue || !this.gentlenessUrlValue) return
+    if (!this.hasBodyInputTarget) return
+
+    const text = this.bodyInputTarget.value.trim()
+    if (text.length < 25) return                        // too short to read tone
+
+    event.preventDefault()
+    this.checkTone(text)
+  }
+
+  async checkTone(text) {
+    if (this.checking) return
+    this.checking = true
+    this.setChecking(true)
+
+    let data = null
+    try {
+      data = await this.postJson(this.gentlenessUrlValue, { content: text })
+    } catch (_e) {
+      data = null                                        // network / timeout → fail open
+    } finally {
+      this.checking = false
+      this.setChecking(false)
+    }
+
+    const harsh = data && data.ok && data.tone === "harsh" && Number(data.confidence || 0) >= 0.5
+    if (harsh) {
+      this.showNudge(data)
+    } else {
+      this.approveAndSend()
+    }
+  }
+
+  approveAndSend() {
+    this.toneApproved = true
+    this.hideNudge()
+    this.element.requestSubmit()
+  }
+
+  showNudge({ nudge, suggestion }) {
+    if (!this.hasNudgeTarget) { this.approveAndSend(); return }
+
+    if (this.hasNudgeTextTarget) {
+      this.nudgeTextTarget.textContent = nudge || "Consider whether this could wound before you send it."
+    }
+    if (this.hasNudgeSuggestionTarget) {
+      const soft = (suggestion || "").trim()
+      this._suggestion = soft || null
+      this.nudgeSuggestionTarget.textContent = soft
+      this.nudgeSuggestionTarget.classList.toggle("hidden", !soft)
+    }
+    this.nudgeTarget.classList.remove("hidden")
+  }
+
+  hideNudge() {
+    if (this.hasNudgeTarget) this.nudgeTarget.classList.add("hidden")
+  }
+
+  useSuggestion(event) {
+    if (event) event.preventDefault()
+    if (this._suggestion && this.hasBodyInputTarget) {
+      this.bodyInputTarget.value = this._suggestion
+      this.bodyInputTarget.dispatchEvent(new Event("input", { bubbles: true }))
+      this.bodyInputTarget.focus()
+    }
+    this.hideNudge()
+    this.toneApproved = false        // sending again re-checks the softened text
+  }
+
+  sendAnyway(event) {
+    if (event) event.preventDefault()
+    this.approveAndSend()
+  }
+
+  dismissNudge(event) {
+    if (event) event.preventDefault()
+    this.hideNudge()
+    if (this.hasBodyInputTarget) this.bodyInputTarget.focus()
+  }
+
+  setChecking(on) {
+    if (this.hasSendBtnTarget) {
+      this.sendBtnTarget.classList.toggle("is-checking", on)
+      this.sendBtnTarget.disabled = on
+    }
+    if (this.hasRecordBtnTarget) this.recordBtnTarget.disabled = on
+  }
+
+  postJson(url, body) {
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || ""
+    const ctl = new AbortController()
+    const timer = setTimeout(() => ctl.abort(), 4500)
+    return fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": csrf },
+      body: JSON.stringify(body),
+      credentials: "same-origin",
+      signal: ctl.signal
+    }).then(r => r.json()).finally(() => clearTimeout(timer))
   }
 
   // ---- Shared scripture ---------------------------------------------------
