@@ -13,12 +13,18 @@ class DmScriptureTest < ActionDispatch::IntegrationTest
     @conversation = Conversation.find_or_create_between!(@sender, @recipient)
   end
 
+  # Stubbed because sending a verse message now broadcasts synchronously, which
+  # renders the scripture card (a ScriptureLookup network call) inline.
+  VERSE = { reference: "John 3:16", text: "For God so loved the world…", translation: "KJV" }.freeze
+
   test "a message can carry a shared verse with no body, and the reference is normalized" do
     sign_in @sender
 
-    assert_difference -> { @conversation.messages.count }, 1 do
-      post conversation_messages_path(@conversation),
-           params: { message: { scripture_ref: "please read John 3:16 tonight" } }
+    ScriptureLookup.stub :lookup, VERSE do
+      assert_difference -> { @conversation.messages.count }, 1 do
+        post conversation_messages_path(@conversation),
+             params: { message: { scripture_ref: "please read John 3:16 tonight" } }
+      end
     end
 
     message = @conversation.messages.order(:created_at).last
@@ -28,9 +34,8 @@ class DmScriptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the verse renders as a card in the thread" do
-    message = @conversation.messages.create!(sender: @sender, scripture_ref: "John 3:16")
-
-    ScriptureLookup.stub :lookup, { reference: "John 3:16", text: "For God so loved the world…", translation: "KJV" } do
+    ScriptureLookup.stub :lookup, VERSE do
+      @conversation.messages.create!(sender: @sender, scripture_ref: "John 3:16")
       sign_in @sender
       get conversation_path(@conversation)
     end

@@ -125,13 +125,17 @@ class Message < ApplicationRecord
       # create.turbo_stream response — skip them to avoid duplicates.
       next if participant.user_id == sender_id
 
-      broadcast_append_later_to(
+      # Broadcast synchronously (not the _later variants) so delivery never
+      # waits on a Solid Queue worker — otherwise a message doesn't reach the
+      # open conversation until the recipient re-renders the thread. Typing
+      # indicators already push over the cable directly; messages now match.
+      broadcast_append_to(
         [ conversation, participant.user_id, :messages ],
         target: "messages",
         partial: "conversations/message",
         locals: { message: self, viewer_id: participant.user_id }
       )
-      broadcast_replace_later_to(
+      broadcast_replace_to(
         [ conversation, participant.user_id, :read_receipt ],
         target: "read_receipt",
         partial: "conversations/read_receipt",

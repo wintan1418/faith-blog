@@ -1,5 +1,7 @@
 <% message = local_assigns.fetch(:message) %>
-<% viewer_id = local_assigns.fetch(:viewer_id, current_user&.id) %>
+<%# Never touch current_user eagerly — this partial is also rendered in
+    Action Cable broadcasts (no request context), where current_user raises. %>
+<% viewer_id = local_assigns[:viewer_id] || current_user&.id %>
 <% last_mine_id = local_assigns[:last_mine_id] %>
 <% conversation_local = local_assigns[:conversation] || message.conversation %>
 <% mine = message.sender_id == viewer_id %>
@@ -9,7 +11,7 @@
 
 <%
   loaded_likes = message.likes.includes(:user).to_a
-  user_like    = current_user ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
+  user_like    = viewer_id ? loaded_likes.find { |l| l.user_id == viewer_id } : nil
   emoji_groups = loaded_likes
                    .reject { |l| l.reaction_emoji.to_s.empty? }
                    .group_by(&:reaction_emoji)
