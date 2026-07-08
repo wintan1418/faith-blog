@@ -14954,15 +14954,30 @@ body.fc-discover-open::before {
   background: linear-gradient(90deg, var(--fc-accent-soft), transparent);
 }
 
-/* ── Thread (right pane) ── */
+/* ── Thread (right pane) ──
+   A flex column, NOT a grid. The grid version pinned the scrollable messages
+   pane to a specific row (minmax(0,1fr)); any extra child — a cable stream
+   source, the typing row, the composer — shifted that assignment, dropping the
+   messages into an auto (content-sized) row that grew past the fixed-height
+   shell and got clipped with no way to scroll. As a flex column, the messages
+   pane is simply "the child that grows and scrolls", which can't be knocked
+   out of place. */
 .inbox-thread {
-  display: grid !important;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  display: flex !important;
+  flex-direction: column;
   background: transparent;
   min-width: 0;
+  min-height: 0;
   height: 100%;
 }
-.inbox-thread--empty { grid-template-rows: 1fr; }
+/* Everything except the messages pane keeps its natural height. */
+.inbox-thread > .inbox-thread-head,
+.inbox-thread > .read-receipt,
+.inbox-thread > .typing-indicator,
+.inbox-thread > .inbox-composer {
+  flex: 0 0 auto;
+}
+.inbox-thread--empty { justify-content: center; }
 
 /* Turbo cable stream sources are zero-content elements but they still
    participate in grid layout, which pushed the chat header down into
@@ -15170,6 +15185,8 @@ html.theme-light .inbox-thread-head {
 
 /* ── Messages ── */
 .inbox-messages {
+  flex: 1 1 auto;
+  min-height: 0; /* the crucial bit — lets the scroller shrink and scroll */
   display: flex !important;
   flex-direction: column;
   gap: 10px;
