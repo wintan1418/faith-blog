@@ -47,7 +47,7 @@ self.addEventListener("push", (event) => {
     badge: "/icon.png",
     tag: data.tag || "brethreign",
     data: { url: data.url || "/feed" },
-    renotify: false,
+    renotify: true, // re-alert when a same-tag notification (e.g. a chat) updates
     requireInteraction: false
   };
 

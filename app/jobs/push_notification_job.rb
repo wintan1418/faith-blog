@@ -27,7 +27,17 @@ class PushNotificationJob < ApplicationJob
       body:  notification.message,
       url:   notification.target_path,
       icon:  "/icon.png",
-      tag:   "brethreign-#{notification.notification_type}-#{notification.notifiable_id}"
+      tag:   push_tag(notification)
     }
+  end
+
+  # Collapse all messages in one conversation into a single, self-replacing
+  # notification so a burst of DMs doesn't stack into a wall of alerts.
+  def push_tag(notification)
+    if notification.direct_message? && notification.notifiable.respond_to?(:conversation_id)
+      "brethreign-dm-#{notification.notifiable.conversation_id}"
+    else
+      "brethreign-#{notification.notification_type}-#{notification.notifiable_id}"
+    end
   end
 end
