@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Can't show this page · Brethreign</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width">
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      * { margin: 0; }
+      html, body { height: 100%; }
+      body {
+        background:
+          radial-gradient(ellipse 60rem 32rem at 50% -8rem, rgba(52, 211, 153, 0.18), transparent 60%),
+          #0b0f10;
+        color: #f4faf7;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 2rem;
+        -webkit-font-smoothing: antialiased;
+      }
+      main { text-align: center; max-width: 32rem; }
+      .mark {
+        width: 72px; height: 72px; margin: 0 auto 1.4rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #34d399, #059669);
+        display: grid; place-items: center;
+        box-shadow: 0 16px 40px -10px rgba(52, 211, 153, 0.45);
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+      .mark svg { width: 38px; height: 38px; }
+      @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+      .code {
+        font-size: 0.74rem; font-weight: 800; letter-spacing: 0.18em;
+        text-transform: uppercase; color: #34d399; margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800;
+        letter-spacing: -0.01em; margin-bottom: 0.7rem;
+      }
+      p { font-size: 0.98rem; color: #c8d3cf; line-height: 1.55; margin-bottom: 1.4rem; }
+      a.btn {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.7rem 1.2rem; background: #34d399; color: #042f1d;
+        font-weight: 800; border-radius: 999px; text-decoration: none;
+        transition: filter 140ms ease, transform 90ms ease;
+      }
+      a.btn:hover { filter: brightness(1.06); }
+      a.btn:active { transform: scale(0.97); }
+      footer { margin-top: 2.5rem; font-size: 0.78rem; color: #75847a; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19"
+                fill="none" stroke="#042f1d" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="22" cy="11" r="1.6" fill="#042f1d"/>
+        </svg>
+      </div>
+      <p class="code">406 · Can't show this page</p>
+      <h1>We couldn't render this page for your browser.</h1>
+      <p>Take a breath and head back — the rest of Brethreign is right where you left it.</p>
+      <a class="btn" href="/">← Back to the feed</a>
+      <footer>Brethreign · breathe</footer>
+    </main>
+  </body>
+</html>

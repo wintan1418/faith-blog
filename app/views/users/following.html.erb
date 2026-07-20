@@ -1,0 +1,9 @@
+<% content_for(:title) { "@#{@user.username} follows · Brethreign" } %>
+
+<%= render "users/people_page",
+           user: @user,
+           heading: "Following",
+           subheading: "People @#{@user.username} follows.",
+           active: :following,
+           empty_title: "Not following anyone yet",
+           empty_copy: "When @#{@user.username} follows people, they'll appear here." %>

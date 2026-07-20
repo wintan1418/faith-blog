@@ -1,0 +1,80 @@
+<%# Shared layout for the Followers / Following pages.
+    Locals: user, heading, subheading, active (:followers | :following),
+            empty_title, empty_copy %>
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-6">
+      <%= link_to user_path(user.username), class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
+        ← Back to <%= user.display_name %>'s profile
+      <% end %>
+      <h1 class="mystic-title mt-3 text-3xl sm:text-4xl"><%= heading %></h1>
+      <p class="mystic-copy mt-1"><%= subheading %></p>
+    </div>
+
+    <div class="mb-6 flex gap-2">
+      <%= link_to followers_user_path(user.username),
+                  class: "fc-btn #{'fc-btn-primary' if active == :followers}" do %>
+        Followers · <%= number_to_human(user.followers_count, format: "%n%u", units: { thousand: "k" }) %>
+      <% end %>
+      <%= link_to following_user_path(user.username),
+                  class: "fc-btn #{'fc-btn-primary' if active == :following}" do %>
+        Following · <%= number_to_human(user.following_count, format: "%n%u", units: { thousand: "k" }) %>
+      <% end %>
+    </div>
+
+    <% if @users.any? %>
+      <ul class="fc-people-list">
+        <% @users.each do |person| %>
+          <li class="fc-people-row">
+            <%= link_to user_path(person.username), class: "fc-people-avatar" do %>
+              <% if person.profile&.avatar&.attached? %>
+                <%= image_tag person.profile.avatar, class: "object-cover", alt: person.username %>
+              <% else %>
+                <span><%= person.username.first.upcase %></span>
+              <% end %>
+            <% end %>
+
+            <div class="fc-people-body">
+              <div class="fc-people-head">
+                <%= link_to person.display_name, user_path(person.username), class: "fc-people-name" %>
+                <span class="fc-people-handle">@<%= person.username %></span>
+              </div>
+
+              <% if person.profile&.bio.present? %>
+                <p class="fc-people-bio"><%= truncate(person.profile.bio, length: 140) %></p>
+              <% end %>
+
+              <div class="fc-people-meta">
+                <span><%= pluralize(person.followers_count, "follower") %></span>
+                <% if person.profile&.location.present? %>
+                  <span class="fc-people-dot">·</span>
+                  <span><%= person.profile.location %></span>
+                <% end %>
+              </div>
+            </div>
+
+            <% if user_signed_in? && person != current_user %>
+              <div class="fc-people-actions">
+                <%= render "users/follow_actions",
+                           user: person,
+                           follow_class: "fc-btn fc-btn-primary",
+                           following_class: "fc-btn" %>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+
+      <% if @pagy.pages > 1 %>
+        <div class="mt-8">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="mystic-panel p-10 text-center">
+        <h2 class="text-xl font-black text-[var(--fc-ink)]"><%= empty_title %></h2>
+        <p class="mystic-copy mx-auto mt-2 max-w-md"><%= empty_copy %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -112,17 +112,25 @@ class UsersController < ApplicationController
   end
 
   def followers
-    @pagy, @users = pagy(@user.followers.includes(:profile))
+    return redirect_private_profile unless profile_visible_to_viewer?(@user)
+
+    @pagy, @users = pagy(@user.followers.includes(:profile), items: 24)
   end
 
   def following
-    @pagy, @users = pagy(@user.following.includes(:profile))
+    return redirect_private_profile unless profile_visible_to_viewer?(@user)
+
+    @pagy, @users = pagy(@user.following.includes(:profile), items: 24)
   end
 
   private
 
   def set_user
     @user = User.find_by!(username: params[:username])
+  end
+
+  def redirect_private_profile
+    redirect_to user_path(@user.username), alert: "This profile is private."
   end
 
   # A private profile (public_profile = false) hides its posts from everyone
