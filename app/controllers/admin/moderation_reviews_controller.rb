@@ -25,6 +25,24 @@ class Admin::ModerationReviewsController < ApplicationController
       flagged: AiModerationReview.where(status: :flagged).count,
       high:    AiModerationReview.where(severity: "high", status: %i[pending flagged]).count
     }
+
+    # Held posts with no open review row (gate job lost/crashed before it could
+    # write one) are invisible to the queue above — surface them here so a
+    # moderator can always find and release every held breath.
+    @stuck_posts = Post.where(status: :published, moderation_status: :pending_review)
+                       .where.not(id: AiModerationReview.where(reviewable_type: "Post", status: %i[pending flagged])
+                                                        .select(:reviewable_id))
+                       .includes(:user)
+                       .order(created_at: :desc)
+                       .limit(50)
+  end
+
+  # POST /admin/moderation_reviews/release_post — approve a held post that has
+  # no review row to decide through.
+  def release_post
+    post = Post.find(params[:post_id])
+    release_post!(post, decision: "approve")
+    redirect_to admin_moderation_reviews_path, notice: "Breath ##{post.id} released to the feed."
   end
 
   def show
@@ -113,6 +131,11 @@ class Admin::ModerationReviewsController < ApplicationController
   def release_post_if_post!(decision)
     post = @review.reviewable
     return unless post.is_a?(Post)
+
+    release_post!(post, decision: decision)
+  end
+
+  def release_post!(post, decision:)
     return if post.moderation_approved?
 
     post.update_columns(moderation_status: Post.moderation_statuses[:approved], moderation_blocked_reason: nil)

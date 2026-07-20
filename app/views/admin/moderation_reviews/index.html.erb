@@ -30,6 +30,34 @@
   <%= filter_link.call("Dismissed", "dismissed") %>
 </div>
 
+<% if @stuck_posts.any? %>
+  <div class="mb-6 overflow-hidden rounded-xl border border-amber-300/60 bg-[var(--fc-surface)] shadow-sm">
+    <div class="border-b border-[var(--fc-line)] bg-amber-50/60 px-5 py-3 dark:bg-amber-500/10">
+      <p class="text-sm font-extrabold text-[var(--fc-ink)]">⏳ Held breaths with no review yet</p>
+      <p class="mt-0.5 text-xs text-[var(--fc-muted)]">
+        These are hidden from the feed but never made it into the queue below (the AI gate didn't finish).
+        Release them, or wait for the sweep to re-run the gate.
+      </p>
+    </div>
+    <ul class="divide-y divide-[var(--fc-line)]">
+      <% @stuck_posts.each do |post| %>
+        <li class="flex items-center gap-4 px-5 py-3">
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-bold text-[var(--fc-ink)]">
+              <%= link_to (post.title.presence || "Breath ##{post.id}"), post_path(post), class: "hover:underline" %>
+            </p>
+            <p class="mt-0.5 text-xs text-[var(--fc-muted)]">
+              by <%= post.user&.username || "unknown" %> · <%= time_ago_in_words(post.created_at) %> ago
+            </p>
+          </div>
+          <%= button_to "Approve & publish", release_post_admin_moderation_reviews_path(post_id: post.id),
+                        class: "btn btn-secondary btn-sm whitespace-nowrap" %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
 <% if @reviews.empty? %>
   <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
     <p class="text-base font-bold text-[var(--fc-ink)]">Nothing in this view.</p>

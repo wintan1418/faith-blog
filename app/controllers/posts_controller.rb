@@ -15,6 +15,15 @@ class PostsController < ApplicationController
   end
 
   def show
+    # A held breath is invisible to signed-out visitors — including its own
+    # author following an email deep link in a browser with no session. Route
+    # them through sign-in and back here instead of dead-ending on the
+    # "held for moderator review" placeholder.
+    if @post.held_for_review? && !user_signed_in?
+      store_location_for(:user, request.fullpath)
+      return redirect_to new_user_session_path, alert: "Please sign in to view this breath."
+    end
+
     @post.increment_views! unless current_user == @post.user
     @comments = @post.comments.root_comments.active.visible_for(current_user)
                      .includes(:user, :replies, likes: :user).oldest_first

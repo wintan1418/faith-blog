@@ -228,6 +228,9 @@ Rails.application.routes.draw do
         post :decide
         post :copilot
       end
+      collection do
+        post :release_post
+      end
     end
     resources :broadcasts do
       member do

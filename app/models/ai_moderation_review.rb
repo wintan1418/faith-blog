@@ -26,11 +26,14 @@ class AiModerationReview < ApplicationRecord
     %w[low medium high].include?(severity) && severity != "none"
   end
 
-  def self.from_result(reviewable:, user:, result:)
+  # `status` override: the moderation decision (hold → :pending,
+  # block → :flagged) outranks result.safe — the admin queue only lists
+  # pending/flagged, so a held post with a :cleared review is invisible.
+  def self.from_result(reviewable:, user:, result:, status: nil)
     review = find_or_initialize_by(reviewable: reviewable)
     review.assign_attributes(
       user: user,
-      status: result.flagged? ? :flagged : :cleared,
+      status: status || (result.flagged? ? :flagged : :cleared),
       severity: result.severity,
       recommended_action: result.recommended_action,
       categories: result.categories,

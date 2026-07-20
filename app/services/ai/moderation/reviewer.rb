@@ -46,20 +46,37 @@ module Ai
       def call
         raw = Client.call(system: SYSTEM_PROMPT, user: user_prompt)
         payload = extract_payload(raw)
+        safe = payload.fetch("safe", true)
 
         Result.new(
-          safe: payload.fetch("safe", true),
-          severity: payload.fetch("severity", "none"),
+          safe: safe,
+          severity: normalize_severity(payload["severity"]),
           categories: Array(payload["categories"]),
           score: payload.fetch("score", 0.0).to_f,
           summary: payload.fetch("summary", ""),
-          recommended_action: payload.fetch("recommended_action", "allow"),
+          recommended_action: normalize_action(payload["recommended_action"], safe: safe),
           raw_response: raw,
-          model: raw["model"] || Client::DEFAULT_MODEL
+          model: raw["model"].to_s.presence || "unknown"
         )
       end
 
       private
+
+      # Models drift from the schema ("None", "Review", "hold"…). Anything the
+      # policy doesn't recognise must be coerced onto the allowlist here —
+      # off-list values downstream fail AiModerationReview validations and
+      # wedge the post in :pending_review with no review row for the admins.
+      def normalize_severity(value)
+        value = value.to_s.strip.downcase
+        Policy::SEVERITIES.include?(value) ? value : "none"
+      end
+
+      def normalize_action(value, safe:)
+        value = value.to_s.strip.downcase
+        return value if Policy::ACTIONS.include?(value)
+
+        safe ? "allow" : "require_review"
+      end
 
       def user_prompt
         ctx = @author_context.present? ? "Author context: #{@author_context}\n\n" : ""

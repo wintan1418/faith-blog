@@ -19,9 +19,15 @@ module Ai
 
         # Persist the AiModerationReview record now that the post has been saved.
         # No-op when fail-open returned no result (network/parse error).
+        # The review's status must mirror the DECISION, not result.safe — a held
+        # post whose review says :cleared never appears on the admin queue.
         def persist_review!(post)
           return nil unless result
-          AiModerationReview.from_result(reviewable: post, user: post.user, result: result)
+
+          status = if hold? then :pending
+          elsif block? then :flagged
+          end
+          AiModerationReview.from_result(reviewable: post, user: post.user, result: result, status: status)
         end
       end
 
@@ -91,7 +97,9 @@ module Ai
         return [:block, "policy_block"]      if action == "block"
         return [:hold,  "hide_pending_review"] if action == "hide_pending_review"
         return [:hold,  "require_review"]     if action == "require_review"
-        return [:hold,  "suggest_edit"]       if action == "suggest_edit" && severity != "low"
+        # suggest_edit only warrants a human when the severity is real —
+        # "none"/"low" suggestions should never keep a breath off the feed.
+        return [:hold,  "suggest_edit"]       if action == "suggest_edit" && %w[medium high].include?(severity)
 
         [:allow, "ok"]
       end

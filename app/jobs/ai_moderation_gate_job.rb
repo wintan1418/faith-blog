@@ -20,7 +20,15 @@ class AiModerationGateJob < ApplicationJob
     # PostGatekeeper is fail-open: any AI/network error returns an :allow verdict
     # with no result, so a flaky upstream releases the post rather than wedging it.
     verdict = Ai::Moderation::PostGatekeeper.call(post: post)
-    verdict.persist_review!(post)
+
+    # The audit row must never block the decision — a validation failure here
+    # used to raise before apply_moderation_decision!, leaving the post held
+    # forever with no review row on the admin board.
+    begin
+      verdict.persist_review!(post)
+    rescue StandardError => e
+      Rails.logger.error("[AiModerationGateJob] persist_review failed for post #{post.id}: #{e.class}: #{e.message}")
+    end
 
     post.apply_moderation_decision!(verdict.decision, reason: verdict.reason)
     Ai::Moderation::RiskScorer.call(user: post.user) if post.user
