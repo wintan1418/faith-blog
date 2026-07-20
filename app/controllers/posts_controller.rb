@@ -209,6 +209,14 @@ class PostsController < ApplicationController
 
   def set_post
     @post = Post.friendly.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    # Old notification emails carry post URLs baked at send time; once the
+    # breath is deleted those links are dead forever. Give signed-in readers
+    # a soft landing instead of the bare 404 page. Anonymous requests
+    # (crawlers, garbage URLs) still get a proper 404.
+    raise unless user_signed_in?
+
+    redirect_to feed_path, alert: "That breath isn't here anymore — it may have been removed."
   end
 
   def post_params

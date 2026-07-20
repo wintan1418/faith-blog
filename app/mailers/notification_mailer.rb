@@ -5,7 +5,10 @@ class NotificationMailer < ApplicationMailer
     @notification = params.fetch(:notification)
     @user = @notification.user
     @actor = @notification.actor
-    @target_url = URI.join(root_url, @notification.target_path).to_s
+    # Link through the visit redirector, NOT the target's URL directly: a
+    # baked post URL 404s forever once the post is deleted or re-slugged,
+    # while /visit recomputes the destination when the reader clicks.
+    @target_url = visit_notification_url(@notification)
 
     mail(
       to: @user.email,

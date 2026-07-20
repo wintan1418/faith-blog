@@ -16,6 +16,20 @@ class NotificationsController < ApplicationController
     render layout: false
   end
 
+  # GET /notifications/:id/visit — indirection target for notification links
+  # (email + in-app). The destination is recomputed at CLICK time, so a breath
+  # that was deleted or re-slugged after the email went out can never strand
+  # the reader on a 404 — they land back on their notifications instead.
+  def visit
+    notification = current_user.notifications.find_by(id: params[:id])
+    unless notification
+      return redirect_to notifications_path, notice: "That notification is no longer available."
+    end
+
+    notification.mark_as_read!
+    redirect_to notification.target_path
+  end
+
   def mark_read
     notification = current_user.notifications.find(params[:id])
     notification.mark_as_read!

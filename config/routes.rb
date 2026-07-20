@@ -139,6 +139,7 @@ Rails.application.routes.draw do
     end
     member do
       post :mark_read
+      get  :visit
     end
   end
   resources :invitations, only: [ :index, :create ] do

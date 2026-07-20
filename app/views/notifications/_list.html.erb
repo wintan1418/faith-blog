@@ -1,7 +1,9 @@
 <% if notifications.any? %>
   <ul class="fc-notif-list">
     <% notifications.each do |notification| %>
-      <%= link_to notification.target_path,
+      <%# Through the visit redirector so a deleted/re-slugged target can't
+          404, and the notification marks itself read on click. %>
+      <%= link_to visit_notification_path(notification),
           class: "fc-notif-row#{' is-unread' unless notification.read?}",
           data: { turbo_frame: "_top" } do %>
         <% if notification.actor %>
