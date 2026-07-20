@@ -111,9 +111,13 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.post_path(notifiable.post)
     when :new_follower
       Rails.application.routes.url_helpers.user_path(actor.username)
-    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved
-      post = notifiable.respond_to?(:post) ? notifiable.post : notifiable
-      Rails.application.routes.url_helpers.post_path(post)
+    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked
+      post = underlying_post
+      if post
+        Rails.application.routes.url_helpers.post_path(post)
+      else
+        Rails.application.routes.url_helpers.notifications_path
+      end
     when :new_post_in_room
       room = notifiable.respond_to?(:room) ? notifiable.room : notifiable
       Rails.application.routes.url_helpers.room_path(room)
@@ -128,6 +132,25 @@ class Notification < ApplicationRecord
     end
   rescue StandardError
     Rails.application.routes.url_helpers.notifications_path
+  end
+
+  # The Post this notification is "about", whatever record was stored as the
+  # notifiable (Post, Comment, Like, Reshare…). Reaction notifications store
+  # the Like, which has no #post — passing it straight to post_path built
+  # /posts/<like-id>, a link to a breath that doesn't exist (or, on an id
+  # collision, to somebody else's breath entirely).
+  def underlying_post
+    n = notifiable
+    return n if n.is_a?(Post)
+    return n.post if n.respond_to?(:post) && n.post.is_a?(Post)
+
+    if n.respond_to?(:likeable)
+      likeable = n.likeable
+      return likeable if likeable.is_a?(Post)
+      return likeable.post if likeable.respond_to?(:post) && likeable.post.is_a?(Post)
+    end
+
+    nil
   end
 
   # Class methods

@@ -47,6 +47,26 @@ class NotificationVisitTest < ActionDispatch::IntegrationTest
     assert_match %r{/notifications/#{@notification.id}/visit}, email.body.encoded
   end
 
+  test "a reaction notification links to the breath, not /posts/<like-id>" do
+    like = Like.create!(user: @commenter, likeable: @post, reaction_type: :amen)
+    notification = Notification.create!(user: @author, actor: @commenter,
+                                        notifiable: like, notification_type: :post_liked)
+
+    assert_equal post_path(@post), notification.target_path
+
+    sign_in @author
+    get visit_notification_path(notification)
+    assert_redirected_to post_path(@post)
+  end
+
+  test "a comment-reaction notification links to the comment's breath" do
+    like = Like.create!(user: @author, likeable: @comment, reaction_type: :love)
+    notification = Notification.create!(user: @commenter, actor: @author,
+                                        notifiable: like, notification_type: :comment_liked)
+
+    assert_equal post_path(@post), notification.target_path
+  end
+
   test "a dead post link gives a signed-in reader a soft landing on the feed" do
     dead_path = post_path(@post)
     @post.destroy
