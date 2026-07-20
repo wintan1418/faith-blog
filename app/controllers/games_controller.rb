@@ -97,8 +97,21 @@ class GamesController < ApplicationController
 
   # ──────── Character Match ────────
   def character_match; end
+  # One AI call returns 5 fresh figure questions, easy → hard. The old
+  # play_filtered_round(kind: "character") path was broken: QuizGenerator
+  # never emits a "character" kind, so the pool stayed empty and rounds
+  # repeated the same stale question after several wasted AI calls.
   def character_match_generate
-    play_filtered_round(kind: "character")
+    questions = Ai::Bible::CharacterMatchRound.call
+    render json: {
+      ok: true,
+      questions: questions.map { |q| { kind: q.kind, prompt: q.prompt, choices: q.choices,
+                                       correct_index: q.correct_index, difficulty: q.difficulty,
+                                       reference: q.reference, explanation: q.explanation } }
+    }
+  rescue Ai::Bible::CharacterMatchRound::ParseError, Ai::Moderation::Client::Error => e
+    Rails.logger.warn("[CharacterMatchRound] #{e.class}: #{e.message}")
+    render json: { ok: false, error: "Couldn't fetch a fresh round. Try again in a moment." }, status: :bad_gateway
   end
   def character_match_submit
     record_attempt(kind: :character_match, max_cap: 50)

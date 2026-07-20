@@ -252,9 +252,10 @@ export default class extends Controller {
           <button type="button" class="fc-btn" data-action="click->quiz#playAgain">
             Play again
           </button>
+          ${this.hasThemeGridTarget ? `
           <button type="button" class="fc-btn" data-action="click->quiz#changeMode">
             Change theme
-          </button>
+          </button>` : ""}
           <a href="/games" class="fc-btn">Leaderboard</a>
         </div>
       </div>
