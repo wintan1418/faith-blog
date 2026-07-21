@@ -18671,10 +18671,13 @@ html.theme-dark .fc-reaction-picker {
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ── The breathing ambience ───────────────────────────────────────────── */
-body::after {
+.fc-app { position: relative; }
+.fc-app > * { position: relative; z-index: 1; }
+
+.fc-app::before {
   content: "";
   position: fixed;
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
   top: -22rem;
   left: 50%;
@@ -18689,24 +18692,24 @@ body::after {
 }
 
 @keyframes fc-breathe {
-  0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); }
-  50%      { opacity: 1;    transform: translateX(-50%) scale(1.07); }
+  0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1;    transform: translateX(-50%) scale(1.12); }
 }
 
 /* Daypart hues: the glow follows the viewer's local sky. */
-html[data-daypart="dawn"] body::after {
+html[data-daypart="dawn"] .fc-app::before {
   background:
     radial-gradient(closest-side, rgba(251, 146, 60, 0.14), transparent 70%),
     radial-gradient(closest-side, rgba(251, 113, 133, 0.10), transparent 75%);
 }
 
-html[data-daypart="dusk"] body::after {
+html[data-daypart="dusk"] .fc-app::before {
   background:
     radial-gradient(closest-side, rgba(251, 191, 36, 0.12), transparent 70%),
     radial-gradient(closest-side, rgba(129, 140, 248, 0.10), transparent 75%);
 }
 
-html[data-daypart="night"] body::after {
+html[data-daypart="night"] .fc-app::before {
   background:
     radial-gradient(closest-side, rgba(129, 140, 248, 0.12), transparent 70%),
     radial-gradient(closest-side, rgba(45, 212, 191, 0.07), transparent 75%);
@@ -18726,7 +18729,7 @@ html[data-daypart="night"] body::after {
   width: 9rem;
   height: 5rem;
   border-radius: 999px;
-  background: radial-gradient(closest-side, rgba(251, 146, 60, 0.13), transparent 70%);
+  background: radial-gradient(closest-side, rgba(251, 146, 60, 0.22), transparent 70%);
   filter: blur(6px);
   animation: fc-candle 2.6s ease-in-out infinite alternate;
 }
@@ -18740,7 +18743,7 @@ html[data-daypart="night"] body::after {
   width: 9rem;
   height: 5rem;
   border-radius: 999px;
-  background: radial-gradient(closest-side, rgba(251, 191, 36, 0.16), transparent 70%);
+  background: radial-gradient(closest-side, rgba(251, 191, 36, 0.26), transparent 70%);
   filter: blur(6px);
 }
 
@@ -18836,7 +18839,7 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::after,
+  .fc-app::before,
   .fc-breath.is-prayer::before,
   .fc-breath.is-prayer::after,
   .fc-composer-bar-title::before,
