@@ -18234,3 +18234,130 @@ turbo-frame#feed_stream[busy] {
   #feed_list .fc-breath { animation: none; }
   .fc-composer-chip { transition: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ CHROME PASS — glassy topbar, app-feel bottom nav, micro-interactions
+   Geometry untouched (topbar 48px, bottom nav 56px are load-bearing for
+   the inbox layout math) — this is purely look and feel.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Topbar: real glass ───────────────────────────────────────────────── */
+.fc-topbar,
+html.theme-dark .fc-topbar {
+  background: color-mix(in srgb, var(--fc-surface) 72%, transparent) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--fc-line) 80%, transparent) !important;
+  backdrop-filter: saturate(170%) blur(18px);
+  -webkit-backdrop-filter: saturate(170%) blur(18px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+}
+
+.fc-brand-mark {
+  background: linear-gradient(135deg, var(--fc-accent), var(--fc-accent-2, var(--fc-accent)));
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--fc-accent) 35%, transparent);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+a:hover > .fc-brand-mark, .fc-brand-mark:hover {
+  transform: rotate(-4deg) scale(1.06);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--fc-accent) 50%, transparent);
+}
+
+.fc-topbar-icons a svg, .fc-topbar-icons button svg {
+  transition: transform 160ms ease, color 160ms ease;
+}
+.fc-topbar-icons a:hover svg, .fc-topbar-icons button:hover svg {
+  transform: scale(1.14);
+  color: var(--fc-accent-2, var(--fc-accent));
+}
+
+/* ── Bottom nav: native-app feel (same 56px geometry) ─────────────────── */
+@media (max-width: 760px) {
+  .fc-bottom-nav,
+  html.theme-dark .fc-bottom-nav {
+    background: color-mix(in srgb, var(--fc-surface) 82%, transparent);
+    backdrop-filter: saturate(170%) blur(18px);
+    -webkit-backdrop-filter: saturate(170%) blur(18px);
+    border-top: 1px solid color-mix(in srgb, var(--fc-line) 80%, transparent);
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.08);
+  }
+
+  .fc-bottom-nav-item { position: relative; }
+
+  /* Active page: accent icon + a small indicator pill at the top edge. */
+  .fc-bottom-nav-item.is-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 3px;
+    border-radius: 0 0 999px 999px;
+    background: linear-gradient(90deg, var(--fc-accent), var(--fc-accent-2, var(--fc-accent)));
+  }
+
+  .fc-bottom-nav-item.is-active svg {
+    filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--fc-accent) 50%, transparent));
+  }
+
+  .fc-bottom-nav-item:active svg { transform: scale(0.88); }
+  .fc-bottom-nav-item svg { transition: transform 120ms ease, filter 160ms ease; }
+
+  /* The Breathe button rises out of the bar as a gradient jewel. */
+  .fc-bottom-nav-compose svg {
+    width: 44px !important;
+    height: 44px !important;
+    padding: 11px;
+    margin-top: -22px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--fc-accent), var(--fc-accent-2, var(--fc-accent)));
+    color: #06231a;
+    box-shadow:
+      0 8px 20px color-mix(in srgb, var(--fc-accent) 45%, transparent),
+      0 0 0 4px color-mix(in srgb, var(--fc-surface) 85%, transparent);
+  }
+
+  .fc-bottom-nav-compose:active svg { transform: scale(0.92); }
+  .fc-bottom-nav-compose span { color: var(--fc-accent-2, var(--fc-accent)); font-weight: 800; }
+}
+
+/* ── Micro-interactions ───────────────────────────────────────────────── */
+.fc-btn {
+  transition: transform 120ms ease, box-shadow 160ms ease,
+              background 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.fc-btn:active, .fc-tab:active, .fc-composer-chip:active { transform: scale(0.95); }
+
+/* Your reaction pops in when it lands. */
+.fc-react-btn.is-mine .fc-react-emoji {
+  display: inline-block;
+  animation: fc-pop 340ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+
+@keyframes fc-pop {
+  0%   { transform: scale(0.3); }
+  60%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+/* Emoji picker springs open. */
+.fc-reaction-picker:not(.hidden) {
+  animation: fc-picker-in 170ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  transform-origin: bottom left;
+}
+
+@keyframes fc-picker-in {
+  from { opacity: 0; transform: scale(0.92) translateY(5px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Avatars respond wherever they're links. */
+.fc-avatar { transition: transform 150ms ease, box-shadow 150ms ease; }
+a.fc-avatar:hover, a:hover > .fc-avatar { transform: scale(1.07); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-react-btn.is-mine .fc-react-emoji,
+  .fc-reaction-picker:not(.hidden) { animation: none; }
+  .fc-brand-mark, .fc-avatar, .fc-btn,
+  .fc-topbar-icons a svg, .fc-topbar-icons button svg { transition: none; }
+}
