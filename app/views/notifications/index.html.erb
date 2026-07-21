@@ -1,50 +1,91 @@
-<% content_for(:title) { "Notifications - Faith Community" } %>
+<% content_for(:title) { "Notifications · Brethreign" } %>
 
-<div class="mystic-shell py-8">
-  <div class="mystic-container max-w-3xl">
-    <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+<%
+  # One emoji per notification type — a fast visual scent for each row.
+  type_badge = ->(n) {
+    case n.notification_type.to_sym
+    when :new_comment              then "💬"
+    when :comment_reply            then "↩️"
+    when :post_liked, :comment_liked then "❤️"
+    when :new_follower             then "👤"
+    when :direct_message           then "✉️"
+    when :prayer_joined            then "🙏"
+    when :prayer_answered          then "🌟"
+    when :mentioned, :everyone_mention then "📣"
+    when :post_reshared            then "🔁"
+    when :post_featured            then "⭐"
+    when :breath_from_followee     then "🌿"
+    when :connection_request, :connection_accepted then "🤝"
+    when :post_moderation_approved then "✅"
+    when :post_held_for_review, :post_blocked then "🛡️"
+    when :resource_approved, :resource_rejected then "📚"
+    else "✦"
+    end
+  }
+
+  groups = @notifications.group_by do |n|
+    if n.created_at >= Time.current.beginning_of_day       then "Today"
+    elsif n.created_at >= 1.day.ago.beginning_of_day       then "Yesterday"
+    elsif n.created_at >= 7.days.ago.beginning_of_day      then "This week"
+    else "Earlier"
+    end
+  end
+  unread_count = @notifications.count(&:unread?)
+%>
+
+<div class="fc-page">
+  <div class="fc-notifpage">
+    <header class="fc-notifpage-head">
       <div>
-        <span class="mystic-kicker">Notifications</span>
-        <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Updates</h1>
+        <span class="fc-page-kicker">✦ Notifications</span>
+        <h1 class="fc-notifpage-title">Updates</h1>
+        <% if unread_count.positive? %>
+          <p class="fc-notifpage-sub"><%= pluralize(unread_count, "new update") %> waiting for you.</p>
+        <% else %>
+          <p class="fc-notifpage-sub">You're all caught up. 🕊️</p>
+        <% end %>
       </div>
-      <% if @notifications.any? { |n| n.unread? } %>
-        <%= button_to "Mark all as read", mark_all_read_notifications_path, class: "btn btn-secondary" %>
+      <% if unread_count.positive? %>
+        <%= button_to "Mark all read", mark_all_read_notifications_path, class: "fc-btn" %>
       <% end %>
-    </div>
+    </header>
 
     <% if @notifications.any? %>
-      <div class="mystic-panel overflow-hidden">
-        <div class="divide-y divide-faith-green/10">
-          <% @notifications.each do |notification| %>
-            <div class="flex items-start gap-4 p-5 <%= notification.unread? ? 'bg-white/45' : '' %>">
-              <% if notification.actor %>
-                <% if notification.actor.profile.avatar.attached? %>
-                  <%= image_tag notification.actor.profile.avatar, class: "mystic-avatar h-10 w-10 shrink-0 object-cover" %>
-                <% else %>
-                  <span class="mystic-avatar mystic-avatar-fallback grid h-10 w-10 shrink-0 place-items-center text-sm font-bold">
-                    <%= notification.actor.username.first.upcase %>
-                  </span>
-                <% end %>
-              <% else %>
-                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/75 text-faith-green">
-                  <%= render_icon("sparkles", classes: "w-5 h-5") %>
+      <% ["Today", "Yesterday", "This week", "Earlier"].each do |label| %>
+        <% rows = groups[label] %>
+        <% next unless rows %>
+        <section class="fc-notifpage-group">
+          <h2 class="fc-notifpage-daylabel"><%= label %></h2>
+          <div class="fc-notifpage-card">
+            <% rows.each do |notification| %>
+              <%= link_to visit_notification_path(notification),
+                          class: "fc-notifrow#{' is-unread' if notification.unread?}" do %>
+                <span class="fc-notifrow-avatar">
+                  <% if notification.actor %>
+                    <% if notification.actor.profile&.avatar&.attached? %>
+                      <%= image_tag notification.actor.profile.avatar, class: "fc-avatar object-cover", alt: notification.actor.username %>
+                    <% else %>
+                      <span class="fc-avatar" style="<%= avatar_tint_style(notification.actor.username) %>"><%= notification.actor.username.first.upcase %></span>
+                    <% end %>
+                  <% else %>
+                    <span class="fc-avatar"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
+                  <% end %>
+                  <span class="fc-notifrow-badge"><%= type_badge.call(notification) %></span>
                 </span>
-              <% end %>
 
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold leading-6 text-faith-dark"><%= notification.message %></p>
-                <p class="mt-1 text-xs font-semibold text-faith-muted"><%= time_ago_in_words(notification.created_at) %> ago</p>
-              </div>
+                <span class="fc-notifrow-body">
+                  <span class="fc-notifrow-text"><%= notification.message %></span>
+                  <span class="fc-notifrow-time"><%= time_ago_in_words(notification.created_at) %> ago</span>
+                </span>
 
-              <% if notification.unread? %>
-                <%= button_to mark_read_notification_path(notification), class: "mt-1 rounded-full p-2 text-faith-green hover:bg-white/75", data: { turbo_frame: "_top" }, title: "Mark as read" do %>
-                  <span class="block h-2.5 w-2.5 rounded-full bg-faith-green"></span>
+                <% if notification.unread? %>
+                  <span class="fc-notifrow-dot" aria-label="Unread"></span>
                 <% end %>
               <% end %>
-            </div>
-          <% end %>
-        </div>
-      </div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
 
       <% if @pagy.pages > 1 %>
         <div class="mt-8">
@@ -52,12 +93,12 @@
         </div>
       <% end %>
     <% else %>
-      <div class="mystic-panel p-12 text-center">
-        <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-white/75 text-faith-green">
-          <%= render_icon("sparkles", classes: "w-8 h-8") %>
+      <div class="fc-empty">
+        <div class="fc-empty-mark" aria-hidden="true">
+          <%= render_icon("sparkles", classes: "h-7 w-7") %>
         </div>
-        <h2 class="text-xl font-bold text-faith-dark">No notifications</h2>
-        <p class="mystic-copy mt-2">You are all caught up.</p>
+        <h2 class="fc-empty-title">Nothing here yet.</h2>
+        <p class="fc-empty-text">When someone reacts, comments, follows, or prays with you, it lands here.</p>
       </div>
     <% end %>
   </div>
