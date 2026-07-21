@@ -26,6 +26,8 @@ class Admin::ModerationReviewsController < ApplicationController
       high:    AiModerationReview.where(severity: "high", status: %i[pending flagged]).count
     }
 
+    @worker_health = worker_health
+
     # Held posts with no open review row (gate job lost/crashed before it could
     # write one) are invisible to the queue above — surface them here so a
     # moderator can always find and release every held breath.
@@ -95,6 +97,30 @@ class Admin::ModerationReviewsController < ApplicationController
   end
 
   private
+
+  # Live snapshot of the Solid Queue worker so "are background jobs running?"
+  # is answerable from the browser instead of SSH. A worker is considered
+  # alive when any Solid Queue process heartbeated within the last minute.
+  def worker_health
+    # table_exists? is a catalog lookup — unlike a failed SELECT it can't
+    # abort the surrounding transaction (which would break the rest of the
+    # page in environments without Solid Queue tables, e.g. test).
+    unless SolidQueue::Process.table_exists?
+      return { ok: false, error: "Solid Queue tables not found — queue database not migrated?",
+               processes: [], ready: nil, failed: nil, finished_last_hour: nil }
+    end
+
+    processes = SolidQueue::Process.order(last_heartbeat_at: :desc).limit(10).to_a
+    {
+      ok: processes.any? { |p| p.last_heartbeat_at && p.last_heartbeat_at > 1.minute.ago },
+      processes: processes,
+      ready: SolidQueue::ReadyExecution.count,
+      failed: SolidQueue::FailedExecution.count,
+      finished_last_hour: SolidQueue::Job.where(finished_at: 1.hour.ago..).count
+    }
+  rescue StandardError => e
+    { ok: false, error: "#{e.class}: #{e.message}", processes: [], ready: nil, failed: nil, finished_last_hour: nil }
+  end
 
   def set_review
     @review = AiModerationReview.find(params[:id])

@@ -1,5 +1,36 @@
 <% content_for(:page_title) { "Moderation Queue" } %>
 
+<% if @worker_health %>
+  <div class="mb-6 rounded-xl border p-4 <%= @worker_health[:ok] ? "border-emerald-300/60 bg-emerald-50/50 dark:bg-emerald-500/10" : "border-red-300/70 bg-red-50/60 dark:bg-red-500/10" %>">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-sm font-extrabold text-[var(--fc-ink)]">
+          <%= @worker_health[:ok] ? "🟢 Background worker is running" : "🔴 Background worker appears DOWN" %>
+        </p>
+        <p class="mt-0.5 text-xs text-[var(--fc-muted)]">
+          <% if @worker_health[:error] %>
+            Couldn't read the queue database: <%= @worker_health[:error] %> — the queue database may not be migrated.
+          <% elsif @worker_health[:processes].any? %>
+            <% newest = @worker_health[:processes].first %>
+            Last heartbeat <%= newest.last_heartbeat_at ? "#{time_ago_in_words(newest.last_heartbeat_at)} ago" : "never" %>
+            · <%= @worker_health[:processes].size %> registered process(es)
+          <% else %>
+            No Solid Queue processes have ever registered — jobs (AI moderation, emails, pushes, digests) are not being processed.
+            Check that SOLID_QUEUE_IN_PUMA isn't set to 0 and that the app restarted after deploy.
+          <% end %>
+        </p>
+      </div>
+      <% unless @worker_health[:error] %>
+        <div class="flex gap-4 text-center">
+          <div><p class="text-lg font-extrabold text-[var(--fc-ink)]"><%= @worker_health[:ready] %></p><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--fc-muted)]">Waiting</p></div>
+          <div><p class="text-lg font-extrabold <%= @worker_health[:failed].to_i.positive? ? "text-red-500" : "text-[var(--fc-ink)]" %>"><%= @worker_health[:failed] %></p><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--fc-muted)]">Failed</p></div>
+          <div><p class="text-lg font-extrabold text-[var(--fc-ink)]"><%= @worker_health[:finished_last_hour] %></p><p class="text-[10px] font-bold uppercase tracking-wider text-[var(--fc-muted)]">Done (1h)</p></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
 <div class="mb-6 grid gap-3 sm:grid-cols-3">
   <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-4">
     <p class="text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]">Open</p>
