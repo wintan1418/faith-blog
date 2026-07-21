@@ -18846,3 +18846,28 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
   .fc-composer-input::before { animation: none; }
   .fc-react-btn:active::after { animation: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ MOBILE COMPOSER HOTFIX — glass is a desktop luxury
+   The compose sheet is full-screen on phones; a live backdrop-filter on
+   it forces Chrome to re-blur the whole viewport every frame while the
+   keyboard is open, freezing typing in the editor. Solid + static on
+   mobile; the frosted look stays on desktop.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 760px) {
+  .fc-composer-panel,
+  html.theme-dark .fc-composer-panel {
+    background: var(--fc-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  .fc-composer-dialog::backdrop {
+    background: rgba(8, 12, 11, 0.55);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .fc-composer-dialog[open] .fc-composer-panel { animation: none; }
+}
