@@ -18661,3 +18661,185 @@ html.theme-dark .fc-reaction-picker {
   .fc-notifrow { animation: none; }
   .fc-notifrow-dot { animation: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ SIGNATURE PASS — a feed no microblog has
+   The app breathes: a slow ambient glow that inhales and exhales, tinted
+   by the viewer's time of day (dawn/day/dusk/night via html[data-daypart],
+   set pre-paint in the layout head). Prayer breaths flicker like candles,
+   reactions ripple, scripture references are gilded.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── The breathing ambience ───────────────────────────────────────────── */
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  top: -22rem;
+  left: 50%;
+  width: 90rem;
+  height: 48rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: radial-gradient(closest-side,
+    var(--fc-accent-soft, rgba(52, 211, 153, 0.16)), transparent 70%);
+  filter: blur(10px);
+  animation: fc-breathe 9s ease-in-out infinite;
+}
+
+@keyframes fc-breathe {
+  0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1;    transform: translateX(-50%) scale(1.07); }
+}
+
+/* Daypart hues: the glow follows the viewer's local sky. */
+html[data-daypart="dawn"] body::after {
+  background:
+    radial-gradient(closest-side, rgba(251, 146, 60, 0.14), transparent 70%),
+    radial-gradient(closest-side, rgba(251, 113, 133, 0.10), transparent 75%);
+}
+
+html[data-daypart="dusk"] body::after {
+  background:
+    radial-gradient(closest-side, rgba(251, 191, 36, 0.12), transparent 70%),
+    radial-gradient(closest-side, rgba(129, 140, 248, 0.10), transparent 75%);
+}
+
+html[data-daypart="night"] body::after {
+  background:
+    radial-gradient(closest-side, rgba(129, 140, 248, 0.12), transparent 70%),
+    radial-gradient(closest-side, rgba(45, 212, 191, 0.07), transparent 75%);
+}
+
+/* ── Prayer breaths glow like candlelight ─────────────────────────────── */
+.fc-breath.is-prayer::before {
+  animation: fc-candle 3.2s ease-in-out infinite;
+}
+
+.fc-breath.is-prayer::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: -0.5rem;
+  right: 6%;
+  width: 9rem;
+  height: 5rem;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(251, 146, 60, 0.13), transparent 70%);
+  filter: blur(6px);
+  animation: fc-candle 2.6s ease-in-out infinite alternate;
+}
+
+.fc-breath.is-answered::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  top: -0.5rem;
+  right: 6%;
+  width: 9rem;
+  height: 5rem;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(251, 191, 36, 0.16), transparent 70%);
+  filter: blur(6px);
+}
+
+@keyframes fc-candle {
+  0%, 100% { opacity: 0.75; }
+  35%      { opacity: 1; }
+  60%      { opacity: 0.6; }
+  80%      { opacity: 0.95; }
+}
+
+/* ── Reactions ripple outward ─────────────────────────────────────────── */
+.fc-react-btn { position: relative; overflow: hidden; }
+
+.fc-react-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fc-accent) 45%, transparent);
+  opacity: 0;
+  transform: scale(1);
+  pointer-events: none;
+}
+
+.fc-react-btn:active::after {
+  animation: fc-ripple 480ms ease-out;
+}
+
+@keyframes fc-ripple {
+  0%   { opacity: 0.85; transform: scale(1); }
+  100% { opacity: 0;    transform: scale(14); }
+}
+
+/* ── Gilded scripture ─────────────────────────────────────────────────── */
+.scripture-ref,
+html.theme-dark .scripture-ref {
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #b8860b;
+  background: linear-gradient(120deg, rgba(212, 168, 90, 0.14), rgba(251, 191, 36, 0.08));
+  border-bottom: 1px solid rgba(212, 168, 90, 0.55);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+html.theme-dark .scripture-ref { color: #e8c66a; }
+
+.scripture-ref:hover, .scripture-ref:focus-visible {
+  background: linear-gradient(120deg, rgba(212, 168, 90, 0.28), rgba(251, 191, 36, 0.16));
+  color: #8a6508;
+}
+
+html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
+
+/* ── The composer breathes with you ───────────────────────────────────── */
+.fc-composer-bar-title { display: flex; align-items: center; gap: 0.55rem; }
+
+.fc-composer-bar-title::before {
+  content: "";
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%,
+    color-mix(in srgb, var(--fc-accent) 80%, white 20%), var(--fc-accent-2, var(--fc-accent)));
+  box-shadow: 0 0 0 0 var(--fc-accent-soft, rgba(52, 211, 153, 0.4));
+  animation: fc-orb 4.5s ease-in-out infinite;
+}
+
+.fc-composer-input { position: relative; }
+
+.fc-composer-input::before {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 999px;
+  background: var(--fc-accent);
+  animation: fc-orb 4.5s ease-in-out infinite;
+}
+
+.fc-composer-input { padding-left: 2rem; }
+
+@keyframes fc-orb {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 var(--fc-accent-soft, rgba(52, 211, 153, 0.4)); }
+  50%      { transform: scale(1.25); box-shadow: 0 0 0 7px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::after,
+  .fc-breath.is-prayer::before,
+  .fc-breath.is-prayer::after,
+  .fc-composer-bar-title::before,
+  .fc-composer-input::before { animation: none; }
+  .fc-react-btn:active::after { animation: none; }
+}

@@ -13,6 +13,12 @@
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
         document.documentElement.classList.toggle('theme-dark', dark);
         document.documentElement.classList.toggle('theme-light', !dark);
+
+        // Daypart ambience: the app's background glow follows the viewer's
+        // local time — dawn, day, dusk, night. Purely atmospheric.
+        const h = new Date().getHours();
+        document.documentElement.dataset.daypart =
+          h < 6 ? 'night' : h < 9 ? 'dawn' : h < 17 ? 'day' : h < 21 ? 'dusk' : 'night';
       })();
     </script>
     <title><%= content_for(:title) || "Brethreign — breathe" %></title>
