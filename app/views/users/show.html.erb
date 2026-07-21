@@ -5,7 +5,10 @@
 <div class="mystic-shell profile-page">
   <section class="profile-hero">
     <div class="mystic-container max-w-6xl py-12">
-      <div class="profile-hero-panel">
+      <%# The hero carries the profile OWNER's accent, not the viewer's —
+          the cover, avatar ring, and badges tint to their chosen colour. %>
+      <div class="profile-hero-panel" style="<%= AccentPalette.css_vars(@user.accent_color) %>">
+        <div class="profile-cover" aria-hidden="true"></div>
         <div class="profile-avatar-wrap">
           <% if @user.profile&.avatar&.attached? %>
             <%= image_tag @user.profile.avatar, class: "profile-avatar object-cover", alt: @user.display_name %>

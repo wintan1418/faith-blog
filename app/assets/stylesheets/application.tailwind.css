@@ -17779,3 +17779,103 @@ div.profile-stat:hover,
 html.theme-dark div.profile-stat:hover {
   border-color: transparent !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ PROFILE HERO — elevated pass
+   Cover banner in the owner's accent, overlapping ringed avatar, gradient
+   role badge, glassy meta pills. Later rules win over the base block above.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.profile-hero { border-bottom: 0; }
+
+.profile-hero-panel,
+html.theme-dark .profile-hero-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px !important;
+  border-color: color-mix(in srgb, var(--fc-accent) 22%, var(--fc-line-strong)) !important;
+  padding-top: 7.25rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* Accent cover strip the avatar straddles. */
+.profile-cover {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 6rem;
+  background:
+    radial-gradient(ellipse 24rem 10rem at 18% 120%, color-mix(in srgb, var(--fc-accent) 55%, transparent), transparent 70%),
+    radial-gradient(ellipse 30rem 12rem at 85% -30%, color-mix(in srgb, var(--fc-accent-2, var(--fc-accent)) 45%, transparent), transparent 72%),
+    linear-gradient(120deg,
+      color-mix(in srgb, var(--fc-accent) 34%, var(--fc-surface-2)),
+      color-mix(in srgb, var(--fc-accent-2, var(--fc-accent)) 20%, var(--fc-surface-2)) 60%,
+      var(--fc-surface-2));
+  -webkit-mask-image: linear-gradient(to bottom, black 72%, transparent);
+  mask-image: linear-gradient(to bottom, black 72%, transparent);
+}
+
+.profile-hero-panel > * { position: relative; }
+
+.profile-avatar-wrap,
+html.theme-dark .profile-avatar-wrap {
+  margin-top: -3.6rem;
+  padding: 0.3rem;
+  background: conic-gradient(from 210deg,
+    var(--fc-accent),
+    color-mix(in srgb, var(--fc-accent-2, var(--fc-accent)) 70%, white 30%),
+    var(--fc-accent));
+  box-shadow:
+    0 18px 40px color-mix(in srgb, var(--fc-accent) 32%, transparent),
+    0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.profile-handle {
+  color: var(--fc-accent-2, var(--fc-accent));
+  letter-spacing: 0.01em;
+}
+
+.profile-role-badge,
+html.theme-dark .profile-role-badge {
+  border: 0 !important;
+  background: linear-gradient(120deg, var(--fc-accent), var(--fc-accent-2, var(--fc-accent))) !important;
+  color: #06231a !important;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--fc-accent) 40%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.7rem;
+}
+
+.profile-meta,
+html.theme-dark .profile-meta {
+  background: color-mix(in srgb, var(--fc-surface-2) 55%, transparent) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.profile-meta:hover,
+html.theme-dark .profile-meta:hover {
+  border-color: color-mix(in srgb, var(--fc-accent) 40%, var(--fc-line)) !important;
+}
+
+.profile-meta svg { color: var(--fc-accent-2, var(--fc-accent)); }
+
+.profile-bio {
+  border-left: 3px solid color-mix(in srgb, var(--fc-accent) 55%, transparent);
+  padding-left: 0.9rem;
+}
+
+/* Streak chip: warm ember, reads as a badge of honour, still clearly inert. */
+div.profile-stat.profile-stat-streak,
+html.theme-dark div.profile-stat.profile-stat-streak {
+  background: linear-gradient(120deg, rgba(251, 146, 60, 0.14), rgba(251, 191, 36, 0.08)) !important;
+  border: 1px solid rgba(251, 146, 60, 0.35) !important;
+  border-radius: 12px;
+}
+
+@media (max-width: 767px) {
+  .profile-hero-panel { padding-top: 6.4rem; }
+  .profile-avatar-wrap { margin-top: -3rem; }
+  .profile-bio { border-left: 0; padding-left: 0; }
+  .profile-cover { height: 5.25rem; }
+}
