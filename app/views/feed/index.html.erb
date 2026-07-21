@@ -94,37 +94,6 @@
     </aside>
 
     <main class="fc-main">
-      <%# Story-style rooms strip: one-tap entry into every room. %>
-      <nav class="fc-rooms-strip" aria-label="Rooms">
-        <% Room.public_rooms.ordered.limit(10).each do |room| %>
-          <%
-            tint = case room.slug.to_s
-                   when /prayer/  then "prayer"
-                   when /testim/  then "testimony"
-                   when /bible/   then "bible"
-                   when /quest/   then "questions"
-                   when /encour/  then "encourage"
-                   when /youth/   then "youth"
-                   else "prayer"
-                   end
-          %>
-          <%= link_to room_path(room), class: "fc-room-story", title: room.name do %>
-            <span class="fc-room-story-ring">
-              <span class="fc-room-story-icon room-tint-<%= tint %>">
-                <%= render_icon(room.icon || "sparkles", classes: "h-5 w-5") %>
-              </span>
-            </span>
-            <span class="fc-room-story-name"><%= truncate(room.name, length: 13, omission: "…") %></span>
-          <% end %>
-        <% end %>
-        <%= link_to rooms_path, class: "fc-room-story is-more", title: "All rooms" do %>
-          <span class="fc-room-story-ring">
-            <span class="fc-room-story-icon">→</span>
-          </span>
-          <span class="fc-room-story-name">All rooms</span>
-        <% end %>
-      </nav>
-
       <div class="fc-panel fc-composer">
         <div class="fc-composer-row">
           <% if current_user.profile&.avatar&.attached? %>
