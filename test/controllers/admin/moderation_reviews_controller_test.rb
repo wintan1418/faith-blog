@@ -73,6 +73,30 @@ class Admin::ModerationReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "suspended", @author.reload.risk_profile.risk_level
   end
 
+  test "suspend against a staff member's content actions the review but never the account" do
+    staff = User.create!(
+      username: "staff_#{SecureRandom.hex(3)}",
+      email: "staff_#{SecureRandom.hex(3)}@example.com",
+      password: "password123",
+      password_confirmation: "password123",
+      role: :super_admin
+    )
+    staff_post = Post.create!(user: staff, room: @room, title: "Staff post", content: "Body", status: :published)
+    flagged = Ai::Moderation::Result.new(
+      safe: false, severity: "high", categories: [ "spam" ], score: 0.9,
+      summary: "Test", recommended_action: "block",
+      raw_response: { "stub" => true }, model: "stub"
+    )
+    staff_review = AiModerationReview.from_result(reviewable: staff_post, user: staff, result: flagged)
+
+    sign_in @admin
+    post decide_admin_moderation_review_path(staff_review), params: { decision: "suspend", notes: "" }
+
+    assert_equal "actioned", staff_review.reload.status
+    assert staff.reload.active?, "a review decision must never deactivate a staff account"
+    refute_equal "suspended", staff.risk_profile&.risk_level
+  end
+
   test "unknown decision is rejected" do
     sign_in @admin
     post decide_admin_moderation_review_path(@review), params: { decision: "nuke" }

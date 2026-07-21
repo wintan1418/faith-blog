@@ -189,7 +189,17 @@ class Admin::ModerationReviewsController < ApplicationController
   end
 
   def apply_user_action!(decision)
-    profile = @review.user&.risk_profile
+    user = @review.user
+    return unless user
+    # Staff accounts can never be warned/restricted/suspended through the
+    # review queue — a stray click here once locked out the super admin.
+    # Acting against an admin must be a deliberate, separate operation.
+    if user.admin_or_moderator?
+      flash[:alert] = "#{user.username} is staff — the content was actioned, but staff accounts can't be #{decision}ed from the review queue."
+      return
+    end
+
+    profile = user.risk_profile
     return unless profile
 
     case decision
