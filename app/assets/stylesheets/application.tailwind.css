@@ -17728,3 +17728,54 @@ trix-editor li,
   padding-top: 6px;
   border-top: 1px solid var(--fc-line);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ PROFILE STATS — clickable vs informational (tester usability report)
+   Followers/Following are links; Breaths/streak are plain facts. They must
+   not look identical. Links get an accent label + chevron + hover lift;
+   info tiles flatten to borderless facts with no hover response.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+a.profile-stat {
+  transition: transform 140ms ease, border-color 140ms ease,
+              background 140ms ease, box-shadow 140ms ease;
+}
+
+a.profile-stat small,
+html.theme-dark a.profile-stat small {
+  color: var(--fc-accent-2) !important;
+}
+
+a.profile-stat small::after {
+  content: "›";
+  margin-left: 0.35rem;
+  font-size: 1.05em;
+  opacity: 0.85;
+}
+
+a.profile-stat:hover,
+html.theme-dark a.profile-stat:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--fc-accent) 62%, var(--fc-line)) !important;
+  background: color-mix(in srgb, var(--fc-accent) 9%, var(--fc-surface-2)) !important;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+}
+
+a.profile-stat:focus-visible {
+  outline: 2px solid var(--fc-accent);
+  outline-offset: 2px;
+}
+
+/* Informational tiles: quiet, borderless, inert. */
+div.profile-stat,
+html.theme-dark div.profile-stat {
+  background: transparent !important;
+  border-color: transparent !important;
+  padding-left: 0.35rem;
+  padding-right: 0.35rem;
+}
+
+div.profile-stat:hover,
+html.theme-dark div.profile-stat:hover {
+  border-color: transparent !important;
+}
