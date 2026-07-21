@@ -18361,3 +18361,124 @@ a.fc-avatar:hover, a:hover > .fc-avatar { transform: scale(1.07); }
   .fc-brand-mark, .fc-avatar, .fc-btn,
   .fc-topbar-icons a svg, .fc-topbar-icons button svg { transition: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ GLASS PASS — iOS-morphism surfaces + reading page + comments
+   Frosted materials on the overlays, an elevated reading experience on
+   the post page, living comments. Restraint over clutter: no new
+   elements, just material, depth, and motion.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Composer modal: frosted sheet over a blurred world ───────────────── */
+.fc-composer-dialog::backdrop {
+  background: rgba(8, 12, 11, 0.42);
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+}
+
+.fc-composer-panel,
+html.theme-dark .fc-composer-panel {
+  background: color-mix(in srgb, var(--fc-surface) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--fc-line-strong) 70%, transparent);
+  border-radius: 22px;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.fc-composer-dialog[open] .fc-composer-panel {
+  animation: fc-sheet-in 260ms cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+@keyframes fc-sheet-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Discover bottom sheet: frosted too ───────────────────────────────── */
+@media (max-width: 1100px) {
+  .fc-aside.is-open {
+    background: color-mix(in srgb, var(--fc-bg) 86%, transparent) !important;
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+  }
+}
+
+/* ── Post page: an elevated read ──────────────────────────────────────── */
+.post-card {
+  border-radius: 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  animation: fc-card-in 360ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.post-hero { border-radius: 14px; overflow: hidden; }
+
+.post-hero img {
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.post-hero:hover img { transform: scale(1.025); }
+
+.post-body {
+  font-size: 1.02rem;
+  line-height: 1.78;
+}
+
+.post-body blockquote {
+  border-left: 3px solid var(--fc-accent);
+  background: var(--fc-accent-soft, rgba(52, 211, 153, 0.10));
+  border-radius: 0 10px 10px 0;
+}
+
+/* ── Conversation: comments that feel alive ───────────────────────────── */
+.post-conversation {
+  border-radius: 18px;
+}
+
+.fc-comment {
+  position: relative;
+  border-radius: 12px;
+  padding: 0.55rem 0.65rem;
+  margin-inline: -0.65rem;
+  transition: background 180ms ease;
+  animation: fc-card-in 320ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.fc-comment:hover {
+  background: color-mix(in srgb, var(--fc-surface-2) 65%, transparent);
+}
+
+/* Thread rail: a soft line that warms on hover, tying replies together. */
+.fc-comment .fc-comment-grid { position: relative; }
+
+.fc-comment:hover .fc-avatar {
+  box-shadow: 0 0 0 2px var(--fc-surface), 0 0 0 3.5px var(--fc-accent);
+}
+
+.fc-comment .fc-avatar { transition: box-shadow 180ms ease; }
+
+.post-conversation-composer {
+  border-radius: 16px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.post-conversation-composer:focus-within {
+  border-color: color-mix(in srgb, var(--fc-accent) 50%, var(--fc-line));
+  box-shadow: 0 0 0 3px var(--fc-accent-soft, rgba(52, 211, 153, 0.14));
+}
+
+/* ── Reaction pickers get the frosted treatment too ───────────────────── */
+.fc-reaction-picker,
+html.theme-dark .fc-reaction-picker {
+  background: color-mix(in srgb, var(--fc-surface) 86%, transparent);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-radius: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-composer-dialog[open] .fc-composer-panel,
+  .post-card, .fc-comment { animation: none; }
+  .post-hero img { transition: none; }
+}
