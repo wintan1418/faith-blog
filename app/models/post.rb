@@ -323,7 +323,9 @@ class Post < ApplicationRecord
   end
 
   def enqueue_ai_moderation_review
-    AiModerationReviewJob.perform_later(self)
+    # The gate job classifies AND enforces (retro-hold/block + review row +
+    # risk scoring) — the breath is already live, this runs behind it.
+    AiModerationGateJob.perform_later(id)
   end
 
   def enqueue_ai_moderation_review_on_publish

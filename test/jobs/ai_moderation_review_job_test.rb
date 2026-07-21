@@ -31,16 +31,18 @@ class AiModerationReviewJobTest < ActiveJob::TestCase
     )
   end
 
-  test "publishing a post enqueues an AI review" do
+  test "publishing a post enqueues the moderation gate" do
     user = make_user
-    assert_enqueued_with(job: AiModerationReviewJob) do
+    # Publish-first flow: posts go live at create and the GATE job (classify +
+    # enforce) runs behind them, not the audit-only review job.
+    assert_enqueued_with(job: AiModerationGateJob) do
       make_post(author: user)
     end
   end
 
   test "draft posts do NOT enqueue a review" do
     user = make_user
-    assert_no_enqueued_jobs(only: AiModerationReviewJob) do
+    assert_no_enqueued_jobs(only: AiModerationGateJob) do
       make_post(author: user, status: :draft)
     end
   end

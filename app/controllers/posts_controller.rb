@@ -60,17 +60,15 @@ class PostsController < ApplicationController
       @post.published_at = nil
     end
 
-    # Published posts are saved as :pending_review and classified off the request
-    # path by AiModerationGateJob — the author sees their breath immediately, the
-    # rest of the community sees it once the gate clears (usually a second or two).
-    # Drafts and scheduled posts skip the gate; scheduled posts are classified by
-    # ScheduledPostPublisherJob when they actually publish.
-    needs_gate = @post.published?
-    @post.moderation_status = needs_gate ? :pending_review : :approved
+    # Publish first, moderate async: the breath goes live immediately and
+    # AiModerationGateJob (enqueued by the model's create callbacks) classifies
+    # it in the background, retro-holding or blocking only when the AI actually
+    # flags something. The feed must never depend on a background worker having
+    # run — the old born-held flow left every post stuck whenever it didn't.
+    @post.moderation_status = :approved
 
     if @post.save
       handle_post_links
-      AiModerationGateJob.perform_later(@post.id) if needs_gate
       redirect_to redirect_target_after_create(@post), notice: flash_notice_for(@post)
     else
       @rooms = Room.public_rooms.ordered

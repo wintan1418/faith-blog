@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-# Async AI moderation gate for newly created posts. The post is saved as
-# :pending_review (visible to its author, kept off the public feed) and this job
-# runs the LLM classification off the request path, then approves / holds /
-# blocks it. Replaces the old synchronous 12s-timeout gate that ran inside the
-# create request.
+# Async AI moderation gate for posts. Publish-first: the breath is live the
+# moment it's created, and this job classifies it in the background —
+# retro-holding or blocking only when the AI flags something. The feed must
+# never depend on this job having run.
 class AiModerationGateJob < ApplicationJob
   queue_as :default
 
@@ -13,9 +12,13 @@ class AiModerationGateJob < ApplicationJob
   def perform(post_id)
     post = Post.find_by(id: post_id)
     return unless post
-    # Only act while the post is still awaiting the async decision; a moderator
-    # may have already resolved it by hand.
-    return unless post.moderation_pending_review?
+    return unless post.published?
+    # Act only while the post awaits its FIRST decision: no review row yet, or
+    # still held with the review pending. Any settled review (cleared/flagged/
+    # actioned/dismissed) means the AI or a moderator already decided — never
+    # re-litigate a released or resolved breath.
+    review = post.ai_moderation_review
+    return if review.present? && !review.pending?
 
     # PostGatekeeper is fail-open: any AI/network error returns an :allow verdict
     # with no result, so a flaky upstream releases the post rather than wedging it.

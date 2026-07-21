@@ -46,11 +46,24 @@ class ModerationBacklogSweepJobTest < ActiveSupport::TestCase
     end
   end
 
-  test "ignores already-approved posts" do
+  test "ignores approved posts that already have a settled review" do
+    user = make_user
+    post = pending_post(user, created_at: 30.minutes.ago)
+    post.update_columns(moderation_status: Post.moderation_statuses[:approved])
+    AiModerationReview.create!(reviewable: post, user: user, status: :cleared,
+                               severity: "none", recommended_action: "allow",
+                               categories: [], score: 0.0, reviewed_at: Time.current)
+
+    assert_no_enqueued_jobs only: AiModerationGateJob do
+      ModerationBacklogSweepJob.perform_now
+    end
+  end
+
+  test "re-enqueues the gate for live posts that were never classified" do
     post = pending_post(make_user, created_at: 30.minutes.ago)
     post.update_columns(moderation_status: Post.moderation_statuses[:approved])
 
-    assert_no_enqueued_jobs only: AiModerationGateJob do
+    assert_enqueued_with(job: AiModerationGateJob, args: [ post.id ]) do
       ModerationBacklogSweepJob.perform_now
     end
   end
