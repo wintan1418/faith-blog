@@ -18149,3 +18149,160 @@ html.theme-dark .fc-composer-input {
   .fc-composer .fc-btn-primary { transition: none; }
   .fc-skel::after, .fc-new-posts-pill { animation: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ FEED — massive pass II: rooms strip, composer chips, frame'd tabs,
+   card entrances. Pairs with the turbo-frame feed_stream in the view.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Story-style rooms strip ──────────────────────────────────────────── */
+.fc-rooms-strip {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 0.6rem;
+  margin-bottom: 0.9rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.fc-rooms-strip::-webkit-scrollbar { display: none; }
+
+.fc-room-story {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  flex: none;
+  width: 4.4rem;
+}
+
+.fc-room-story-ring {
+  display: grid;
+  place-items: center;
+  width: 3.6rem;
+  height: 3.6rem;
+  border-radius: 999px;
+  padding: 3px;
+  background: conic-gradient(from 210deg,
+    var(--fc-accent),
+    color-mix(in srgb, var(--fc-accent-2, var(--fc-accent)) 55%, white 25%),
+    var(--fc-accent-soft, rgba(52, 211, 153, 0.25)),
+    var(--fc-accent));
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.fc-room-story:hover .fc-room-story-ring {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--fc-accent) 35%, transparent);
+}
+
+.fc-room-story-icon {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--fc-surface);
+  border: 2px solid var(--fc-surface);
+  color: var(--fc-accent-2, var(--fc-accent));
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.fc-room-story-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--fc-soft);
+  text-align: center;
+}
+
+.fc-room-story:hover .fc-room-story-name { color: var(--fc-ink); }
+
+.fc-room-story.is-more .fc-room-story-ring {
+  background: var(--fc-line-strong);
+}
+
+/* ── Composer: two rows + quick chips ─────────────────────────────────── */
+.fc-composer { display: block; }
+
+.fc-composer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fc-composer-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+  padding-left: 3.2rem;
+}
+
+.fc-composer-chip {
+  border: 1px solid var(--fc-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fc-surface-2) 70%, transparent);
+  color: var(--fc-soft);
+  padding: 0.32rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition: border-color 150ms ease, background 150ms ease,
+              color 150ms ease, transform 120ms ease;
+}
+
+.fc-composer-chip:hover {
+  border-color: color-mix(in srgb, var(--fc-accent) 45%, var(--fc-line));
+  background: var(--fc-accent-soft, rgba(52, 211, 153, 0.14));
+  color: var(--fc-accent-2, var(--fc-accent));
+  transform: translateY(-1px);
+}
+
+/* ── Frame'd tab switching ────────────────────────────────────────────── */
+turbo-frame#feed_stream { display: block; }
+
+turbo-frame#feed_stream[busy] {
+  opacity: 0.5;
+  filter: saturate(0.7);
+  transition: opacity 180ms ease, filter 180ms ease;
+  pointer-events: none;
+}
+
+/* Tabs scroll on narrow screens instead of wrapping awkwardly. */
+.fc-tabs {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.fc-tabs::-webkit-scrollbar { display: none; }
+.fc-tabs .fc-tab { flex: none; }
+
+/* ── Card entrances: cascade in on load and tab switch ────────────────── */
+#feed_list .fc-breath {
+  animation: fc-card-in 380ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+#feed_list > :nth-child(1) .fc-breath, #feed_list > .fc-breath:nth-child(1) { animation-delay: 0ms; }
+#feed_list > :nth-child(2) .fc-breath, #feed_list > .fc-breath:nth-child(2) { animation-delay: 45ms; }
+#feed_list > :nth-child(3) .fc-breath, #feed_list > .fc-breath:nth-child(3) { animation-delay: 90ms; }
+#feed_list > :nth-child(4) .fc-breath, #feed_list > .fc-breath:nth-child(4) { animation-delay: 135ms; }
+#feed_list > :nth-child(5) .fc-breath, #feed_list > .fc-breath:nth-child(5) { animation-delay: 180ms; }
+#feed_list > :nth-child(6) .fc-breath, #feed_list > .fc-breath:nth-child(6) { animation-delay: 225ms; }
+
+@keyframes fc-card-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 760px) {
+  .fc-composer-chips { padding-left: 0; }
+  .fc-room-story { width: 4rem; }
+  .fc-room-story-ring { width: 3.2rem; height: 3.2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #feed_list .fc-breath { animation: none; }
+  .fc-room-story-ring, .fc-composer-chip { transition: none; }
+}

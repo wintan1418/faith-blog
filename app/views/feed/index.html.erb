@@ -94,35 +94,60 @@
     </aside>
 
     <main class="fc-main">
-      <div class="fc-panel fc-composer">
-        <% if current_user.profile&.avatar&.attached? %>
-          <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
-        <% else %>
-          <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
+      <%# Story-style rooms strip: one-tap entry into every room. %>
+      <nav class="fc-rooms-strip" aria-label="Rooms">
+        <% Room.public_rooms.ordered.limit(10).each do |room| %>
+          <%
+            tint = case room.slug.to_s
+                   when /prayer/  then "prayer"
+                   when /testim/  then "testimony"
+                   when /bible/   then "bible"
+                   when /quest/   then "questions"
+                   when /encour/  then "encourage"
+                   when /youth/   then "youth"
+                   else "prayer"
+                   end
+          %>
+          <%= link_to room_path(room), class: "fc-room-story", title: room.name do %>
+            <span class="fc-room-story-ring">
+              <span class="fc-room-story-icon room-tint-<%= tint %>">
+                <%= render_icon(room.icon || "sparkles", classes: "h-5 w-5") %>
+              </span>
+            </span>
+            <span class="fc-room-story-name"><%= truncate(room.name, length: 13, omission: "…") %></span>
+          <% end %>
         <% end %>
-        <button type="button"
-                class="fc-composer-input flex items-center text-[var(--fc-muted)]"
-                data-action="click->composer-modal#open">
-          What's on your heart? Take a breath...
-        </button>
-        <button type="button"
-                class="fc-btn fc-btn-primary"
-                data-action="click->composer-modal#open">
-          Breathe
-        </button>
-      </div>
+        <%= link_to rooms_path, class: "fc-room-story is-more", title: "All rooms" do %>
+          <span class="fc-room-story-ring">
+            <span class="fc-room-story-icon">→</span>
+          </span>
+          <span class="fc-room-story-name">All rooms</span>
+        <% end %>
+      </nav>
 
-      <div class="fc-tabs">
-        <%= link_to "Recent", feed_path, class: "fc-tab #{current_page?(feed_path) ? 'is-active' : ''}" %>
-        <%= link_to "Threads", feed_threads_path, class: "fc-tab #{current_page?(feed_threads_path) ? 'is-active' : ''}" %>
-        <%= link_to "Trending", feed_trending_path, class: "fc-tab #{current_page?(feed_trending_path) ? 'is-active' : ''}" %>
-        <%= link_to "Following", feed_following_path, class: "fc-tab #{current_page?(feed_following_path) ? 'is-active' : ''}" %>
-        <button type="button" class="fc-discover-trigger" data-action="click->discover#open" aria-label="Open discover panel">
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
-          <span>Discover</span>
-        </button>
-        <div class="ml-auto hidden sm:block">
-          <%= link_to "All rooms", rooms_path, class: "fc-btn" %>
+      <div class="fc-panel fc-composer">
+        <div class="fc-composer-row">
+          <% if current_user.profile&.avatar&.attached? %>
+            <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+          <% else %>
+            <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
+          <% end %>
+          <button type="button"
+                  class="fc-composer-input flex items-center text-[var(--fc-muted)]"
+                  data-action="click->composer-modal#open">
+            What's on your heart? Take a breath...
+          </button>
+          <button type="button"
+                  class="fc-btn fc-btn-primary"
+                  data-action="click->composer-modal#open">
+            Breathe
+          </button>
+        </div>
+        <div class="fc-composer-chips">
+          <button type="button" class="fc-composer-chip" data-action="click->composer-modal#open">🙏 Prayer request</button>
+          <button type="button" class="fc-composer-chip" data-action="click->composer-modal#open">📖 Share a verse</button>
+          <button type="button" class="fc-composer-chip" data-action="click->composer-modal#open">🎙️ Voice note</button>
+          <button type="button" class="fc-composer-chip" data-action="click->bible-drawer#open">✨ Read first</button>
         </div>
       </div>
 
@@ -271,6 +296,30 @@
         </section>
       <% end %>
 
+      <%# The stream (tabs + list) lives in a frame so switching tabs swaps
+          just this region — no full page reload. target: "_top" keeps every
+          link inside the cards navigating normally; only the tab links opt
+          into the frame. %>
+      <%= turbo_frame_tag "feed_stream", target: "_top" do %>
+      <div class="fc-tabs">
+        <%= link_to "Recent", feed_path,
+              class: "fc-tab #{current_page?(feed_path) ? 'is-active' : ''}",
+              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+        <%= link_to "Threads", feed_threads_path,
+              class: "fc-tab #{current_page?(feed_threads_path) ? 'is-active' : ''}",
+              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+        <%= link_to "Trending", feed_trending_path,
+              class: "fc-tab #{current_page?(feed_trending_path) ? 'is-active' : ''}",
+              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+        <%= link_to "Following", feed_following_path,
+              class: "fc-tab #{current_page?(feed_following_path) ? 'is-active' : ''}",
+              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+        <button type="button" class="fc-discover-trigger" data-action="click->discover#open" aria-label="Open discover panel">
+          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          <span>Discover</span>
+        </button>
+      </div>
+
       <div data-controller="new-posts-pill">
         <%= turbo_stream_from "feed:public" %>
         <div id="feed_incoming" hidden data-new-posts-pill-target="bucket"></div>
@@ -330,6 +379,7 @@
           <% end %>
         </div>
       </div>
+      <% end %>
     </main>
 
     <aside class="fc-aside space-y-3" data-discover-target="panel">
