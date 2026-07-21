@@ -18871,3 +18871,50 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
 
   .fc-composer-dialog[open] .fc-composer-panel { animation: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ MOBILE PERFORMANCE KILL-SWITCH
+   Phones get the clean, instant UI. Every continuously-running or
+   GPU-heavy effect (breathing blurred glow, orbs, candle halos, card
+   cascade animations) is desktop-only — on mobile they compete with the
+   keyboard and the editor for frame time and typing suffers.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 760px) {
+  .fc-app::before { display: none; }
+
+  .fc-composer-bar-title::before,
+  .fc-composer-input::before { display: none; }
+  .fc-composer-input { padding-left: 1.15rem; }
+
+  .fc-breath.is-prayer::after,
+  .fc-breath.is-answered::after { display: none; }
+  .fc-breath.is-prayer::before { animation: none; }
+
+  #feed_list .fc-breath { animation: none; }
+  .fc-notifrow { animation: none; }
+  .fc-notifrow-dot { animation: none; }
+
+  .fc-topbar, html.theme-dark .fc-topbar {
+    background: var(--fc-surface) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .fc-bottom-nav, html.theme-dark .fc-bottom-nav {
+    background: var(--fc-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .fc-aside.is-open {
+    background: var(--fc-bg) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .fc-reaction-picker, html.theme-dark .fc-reaction-picker {
+    background: var(--fc-surface);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
