@@ -11,6 +11,32 @@ module Ai
 
       TASK_MARKER = "[TASK:BIBLE_PIC_WORD]"
 
+      # Rotating category buckets — one per round — so consecutive rounds
+      # pull from different corners of scripture instead of recycling the
+      # same famous handful (players called the old rounds monotonous).
+      CATEGORIES = [
+        "miracles of Jesus (healings, feedings, storms, resurrections)",
+        "parables of Jesus (sower, prodigal, talents, good Samaritan...)",
+        "Old Testament heroes and their defining moments",
+        "women of the Bible (Ruth, Esther, Deborah, Mary, Lydia...)",
+        "kings, thrones, and royal drama (Saul, David, Solomon, Ahab...)",
+        "prophets and their strange assignments (Elijah, Ezekiel, Hosea...)",
+        "journeys and escapes (Exodus, Paul's voyages, flight to Egypt...)",
+        "creation, patriarchs, and Genesis scenes",
+        "the early church in Acts (Pentecost, prison breaks, conversions)",
+        "objects and symbols of scripture (ark, altar, lampstand, jars...)",
+        "battles and impossible victories (Jericho, Gideon, Jehoshaphat...)",
+        "angels, dreams, and visions (Jacob's ladder, Gabriel, Revelation)"
+      ].freeze
+
+      TWISTS = [
+        "make one puzzle a play on a specific verse rather than a story",
+        "include one deliberately tricky pair of similar stories as answer/decoy",
+        "include one lesser-known story a casual reader might miss",
+        "include one puzzle about a place rather than a person",
+        "include one puzzle where the emoji tell the story in sequence"
+      ].freeze
+
       SYSTEM_PROMPT = <<~PROMPT.freeze
         #{TASK_MARKER}
         You design '4 Pics 1 Word' puzzles, Bible edition. For each puzzle:
@@ -81,7 +107,14 @@ module Ai
       private
 
       def user_prompt
-        "#{TASK_MARKER}\nGenerate one round of 5 puzzles. Seed: #{SecureRandom.hex(4)}"
+        <<~PROMPT
+          #{TASK_MARKER}
+          Category for this round: #{CATEGORIES.sample}
+          Twist: #{TWISTS.sample}
+          All 5 puzzles must come from this category, all different stories.
+          Difficulty mix: 2 easy, 2 medium, 1 genuinely tricky.
+          Generate one round of 5 puzzles. Seed: #{SecureRandom.hex(4)}
+        PROMPT
       end
 
       def extract_payload(raw)

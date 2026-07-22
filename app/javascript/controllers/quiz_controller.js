@@ -8,7 +8,8 @@ import { Controller } from "@hotwired/stimulus"
 // captured for the share line.
 export default class extends Controller {
   static targets = ["stage", "modeSelect", "themeGrid", "diffRow", "lengthRow"]
-  static values  = { generateUrl: String, submitUrl: String, csrf: String }
+  static values  = { generateUrl: String, submitUrl: String, csrf: String,
+                     gameName: String, flagUrl: String }
 
   connect() {
     this.theme      = ""
@@ -122,6 +123,10 @@ export default class extends Controller {
         </p>
         ${q.reference ? `<p class="fc-quiz-ref">${this.escape(q.reference)}</p>` : ""}
         ${q.explanation ? `<p class="fc-quiz-note">${this.escape(q.explanation)}</p>` : ""}
+        ${q.id && this.flagUrlValue ? `
+          <button type="button" class="fc-quiz-flag" data-action="click->quiz#flagQuestion" data-qid="${q.id}">
+            ⚑ Answer looks wrong? Report it
+          </button>` : ""}
       `
     }
 
@@ -229,7 +234,11 @@ export default class extends Controller {
                    : pct >= 40 ? "Keep building."
                    : "First step taken."
 
-    const shareLine = `📖 Brethreign Bible Quiz · ${s}/${t} (${pct}%) · ${this.bestStreak} streak · ${secs}s`
+    const game = this.gameNameValue || "Bible Quiz"
+    const shareLine = `📖 Brethreign ${game} · ${s}/${t} (${pct}%) · ${this.bestStreak} streak · ${secs}s`
+    const feedShare = `🎮 I just scored ${s}/${t} (${pct}%) on ${game}` +
+                      `${this.bestStreak > 1 ? ` with a 🔥 ${this.bestStreak}-answer streak` : ""}` +
+                      ` in ${secs}s. Think you can beat me? Head to Games and try. 🙌`
 
     this.stageTarget.classList.remove("is-correct", "is-wrong")
     this.stageTarget.innerHTML = `
@@ -246,7 +255,10 @@ export default class extends Controller {
         <pre class="fc-quiz-share">${this.escape(shareLine)}</pre>
 
         <div class="fc-quiz-actions">
-          <button type="button" class="fc-btn fc-btn-primary" data-action="click->quiz#copyShare" data-share="${this.escape(shareLine)}">
+          <a class="fc-btn fc-btn-primary" href="/posts/new?prefill=${encodeURIComponent(feedShare)}">
+            📣 Share to feed
+          </a>
+          <button type="button" class="fc-btn" data-action="click->quiz#copyShare" data-share="${this.escape(shareLine)}">
             ⎘ Copy share line
           </button>
           <button type="button" class="fc-btn" data-action="click->quiz#playAgain">
@@ -265,6 +277,22 @@ export default class extends Controller {
   playAgain() {
     // Same theme/difficulty/length, fresh questions
     this.start()
+  }
+
+  async flagQuestion(event) {
+    const btn = event.currentTarget
+    btn.disabled = true
+    try {
+      await fetch(this.flagUrlValue, {
+        method: "POST",
+        headers: this.headers(),
+        credentials: "same-origin",
+        body: JSON.stringify({ question_id: btn.dataset.qid })
+      })
+      btn.textContent = "✓ Reported — thank you, we'll review it"
+    } catch {
+      btn.disabled = false
+    }
   }
 
   changeMode() {

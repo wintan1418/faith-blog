@@ -47,6 +47,11 @@ class PostsController < ApplicationController
 
   def new
     @post = current_user.posts.build
+    # Prefill from a share action (e.g. a game result bragging its score).
+    # Escaped so the param can only ever contribute plain text.
+    if params[:prefill].present?
+      @post.content = ERB::Util.html_escape(params[:prefill].to_s.first(500))
+    end
     @rooms = Room.public_rooms.ordered
     preload_quoted_post(params[:quote])
   end

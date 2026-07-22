@@ -49,6 +49,7 @@ class GamesController < ApplicationController
 
     questions = rows.map do |r|
       {
+        id: r.id,
         kind: r.kind,
         prompt: r.prompt,
         choices: r.choices,
@@ -60,6 +61,16 @@ class GamesController < ApplicationController
       }
     end
     render json: { ok: true, questions: questions, theme: theme, difficulty: difficulty }
+  end
+
+  # POST /games/quiz/flag — a player says this question's answer is wrong.
+  # Two flags retire the question from the pool.
+  def quiz_flag
+    question = BibleQuizQuestion.find_by(id: params[:question_id])
+    return render(json: { ok: false }, status: :not_found) unless question
+
+    BibleQuizQuestion.increment_counter(:flags_count, question.id)
+    render json: { ok: true }
   end
 
   # POST /games/quiz/submit — record the result
@@ -206,7 +217,7 @@ class GamesController < ApplicationController
     BibleQuizQuestion.mark_seen!(user: current_user, question_ids: rows.map(&:id))
 
     questions = rows.map do |r|
-      { kind: r.kind, prompt: r.prompt, choices: r.choices, correct_index: r.correct_index,
+      { id: r.id, kind: r.kind, prompt: r.prompt, choices: r.choices, correct_index: r.correct_index,
         reference: r.reference, explanation: r.explanation, theme: r.theme, difficulty: r.difficulty }
     end
     render json: { ok: true, questions: questions, difficulty: difficulty }

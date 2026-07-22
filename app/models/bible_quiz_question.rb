@@ -18,8 +18,11 @@ class BibleQuizQuestion < ApplicationRecord
   # the last 30 days. Falls back to least-recently-seen when the unseen
   # pool is exhausted so the round is never short. theme/difficulty/kind
   # are optional filters; pass nil/"" to sample across all.
+  # Questions two players have flagged as wrong stop being served.
+  scope :trusted, -> { where("flags_count < 2") }
+
   def self.sample_for(user:, theme: nil, difficulty: nil, kind: nil, count: 5)
-    candidates = by_theme(theme).by_difficulty(difficulty).by_kind(kind)
+    candidates = trusted.by_theme(theme).by_difficulty(difficulty).by_kind(kind)
     return [] if candidates.none?
 
     seen_ids = UserSeenQuizQuestion

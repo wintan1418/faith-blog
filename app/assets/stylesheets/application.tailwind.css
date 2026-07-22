@@ -18918,3 +18918,19 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
     -webkit-backdrop-filter: none;
   }
 }
+
+/* ── Quiz: "answer looks wrong" flag ──────────────────────────────────── */
+.fc-quiz-flag {
+  display: inline-block;
+  margin-top: 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--fc-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: underline dotted;
+  cursor: pointer;
+  transition: color 140ms ease;
+}
+.fc-quiz-flag:hover { color: #d97706; }
+.fc-quiz-flag:disabled { text-decoration: none; color: var(--fc-accent-2, var(--fc-accent)); cursor: default; }

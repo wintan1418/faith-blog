@@ -74,6 +74,18 @@ module Ai
           - Use canonical 66-book Protestant references in KJV-friendly form.
           - The 5 questions in a batch should feel different from each other.
 
+        ACCURACY CONTRACT — this game has shipped wrong answers before, so:
+          - Quote scripture EXACTLY as the KJV words it. Never paraphrase a
+            quote and present it as the verse.
+          - The "explanation" MUST quote the exact KJV wording of the verse
+            (with reference) that proves the correct answer.
+          - Before returning, RE-CHECK each question: is the choice at
+            correct_index the only defensible answer? Could a well-read
+            believer argue for any other choice? If yes, rewrite the wrong
+            choices until only one answer is correct.
+          - If you cannot verify a question word-for-word against the KJV,
+            REPLACE it with one you can.
+
         Return ONLY a single JSON object, no prose, no markdown fences:
         {
           "questions": [
@@ -114,11 +126,15 @@ module Ai
           correct = q["correct_index"].to_i
           next if choices.size != 4 || !(0..3).cover?(correct) || q["prompt"].to_s.strip.empty?
 
+          # Re-shuffle server-side — models favour certain answer slots and
+          # regulars learn the pattern.
+          order = (0..3).to_a.shuffle
+
           Question.new(
             kind: q["kind"].to_s,
             prompt: q["prompt"].to_s.strip,
-            choices: choices,
-            correct_index: correct,
+            choices: order.map { |i| choices[i] },
+            correct_index: order.index(correct),
             reference: q["reference"].to_s.strip,
             explanation: q["explanation"].to_s.strip,
             theme: @theme,

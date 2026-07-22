@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_21_095913) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_22_150512) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -102,6 +102,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_21_095913) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "theme", limit: 32
+    t.integer "flags_count", default: 0, null: false
     t.index ["fingerprint"], name: "index_bible_quiz_questions_on_fingerprint", unique: true
     t.index ["kind"], name: "index_bible_quiz_questions_on_kind"
     t.index ["theme", "difficulty"], name: "index_bible_quiz_questions_on_theme_and_difficulty"
