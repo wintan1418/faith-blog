@@ -9,7 +9,10 @@ class FeedController < ApplicationController
   PER_PAGE        = 20
 
   def index
-    posts    = feed_posts_scope.recent.limit(POSTS_BUFFER)
+    # Pinned breaths (admin-featured) lead the feed — a community noticeboard.
+    @pinned_posts = feed_posts_scope.where(featured: true).recent.limit(2).to_a
+
+    posts    = feed_posts_scope.where.not(id: @pinned_posts.map(&:id)).recent.limit(POSTS_BUFFER)
     reshares = Reshare.includes(:user, post: feed_post_includes)
                       .order(created_at: :desc)
                       .limit(RESHARES_BUFFER)

@@ -18,7 +18,10 @@ class CommentsController < ApplicationController
 
     if @comment.save
       verdict.persist_review!(@comment)
-      create_notification if @comment.moderation_approved?
+      if @comment.moderation_approved?
+        create_notification
+        notify_thread_participants(@comment)
+      end
 
       respond_to do |format|
         if from_inline_thread?
@@ -58,7 +61,10 @@ class CommentsController < ApplicationController
 
     if @reply.save
       verdict.persist_review!(@reply)
-      create_reply_notification if @reply.moderation_approved?
+      if @reply.moderation_approved?
+        create_reply_notification
+        notify_thread_participants(@reply, replied_to: @comment)
+      end
 
       respond_to do |format|
         if from_inline_thread?
@@ -186,5 +192,23 @@ class CommentsController < ApplicationController
       notifiable: @reply,
       notification_type: :comment_reply
     )
+  end
+
+  # A thread gained a new voice: alert everyone else who has spoken in it
+  # so they can come back and add theirs. The post author is already
+  # covered by :new_comment and a replied-to author by :comment_reply.
+  def notify_thread_participants(new_comment, replied_to: nil)
+    return unless @post.threaded?
+
+    skip_ids = [ current_user.id, @post.user_id, replied_to&.user_id ].compact
+    @post.comments.active.where.not(user_id: skip_ids)
+         .distinct.pluck(:user_id).each do |participant_id|
+      Notification.create(
+        user_id: participant_id,
+        actor: current_user,
+        notifiable: new_comment,
+        notification_type: :thread_new_voice
+      )
+    end
   end
 end

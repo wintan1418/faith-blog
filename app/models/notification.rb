@@ -23,7 +23,8 @@ class Notification < ApplicationRecord
     prayer_answered:      17,
     post_blocked:         18,
     post_held_for_review: 19,
-    post_moderation_approved: 20
+    post_moderation_approved: 20,
+    thread_new_voice:     21
   }
 
   # Associations
@@ -90,6 +91,8 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} breathed"
     when :everyone_mention
       "#{actor&.display_name || 'Someone'} mentioned everyone"
+    when :thread_new_voice
+      "#{actor&.display_name || 'Someone'} added their breath to a thread you're in 🧵"
     when :prayer_joined
       "#{actor&.display_name || 'Someone'} joined your prayer chain"
     when :prayer_answered
@@ -111,7 +114,7 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.post_path(notifiable.post)
     when :new_follower
       Rails.application.routes.url_helpers.user_path(actor.username)
-    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked
+    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked, :thread_new_voice
       post = underlying_post
       if post
         Rails.application.routes.url_helpers.post_path(post)

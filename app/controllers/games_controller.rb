@@ -33,16 +33,19 @@ class GamesController < ApplicationController
 
     rows = BibleQuizQuestion.sample_for(user: current_user, theme: theme, difficulty: difficulty, count: length)
 
-    # If the filtered pool is empty (e.g. no questions yet for this theme),
-    # generate one batch on demand so the user isn't stuck.
-    if rows.size < length
+    # Top up the pool on demand. Each AI batch yields ~5 questions, so a
+    # 10- or 20-question round needs SEVERAL batches when the pool is thin —
+    # a single batch used to leave long rounds failing with an empty result.
+    attempts = 0
+    while rows.size < length && attempts < 5
       begin
         generated = Ai::Bible::QuizGenerator.call(theme: theme, difficulty: difficulty)
         BibleQuizQuestion.import_from_generator!(generated)
-        rows = BibleQuizQuestion.sample_for(user: current_user, theme: theme, difficulty: difficulty, count: length)
       rescue Ai::Bible::QuizGenerator::ParseError, Ai::Moderation::Client::Error => e
         Rails.logger.warn("[QuizGenerator] #{e.class}: #{e.message}")
       end
+      attempts += 1
+      rows = BibleQuizQuestion.sample_for(user: current_user, theme: theme, difficulty: difficulty, count: length)
     end
 
     BibleQuizQuestion.mark_seen!(user: current_user, question_ids: rows.map(&:id))

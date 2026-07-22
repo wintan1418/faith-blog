@@ -19022,3 +19022,25 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
   font-size: 0.82rem;
   font-weight: 650;
 }
+
+/* ── Pinned breaths: the community noticeboard at the top of the feed ─── */
+.fc-pinned-strip { margin-bottom: 1rem; }
+
+.fc-pinned-label {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fc-accent-2, var(--fc-accent));
+  margin: 0 0.25rem 0.5rem;
+}
+
+.fc-pinned-card .fc-breath {
+  border-color: color-mix(in srgb, var(--fc-accent) 45%, var(--fc-line-strong));
+  background:
+    linear-gradient(135deg, var(--fc-accent-soft, rgba(52, 211, 153, 0.08)), transparent 55%),
+    var(--fc-surface);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--fc-accent) 16%, transparent);
+}
+
+.fc-pinned-card .fc-breath::before { opacity: 1; top: 10%; bottom: 10%; }

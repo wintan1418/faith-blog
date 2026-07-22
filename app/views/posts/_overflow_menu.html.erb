@@ -19,6 +19,18 @@
       <% end %>
     <% end %>
 
+    <% if user_signed_in? && current_user.admin_or_moderator? %>
+      <% if post.featured? %>
+        <%= button_to unfeature_post_path(post), form_class: "contents", class: "fc-action w-full", role: "menuitem" do %>
+          <span class="fc-action-label">📌 Unpin breath</span>
+        <% end %>
+      <% else %>
+        <%= button_to feature_post_path(post), form_class: "contents", class: "fc-action w-full", role: "menuitem" do %>
+          <span class="fc-action-label">📌 Pin for everyone</span>
+        <% end %>
+      <% end %>
+    <% end %>
+
     <%= render "posts/impressions", post: post %>
 
     <% if user_signed_in? %>

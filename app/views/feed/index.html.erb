@@ -304,6 +304,19 @@
         </button>
 
         <div class="mt-4 space-y-3">
+          <% if @pinned_posts.present? %>
+            <div class="fc-pinned-strip">
+              <p class="fc-pinned-label">📌 Pinned for the community</p>
+              <div class="space-y-3">
+                <% @pinned_posts.each do |pinned| %>
+                  <div class="fc-pinned-card">
+                    <%= render "posts/card", post: pinned %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
           <% if @items.any? %>
             <div id="feed_list" class="space-y-3">
               <% @items.each do |item| %>
