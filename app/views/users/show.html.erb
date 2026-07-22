@@ -62,6 +62,19 @@
             </span>
           </div>
 
+          <% badges = @user.user_badges.order(:awarded_at) %>
+          <% if badges.any? %>
+            <div class="profile-badges" aria-label="Milestones">
+              <% badges.each do |badge| %>
+                <% info = badge.info %>
+                <span class="profile-badge" title="<%= info[:name] %> — <%= info[:blurb] %>">
+                  <span class="profile-badge-emoji"><%= info[:emoji] %></span>
+                  <span class="profile-badge-name"><%= info[:name] %></span>
+                </span>
+              <% end %>
+            </div>
+          <% end %>
+
           <div class="profile-stats">
             <%= link_to followers_user_path(@user.username), class: "profile-stat" do %>
               <span><%= number_to_human(@user.followers_count, format: "%n%u", units: { thousand: "k" }) %></span>

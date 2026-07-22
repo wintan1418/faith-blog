@@ -19044,3 +19044,80 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
 }
 
 .fc-pinned-card .fc-breath::before { opacity: 1; top: 10%; bottom: 10%; }
+
+/* ── Daily Breath prompt: one question a day, answered in breaths ─────── */
+.fc-daily-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.9rem 0;
+  padding: 0.95rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--fc-accent) 30%, var(--fc-line-strong));
+  background:
+    radial-gradient(ellipse 20rem 8rem at 0% 0%, var(--fc-accent-soft, rgba(52, 211, 153, 0.14)), transparent 70%),
+    var(--fc-surface);
+}
+
+.fc-daily-prompt-kicker {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--fc-accent-2, var(--fc-accent));
+}
+
+.fc-daily-prompt-q {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--fc-ink);
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+.fc-daily-prompt-cta { white-space: nowrap; flex: none; }
+
+.fc-daily-prompt-done {
+  flex: none;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--fc-accent-2, var(--fc-accent));
+}
+
+.fc-daily-prompt.is-done { opacity: 0.85; }
+
+@media (max-width: 560px) {
+  .fc-daily-prompt { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+}
+
+/* ── Profile badges: milestones worn on the hero ──────────────────────── */
+.profile-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1.1rem;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in srgb, var(--fc-accent) 30%, var(--fc-line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fc-accent-soft, rgba(52, 211, 153, 0.12)) 70%, var(--fc-surface));
+  padding: 0.28rem 0.7rem 0.28rem 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--fc-soft);
+  cursor: default;
+  transition: transform 140ms ease, border-color 140ms ease;
+}
+
+.profile-badge:hover {
+  transform: translateY(-1px);
+  border-color: var(--fc-accent);
+}
+
+.profile-badge-emoji { font-size: 0.95rem; }

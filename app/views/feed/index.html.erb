@@ -120,6 +120,25 @@
         </div>
       </div>
 
+      <%# The Daily Breath prompt — one question a day the whole community
+          answers. Turns readers into writers. %>
+      <% breathed_today = current_user.posts.published.where(created_at: Time.current.all_day).exists? %>
+      <section class="fc-daily-prompt<%= ' is-done' if breathed_today %>">
+        <div class="fc-daily-prompt-body">
+          <p class="fc-daily-prompt-kicker">🌅 Today's breath prompt</p>
+          <h2 class="fc-daily-prompt-q"><%= DailyPrompt.today %></h2>
+        </div>
+        <% if breathed_today %>
+          <span class="fc-daily-prompt-done">✓ You breathed today</span>
+        <% else %>
+          <%= link_to new_post_path(prompt: DailyPrompt.today),
+                      class: "fc-btn fc-btn-primary fc-daily-prompt-cta",
+                      data: { turbo_frame: "_top" } do %>
+            Breathe your answer
+          <% end %>
+        <% end %>
+      </section>
+
       <% if @new_member_announcements&.any? %>
         <div class="space-y-2 mb-3">
           <% @new_member_announcements.each do |joiner| %>

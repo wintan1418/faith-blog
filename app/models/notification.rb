@@ -24,7 +24,8 @@ class Notification < ApplicationRecord
     post_blocked:         18,
     post_held_for_review: 19,
     post_moderation_approved: 20,
-    thread_new_voice:     21
+    thread_new_voice:     21,
+    badge_earned:         22
   }
 
   # Associations
@@ -93,6 +94,9 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} mentioned everyone"
     when :thread_new_voice
       "#{actor&.display_name || 'Someone'} added their breath to a thread you're in 🧵"
+    when :badge_earned
+      badge = notifiable.respond_to?(:info) ? notifiable.info : nil
+      badge ? "You earned the #{badge[:name]} badge #{badge[:emoji]}" : "You earned a new badge ✦"
     when :prayer_joined
       "#{actor&.display_name || 'Someone'} joined your prayer chain"
     when :prayer_answered
@@ -114,6 +118,8 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.post_path(notifiable.post)
     when :new_follower
       Rails.application.routes.url_helpers.user_path(actor.username)
+    when :badge_earned
+      Rails.application.routes.url_helpers.user_path(user.username)
     when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked, :thread_new_voice
       post = underlying_post
       if post

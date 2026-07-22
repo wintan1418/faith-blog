@@ -2,6 +2,7 @@
 
 class GameAttempt < ApplicationRecord
   belongs_to :user
+  after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
 
   enum :kind, {
     bible_quiz: 0,

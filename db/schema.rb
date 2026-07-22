@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_22_152217) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_22_180736) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -599,6 +599,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_22_152217) do
     t.index ["usage_count"], name: "index_tags_on_usage_count"
   end
 
+  create_table "user_badges", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "slug", null: false
+    t.datetime "awarded_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "slug"], name: "index_user_badges_on_user_id_and_slug", unique: true
+    t.index ["user_id"], name: "index_user_badges_on_user_id"
+  end
+
   create_table "user_reading_plans", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "plan_slug", null: false
@@ -730,6 +740,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_22_152217) do
   add_foreign_key "resources", "users", column: "approved_by_id"
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
+  add_foreign_key "user_badges", "users"
   add_foreign_key "user_reading_plans", "users"
   add_foreign_key "user_risk_profiles", "users"
   add_foreign_key "user_seen_quiz_questions", "bible_quiz_questions"

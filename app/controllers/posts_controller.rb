@@ -68,6 +68,11 @@ class PostsController < ApplicationController
       end
     end
 
+    # Daily Breath prompt: the prompt becomes the title, the body is theirs.
+    if params[:prompt].present? && params[:prompt].to_s == DailyPrompt.today
+      @post.title = params[:prompt].to_s.first(200)
+    end
+
     # Lift a comment into a breath of its own: prefill the comment's words
     # (escaped, attributed) and embed the thread it came from so readers can
     # trace it back. The resulting post shares/reshares like any other.

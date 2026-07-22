@@ -151,6 +151,8 @@ class Post < ApplicationRecord
   after_update_commit :broadcast_to_public_feed,
                       if: -> { saved_change_to_moderation_status? && feed_visible? }
 
+  after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
+
   # Instance methods
   def engagement_score
     likes_count * 2 + comments_count * 3 + views_count * 0.1
