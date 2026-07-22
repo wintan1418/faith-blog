@@ -43,10 +43,42 @@ class GameQualityTest < ActionDispatch::IntegrationTest
   end
 
   test "the composer prefills a shared game result as plain text" do
-    get new_post_path(prefill: "🎮 I just scored 5/5 (100%) on Character Match. <script>alert(1)</script>")
+    get new_post_path(prefill: "I finished a round. <script>alert(1)</script>")
 
     assert_response :success
-    assert_match "I just scored 5/5", response.body
+    assert_match "I finished a round.", response.body
     assert_no_match "<script>alert(1)</script>", response.body
+  end
+
+  test "a game share builds a card with a warm, non-competitive line" do
+    get new_post_path(share_game: "character_match", score: 4, total: 5, streak: 3, secs: 38)
+
+    assert_response :success
+    assert_match "Come play with me", response.body
+    assert_match "Sharing your", response.body
+    assert_no_match(/beat me/i, response.body)
+  end
+
+  test "an unknown share_game slug is ignored" do
+    get new_post_path(share_game: "poker", score: 4, total: 5)
+    assert_response :success
+    assert_no_match "Sharing your", response.body
+  end
+
+  test "creating a shared post persists the sanitized game card and renders it" do
+    room = Room.create!(name: "GQ Room", description: "x")
+    post posts_path, params: { post: {
+      content: "Come play with me. 🙌", room_id: room.id, status: "published",
+      game_share: { slug: "quiz", score: "99", total: "5", streak: "2", secs: "40" }.to_json
+    } }
+
+    created = Post.order(:created_at).last
+    assert_equal "quiz", created.game_share["slug"]
+    assert_equal 5, created.game_share["score"], "score must be clamped to total"
+
+    get post_path(created)
+    assert_response :success
+    assert_match "Play Bible Quiz", response.body
+    assert_match "/games/quiz", response.body
   end
 end

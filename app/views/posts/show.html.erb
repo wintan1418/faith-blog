@@ -54,6 +54,10 @@
             <%= render_social_text(@post.content, class_name: "fc-social-text") %>
           </div>
 
+          <% if @post.game_share.present? %>
+            <%= render "posts/game_share_card", post: @post %>
+          <% end %>
+
           <% if @post.quote_repost? %>
             <div class="post-embedded-quote">
               <%= render "posts/embedded_quote", quoted: @post.quoted_post %>

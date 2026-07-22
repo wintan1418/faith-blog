@@ -1,0 +1,24 @@
+<%# A game result shared as its own card: score, progress bar, and a link
+    into the game. Local: post (must have game_share + a known slug). %>
+<% info = post.game_share_info %>
+<% if info %>
+  <% share = post.game_share %>
+  <% pct = ((share["score"].to_f / [share["total"], 1].max) * 100).round %>
+  <div class="fc-game-card">
+    <div class="fc-game-card-top">
+      <span class="fc-game-card-emoji" aria-hidden="true"><%= info[:emoji] %></span>
+      <div class="min-w-0">
+        <p class="fc-game-card-name"><%= info[:name] %></p>
+        <p class="fc-game-card-score">
+          <%= share["score"] %>/<%= share["total"] %> · <%= pct %>%
+          <% if share["streak"].to_i > 1 %> · 🔥 <%= share["streak"] %> streak<% end %>
+          <% if share["secs"].to_i.positive? %> · <%= share["secs"] %>s<% end %>
+        </p>
+      </div>
+    </div>
+    <div class="fc-game-card-bar" aria-hidden="true"><span style="width: <%= pct %>%"></span></div>
+    <%= link_to "/games/#{share["slug"]}", class: "fc-game-card-cta", data: { turbo_frame: "_top" } do %>
+      ▶ Play <%= info[:name] %>
+    <% end %>
+  </div>
+<% end %>

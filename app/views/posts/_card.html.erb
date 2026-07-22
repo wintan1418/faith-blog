@@ -106,6 +106,10 @@
         <% end %>
       </div>
 
+      <% if post.game_share.present? %>
+        <%= render "posts/game_share_card", post: post %>
+      <% end %>
+
       <% if post.has_voice_note? %>
         <%= render "posts/voice_note", post: post %>
       <% end %>

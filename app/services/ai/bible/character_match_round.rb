@@ -62,8 +62,8 @@ module Ai
           be plausible — figures from a similar era or role, never absurd.
         - Use 5 DIFFERENT figures — no repeats within the round.
         - Prompt ≤ 240 chars; each choice ≤ 40 chars.
-        - Difficulty ramp: questions 1-2 easy (famous figures, famous moments),
-          3-4 medium, 5 hard (an obscure figure or a subtle detail).
+        - Difficulty ramp: 1 easy question (a famous figure), 2 medium,
+          2 hard (obscure figures or subtle details).
         - Tag each question with its "difficulty": "easy" | "medium" | "hard".
         - "reference" is the Bible passage where the figure appears (e.g. "Judges 4-5").
         - "explanation" is one warm sentence about who they were.
@@ -87,12 +87,15 @@ module Ai
                             :reference, :explanation, keyword_init: true)
 
       def self.call(bucket: nil)
-        new(bucket: bucket || BUCKETS.sample).call
+        new(bucket: bucket).call
       end
 
-      def initialize(bucket:)
-        @bucket = bucket
-        @clue_style = CLUE_STYLES.sample
+      # Three buckets per round (not one) — a whole round drawn from a single
+      # corner of scripture read as monotonous. Two clue styles per round and
+      # an anti-formula rule keep the prompts from all sounding alike.
+      def initialize(bucket: nil)
+        @buckets = bucket ? [ bucket ] : BUCKETS.sample(3)
+        @clue_styles = CLUE_STYLES.sample(2)
       end
 
       def call
@@ -134,8 +137,17 @@ module Ai
       def user_prompt
         <<~PROMPT
           #{TASK_MARKER}
-          Figure bucket: #{@bucket}
-          Clue style to lean on: #{@clue_style}
+          Spread the 5 figures across these buckets (at least one from each):
+          #{@buckets.map { |b| "- #{b}" }.join("\n")}
+          Alternate between these clue styles: #{@clue_styles.join(" / ")}
+
+          Anti-formula rules:
+          - No two prompts may open with the same words. Ban the openers
+            "This man", "This woman", "He was", "She was", "A man who".
+          - Clues must carry CONCRETE, vivid details — places, objects,
+            numbers, quotes — never generic bios ("a faithful servant of God").
+          - Difficulty: 1 easy, 2 medium, 2 hard.
+
           Generate 5 questions. Seed: #{SecureRandom.hex(4)}
         PROMPT
       end

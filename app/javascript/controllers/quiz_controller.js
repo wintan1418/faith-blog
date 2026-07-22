@@ -236,9 +236,11 @@ export default class extends Controller {
 
     const game = this.gameNameValue || "Bible Quiz"
     const shareLine = `📖 Brethreign ${game} · ${s}/${t} (${pct}%) · ${this.bestStreak} streak · ${secs}s`
-    const feedShare = `🎮 I just scored ${s}/${t} (${pct}%) on ${game}` +
-                      `${this.bestStreak > 1 ? ` with a 🔥 ${this.bestStreak}-answer streak` : ""}` +
-                      ` in ${secs}s. Think you can beat me? Head to Games and try. 🙌`
+    // Structured share: the server builds a proper game card + a warm,
+    // non-competitive line from these params.
+    const slug = (this.generateUrlValue.match(/games\/([a-z_]+)\//) || [])[1] || "quiz"
+    const shareUrl = `/posts/new?share_game=${slug}&score=${s}&total=${t}` +
+                     `&streak=${this.bestStreak}&secs=${secs}`
 
     this.stageTarget.classList.remove("is-correct", "is-wrong")
     this.stageTarget.innerHTML = `
@@ -255,7 +257,7 @@ export default class extends Controller {
         <pre class="fc-quiz-share">${this.escape(shareLine)}</pre>
 
         <div class="fc-quiz-actions">
-          <a class="fc-btn fc-btn-primary" href="/posts/new?prefill=${encodeURIComponent(feedShare)}">
+          <a class="fc-btn fc-btn-primary" href="${shareUrl}">
             📣 Share to feed
           </a>
           <button type="button" class="fc-btn" data-action="click->quiz#copyShare" data-share="${this.escape(shareLine)}">

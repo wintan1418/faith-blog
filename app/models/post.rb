@@ -182,6 +182,40 @@ class Post < ApplicationRecord
     images.first
   end
 
+  # Shareable game results — a "game card" a post can carry. Whitelist of
+  # games and their display metadata; slugs double as /games/<slug> paths.
+  GAME_SHARES = {
+    "quiz"               => { name: "Bible Quiz",         emoji: "📖" },
+    "character_match"    => { name: "Character Match",    emoji: "👤" },
+    "reference_scramble" => { name: "Reference Scramble", emoji: "🔀" },
+    "history"            => { name: "Church History",     emoji: "⛪" },
+    "pic_word"           => { name: "4 Pics 1 Word",      emoji: "🖼️" },
+    "verse_memory"       => { name: "Verse Memory",       emoji: "🧠" }
+  }.freeze
+
+  # Never trust client-supplied share data: slug must be a known game and
+  # every number is clamped. Returns a clean hash or nil.
+  def self.sanitize_game_share(raw)
+    data = raw.is_a?(Hash) ? raw : JSON.parse(raw.to_s)
+    slug = data["slug"].to_s
+    return nil unless GAME_SHARES.key?(slug)
+
+    total = data["total"].to_i.clamp(1, 50)
+    {
+      "slug"   => slug,
+      "score"  => data["score"].to_i.clamp(0, total),
+      "total"  => total,
+      "streak" => data["streak"].to_i.clamp(0, 50),
+      "secs"   => data["secs"].to_i.clamp(0, 3600)
+    }
+  rescue JSON::ParserError
+    nil
+  end
+
+  def game_share_info
+    game_share.present? ? GAME_SHARES[game_share["slug"]] : nil
+  end
+
   # FriendlyId source: prefer the explicit title, otherwise fall back to the
   # first chunk of the breath body so untitled breaths still get a slug.
   def slug_source

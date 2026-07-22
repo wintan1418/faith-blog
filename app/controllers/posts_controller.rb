@@ -47,11 +47,27 @@ class PostsController < ApplicationController
 
   def new
     @post = current_user.posts.build
-    # Prefill from a share action (e.g. a game result bragging its score).
-    # Escaped so the param can only ever contribute plain text.
+    # Prefill from a share action. Escaped so the param can only ever
+    # contribute plain text.
     if params[:prefill].present?
       @post.content = ERB::Util.html_escape(params[:prefill].to_s.first(500))
     end
+
+    # Game-result share: attaches a game card (rendered as its own block
+    # with a play link) plus a warm, non-competitive opening line.
+    if params[:share_game].present?
+      share = Post.sanitize_game_share(
+        "slug" => params[:share_game], "score" => params[:score],
+        "total" => params[:total], "streak" => params[:streak], "secs" => params[:secs]
+      )
+      if share
+        @post.game_share = share
+        info = Post::GAME_SHARES[share["slug"]]
+        @post.content = "Just finished a round of #{info[:name]} — #{share["score"]}/#{share["total"]}. " \
+                        "Come play with me and hide some scripture in your heart. 🙌"
+      end
+    end
+
     @rooms = Room.public_rooms.ordered
     preload_quoted_post(params[:quote])
   end
@@ -59,6 +75,12 @@ class PostsController < ApplicationController
   def create
     @post = current_user.posts.build(post_params)
     sanitize_quoted_post!(@post)
+
+    # The composer carries the game card through a hidden JSON field;
+    # re-sanitize here — never trust the round trip.
+    if params.dig(:post, :game_share).present?
+      @post.game_share = Post.sanitize_game_share(params[:post][:game_share])
+    end
 
     if scheduled_in_future?(@post)
       @post.status = :scheduled

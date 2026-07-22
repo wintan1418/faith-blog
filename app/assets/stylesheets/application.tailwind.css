@@ -18934,3 +18934,91 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
 }
 .fc-quiz-flag:hover { color: #d97706; }
 .fc-quiz-flag:disabled { text-decoration: none; color: var(--fc-accent-2, var(--fc-accent)); cursor: default; }
+
+/* ── Game share card: a result shared to the feed as its own block ────── */
+.fc-game-card {
+  margin-top: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--fc-accent) 26%, var(--fc-line-strong));
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, var(--fc-accent-soft, rgba(52, 211, 153, 0.10)), transparent 60%),
+    var(--fc-surface-2);
+  padding: 0.9rem 1rem;
+}
+
+.fc-game-card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fc-game-card-emoji {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 12px;
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  font-size: 1.25rem;
+  flex: none;
+}
+
+.fc-game-card-name {
+  font-weight: 900;
+  color: var(--fc-ink);
+  font-size: 0.95rem;
+}
+
+.fc-game-card-score {
+  color: var(--fc-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.fc-game-card-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--fc-surface-3, var(--fc-surface));
+  border: 1px solid var(--fc-line);
+  overflow: hidden;
+  margin: 0.7rem 0;
+}
+
+.fc-game-card-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--fc-accent), var(--fc-accent-2, var(--fc-accent)));
+}
+
+.fc-game-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  background: var(--fc-surface);
+  border: 1px solid color-mix(in srgb, var(--fc-accent) 40%, var(--fc-line));
+  color: var(--fc-accent-2, var(--fc-accent));
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition: background 150ms ease, color 150ms ease, transform 120ms ease;
+}
+
+.fc-game-card-cta:hover {
+  background: var(--fc-accent);
+  color: #06231a;
+  transform: translateY(-1px);
+}
+
+.fc-composer-gamecard-note {
+  margin-bottom: 0.7rem;
+  border: 1px dashed color-mix(in srgb, var(--fc-accent) 40%, var(--fc-line));
+  border-radius: 10px;
+  background: var(--fc-accent-soft, rgba(52, 211, 153, 0.10));
+  color: var(--fc-soft);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+}

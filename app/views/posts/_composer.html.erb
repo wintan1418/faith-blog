@@ -19,6 +19,17 @@
     </div>
   <% end %>
 
+  <%# Game-result share card riding along (re-sanitized server-side on create). %>
+  <% if post.game_share.present? %>
+    <%= f.hidden_field :game_share, value: post.game_share.to_json %>
+    <% if (info = post.game_share_info) %>
+      <div class="fc-composer-gamecard-note">
+        <%= info[:emoji] %> Sharing your <strong><%= info[:name] %></strong> result —
+        <%= post.game_share["score"] %>/<%= post.game_share["total"] %> — as a card on this breath.
+      </div>
+    <% end %>
+  <% end %>
+
   <div class="fc-composer-tabs" role="tablist" aria-label="What are you posting?">
     <button type="button"
             class="fc-composer-tab is-active"
