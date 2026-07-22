@@ -10,14 +10,24 @@ const GLYPH = { p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚" }
 export default class extends Controller {
   static targets = ["board", "status", "feedback", "progress", "hintBtn", "resetBtn"]
   static values  = {
-    fen:       String,
-    solution:  Array,
-    solvedUrl: String,
-    csrf:      String,
-    already:   Boolean
+    fen:         String,
+    solution:    Array,
+    lastMove:    String,
+    solvedUrl:   String,
+    practiceUrl: String,
+    csrf:        String,
+    already:     Boolean
   }
 
   connect() {
+    let solution = []
+    try { solution = this.solutionValue } catch { solution = [] }
+    this.puzzle = {
+      fen: (this.fenValue || "").trim(),
+      solution: Array.isArray(solution) ? solution : [],
+      lastMove: (this.lastMoveValue || "").trim()
+    }
+    this.practice = false
     try {
       this.start()
     } catch (err) {
@@ -27,26 +37,80 @@ export default class extends Controller {
   }
 
   start() {
-    const fen = (this.fenValue || "").trim()
-    if (!fen) throw new Error("missing puzzle FEN")
-
-    // Stimulus Array values throw on malformed JSON — read defensively.
-    let solution = []
-    try { solution = this.solutionValue } catch { solution = [] }
-    this.solution = Array.isArray(solution) ? solution : []
+    if (!this.puzzle.fen) throw new Error("missing puzzle FEN")
+    this.solution = this.puzzle.solution
     if (this.solution.length === 0) throw new Error("missing puzzle solution")
 
-    this.game = new Chess(fen)
-    this.solverColor = this.game.turn()         // side to move in the puzzle FEN
+    this.game = new Chess(this.puzzle.fen)
     this.idx = 0                                // index into the solution list
     this.selected = null
     this.legalTargets = []
     this.lastMove = null
     this.complete = false
+    this.revealed = false
+
+    // Some Lichess payloads give the position BEFORE the opponent's last
+    // move. If the first solution move isn't legal here, play lastMove
+    // first so the board shows the real puzzle position.
+    const s0 = this.parseUci(this.solution[0])
+    const s0Legal = this.game.moves({ verbose: true })
+                        .some(m => m.from === s0.from && m.to === s0.to)
+    if (!s0Legal && this.puzzle.lastMove) {
+      const lm = this.parseUci(this.puzzle.lastMove)
+      try {
+        this.game.move({ from: lm.from, to: lm.to, promotion: lm.promotion || "q" })
+        this.lastMove = { from: lm.from, to: lm.to }
+      } catch { /* leave the position as given */ }
+    }
+
+    this.solverColor = this.game.turn()
     this.renderBoard()
     this.setStatus(`${this.colorName(this.solverColor)} to move — find the strongest line.`)
     this.updateProgress()
     if (this.hasFeedbackTarget) this.feedbackTarget.classList.add("hidden")
+  }
+
+  // ─── Practice mode: unlimited fresh puzzles, no points ───────
+  async nextPractice() {
+    if (!this.practiceUrlValue) return
+    this.setStatus("Fetching a fresh puzzle…")
+    try {
+      const resp = await fetch(this.practiceUrlValue, {
+        headers: { "Accept": "application/json" }, credentials: "same-origin"
+      })
+      const data = await resp.json()
+      if (!data.ok || !data.puzzle) throw new Error(data.error || "no puzzle")
+      this.puzzle = {
+        fen: data.puzzle.fen || "",
+        solution: Array.isArray(data.puzzle.solution) ? data.puzzle.solution : [],
+        lastMove: data.puzzle.last_move || ""
+      }
+      this.practice = true
+      this.start()
+      this.flash("hint", `Practice puzzle · rating ${data.puzzle.rating} — no points, pure sharpening.`)
+    } catch (err) {
+      this.flash("bad", "Couldn't fetch a practice puzzle — try again in a moment.")
+    }
+  }
+
+  // ─── Reveal: watch the solution play out (no points) ─────────
+  async revealSolution() {
+    if (this.complete) return
+    this.revealed = true
+    this.clearSelection()
+    this.setStatus("Watch the line…")
+    while (this.idx < this.solution.length) {
+      const m = this.parseUci(this.solution[this.idx])
+      try { this.game.move({ from: m.from, to: m.to, promotion: m.promotion || "q" }) }
+      catch { break }
+      this.lastMove = { from: m.from, to: m.to }
+      this.idx += 1
+      this.renderBoard()
+      this.updateProgress()
+      await new Promise(r => setTimeout(r, 650))
+    }
+    this.complete = true
+    this.flash("hint", "That was the line. Try a practice puzzle next — you'll spot the next one yourself.")
   }
 
   reset() {
@@ -195,6 +259,14 @@ export default class extends Controller {
     this.clearSelection()
     this.flash("good", "Puzzle solved — well played.")
 
+    if (this.practice) {
+      this.showFeedback("Practice solved 🎉 — hit “New puzzle” for another.")
+      return
+    }
+    if (this.revealed) {
+      this.showFeedback("Solution shown — no points this time, but now you've seen the idea.")
+      return
+    }
     if (this.alreadyValue) {
       this.showFeedback("You already claimed today's points — nice replay though.")
       return

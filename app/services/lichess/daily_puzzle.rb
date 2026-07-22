@@ -13,11 +13,30 @@ module Lichess
 
     CACHE_KEY = "lichess:daily_puzzle:v2"
 
+    PRACTICE_ENDPOINT = "https://lichess.org/api/puzzle/next"
+
     def self.fetch
       cached = Rails.cache.read(CACHE_KEY) rescue nil
       return cached if cached
 
-      uri = URI(ENDPOINT)
+      data = request_puzzle(ENDPOINT)
+      return nil unless data
+
+      begin
+        Rails.cache.write(CACHE_KEY, data, expires_in: CACHE_TTL)
+      rescue StandardError
+        # Cache unavailable — fine, just don't memoize.
+      end
+      data
+    end
+
+    # A fresh random puzzle for unlimited practice — never cached.
+    def self.practice
+      request_puzzle(PRACTICE_ENDPOINT)
+    end
+
+    def self.request_puzzle(endpoint)
+      uri = URI(endpoint)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.open_timeout = 4
@@ -33,7 +52,7 @@ module Lichess
       # puzzle["fen"] — the position right before the solver's first move.
       # The solution is a UCI move list that alternates solver / opponent.
       fen     = puzzle["fen"].presence || fen_from_game(game)
-      data    = {
+      {
         id:        puzzle["id"],
         rating:    puzzle["rating"].to_i,
         plays:     puzzle["plays"].to_i,
@@ -44,12 +63,6 @@ module Lichess
         link:      "https://lichess.org/training/#{puzzle["id"]}",
         side_to_move: side_to_move(fen)
       }
-      begin
-        Rails.cache.write(CACHE_KEY, data, expires_in: CACHE_TTL)
-      rescue StandardError
-        # Cache unavailable — fine, just don't memoize.
-      end
-      data
     rescue StandardError => e
       Rails.logger.warn("[Lichess::DailyPuzzle] #{e.class}: #{e.message}")
       nil

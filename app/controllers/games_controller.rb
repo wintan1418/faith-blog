@@ -90,6 +90,16 @@ class GamesController < ApplicationController
                                         .exists?
   end
 
+  # GET /games/chess/practice — a fresh random puzzle, unlimited, no points.
+  def chess_practice
+    puzzle = Lichess::DailyPuzzle.practice
+    if puzzle
+      render json: { ok: true, puzzle: puzzle }
+    else
+      render json: { ok: false, error: "Couldn't fetch a practice puzzle right now." }, status: :bad_gateway
+    end
+  end
+
   # POST /games/chess/solved — record that the user solved today's puzzle
   def chess_solved
     puzzle = Lichess::DailyPuzzle.fetch

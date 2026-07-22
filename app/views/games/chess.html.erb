@@ -16,7 +16,9 @@
                  data-controller="chess-puzzle"
                  data-chess-puzzle-fen-value="<%= @puzzle[:fen] %>"
                  data-chess-puzzle-solution-value="<%= @puzzle[:solution].to_json %>"
+                 data-chess-puzzle-last-move-value="<%= @puzzle[:last_move] %>"
                  data-chess-puzzle-solved-url-value="<%= games_chess_solved_path %>"
+                 data-chess-puzzle-practice-url-value="<%= games_chess_practice_path %>"
                  data-chess-puzzle-csrf-value="<%= form_authenticity_token %>"
                  data-chess-puzzle-already-value="<%= @already_solved_today %>">
           <div class="fc-chess-head">
@@ -47,6 +49,12 @@
                       class="fc-btn"
                       data-chess-puzzle-target="resetBtn"
                       data-action="click->chess-puzzle#reset">↺ Restart</button>
+              <button type="button"
+                      class="fc-btn"
+                      data-action="click->chess-puzzle#revealSolution">▶ Show solution</button>
+              <button type="button"
+                      class="fc-btn fc-btn-primary"
+                      data-action="click->chess-puzzle#nextPractice">♞ New puzzle</button>
             </div>
           </div>
 

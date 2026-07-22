@@ -99,6 +99,7 @@ Rails.application.routes.draw do
   post "games/quiz/flag",        to: "games#quiz_flag",        as: :games_quiz_flag
   get  "games/chess",            to: "games#chess",            as: :games_chess
   post "games/chess/solved",     to: "games#chess_solved",     as: :games_chess_solved
+  get  "games/chess/practice",   to: "games#chess_practice",   as: :games_chess_practice
   get  "games/history",          to: "games#history",          as: :games_history
   post "games/history/generate", to: "games#history_generate", as: :games_history_generate
   post "games/history/submit",   to: "games#history_submit",   as: :games_history_submit
