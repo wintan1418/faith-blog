@@ -74,7 +74,9 @@ class PostsController < ApplicationController
     if params[:from_comment].present?
       comment = Comment.active.find_by(id: params[:from_comment])
       if comment&.moderation_approved? && comment.post.visible_to?(current_user)
-        quoted = ERB::Util.html_escape(comment.content.to_plain_text.to_s.strip.first(400))
+        # Carry the WHOLE comment (generous safety cap only) — cutting it
+        # mid-thought lost most of long comments.
+        quoted = ERB::Util.html_escape(comment.content.to_plain_text.to_s.strip.first(8_000))
         @post.content = "💬 A word from @#{comment.user.username} that deserves its own breath:" \
                         "<blockquote>#{quoted}</blockquote>"
         @post.quoted_post = comment.post
