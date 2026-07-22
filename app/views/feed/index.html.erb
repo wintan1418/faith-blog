@@ -125,17 +125,17 @@
       <% breathed_today = current_user.posts.published.where(created_at: Time.current.all_day).exists? %>
       <section class="fc-daily-prompt<%= ' is-done' if breathed_today %>">
         <div class="fc-daily-prompt-body">
-          <p class="fc-daily-prompt-kicker">🌅 Today's breath prompt</p>
-          <h2 class="fc-daily-prompt-q"><%= DailyPrompt.today %></h2>
+          <p class="fc-daily-prompt-kicker">🌅 Daily breath</p>
+          <h2 class="fc-daily-prompt-q">What breath do you have today?</h2>
         </div>
         <% if breathed_today %>
           <span class="fc-daily-prompt-done">✓ You breathed today</span>
         <% else %>
-          <%= link_to new_post_path(prompt: DailyPrompt.today),
-                      class: "fc-btn fc-btn-primary fc-daily-prompt-cta",
-                      data: { turbo_frame: "_top" } do %>
-            Breathe your answer
-          <% end %>
+          <button type="button"
+                  class="fc-btn fc-btn-primary fc-daily-prompt-cta"
+                  data-action="click->composer-modal#open">
+            Breathe it out
+          </button>
         <% end %>
       </section>
 

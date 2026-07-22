@@ -17,35 +17,16 @@ class DailyPromptAndBadgesTest < ActionDispatch::IntegrationTest
 
   teardown { ENV.delete("AI_MODERATION_STUB") }
 
-  test "the feed shows today's prompt with a breathe CTA until you've posted" do
+  test "the feed shows the daily breath card until you've posted" do
     get feed_path
     assert_response :success
-    assert_match "breath prompt", response.body
-    assert_match ERB::Util.html_escape(DailyPrompt.today), response.body
-    assert_match "Breathe your answer", response.body
+    assert_match "What breath do you have today?", response.body
+    assert_match "Breathe it out", response.body
 
     Post.create!(user: @user, room: @room, title: "Answered it",
                  content: "Body", status: :published, moderation_status: :approved)
     get feed_path
     assert_match "You breathed today", response.body
-  end
-
-  test "the prompt CTA prefills the composer title with today's prompt" do
-    get new_post_path(prompt: DailyPrompt.today)
-    assert_response :success
-    assert_match ERB::Util.html_escape(DailyPrompt.today), response.body
-  end
-
-  test "an arbitrary prompt param is ignored" do
-    get new_post_path(prompt: "Buy my crypto course")
-    assert_response :success
-    assert_no_match "Buy my crypto course", response.body
-  end
-
-  test "the prompt is deterministic per day and rotates" do
-    today = DailyPrompt.today(Date.new(2026, 7, 22))
-    assert_equal today, DailyPrompt.today(Date.new(2026, 7, 22))
-    refute_equal today, DailyPrompt.today(Date.new(2026, 7, 23))
   end
 
   test "publishing a first breath awards First Breath and notifies" do
