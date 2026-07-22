@@ -68,6 +68,19 @@ class PostsController < ApplicationController
       end
     end
 
+    # Lift a comment into a breath of its own: prefill the comment's words
+    # (escaped, attributed) and embed the thread it came from so readers can
+    # trace it back. The resulting post shares/reshares like any other.
+    if params[:from_comment].present?
+      comment = Comment.active.find_by(id: params[:from_comment])
+      if comment&.moderation_approved? && comment.post.visible_to?(current_user)
+        quoted = ERB::Util.html_escape(comment.content.to_plain_text.to_s.strip.first(400))
+        @post.content = "💬 A word from @#{comment.user.username} that deserves its own breath:" \
+                        "<blockquote>#{quoted}</blockquote>"
+        @post.quoted_post = comment.post
+      end
+    end
+
     @rooms = Room.public_rooms.ordered
     preload_quoted_post(params[:quote])
   end

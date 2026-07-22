@@ -39,6 +39,29 @@ class ThreadVoiceAndPinTest < ActionDispatch::IntegrationTest
     assert_not_includes author_types, "thread_new_voice"
   end
 
+  test "a comment can be lifted into a breath of its own" do
+    comment = @thread.comments.create!(user: @bola, content: "Fasting taught me to hunger for the Word. <b>bold</b>")
+
+    sign_in @alice
+    get new_post_path(from_comment: comment.id)
+
+    assert_response :success
+    assert_match "A word from @tv_bola", response.body
+    assert_match "Fasting taught me to hunger for the Word.", response.body
+    # The thread rides along as an embedded quote so readers can trace it back.
+    assert_match @thread.title, response.body
+  end
+
+  test "a deleted or invisible comment cannot be lifted" do
+    comment = @thread.comments.create!(user: @bola, content: "Soon deleted.")
+    comment.update!(deleted_at: Time.current)
+
+    sign_in @alice
+    get new_post_path(from_comment: comment.id)
+    assert_response :success
+    assert_no_match "Soon deleted.", response.body
+  end
+
   test "pinned breaths lead the feed with the pinned strip" do
     pinned = Post.create!(user: @author, room: @room, title: "Community fast this Friday",
                           content: "Join us as we seek His face together.", status: :published,
