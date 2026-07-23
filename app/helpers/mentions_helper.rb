@@ -51,6 +51,30 @@ module MentionsHelper
 
   private
 
+  # Rich rendering for the post page: KEEPS the author's Trix formatting
+  # (bold, italics, headings, lists, quotes) — render_social_text flattens
+  # everything to plain text, which silently erased all formatting — while
+  # still linkifying @mentions and bare URLs inside the text nodes.
+  def render_rich_social_text(content, class_name: nil, data: nil)
+    html = content.respond_to?(:body) ? content.body&.to_html : content.to_s
+    return "" if html.blank?
+
+    clean = sanitize(html)
+    users_by_username = social_mentioned_users(social_plain_text(content))
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(clean)
+    doc.traverse do |node|
+      next unless node.text?
+      next if node.ancestors.any? { |a| %w[a code pre].include?(a.name) }
+      next unless node.text.match?(SOCIAL_TOKEN_REGEX)
+
+      linked = safe_join(social_inline_nodes(node.text, users_by_username))
+      node.replace(Nokogiri::HTML::DocumentFragment.parse(linked))
+    end
+
+    tag.div(doc.to_html.html_safe, class: [ "trix-content", class_name ].compact.join(" "), data: data)
+  end
+
   def social_plain_text(content)
     text =
       if content.respond_to?(:to_plain_text)
