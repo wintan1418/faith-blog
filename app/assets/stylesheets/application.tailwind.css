@@ -19121,3 +19121,61 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
 }
 
 .profile-badge-emoji { font-size: 0.95rem; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ RICH TEXT POLISH — formatting must be unmistakable, in the editor
+   and on the page. (Report: "I bold a subheading and nothing changes.")
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* On the published breath */
+.post-body .trix-content h1 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.5em;
+  font-weight: 750;
+  line-height: 1.25;
+  color: var(--fc-ink);
+  margin: 1.5em 0 0.5em;
+}
+
+.post-body .trix-content h1:first-child { margin-top: 0; }
+
+/* Trix leaves <h1><br></h1> behind when a heading line ends up empty —
+   don't render a mysterious gap for it. */
+.post-body .trix-content h1:has(> br:only-child) { display: none; }
+
+.post-body .trix-content strong { font-weight: 800; color: var(--fc-ink); }
+.post-body .trix-content em { font-style: italic; }
+
+.post-body .trix-content ul { list-style: disc; padding-left: 1.4em; margin: 0.8em 0; }
+.post-body .trix-content ol { list-style: decimal; padding-left: 1.4em; margin: 0.8em 0; }
+.post-body .trix-content li { margin: 0.3em 0; }
+
+.post-body .trix-content pre {
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+  border-radius: 10px;
+  padding: 0.8em 1em;
+  overflow-x: auto;
+  font-size: 0.88em;
+}
+
+/* In the composer: WYSIWYG must actually look like what you'll get —
+   if a heading doesn't LOOK like a heading while typing, authors can't
+   tell the button didn't take. */
+trix-editor h1 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.35em;
+  font-weight: 750;
+  line-height: 1.3;
+  margin: 0.6em 0 0.3em;
+}
+
+trix-editor strong { font-weight: 800; }
+trix-editor em { font-style: italic; }
+trix-editor ul { list-style: disc; padding-left: 1.4em; }
+trix-editor ol { list-style: decimal; padding-left: 1.4em; }
+trix-editor blockquote {
+  border-left: 3px solid var(--fc-accent);
+  padding-left: 0.8em;
+  color: var(--fc-soft);
+}
