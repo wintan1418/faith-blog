@@ -33,6 +33,19 @@ class RichTextRenderingTest < ActionDispatch::IntegrationTest
     assert_select ".post-body a[href='https://example.com/grace']"
   end
 
+  test "formatting shows on the feed card too, not just the post page" do
+    Post.create!(
+      user: @author, room: @room, title: "Feed formatted",
+      content: "<h1>Card heading</h1><div><strong>Card bold</strong> stands out</div>",
+      status: :published, moderation_status: :approved
+    )
+
+    get feed_path
+    assert_response :success
+    assert_select "#feed_list .fc-breath-copy strong", text: "Card bold"
+    assert_select "#feed_list .fc-breath-copy h1", text: "Card heading"
+  end
+
   test "script tags never survive rendering" do
     post_record = Post.create!(
       user: @author, room: @room, title: "Sneaky breath",

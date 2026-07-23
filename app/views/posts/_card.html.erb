@@ -84,18 +84,17 @@
 
       <%
         plain_text   = post.content.to_plain_text.to_s
-        # Body is clamped to 3 lines by the base .fc-breath-copy rule. Roughly
-        # 50 chars per line on the card width, so anything over ~150 chars is
-        # very likely to overflow and need a "…more" affordance.
-        likely_overflow = plain_text.length > 150 || plain_text.lines.size > 3
+        # Rich cards show ~6 lines behind a fade curtain (max-height 9.5em),
+        # so the "…more" affordance kicks in around ~280 chars.
+        likely_overflow = plain_text.length > 280 || plain_text.lines.size > 6
       %>
       <div class="fc-breath-body" data-controller="expand-text scripture">
         <% if post.display_title %>
           <%= link_to post.display_title, post_path(post), class: "fc-breath-title hover:text-[var(--fc-accent)]" %>
         <% end %>
-        <%= render_social_card_text(
+        <%= render_rich_social_text(
               post.content,
-              class_name: "fc-breath-copy#{' is-untitled' unless post.display_title}",
+              class_name: "fc-breath-copy is-rich#{' is-untitled' unless post.display_title}",
               data: { expand_text_target: "copy" }
             ) %>
         <% if likely_overflow %>
