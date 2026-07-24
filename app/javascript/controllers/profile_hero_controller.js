@@ -24,7 +24,7 @@ export default class extends Controller {
       if (isNaN(value)) return
       if (this.reduced || value === 0) { el.textContent = this.format(value); return }
 
-      const duration = 900
+      const duration = 1500
       const start = performance.now()
       const tick = now => {
         const t = Math.min((now - start) / duration, 1)

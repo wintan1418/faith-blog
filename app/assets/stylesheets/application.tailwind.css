@@ -19354,7 +19354,7 @@ html.theme-dark div.profile-stat.profile-stat-streak:hover {
 
 /* ── Entrance cascade ─────────────────────────────────────────────────── */
 @keyframes profile-rise {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(26px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -19365,11 +19365,11 @@ html.theme-dark div.profile-stat.profile-stat-streak:hover {
 }
 
 .profile-avatar-wrap {
-  animation: profile-avatar-pop 520ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  animation: profile-avatar-pop 700ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
 
 .profile-hero-panel > .min-w-0 > * {
-  animation: profile-rise 480ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation: profile-rise 640ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
 .profile-hero-panel > .min-w-0 > :nth-child(1) { animation-delay: 90ms; }
@@ -19382,7 +19382,7 @@ html.theme-dark div.profile-stat.profile-stat-streak:hover {
 /* ── Living cover: the accent light drifts slowly ─────────────────────── */
 .profile-cover {
   background-size: 170% 170%, 170% 170%, 140% 140%;
-  animation: profile-cover-drift 16s ease-in-out infinite alternate;
+  animation: profile-cover-drift 9s ease-in-out infinite alternate;
 }
 
 @keyframes profile-cover-drift {
