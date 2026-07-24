@@ -23,7 +23,8 @@
           <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <div class="flex flex-wrap items-center gap-3">
-                <h1 class="profile-title"><%= @user.display_name.presence || @user.username %></h1>
+                <% display_name = @user.display_name.presence || @user.username %>
+                <h1 class="profile-title<%= " is-long" if display_name.length > 13 %><%= " is-very-long" if display_name.length > 20 %>"><%= display_name %></h1>
                 <% if @user.super_admin? || @user.admin? || @user.moderator? %>
                   <span class="profile-role-badge">
                     <%= render_icon("shield", classes: "h-3.5 w-3.5") %>

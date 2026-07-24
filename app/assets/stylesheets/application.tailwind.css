@@ -19317,3 +19317,20 @@ div.profile-stat.profile-stat-streak:hover,
 html.theme-dark div.profile-stat.profile-stat-streak:hover {
   background: linear-gradient(120deg, rgba(251, 146, 60, 0.16), rgba(251, 191, 36, 0.09)) !important;
 }
+
+/* ── Long-name scaling: the serif display size steps down with name
+   length so even abiodun_akintelure-sized names sit inside the panel
+   with air, instead of jamming edge to edge. ─────────────────────────── */
+.profile-hero-panel { min-width: 0; }
+.profile-hero-panel .flex.flex-wrap { min-width: 0; }
+
+@media (max-width: 767px) {
+  .profile-title.is-long { font-size: clamp(1.3rem, 6.4vw, 1.9rem); }
+  .profile-title.is-very-long { font-size: clamp(1.1rem, 5.2vw, 1.6rem); }
+  .profile-hero-panel { padding-left: 1rem; padding-right: 1rem; }
+}
+
+@media (min-width: 768px) {
+  .profile-title.is-long { font-size: 3.2rem; }
+  .profile-title.is-very-long { font-size: 2.4rem; }
+}
