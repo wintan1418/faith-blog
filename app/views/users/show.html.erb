@@ -2,8 +2,25 @@
 <% content_for(:og_accent) { @user.accent_color } %>
 <% content_for(:og_title) { "#{@user.username} on Brethreign" } %>
 
-<div class="mystic-shell profile-page">
-  <section class="profile-hero">
+<div class="mystic-shell profile-page" data-controller="profile-hero">
+  <%# Sticky mini-bar: slides in when the hero scrolls out of view. %>
+  <div class="profile-minibar" data-profile-hero-target="minibar" style="<%= AccentPalette.css_vars(@user.accent_color) %>">
+    <div class="profile-minibar-inner">
+      <% if @user.profile&.avatar&.attached? %>
+        <%= image_tag @user.profile.avatar, class: "profile-minibar-avatar object-cover", alt: @user.display_name %>
+      <% else %>
+        <span class="profile-minibar-avatar" style="<%= avatar_tint_style(@user.username) %>"><%= @user.username.first.upcase %></span>
+      <% end %>
+      <span class="profile-minibar-name"><%= @user.display_name.presence || @user.username %></span>
+      <% if user_signed_in? && @user != current_user %>
+        <div class="profile-minibar-action">
+          <%= render "users/follow_actions", user: @user, follow_class: "fc-btn fc-btn-primary", following_class: "fc-btn" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <section class="profile-hero" data-profile-hero-target="hero">
     <div class="mystic-container max-w-6xl py-12">
       <%# The hero carries the profile OWNER's accent, not the viewer's —
           the cover, avatar ring, and badges tint to their chosen colour. %>
@@ -78,15 +95,15 @@
 
           <div class="profile-stats">
             <%= link_to followers_user_path(@user.username), class: "profile-stat" do %>
-              <span><%= number_to_human(@user.followers_count, format: "%n%u", units: { thousand: "k" }) %></span>
+              <span data-profile-hero-target="count" data-count="<%= @user.followers_count %>"><%= number_to_human(@user.followers_count, format: "%n%u", units: { thousand: "k" }) %></span>
               <small>Followers</small>
             <% end %>
             <%= link_to following_user_path(@user.username), class: "profile-stat" do %>
-              <span><%= number_to_human(@user.following_count, format: "%n%u", units: { thousand: "k" }) %></span>
+              <span data-profile-hero-target="count" data-count="<%= @user.following_count %>"><%= number_to_human(@user.following_count, format: "%n%u", units: { thousand: "k" }) %></span>
               <small>Following</small>
             <% end %>
             <div class="profile-stat">
-              <span><%= @user.posts.published.count %></span>
+              <span data-profile-hero-target="count" data-count="<%= @user.posts.published.count %>"><%= @user.posts.published.count %></span>
               <small>Breaths</small>
             </div>
             <% if @user.current_breath_streak.to_i.positive? %>

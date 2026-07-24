@@ -79,6 +79,9 @@ application.register("message-edit", MessageEditController)
 import MessageMenuController from "./message_menu_controller"
 application.register("message-menu", MessageMenuController)
 
+import ProfileHeroController from "./profile_hero_controller"
+application.register("profile-hero", ProfileHeroController)
+
 import NewPostsPillController from "./new_posts_pill_controller"
 application.register("new-posts-pill", NewPostsPillController)
 
