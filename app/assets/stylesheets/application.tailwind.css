@@ -19334,3 +19334,13 @@ html.theme-dark div.profile-stat.profile-stat-streak:hover {
   .profile-title.is-long { font-size: 3.2rem; }
   .profile-title.is-very-long { font-size: 2.4rem; }
 }
+
+/* Mobile profile centering: center the flex ROWS, not just the text —
+   a shrunk-to-fit name box otherwise parks on the left of its row. */
+@media (max-width: 767px) {
+  .profile-hero-panel .flex.flex-wrap,
+  .profile-badges,
+  .profile-hero-panel .mt-6.flex {
+    justify-content: center;
+  }
+}
