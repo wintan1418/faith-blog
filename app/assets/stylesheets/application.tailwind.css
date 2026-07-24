@@ -19247,3 +19247,73 @@ trix-editor blockquote {
 
 .fc-breath-copy.is-rich div { margin-bottom: 0.35em; }
 .fc-breath-copy.is-rich div:last-child { margin-bottom: 0; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ PROFILE TESTER FIXES
+   1) Long usernames must never break the mobile layout — wrap anywhere
+      and scale the display size down on small screens.
+   2) Informational elements must not read as buttons: meta items lose
+      their borders and hover response entirely (they were chips that
+      LOOKED tappable); the info stats become quiet filled status labels
+      so "Breaths" isn't a naked lone ranger next to bordered links.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Long usernames ────────────────────────────────────────────────── */
+.profile-title,
+.profile-handle {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 767px) {
+  .profile-title { font-size: clamp(1.7rem, 9vw, 2.5rem); }
+  .profile-handle { font-size: 0.95rem; }
+}
+
+/* ── 2a. Meta items: plain facts, not chips ───────────────────────────── */
+.profile-meta,
+html.theme-dark .profile-meta {
+  border: 0 !important;
+  background: transparent !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0 !important;
+  min-height: auto;
+  transition: none;
+}
+
+.profile-meta:hover,
+html.theme-dark .profile-meta:hover {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* ── 2b. Info stats: filled status labels, borderless, inert ──────────── */
+div.profile-stat,
+html.theme-dark div.profile-stat {
+  background: color-mix(in srgb, var(--fc-surface-2) 85%, transparent) !important;
+  border: 0 !important;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+
+div.profile-stat:hover,
+html.theme-dark div.profile-stat:hover {
+  border: 0 !important;
+  background: color-mix(in srgb, var(--fc-surface-2) 85%, transparent) !important;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Streak stays a warm badge — filled ember, no border, clearly a label. */
+div.profile-stat.profile-stat-streak,
+html.theme-dark div.profile-stat.profile-stat-streak {
+  background: linear-gradient(120deg, rgba(251, 146, 60, 0.16), rgba(251, 191, 36, 0.09)) !important;
+  border: 0 !important;
+}
+
+div.profile-stat.profile-stat-streak:hover,
+html.theme-dark div.profile-stat.profile-stat-streak:hover {
+  background: linear-gradient(120deg, rgba(251, 146, 60, 0.16), rgba(251, 191, 36, 0.09)) !important;
+}
