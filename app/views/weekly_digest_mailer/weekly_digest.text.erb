@@ -11,6 +11,24 @@ Your streak is at <%= @streak %> day<%= @streak == 1 ? "" : "s" %>. Open the fee
 Quiet week from your side. The community is here when you're ready.
 <% end %>
 
+Your week: <%= @user_breaths %> breath<%= @user_breaths == 1 ? "" : "s" %> · <%= @new_followers.size %> new brethren · <%= @chain_joiners %> joined your prayer chains
+<% if @new_followers.any? %>
+<%= @new_followers.map { |f| f.follower.display_name.presence || f.follower.username }.first(3).to_sentence %> started walking with you this week.
+<% end %>
+<% if @badges.any? %>
+Milestones you earned
+---------------------
+<% @badges.each do |badge| %><% info = badge.info %>- <%= info[:emoji] %> <%= info[:name] %>
+<% end %>
+<% end %>
+<% if @answered_in_circle.any? %>
+Prayers answered this week
+--------------------------
+<% @answered_in_circle.each do |post| %>
+- <%= post.user_id == @user.id ? "Your prayer" : "#{post.user.display_name}'s prayer" %> was answered<% if post.intercessions_count.to_i.positive? %> (<%= post.intercessions_count %> brethren in the chain)<% end %>: <%= Rails.application.routes.url_helpers.post_url(post, host: @host) %>
+<% end %>
+<% end %>
+
 <% if @top_breaths.any? %>
 What your circle has been breathing
 -----------------------------------
