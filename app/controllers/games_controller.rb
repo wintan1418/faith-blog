@@ -9,6 +9,11 @@ class GamesController < ApplicationController
     @my_rank = GameAttempt.user_rank(current_user, window: @window.to_sym)
     @my_stats = my_stats
     @recent_attempts = current_user.game_attempts.recent.limit(5)
+    # This week's champion per game — one crown per discipline.
+    @champions = GameAttempt.kinds.keys.filter_map do |kind|
+      row = GameAttempt.leaderboard(window: :week, limit: 1, kind: kind).first
+      row && row.merge(kind: kind)
+    end
   end
 
   # GET /games/quiz — render the play page (mode-select happens client side)

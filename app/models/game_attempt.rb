@@ -19,8 +19,10 @@ class GameAttempt < ApplicationRecord
   before_validation :default_played_at, on: :create
 
   scope :recent,      -> { order(played_at: :desc) }
-  scope :this_week,   -> { where("played_at >= ?", 7.days.ago) }
-  scope :this_month,  -> { where("played_at >= ?", 30.days.ago) }
+  # Calendar windows so the board truly RESETS — Monday 00:00 and the 1st —
+  # instead of a rolling tail where old scores fade out gradually.
+  scope :this_week,   -> { where("played_at >= ?", Time.current.beginning_of_week) }
+  scope :this_month,  -> { where("played_at >= ?", Time.current.beginning_of_month) }
 
   # Aggregate leaderboard. Returns rows of {user, total_score, plays, best}.
   # window: :week | :month | :all

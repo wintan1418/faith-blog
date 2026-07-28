@@ -88,8 +88,34 @@
 
       <%# ── Leaderboard ─────────────────────────────────────────── %>
       <section>
+        <% if @champions.present? %>
+          <div class="mb-6">
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">👑 This week's champions</h2>
+            <div class="fc-champ-grid mt-3">
+              <% @champions.each do |champ| %>
+                <% meta = game_kind_meta(champ[:kind]) %>
+                <div class="fc-champ-card<%= ' is-me' if champ[:user]&.id == current_user.id %>">
+                  <span class="fc-champ-emoji"><%= meta[:emoji] %></span>
+                  <div class="fc-champ-body">
+                    <span class="fc-champ-game"><%= meta[:name] %></span>
+                    <% if champ[:user] %>
+                      <%= link_to champ[:user].username, user_path(champ[:user].username), class: "fc-champ-name" %>
+                    <% end %>
+                  </div>
+                  <span class="fc-champ-score"><%= champ[:total_score] %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
         <div class="mb-3 flex items-center justify-between">
-          <h2 class="text-sm font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">Leaderboard</h2>
+          <div>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">Leaderboard</h2>
+            <% if @window == "week" %>
+              <p class="fc-lb-reset">⏳ Resets in <%= leaderboard_reset_countdown %> — every Monday, a clean slate.</p>
+            <% end %>
+          </div>
           <nav class="fc-window-tabs">
             <%= link_to "Week",  games_path(window: "week"),  class: "fc-window-tab #{'is-active' if @window == 'week'}" %>
             <%= link_to "Month", games_path(window: "month"), class: "fc-window-tab #{'is-active' if @window == 'month'}" %>
@@ -101,7 +127,7 @@
           <ol class="fc-leaderboard">
             <% @leaderboard.each_with_index do |row, i| %>
               <li class="fc-lb-row<%= ' is-me' if row[:user].id == current_user.id %>">
-                <span class="fc-lb-rank"><%= i + 1 %></span>
+                <span class="fc-lb-rank<%= " fc-trend-rank is-#{i + 1}" if i < 3 %>"><%= i + 1 %></span>
                 <% if row[:user].profile&.avatar&.attached? %>
                   <%= image_tag row[:user].profile.avatar, class: "fc-avatar object-cover" %>
                 <% else %>

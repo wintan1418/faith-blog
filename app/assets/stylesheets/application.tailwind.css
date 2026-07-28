@@ -20694,3 +20694,71 @@ html.theme-dark .sp-kicker { color: #fbbf24; }
 @media (prefers-reduced-motion: reduce) {
   .fc-ring-fill { transition: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ GAMES LEADERBOARD — weekly champions + Monday-reset pulse.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.fc-lb-reset {
+  margin-top: 0.25rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--fc-muted);
+}
+
+.fc-champ-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+@media (max-width: 560px) { .fc-champ-grid { grid-template-columns: 1fr; } }
+
+.fc-champ-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid var(--fc-line);
+  border-radius: 12px;
+  background: var(--fc-surface);
+  padding: 0.6rem 0.8rem;
+}
+
+.fc-champ-card.is-me {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: linear-gradient(140deg, rgba(251, 191, 36, 0.10), transparent 60%), var(--fc-surface);
+}
+
+.fc-champ-emoji { font-size: 1.15rem; flex: none; }
+
+.fc-champ-body { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+
+.fc-champ-game {
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fc-muted);
+}
+
+.fc-champ-name {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--fc-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fc-champ-name:hover { color: var(--fc-accent-2, var(--fc-accent)); }
+
+.fc-champ-score {
+  flex: none;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: #b45309;
+}
+html.theme-dark .fc-champ-score { color: #fbbf24; }
+
+/* Medal ranks on the main board reuse the trending medal treatment; keep
+   the row layout width stable. */
+.fc-lb-rank.fc-trend-rank { width: 1.5rem; height: 1.5rem; font-size: 0.72rem; }
