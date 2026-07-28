@@ -1,0 +1,137 @@
+<% content_for(:title) { "#{@circle.name} - Prayer Circle" } %>
+
+<div class="mystic-shell circle-room">
+  <div class="mystic-container max-w-5xl py-8">
+    <%= link_to "← All circles", circles_path, class: "circle-back" %>
+
+    <header class="circle-head-panel">
+      <div class="circle-head-main">
+        <h1 class="circle-room-title">🕯️ <%= @circle.name %></h1>
+        <% if @circle.description.present? %>
+          <p class="circle-room-desc"><%= @circle.description %></p>
+        <% end %>
+        <div class="circle-members-row">
+          <div class="circle-avatar-stack">
+            <% @members.first(8).each do |member| %>
+              <% if member.profile&.avatar&.attached? %>
+                <%= image_tag member.profile.avatar, class: "fc-avatar object-cover", title: member.username, alt: member.username %>
+              <% else %>
+                <span class="fc-avatar" style="<%= avatar_tint_style(member.username) %>" title="<%= member.username %>"><%= member.username.first.upcase %></span>
+              <% end %>
+            <% end %>
+          </div>
+          <span class="circle-members-count"><%= pluralize(@circle.members_count, "member") %></span>
+        </div>
+      </div>
+
+      <div class="circle-head-actions">
+        <div class="circle-invite" data-controller="invite-link">
+          <input readonly value="<%= join_circle_url(code: @circle.invite_code) %>" data-invite-link-target="input" class="circle-invite-input" aria-label="Invite link">
+          <button type="button" class="fc-btn" data-invite-link-target="copyBtn" data-action="click->invite-link#copy">Copy invite</button>
+        </div>
+        <div class="circle-head-admin">
+          <% if @circle.owned_by?(current_user) %>
+            <%= button_to "New invite link", rotate_invite_circle_path(@circle), method: :post, form_class: "inline", class: "circle-quiet-btn",
+                  data: { turbo_confirm: "Issue a new invite link? The current one will stop working." } %>
+            <%= button_to "Dissolve circle", circle_path(@circle), method: :delete, form_class: "inline", class: "circle-quiet-btn is-danger",
+                  data: { turbo_confirm: "Dissolve “#{@circle.name}”? The stream and prayer list will be gone for everyone." } %>
+          <% else %>
+            <%= button_to "Leave circle", leave_circle_path(@circle), method: :delete, form_class: "inline", class: "circle-quiet-btn",
+                  data: { turbo_confirm: "Leave “#{@circle.name}”?" } %>
+          <% end %>
+        </div>
+      </div>
+    </header>
+
+    <div class="circle-columns">
+      <section class="circle-stream">
+        <%= form_with url: circle_breaths_path(@circle), scope: :circle_breath, class: "circle-breathe-form" do |f| %>
+          <%= f.text_area :body, placeholder: "Breathe into the circle — only members will ever see it…", maxlength: 2000, required: true, rows: 2, class: "circle-input circle-breathe-input" %>
+          <%= f.submit "Breathe", class: "fc-btn fc-btn-primary" %>
+        <% end %>
+
+        <% if @breaths.any? %>
+          <div class="circle-breaths">
+            <% @breaths.each do |breath| %>
+              <article class="circle-breath">
+                <% if breath.user.profile&.avatar&.attached? %>
+                  <%= image_tag breath.user.profile.avatar, class: "fc-avatar object-cover", alt: breath.user.username %>
+                <% else %>
+                  <span class="fc-avatar" style="<%= avatar_tint_style(breath.user.username) %>"><%= breath.user.username.first.upcase %></span>
+                <% end %>
+                <div class="circle-breath-body">
+                  <header class="circle-breath-head">
+                    <span class="circle-breath-name"><%= breath.user.display_name.presence || breath.user.username %></span>
+                    <span class="circle-breath-time"><%= time_ago_in_words(breath.created_at) %> ago</span>
+                    <% if breath.user_id == current_user.id || @circle.owned_by?(current_user) %>
+                      <%= button_to "×", circle_breath_path(@circle, breath), method: :delete, form_class: "inline ml-auto", class: "circle-x", aria: { label: "Remove breath" },
+                            data: { turbo_confirm: "Remove this breath?" } %>
+                    <% end %>
+                  </header>
+                  <div class="circle-breath-text"><%= simple_format(breath.body) %></div>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="circle-quiet-note">The circle is quiet. Take the first breath.</p>
+        <% end %>
+      </section>
+
+      <aside class="circle-prayer-list">
+        <h2 class="circle-section-title">🙏 Prayer list</h2>
+
+        <%= form_with url: circle_prayers_path(@circle), scope: :circle_prayer, class: "circle-prayer-form" do |f| %>
+          <%= f.text_field :title, placeholder: "What shall we carry?", maxlength: 160, required: true, class: "circle-input" %>
+          <%= f.text_area :details, placeholder: "Details (optional)", maxlength: 1000, rows: 2, class: "circle-input" %>
+          <%= f.submit "Add to the list", class: "fc-btn w-full" %>
+        <% end %>
+
+        <% if @open_prayers.any? %>
+          <div class="circle-prayers">
+            <% @open_prayers.each do |prayer| %>
+              <article class="circle-prayer">
+                <header class="circle-prayer-head">
+                  <h3 class="circle-prayer-title"><%= prayer.title %></h3>
+                  <% if prayer.user_id == current_user.id || @circle.owned_by?(current_user) %>
+                    <%= button_to "×", circle_prayer_path(@circle, prayer), method: :delete, form_class: "inline", class: "circle-x", aria: { label: "Remove prayer" },
+                          data: { turbo_confirm: "Remove this prayer from the list?" } %>
+                  <% end %>
+                </header>
+                <% if prayer.details.present? %>
+                  <p class="circle-prayer-details"><%= prayer.details %></p>
+                <% end %>
+                <p class="circle-prayer-meta"><%= prayer.user.display_name.presence || prayer.user.username %> · <%= time_ago_in_words(prayer.created_at) %> ago</p>
+                <div class="circle-prayer-actions">
+                  <% prayed = prayer.prayed_by?(current_user) %>
+                  <%= button_to amen_circle_prayer_path(@circle, prayer), method: :post, form_class: "inline",
+                        class: "circle-amen#{' is-prayed' if prayed}" do %>
+                    🙏 <%= prayed ? "Prayed" : "I prayed" %><% if prayer.amens_count.positive? %> · <%= prayer.amens_count %><% end %>
+                  <% end %>
+                  <% if prayer.user_id == current_user.id || @circle.owned_by?(current_user) %>
+                    <%= button_to "🌟 Answered", answered_circle_prayer_path(@circle, prayer), method: :post, form_class: "inline", class: "circle-answered-btn",
+                          data: { turbo_confirm: "Mark “#{prayer.title}” answered? The circle will be told." } %>
+                  <% end %>
+                </div>
+              </article>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="circle-quiet-note">Nothing on the list — add what the circle should carry.</p>
+        <% end %>
+
+        <% if @answered_prayers.any? %>
+          <h3 class="circle-answered-heading">🌟 Answered</h3>
+          <ul class="circle-answered-list">
+            <% @answered_prayers.each do |prayer| %>
+              <li>
+                <span class="circle-answered-title"><%= prayer.title %></span>
+                <span class="circle-answered-when"><%= time_ago_in_words(prayer.answered_at) %> ago</span>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </aside>
+    </div>
+  </div>
+</div>

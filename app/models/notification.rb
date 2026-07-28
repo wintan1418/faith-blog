@@ -25,7 +25,10 @@ class Notification < ApplicationRecord
     post_held_for_review: 19,
     post_moderation_approved: 20,
     thread_new_voice:     21,
-    badge_earned:         22
+    badge_earned:         22,
+    circle_breath:          23,
+    circle_prayer:          24,
+    circle_prayer_answered: 25
   }
 
   # Associations
@@ -107,6 +110,12 @@ class Notification < ApplicationRecord
       "Your post is held for moderator review — we'll get back to you shortly."
     when :post_moderation_approved
       "Good news — your post passed moderation review and is now live."
+    when :circle_breath
+      "#{actor&.display_name || 'Someone'} breathed in your circle #{circle_name_suffix}"
+    when :circle_prayer
+      "#{actor&.display_name || 'Someone'} added a prayer to #{circle_name_suffix('your circle')} 🙏"
+    when :circle_prayer_answered
+      "A prayer in #{circle_name_suffix('your circle')} was marked answered 🌟"
     else
       "You have a new notification"
     end
@@ -136,6 +145,8 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.my_connections_path
     when :direct_message
       Rails.application.routes.url_helpers.conversation_path(notifiable.conversation)
+    when :circle_breath, :circle_prayer, :circle_prayer_answered
+      Rails.application.routes.url_helpers.circle_path(notifiable.circle)
     else
       Rails.application.routes.url_helpers.notifications_path
     end
@@ -160,6 +171,12 @@ class Notification < ApplicationRecord
     end
 
     nil
+  end
+
+  # "in <circle name>" when the notifiable still has its circle, else fallback.
+  def circle_name_suffix(fallback = "your circle")
+    name = notifiable.respond_to?(:circle) ? notifiable.circle&.name : nil
+    name.present? ? "“#{name}”" : fallback
   end
 
   # Class methods

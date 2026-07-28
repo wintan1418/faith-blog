@@ -33,6 +33,9 @@ class User < ApplicationRecord
   has_many :ai_moderation_reviews, dependent: :nullify
   has_many :prayer_intercessions, dependent: :destroy
   has_many :prayed_for_posts, through: :prayer_intercessions, source: :post
+  has_many :circle_memberships, dependent: :destroy
+  has_many :circles, through: :circle_memberships
+  has_many :owned_circles, class_name: "Circle", foreign_key: :owner_id, dependent: :destroy
   has_many :user_reading_plans, dependent: :destroy
   has_many :push_subscriptions, dependent: :destroy
   has_many :conversation_participants, dependent: :destroy

@@ -27,6 +27,23 @@ Rails.application.routes.draw do
   # Wall of Answered Prayers — public celebration of every answered chain.
   get "answered", to: "answered_prayers#index", as: :answered_prayers
 
+  # Prayer Circles — private groups with a quiet stream + shared prayer list.
+  # The join route must precede resources so "join" is never read as a slug.
+  get "circles/join/:code", to: "circles#join", as: :join_circle
+  resources :circles, param: :slug, only: [ :index, :show, :create, :destroy ] do
+    member do
+      delete :leave
+      post :rotate_invite
+    end
+    resources :breaths, controller: "circle_breaths", only: [ :create, :destroy ]
+    resources :prayers, controller: "circle_prayers", only: [ :create, :destroy ] do
+      member do
+        post :amen
+        post :answered
+      end
+    end
+  end
+
   # Rooms
   resources :rooms, only: [ :index, :show ] do
     member do

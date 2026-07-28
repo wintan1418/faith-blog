@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_22_180736) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_28_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -180,6 +180,67 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_22_180736) do
     t.datetime "updated_at", null: false
     t.index ["era"], name: "index_church_history_figures_on_era"
     t.index ["slug"], name: "index_church_history_figures_on_slug", unique: true
+  end
+
+  create_table "circle_breaths", force: :cascade do |t|
+    t.bigint "circle_id", null: false
+    t.bigint "user_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["circle_id", "created_at"], name: "index_circle_breaths_on_circle_id_and_created_at"
+    t.index ["circle_id"], name: "index_circle_breaths_on_circle_id"
+    t.index ["user_id"], name: "index_circle_breaths_on_user_id"
+  end
+
+  create_table "circle_memberships", force: :cascade do |t|
+    t.bigint "circle_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "role", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["circle_id", "user_id"], name: "index_circle_memberships_on_circle_id_and_user_id", unique: true
+    t.index ["circle_id"], name: "index_circle_memberships_on_circle_id"
+    t.index ["user_id"], name: "index_circle_memberships_on_user_id"
+  end
+
+  create_table "circle_prayer_amens", force: :cascade do |t|
+    t.bigint "circle_prayer_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["circle_prayer_id", "user_id"], name: "index_circle_prayer_amens_on_circle_prayer_id_and_user_id", unique: true
+    t.index ["circle_prayer_id"], name: "index_circle_prayer_amens_on_circle_prayer_id"
+    t.index ["user_id"], name: "index_circle_prayer_amens_on_user_id"
+  end
+
+  create_table "circle_prayers", force: :cascade do |t|
+    t.bigint "circle_id", null: false
+    t.bigint "user_id", null: false
+    t.string "title", null: false
+    t.text "details"
+    t.integer "status", default: 0, null: false
+    t.datetime "answered_at"
+    t.integer "amens_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["circle_id", "status"], name: "index_circle_prayers_on_circle_id_and_status"
+    t.index ["circle_id"], name: "index_circle_prayers_on_circle_id"
+    t.index ["user_id"], name: "index_circle_prayers_on_user_id"
+  end
+
+  create_table "circles", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.bigint "owner_id", null: false
+    t.string "invite_code", null: false
+    t.integer "members_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invite_code"], name: "index_circles_on_invite_code", unique: true
+    t.index ["owner_id"], name: "index_circles_on_owner_id"
+    t.index ["slug"], name: "index_circles_on_slug", unique: true
   end
 
   create_table "comments", force: :cascade do |t|
@@ -698,6 +759,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_22_180736) do
   add_foreign_key "bookmarks", "users"
   add_foreign_key "brethren_cards", "users"
   add_foreign_key "broadcasts", "users", column: "sender_id"
+  add_foreign_key "circle_breaths", "circles"
+  add_foreign_key "circle_breaths", "users"
+  add_foreign_key "circle_memberships", "circles"
+  add_foreign_key "circle_memberships", "users"
+  add_foreign_key "circle_prayer_amens", "circle_prayers"
+  add_foreign_key "circle_prayer_amens", "users"
+  add_foreign_key "circle_prayers", "circles"
+  add_foreign_key "circle_prayers", "users"
+  add_foreign_key "circles", "users", column: "owner_id"
   add_foreign_key "comments", "comments", column: "parent_comment_id"
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users"

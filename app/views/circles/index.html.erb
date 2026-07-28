@@ -1,0 +1,55 @@
+<% content_for(:title) { "Prayer Circles - Brethreign" } %>
+
+<div class="mystic-shell circles-page">
+  <section class="circles-hero">
+    <div class="mystic-container max-w-4xl py-12 text-center">
+      <p class="circles-kicker">🕊️ Close company</p>
+      <h1 class="circles-title">Prayer Circles</h1>
+      <p class="circles-sub">
+        A circle is a small, private room — your cell group, your family, your closest brethren.
+        A quiet stream only members can see, and one shared prayer list you carry together.
+      </p>
+    </div>
+  </section>
+
+  <div class="mystic-container max-w-4xl pb-14">
+    <section class="circle-create-panel">
+      <h2 class="circle-section-title">Start a circle</h2>
+      <%= form_with model: @new_circle, url: circles_path, class: "circle-create-form" do |f| %>
+        <%= f.text_field :name, placeholder: "Circle name — e.g. Tuesday Cell Group", maxlength: 60, required: true, class: "circle-input" %>
+        <%= f.text_field :description, placeholder: "What gathers you? (optional)", maxlength: 500, class: "circle-input" %>
+        <%= f.submit "Gather the circle", class: "fc-btn fc-btn-primary" %>
+      <% end %>
+      <p class="circle-hint">You'll get a private invite link to share — that's the only door in.</p>
+    </section>
+
+    <% if @circles.any? %>
+      <div class="circle-grid">
+        <% @circles.each do |circle| %>
+          <%= link_to circle_path(circle), class: "circle-card" do %>
+            <div class="circle-card-head">
+              <span class="circle-card-mark">🕯️</span>
+              <h3 class="circle-card-name"><%= circle.name %></h3>
+            </div>
+            <% if circle.description.present? %>
+              <p class="circle-card-desc"><%= truncate(circle.description, length: 90) %></p>
+            <% end %>
+            <div class="circle-card-foot">
+              <span><%= pluralize(circle.members_count, "member") %></span>
+              <% if circle.attributes["last_breath_at"].present? %>
+                <span>· breathed <%= time_ago_in_words(Time.zone.parse(circle.attributes["last_breath_at"].to_s)) %> ago</span>
+              <% else %>
+                <span>· quiet so far</span>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="mystic-panel circle-empty p-10 text-center">
+        <h3>No circles yet.</h3>
+        <p class="mystic-copy mt-2">Start one above and invite the people you actually pray with.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
