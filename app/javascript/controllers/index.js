@@ -88,6 +88,9 @@ application.register("feed-tabs", FeedTabsController)
 import ScrollTopController from "./scroll_top_controller"
 application.register("scroll-top", ScrollTopController)
 
+import ScrollProgressController from "./scroll_progress_controller"
+application.register("scroll-progress", ScrollProgressController)
+
 import NewPostsPillController from "./new_posts_pill_controller"
 application.register("new-posts-pill", NewPostsPillController)
 

@@ -135,14 +135,14 @@
           </button>
         </div>
         <div class="fc-composer-chips">
-          <button type="button" class="fc-composer-chip"
+          <button type="button" class="fc-composer-chip is-prayer"
                   data-action="click->composer-modal#openWith"
                   data-composer-modal-prefill-param="🙏 Brethren, please pray with me — ">🙏 Prayer request</button>
-          <button type="button" class="fc-composer-chip"
+          <button type="button" class="fc-composer-chip is-verse"
                   data-action="click->composer-modal#openWith"
                   data-composer-modal-prefill-param="📖 A verse on my heart today: ">📖 Share a verse</button>
-          <button type="button" class="fc-composer-chip" data-action="click->composer-modal#open">🎙️ Voice note</button>
-          <button type="button" class="fc-composer-chip" data-action="click->bible-drawer#open">✨ Read first</button>
+          <button type="button" class="fc-composer-chip is-voice" data-action="click->composer-modal#open">🎙️ Voice note</button>
+          <button type="button" class="fc-composer-chip is-read" data-action="click->bible-drawer#open">✨ Read first</button>
         </div>
       </div>
 
@@ -679,4 +679,9 @@
           data-controller="scroll-top"
           data-action="click->scroll-top#toTop"
           aria-label="Back to top">↑</button>
+
+  <%# Hairline reading-progress bar along the very top of the viewport. %>
+  <div class="fc-scroll-progress" data-controller="scroll-progress" aria-hidden="true">
+    <span class="fc-scroll-progress-bar" data-scroll-progress-target="bar"></span>
+  </div>
 </div>

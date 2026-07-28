@@ -47,7 +47,7 @@
             <span class="fc-breath-handle">@<%= post.user.username %></span>
           <% end %>
           <span class="fc-breath-dot">·</span>
-          <span class="fc-breath-time"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
+          <span class="fc-breath-time" title="<%= (post.published_at || post.created_at).strftime("%A, %b %-d %Y · %-l:%M %p") %>"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
         </div>
         <%= render "posts/overflow_menu", post: post %>
       </header>
