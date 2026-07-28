@@ -29,6 +29,22 @@ module Ai
       def flagged?
         !safe
       end
+
+      # Synthetic clean verdict for authors who skip the AI gate on trust.
+      # Persisted like any other result so the moderation board and the
+      # backlog sweep see a settled review.
+      def self.trusted_skip
+        new(
+          safe: true,
+          severity: "none",
+          categories: [],
+          score: 0.0,
+          summary: "Trusted author — AI gate skipped.",
+          recommended_action: "allow",
+          raw_response: { source: "trust_gate" },
+          model: "trust-gate"
+        )
+      end
     end
   end
 end

@@ -361,7 +361,27 @@ class Post < ApplicationRecord
   def enqueue_ai_moderation_review
     # The gate job classifies AND enforces (retro-hold/block + review row +
     # risk scoring) — the breath is already live, this runs behind it.
-    AiModerationGateJob.perform_later(id)
+    # Proven authors skip the AI call entirely.
+    if user&.trusted_breather?
+      record_trusted_moderation_skip
+    else
+      AiModerationGateJob.perform_later(id)
+    end
+  end
+
+  # A settled review row must still be written for trusted skips —
+  # ModerationBacklogSweepJob treats review-less published posts as lost
+  # jobs and would re-enqueue the AI gate for them forever.
+  def record_trusted_moderation_skip
+    AiModerationReview.from_result(
+      reviewable: self,
+      user: user,
+      result: Ai::Moderation::Result.trusted_skip
+    )
+  rescue StandardError => e
+    # Fail open: with no row the sweep re-enqueues the normal gate job —
+    # the post just costs one AI call instead of zero.
+    Rails.logger.error("[TrustGate] review row failed for post #{id}: #{e.class}: #{e.message}")
   end
 
   def enqueue_ai_moderation_review_on_publish

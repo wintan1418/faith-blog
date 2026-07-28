@@ -96,6 +96,23 @@ class User < ApplicationRecord
     super_admin? || admin? || moderator?
   end
 
+  # Trust threshold for skipping the AI moderation gate on new breaths.
+  TRUSTED_BREATHER_POSTS = 20
+
+  # A proven author: staff, or a clean track record — enough approved
+  # breaths, a clear risk profile, and nothing the AI or a moderator has
+  # flagged in the last 90 days. Trusted authors publish without an AI
+  # call; everyone else keeps the full gate.
+  def trusted_breather?
+    return true if admin_or_moderator?
+    return false unless risk_profile&.clear?
+    return false if posts.where(moderation_status: :approved).count < TRUSTED_BREATHER_POSTS
+
+    AiModerationReview.where(user_id: id, status: %i[flagged actioned])
+                      .where(reviewed_at: 90.days.ago..)
+                      .none?
+  end
+
   def active_for_authentication?
     super && active?
   end
