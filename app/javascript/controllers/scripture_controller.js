@@ -52,9 +52,18 @@ export default class extends Controller {
       span.className = "scripture-ref"
       span.dataset.reference = match[0]
       span.textContent = match[0]
+      span.title = `Open ${match[0]} — the verse and every breath that carries it`
       span.addEventListener("mouseenter", (e) => this.show(e.currentTarget))
       span.addEventListener("focus", (e) => this.show(e.currentTarget), true)
       span.addEventListener("mouseleave", () => this.hide())
+      // Click-through to the verse's own page (/scripture/john-3-16).
+      span.addEventListener("click", (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const slug = span.dataset.reference.toLowerCase()
+          .replace(/[:\s–—]+/g, "-").replace(/[^a-z0-9\-]/g, "").replace(/\-+/g, "-")
+        window.location.assign(`/scripture/${slug}`)
+      })
       span.tabIndex = 0
       frag.appendChild(span)
 

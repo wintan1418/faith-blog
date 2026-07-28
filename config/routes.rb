@@ -109,6 +109,10 @@ Rails.application.routes.draw do
   get "bookmarks", to: "bookmarks#index"
   get "drafts", to: "drafts#index", as: :drafts
   get "scripture/lookup", to: "scripture#show", as: :scripture_lookup
+  # Scripture pages — a living concordance: the verse + every breath that
+  # carries it. Declared after /scripture/lookup so "lookup" never parses
+  # as a slug.
+  get "scripture/:slug", to: "scripture_pages#show", as: :scripture_page, constraints: { slug: /[a-z0-9\-]+/ }
   post "bible/search", to: "bible#search", as: :bible_search
 
   # Games / leaderboard

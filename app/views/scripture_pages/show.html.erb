@@ -1,0 +1,42 @@
+<% content_for(:title) { "#{@reference} - Brethreign" } %>
+<% if @verse&.dig(:text).present? %>
+  <% content_for(:meta_description) { "#{@reference} — #{truncate(@verse[:text], length: 140)} Read every breath the Brethreign community shares around this verse." } %>
+<% end %>
+
+<div class="mystic-shell scripture-page">
+  <section class="sp-hero">
+    <div class="mystic-container max-w-3xl py-14 text-center">
+      <p class="sp-kicker">📖 Scripture</p>
+      <h1 class="sp-ref"><%= @verse&.dig(:reference).presence || @reference %></h1>
+      <% if @verse&.dig(:text).present? %>
+        <blockquote class="sp-verse">“<%= @verse[:text] %>”</blockquote>
+        <p class="sp-translation"><%= @verse[:translation].presence || "KJV" %></p>
+      <% else %>
+        <p class="sp-verse-missing">Open your Bible to <%= @reference %> — the text couldn't be fetched right now.</p>
+      <% end %>
+      <div class="sp-actions">
+        <% if user_signed_in? %>
+          <%= link_to "Breathe on this verse", new_post_path(prefill: "#{@reference} — "), class: "fc-btn fc-btn-primary" %>
+        <% else %>
+          <%= link_to "Join Brethreign to breathe on it", new_user_registration_path, class: "fc-btn fc-btn-primary" %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <div class="mystic-container max-w-3xl pb-14">
+    <% if @posts.any? %>
+      <h2 class="sp-section-title">Breaths that carry this verse</h2>
+      <div class="space-y-4 mt-5">
+        <% @posts.each do |post| %>
+          <%= render "posts/card", post: post %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="mystic-panel sp-empty p-10 text-center">
+        <h2>No breaths carry <%= @reference %> yet.</h2>
+        <p class="mystic-copy mt-2">Be the first — share what this verse has done in you.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

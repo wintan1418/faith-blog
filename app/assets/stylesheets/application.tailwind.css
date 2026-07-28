@@ -20527,3 +20527,72 @@ html.theme-dark .circle-answered-heading { color: #fbbf24; }
   .circle-head-panel { flex-direction: column; }
   .circle-head-actions { min-width: 0; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ SCRIPTURE PAGES — /scripture/:ref, a living concordance.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.sp-hero {
+  background: radial-gradient(ellipse 55rem 18rem at 50% -4rem,
+    color-mix(in srgb, #f59e0b 12%, transparent), transparent 70%);
+}
+
+.sp-kicker {
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #b45309;
+}
+html.theme-dark .sp-kicker { color: #fbbf24; }
+
+.sp-ref {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(1.8rem, 5vw, 2.7rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 0.5rem;
+  color: var(--fc-ink, #17251d);
+}
+
+.sp-verse {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+  line-height: 1.7;
+  max-width: 38rem;
+  margin: 1.2rem auto 0;
+  color: var(--fc-soft, #52665a);
+}
+
+.sp-translation {
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--fc-faint, #9caaa1);
+}
+
+.sp-verse-missing {
+  margin: 1.2rem auto 0;
+  max-width: 32rem;
+  color: var(--fc-muted, #6c7c72);
+}
+
+.sp-actions { margin-top: 1.5rem; }
+
+.sp-section-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fc-ink, #17251d);
+}
+
+.sp-empty h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.scripture-ref { cursor: pointer; }
