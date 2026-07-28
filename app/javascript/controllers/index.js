@@ -82,6 +82,12 @@ application.register("message-menu", MessageMenuController)
 import ProfileHeroController from "./profile_hero_controller"
 application.register("profile-hero", ProfileHeroController)
 
+import FeedTabsController from "./feed_tabs_controller"
+application.register("feed-tabs", FeedTabsController)
+
+import ScrollTopController from "./scroll_top_controller"
+application.register("scroll-top", ScrollTopController)
+
 import NewPostsPillController from "./new_posts_pill_controller"
 application.register("new-posts-pill", NewPostsPillController)
 

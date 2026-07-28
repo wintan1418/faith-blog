@@ -94,6 +94,28 @@
     </aside>
 
     <main class="fc-main">
+      <%# Personal masthead — the greeting follows the VIEWER's clock via
+          html[data-greet] (set in the layout head script); all variants render
+          and CSS shows the right one, so there's no flash of wrong greeting. %>
+      <header class="fc-masthead">
+        <div class="min-w-0">
+          <h1 class="fc-masthead-greet">
+            <span class="fc-greet" data-greet="morning">Good morning</span>
+            <span class="fc-greet" data-greet="afternoon">Good afternoon</span>
+            <span class="fc-greet" data-greet="evening">Good evening</span>
+            <span class="fc-greet" data-greet="night">Grace for the night watch</span>
+            <span class="fc-greet fc-greet-fallback">Welcome back</span>,
+            <span class="fc-masthead-name"><%= current_user.display_name.presence || current_user.username %></span>
+          </h1>
+          <p class="fc-masthead-sub"><%= Date.current.strftime("%A, %B %-d") %> · The assembly is gathered. Breathe deep.</p>
+        </div>
+        <% if current_user.current_breath_streak.to_i.positive? %>
+          <span class="fc-masthead-streak" title="Breath streak — days in a row you've breathed">
+            🔥 <%= current_user.current_breath_streak %><small><%= current_user.current_breath_streak == 1 ? "day" : "days" %></small>
+          </span>
+        <% end %>
+      </header>
+
       <div class="fc-panel fc-composer">
         <div class="fc-composer-row">
           <% if current_user.profile&.avatar&.attached? %>
@@ -113,8 +135,12 @@
           </button>
         </div>
         <div class="fc-composer-chips">
-          <button type="button" class="fc-composer-chip" data-action="click->composer-modal#open">🙏 Prayer request</button>
-          <button type="button" class="fc-composer-chip" data-action="click->composer-modal#open">📖 Share a verse</button>
+          <button type="button" class="fc-composer-chip"
+                  data-action="click->composer-modal#openWith"
+                  data-composer-modal-prefill-param="🙏 Brethren, please pray with me — ">🙏 Prayer request</button>
+          <button type="button" class="fc-composer-chip"
+                  data-action="click->composer-modal#openWith"
+                  data-composer-modal-prefill-param="📖 A verse on my heart today: ">📖 Share a verse</button>
           <button type="button" class="fc-composer-chip" data-action="click->composer-modal#open">🎙️ Voice note</button>
           <button type="button" class="fc-composer-chip" data-action="click->bible-drawer#open">✨ Read first</button>
         </div>
@@ -289,19 +315,19 @@
           link inside the cards navigating normally; only the tab links opt
           into the frame. %>
       <%= turbo_frame_tag "feed_stream", target: "_top" do %>
-      <div class="fc-tabs">
+      <div class="fc-tabs" data-controller="feed-tabs">
         <%= link_to "Recent", feed_path,
               class: "fc-tab #{current_page?(feed_path) ? 'is-active' : ''}",
-              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+              data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
         <%= link_to "Threads", feed_threads_path,
               class: "fc-tab #{current_page?(feed_threads_path) ? 'is-active' : ''}",
-              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+              data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
         <%= link_to "Trending", feed_trending_path,
               class: "fc-tab #{current_page?(feed_trending_path) ? 'is-active' : ''}",
-              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+              data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
         <%= link_to "Following", feed_following_path,
               class: "fc-tab #{current_page?(feed_following_path) ? 'is-active' : ''}",
-              data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+              data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
         <button type="button" class="fc-discover-trigger" data-action="click->discover#open" aria-label="Open discover panel">
           <%= render_icon("sparkles", classes: "h-4 w-4") %>
           <span>Discover</span>
@@ -355,6 +381,12 @@
                     <div class="fc-skel fc-skel-line is-mid"></div>
                   </div>
                 </div>
+              </div>
+            <% else %>
+              <div class="fc-caught-up" role="status">
+                <span class="fc-caught-up-line" aria-hidden="true"></span>
+                <span class="fc-caught-up-text">✦ You're all caught up</span>
+                <span class="fc-caught-up-line" aria-hidden="true"></span>
               </div>
             <% end %>
           <% else %>
@@ -586,7 +618,7 @@
           <div class="space-y-3">
             <% @trending_breaths.each_with_index do |post, idx| %>
               <%= link_to post_path(post), class: "flex items-start gap-3 hover:bg-[var(--fc-surface-2)] -mx-2 px-2 py-1.5 rounded-md transition-colors" do %>
-                <span class="text-xs font-extrabold text-[var(--fc-faint)] mt-0.5 w-4 text-right"><%= idx + 1 %></span>
+                <span class="fc-trend-rank is-<%= idx + 1 %> mt-0.5"><%= idx + 1 %></span>
                 <span class="min-w-0 flex-1">
                   <span class="block truncate text-sm font-bold text-[var(--fc-ink)]">
                     <%= truncate(post.title, length: 48) %>
@@ -641,4 +673,10 @@
       <% end %>
     </aside>
   </div>
+
+  <button type="button"
+          class="fc-scroll-top"
+          data-controller="scroll-top"
+          data-action="click->scroll-top#toTop"
+          aria-label="Back to top">↑</button>
 </div>

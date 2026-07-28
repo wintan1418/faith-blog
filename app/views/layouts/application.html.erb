@@ -19,6 +19,9 @@
         const h = new Date().getHours();
         document.documentElement.dataset.daypart =
           h < 6 ? 'night' : h < 9 ? 'dawn' : h < 17 ? 'day' : h < 21 ? 'dusk' : 'night';
+        // Greeting bucket for the feed masthead — the viewer's clock, not the server's.
+        document.documentElement.dataset.greet =
+          h < 5 ? 'night' : h < 12 ? 'morning' : h < 17 ? 'afternoon' : h < 21 ? 'evening' : 'night';
       })();
     </script>
     <title><%= content_for(:title) || "Brethreign — breathe" %></title>

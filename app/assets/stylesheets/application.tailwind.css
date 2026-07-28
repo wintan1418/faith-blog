@@ -19498,3 +19498,273 @@ html.theme-dark div.profile-stat.profile-stat-streak:hover {
   .profile-badge::after { display: none; }
   .profile-minibar { transition: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ FEED MILLION PASS — masthead, gliding sticky tabs, caught-up terminus,
+   back-to-top pill, trending medals, brand micro-details.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Personal masthead ── */
+.fc-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.35rem 0.25rem 1rem;
+}
+
+.fc-masthead-greet {
+  font-size: 1.45rem;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--fc-ink);
+}
+
+.fc-masthead-name {
+  background: linear-gradient(120deg, var(--fc-accent), var(--fc-accent-2, var(--fc-accent)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.fc-masthead-sub {
+  margin-top: 0.3rem;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--fc-muted);
+}
+
+.fc-masthead-streak {
+  flex: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #b45309;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.18), rgba(249, 115, 22, 0.12));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.fc-masthead-streak small {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, #b45309 75%, var(--fc-muted));
+}
+
+html.theme-dark .fc-masthead-streak { color: #fbbf24; }
+html.theme-dark .fc-masthead-streak small { color: color-mix(in srgb, #fbbf24 70%, var(--fc-muted)); }
+
+/* Greeting variants: the layout head script stamps html[data-greet] from the
+   viewer's clock before first paint — only the matching span shows. */
+.fc-greet { display: none; }
+html[data-greet="morning"] .fc-greet[data-greet="morning"],
+html[data-greet="afternoon"] .fc-greet[data-greet="afternoon"],
+html[data-greet="evening"] .fc-greet[data-greet="evening"],
+html[data-greet="night"] .fc-greet[data-greet="night"],
+html:not([data-greet]) .fc-greet-fallback { display: inline; }
+
+@media (min-width: 761px) {
+  .fc-masthead {
+    animation: fc-masthead-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes fc-masthead-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* ── Sticky tabs with gliding thumb ── */
+.fc-tabs {
+  position: sticky;
+  top: 52px;
+  z-index: 30;
+}
+
+/* Opaque scrim behind the pill so cards don't peek through its rounded
+   corners while it's stuck. */
+.fc-tabs::before {
+  content: "";
+  position: absolute;
+  inset: -10px -4px -6px;
+  background: var(--fc-bg);
+  border-radius: 0 0 16px 16px;
+  z-index: -1;
+}
+
+.fc-tabs.has-thumb { position: sticky; }
+
+.fc-tab-thumb {
+  position: absolute;
+  top: 0.3rem;
+  bottom: 0.3rem;
+  left: 0;
+  width: 0;
+  border-radius: 999px;
+  background: var(--fc-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+              inset 0 0 0 1px color-mix(in srgb, var(--fc-accent) 30%, transparent);
+  transition: transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+              width 380ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 200ms ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.fc-tabs.has-thumb .fc-tab,
+.fc-tabs.has-thumb .fc-discover-trigger {
+  position: relative;
+  z-index: 1;
+}
+
+/* The thumb IS the active background now — flatten the tab's own. */
+.fc-tabs.has-thumb .fc-tab.is-active {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 760px) {
+  .fc-tabs { top: 46px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-tab-thumb { transition: none; }
+  .fc-masthead { animation: none; }
+}
+
+/* ── Caught-up terminus ── */
+.fc-caught-up {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 1.8rem 0.25rem 1.2rem;
+}
+
+.fc-caught-up-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--fc-accent) 40%, var(--fc-line)));
+}
+
+.fc-caught-up-line:last-child {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--fc-accent) 40%, var(--fc-line)), transparent);
+}
+
+.fc-caught-up-text {
+  flex: none;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--fc-muted);
+}
+
+/* ── Back-to-top pill ── */
+.fc-scroll-top {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.5rem;
+  z-index: 40;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--fc-accent-2, var(--fc-accent));
+  background: var(--fc-surface);
+  border: 1px solid var(--fc-line);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateY(14px) scale(0.9);
+  pointer-events: none;
+  transition: opacity 240ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fc-scroll-top.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.fc-scroll-top:hover {
+  color: var(--fc-ink);
+  border-color: color-mix(in srgb, var(--fc-accent) 45%, var(--fc-line));
+}
+
+@media (max-width: 760px) {
+  .fc-scroll-top {
+    right: 0.9rem;
+    bottom: calc(56px + 0.9rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ── Trending medals ── */
+.fc-trend-rank {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  color: var(--fc-faint);
+  background: var(--fc-surface-2);
+  border: 1px solid var(--fc-line);
+}
+
+.fc-trend-rank.is-1 {
+  color: #713f12;
+  background: linear-gradient(135deg, #fde68a, #f59e0b);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.fc-trend-rank.is-2 {
+  color: #334155;
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+.fc-trend-rank.is-3 {
+  color: #431407;
+  background: linear-gradient(135deg, #fdba74, #c2703d);
+  border-color: rgba(194, 112, 61, 0.5);
+}
+
+/* ── Card micro-details ── */
+.fc-breath-avatar .fc-avatar { transition: box-shadow 220ms ease; }
+
+@media (hover: hover) and (min-width: 761px) {
+  .fc-breath:hover .fc-breath-avatar .fc-avatar {
+    box-shadow: 0 0 0 2px var(--fc-bg),
+                0 0 0 4px color-mix(in srgb, var(--fc-accent) 55%, transparent);
+  }
+}
+
+/* ── Brand micro-details ── */
+.fc-app ::selection {
+  background: color-mix(in srgb, var(--fc-accent, #2f855a) 26%, transparent);
+}
+
+.fc-btn:focus-visible,
+.fc-tab:focus-visible,
+.fc-rail-link:focus-visible,
+.fc-composer-chip:focus-visible,
+.fc-scroll-top:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fc-accent) 70%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .fc-masthead { padding: 0.15rem 0.15rem 0.75rem; }
+  .fc-masthead-greet { font-size: 1.15rem; }
+  .fc-masthead-sub { font-size: 0.76rem; }
+  .fc-masthead-streak { font-size: 0.85rem; padding: 0.35rem 0.7rem; }
+}

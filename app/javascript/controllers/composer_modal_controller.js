@@ -32,6 +32,21 @@ export default class extends Controller {
     }))
   }
 
+  // Open with starter text from a data-composer-modal-prefill-param — used by
+  // the composer chips ("Prayer request", "Share a verse"). Never clobbers a
+  // draft: only inserts when the editor is empty.
+  openWith(event) {
+    const text = event.params && event.params.prefill
+    this.open(event)
+    if (!text) return
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const editor = this.dialogTarget.querySelector("trix-editor")
+      if (editor && editor.editor && editor.editor.getDocument().toString().trim() === "") {
+        editor.editor.insertString(text)
+      }
+    }))
+  }
+
   open(event) {
     if (event) event.preventDefault()
     const dialog = this.dialogTarget
