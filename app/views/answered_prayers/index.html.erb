@@ -1,0 +1,83 @@
+<% content_for(:title) { "Wall of Answered Prayers - Brethreign" } %>
+<% content_for(:meta_description) { "Every prayer the Brethreign community carried that God answered — a living wall of testimony." } %>
+
+<div class="mystic-shell answered-wall">
+  <section class="aw-hero">
+    <div class="mystic-container max-w-4xl py-14 text-center">
+      <p class="aw-kicker">🌟 Testimony</p>
+      <h1 class="aw-title">The Wall of Answered Prayers</h1>
+      <p class="aw-sub">
+        Every request the assembly carried together, answered.
+        Read them slowly — each one was someone's long night.
+      </p>
+      <% if @total_answered.positive? %>
+        <div class="aw-stats">
+          <span class="aw-stat"><strong><%= @total_answered %></strong> prayer<%= @total_answered == 1 ? "" : "s" %> answered</span>
+          <span class="aw-stat-dot" aria-hidden="true">·</span>
+          <span class="aw-stat"><strong><%= @total_interceded %></strong> brethren stood in the chains</span>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <div class="mystic-container max-w-4xl pb-14">
+    <% if @posts.any? %>
+      <div class="aw-grid">
+        <% @posts.each do |post| %>
+          <%
+            started  = post.published_at || post.created_at
+            answered = post.prayer_answered_at
+            carried  = answered && started && answered > started ? distance_of_time_in_words(started, answered) : nil
+          %>
+          <article class="aw-card">
+            <header class="aw-card-head">
+              <% if post.anonymous? %>
+                <span class="fc-avatar"><%= render_icon("users", classes: "h-4 w-4") %></span>
+                <span class="aw-card-name">Anonymous</span>
+              <% else %>
+                <% if post.user.profile&.avatar&.attached? %>
+                  <%= link_to user_path(post.user.username) do %>
+                    <%= image_tag post.user.profile.avatar, class: "fc-avatar object-cover", alt: post.user.username %>
+                  <% end %>
+                <% else %>
+                  <%= link_to user_path(post.user.username), class: "fc-avatar", style: avatar_tint_style(post.user.username) do %>
+                    <%= post.user.username.first.upcase %>
+                  <% end %>
+                <% end %>
+                <%= link_to post.user.username, user_path(post.user.username), class: "aw-card-name" %>
+              <% end %>
+              <span class="aw-card-when" title="<%= answered.strftime("%A, %b %-d %Y") %>">answered <%= time_ago_in_words(answered) %> ago</span>
+            </header>
+
+            <% if post.display_title %>
+              <h2 class="aw-card-title"><%= link_to post.display_title, post_path(post) %></h2>
+            <% end %>
+            <p class="aw-card-copy"><%= truncate(post.content.to_plain_text, length: 200) %></p>
+
+            <footer class="aw-card-foot">
+              <% if carried %>
+                <span class="aw-chip">🕯️ Carried for <%= carried %></span>
+              <% end %>
+              <% if post.intercessions_count.to_i.positive? %>
+                <span class="aw-chip">🙏 <%= post.intercessions_count %> in the chain</span>
+              <% end %>
+              <%= link_to "Read the testimony →", post_path(post), class: "aw-card-link" %>
+            </footer>
+          </article>
+        <% end %>
+      </div>
+
+      <% if @pagy.pages > 1 %>
+        <div class="mt-8">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="mystic-panel aw-empty p-12 text-center">
+        <h2>The wall is waiting for its first testimony.</h2>
+        <p class="mystic-copy mt-2">When a prayer request is marked answered, it takes its place here — keep praying with one another.</p>
+        <%= link_to "Go to the feed", feed_path, class: "btn btn-primary mt-6 inline-block" %>
+      </div>
+    <% end %>
+  </div>
+</div>

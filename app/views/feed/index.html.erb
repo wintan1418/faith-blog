@@ -23,6 +23,10 @@
           <%= render_icon("bookopen", classes: "h-4 w-4") %>
           Church History
         <% end %>
+        <%= link_to answered_prayers_path, class: "fc-rail-link" do %>
+          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          Answered Prayers
+        <% end %>
         <%= link_to bookmarks_path, class: "fc-rail-link" do %>
           <%= render_icon("bookmark", classes: "h-4 w-4") %>
           Bookmarks
@@ -596,7 +600,10 @@
             </div>
             <% end %>
           </div>
-          <%= link_to "View prayer room", (@prayer_room ? room_path(@prayer_room) : rooms_path), class: "mt-4 inline-block text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
+          <div class="mt-4 flex items-center gap-4">
+            <%= link_to "View prayer room", (@prayer_room ? room_path(@prayer_room) : rooms_path), class: "text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
+            <%= link_to "🌟 Answered wall", answered_prayers_path, class: "text-sm font-bold text-[#b45309] hover:text-[var(--fc-ink)]" %>
+          </div>
         <% else %>
           <div class="rounded-md border border-[var(--fc-line)] bg-[var(--fc-surface-2)] p-4">
             <p class="text-sm font-semibold text-[var(--fc-soft)]">No prayer requests yet.</p>

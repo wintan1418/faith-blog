@@ -24,6 +24,9 @@ Rails.application.routes.draw do
   get "feed/following", to: "feed#following"
   get "feed/threads",   to: "feed#threads"
 
+  # Wall of Answered Prayers — public celebration of every answered chain.
+  get "answered", to: "answered_prayers#index", as: :answered_prayers
+
   # Rooms
   resources :rooms, only: [ :index, :show ] do
     member do
