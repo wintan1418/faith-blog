@@ -128,7 +128,21 @@ class PostsController < ApplicationController
   end
 
   def update
-    if @post.update(post_params)
+    attrs = post_params
+    uploaded    = Array(attrs[:images]).reject(&:blank?)
+    removed_ids = Array(params.dig(:post, :remove_image_ids)).reject(&:blank?).map(&:to_i)
+
+    # Editing must APPEND images, not replace the set. Assigning
+    # kept-signed-ids + new uploads in one go keeps every model validation
+    # (type / size / max count) and rolls back cleanly on failure.
+    if uploaded.any? || removed_ids.any?
+      kept = @post.images.attachments.reject { |a| removed_ids.include?(a.id) }
+      attrs[:images] = kept.map { |a| a.blob.signed_id } + uploaded
+    else
+      attrs = attrs.except(:images)
+    end
+
+    if @post.update(attrs)
       handle_post_links
       if @post.draft?
         redirect_to drafts_path, notice: "Draft saved — pick it back up under Drafts when you're ready."

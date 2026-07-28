@@ -144,13 +144,15 @@
         rendering them 500s the whole edit form. %>
     <% saved_images = post.persisted? ? post.images.attachments.select(&:persisted?) : [] %>
     <% if saved_images.any? %>
+      <p class="text-xs text-gray-500 dark:text-gray-400">New uploads are <strong>added</strong> to these. Tick "Remove" on any you want gone.</p>
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <% saved_images.each do |image| %>
-          <div class="relative group">
+          <div class="relative">
             <%= image_tag image, class: "w-full h-24 object-cover rounded-lg" %>
-            <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-              <span class="text-white text-xs">Attached</span>
-            </div>
+            <label class="absolute top-1 right-1 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white cursor-pointer select-none">
+              <input type="checkbox" name="post[remove_image_ids][]" value="<%= image.id %>" class="h-3 w-3 accent-red-500">
+              Remove
+            </label>
           </div>
         <% end %>
       </div>

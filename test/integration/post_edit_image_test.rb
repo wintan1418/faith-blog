@@ -18,6 +18,46 @@ class PostEditImageTest < ActionDispatch::IntegrationTest
 
   teardown { ENV.delete("AI_MODERATION_STUB") }
 
+  TINY_PNG = Base64.decode64(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+  )
+
+  def png_upload(name)
+    file = Tempfile.new([ name, ".png" ])
+    file.binmode
+    file.write(TINY_PNG)
+    file.rewind
+    Rack::Test::UploadedFile.new(file.path, "image/png")
+  end
+
+  test "uploading a new image on edit appends instead of replacing" do
+    @post.images.attach(io: StringIO.new(TINY_PNG), filename: "first.png", content_type: "image/png")
+    assert_equal 1, @post.images.count
+
+    patch post_path(@post), params: { post: {
+      title: @post.title, content: "Body",
+      images: [ png_upload("second") ]
+    } }
+
+    assert_response :redirect
+    assert_equal 2, @post.reload.images.count, "new upload must append, not replace"
+  end
+
+  test "remove_image_ids purges only the ticked images" do
+    @post.images.attach(io: StringIO.new(TINY_PNG), filename: "keep.png", content_type: "image/png")
+    @post.images.attach(io: StringIO.new(TINY_PNG), filename: "drop.png", content_type: "image/png")
+    drop_id = @post.images.attachments.find { |a| a.filename.to_s == "drop.png" }.id
+
+    patch post_path(@post), params: { post: {
+      title: @post.title, content: "Body",
+      remove_image_ids: [ drop_id.to_s ]
+    } }
+
+    assert_response :redirect
+    filenames = @post.reload.images.attachments.map { |a| a.filename.to_s }
+    assert_equal [ "keep.png" ], filenames
+  end
+
   test "a failed image upload re-renders the edit form instead of crashing" do
     bad_file = Tempfile.new([ "not_an_image", ".txt" ])
     bad_file.write("just text")
