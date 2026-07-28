@@ -3,6 +3,7 @@
 class FeedController < ApplicationController
   before_action :authenticate_user!
   before_action :load_sidebar_context
+  before_action :load_onboarding_progress
 
   POSTS_BUFFER    = 60
   RESHARES_BUFFER = 60
@@ -59,6 +60,17 @@ class FeedController < ApplicationController
   end
 
   private
+
+  # The three activation steps behind the progress ring. Cheap EXISTS
+  # queries; the ring renders only while something is still missing.
+  def load_onboarding_progress
+    @onboard = {
+      followed: current_user.following.exists?,
+      roomed:   current_user.room_memberships.exists?,
+      breathed: current_user.posts.published.exists?
+    }
+    @onboard_done = @onboard.values.count(true)
+  end
 
   def feed_posts_scope
     Post.published.includes(feed_post_includes)

@@ -124,6 +124,39 @@
         <% end %>
       </header>
 
+      <%# Activation ring: stays until all three first steps are done, then
+          disappears for good. Each pending step is the link to do it. %>
+      <% if @onboard && @onboard_done < 3 %>
+        <section class="fc-onboard-ring" aria-label="Getting started progress">
+          <svg viewBox="0 0 40 40" class="fc-ring" aria-hidden="true">
+            <circle class="fc-ring-track" cx="20" cy="20" r="16"/>
+            <circle class="fc-ring-fill" cx="20" cy="20" r="16"
+                    style="stroke-dashoffset: <%= (100.5 * (1 - @onboard_done / 3.0)).round(1) %>"/>
+            <text x="20" y="24.5" class="fc-ring-text"><%= @onboard_done %>/3</text>
+          </svg>
+          <div class="fc-onboard-mini">
+            <p class="fc-onboard-mini-title">Make Brethreign feel like home</p>
+            <div class="fc-onboard-mini-steps">
+              <% if @onboard[:followed] %>
+                <span class="fc-onboard-chip is-done">✓ Brethren someone</span>
+              <% else %>
+                <%= link_to "Brethren someone", people_path, class: "fc-onboard-chip" %>
+              <% end %>
+              <% if @onboard[:roomed] %>
+                <span class="fc-onboard-chip is-done">✓ Step into a room</span>
+              <% else %>
+                <%= link_to "Step into a room", rooms_path, class: "fc-onboard-chip" %>
+              <% end %>
+              <% if @onboard[:breathed] %>
+                <span class="fc-onboard-chip is-done">✓ Take a breath</span>
+              <% else %>
+                <button type="button" class="fc-onboard-chip" data-action="click->composer-modal#open">Take a breath</button>
+              <% end %>
+            </div>
+          </div>
+        </section>
+      <% end %>
+
       <div class="fc-panel fc-composer">
         <div class="fc-composer-row">
           <% if current_user.profile&.avatar&.attached? %>
