@@ -18816,23 +18816,6 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
   animation: fc-orb 4.5s ease-in-out infinite;
 }
 
-.fc-composer-input { position: relative; }
-
-.fc-composer-input::before {
-  content: "";
-  position: absolute;
-  left: 0.9rem;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  margin-top: -4px;
-  border-radius: 999px;
-  background: var(--fc-accent);
-  animation: fc-orb 4.5s ease-in-out infinite;
-}
-
-.fc-composer-input { padding-left: 2rem; }
-
 @keyframes fc-orb {
   0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 var(--fc-accent-soft, rgba(52, 211, 153, 0.4)); }
   50%      { transform: scale(1.25); box-shadow: 0 0 0 7px transparent; }
@@ -18842,8 +18825,7 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
   .fc-app::before,
   .fc-breath.is-prayer::before,
   .fc-breath.is-prayer::after,
-  .fc-composer-bar-title::before,
-  .fc-composer-input::before { animation: none; }
+  .fc-composer-bar-title::before { animation: none; }
   .fc-react-btn:active::after { animation: none; }
 }
 
@@ -18882,9 +18864,7 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
 @media (max-width: 760px) {
   .fc-app::before { display: none; }
 
-  .fc-composer-bar-title::before,
-  .fc-composer-input::before { display: none; }
-  .fc-composer-input { padding-left: 1.15rem; }
+  .fc-composer-bar-title::before { display: none; }
 
   .fc-breath.is-prayer::after,
   .fc-breath.is-answered::after { display: none; }
