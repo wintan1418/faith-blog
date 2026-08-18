@@ -72,7 +72,7 @@
 
   <% last_mine_id = messages.reverse.find { |m| m.sender_id == current_user.id }&.id %>
 
-  <div id="messages" class="inbox-messages">
+  <div id="messages" class="inbox-messages" data-controller="chat-scroll">
     <% if messages.any? %>
       <%= render partial: "conversations/message",
                  collection: messages,

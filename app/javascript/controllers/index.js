@@ -91,6 +91,9 @@ application.register("scroll-top", ScrollTopController)
 import ScrollProgressController from "./scroll_progress_controller"
 application.register("scroll-progress", ScrollProgressController)
 
+import ChatScrollController from "./chat_scroll_controller"
+application.register("chat-scroll", ChatScrollController)
+
 import NewPostsPillController from "./new_posts_pill_controller"
 application.register("new-posts-pill", NewPostsPillController)
 
