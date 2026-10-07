@@ -15269,7 +15269,7 @@ html.theme-light .inbox-thread-head {
 
 .inbox-composer-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
   position: relative;
 }
@@ -15278,15 +15278,18 @@ html.theme-light .inbox-thread-head {
 .inbox-composer-pill {
   flex: 1 1 auto;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 2px;
   min-height: 44px;
-  padding: 0 4px;
+  padding: 3px 4px;
   background: var(--fc-bg);
   border: 1px solid var(--fc-line-strong);
-  border-radius: 999px;
-  transition: border-color 140ms ease, box-shadow 140ms ease;
+  border-radius: 22px;
+  transition: border-color 140ms ease, box-shadow 140ms ease, border-radius 140ms ease;
 }
+/* Once the textarea needs more than one line the pill becomes a rounded
+   card and its buttons stay pinned to the bottom edge. */
+.inbox-composer-pill.is-tall { border-radius: 18px; }
 .inbox-composer-pill:focus-within {
   border-color: var(--fc-accent);
   box-shadow: 0 0 0 4px var(--fc-accent-soft);
@@ -15326,8 +15329,10 @@ html.theme-light .inbox-thread-head {
   color: var(--fc-ink) !important;
   resize: none !important;
   min-height: 24px !important;
-  max-height: 120px;
+  max-height: 180px;
+  overflow-y: hidden;
   font-family: inherit;
+  scrollbar-width: thin;
 }
 .inbox-composer-input::placeholder { color: var(--fc-muted); }
 
@@ -15606,7 +15611,8 @@ html.theme-light .inbox-thread-head {
 
   /* ---- Composer ---- */
   .inbox-composer { padding: 8px 10px 10px; }
-  .inbox-composer-pill { min-height: 42px; }
+  .inbox-composer-pill { min-height: 42px; border-radius: 21px; padding: 2px 4px; }
+  .inbox-composer-input { max-height: 140px; }
   .inbox-composer-action { width: 42px; height: 42px; }
 }
 

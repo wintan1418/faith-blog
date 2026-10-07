@@ -16,10 +16,37 @@ export default class extends Controller {
       if (this.hasSendBtnTarget) this.sendBtnTarget.classList.remove("hidden")
     }
     this.syncTrailingAction()
+    this.autosize()
   }
 
   onInput() {
     this.syncTrailingAction()
+    this.autosize()
+  }
+
+  // Grow the textarea with its content, up to the CSS max-height, then let
+  // it scroll. The pill keeps its single-row height until a second line is
+  // actually needed, so a short message still reads as a chat pill.
+  autosize() {
+    if (!this.hasBodyInputTarget) return
+    const el = this.bodyInputTarget
+    const max = parseFloat(getComputedStyle(el).maxHeight) || 180
+
+    el.style.height = "auto"
+    const needed = el.scrollHeight
+    const next = Math.min(needed, max)
+    el.style.height = `${next}px`
+    el.style.overflowY = needed > max ? "auto" : "hidden"
+
+    const grown = next > (parseFloat(getComputedStyle(el).minHeight) || 0) + 24
+    el.closest(".inbox-composer-pill")?.classList.toggle("is-tall", grown)
+
+    // A taller composer eats into the thread; keep the newest message in
+    // view if the reader was already looking at it.
+    const thread = document.getElementById("messages")
+    if (thread && thread.scrollHeight - thread.scrollTop - thread.clientHeight < 160) {
+      thread.scrollTop = thread.scrollHeight
+    }
   }
 
   onKeydown(event) {
