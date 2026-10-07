@@ -17413,6 +17413,9 @@ trix-editor li,
 }
 
 /* DM image previews + voice note pieces */
+.dm-previews.hidden,
+.dm-voice-preview.hidden { display: none; }
+
 .dm-previews {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
