@@ -33,19 +33,19 @@ port ENV.fetch("PORT", 3000)
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
-# Run the Solid Queue supervisor inside of Puma for single-server deployments.
-#
-# Defaults ON in production: without a worker, background jobs never run and
-# newly created posts sit in :pending_review forever (the AI moderation gate
-# that releases them is an async job) while nothing ever reaches the moderation
-# board. Running the supervisor in Puma guarantees a worker wherever the web
-# process runs. Set SOLID_QUEUE_IN_PUMA=0 to opt out — e.g. when you run a
-# dedicated `bin/jobs` process instead.
+# Run the Solid Queue supervisor inside of Puma for single-server deployments
+# that have no dedicated worker. Without any worker, background jobs never run
+# and the AI moderation gate never releases new posts. Set
+# SOLID_QUEUE_IN_PUMA=1 to opt in when there is no `bin/jobs` process.
 solid_queue_in_puma =
   if ENV.key?("SOLID_QUEUE_IN_PUMA")
-    %w[0 false off no].exclude?(ENV["SOLID_QUEUE_IN_PUMA"].to_s.downcase)
+    !%w[0 false off no].include?(ENV["SOLID_QUEUE_IN_PUMA"].to_s.downcase)
   else
-    ENV.fetch("RAILS_ENV", ENV.fetch("RACK_ENV", "development")) == "production"
+    # Production on Hatchbox runs a dedicated `bin/jobs` background worker
+    # (faith-blog-solid_queue.service). Running a second supervisor inside
+    # Puma doubled every queue process (~500MB RAM, 8 extra DB connections)
+    # on a shared box, so the plugin is opt-in everywhere now.
+    false
   end
 plugin :solid_queue if solid_queue_in_puma
 
