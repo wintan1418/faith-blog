@@ -1,0 +1,41 @@
+<% content_for(:title) { "Delete Account - Faith Community" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Settings</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Delete account</h1>
+      <p class="mystic-copy mt-2">We're sorry to see you go. Please read this before you continue.</p>
+    </div>
+
+    <div class="rounded-3xl border border-red-200 bg-red-50/80 p-6">
+      <h2 class="text-lg font-bold text-red-900">This can't be undone</h2>
+      <p class="mt-2 text-sm text-red-800">Deleting your account permanently removes:</p>
+      <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-red-800">
+        <li>Your profile, photo and Brethren Card</li>
+        <li>Your breaths, comments, reactions, bookmarks and reposts</li>
+        <li>Your messages, voice notes and uploaded images</li>
+        <li>Your Prayer Circles, prayers and reading-plan progress</li>
+        <li>Your follows, connections and notification settings</li>
+      </ul>
+      <p class="mt-3 text-sm text-red-800">
+        Other people's notifications about you will show "Someone" instead of your name.
+      </p>
+
+      <%= form_with url: settings_account_path, method: :delete, class: "mt-6 space-y-4" do |f| %>
+        <div>
+          <%= f.label :confirm_username, class: "block text-sm font-semibold text-red-900" do %>
+            Type your username, <strong><%= current_user.username %></strong>, to confirm
+          <% end %>
+          <%= f.text_field :confirm_username,
+                autocomplete: "off", autocapitalize: "off", spellcheck: false, required: true,
+                class: "mt-2 w-full rounded-xl border border-red-200 bg-white px-4 py-3 text-base" %>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <%= f.submit "Permanently delete my account", class: "btn btn-danger" %>
+          <%= link_to "Keep my account", edit_settings_account_path, class: "btn" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

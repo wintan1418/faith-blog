@@ -7,7 +7,7 @@
 class Broadcast < ApplicationRecord
   enum :status, { draft: 0, sending: 1, sent: 2, failed: 3 }
 
-  belongs_to :sender, class_name: "User"
+  belongs_to :sender, class_name: "User", optional: true # nil once the sender deletes their account
   has_rich_text :body
 
   validates :subject, presence: true, length: { minimum: 3, maximum: 200 }
