@@ -27,6 +27,17 @@
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
 
+# Production runs 2 workers by default (override with WEB_CONCURRENCY); each
+# worker is a forked copy of the preloaded app, so copy-on-write keeps the
+# second process cheap. Development and test stay single-process.
+worker_count = Integer(ENV.fetch("WEB_CONCURRENCY") {
+  ENV.fetch("RAILS_ENV", ENV.fetch("RACK_ENV", "development")) == "production" ? 2 : 0
+})
+if worker_count > 1
+  workers worker_count
+  preload_app!
+end
+
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
 
