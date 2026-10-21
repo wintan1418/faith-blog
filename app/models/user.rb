@@ -15,7 +15,7 @@ class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :announcements, dependent: :destroy
 
-  validates :accent_color, inclusion: { in: -> (_) { AccentPalette.slugs } }, allow_blank: true
+  validates :accent_color, inclusion: { in: ->(_) { AccentPalette.slugs } }, allow_blank: true
   has_many :game_attempts, dependent: :destroy
   has_many :user_badges, dependent: :destroy
   has_many :user_seen_quiz_questions, dependent: :delete_all
@@ -185,9 +185,9 @@ class User < ApplicationRecord
 
     new_current = if streak_updated_on == today - 1
                     current_breath_streak.to_i + 1
-                  else
+    else
                     1
-                  end
+    end
     new_longest = [ longest_breath_streak.to_i, new_current ].max
 
     update_columns(

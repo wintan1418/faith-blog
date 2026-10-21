@@ -75,7 +75,7 @@ module Ai
       private
 
       def extract_content
-        [@post.title, @post.content&.to_plain_text].compact.reject(&:blank?).join("\n\n")
+        [ @post.title, @post.content&.to_plain_text ].compact.reject(&:blank?).join("\n\n")
       end
 
       def author_context
@@ -93,15 +93,15 @@ module Ai
         severity = result.severity.to_s
         cats = Array(result.categories).map(&:to_s)
 
-        return [:block, "explicit_category"] if severity == "high" && (HARD_BLOCK_CATEGORIES & cats).any?
-        return [:block, "policy_block"]      if action == "block"
-        return [:hold,  "hide_pending_review"] if action == "hide_pending_review"
-        return [:hold,  "require_review"]     if action == "require_review"
+        return [ :block, "explicit_category" ] if severity == "high" && (HARD_BLOCK_CATEGORIES & cats).any?
+        return [ :block, "policy_block" ]      if action == "block"
+        return [ :hold,  "hide_pending_review" ] if action == "hide_pending_review"
+        return [ :hold,  "require_review" ]     if action == "require_review"
         # suggest_edit only warrants a human when the severity is real —
         # "none"/"low" suggestions should never keep a breath off the feed.
-        return [:hold,  "suggest_edit"]       if action == "suggest_edit" && %w[medium high].include?(severity)
+        return [ :hold,  "suggest_edit" ]       if action == "suggest_edit" && %w[medium high].include?(severity)
 
-        [:allow, "ok"]
+        [ :allow, "ok" ]
       end
     end
   end

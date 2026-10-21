@@ -15,7 +15,7 @@ class Comment < ApplicationRecord
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
   after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
-  has_one  :ai_moderation_review, as: :reviewable, dependent: :destroy
+  has_one :ai_moderation_review, as: :reviewable, dependent: :destroy
 
   # Enums
   enum :moderation_status, { approved: 0, pending_review: 1, blocked: 2 }, prefix: :moderation

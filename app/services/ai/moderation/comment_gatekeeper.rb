@@ -60,13 +60,13 @@ module Ai
         severity = result.severity.to_s
         cats     = Array(result.categories).map(&:to_s)
 
-        return [:block, "explicit_category"]   if severity == "high" && (HARD_BLOCK_CATEGORIES & cats).any?
-        return [:block, "policy_block"]        if action == "block"
-        return [:hold,  "hide_pending_review"] if action == "hide_pending_review"
-        return [:hold,  "require_review"]      if action == "require_review"
-        return [:hold,  "suggest_edit"]        if action == "suggest_edit" && severity != "low"
+        return [ :block, "explicit_category" ]   if severity == "high" && (HARD_BLOCK_CATEGORIES & cats).any?
+        return [ :block, "policy_block" ]        if action == "block"
+        return [ :hold,  "hide_pending_review" ] if action == "hide_pending_review"
+        return [ :hold,  "require_review" ]      if action == "require_review"
+        return [ :hold,  "suggest_edit" ]        if action == "suggest_edit" && severity != "low"
 
-        [:allow, "ok"]
+        [ :allow, "ok" ]
       end
     end
   end

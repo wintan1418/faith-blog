@@ -158,9 +158,9 @@ module Mentionable
   def content_with_mentions
     raw = if respond_to?(:content) && content.present?
             content.to_s
-          else
+    else
             content.to_s
-          end
+    end
 
     raw.gsub(/@([a-zA-Z0-9_-]{2,30})/) do |match|
       handle = $1.downcase

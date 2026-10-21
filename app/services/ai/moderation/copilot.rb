@@ -73,10 +73,10 @@ module Ai
       def content_block
         reviewable = @review.reviewable
         body = case reviewable
-               when Post    then [ reviewable.title, reviewable.content.to_plain_text ].compact.join("\n\n")
-               when Comment then reviewable.content.to_plain_text.to_s
-               else reviewable.try(:body).to_s
-               end
+        when Post    then [ reviewable.title, reviewable.content.to_plain_text ].compact.join("\n\n")
+        when Comment then reviewable.content.to_plain_text.to_s
+        else reviewable.try(:body).to_s
+        end
 
         <<~CTX
           AI severity: #{@review.severity}
@@ -94,9 +94,9 @@ module Ai
                     risk      = @user.risk_profile&.risk_level || "clear"
                     age_days  = ((Time.current - @user.created_at) / 1.day).to_i
                     "User account: @#{@user.username} | risk_level=#{risk} | flagged_reviews=#{flagged} | account_age_days=#{age_days}"
-                  else
+        else
                     "User account: (anonymous)"
-                  end
+        end
 
         "#{content_block}\n\n#{history}"
       end

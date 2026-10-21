@@ -91,6 +91,6 @@ class BibleQuizQuestion < ApplicationRecord
 
   def choices_well_formed
     return errors.add(:choices, "must have exactly 4 entries") unless choices.is_a?(Array) && choices.size == 4
-    return errors.add(:correct_index, "out of range") unless correct_index.to_i.between?(0, 3)
+    errors.add(:correct_index, "out of range") unless correct_index.to_i.between?(0, 3)
   end
 end

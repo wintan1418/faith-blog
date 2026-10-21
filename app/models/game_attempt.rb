@@ -30,10 +30,10 @@ class GameAttempt < ApplicationRecord
     scope = self
     scope = scope.where(kind: kind) if kind
     scope = case window
-            when :week  then scope.this_week
-            when :month then scope.this_month
-            else scope
-            end
+    when :week  then scope.this_week
+    when :month then scope.this_month
+    else scope
+    end
 
     rows = scope
       .group(:user_id)
