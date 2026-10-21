@@ -24,7 +24,8 @@
           h < 5 ? 'night' : h < 12 ? 'morning' : h < 17 ? 'afternoon' : h < 21 ? 'evening' : 'night';
       })();
     </script>
-    <title><%= content_for(:title) || "Brethreign — breathe" %></title>
+    <%# In the mobile apps the title becomes the native header, so drop the site-name suffix ("Inbox - Faith Community" → "Inbox"). %>
+    <title><%= hotwire_native_app? ? (content_for(:title).to_s.split(/\s[-·—|]\s/).first.presence || "Brethreign") : (content_for(:title) || "Brethreign — breathe") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : "A community where Christians breathe — share testimonies, read scripture, pray for one another." %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -74,8 +75,10 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="h-full bg-stone-50 font-sans antialiased theme-light"
-        data-controller="<%= 'pwa' if user_signed_in? %>"
+  <body class="h-full bg-stone-50 font-sans antialiased theme-light<%= ' hotwire-native' if hotwire_native_app? %>"
+        data-controller="<%= 'pwa' if user_signed_in? && !hotwire_native_app? %>"
+        data-native-signed-in="<%= user_signed_in? %>"
+        data-native-admin="<%= user_signed_in? && current_user_admin? %>"
         data-pwa-vapid-key-value="<%= WebPushConfig.public_key if user_signed_in? && WebPushConfig.configured? %>"
         style="<%= AccentPalette.css_vars(current_user&.accent_color) %>">
     <script>

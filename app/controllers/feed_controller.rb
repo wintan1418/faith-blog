@@ -83,7 +83,15 @@ class FeedController < ApplicationController
   def respond_to_feed
     respond_to do |format|
       format.html { render :index }
-      format.turbo_stream { render :paginate }
+      # Only infinite scroll (?page=N) wants the stream. A Turbo form that redirects
+      # here (e.g. sign-in) also accepts streams but needs the full page.
+      format.turbo_stream do
+        if params[:page].present?
+          render :paginate
+        else
+          render :index, formats: [ :html ], content_type: "text/html"
+        end
+      end
     end
   end
 

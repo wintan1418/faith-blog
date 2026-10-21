@@ -22,7 +22,7 @@
 
       <%= render "devise/shared/google_sign_in" %>
 
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5", data: { turbo: false } }) do |f| %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5", data: { turbo: hotwire_native_app? } }) do |f| %>
         <div>
           <%= f.label :email, class: "label" %>
           <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input", placeholder: "you@example.com" %>

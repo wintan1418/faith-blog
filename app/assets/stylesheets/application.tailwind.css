@@ -20751,3 +20751,34 @@ html.theme-dark .fc-champ-score { color: #fbbf24; }
 /* Medal ranks on the main board reuse the trending medal treatment; keep
    the row layout width stable. */
 .fc-lb-rank.fc-trend-rank { width: 1.5rem; height: 1.5rem; font-size: 0.72rem; }
+
+/* ── Inside the iOS/Android apps (Hotwire Native) ──
+   The native tab bar replaces the web bottom nav, so hide it and drop the
+   padding reserved for it. Keep the compose button visible in the top bar. */
+body.hotwire-native .fc-bottom-nav {
+  display: none !important;
+}
+body.hotwire-native {
+  padding-bottom: 0 !important;
+}
+body.hotwire-native .fc-compose-btn {
+  display: inline-flex !important;
+}
+/* Alerts and Inbox are native tabs in the apps, so drop their top-bar shortcuts. */
+body.hotwire-native .fc-nav-notifications,
+body.hotwire-native .fc-nav-inbox {
+  display: none !important;
+}
+
+/* Phones: the inbox list is the whole screen; the "No conversation selected"
+   pane only makes sense beside the list on wider screens. */
+@media (max-width: 760px) {
+  .inbox-thread--empty {
+    display: none !important;
+  }
+}
+/* The apps draw their own native top bar (compose + menu), so the web one is hidden.
+   Its buttons stay in the page so the native bar can trigger them. */
+body.hotwire-native .fc-topbar {
+  display: none !important;
+}

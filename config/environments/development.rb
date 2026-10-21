@@ -32,6 +32,10 @@ Rails.application.configure do
   # Set RAILS_STORAGE_SERVICE=cloudinary in .env to use Cloudinary in development
   config.active_storage.service = ENV.fetch("RAILS_STORAGE_SERVICE", "local").to_sym
 
+  # Serve files through Rails instead of 5-minute signed redirects, so cached pages
+  # (Turbo snapshots, the mobile apps' web views) never show broken images.
+  config.active_storage.resolve_model_to_route = :rails_storage_proxy
+
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
