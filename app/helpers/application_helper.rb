@@ -22,6 +22,22 @@ module ApplicationHelper
   # Whether the signed-in user has joined a post's prayer chain. The set of
   # post ids the user interceded on is loaded once per request and memoized, so
   # rendering a feed of prayer cards is a single query instead of one per card.
+  # Viewer state for the card buttons, fetched once per request instead of an
+  # EXISTS query per card.
+  def bookmarked_post?(post)
+    return false unless user_signed_in?
+
+    @bookmarked_post_ids ||= current_user.bookmarks.pluck(:post_id).to_set
+    @bookmarked_post_ids.include?(post.id)
+  end
+
+  def reshared_post?(post)
+    return false unless user_signed_in?
+
+    @reshared_post_ids ||= current_user.reshares.pluck(:post_id).to_set
+    @reshared_post_ids.include?(post.id)
+  end
+
   def joined_prayer_chain?(post)
     return false unless user_signed_in?
 

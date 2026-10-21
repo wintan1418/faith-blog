@@ -116,10 +116,22 @@ class Post < ApplicationRecord
                     tsearch: { prefix: true, dictionary: "english" }
                   }
 
+  # Everything `posts/_card` touches, so a page of cards is a fixed number of
+  # queries instead of ~10 per post (author + avatar blob, images, voice note,
+  # tags, likes, moderation review, quoted post).
+  CARD_INCLUDES = [
+    :room, :tags, :rich_text_content, :ai_moderation_review, :voice_note_attachment,
+    { images_attachments: :blob },
+    { user: { profile: { avatar_attachment: :blob } } },
+    { likes: :user },
+    { quoted_post: :user }
+  ].freeze
+  scope :for_cards, -> { includes(*CARD_INCLUDES) }
+
   # Scopes
-  scope :published_status, -> { where(status: :published).where("published_at <= ?", Time.current) }
+  scope :published_status, -> { where(status: :published).where(published_at: ..Time.current) }
   scope :moderation_visible, -> { where(moderation_status: :approved) }
-  scope :scheduled_due,    -> { where(status: :scheduled).where("scheduled_for <= ?", Time.current) }
+  scope :scheduled_due,    -> { where(status: :scheduled).where(scheduled_for: ..Time.current) }
   scope :upcoming_for,     ->(user) { where(user: user, status: :scheduled).order(:scheduled_for) }
   # Public "published" feed — must be both published-status AND moderation-approved.
   # Held / blocked posts deliberately stay out of feeds; authors and admins reach
@@ -129,7 +141,7 @@ class Post < ApplicationRecord
   scope :featured, -> { where(featured: true) }
   scope :recent, -> { order(published_at: :desc) }
   scope :popular, -> { order(views_count: :desc) }
-  scope :trending, -> { published.where("published_at > ?", 7.days.ago).order(engagement_score: :desc) }
+  scope :trending, -> { published.where(published_at: 7.days.ago..).order(engagement_score: :desc) }
   scope :by_room, ->(room) { where(room: room) }
   scope :by_user, ->(user) { where(user: user) }
 

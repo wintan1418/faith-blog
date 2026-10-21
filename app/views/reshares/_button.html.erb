@@ -2,7 +2,7 @@
     - Quick repost (one click — creates a Reshare row)
     - Quote — opens the full composer with this post embedded.
     Locals: post %>
-<% if user_signed_in? && current_user.has_reshared?(post) %>
+<% if reshared_post?(post) %>
   <span id="<%= dom_id(post, :reshare) %>">
     <%= button_to post_reshare_path(post),
         method: :delete,

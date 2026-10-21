@@ -10,7 +10,7 @@ class RoomsController < ApplicationController
 
   def show
     @pagy, @posts = pagy(
-      @room.posts.published.includes(:user, :tags).recent
+      @room.posts.published.for_cards.recent
     )
     @is_member = current_user&.room_memberships&.exists?(room: @room)
   end

@@ -31,8 +31,8 @@ class UsersController < ApplicationController
       return
     end
 
-    posts    = @user.posts.published.includes(:room, :tags).recent.limit(60)
-    reshares = Reshare.where(user: @user).includes(post: [ :user, :room, :tags ])
+    posts    = @user.posts.published.for_cards.recent.limit(60)
+    reshares = Reshare.where(user: @user).includes(:user, post: Post::CARD_INCLUDES)
                       .order(created_at: :desc).limit(60)
     @items = FeedItem.merge(posts: posts, reshares: reshares)
     @pagy, @items = pagy_array(@items, items: 20)
@@ -42,7 +42,7 @@ class UsersController < ApplicationController
   def posts
     @profile_private = !profile_visible_to_viewer?(@user)
     scope = @profile_private ? @user.posts.none : @user.posts.published
-    @pagy, @posts = pagy(scope.includes(:room, :tags).recent)
+    @pagy, @posts = pagy(scope.for_cards.recent)
     render :show
   end
 

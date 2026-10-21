@@ -38,7 +38,7 @@ class ScripturePagesController < ApplicationController
     Post.published
         .left_joins(:rich_text_content)
         .where("action_text_rich_texts.body ILIKE :p OR posts.title ILIKE :p", p: pattern)
-        .includes(:user, :room, :tags, :rich_text_content)
+        .for_cards
         .recent
         .limit(30)
   end

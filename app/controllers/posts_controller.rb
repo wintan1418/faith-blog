@@ -10,7 +10,7 @@ class PostsController < ApplicationController
 
   def index
     @pagy, @posts = pagy(
-      Post.published.includes(:user, :room, :tags).recent
+      Post.published.for_cards.recent
     )
   end
 

@@ -131,7 +131,7 @@
 
       <% if post.tags.any? %>
         <div class="fc-breath-tags">
-          <% post.tags.limit(4).each do |tag| %>
+          <% post.tags.to_a.first(4).each do |tag| %>
             <%= link_to "##{tag.name}", search_path(q: tag.name), class: "fc-breath-tag" %>
           <% end %>
         </div>

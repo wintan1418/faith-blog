@@ -5,7 +5,7 @@ class BookmarksController < ApplicationController
   before_action :set_post
 
   def index
-    @pagy, @posts = pagy(current_user.bookmarked_posts.includes(:user, :room).recent)
+    @pagy, @posts = pagy(current_user.bookmarked_posts.for_cards.recent)
   end
 
   def create

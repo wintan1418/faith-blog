@@ -1,6 +1,6 @@
 <span id="<%= dom_id(post, :bookmark) %>">
   <% if user_signed_in? %>
-    <% if current_user.has_bookmarked?(post) %>
+    <% if bookmarked_post?(post) %>
       <%= button_to post_bookmark_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove bookmark", data: { turbo_frame: "_top" } do %>
         <%= render_icon("bookmark", classes: "h-4 w-4") %>
         <span class="fc-action-label">Saved</span>

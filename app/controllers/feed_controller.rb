@@ -35,7 +35,7 @@ class FeedController < ApplicationController
 
   def trending
     posts = feed_posts_scope
-                .where("published_at > ?", 7.days.ago)
+                .where(published_at: 7.days.ago..)
                 .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
                 .limit(POSTS_BUFFER)
 
@@ -77,7 +77,7 @@ class FeedController < ApplicationController
   end
 
   def feed_post_includes
-    [ :user, :room, :tags, :rich_text_content, { likes: :user } ]
+    Post::CARD_INCLUDES
   end
 
   def respond_to_feed
@@ -103,14 +103,14 @@ class FeedController < ApplicationController
     @user_reading_plan = current_user.user_reading_plans.where(completed: false).order(updated_at: :desc).first
 
     @trending_breaths = Post.published
-                            .where("published_at > ?", 7.days.ago)
+                            .where(published_at: 7.days.ago..)
                             .includes(:user, :room)
                             .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
                             .limit(4)
 
     following_ids = current_user.following.pluck(:id) << current_user.id
     active_author_ids = Post.published
-                            .where("published_at > ?", 30.days.ago)
+                            .where(published_at: 30.days.ago..)
                             .where.not(user_id: following_ids)
                             .group(:user_id)
                             .order(Arel.sql("COUNT(*) DESC"))

@@ -8,7 +8,7 @@ class AnsweredPrayersController < ApplicationController
     scope = Post.published
                 .answered_prayers
                 .where.not(prayer_answered_at: nil)
-                .includes(:user, :room, :rich_text_content)
+                .for_cards
                 .order(prayer_answered_at: :desc)
 
     @total_answered   = scope.count

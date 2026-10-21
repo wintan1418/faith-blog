@@ -23,7 +23,7 @@ class SearchController < ApplicationController
       @pagy, @results = pagy(Resource.approved.search(@query).includes(:resource_category, :user))
       @result_type = :resources
     else
-      @pagy, @results = pagy(Post.published.search(@query).includes(:user, :room, :tags))
+      @pagy, @results = pagy(Post.published.search(@query).for_cards)
       @result_type = :posts
     end
   end
