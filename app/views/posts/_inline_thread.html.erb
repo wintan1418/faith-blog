@@ -27,7 +27,7 @@
           composer_assistant_scripture_url_value:  suggest_scripture_posts_path
         } do |f| %>
       <% if current_user.profile&.avatar&.attached? %>
-        <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+        <%= image_tag current_user.profile.avatar_thumbnail, class: "fc-avatar object-cover" %>
       <% else %>
         <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
       <% end %>

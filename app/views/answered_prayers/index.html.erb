@@ -37,7 +37,7 @@
               <% else %>
                 <% if post.user.profile&.avatar&.attached? %>
                   <%= link_to user_path(post.user.username) do %>
-                    <%= image_tag post.user.profile.avatar, class: "fc-avatar object-cover", alt: post.user.username %>
+                    <%= image_tag post.user.profile.avatar_thumbnail, class: "fc-avatar object-cover", alt: post.user.username %>
                   <% end %>
                 <% else %>
                   <%= link_to user_path(post.user.username), class: "fc-avatar", style: avatar_tint_style(post.user.username) do %>

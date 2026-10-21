@@ -22,7 +22,7 @@
             <% @sent_requests.each do |request| %>
               <div class="flex items-center gap-4 py-4">
                 <% if request.receiver.profile&.avatar&.attached? %>
-                  <%= image_tag request.receiver.profile.avatar, class: "mystic-avatar h-12 w-12 object-cover" %>
+                  <%= image_tag request.receiver.profile.avatar_medium, class: "mystic-avatar h-12 w-12 object-cover" %>
                 <% else %>
                   <span class="mystic-avatar mystic-avatar-fallback grid h-12 w-12 place-items-center font-bold">
                     <%= request.receiver.display_name.first.upcase %>

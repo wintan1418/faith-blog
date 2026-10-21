@@ -148,7 +148,7 @@
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <% saved_images.each do |image| %>
           <div class="relative">
-            <%= image_tag image, class: "w-full h-24 object-cover rounded-lg" %>
+            <%= image_tag sized_image(image, max: 400), class: "w-full h-24 object-cover rounded-lg" %>
             <label class="absolute top-1 right-1 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-semibold text-white cursor-pointer select-none">
               <input type="checkbox" name="post[remove_image_ids][]" value="<%= image.id %>" class="h-3 w-3 accent-red-500">
               Remove

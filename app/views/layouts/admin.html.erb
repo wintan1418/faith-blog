@@ -112,7 +112,7 @@
               </button>
               <div class="fc-avatar" title="<%= current_user.username %>">
                 <% if current_user.profile&.avatar&.attached? %>
-                  <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover", alt: current_user.username %>
+                  <%= image_tag current_user.profile.avatar_thumbnail, class: "h-full w-full rounded-full object-cover", alt: current_user.username %>
                 <% else %>
                   <%= current_user.username.first.upcase %>
                 <% end %>

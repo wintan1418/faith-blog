@@ -8,7 +8,7 @@
     <% else %>
       <% if post.user.profile&.avatar&.attached? %>
         <%= link_to user_path(post.user.username), class: "post-author-avatar" do %>
-          <%= image_tag post.user.profile.avatar, class: "object-cover", alt: post.user.username %>
+          <%= image_tag post.user.profile.avatar_medium, class: "object-cover", alt: post.user.username %>
         <% end %>
       <% else %>
         <%= link_to user_path(post.user.username), class: "post-author-avatar" do %>

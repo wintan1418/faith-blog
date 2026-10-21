@@ -8,7 +8,7 @@
           data: { turbo_frame: "_top" } do %>
         <% if notification.actor %>
           <% if notification.actor.profile&.avatar&.attached? %>
-            <%= image_tag notification.actor.profile.avatar, class: "fc-avatar object-cover", alt: notification.actor.username %>
+            <%= image_tag notification.actor.profile.avatar_thumbnail, class: "fc-avatar object-cover", alt: notification.actor.username %>
           <% else %>
             <span class="fc-avatar" style="<%= avatar_tint_style(notification.actor.username) %>"><%= notification.actor.username.first.upcase %></span>
           <% end %>

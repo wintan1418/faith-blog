@@ -94,7 +94,7 @@
       <% @recent_users.each do |user| %>
         <%= link_to admin_user_path(user), class: "flex items-center gap-3 px-5 py-4 hover:bg-[var(--fc-surface-2)]" do %>
           <% if user.profile.avatar.attached? %>
-            <%= image_tag user.profile.avatar, class: "fc-avatar object-cover" %>
+            <%= image_tag user.profile.avatar_thumbnail, class: "fc-avatar object-cover" %>
           <% else %>
             <span class="fc-avatar" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
           <% end %>

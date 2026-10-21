@@ -10,7 +10,7 @@
 
   <div class="fc-voice-banner-dp">
     <% if display_user&.profile&.avatar&.attached? %>
-      <%= image_tag display_user.profile.avatar, class: "fc-voice-banner-avatar object-cover", alt: display_user.username %>
+      <%= image_tag display_user.profile.avatar_thumbnail, class: "fc-voice-banner-avatar object-cover", alt: display_user.username %>
     <% elsif display_user %>
       <span class="fc-voice-banner-avatar fc-voice-banner-avatar--fallback"
             style="<%= avatar_tint_style(display_user.username) %>">

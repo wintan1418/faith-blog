@@ -22,6 +22,13 @@ module ApplicationHelper
   # Whether the signed-in user has joined a post's prayer chain. The set of
   # post ids the user interceded on is loaded once per request and memoized, so
   # rendering a feed of prayer cards is a single query instead of one per card.
+  # Uploads are phone photos of several MB and nothing on the site renders
+  # wider than ~1200px. Serve a bounded variant (processed once, then stored)
+  # and leave the original for downloads / the lightbox link.
+  def sized_image(attachment, max: 1200)
+    attachment.variable? ? attachment.variant(resize_to_limit: [ max, max ]) : attachment
+  end
+
   # Viewer state for the card buttons, fetched once per request instead of an
   # EXISTS query per card.
   def bookmarked_post?(post)
