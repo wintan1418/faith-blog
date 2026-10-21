@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_28_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_21_230000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -146,7 +146,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_100000) do
   create_table "broadcasts", force: :cascade do |t|
     t.string "subject", limit: 200, null: false
     t.string "preheader", limit: 200
-    t.bigint "sender_id", null: false
+    t.bigint "sender_id"
     t.integer "status", default: 0, null: false
     t.datetime "sent_at"
     t.integer "recipients_count", default: 0, null: false
@@ -416,7 +416,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_28_100000) do
   end
 
   create_table "moderation_logs", force: :cascade do |t|
-    t.bigint "moderator_id", null: false
+    t.bigint "moderator_id"
     t.string "action", null: false
     t.string "target_type", null: false
     t.bigint "target_id", null: false

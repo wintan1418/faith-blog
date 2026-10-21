@@ -27,6 +27,12 @@ class User < ApplicationRecord
   has_many :reshared_posts, through: :reshares, source: :post
   has_many :resources, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  # Notifications this user triggered for others: keep them, show "Someone".
+  has_many :acted_notifications, class_name: "Notification", foreign_key: :actor_id, dependent: :nullify
+  has_many :mentions, dependent: :delete_all
+  has_many :reviewed_reports, class_name: "Report", foreign_key: :reviewed_by_id, dependent: :nullify
+  has_many :approved_resources, class_name: "Resource", foreign_key: :approved_by_id, dependent: :nullify
+  has_many :sent_broadcasts, class_name: "Broadcast", foreign_key: :sender_id, dependent: :nullify
   has_many :reports, foreign_key: :reporter_id, dependent: :destroy
   has_many :moderation_logs, foreign_key: :moderator_id, dependent: :nullify
   has_one  :risk_profile, class_name: "UserRiskProfile", dependent: :destroy
@@ -36,6 +42,9 @@ class User < ApplicationRecord
   has_many :circle_memberships, dependent: :destroy
   has_many :circles, through: :circle_memberships
   has_many :owned_circles, class_name: "Circle", foreign_key: :owner_id, dependent: :destroy
+  has_many :circle_breaths, dependent: :destroy
+  has_many :circle_prayers, dependent: :destroy
+  has_many :circle_prayer_amens, dependent: :destroy
   has_many :user_reading_plans, dependent: :destroy
   has_many :push_subscriptions, dependent: :destroy
   has_many :conversation_participants, dependent: :destroy

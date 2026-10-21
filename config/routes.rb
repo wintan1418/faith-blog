@@ -17,6 +17,8 @@ Rails.application.routes.draw do
   get "about", to: "pages#about"
   get "guidelines", to: "pages#guidelines"
   get "contact", to: "pages#contact"
+  get "privacy", to: "pages#privacy"
+  get "terms", to: "pages#terms"
 
   # Main feed
   get "feed", to: "feed#index"
@@ -185,7 +187,9 @@ Rails.application.routes.draw do
   namespace :settings do
     get "/", to: redirect("/settings/profile/edit")
     resource :profile, only: [ :edit, :update ]
-    resource :account, only: [ :edit, :update ]
+    resource :account, only: [ :edit, :update, :destroy ] do
+      get :delete # confirmation screen before destroy
+    end
     resource :notifications, only: [ :edit, :update ]
     resource :privacy, only: [ :edit, :update ]
     resource :brethren_card, only: [ :edit, :update ]

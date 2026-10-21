@@ -57,7 +57,11 @@
         <%= f.submit "Create Account", class: "btn btn-primary btn-lg w-full" %>
 
         <p class="text-center text-xs leading-5 text-faith-muted">
-          By creating an account, you agree to follow the community guidelines and treat others with care.
+          By creating an account, you agree to our
+          <%= link_to "Terms of Use", terms_path, class: "underline", data: { turbo_frame: "_top" } %>,
+          <%= link_to "Community Guidelines", guidelines_path, class: "underline", data: { turbo_frame: "_top" } %>
+          and <%= link_to "Privacy Policy", privacy_path, class: "underline", data: { turbo_frame: "_top" } %>,
+          including no tolerance for abusive or objectionable content.
         </p>
       <% end %>
 

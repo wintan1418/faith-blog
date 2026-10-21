@@ -61,7 +61,11 @@
     <div class="mt-6 rounded-3xl border border-red-200 bg-red-50/80 p-6">
       <h2 class="text-lg font-bold text-red-900">Danger Zone</h2>
       <p class="mt-1 text-sm text-red-700">Irreversible account actions live here.</p>
-      <%= button_to "Delete Account", edit_user_registration_path, method: :get, class: "btn btn-danger mt-4", data: { turbo_confirm: "Are you absolutely sure you want to delete your account? This cannot be undone." } %>
+      <%= link_to "Delete Account", delete_settings_account_path, class: "btn btn-danger mt-4" %>
+      <p class="mt-4 text-xs text-red-700">
+        <%= link_to "Privacy Policy", privacy_path, class: "underline" %> ·
+        <%= link_to "Terms of Use", terms_path, class: "underline" %>
+      </p>
     </div>
   </div>
 </div>

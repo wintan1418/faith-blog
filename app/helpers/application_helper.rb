@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  # Where people reach us about privacy, accounts and safety (privacy policy, terms).
+  def support_email
+    ENV.fetch("SUPPORT_EMAIL", "support@brethreign.com")
+  end
+
   include Pagy::Frontend
 
   def page_title(title = nil)
