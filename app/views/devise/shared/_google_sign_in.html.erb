@@ -1,4 +1,5 @@
-<% if ENV["GOOGLE_CLIENT_ID"].present? && ENV["GOOGLE_CLIENT_SECRET"].present? %>
+<%# Hidden in the mobile apps: Google blocks its sign-in inside embedded web views. %>
+<% if ENV["GOOGLE_CLIENT_ID"].present? && ENV["GOOGLE_CLIENT_SECRET"].present? && !hotwire_native_app? %>
   <div class="auth-divider">
     <span>or</span>
   </div>

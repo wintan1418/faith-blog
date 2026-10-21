@@ -282,6 +282,11 @@ Rails.application.routes.draw do
       to: "email_unsubscribes#weekly_digest",
       as: :email_unsubscribes_weekly_digest
 
+  # Mobile apps (Hotwire Native)
+  get "me", to: "me#show", as: :me
+  get "configurations/ios_v1.json",     to: "configurations#ios_v1",     defaults: { format: :json }
+  get "configurations/android_v1.json", to: "configurations#android_v1", defaults: { format: :json }
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end
