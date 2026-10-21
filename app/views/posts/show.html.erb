@@ -46,7 +46,7 @@
 
           <% if @post.has_images? %>
             <figure class="post-hero">
-              <%= image_tag sized_image(@post.images.first, max: 1600), alt: @post.title %>
+              <%= image_tag @post.images.first, alt: @post.title %>
             </figure>
           <% end %>
 
@@ -98,7 +98,7 @@
                 <%= form_with model: [@post, @new_comment], id: "comment_form", class: "composer-form",
                               data: { controller: "pristine-field" } do |f| %>
                   <% if current_user.profile&.avatar&.attached? %>
-                    <%= image_tag current_user.profile.avatar_thumbnail, class: "composer-avatar object-cover" %>
+                    <%= image_tag current_user.profile.avatar, class: "composer-avatar object-cover" %>
                   <% else %>
                     <span class="composer-avatar"><%= current_user.username.first.upcase %></span>
                   <% end %>

@@ -160,7 +160,7 @@
       <div class="fc-panel fc-composer">
         <div class="fc-composer-row">
           <% if current_user.profile&.avatar&.attached? %>
-            <%= image_tag current_user.profile.avatar_thumbnail, class: "fc-avatar object-cover" %>
+            <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
           <% else %>
             <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
           <% end %>
@@ -216,7 +216,7 @@
                  data-auto-dismiss-persist-key-value="join-<%= joiner.id %>"
                  data-auto-dismiss-store-key-value="fc:joins-dismissed">
               <% if joiner.user.profile&.avatar&.attached? %>
-                <%= image_tag joiner.user.profile.avatar_thumbnail, class: "fc-avatar object-cover" %>
+                <%= image_tag joiner.user.profile.avatar, class: "fc-avatar object-cover" %>
               <% else %>
                 <span class="fc-avatar" style="<%= avatar_tint_style(joiner.user.username) %>">
                   <%= joiner.user.username.first.upcase %>
@@ -287,7 +287,7 @@
                     <% @who_to_brethren.first(3).each do |u| %>
                       <li>
                         <% if u.profile&.avatar&.attached? %>
-                          <%= image_tag u.profile.avatar_thumbnail, class: "fc-avatar object-cover" %>
+                          <%= image_tag u.profile.avatar, class: "fc-avatar object-cover" %>
                         <% else %>
                           <span class="fc-avatar" style="<%= avatar_tint_style(u.username) %>"><%= u.username.first.upcase %></span>
                         <% end %>
@@ -689,7 +689,7 @@
               <div class="flex items-center gap-3">
                 <% if user.profile&.avatar&.attached? %>
                   <%= link_to user_path(user.username) do %>
-                    <%= image_tag user.profile.avatar_thumbnail, class: "fc-avatar object-cover", alt: user.username %>
+                    <%= image_tag user.profile.avatar, class: "fc-avatar object-cover", alt: user.username %>
                   <% end %>
                 <% else %>
                   <%= link_to user.username.first.upcase, user_path(user.username), class: "fc-avatar" %>

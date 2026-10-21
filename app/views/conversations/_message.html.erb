@@ -37,7 +37,7 @@
           <div class="message-images <%= "is-grid-#{[message.images.count, 4].min}" %>">
             <% message.images.each do |img| %>
               <a href="<%= url_for(img) %>" target="_blank" rel="noopener" class="message-image-link">
-                <%= image_tag sized_image(img), class: "message-image", loading: "lazy", alt: "Attachment" %>
+                <%= image_tag img, class: "message-image", loading: "lazy", alt: "Attachment" %>
               </a>
             <% end %>
           </div>

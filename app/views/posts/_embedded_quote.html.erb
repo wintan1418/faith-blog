@@ -33,7 +33,7 @@
         <span class="fc-embedded-quote-name">Anonymous</span>
       <% else %>
         <% if quoted.user.profile&.avatar&.attached? %>
-          <%= image_tag quoted.user.profile.avatar_thumbnail,
+          <%= image_tag quoted.user.profile.avatar,
                         class: "fc-embedded-quote-avatar object-cover",
                         alt: quoted.user.username %>
         <% else %>

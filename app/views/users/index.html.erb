@@ -31,7 +31,7 @@
           <li class="fc-people-row">
             <%= link_to user_path(user.username), class: "fc-people-avatar" do %>
               <% if user.profile&.avatar&.attached? %>
-                <%= image_tag user.profile.avatar_medium, class: "object-cover", alt: user.username %>
+                <%= image_tag user.profile.avatar, class: "object-cover", alt: user.username %>
               <% else %>
                 <span><%= user.username.first.upcase %></span>
               <% end %>

@@ -16,7 +16,7 @@
   <div class="fc-comment-grid">
     <%= link_to user_path(comment.user.username), class: "fc-comment-avatar" do %>
       <% if comment.user.profile&.avatar&.attached? %>
-        <%= image_tag comment.user.profile.avatar_thumbnail, class: "fc-avatar object-cover", alt: comment.user.username %>
+        <%= image_tag comment.user.profile.avatar, class: "fc-avatar object-cover", alt: comment.user.username %>
       <% else %>
         <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
       <% end %>
@@ -112,7 +112,7 @@
           <div class="fc-comment-reply-form hidden" data-reply-toggle-target="form">
             <%= form_with url: reply_post_comment_path(post, comment), scope: :comment, class: "fc-inline-reply" do |f| %>
               <% if current_user.profile&.avatar&.attached? %>
-                <%= image_tag current_user.profile.avatar_thumbnail, class: "fc-avatar object-cover" %>
+                <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
               <% else %>
                 <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
               <% end %>

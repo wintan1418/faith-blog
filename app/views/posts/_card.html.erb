@@ -28,7 +28,7 @@
         <span class="fc-avatar"><%= render_icon("users", classes: "h-4 w-4") %></span>
       <% elsif post.user.profile&.avatar&.attached? %>
         <%= link_to user_path(post.user.username) do %>
-          <%= image_tag post.user.profile.avatar_thumbnail, class: "fc-avatar object-cover", alt: post.user.username %>
+          <%= image_tag post.user.profile.avatar, class: "fc-avatar object-cover", alt: post.user.username %>
         <% end %>
       <% else %>
         <%= link_to user_path(post.user.username), class: "fc-avatar", style: avatar_tint_style(post.user.username) do %>
@@ -124,7 +124,7 @@
         %>
         <div class="<%= grid_class %>" data-controller="lightbox">
           <% imgs.each do |img| %>
-            <%= image_tag sized_image(img), class: "fc-breath-media-image", alt: post.title, loading: "lazy" %>
+            <%= image_tag img, class: "fc-breath-media-image", alt: post.title, loading: "lazy" %>
           <% end %>
         </div>
       <% end %>

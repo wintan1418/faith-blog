@@ -17,7 +17,7 @@
           <div class="mystic-panel p-5">
             <div class="flex items-start gap-4">
               <% if user.profile&.avatar&.attached? %>
-                <%= image_tag user.profile.avatar_medium, class: "mystic-avatar h-16 w-16 object-cover" %>
+                <%= image_tag user.profile.avatar, class: "mystic-avatar h-16 w-16 object-cover" %>
               <% else %>
                 <span class="mystic-avatar mystic-avatar-fallback grid h-16 w-16 place-items-center text-xl font-bold">
                   <%= user.display_name.first.upcase %>

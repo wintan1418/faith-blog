@@ -14,7 +14,7 @@
           <div class="circle-avatar-stack">
             <% @members.first(8).each do |member| %>
               <% if member.profile&.avatar&.attached? %>
-                <%= image_tag member.profile.avatar_thumbnail, class: "fc-avatar object-cover", title: member.username, alt: member.username %>
+                <%= image_tag member.profile.avatar, class: "fc-avatar object-cover", title: member.username, alt: member.username %>
               <% else %>
                 <span class="fc-avatar" style="<%= avatar_tint_style(member.username) %>" title="<%= member.username %>"><%= member.username.first.upcase %></span>
               <% end %>
@@ -55,7 +55,7 @@
             <% @breaths.each do |breath| %>
               <article class="circle-breath">
                 <% if breath.user.profile&.avatar&.attached? %>
-                  <%= image_tag breath.user.profile.avatar_thumbnail, class: "fc-avatar object-cover", alt: breath.user.username %>
+                  <%= image_tag breath.user.profile.avatar, class: "fc-avatar object-cover", alt: breath.user.username %>
                 <% else %>
                   <span class="fc-avatar" style="<%= avatar_tint_style(breath.user.username) %>"><%= breath.user.username.first.upcase %></span>
                 <% end %>
