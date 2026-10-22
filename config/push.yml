@@ -1,0 +1,17 @@
+# Native push for the iOS and Android apps (gem: action_push_native).
+# Configured with environment variables, like the rest of production (Hatchbox).
+# Each platform stays switched off until its variables are set; see NativePushConfig.
+shared:
+  apple:
+    key_id: <%= ENV["APNS_KEY_ID"] %>
+    # Contents of the AuthKey_XXXXXX.p8 file from developer.apple.com (Keys).
+    encryption_key: <%= ENV["APNS_KEY"].to_s.gsub("\\n", "\n").dump %>
+    team_id: <%= ENV["APNS_TEAM_ID"] %>
+    topic: <%= ENV.fetch("APNS_TOPIC", "com.brethreign.app") %>
+    # Builds run from Xcode get development tokens; TestFlight/App Store get production ones.
+    connect_to_development_server: <%= ENV["APNS_DEVELOPMENT"] == "1" %>
+
+  google:
+    # The Firebase service account JSON (Project settings → Service accounts → Generate key).
+    encryption_key: <%= ENV["FCM_SERVICE_ACCOUNT_JSON"].to_s.dump %>
+    project_id: <%= ENV["FCM_PROJECT_ID"] %>
