@@ -9,7 +9,7 @@ class PwaController < ApplicationController
 
   def manifest
     render json: {
-      name: "Brethreign — Faith Community",
+      name: "Brethreign",
       short_name: "Brethreign",
       description: "Breathe into the faith community.",
       start_url: "/feed",
