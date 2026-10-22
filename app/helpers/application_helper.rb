@@ -9,7 +9,7 @@ module ApplicationHelper
   include Pagy::Frontend
 
   def page_title(title = nil)
-    base_title = "Faith Community"
+    base_title = "Brethreign"
     title.present? ? "#{title} - #{base_title}" : base_title
   end
 

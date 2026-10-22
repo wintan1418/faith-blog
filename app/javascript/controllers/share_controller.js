@@ -229,7 +229,7 @@ export default class extends Controller {
     ctx.font = `800 22px ${FONT}`
     ctx.textAlign = "left"
     ctx.textBaseline = "middle"
-    ctx.fillText("Faith Community", PAD_X + badge + 14, y + badge / 2 + 1)
+    ctx.fillText("Brethreign", PAD_X + badge + 14, y + badge / 2 + 1)
 
     y += badge + 28
 
@@ -335,7 +335,7 @@ export default class extends Controller {
     ctx.fillText("@" + author, PAD_X + avatarSize + 14, footerTop + 2)
     ctx.fillStyle = "#8a9893"
     ctx.font = `600 16px ${FONT}`
-    ctx.fillText("read more on Faith Community", PAD_X + avatarSize + 14, footerTop + 28)
+    ctx.fillText("read more on Brethreign", PAD_X + avatarSize + 14, footerTop + 28)
 
     // CTA
     ctx.textAlign = "right"

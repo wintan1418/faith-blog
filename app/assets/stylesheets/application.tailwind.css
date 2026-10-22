@@ -20782,3 +20782,31 @@ body.hotwire-native .fc-nav-inbox {
 body.hotwire-native .fc-topbar {
   display: none !important;
 }
+
+/* ── Inside the apps: feel native, not like a website ──
+   Phones are small, so the scripture rain is a faint shimmer rather than
+   text competing with posts. */
+body.hotwire-native .fc-rain {
+  opacity: 0.3;
+}
+/* No grey flash when tapping, and no "open link / copy" pop-up on long-press. */
+body.hotwire-native {
+  -webkit-tap-highlight-color: transparent;
+}
+body.hotwire-native a,
+body.hotwire-native button,
+body.hotwire-native img {
+  -webkit-touch-callout: none;
+}
+/* Buttons, tabs and menus aren't text to select; posts, comments and messages still are. */
+body.hotwire-native button,
+body.hotwire-native nav,
+body.hotwire-native [role="tab"],
+body.hotwire-native [role="menu"],
+body.hotwire-native .fc-btn,
+body.hotwire-native .fc-icon-btn,
+body.hotwire-native .fc-avatar,
+body.hotwire-native label {
+  -webkit-user-select: none;
+  user-select: none;
+}
