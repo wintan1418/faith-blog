@@ -25,7 +25,7 @@
       })();
     </script>
     <%# In the mobile apps the title becomes the native header, so drop the site-name suffix ("Inbox - Brethreign" → "Inbox"). %>
-    <title><%= hotwire_native_app? ? (content_for(:title).to_s.split(/\s[-·—|]\s/).first.presence || "Brethreign") : (content_for(:title) || "Brethreign — breathe") %></title>
+    <title><%= hotwire_native_app? ? native_app_title : (content_for(:title) || "Brethreign — breathe") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="description" content="<%= content_for?(:meta_description) ? content_for(:meta_description) : "A community where Christians breathe — share testimonies, read scripture, pray for one another." %>">
     <meta name="apple-mobile-web-app-capable" content="yes">
