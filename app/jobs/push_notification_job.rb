@@ -6,10 +6,20 @@ class PushNotificationJob < ApplicationJob
 
   def perform(notification)
     return unless notification
-    return unless WebPushConfig.configured?
 
     user = notification.user
     return unless user
+
+    deliver_web(notification, user)
+    deliver_native(notification, user)
+  end
+
+  private
+
+  # Browsers (web push)
+  def deliver_web(notification, user)
+    return unless WebPushConfig.configured?
+
     subs = user.push_subscriptions
     return if subs.empty?
 
@@ -19,7 +29,20 @@ class PushNotificationJob < ApplicationJob
     end
   end
 
-  private
+  # iOS / Android apps. Tapping the push opens `path` inside the app.
+  def deliver_native(notification, user)
+    devices = user.push_devices.deliverable.to_a
+    return if devices.empty?
+
+    ApplicationPushNotification.new(
+      title:     "Brethreign",
+      body:      notification.message,
+      badge:     user.notifications.unread.count,
+      thread_id: push_tag(notification),
+      sound:     "default",
+      data:      { path: notification.target_path }
+    ).deliver_later_to(devices)
+  end
 
   def build_payload(notification)
     {

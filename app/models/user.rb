@@ -47,6 +47,8 @@ class User < ApplicationRecord
   has_many :circle_prayer_amens, dependent: :destroy
   has_many :user_reading_plans, dependent: :destroy
   has_many :push_subscriptions, dependent: :destroy
+  # Phones running the iOS / Android apps
+  has_many :push_devices, class_name: "ApplicationPushDevice", as: :owner, dependent: :destroy
   has_many :conversation_participants, dependent: :destroy
   has_many :conversations, through: :conversation_participants
   has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy

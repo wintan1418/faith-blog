@@ -193,8 +193,9 @@ class Notification < ApplicationRecord
   end
 
   def deliver_push_notification
-    return unless WebPushConfig.configured?
-    return if user.push_subscriptions.none?
+    web    = WebPushConfig.configured? && user.push_subscriptions.exists?
+    native = NativePushConfig.configured? && user.push_devices.deliverable.exists?
+    return unless web || native
 
     PushNotificationJob.perform_later(self)
   end

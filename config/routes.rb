@@ -287,6 +287,8 @@ Rails.application.routes.draw do
       as: :email_unsubscribes_weekly_digest
 
   # Mobile apps (Hotwire Native)
+  post   "push_devices", to: "push_devices#create",  as: :push_devices
+  delete "push_devices", to: "push_devices#destroy"
   get "me", to: "me#show", as: :me
   get "configurations/ios_v1.json",     to: "configurations#ios_v1",     defaults: { format: :json }
   get "configurations/android_v1.json", to: "configurations#android_v1", defaults: { format: :json }
