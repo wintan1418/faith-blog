@@ -126,7 +126,12 @@ class Notification < ApplicationRecord
     when :new_comment, :comment_reply
       Rails.application.routes.url_helpers.post_path(notifiable.post)
     when :new_follower
-      Rails.application.routes.url_helpers.user_path(actor.username)
+      # The follower may have deleted their account since (actor is then nil).
+      if actor
+        Rails.application.routes.url_helpers.user_path(actor.username)
+      else
+        Rails.application.routes.url_helpers.notifications_path
+      end
     when :badge_earned
       Rails.application.routes.url_helpers.user_path(user.username)
     when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked, :thread_new_voice

@@ -64,4 +64,18 @@ class UserDeletionTest < ActiveSupport::TestCase
     assert_equal 0, CircleBreath.where(circle: their_circle).count
     assert Circle.exists?(their_circle.id), "other people's circles are untouched"
   end
+
+  test "a follower who leaves doesn't break the followed user's notifications" do
+    follower = make_user
+    followed = make_user
+    notification = Notification.create!(
+      user: followed, actor: follower, notifiable: follower, notification_type: :new_follower
+    )
+
+    follower.destroy!
+
+    assert_nil notification.reload.actor
+    assert_equal Rails.application.routes.url_helpers.notifications_path, notification.target_path
+    assert_match "Someone", notification.message
+  end
 end
