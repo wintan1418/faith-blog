@@ -295,6 +295,7 @@ Rails.application.routes.draw do
   get  "auth/google/native/start", to: "users/native_google_sessions#start", as: :native_google_start
   post "auth/google/native",       to: "users/native_google_sessions#create", as: :native_google_sign_in
 
+  get ".well-known/assetlinks.json", to: "well_known#assetlinks", defaults: { format: :json }
   get "me", to: "me#show", as: :me
   get "configurations/ios_v1.json",     to: "configurations#ios_v1",     defaults: { format: :json }
   get "configurations/android_v1.json", to: "configurations#android_v1", defaults: { format: :json }
