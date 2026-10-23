@@ -14,7 +14,7 @@
         document.documentElement.classList.toggle('theme-light', !dark);
       })();
     </script>
-    <title><%= content_for(:title) || "Admin - Brethreign" %></title>
+    <title><%= hotwire_native_app? ? (content_for?(:title) ? native_app_title : "Admin") : (content_for(:title) || "Admin - Brethreign") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -28,7 +28,15 @@
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
-  <body class="h-full font-sans antialiased theme-light">
+  <%# Same markers as the main layout: the apps read them to know you're still signed in
+      (without them, opening Admin looked like a sign-out and sent the app back to Feed). %>
+  <body class="h-full font-sans antialiased theme-light<%= ' hotwire-native' if hotwire_native_app? %>"
+        data-native-signed-in="<%= user_signed_in? %>"
+        data-native-admin="<%= user_signed_in? && current_user_admin? %>"
+        <% if hotwire_native_app? && user_signed_in? %>
+        data-native-unread-notifications="<%= current_user.unread_notifications_count.to_i %>"
+        data-native-unread-messages="<%= current_user.unread_conversations_count.to_i %>"
+        <% end %>>
     <script>
       (function() {
         var dark = document.documentElement.classList.contains('theme-dark');

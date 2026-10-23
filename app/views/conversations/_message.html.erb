@@ -2,12 +2,11 @@
 <%# Never touch current_user eagerly — this partial is also rendered in
     Action Cable broadcasts (no request context), where current_user raises. %>
 <% viewer_id = local_assigns[:viewer_id] || current_user&.id %>
-<% last_mine_id = local_assigns[:last_mine_id] %>
-<% conversation_local = local_assigns[:conversation] || message.conversation %>
+<%# The thread passes the previous message; live appends and edits look it up. %>
+<% previous = local_assigns.key?(:previous) ? local_assigns[:previous] : message.previous_in_thread %>
 <% mine = message.sender_id == viewer_id %>
 <% deleted = message.deleted? %>
-<% show_status = mine && !deleted && message.id == last_mine_id %>
-<% seen_by_other = show_status && conversation_local.read_by_other?(message) %>
+<% starts_group = message_starts_group?(message, previous) %>
 
 <%
   loaded_likes = message.likes.includes(:user).to_a
@@ -19,130 +18,111 @@
                    .first(4)
 %>
 
-<div id="<%= dom_id(message) %>" class="message-row <%= mine ? 'is-mine' : 'is-theirs' %><%= ' is-deleted' if deleted %>">
-  <% unless mine %>
-    <%= render "conversations/avatar", user: message.sender, size: "h-8 w-8" %>
+<div id="<%= dom_id(message) %>" class="msg-item <%= mine ? 'is-mine' : 'is-theirs' %><%= ' starts-group' if starts_group %><%= ' is-deleted' if deleted %>">
+  <% if message_starts_day?(message, previous) %>
+    <div class="msg-day" role="separator"><span><%= local_time_tag(message.created_at, "day", message_day_label(message.created_at)) %></span></div>
   <% end %>
 
-  <div class="message-stack">
-    <div class="message-bubble" data-controller="message-menu" data-action="click->message-menu#toggle">
-      <% if deleted %>
-        <div class="message-deleted">— message deleted —</div>
+  <div class="msg-line">
+    <div class="msg-gutter">
+      <% if starts_group %>
+        <%= render "conversations/avatar", user: message.sender, size: "h-10 w-10" %>
       <% else %>
-        <% if message.has_scripture? %>
-          <%= render "conversations/scripture_card", message: message %>
-        <% end %>
-
-        <% if message.has_images? %>
-          <div class="message-images <%= "is-grid-#{[message.images.count, 4].min}" %>">
-            <% message.images.each do |img| %>
-              <a href="<%= url_for(img) %>" target="_blank" rel="noopener" class="message-image-link">
-                <%= image_tag img, class: "message-image", loading: "lazy", alt: "Attachment" %>
-              </a>
-            <% end %>
-          </div>
-        <% end %>
-
-        <% if message.has_voice_note? %>
-          <audio controls preload="metadata" class="message-voice"
-                 src="<%= url_for(message.voice_note) %>"></audio>
-        <% end %>
-
-        <% if message.body.present? %>
-          <div class="message-body"><%= simple_format(message.body) %></div>
-        <% end %>
-      <% end %>
-
-      <span class="message-meta">
-        <%= message.created_at.strftime("%I:%M %p") %>
-        <% if message.respond_to?(:edited?) && message.edited? %>
-          <span class="message-edited">· edited</span>
-        <% end %>
-        <% if show_status %>
-          <span class="message-status<%= ' is-seen' if seen_by_other %>">
-            <% if seen_by_other %>
-              · Seen
-            <% else %>
-              · Delivered
-            <% end %>
-          </span>
-        <% end %>
-      </span>
-
-      <% unless deleted %>
-        <div class="message-actions" data-message-menu-target="actions"
-             data-controller="emoji-reactions message-edit"
-             data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Message", likeable_id: message.id) %>"
-             data-emoji-reactions-token-value="<%= form_authenticity_token %>">
-          <button type="button"
-                  class="message-action-btn"
-                  data-action="click->emoji-reactions#toggle"
-                  title="React"
-                  aria-label="React">
-            <%= render_icon("smile", classes: "h-4 w-4") %>
-          </button>
-
-          <% if mine %>
-            <button type="button"
-                    class="message-action-btn"
-                    data-action="click->message-edit#start"
-                    data-message-edit-message-id-param="<%= message.id %>"
-                    title="Edit"
-                    aria-label="Edit">
-              <%= render_icon("pencil", classes: "h-4 w-4") %>
-            </button>
-            <%= button_to conversation_message_path(message.conversation_id, message),
-                method: :delete,
-                form_class: "inline",
-                class: "message-action-btn",
-                title: "Delete",
-                data: { turbo_confirm: "Delete this message?" } do %>
-              <%= render_icon("x", classes: "h-4 w-4") %>
-            <% end %>
-          <% else %>
-            <%= button_to reports_path(reportable_type: "Message", reportable_id: message.id, reason: "Reported private message."),
-                method: :post,
-                form_class: "inline",
-                class: "message-action-btn",
-                title: "Report",
-                data: { turbo_frame: "_top", turbo_confirm: "Report this message?" } do %>
-              <%= render_icon("shield", classes: "h-4 w-4") %>
-            <% end %>
-          <% end %>
-
-          <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker">
-            <emoji-picker style="width: 300px; height: 340px;"></emoji-picker>
-          </div>
-        </div>
+        <span class="msg-gutter-time"><%= local_time_tag(message.created_at, "short", message.created_at.in_time_zone.strftime("%-l:%M")) %></span>
       <% end %>
     </div>
 
-    <% if !deleted && (emoji_groups.any? || user_like) %>
-      <div class="message-reactions">
-        <% emoji_groups.each do |emoji, group| %>
-          <% mine_emoji = user_like&.display_emoji == emoji %>
-          <% tip = reactor_names_label(group) %>
-          <% if mine_emoji %>
-            <%= button_to unlike_path(likeable_type: "Message", likeable_id: message.id),
-                method: :delete,
-                form_class: "inline",
-                class: "fc-reaction-pill is-mine",
-                title: "Remove your reaction" do %>
-              <span class="fc-reaction-emoji"><%= emoji %></span>
-              <span class="fc-reaction-count"><%= group.size %></span>
-              <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
-            <% end %>
-          <% else %>
-            <%= button_to likes_path(likeable_type: "Message", likeable_id: message.id, reaction_emoji: emoji),
-                form_class: "inline",
-                class: "fc-reaction-pill" do %>
-              <span class="fc-reaction-emoji"><%= emoji %></span>
-              <span class="fc-reaction-count"><%= group.size %></span>
-              <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
-            <% end %>
+    <div class="msg-content">
+      <% if starts_group %>
+        <div class="msg-head">
+          <span class="msg-name"><%= message.sender.display_name %></span>
+          <span class="msg-time">· <%= local_time_tag(message.created_at, "time", message.created_at.in_time_zone.strftime("%-l:%M %p")) %></span>
+        </div>
+      <% end %>
+
+      <div class="msg-bubble" data-controller="message-menu" data-action="click->message-menu#toggle">
+        <% if deleted %>
+          <p class="msg-deleted">This message was deleted</p>
+        <% else %>
+          <% if message.has_scripture? %>
+            <%= render "conversations/scripture_card", message: message %>
+          <% end %>
+
+          <% if message.has_images? %>
+            <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
+              <% message.images.each do |img| %>
+                <%= image_tag img, class: "msg-image", loading: "lazy", alt: "Photo" %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if message.has_voice_note? %>
+            <audio controls preload="metadata" class="msg-voice" src="<%= url_for(message.voice_note) %>"></audio>
+          <% end %>
+
+          <% if message.body.present? %>
+            <div class="msg-body"><%= simple_format(message.body) %></div>
+          <% end %>
+
+          <% if message.respond_to?(:edited?) && message.edited? %>
+            <span class="msg-edited">(edited)</span>
           <% end %>
         <% end %>
+
+        <% unless deleted %>
+          <div class="msg-actions" data-message-menu-target="actions"
+               data-controller="emoji-reactions message-edit"
+               data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Message", likeable_id: message.id) %>"
+               data-emoji-reactions-token-value="<%= form_authenticity_token %>">
+            <button type="button" class="msg-action" data-action="click->emoji-reactions#toggle" title="React" aria-label="React">
+              <%= render_icon("smile", classes: "h-4 w-4") %>
+            </button>
+            <% if mine %>
+              <button type="button" class="msg-action" data-action="click->message-edit#start"
+                      data-message-edit-message-id-param="<%= message.id %>" title="Edit" aria-label="Edit">
+                <%= render_icon("pencil", classes: "h-4 w-4") %>
+              </button>
+              <%= button_to conversation_message_path(message.conversation_id, message),
+                  method: :delete, form_class: "inline", class: "msg-action", title: "Delete", aria: { label: "Delete" },
+                  data: { turbo_confirm: "Delete this message?" } do %>
+                <%= render_icon("trash", classes: "h-4 w-4") %>
+              <% end %>
+            <% else %>
+              <%= button_to reports_path(reportable_type: "Message", reportable_id: message.id, reason: "Reported private message."),
+                  method: :post, form_class: "inline", class: "msg-action", title: "Report", aria: { label: "Report" },
+                  data: { turbo_frame: "_top", turbo_confirm: "Report this message?" } do %>
+                <%= render_icon("flag", classes: "h-4 w-4") %>
+              <% end %>
+            <% end %>
+            <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker">
+              <emoji-picker style="width: 300px; height: 340px;"></emoji-picker>
+            </div>
+          </div>
+        <% end %>
       </div>
-    <% end %>
+
+      <% if !deleted && (emoji_groups.any? || user_like) %>
+        <div class="msg-reactions">
+          <% emoji_groups.each do |emoji, group| %>
+            <% mine_emoji = user_like&.display_emoji == emoji %>
+            <% tip = reactor_names_label(group) %>
+            <% if mine_emoji %>
+              <%= button_to unlike_path(likeable_type: "Message", likeable_id: message.id),
+                  method: :delete, form_class: "inline", class: "msg-reaction is-mine", title: "Remove your reaction" do %>
+                <span><%= emoji %></span><span class="msg-reaction-count"><%= group.size %></span>
+                <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
+              <% end %>
+            <% else %>
+              <%= button_to likes_path(likeable_type: "Message", likeable_id: message.id, reaction_emoji: emoji),
+                  form_class: "inline", class: "msg-reaction" do %>
+                <span><%= emoji %></span><span class="msg-reaction-count"><%= group.size %></span>
+                <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+
+    </div>
   </div>
 </div>

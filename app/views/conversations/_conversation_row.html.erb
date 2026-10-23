@@ -4,25 +4,18 @@
 <% latest_message = conversation.messages.visible.order(created_at: :desc).first %>
 <% unread_count = conversation.unread_count_for(current_user) %>
 
-<%= link_to conversation_path(conversation), class: "inbox-row #{'is-active' if active} #{'is-unread' if unread_count.positive?}" do %>
-  <%= render "conversations/avatar", user: other_user, size: "h-11 w-11" %>
-  <span class="min-w-0 flex-1">
-    <span class="flex items-center justify-between gap-3">
-      <span class="truncate font-extrabold text-[var(--fc-ink)]"><%= other_user.display_name %></span>
-      <% if latest_message %>
-        <span class="shrink-0 text-xs font-bold text-[var(--fc-muted)]"><%= time_ago_in_words(latest_message.created_at) %></span>
-      <% end %>
+<%= link_to conversation_path(conversation), class: "msg-row#{' is-active' if active}#{' is-unread' if unread_count.positive?}" do %>
+  <%= render "conversations/avatar", user: other_user, size: "h-14 w-14", online: other_user.online? %>
+  <span class="msg-row-main">
+    <span class="msg-row-top">
+      <span class="msg-row-name"><%= other_user.display_name %></span>
+      <% shown_at = latest_message&.created_at || conversation.created_at %>
+      <span class="msg-row-time"><%= local_time_tag(shown_at, "inbox", inbox_time(shown_at)) %></span>
     </span>
-    <span class="mt-1 flex items-center justify-between gap-2">
-      <span class="min-w-0 truncate text-sm text-[var(--fc-muted)]">
-        <% if latest_message %>
-          <%= latest_message.sender == current_user ? "You: " : "" %><%= truncate(latest_message.body, length: 60) %>
-        <% else %>
-          No messages yet
-        <% end %>
-      </span>
+    <span class="msg-row-bottom">
+      <span class="msg-row-preview"><%= conversation_preview(latest_message, current_user) %></span>
       <% if unread_count.positive? %>
-        <span class="inbox-row-badge"><%= unread_count > 99 ? "99+" : unread_count %></span>
+        <span class="msg-row-unread" aria-label="<%= pluralize(unread_count, 'unread message') %>"><%= unread_count > 9 ? "9+" : unread_count %></span>
       <% end %>
     </span>
   </span>

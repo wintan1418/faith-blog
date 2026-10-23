@@ -64,6 +64,11 @@ class Message < ApplicationRecord
   after_create_commit :broadcast_to_participants
   after_create_commit :notify_recipient
 
+  # The message just before this one in its thread (for grouping and day dividers).
+  def previous_in_thread
+    conversation.messages.visible.where(created_at: ...created_at).order(created_at: :desc).first
+  end
+
   def deleted?
     deleted_at.present?
   end

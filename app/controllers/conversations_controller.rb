@@ -5,9 +5,18 @@ class ConversationsController < ApplicationController
   before_action :set_conversation, only: [ :show, :archive, :mark_read ]
 
   def index
-    @conversations = conversation_scope
+    @filter = params[:filter] == "unread" ? "unread" : "all"
+    @conversations = conversation_scope.reject { |c| c.last_message_at.nil? }
+    @unread_total = @conversations.count { |c| c.unread_count_for(current_user).positive? }
+    @conversations = @conversations.select { |c| c.unread_count_for(current_user).positive? } if @filter == "unread"
+    # Computers show the newest conversation beside the list; phones show the list only.
     @conversation = @conversations.first
     load_thread if @conversation
+  end
+
+  # "New message": pick one of your connections.
+  def new
+    @connections = current_user.connections.uniq.sort_by { |u| u.display_name.downcase }
   end
 
   def show
@@ -63,8 +72,9 @@ class ConversationsController < ApplicationController
     @conversation = current_user.conversations.find(params[:id])
   end
 
+  # Chats opened but never written in stay out of the list (except the one you're in).
   def load_sidebar
-    @conversations = conversation_scope
+    @conversations = conversation_scope.reject { |c| c.last_message_at.nil? && c != @conversation }
   end
 
   def load_thread

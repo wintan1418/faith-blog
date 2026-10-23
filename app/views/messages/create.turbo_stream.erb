@@ -5,6 +5,10 @@
   <%= render "conversations/message", message: @message, viewer_id: current_user.id %>
 <% end %>
 
+<%= turbo_stream.replace "read_receipt" do %>
+  <%= render "conversations/read_receipt", conversation: @conversation, viewer_id: current_user.id %>
+<% end %>
+
 <%= turbo_stream.replace "new_message" do %>
   <%= render "conversations/composer", conversation: @conversation, message: Message.new %>
 <% end %>

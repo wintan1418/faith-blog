@@ -1,44 +1,22 @@
-<% content_for(:title) { "Inbox - Brethreign" } %>
+<%# Always fetch fresh: going back to the list should show the latest messages, not a saved copy. %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
+<% content_for(:title) { "Messaging - Brethreign" } %>
 
-<div class="inbox-shell">
-  <aside class="inbox-list inbox-list--full">
-    <div class="inbox-list-head">
-      <h2>Messages</h2>
-      <div class="flex items-center gap-1">
-        <%= link_to inbox_search_path, class: "fc-icon-btn", title: "Search messages" do %>
-          <%= render_icon("search", classes: "h-4 w-4") %>
-        <% end %>
-        <%= link_to my_connections_path, class: "fc-icon-btn", title: "My connections" do %>
-          <%= render_icon("users", classes: "h-4 w-4") %>
-        <% end %>
-      </div>
-    </div>
+<div class="msg-page msg-page--index">
+  <div class="msg-shell">
+    <%= render "conversations/list", conversations: @conversations, filter: @filter, unread_total: @unread_total, active: @conversation %>
 
-    <% if @conversations.any? %>
-      <div class="inbox-list-scroll">
-        <% @conversations.each do |conversation| %>
-          <%= render "conversations/conversation_row", conversation: conversation, active: @conversation == conversation %>
-        <% end %>
-      </div>
+    <% if @conversation %>
+      <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
     <% else %>
-      <div class="inbox-list-empty">
-        <%= render_icon("mail", classes: "h-7 w-7") %>
-        <p>No conversations yet.</p>
-        <small>Open a connected profile and tap Message.</small>
-      </div>
+      <section class="msg-thread msg-thread--empty">
+        <div class="msg-empty">
+          <span class="msg-empty-icon"><%= render_icon("mail", classes: "h-8 w-8") %></span>
+          <p class="msg-empty-title">Select a conversation</p>
+          <p class="msg-empty-text">Choose someone on the left, or start a new message.</p>
+          <%= link_to "New message", new_conversation_path, class: "msg-btn msg-btn-primary" %>
+        </div>
+      </section>
     <% end %>
-  </aside>
-
-  <% if @conversation %>
-    <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
-  <% else %>
-    <section class="inbox-thread inbox-thread--empty">
-      <div class="inbox-thread-empty">
-        <%= render_icon("mail", classes: "h-12 w-12") %>
-        <h2>No conversation selected</h2>
-        <p>Pick someone from your messages on the left, or start a new one from a connected profile.</p>
-        <%= link_to "Find Connections", my_connections_path, class: "fc-btn fc-btn-primary" %>
-      </div>
-    </section>
-  <% end %>
+  </div>
 </div>

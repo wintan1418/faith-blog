@@ -26,7 +26,7 @@ export default class extends Controller {
 
     // Let interactive descendants (links, buttons, media, the pill itself)
     // behave normally instead of toggling the menu.
-    if (event.target.closest("a, button, audio, input, textarea, label, .message-actions, .message-reactions, .fc-reaction-picker")) {
+    if (event.target.closest("a, button, audio, input, textarea, label, .msg-actions, .msg-reactions, .message-actions, .message-reactions, .fc-reaction-picker")) {
       return
     }
 
@@ -39,7 +39,7 @@ export default class extends Controller {
 
   open() {
     // Only one message menu open at a time.
-    document.querySelectorAll(".message-actions.is-open").forEach(el => el.classList.remove("is-open"))
+    document.querySelectorAll(".msg-actions.is-open, .message-actions.is-open").forEach(el => el.classList.remove("is-open"))
     this.actionsTarget.classList.add("is-open")
     if (!this.listening) {
       // Defer so the tap that opened us doesn't immediately close it.

@@ -156,3 +156,9 @@ application.register("voice-recorder", VoiceRecorderController)
 
 import TypingController from "./typing_controller"
 application.register("typing", TypingController)
+
+import ListFilterController from "./list_filter_controller"
+application.register("list-filter", ListFilterController)
+
+import LocalTimeController from "./local_time_controller"
+application.register("local-time", LocalTimeController)

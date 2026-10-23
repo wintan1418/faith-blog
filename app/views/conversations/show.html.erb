@@ -1,21 +1,13 @@
 <% other_user = @conversation.other_participant_for(current_user) %>
-<% content_for(:title) { "Message #{other_user.display_name} - Brethreign" } %>
+<%# Always fetch fresh: going back to the list should show the latest messages, not a saved copy. %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
+<% content_for(:title) { "#{other_user.display_name} - Brethreign" } %>
+<%# The conversation header already shows who it is; the app's top bar just says Messaging. %>
+<% content_for(:app_title) { "Messaging" } %>
 
-<div class="inbox-shell">
-  <aside class="inbox-list">
-    <div class="inbox-list-head">
-      <h2>Messages</h2>
-      <%= link_to inbox_search_path, class: "fc-icon-btn", title: "Search messages" do %>
-        <%= render_icon("search", classes: "h-4 w-4") %>
-      <% end %>
-    </div>
-
-    <div class="inbox-list-scroll">
-      <% @conversations.each do |conversation| %>
-        <%= render "conversations/conversation_row", conversation: conversation, active: @conversation == conversation %>
-      <% end %>
-    </div>
-  </aside>
-
-  <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
+<div class="msg-page msg-page--thread">
+  <div class="msg-shell">
+    <%= render "conversations/list", conversations: @conversations, filter: "all", active: @conversation %>
+    <%= render "conversations/thread", conversation: @conversation, messages: @messages, message: @message %>
+  </div>
 </div>

@@ -1,5 +1,5 @@
 <%= form_with model: [conversation, message],
-              class: "inbox-composer",
+              class: "msg-composer",
               id: "new_message",
               html: { multipart: true, data: {
                 controller: "dm-composer",
@@ -8,7 +8,7 @@
               } } do |f| %>
 
   <% if message.errors.any? %>
-    <div class="inbox-composer-errors">
+    <div class="msg-composer-errors">
       <%= message.errors.full_messages.to_sentence %>
     </div>
   <% end %>
@@ -49,87 +49,63 @@
     </div>
   </div>
 
-  <div class="inbox-composer-row" data-controller="emoji-picker">
-    <%# The input pill — emoji on the left, textarea in the middle, attach on the right %>
-    <div class="inbox-composer-pill">
-      <button type="button"
-              data-emoji-picker-target="button"
-              data-action="click->emoji-picker#toggle"
-              class="inbox-composer-iconbtn"
-              title="Add emoji"
-              aria-label="Add emoji">
-        <%= render_icon("smile", classes: "h-5 w-5") %>
-      </button>
+  <%# LinkedIn-style: a roomy text box, then a tool row with Send on the right. %>
+  <div class="msg-compose" data-controller="emoji-picker">
+    <%= f.text_area :body,
+                    rows: 1,
+                    class: "msg-compose-input",
+                    maxlength: 4000,
+                    placeholder: "Write a message…",
+                    aria: { label: "Write a message" },
+                    data: {
+                      typing_target: "input",
+                      emoji_picker_target: "editor",
+                      dm_composer_target: "bodyInput",
+                      action: "input->typing#input input->dm-composer#onInput keydown->dm-composer#onKeydown"
+                    } %>
 
-      <%= f.text_area :body,
-                      rows: 1,
-                      class: "inbox-composer-input",
-                      maxlength: 4000,
-                      placeholder: "Message…",
-                      data: {
-                        typing_target: "input",
-                        emoji_picker_target: "editor",
-                        dm_composer_target: "bodyInput",
-                        action: "input->typing#input input->dm-composer#onInput keydown->dm-composer#onKeydown"
-                      } %>
+    <div class="msg-compose-bar">
+      <div class="msg-compose-tools">
+        <label class="msg-tool" title="Add photos" aria-label="Add photos">
+          <%= render_icon("image", classes: "h-5 w-5") %>
+          <%= f.file_field :images,
+              multiple: true,
+              accept: "image/*",
+              class: "sr-only",
+              data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
+        </label>
+        <button type="button" class="msg-tool" data-emoji-picker-target="button" data-action="click->emoji-picker#toggle"
+                title="Add emoji" aria-label="Add emoji">
+          <%= render_icon("smile", classes: "h-5 w-5") %>
+        </button>
+        <button type="button" class="msg-tool" data-action="click->dm-composer#toggleVersePanel"
+                title="Share a verse" aria-label="Share a verse">
+          <%= render_icon("book_open", classes: "h-5 w-5") %>
+        </button>
+        <button type="button" class="msg-tool" data-dm-composer-target="recordBtn" data-action="click->dm-composer#toggleRecord"
+                title="Record a voice note" aria-label="Record a voice note">
+          <%= render_icon("mic", classes: "h-5 w-5") %>
+        </button>
+      </div>
 
-      <label class="inbox-composer-iconbtn cursor-pointer" title="Add images" aria-label="Add images">
-        <%= render_icon("image", classes: "h-5 w-5") %>
-        <%= f.file_field :images,
-            multiple: true,
-            accept: "image/*",
-            class: "sr-only",
-            data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
-      </label>
-
-      <button type="button"
-              class="inbox-composer-iconbtn"
-              data-action="click->dm-composer#toggleVersePanel"
-              title="Share a verse"
-              aria-label="Share a verse">
-        <%= render_icon("book_open", classes: "h-5 w-5") %>
-      </button>
+      <%= f.button "Send", type: "submit", class: "msg-send hidden", data: { dm_composer_target: "sendBtn" } %>
     </div>
 
     <%# IMPORTANT: explicitly pass value: "" so Rails doesn't serialize the
-        ActiveStorage::Attached::One proxy as its #inspect string —
-        otherwise the param arrives as "#<ActiveStorage::Attached::One:…>"
-        and Active Storage 500s trying to verify it as a signed_id. The JS
-        controller swaps this element for a real <input type=\"file\"> the
-        moment a voice note is finalised. %>
+        ActiveStorage::Attached::One proxy as its #inspect string. The JS
+        controller swaps this element for a real file input once a voice
+        note is finalised. %>
     <%= f.hidden_field :voice_note, value: "", data: { dm_composer_target: "voiceField" } %>
-
-    <%# Shared scripture reference — set by the verse panel, cleared with the chip. %>
     <%= f.hidden_field :scripture_ref, value: "", data: { dm_composer_target: "scriptureField" } %>
 
     <%# Verse panel: type a reference (e.g. John 3:16) and attach it to the message. %>
-    <div class="dm-verse-panel hidden" data-dm-composer-target="versePanel">
-      <input type="text"
-             class="dm-verse-input"
-             placeholder="e.g. John 3:16"
-             data-dm-composer-target="verseInput"
-             data-action="keydown->dm-composer#verseKeydown">
+    <div class="dm-verse-panel msg-verse-panel hidden" data-dm-composer-target="versePanel">
+      <input type="text" class="dm-verse-input" placeholder="e.g. John 3:16"
+             data-dm-composer-target="verseInput" data-action="keydown->dm-composer#verseKeydown">
       <button type="button" class="dm-verse-add" data-action="click->dm-composer#attachVerse">Add</button>
     </div>
 
-    <%# Single trailing action — mic when input is empty, send when there's text %>
-    <button type="button"
-            class="inbox-composer-action"
-            data-dm-composer-target="recordBtn"
-            data-action="click->dm-composer#toggleRecord"
-            title="Record voice note"
-            aria-label="Record voice note">
-      <%= render_icon("mic", classes: "h-5 w-5") rescue "🎙️" %>
-    </button>
-
-    <%= f.button type: "submit",
-                 class: "inbox-composer-action is-send hidden",
-                 data: { dm_composer_target: "sendBtn" } do %>
-      <%= render_icon("send", classes: "h-5 w-5") %>
-    <% end %>
-
-    <div data-emoji-picker-target="picker"
-         class="inbox-composer-emoji-popover hidden">
+    <div data-emoji-picker-target="picker" class="msg-emoji-popover hidden">
       <emoji-picker></emoji-picker>
     </div>
   </div>
