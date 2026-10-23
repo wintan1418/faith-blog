@@ -159,6 +159,7 @@
       <%= render "shared/navbar" %>
 
       <div id="flash_messages"><%= render "shared/flash" %></div>
+      <%= render "shared/app_update_banner" if outdated_android_app? %>
 
       <main>
         <%= yield %>

@@ -153,4 +153,21 @@ module ApplicationHelper
   def native_google_sign_in_supported?
     request.user_agent.to_s.include?("NativeGoogleSignIn")
   end
+
+  # Android app builds before 1.0.2 can't prompt for updates themselves, so the site
+  # nudges them when Play has a newer version (ANDROID_LATEST_VERSION, set on release).
+  FIRST_ANDROID_VERSION_WITH_IN_APP_UPDATES = Gem::Version.new("1.0.2")
+
+  def outdated_android_app?
+    return false unless hotwire_native_app? && request.user_agent.to_s.include?("Android")
+
+    # 1.0.0 didn't send a version; later builds start their user agent with "Brethreign/x.y.z".
+    version = Gem::Version.new(request.user_agent.to_s[%r{Brethreign/(\d+(?:\.\d+)*)}, 1] || "1.0.0")
+    latest = Gem::Version.new(ENV.fetch("ANDROID_LATEST_VERSION", "1.0.1"))
+    version < latest && version < FIRST_ANDROID_VERSION_WITH_IN_APP_UPDATES
+  end
+
+  def android_store_url
+    "https://play.google.com/store/apps/details?id=com.brethreign.app"
+  end
 end
