@@ -22,4 +22,11 @@ class LegalPagesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", terms_path
     assert_select "a[href=?]", privacy_path
   end
+
+  test "child safety standards are public" do
+    get child_safety_path
+    assert_response :success
+    assert_match "Child Safety Standards", response.body
+    assert_match "NCMEC", response.body
+  end
 end

@@ -1,0 +1,77 @@
+<% content_for(:title) { "Child Safety Standards - Brethreign" } %>
+
+<div class="page-header">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+    <h1 class="text-4xl font-bold text-stone-900 mb-4">Child Safety Standards</h1>
+    <p class="text-xl text-stone-600">Our zero-tolerance policy on child sexual abuse and exploitation.</p>
+    <p class="mt-2 text-sm text-stone-500">Effective October 23, 2026</p>
+  </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="prose prose-lg prose-stone mx-auto">
+    <p>
+      Brethreign is a faith community for sharing testimonies, prayer and encouragement. These standards apply to the
+      website at brethreign.com and the Brethreign apps for iPhone and Android. Protecting children is part of how we
+      love our neighbour, and we treat any threat to a child as the most serious kind of harm on our platform.
+    </p>
+
+    <h2>Zero tolerance</h2>
+    <p>Brethreign prohibits child sexual abuse and exploitation (CSAE) of any kind. This includes:</p>
+    <ul>
+      <li>Child sexual abuse material (CSAM): any image, video, audio, drawing or text that sexualises a minor.</li>
+      <li>Grooming: building trust with a minor in order to exploit or abuse them, including moving the conversation elsewhere.</li>
+      <li>Sexual or romantic messages to minors, or asking a minor for images, personal details or to meet in person.</li>
+      <li>Sextortion, trafficking, or any content that promotes, praises or normalises the abuse of children.</li>
+    </ul>
+    <p>
+      Accounts that break these rules are removed permanently, and the person may not create a new account.
+    </p>
+
+    <h2>Who can use Brethreign</h2>
+    <p>
+      You must be at least 13 years old to have an account, and members under the age of majority need a parent's or
+      guardian's permission (see our <%= link_to "Terms of Use", terms_path %>). Profiles do not show anyone's date of birth.
+    </p>
+
+    <h2>How to report</h2>
+    <p>Anyone can report a concern, and every report is reviewed by a person:</p>
+    <ul>
+      <li><strong>In the app or on the website:</strong> use the flag (Report) option on any post, comment or message.</li>
+      <li><strong>Block:</strong> you can block anyone from messaging you at any time.</li>
+      <li><strong>By email:</strong> write to <%= mail_to support_email %> with "Child safety" in the subject. Include a link to
+        the post or profile if you can. Please do not attach or forward abusive images; a link is enough.</li>
+    </ul>
+    <p>
+      If a child is in immediate danger, contact your local police or emergency services first.
+    </p>
+
+    <h2>What we do when we find it</h2>
+    <ul>
+      <li>We remove the content and suspend the account as soon as we are aware of it.</li>
+      <li>We preserve the evidence securely so it can be given to law enforcement.</li>
+      <li>We report child sexual abuse material to the National Center for Missing &amp; Exploited Children (NCMEC) and to
+        the relevant authorities in the country where it was found, as the law requires.</li>
+      <li>We cooperate fully with law enforcement investigations.</li>
+    </ul>
+
+    <h2>Prevention</h2>
+    <ul>
+      <li>New posts are checked by automated moderation, and our moderators review flagged content.</li>
+      <li>Members can block anyone from messaging them.</li>
+      <li>We review these standards regularly and update them as the law and best practice change.</li>
+    </ul>
+
+    <h2>Compliance</h2>
+    <p>
+      Brethreign complies with applicable child safety laws, including the obligation to report child sexual abuse
+      material to the appropriate authorities.
+    </p>
+
+    <h2>Child safety contact</h2>
+    <p>
+      Our designated contact for child safety, including questions from parents, regulators and law enforcement, can be
+      reached at <%= mail_to support_email %>.
+    </p>
+  </div>
+</div>
