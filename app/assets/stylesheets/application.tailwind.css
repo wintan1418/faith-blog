@@ -20810,3 +20810,24 @@ body.hotwire-native label {
   -webkit-user-select: none;
   user-select: none;
 }
+
+/* "Update the app" bar inside older Android app versions */
+.fc-app-update {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0.75rem 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.875rem;
+  background: color-mix(in oklch, var(--fc-accent) 14%, var(--fc-surface, #fff));
+  border: 1px solid color-mix(in oklch, var(--fc-accent) 35%, transparent);
+  color: var(--fc-ink, inherit);
+  font-size: 0.9rem;
+}
+.fc-app-update__action {
+  flex-shrink: 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  text-decoration: none;
+}
