@@ -1,0 +1,42 @@
+<% content_for(:title) { "New message - Brethreign" } %>
+
+<div class="msg-page msg-page--new">
+  <div class="msg-new" data-controller="list-filter">
+    <header class="msg-list-head">
+      <%= link_to conversations_path, class: "msg-icon-btn msg-thread-back", aria: { label: "Back to messages" } do %>
+        <%= render_icon("chevron_left", classes: "h-6 w-6") %>
+      <% end %>
+      <h1 class="msg-list-title">New message</h1>
+    </header>
+
+    <label class="msg-search">
+      <%= render_icon("search", classes: "h-4 w-4") %>
+      <input type="search" placeholder="Type a name" aria-label="Search your connections" autofocus
+             data-list-filter-target="input" data-action="input->list-filter#filter">
+    </label>
+
+    <% if @connections.any? %>
+      <p class="msg-section-label">Your connections</p>
+      <div class="msg-rows">
+        <% @connections.each do |user| %>
+          <%= button_to conversations_path(recipient_id: user.id), method: :post, class: "msg-row msg-row--person",
+                        form: { data: { list_filter_target: "row", list_filter_text: "#{user.display_name} #{user.username}".downcase } } do %>
+            <%= render "conversations/avatar", user: user, size: "h-12 w-12", online: user.online? %>
+            <span class="msg-row-main">
+              <span class="msg-row-name"><%= user.display_name %></span>
+              <span class="msg-row-preview">@<%= user.username %></span>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
+      <p class="msg-empty-text msg-new-none" hidden data-list-filter-target="empty">No connections match that name.</p>
+    <% else %>
+      <div class="msg-empty">
+        <span class="msg-empty-icon"><%= render_icon("users", classes: "h-7 w-7") %></span>
+        <p class="msg-empty-title">No connections yet</p>
+        <p class="msg-empty-text">You can message people once you're connected. Find brothers and sisters to connect with.</p>
+        <%= link_to "Find people", people_path, class: "msg-btn msg-btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

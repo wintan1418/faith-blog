@@ -103,6 +103,12 @@ module IconHelper
       icon_svg("<circle cx='5' cy='12' r='1' /><circle cx='12' cy='12' r='1' /><circle cx='19' cy='12' r='1' />", classes)
     when "thumbsup", "thumbs_up", "like"
       icon_svg("M7 10v12 M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z", classes)
+    when "mic", "microphone"
+      icon_svg("<path d='M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z' /><path d='M19 10v2a7 7 0 0 1-14 0v-2' /><path d='M12 19v3' />", classes)
+    when "compose", "squarepen", "newmessage"
+      icon_svg("<path d='M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7' /><path d='M18.4 2.6a2.1 2.1 0 0 1 3 3L12.5 14.5 8.5 15.5l1-4Z' />", classes)
+    when "chevronleft", "back"
+      icon_svg("M15 18l-6-6 6-6", classes)
     else
       # Default Sparkles
       icon_svg("m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z", classes)

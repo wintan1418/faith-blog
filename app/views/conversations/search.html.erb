@@ -1,57 +1,46 @@
 <% content_for(:title) { "Search messages - Brethreign" } %>
 
-<div class="mystic-shell inbox-page">
-  <div class="mystic-container max-w-3xl py-8">
-    <div class="mb-6">
-      <%= link_to "← Back to Inbox", conversations_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
-      <h1 class="mystic-title mt-3 text-3xl">Search your messages</h1>
-    </div>
+<div class="msg-page msg-page--new">
+  <div class="msg-new">
+    <header class="msg-list-head">
+      <%= link_to conversations_path, class: "msg-icon-btn msg-thread-back", aria: { label: "Back to messages" } do %>
+        <%= render_icon("chevron_left", classes: "h-6 w-6") %>
+      <% end %>
+      <h1 class="msg-list-title">Search messages</h1>
+    </header>
 
-    <%= form_with url: inbox_search_path, method: :get, class: "mb-6" do %>
-      <div class="relative">
-        <%= render_icon("search", classes: "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--fc-muted)]") %>
-        <input type="text"
-               name="q"
-               value="<%= @query %>"
-               class="fc-cms-input pl-10 w-full"
-               placeholder="Search across all your conversations..."
-               autofocus>
-      </div>
+    <%= form_with url: inbox_search_path, method: :get, class: "msg-search", role: "search" do %>
+      <%= render_icon("search", classes: "h-4 w-4") %>
+      <input type="search" name="q" value="<%= @query %>" placeholder="Search messages" aria-label="Search messages" autofocus>
     <% end %>
 
     <% if @query.blank? %>
-      <p class="text-sm text-[var(--fc-muted)]">Type at least 2 characters to search.</p>
+      <p class="msg-empty-text msg-new-none">Type at least 2 letters to search all your conversations.</p>
     <% elsif @results.empty? %>
-      <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-8 text-center">
-        <h2 class="text-base font-bold text-[var(--fc-ink)]">No matches</h2>
-        <p class="mt-1 text-sm text-[var(--fc-muted)]">Nothing matches "<%= @query %>" in any of your conversations.</p>
+      <div class="msg-empty">
+        <p class="msg-empty-title">No matches</p>
+        <p class="msg-empty-text">Nothing matches "<%= @query %>" in your conversations.</p>
       </div>
     <% else %>
-      <p class="mb-3 text-xs font-bold uppercase tracking-wider text-[var(--fc-muted)]"><%= pluralize(@pagy.count, "match") %></p>
-      <ul class="inbox-search-list">
+      <p class="msg-section-label"><%= pluralize(@pagy.count, "message") %></p>
+      <div class="msg-rows">
         <% @results.each do |message| %>
           <% other = message.conversation.other_participant_for(current_user) %>
-          <li>
-            <%= link_to conversation_path(message.conversation, anchor: dom_id(message)), class: "inbox-search-row" do %>
-              <%= render "conversations/avatar", user: other, size: "h-9 w-9" %>
-              <div class="min-w-0 flex-1">
-                <div class="flex items-baseline gap-2">
-                  <span class="font-extrabold text-[var(--fc-ink)] truncate"><%= other.display_name %></span>
-                  <span class="text-xs text-[var(--fc-muted)]"><%= time_ago_in_words(message.created_at) %> ago</span>
-                </div>
-                <p class="mt-0.5 text-sm text-[var(--fc-soft)] line-clamp-2">
-                  <%= message.sender_id == current_user.id ? "You: " : "" %>
-                  <%= highlight(truncate(message.body, length: 200), @query, highlighter: '<mark class="inbox-search-mark">\1</mark>') %>
-                </p>
-              </div>
-            <% end %>
-          </li>
+          <%= link_to conversation_path(message.conversation, anchor: dom_id(message)), class: "msg-row" do %>
+            <%= render "conversations/avatar", user: other, size: "h-12 w-12" %>
+            <span class="msg-row-main">
+              <span class="msg-row-top">
+                <span class="msg-row-name"><%= other.display_name %></span>
+                <span class="msg-row-time"><%= local_time_tag(message.created_at, "inbox", inbox_time(message.created_at)) %></span>
+              </span>
+              <span class="msg-row-preview is-wrap">
+                <%= message.sender_id == current_user.id ? "You: " : "" %><%= highlight(truncate(message.body, length: 160), @query, highlighter: '<mark class="msg-mark">\1</mark>') %>
+              </span>
+            </span>
+          <% end %>
         <% end %>
-      </ul>
-
-      <% if @pagy.pages > 1 %>
-        <div class="mt-6"><%== pagy_nav(@pagy) %></div>
-      <% end %>
+      </div>
+      <% if @pagy.pages > 1 %><div class="msg-pagination"><%== pagy_nav(@pagy) %></div><% end %>
     <% end %>
   </div>
 </div>

@@ -281,6 +281,7 @@ export default class extends Controller {
     this.recorder.start()
 
     this.recordBtnTarget.classList.add("is-recording")
+    this.micHTML ??= this.recordBtnTarget.innerHTML
     this.recordBtnTarget.textContent = "⏺"
     this.recordBtnTarget.title = "Stop recording"
 
@@ -294,7 +295,8 @@ export default class extends Controller {
     this.recording = false
     if (this.autoStop) { clearTimeout(this.autoStop); this.autoStop = null }
     this.recordBtnTarget.classList.remove("is-recording")
-    this.recordBtnTarget.textContent = "🎙️"
+    if (this.micHTML) this.recordBtnTarget.innerHTML = this.micHTML
+    else this.recordBtnTarget.textContent = "🎙️"
     this.recordBtnTarget.title = "Record voice note"
   }
 

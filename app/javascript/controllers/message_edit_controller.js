@@ -10,9 +10,9 @@ export default class extends Controller {
     const id = event.params?.messageId || event.currentTarget.closest("[id^='message_']")?.id?.replace("message_", "")
     if (!id) return
 
-    const row = event.currentTarget.closest(".message-row")
+    const row = event.currentTarget.closest(".msg-item, .message-row")
     if (!row) return
-    const body = row.querySelector(".message-body")
+    const body = row.querySelector(".msg-body, .message-body")
     if (!body) return
 
     const original = body.innerHTML

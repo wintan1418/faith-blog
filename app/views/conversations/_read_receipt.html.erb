@@ -1,8 +1,15 @@
 <% viewer_id = local_assigns[:viewer_id] || current_user&.id %>
-<% latest_sent = conversation.messages.visible.where(sender_id: viewer_id).order(created_at: :desc).first %>
-
-<div id="read_receipt" class="read-receipt">
-  <% if latest_sent %>
-    <%= conversation.read_by_other?(latest_sent) ? "Read" : "Sent" %>
+<% latest = conversation.messages.visible.order(created_at: :desc).first %>
+<%# Under your latest message (if it's the last one in the thread): "Seen" with their photo, or "Sent". %>
+<div id="read_receipt" class="msg-receipt">
+  <% if latest && latest.sender_id == viewer_id %>
+    <% reader = conversation.conversation_participants.includes(user: :profile).where.not(user_id: viewer_id).first&.user %>
+    <% if conversation.read_by_other?(latest) && reader %>
+      <span class="msg-receipt-seen" title="Seen by <%= reader.display_name %>">
+        <%= render "conversations/avatar", user: reader, size: "h-4 w-4" %> Seen
+      </span>
+    <% else %>
+      <span>Sent</span>
+    <% end %>
   <% end %>
 </div>

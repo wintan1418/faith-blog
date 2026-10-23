@@ -141,10 +141,13 @@ module ApplicationHelper
     html.html_safe
   end
 
-  # Title for the apps' native top bar: the page title without the " - Brethreign" suffix.
+  # Title for the apps' native top bar: the page title without the " - Brethreign" suffix,
+  # or content_for(:app_title) when a page wants something different in the app.
   # content_for(:title) is already escaped, so the piece we keep stays html_safe
   # (splitting it as a plain String would escape "&#39;" a second time).
   def native_app_title
+    return content_for(:app_title) if content_for?(:app_title)
+
     title = content_for(:title).to_s.split(/\s[-·—|]\s/).first
     title.present? ? title.html_safe : "Brethreign" # rubocop:disable Rails/OutputSafety
   end

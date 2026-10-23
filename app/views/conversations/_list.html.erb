@@ -1,0 +1,50 @@
+<%# Left pane on computers, the whole screen on phones (LinkedIn "Messaging"). %>
+<% filter = local_assigns.fetch(:filter, "all") %>
+<% active = local_assigns[:active] %>
+
+<aside class="msg-list" aria-label="Conversations">
+  <header class="msg-list-head">
+    <h1 class="msg-list-title">Messaging</h1>
+    <%= link_to new_conversation_path, class: "msg-icon-btn", title: "New message", aria: { label: "New message" } do %>
+      <%= render_icon("compose", classes: "h-5 w-5") %>
+    <% end %>
+  </header>
+
+  <div class="msg-search-row">
+    <%= form_with url: inbox_search_path, method: :get, class: "msg-search", role: "search" do %>
+      <%= render_icon("search", classes: "h-4 w-4") %>
+      <input type="search" name="q" placeholder="Search messages" aria-label="Search messages" value="<%= local_assigns[:query] %>">
+    <% end %>
+    <%# In the app the title row is hidden (the native bar shows "Messaging"), so New message sits here. %>
+    <%= link_to new_conversation_path, class: "msg-icon-btn msg-compose-inline", title: "New message", aria: { label: "New message" } do %>
+      <%= render_icon("compose", classes: "h-5 w-5") %>
+    <% end %>
+  </div>
+
+  <nav class="msg-filters" aria-label="Filter conversations">
+    <%= link_to "All", conversations_path, class: "msg-filter#{' is-active' if filter == 'all'}" %>
+    <%= link_to conversations_path(filter: "unread"), class: "msg-filter#{' is-active' if filter == 'unread'}" do %>
+      Unread<% if local_assigns[:unread_total].to_i.positive? %> <span class="msg-filter-count"><%= unread_total %></span><% end %>
+    <% end %>
+  </nav>
+
+  <div class="msg-rows">
+    <% if conversations.any? %>
+      <% conversations.each do |conversation| %>
+        <%= render "conversations/conversation_row", conversation: conversation, active: active == conversation %>
+      <% end %>
+    <% elsif filter == "unread" %>
+      <div class="msg-empty">
+        <p class="msg-empty-title">You're all caught up</p>
+        <p class="msg-empty-text">No unread messages.</p>
+      </div>
+    <% else %>
+      <div class="msg-empty">
+        <span class="msg-empty-icon"><%= render_icon("mail", classes: "h-7 w-7") %></span>
+        <p class="msg-empty-title">No messages yet</p>
+        <p class="msg-empty-text">Reach out to a brother or sister: encourage them, pray with them, or just say hello.</p>
+        <%= link_to "Write a message", new_conversation_path, class: "msg-btn msg-btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</aside>
