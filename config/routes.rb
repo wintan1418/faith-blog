@@ -289,6 +289,11 @@ Rails.application.routes.draw do
   # Mobile apps (Hotwire Native)
   post   "push_devices", to: "push_devices#create",  as: :push_devices
   delete "push_devices", to: "push_devices#destroy"
+
+  # Native Google sign-in for the mobile apps (see Users::NativeGoogleSessionsController)
+  get  "auth/google/native/start", to: "users/native_google_sessions#start", as: :native_google_start
+  post "auth/google/native",       to: "users/native_google_sessions#create", as: :native_google_sign_in
+
   get "me", to: "me#show", as: :me
   get "configurations/ios_v1.json",     to: "configurations#ios_v1",     defaults: { format: :json }
   get "configurations/android_v1.json", to: "configurations#android_v1", defaults: { format: :json }

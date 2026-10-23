@@ -503,6 +503,7 @@ DEPENDENCIES
   devise (~> 4.9)
   dotenv-rails
   friendly_id (~> 5.5)
+  googleauth (~> 1.14)
   image_processing (~> 1.2)
   jbuilder
   jsbundling-rails
