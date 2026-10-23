@@ -91,3 +91,4 @@ group :test do
 end
 
 gem "action_push_native", "~> 0.3.1"
+gem "googleauth", "~> 1.14" # verifies Google ID tokens from the apps

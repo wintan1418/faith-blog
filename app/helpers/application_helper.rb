@@ -148,4 +148,9 @@ module ApplicationHelper
     title = content_for(:title).to_s.split(/\s[-·—|]\s/).first
     title.present? ? title.html_safe : "Brethreign" # rubocop:disable Rails/OutputSafety
   end
+
+  # App builds with native Google sign-in add "NativeGoogleSignIn" to their user agent.
+  def native_google_sign_in_supported?
+    request.user_agent.to_s.include?("NativeGoogleSignIn")
+  end
 end
