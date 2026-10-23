@@ -108,11 +108,8 @@
       <header class="fc-masthead">
         <div class="min-w-0">
           <h1 class="fc-masthead-greet">
-            <span class="fc-greet" data-greet="morning">Good morning</span>
-            <span class="fc-greet" data-greet="afternoon">Good afternoon</span>
-            <span class="fc-greet" data-greet="evening">Good evening</span>
-            <span class="fc-greet" data-greet="night">Grace for the night watch</span>
-            <span class="fc-greet fc-greet-fallback">Welcome back</span>,
+            <%# One line, no spaces between the spans: the hidden greetings would leave a gap before the comma. %>
+            <span class="fc-greet" data-greet="morning">Good morning</span><span class="fc-greet" data-greet="afternoon">Good afternoon</span><span class="fc-greet" data-greet="evening">Good evening</span><span class="fc-greet" data-greet="night">Grace for the night watch</span><span class="fc-greet fc-greet-fallback">Welcome back</span>,
             <span class="fc-masthead-name"><%= current_user.display_name.presence || current_user.username %></span>
           </h1>
           <p class="fc-masthead-sub"><%= Date.current.strftime("%A, %B %-d") %> · The assembly is gathered. Breathe deep.</p>
@@ -167,7 +164,7 @@
           <button type="button"
                   class="fc-composer-input flex items-center text-[var(--fc-muted)]"
                   data-action="click->composer-modal#open">
-            What's on your heart? Take a breath...
+            <span class="fc-composer-input-text">What's on your heart?<span class="fc-composer-input-more"> Take a breath...</span></span>
           </button>
           <button type="button"
                   class="fc-btn fc-btn-primary"
