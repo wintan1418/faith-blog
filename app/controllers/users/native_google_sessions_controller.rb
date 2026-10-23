@@ -15,20 +15,19 @@ class Users::NativeGoogleSessionsController < ApplicationController
 
   def create
     payload = Google::Auth::IDTokens.verify_oidc(params.require(:id_token), aud: self.class.audiences)
-    return render(json: { error: "Your Google email isn't verified." }, status: :unauthorized) unless payload["email_verified"]
+    return refuse("Your Google email isn't verified.", :unauthorized) unless payload["email_verified"]
 
     user = User.from_google(google_auth(payload))
     unless user.active_for_authentication?
-      return render json: { error: I18n.t("devise.failure.#{user.inactive_message}", default: "This account can't sign in.") },
-                    status: :forbidden
+      return refuse(I18n.t("devise.failure.#{user.inactive_message}", default: "This account can't sign in."), :forbidden)
     end
 
     sign_in(user, event: :authentication)
     render json: { location: after_sign_in_path_for(user) }
   rescue Google::Auth::IDTokens::VerificationError, ActionController::ParameterMissing
-    render json: { error: "Google sign in could not be completed. Please try again." }, status: :unauthorized
+    refuse("Google sign in could not be completed. Please try again.", :unauthorized)
   rescue ActiveRecord::RecordInvalid => e
-    render json: { error: e.record.errors.full_messages.to_sentence }, status: :unprocessable_entity
+    refuse(e.record.errors.full_messages.to_sentence, :unprocessable_entity)
   end
 
   # ID tokens from the apps are issued for our web client (Android) or the iOS client.
@@ -37,6 +36,12 @@ class Users::NativeGoogleSessionsController < ApplicationController
   end
 
   private
+
+  # The app always follows "location"; on failure that's the sign-in page with the reason shown.
+  def refuse(message, status)
+    flash[:alert] = message
+    render json: { location: new_user_session_path, error: message }, status: status
+  end
 
   def google_auth(payload)
     OmniAuth::AuthHash.new(

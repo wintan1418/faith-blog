@@ -62,6 +62,7 @@ class NativeGoogleSignInTest < ActionDispatch::IntegrationTest
     post_token(Google::Auth::IDTokens::SignatureError)
 
     assert_response :unauthorized
+    assert_equal new_user_session_path, response.parsed_body["location"]
     assert_nil User.find_by(email: "faithful@example.com")
   end
 
