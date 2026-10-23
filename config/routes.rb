@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "contact", to: "pages#contact"
   get "privacy", to: "pages#privacy"
   get "terms", to: "pages#terms"
+  get "child-safety", to: "pages#child_safety", as: :child_safety
 
   # Main feed
   get "feed", to: "feed#index"
