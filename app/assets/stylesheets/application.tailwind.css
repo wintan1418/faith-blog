@@ -20831,3 +20831,155 @@ body.hotwire-native label {
   border-radius: 999px;
   text-decoration: none;
 }
+
+/* ── Phone polish (app audit, Oct 2026) ─────────────────────────────── */
+@media (max-width: 520px) {
+  /* Post action bar: label under the icon (LinkedIn mobile), so all four fit. */
+  .fc-breath-actions { gap: 0 !important; }
+  .fc-breath-actions .fc-reactions,
+  .fc-breath-actions .fc-repost,
+  .fc-breath-actions .fc-share { flex: 1 1 0; min-width: 0; }
+  .fc-breath-actions .fc-breath-action {
+    flex: 1 1 0;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px !important;
+    padding: 6px 0 !important;
+    min-height: 48px;
+  }
+  .fc-breath-actions .fc-action-label,
+  .fc-breath-actions .fc-react-label {
+    font-size: 11px !important;
+    line-height: 1.1;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+@media (max-width: 520px) {
+  /* Name · time on one line; the @handle repeats the name here. */
+  .fc-breath-head-author .fc-breath-handle { display: none; }
+}
+
+/* The light-theme editor frame (border + fill) was also boxing in published post text. */
+html.theme-light .trix-content:not(trix-editor) {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* In the apps the scripture rain drifts BEHIND the page, so it never sits on top of
+   posts, cards or inputs; it shows only in the gaps. */
+body.hotwire-native .fc-rain { z-index: 0; }
+body.hotwire-native > .fc-page { position: relative; z-index: 1; }
+
+/* Long posts fade out with a mask, so the fade matches any card background
+   (the old white overlay showed as a pale block on tinted cards). */
+.fc-breath-copy.is-rich:not(.is-expanded) {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 2.6em), transparent);
+}
+.fc-breath-copy.is-rich:not(.is-expanded)::after,
+.fc-breath:hover .fc-breath-copy.is-rich:not(.is-expanded)::after { display: none; }
+
+@media (max-width: 520px) {
+  /* Composer: full-screen sheet on phones, with Cancel / Save draft / Breathe always in view. */
+  dialog.fc-composer-dialog[open] {
+    inset: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    border-radius: 0;
+    overflow: hidden;
+  }
+  dialog.fc-composer-dialog .fc-composer-panel {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0;
+  }
+  dialog.fc-composer-dialog .fc-composer-form {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  dialog.fc-composer-dialog .fc-composer-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin-top: 0.75rem;
+    padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
+    background: var(--fc-surface);
+    border-top: 1px solid var(--fc-line);
+  }
+  /* Formatting buttons: one scrollable row instead of three stacked rows. */
+  dialog.fc-composer-dialog trix-toolbar .trix-button-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  /* Writing tools (tone, scripture…) wrap instead of running off the edge. */
+  dialog.fc-composer-dialog .fc-composer-tools { flex-wrap: wrap; row-gap: 0.4rem; }
+}
+
+@media (max-width: 520px) {
+  /* Keep formatting buttons full size; the row scrolls sideways. */
+  dialog.fc-composer-dialog trix-toolbar .trix-button-group,
+  dialog.fc-composer-dialog trix-toolbar .trix-button { flex-shrink: 0; }
+  /* Feed prompt: one line on phones. */
+  .fc-composer-input { min-width: 0; }
+  .fc-composer-input-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fc-composer-input-more { display: none; }
+}
+
+@media (max-width: 520px) {
+  /* Post page: reactions on one row, then Repost · Send · Save · Report evenly spaced. */
+  .post-reactions-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0; }
+  .post-reactions-bar .post-reactions-left,
+  .post-reactions-bar .post-reactions-right { display: contents; }
+  .post-reactions-bar::before { content: ""; order: 2; flex-basis: 100%; height: 0; border-top: 1px solid var(--fc-line); margin-top: 0.35rem; }
+  .post-reactions-bar .fc-repost,
+  .post-reactions-bar .fc-share,
+  .post-reactions-bar .post-reactions-right > span[id^="bookmark_"],
+  .post-reactions-bar .post-reactions-right > form.button_to:not(.inline) {
+    order: 3; flex: 1 1 22%; min-width: 0; display: flex; justify-content: center;
+  }
+  .post-reactions-bar .post-reactions-right > form.inline { order: 4; }
+  .post-reactions-bar .fc-repost .fc-breath-action,
+  .post-reactions-bar .fc-share .fc-breath-action,
+  .post-reactions-bar .fc-repost > button,
+  .post-reactions-bar .fc-share > button,
+  .post-reactions-bar .post-reactions-right .fc-action {
+    flex-direction: column; justify-content: center; gap: 3px; width: 100%;
+    min-height: 48px; padding: 6px 0; font-size: 11px;
+  }
+  .post-reactions-bar .fc-reaction-viewers { margin-left: 0.25rem; }
+}
+@media (max-width: 520px) {
+  .post-reactions-bar .fc-repost .fc-action-label,
+  .post-reactions-bar .fc-share .fc-action-label,
+  .post-reactions-bar .post-reactions-right .fc-action-label { font-size: 11px !important; font-weight: 600; }
+  .post-reactions-bar .fc-repost > button,
+  .post-reactions-bar .fc-share > button,
+  .post-reactions-bar .post-reactions-right .fc-action { color: var(--fc-muted) !important; }
+}
+@media (max-width: 520px) {
+  /* Comment actions (Amen · Reply · Breathe this · Report) stay on one tidy row. */
+  .fc-comment-actions { flex-wrap: nowrap !important; gap: 0.1rem !important; overflow-x: auto; scrollbar-width: none; }
+  .fc-comment-actions::-webkit-scrollbar { display: none; }
+  .fc-comment-actions .fc-breath-action,
+  .fc-comment-actions .fc-action,
+  .fc-comment-actions .fc-reaction-add {
+    flex: 0 0 auto; white-space: nowrap; padding: 4px 7px !important; font-size: 12px !important; gap: 4px !important;
+  }
+  .fc-comment-actions .fc-breath-action svg,
+  .fc-comment-actions .fc-action svg { width: 14px; height: 14px; }
+}
+@media (max-width: 520px) {
+  .fc-comment-actions .fc-reactions { display: inline-flex; flex: 0 0 auto; flex-wrap: nowrap !important; align-items: center; gap: 2px; }
+  .fc-comment-actions form.button_to:not(.inline) .fc-action-label { display: none; }
+  .fc-comment .fc-breath-handle, .fc-comment-handle,
+  .fc-comment-head .fc-breath-handle { display: none; }
+}
+@media (max-width: 520px) { .fc-hide-phone { display: none; } }
