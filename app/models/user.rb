@@ -219,8 +219,9 @@ class User < ApplicationRecord
     reshares.exists?(post: post)
   end
 
+  # Alerts badge: activity only (messages are counted on the Inbox).
   def unread_notifications_count
-    notifications.unread.count
+    notifications.activity.unread.count
   end
 
   def unread_conversations_count

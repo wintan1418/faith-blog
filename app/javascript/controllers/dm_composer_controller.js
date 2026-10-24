@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 //      to the form via a DataTransfer-backed FileList so submitting the
 //      form ships it like any other file upload.
 export default class extends Controller {
-  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput", "nudge", "nudgeText", "nudgeSuggestion"]
+  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput", "nudge", "nudgeText", "nudgeSuggestion", "recordingBar", "recordingTime", "voiceAudio"]
   static values  = { gentlenessUrl: String }
 
   connect() {
@@ -285,8 +285,32 @@ export default class extends Controller {
     this.recordBtnTarget.textContent = "⏺"
     this.recordBtnTarget.title = "Stop recording"
 
+    // A clear "Recording 0:07" bar with Stop / Cancel, instead of just a red icon.
+    this.cancelled = false
+    this.element.classList.add("is-recording")
+    if (this.hasRecordingBarTarget) this.recordingBarTarget.classList.remove("hidden")
+    this.tickTimer()
+    this.ticker = setInterval(() => this.tickTimer(), 250)
+
     // Auto-stop at 2 minutes so a forgotten recorder can't run forever.
     this.autoStop = setTimeout(() => this.stopRecording(), 120_000)
+  }
+
+  tickTimer() {
+    if (!this.hasRecordingTimeTarget) return
+    const s = Math.floor((Date.now() - this.recordStart) / 1000)
+    this.recordingTimeTarget.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`
+  }
+
+  stopRecordingClick(event) {
+    event.preventDefault()
+    this.stopRecording()
+  }
+
+  cancelRecording(event) {
+    event.preventDefault()
+    this.cancelled = true
+    this.stopRecording()
   }
 
   stopRecording() {
@@ -294,6 +318,9 @@ export default class extends Controller {
     this.recorder.stop()
     this.recording = false
     if (this.autoStop) { clearTimeout(this.autoStop); this.autoStop = null }
+    if (this.ticker) { clearInterval(this.ticker); this.ticker = null }
+    this.element.classList.remove("is-recording")
+    if (this.hasRecordingBarTarget) this.recordingBarTarget.classList.add("hidden")
     this.recordBtnTarget.classList.remove("is-recording")
     if (this.micHTML) this.recordBtnTarget.innerHTML = this.micHTML
     else this.recordBtnTarget.textContent = "🎙️"
@@ -305,7 +332,7 @@ export default class extends Controller {
       this.stream.getTracks().forEach(t => t.stop())
       this.stream = null
     }
-    if (!this.chunks.length) return
+    if (this.cancelled || !this.chunks.length) { this.chunks = []; return }
 
     const blob  = new Blob(this.chunks, { type: mimeType })
     const ext   = mimeType.includes("webm") ? "webm" : "ogg"
@@ -329,7 +356,13 @@ export default class extends Controller {
 
     if (this.hasVoicePreviewTarget) {
       this.voicePreviewTarget.classList.remove("hidden")
-      if (this.hasVoiceLengthTarget) this.voiceLengthTarget.textContent = `${seconds}s`
+      if (this.hasVoiceLengthTarget) this.voiceLengthTarget.textContent = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`
+      // Let people listen before they send.
+      if (this.hasVoiceAudioTarget) {
+        if (this.voiceUrl) URL.revokeObjectURL(this.voiceUrl)
+        this.voiceUrl = URL.createObjectURL(blob)
+        this.voiceAudioTarget.src = this.voiceUrl
+      }
     }
     this.syncTrailingAction()
   }
@@ -337,6 +370,8 @@ export default class extends Controller {
   clearVoice(event) {
     event.preventDefault()
     if (this.hasVoicePreviewTarget) this.voicePreviewTarget.classList.add("hidden")
+    if (this.hasVoiceAudioTarget) { this.voiceAudioTarget.pause(); this.voiceAudioTarget.removeAttribute("src") }
+    if (this.voiceUrl) { URL.revokeObjectURL(this.voiceUrl); this.voiceUrl = null }
     if (this.hasVoiceFieldTarget) {
       const hidden = document.createElement("input")
       hidden.type  = "hidden"

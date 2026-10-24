@@ -161,11 +161,17 @@ class Message < ApplicationRecord
     recipient = conversation.other_participant_for(sender)
     return unless recipient
 
-    Notification.create(
-      user: recipient,
-      actor: sender,
-      notifiable: self,
-      notification_type: :direct_message
-    )
+    # One unread chat notification per conversation: a burst of messages updates
+    # it (and re-sends the phone notification, which replaces the last one)
+    # instead of piling up a new notification for every line.
+    waiting = recipient.notifications.unread.direct_message
+                       .where(notifiable_type: "Message", notifiable_id: conversation.messages.select(:id))
+                       .order(created_at: :desc).first
+    if waiting
+      waiting.update!(notifiable: self, actor: sender, created_at: Time.current)
+      waiting.deliver_push_notification
+    else
+      Notification.create(user: recipient, actor: sender, notifiable: self, notification_type: :direct_message)
+    end
   end
 end

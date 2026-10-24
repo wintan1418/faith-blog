@@ -37,10 +37,13 @@ class PushNotificationJob < ApplicationJob
     ApplicationPushNotification.new(
       title:     "Brethreign",
       body:      notification.message,
-      badge:     user.notifications.unread.count,
+      badge:     user.unread_notifications_count + user.unread_conversations_count,
       thread_id: push_tag(notification),
       sound:     "default",
-      data:      { path: notification.target_path }
+      # Same tag/collapse id = the new notification replaces the last one instead of stacking.
+      google_data: { android: { notification: { tag: push_tag(notification) } } },
+      apple_data: { "apns-collapse-id": push_tag(notification) },
+      data:      { path: notification.target_path, tag: push_tag(notification) }
     ).deliver_later_to(devices)
   end
 

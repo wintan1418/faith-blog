@@ -94,4 +94,13 @@ class MessagingTest < ActionDispatch::IntegrationTest
     assert_match %r{<turbo-stream action="append" target="messages">}, response.body
     assert_match %r{<turbo-stream action="replace" target="read_receipt">}, response.body
   end
+
+  test "opening a conversation clears its chat notifications" do
+    @with_maria.messages.create!(sender: @maria, body: "Are you there?")
+    assert @me.notifications.unread.direct_message.exists?
+
+    get conversation_path(@with_maria)
+
+    assert_not @me.notifications.unread.direct_message.exists?
+  end
 end

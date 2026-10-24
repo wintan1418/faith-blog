@@ -519,3 +519,70 @@ html .msg-page .msg-search input[type="search"]:focus {
 html .msg-page .msg-rows > form.button_to { display: block !important; width: 100%; margin: 0; }
 html .msg-page .msg-compose-input,
 html .msg-page .msg-compose-input:focus { box-shadow: none !important; }
+
+/* QA: messages in a group need to read as separate messages. */
+.msg-item:not(.starts-group) { margin-top: 0.45rem; }
+@media (hover: none) {
+  /* Phones can't hover, so each grouped message shows its time faintly. */
+  .msg-gutter-time { visibility: visible; opacity: 0.7; }
+}
+
+/* QA: tighter composer on phones so more of the conversation fits on screen. */
+@media (max-width: 899px) {
+  .msg-composer { padding: 0.4rem 0.6rem 0.4rem; }
+  .msg-compose-input { min-height: 40px; padding: 0.55rem 0.75rem; font-size: 0.95rem; }
+  .msg-compose-bar { margin-top: 0.15rem; }
+  .msg-tool { width: 34px; height: 34px; }
+  .msg-send { padding: 0.35rem 1rem; }
+  .msg-receipt { padding-bottom: 0.1rem; }
+}
+
+/* ── Voice notes (QA): clear recording state + listen before sending ── */
+.msg-recording {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 52px;
+  padding: 0.4rem 0.4rem 0.4rem 0.9rem;
+  border-radius: 12px;
+  background: color-mix(in oklch, #dc2626 10%, var(--msg-surface));
+  border: 1px solid color-mix(in oklch, #dc2626 35%, transparent);
+  color: var(--msg-ink);
+}
+.msg-recording.hidden { display: none; }
+.msg-composer.is-recording .msg-compose { display: none; }
+.msg-recording-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #dc2626;
+  animation: msg-rec-pulse 1.1s ease-in-out infinite;
+}
+@keyframes msg-rec-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.8); } }
+.msg-recording-label { font-weight: 700; font-size: 0.9rem; }
+.msg-recording-time { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 1rem; }
+.msg-recording-max { flex: 1; font-size: 0.72rem; color: var(--msg-muted); }
+.msg-recording-cancel,
+.msg-recording-stop {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.msg-recording-cancel { background: transparent; color: var(--msg-muted); }
+.msg-recording-stop { background: #dc2626; color: #fff; }
+
+.msg-voice-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+  padding: 0.3rem 0.3rem 0.3rem 0.5rem;
+  border-radius: 12px;
+  background: var(--msg-soft);
+}
+.msg-voice-preview.hidden { display: none; }
+.msg-voice-preview-audio { flex: 1; min-width: 0; height: 40px; }
+.msg-voice-preview-length { font-size: 0.8rem; font-weight: 700; color: var(--msg-muted); font-variant-numeric: tabular-nums; }
