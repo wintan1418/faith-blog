@@ -1,53 +1,42 @@
 <% content_for(:title) { "Sign In - Brethreign" } %>
 
-<div class="mystic-shell flex min-h-[calc(100vh-160px)] items-center px-4 py-12">
-  <div class="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[1fr_440px] lg:items-center">
-    <div class="hidden space-y-5 lg:block">
-      <span class="mystic-kicker">
-        <%= render_icon("sparkles", classes: "w-4 h-4") %>
-        Welcome back
-      </span>
-      <h1 class="mystic-title text-6xl">Return to the conversation with a clear heart.</h1>
-      <p class="mystic-copy max-w-xl text-lg">Pick up your feed, rooms, bookmarks, and connections without changing context.</p>
-    </div>
+<%= render layout: "devise/shared/auth_shell", locals: { title: "Welcome back", subtitle: "Take a breath. Your community is here." } do %>
+  <%= render "devise/shared/google_sign_in" %>
 
-    <div class="mystic-panel-strong p-6 sm:p-8">
-      <div class="mb-8">
-        <div class="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-white/80 text-faith-green">
-          <%= render_icon("sparkles", classes: "w-6 h-6") %>
-        </div>
-        <h1 class="text-3xl font-bold text-faith-dark">Sign in</h1>
-        <p class="mt-1 text-sm text-faith-muted">Continue to Brethreign.</p>
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name),
+               html: { class: "auth-form", data: { turbo: hotwire_native_app? } }) do |f| %>
+    <div class="auth-field">
+      <%= f.label :email, "Email", class: "auth-label" %>
+      <div class="auth-input-wrap">
+        <%= render_icon("mail", classes: "auth-input-icon") %>
+        <%= f.email_field :email, autofocus: !hotwire_native_app?, autocomplete: "email", inputmode: "email",
+                          class: "auth-input", placeholder: "you@example.com", required: true %>
       </div>
-
-      <%= render "devise/shared/google_sign_in" %>
-
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-5", data: { turbo: hotwire_native_app? } }) do |f| %>
-        <div>
-          <%= f.label :email, class: "label" %>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input", placeholder: "you@example.com" %>
-        </div>
-
-        <div>
-          <%= f.label :password, class: "label" %>
-          <%= f.password_field :password, autocomplete: "current-password", class: "input", placeholder: "Your password" %>
-        </div>
-
-        <div class="flex items-center justify-between gap-3">
-          <label class="flex items-center gap-2 text-sm font-semibold text-faith-muted">
-            <%= f.check_box :remember_me, { checked: true, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" } %>
-            Keep me signed in
-          </label>
-          <%= link_to "Forgot password?", new_password_path(resource_name), class: "text-sm font-bold text-faith-green hover:text-faith-dark" %>
-        </div>
-
-        <%= f.submit "Sign In", class: "btn btn-primary btn-lg w-full" %>
-      <% end %>
-
-      <p class="mt-6 text-center text-sm text-faith-muted">
-        New here?
-        <%= link_to "Create an account", new_registration_path(resource_name), class: "font-bold text-faith-green hover:text-faith-dark" %>
-      </p>
     </div>
-  </div>
-</div>
+
+    <div class="auth-field" data-controller="password-field">
+      <div class="auth-label-row">
+        <%= f.label :password, "Password", class: "auth-label" %>
+        <%= link_to "Forgot?", new_password_path(resource_name), class: "auth-link-small" %>
+      </div>
+      <div class="auth-input-wrap">
+        <%= render_icon("lock", classes: "auth-input-icon") %>
+        <%= f.password_field :password, autocomplete: "current-password", class: "auth-input",
+                             placeholder: "Your password", required: true, data: { password_field_target: "input" } %>
+        <button type="button" class="auth-eye" data-action="password-field#toggle" data-password-field-target="toggle"
+                aria-label="Show password" aria-pressed="false">Show</button>
+      </div>
+    </div>
+
+    <label class="auth-check">
+      <%= f.check_box :remember_me, { checked: true } %>
+      <span>Keep me signed in</span>
+    </label>
+
+    <%= f.submit "Sign in", class: "auth-submit", data: { turbo_submits_with: "Signing in…" } %>
+  <% end %>
+
+  <p class="auth-switch">
+    New to Brethreign? <%= link_to "Create an account", new_registration_path(resource_name) %>
+  </p>
+<% end %>
