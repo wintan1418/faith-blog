@@ -162,3 +162,6 @@ application.register("list-filter", ListFilterController)
 
 import LocalTimeController from "./local_time_controller"
 application.register("local-time", LocalTimeController)
+
+import PasswordFieldController from "./password_field_controller"
+application.register("password-field", PasswordFieldController)

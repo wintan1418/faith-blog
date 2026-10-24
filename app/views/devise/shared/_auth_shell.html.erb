@@ -1,0 +1,24 @@
+<%# Shared frame for sign in / sign up / password pages.
+    Phones: full screen, breathing mark on top, form below.
+    Computers: a calm brand panel on the left, the form on the right. %>
+<div class="auth">
+  <aside class="auth-side" aria-hidden="true">
+    <div class="auth-side-inner">
+      <%= render "devise/shared/breath_mark" %>
+      <p class="auth-side-verse">“And the LORD God formed man of the dust of the ground, and breathed into his nostrils the breath of life.”</p>
+      <p class="auth-side-ref">Genesis 2:7</p>
+    </div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-card">
+      <header class="auth-head">
+        <div class="auth-head-mark"><%= render "devise/shared/breath_mark" %></div>
+        <h1 class="auth-title"><%= title %></h1>
+        <p class="auth-subtitle"><%= subtitle %></p>
+      </header>
+
+      <%= yield %>
+    </div>
+  </main>
+</div>
