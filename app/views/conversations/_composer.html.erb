@@ -16,13 +16,14 @@
   <%# Inline previews (images + recorded voice note) sit ABOVE the row %>
   <div class="dm-previews-row">
     <div data-dm-composer-target="previews" class="dm-previews hidden"></div>
-    <div data-dm-composer-target="voicePreview" class="dm-voice-preview hidden">
-      <span class="dm-voice-preview-label">🎙️ Voice note ready</span>
-      <span data-dm-composer-target="voiceLength">0s</span>
-      <button type="button"
-              class="dm-voice-clear"
-              data-action="click->dm-composer#clearVoice"
-              aria-label="Discard voice note">✕</button>
+    <%# After recording: listen back, then send or delete. %>
+    <div data-dm-composer-target="voicePreview" class="msg-voice-preview hidden">
+      <audio controls preload="metadata" class="msg-voice-preview-audio" data-dm-composer-target="voiceAudio"></audio>
+      <span class="msg-voice-preview-length" data-dm-composer-target="voiceLength">0:00</span>
+      <button type="button" class="msg-icon-btn" data-action="click->dm-composer#clearVoice"
+              title="Delete voice note" aria-label="Delete voice note">
+        <%= render_icon("trash", classes: "h-4 w-4") %>
+      </button>
     </div>
 
     <div data-dm-composer-target="scripturePreview" class="dm-scripture-chip hidden">
@@ -47,6 +48,16 @@
       <button type="button" class="dm-nudge-soften" data-action="click->dm-composer#useSuggestion">Use softer wording</button>
       <button type="button" class="dm-nudge-send" data-action="click->dm-composer#sendAnyway">Send anyway</button>
     </div>
+  </div>
+
+  <%# While recording a voice note: an unmistakable bar with a live timer. %>
+  <div class="msg-recording hidden" data-dm-composer-target="recordingBar" role="status" aria-live="polite">
+    <span class="msg-recording-dot" aria-hidden="true"></span>
+    <span class="msg-recording-label">Recording</span>
+    <span class="msg-recording-time" data-dm-composer-target="recordingTime">0:00</span>
+    <span class="msg-recording-max">max 2:00</span>
+    <button type="button" class="msg-recording-cancel" data-action="click->dm-composer#cancelRecording">Cancel</button>
+    <button type="button" class="msg-recording-stop" data-action="click->dm-composer#stopRecordingClick">Stop</button>
   </div>
 
   <%# LinkedIn-style: a roomy text box, then a tool row with Send on the right. %>

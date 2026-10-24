@@ -43,7 +43,8 @@ class DmPushNotificationTest < ActionDispatch::IntegrationTest
     assert_equal @sub.endpoint, sent.first[:endpoint]
 
     payload = JSON.parse(sent.first[:message])
-    assert_match(/sent you a message/, payload["body"])
+    # Shows who it is from and what they said (LinkedIn-style preview).
+    assert_equal "push_sender: Grace and peace to you today.", payload["body"]
     assert_equal conversation_path(@conversation), payload["url"]
     # DM pushes collapse per conversation so a burst doesn't stack.
     assert_equal "brethreign-dm-#{@conversation.id}", payload["tag"]

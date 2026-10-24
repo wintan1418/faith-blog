@@ -23,6 +23,7 @@ class ConversationsController < ApplicationController
     load_sidebar
     load_thread
     @conversation.mark_read_for!(current_user)
+    clear_message_notifications
   end
 
   def create
@@ -63,10 +64,18 @@ class ConversationsController < ApplicationController
 
   def mark_read
     @conversation.mark_read_for!(current_user)
+    clear_message_notifications
     redirect_to conversation_path(@conversation)
   end
 
   private
+
+  # Reading a conversation clears its chat notifications.
+  def clear_message_notifications
+    current_user.notifications.unread.direct_message
+                .where(notifiable_type: "Message", notifiable_id: @conversation.messages.select(:id))
+                .update_all(read_at: Time.current)
+  end
 
   def set_conversation
     @conversation = current_user.conversations.find(params[:id])

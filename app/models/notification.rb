@@ -47,6 +47,9 @@ class Notification < ApplicationRecord
   scope :read, -> { where.not(read_at: nil) }
   scope :recent, -> { order(created_at: :desc) }
   scope :today, -> { where("created_at >= ?", Time.current.beginning_of_day) }
+  # Everything except chat messages. Messages live in the Inbox (with its own badge),
+  # like LinkedIn, so they don't bury comments, reactions and follows in Alerts.
+  scope :activity, -> { where.not(notification_type: :direct_message) }
 
   # Instance methods
   def mark_as_read!
@@ -90,7 +93,7 @@ class Notification < ApplicationRecord
     when :post_reshared
       "#{actor&.display_name || 'Someone'} reshared your post"
     when :direct_message
-      "#{actor&.display_name || 'Someone'} sent you a message"
+      direct_message_text
     when :breath_from_followee
       "#{actor&.display_name || 'Someone'} breathed"
     when :everyone_mention
@@ -197,6 +200,18 @@ class Notification < ApplicationRecord
     NotificationMailer.with(notification: self).community_notification.deliver_later
   end
 
+  # One chat notification per conversation: "Maria: See you at 7", or
+  # "Maria sent you 3 messages" when several are waiting.
+  def direct_message_text
+    name = actor&.display_name || "Someone"
+    conversation = notifiable.try(:conversation)
+    waiting = conversation ? conversation.unread_count_for(user) : 1
+    return "#{name} sent you #{waiting} messages" if waiting > 1
+
+    preview = notifiable.try(:body).to_s.squish
+    preview.present? && preview != "[deleted]" ? "#{name}: #{preview.truncate(120)}" : "#{name} sent you a message"
+  end
+
   def deliver_push_notification
     web    = WebPushConfig.configured? && user.push_subscriptions.exists?
     native = NativePushConfig.configured? && user.push_devices.deliverable.exists?
@@ -204,4 +219,7 @@ class Notification < ApplicationRecord
 
     PushNotificationJob.perform_later(self)
   end
+
+  # Also called when a waiting chat notification is refreshed by a newer message.
+  public :deliver_push_notification
 end
