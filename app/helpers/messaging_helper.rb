@@ -49,7 +49,8 @@ module MessagingHelper
     return "No messages yet" unless message
 
     text =
-      if message.body.present? then message.body.squish
+      if message.respond_to?(:removed?) && message.removed? then "Message removed"
+      elsif message.body.present? then message.body.squish
       elsif message.respond_to?(:has_voice_note?) && message.has_voice_note? then "Sent a voice note"
       elsif message.respond_to?(:has_images?) && message.has_images? then "Sent a photo"
       elsif message.respond_to?(:has_scripture?) && message.has_scripture? then "Shared a verse"

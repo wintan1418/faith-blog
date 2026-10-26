@@ -276,6 +276,12 @@ class User < ApplicationRecord
   end
 
   # Ids of accepted connections, without loading the users.
+  validate :username_is_clean, if: :will_save_change_to_username?
+
+  def username_is_clean
+    errors.add(:username, "isn't allowed. Please choose another") if CleanLanguage.offensive?(username.to_s.tr("_", " "))
+  end
+
   # Cards this person closed, remembered across devices ("join-12", "release-3", "onboard-feed").
   DISMISSED_CARDS_KEPT = 300
   DISMISSAL_KEY = /\A[a-z0-9_-]{1,60}\z/

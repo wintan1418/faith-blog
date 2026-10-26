@@ -26,7 +26,12 @@ class MessagesController < ApplicationController
       @messages = @conversation.messages.visible.includes(sender: { profile: { avatar_attachment: :blob } }).oldest_first
       respond_to do |format|
         format.html { render "conversations/show", status: :unprocessable_entity }
-        format.turbo_stream { render "conversations/show", status: :unprocessable_entity }
+        # Keep the chat on screen: just show why, with what they typed still in the box.
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("new_message", partial: "conversations/composer",
+                                                                   locals: { conversation: @conversation, message: @message }),
+                 status: :unprocessable_entity
+        end
       end
     end
   end

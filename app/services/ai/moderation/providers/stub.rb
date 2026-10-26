@@ -7,6 +7,12 @@ module Ai
         DEFAULT_MODEL = "stub"
 
         FLAGGED_KEYWORDS = %w[kill suicide bomb scam phish stupid hate].freeze
+        # Offline stand-ins for the three things Brethreign fights hardest (high severity).
+        STRONG_KEYWORDS = {
+          "explicit_adult" => [ "sext", "naked", "hook up" ],
+          "occult"         => [ "juju", "money ritual", "native doctor", "spell" ],
+          "scam"           => [ "bank details", "otp", "double your money", "send me money", "forex" ]
+        }.freeze
         HARSH_KEYWORDS   = %w[idiot stupid moron loser shut\ up].freeze
 
         def call(system:, user:)
@@ -15,7 +21,16 @@ module Ai
           return wrap(model: "stub", text: JSON.dump(gentleness_payload(user))) if system.to_s.include?("[TASK:GENTLENESS]")
           return wrap(model: "stub", text: JSON.dump(scripture_payload(user)))  if system.to_s.include?("[TASK:SCRIPTURE]")
 
-          match = FLAGGED_KEYWORDS.find { |w| user.to_s.downcase.include?(w) }
+          text = user.to_s.downcase
+          strong = STRONG_KEYWORDS.find { |_cat, words| words.any? { |w| text.include?(w) } }
+          if strong
+            return wrap(model: "stub", text: JSON.dump(
+              safe: false, severity: "high", categories: [ strong.first ], score: 0.95,
+              summary: "Stub flagged #{strong.first}.", recommended_action: "block"
+            ))
+          end
+
+          match = FLAGGED_KEYWORDS.find { |w| text.include?(w) }
 
           payload =
             if match

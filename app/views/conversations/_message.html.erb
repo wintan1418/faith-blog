@@ -6,6 +6,7 @@
 <% previous = local_assigns.key?(:previous) ? local_assigns[:previous] : message.previous_in_thread %>
 <% mine = message.sender_id == viewer_id %>
 <% deleted = message.deleted? %>
+<% removed = !deleted && message.removed? %>
 <% starts_group = message_starts_group?(message, previous) %>
 
 <%
@@ -43,6 +44,8 @@
       <div class="msg-bubble" data-controller="message-menu" data-action="click->message-menu#toggle">
         <% if deleted %>
           <p class="msg-deleted">This message was deleted</p>
+        <% elsif removed %>
+          <p class="msg-deleted msg-removed">🛡 This message was removed for breaking our community guidelines.</p>
         <% else %>
           <% if message.has_scripture? %>
             <%= render "conversations/scripture_card", message: message %>
@@ -69,7 +72,7 @@
           <% end %>
         <% end %>
 
-        <% unless deleted %>
+        <% unless deleted || removed %>
           <div class="msg-actions" data-message-menu-target="actions"
                data-controller="emoji-reactions message-edit"
                data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Message", likeable_id: message.id) %>"
@@ -101,7 +104,7 @@
         <% end %>
       </div>
 
-      <% if !deleted && (emoji_groups.any? || user_like) %>
+      <% if !deleted && !removed && (emoji_groups.any? || user_like) %>
         <div class="msg-reactions">
           <% emoji_groups.each do |emoji, group| %>
             <% mine_emoji = user_like&.display_emoji == emoji %>

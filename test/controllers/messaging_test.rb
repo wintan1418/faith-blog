@@ -134,4 +134,13 @@ class MessagingTest < ActionDispatch::IntegrationTest
 
     assert_select "textarea.msg-compose-input", text: "Happy birthday, Maria!"
   end
+
+  test "a refused message keeps the chat open, shows why, and keeps the text" do
+    post conversation_messages_path(@with_maria), params: { message: { body: "f*ck this" } }, as: :turbo_stream
+
+    assert_response :unprocessable_entity
+    assert_match %r{<turbo-stream action="replace" target="new_message">}, response.body
+    assert_match "keep it kind", response.body
+    assert_match "f*ck this", response.body
+  end
 end

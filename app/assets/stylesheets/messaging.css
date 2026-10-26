@@ -601,3 +601,4 @@ html .msg-page .msg-compose-input:focus { box-shadow: none !important; }
   text-decoration: none;
 }
 .msg-load-earlier-btn:hover { background: var(--msg-soft); }
+.msg-removed { color: #b45309; }
