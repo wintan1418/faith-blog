@@ -5,8 +5,8 @@ require "test_helper"
 # Closed cards are remembered on the account, so they stay gone on every device.
 class DismissalsTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(username: "dismisser", email: "dismisser@example.com", password: "Pw-#{SecureRandom.hex(8)}")
-    @joiner = User.create!(username: "newbie", email: "newbie@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    @user = User.create!(username: "dismisser", email: "dismisser@example.com", password: test_password)
+    @joiner = User.create!(username: "newbie", email: "newbie@example.com", password: test_password)
     # Joining automatically posts the "just joined" card.
     @join = Announcement.new_members.find_by!(user: @joiner)
     sign_in @user

@@ -3,7 +3,7 @@
 require "test_helper"
 
 class ExperienceTest < ActiveSupport::TestCase
-  setup { @user = User.create!(username: "pro_user", email: "pro_user@example.com", password: "Pw-#{SecureRandom.hex(8)}") }
+  setup { @user = User.create!(username: "pro_user", email: "pro_user@example.com", password: test_password) }
 
   test "month fields store the first of the month and show LinkedIn-style dates" do
     role = @user.experiences.create!(title: "Nurse", organization: "LUTH", start_month: "2022-03", end_month: "2024-05")
