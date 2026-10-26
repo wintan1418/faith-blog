@@ -34,4 +34,11 @@ class FeedPagingTest < ActionDispatch::IntegrationTest
     assert_match "Breath 6", response.body
     assert_no_match(/Breath 25</, response.body)
   end
+
+  test "opening the feed at page two as a full page still works" do
+    get feed_path(page: 2)
+
+    assert_response :success
+    assert_match "Breath 6", response.body
+  end
 end
