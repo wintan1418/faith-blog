@@ -602,3 +602,14 @@ html .msg-page .msg-compose-input:focus { box-shadow: none !important; }
 }
 .msg-load-earlier-btn:hover { background: var(--msg-soft); }
 .msg-removed { color: #b45309; }
+.msg-money-tip {
+  margin: 0.4rem 0 0.15rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid rgba(217, 119, 6, 0.28);
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.09);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #92400e;
+}
+html.theme-dark .msg-money-tip { color: #fcd34d; background: rgba(245, 158, 11, 0.12); }

@@ -38,11 +38,16 @@ module Ai
           rituals, spells, divination, séances, "spiritual power" for sale.
           Category "occult". A testimony of being DELIVERED from the occult, or
           teaching against it, is NOT a violation.
-        - Fraud and scams: asking for money, bank details, card numbers, OTPs or
-          passwords; investment, forex, crypto or "doubling" schemes; fake jobs,
-          loans, visas or grants; romance scams; impersonating a pastor or ministry
-          to collect money. Category "scam". Kind: message (a private chat) deserves
-          extra care here, because scammers work one-to-one.
+        - Fraud and scams. Money itself is NOT a problem: brethren help each other,
+          give, lend, sell and do honest business, so "send your account number,
+          I want to bless you", "how much for the cake?" or "I'll pay you Friday"
+          are fine (safe, severity "none" or "low"). Only flag clear scam signs:
+          asking for OTPs, PINs, BVN, card numbers or passwords; investment, forex,
+          crypto or "doubling" promises; "pay a fee to receive" a prize, grant, job,
+          loan or visa; romance or sob-story pressure from a stranger; urgency and
+          secrecy; impersonating a pastor, ministry or staff to collect money.
+          Category "scam". Clear scams: severity "high", recommended_action "block".
+          Merely suspicious: severity "medium", recommended_action "require_review".
 
         Insults and name-calling aimed at a person ("you idiot", "you madman",
         "your head is not correct", "your mother", mocking someone's looks) are
