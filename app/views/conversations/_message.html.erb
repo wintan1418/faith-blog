@@ -9,7 +9,7 @@
 <% starts_group = message_starts_group?(message, previous) %>
 
 <%
-  loaded_likes = message.likes.includes(:user).to_a
+  loaded_likes = message.likes.loaded? ? message.likes.to_a : message.likes.includes(:user).to_a
   user_like    = viewer_id ? loaded_likes.find { |l| l.user_id == viewer_id } : nil
   emoji_groups = loaded_likes
                    .reject { |l| l.reaction_emoji.to_s.empty? }

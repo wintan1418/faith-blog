@@ -213,6 +213,7 @@ Rails.application.routes.draw do
     member do
       post :archive
       post :mark_read
+      get :earlier
     end
     resources :messages, only: [ :create, :update, :destroy ]
   end

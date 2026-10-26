@@ -45,6 +45,7 @@
         <p class="msg-intro-name"><%= other_user.display_name %></p>
         <% if other_user.profile&.bio.present? %><p class="msg-intro-bio"><%= truncate(other_user.profile.bio, length: 90) %></p><% end %>
       </div>
+      <%= render "conversations/load_earlier", conversation: conversation, oldest: messages.first, has_more: @has_earlier %>
       <% previous = nil %>
       <% messages.each do |msg| %>
         <%= render "conversations/message", message: msg, previous: previous, viewer_id: current_user.id %>

@@ -1,0 +1,7 @@
+<%# Sits above the oldest message shown; replaced by the next page when tapped. %>
+<div id="load_earlier" class="msg-load-earlier">
+  <% if has_more && oldest %>
+    <%= link_to "Load earlier messages", earlier_conversation_path(conversation, before: oldest.id),
+                class: "msg-load-earlier-btn", data: { turbo_stream: true } %>
+  <% end %>
+</div>

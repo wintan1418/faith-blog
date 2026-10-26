@@ -31,7 +31,12 @@
   <div class="msg-rows">
     <% if conversations.any? %>
       <% conversations.each do |conversation| %>
-        <%= render "conversations/conversation_row", conversation: conversation, active: active == conversation %>
+        <% if defined?(@latest_by_conversation) && @latest_by_conversation %>
+          <%= render "conversations/conversation_row", conversation: conversation, active: active == conversation,
+                     latest: @latest_by_conversation[conversation.id], unread: @unread_by_conversation[conversation.id] %>
+        <% else %>
+          <%= render "conversations/conversation_row", conversation: conversation, active: active == conversation %>
+        <% end %>
       <% end %>
     <% elsif filter == "unread" %>
       <div class="msg-empty">

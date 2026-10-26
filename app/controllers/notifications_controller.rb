@@ -4,14 +4,14 @@ class NotificationsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @pagy, @notifications = pagy(current_user.notifications.activity.recent)
+    @pagy, @notifications = pagy(current_user.notifications.activity.recent.includes(actor: { profile: { avatar_attachment: :blob } }))
   end
 
   # Lazy-loaded fragment for the navbar bell modal. Renders without
   # the application layout. Opening the panel marks everything read
   # as a side effect.
   def popover
-    @notifications = current_user.notifications.activity.recent.limit(20)
+    @notifications = current_user.notifications.activity.recent.includes(actor: { profile: { avatar_attachment: :blob } }).limit(20)
     Notification.mark_all_as_read!(current_user)
     render layout: false
   end

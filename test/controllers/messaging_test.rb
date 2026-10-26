@@ -103,4 +103,28 @@ class MessagingTest < ActionDispatch::IntegrationTest
 
     assert_not @me.notifications.unread.direct_message.exists?
   end
+
+  test "long chats open with the latest 50 and load earlier ones on request" do
+    60.times { |i| say(@with_maria, @maria, "Message #{i}", at: (120 - i).minutes.ago) }
+    get conversation_path(@with_maria)
+
+    assert_select ".msg-item", count: 50
+    assert_select "#load_earlier a", text: "Load earlier messages"
+    assert_no_match "Message 9<", response.body, "the oldest ones wait"
+
+    first_shown = @with_maria.messages.visible.order(created_at: :desc).limit(50).last
+    get earlier_conversation_path(@with_maria, before: first_shown.id), as: :turbo_stream
+
+    assert_response :success
+    assert_match "Would you pray with me?", response.body, "the very first message comes back"
+    assert_match %r{<turbo-stream action="replace" target="message_#{first_shown.id}">}, response.body
+  end
+
+  test "the list shows previews and unread counts from batched queries" do
+    say(@with_maria, @maria, "Second line", at: 1.hour.ago)
+    get conversations_path
+
+    assert_select ".msg-row.is-unread .msg-row-unread", text: "2"
+    assert_select ".msg-row-preview", text: "Second line"
+  end
 end

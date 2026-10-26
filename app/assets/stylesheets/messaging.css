@@ -586,3 +586,18 @@ html .msg-page .msg-compose-input:focus { box-shadow: none !important; }
 .msg-voice-preview.hidden { display: none; }
 .msg-voice-preview-audio { flex: 1; min-width: 0; height: 40px; }
 .msg-voice-preview-length { font-size: 0.8rem; font-weight: 700; color: var(--msg-muted); font-variant-numeric: tabular-nums; }
+
+/* "Load earlier messages" above the oldest message shown. */
+.msg-load-earlier { display: flex; justify-content: center; }
+.msg-load-earlier:not(:has(a)) { display: none; }
+.msg-load-earlier-btn {
+  margin: 0.75rem 0 0.25rem;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--msg-line);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--msg-accent);
+  text-decoration: none;
+}
+.msg-load-earlier-btn:hover { background: var(--msg-soft); }

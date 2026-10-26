@@ -38,7 +38,9 @@ class Conversation < ApplicationRecord
   end
 
   def other_participant_for(user)
-    conversation_participants.includes(:user).map(&:user).detect { |participant| participant.id != user.id }
+    # Use the participants already loaded with the list (one query for all rows), if any.
+    participants = conversation_participants.loaded? ? conversation_participants : conversation_participants.includes(:user)
+    participants.map(&:user).detect { |participant| participant.id != user.id }
   end
 
   def participant_for(user)
