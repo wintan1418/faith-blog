@@ -18,4 +18,20 @@ class CleanLanguageTest < ActiveSupport::TestCase
       assert_not CleanLanguage.offensive?(text), "should allow: #{text}"
     end
   end
+
+  test "insults aimed at someone are blocked" do
+    [ "you are mad", "you madman", "You idiot!", "youre stupid", "u r a mumu", "you are a big fool",
+      "stupid man", "useless girl", "Shut up!", "shut your mouth", "you dog", "you are such a moron" ].each do |text|
+      assert CleanLanguage.offensive?(text), "should block: #{text}"
+    end
+  end
+
+  test "the same words are fine when not aimed at anyone, or in scripture" do
+    [ "you are not useless, God loves you", "I was a fool before Christ", "Ye fools and blind",
+      "Thou fool, this night thy soul", "you are mad blessed this year", "Are you mad at God? Tell Him",
+      "That stupid habit nearly ruined me", "the priest shall shut up the house", "O foolish people and unwise",
+      "a dumb man possessed", "one of you is a devil", "Have I need of mad men" ].each do |text|
+      assert_not CleanLanguage.offensive?(text), "should allow: #{text}"
+    end
+  end
 end

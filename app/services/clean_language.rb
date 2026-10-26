@@ -38,9 +38,46 @@ module CleanLanguage
   LEET = { "0" => "o", "1" => "i", "!" => "i", "|" => "i", "3" => "e", "4" => "a", "@" => "a",
            "5" => "s", "$" => "s", "7" => "t", "+" => "t", "8" => "b", "9" => "g" }.freeze
 
+  # Insults are blocked when aimed at someone ("you idiot", "you're stupid",
+  # "stupid man"), not as bare words: the Bible says "the fool hath said",
+  # people say "I was a fool before Christ", and "you are mad blessed" is praise.
+  INSULTS = %w[
+    idiot idiots stupid stupidity moron morons imbecile dumb dummy fool fools foolish
+    madman madmen madwoman useless worthless nonsense rubbish senseless brainless
+    mumu olodo werey mugu ewu bastard bastards loser losers dullard
+  ].freeze
+  # Only an insult with nothing praising after it: "you are mad" yes, "you are mad blessed" no.
+  SOFT_INSULTS = %w[mad crazy silly ugly dog pig goat animal witch].freeze # not "devil": "one of you is a devil" (John 6:70)
+  INSULT_PEOPLE = %w[man men woman women boy boys girl girls guy guys person people thing things fellow].freeze
+
+  YOU = /(?:you|u|ya|yu)/
+  YOU_ARE = /(?:#{YOU}\s+(?:are|r|re|is)|youre|ur|ure)/
+  FILLER = /(?:\s+(?:a|an|such|so|very|really|just|this|one|big|total|complete|ode))*/
+  INSULT_WORDS = /(?:#{INSULTS.join("|")})/
+  SOFT_WORDS = /(?:#{SOFT_INSULTS.join("|")})/
+  PEOPLE_WORDS = /(?:#{INSULT_PEOPLE.join("|")})/
+  # Harsh adjectives that insult when put in front of a person ("stupid man").
+  # Not "foolish"/"mad": the Bible says "O foolish people" and "mad men".
+  HARSH = /(?:stupid|useless|worthless|senseless|brainless|idiotic|rubbish|nonsense)/ # not "dumb": KJV "a dumb man" = unable to speak
+  DIRECTED = [
+    /\b(?:#{YOU_ARE}|#{YOU})#{FILLER}\s+#{INSULT_WORDS}\b/,                      # you idiot / you're a stupid
+    /\b(?:#{YOU_ARE}|#{YOU})#{FILLER}\s+#{SOFT_WORDS}(?:\s+#{PEOPLE_WORDS})?\s*$/, # you are mad (end of sentence)
+    /\b#{HARSH}\s+#{PEOPLE_WORDS}\b/,                                             # stupid man, useless girl
+    # "Shut up!" said to someone: at the start or end of a sentence, not "shut up the heaven".
+    /(?:\A\s*(?:just\s+|you\s+)?shut\s+up(?:\s+(?:you|man|joor|jare))?\s*\z|\bshut\s+your\s+(?:mouth|trap)\b)/
+].freeze
+
   module_function
 
-  def offensive?(text) = offending_word(text).present?
+  def offensive?(text) = offending_word(text).present? || insulting?(text)
+
+  # A directed insult, judged sentence by sentence on cleaned-up words.
+  def insulting?(text)
+    text.to_s.downcase.split(/[.!?;\n]+/).any? do |sentence|
+      words = sentence.split(/\s+/).map { |t| normalise(t) }.compact_blank.join(" ")
+      DIRECTED.any? { |pattern| words.match?(pattern) }
+    end
+  end
 
   # The first offending (normalised) word, for logs and tests.
   def offending_word(text)
