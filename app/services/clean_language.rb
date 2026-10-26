@@ -65,11 +65,34 @@ module CleanLanguage
     /\b#{HARSH}\s+#{PEOPLE_WORDS}\b/,                                             # stupid man, useless girl
     # "Shut up!" said to someone: at the start or end of a sentence, not "shut up the heaven".
     /(?:\A\s*(?:just\s+|you\s+)?shut\s+up(?:\s+(?:you|man|joor|jare))?\s*\z|\bshut\s+your\s+(?:mouth|trap)\b)/
-].freeze
+  ].freeze
+
+  # Coded sexual talk aimed at someone ("your kitty is dripping", "I want to taste you").
+  # Body slang only counts next to a sexual word, so "your body is a temple" is fine.
+  BODY_SLANG = /(?:kitty|kitten|cookie|toto|coochie|punani|pum\s*pum|yansh|nyash|bum|booty|backside|boobs?|breasts?|nipples?|melons|package|privates?|private\s+parts?|thing|body|hole)/
+  SEXY = /(?:wet|wetter|dripping|drippin|juicy|tight|hard|horny|sexy|hot|sweet|delicious|tasty|ready\s+for\s+me)/
+  SEXUAL = [
+    /\b(?:your|ur|yur|ya)\s+#{BODY_SLANG}(?:\s+(?:is|are|dey|be|looks?|looking|getting|so|very|all))*\s+#{SEXY}\b/,
+    /\b(?:want|wanna|gonna|go|will|let\s+me|lemme|can\s+i|i\s+go)\s+(?:to\s+)?(?:lick|taste|suck|smash|knack|bang|ride|chop|eat)\s+(?:you|u|your|ur|that)\b/,
+    /\bsit\s+on\s+my\s+(?:face|d|dick|lap)\b/,
+    /\b(?:sexy|naked|nude|bedroom|bed)\s+(?:pics?|pictures?|photos?|videos?|vids?)\b/,
+    /\b(?:wet|wetter|dripping|horny)\s+for\s+(?:you|u|me)\b/
+  ].freeze
+  SEXUAL_EMOJI = %w[🍆 🍑 💦 👅].freeze
 
   module_function
 
-  def offensive?(text) = offending_word(text).present? || insulting?(text)
+  def offensive?(text) = offending_word(text).present? || insulting?(text) || sexual?(text)
+
+  # Coded sexual talk, or two or more sexual emojis together (🍆💦).
+  def sexual?(text)
+    return true if SEXUAL_EMOJI.count { |e| text.to_s.include?(e) } >= 2
+
+    text.to_s.downcase.split(/[.!?;\n]+/).any? do |sentence|
+      words = sentence.split(/\s+/).map { |t| normalise(t) }.compact_blank.join(" ")
+      SEXUAL.any? { |pattern| words.match?(pattern) }
+    end
+  end
 
   # A directed insult, judged sentence by sentence on cleaned-up words.
   def insulting?(text)

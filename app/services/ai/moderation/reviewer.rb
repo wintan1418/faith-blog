@@ -28,6 +28,12 @@ module Ai
         - Sexual or raunchy content: sexual descriptions, sexting, flirting for sex,
           requests for nude photos, hook-ups, porn links. Category "explicit_adult"
           (or "sexual_exploitation" if a minor or coercion is involved).
+          This includes hidden or coded sexual talk: innuendo, double meanings,
+          slang and pet names for body parts ("kitty", "cookie", "toto", "thing",
+          "package", "melons"), words like wet, dripping, hard, horny, "come and sit
+          on", "what are you wearing", "send pics", "let's link up tonight" said with
+          sexual intent, and sexual emojis (🍆 🍑 💦 👅 😈) used suggestively.
+          Judge the meaning, not just the words.
         - Occult practice: witchcraft, sorcery, juju, charms, native doctors, money
           rituals, spells, divination, séances, "spiritual power" for sale.
           Category "occult". A testimony of being DELIVERED from the occult, or
@@ -37,6 +43,10 @@ module Ai
           loans, visas or grants; romance scams; impersonating a pastor or ministry
           to collect money. Category "scam". Kind: message (a private chat) deserves
           extra care here, because scammers work one-to-one.
+
+        Insults and name-calling aimed at a person ("you idiot", "you madman",
+        "your head is not correct", "your mother", mocking someone's looks) are
+        harassment: category "harassment", severity at least "medium".
 
         Return ONLY a single JSON object, no prose, no markdown fences. Schema:
         {

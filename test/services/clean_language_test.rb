@@ -34,4 +34,19 @@ class CleanLanguageTest < ActiveSupport::TestCase
       assert_not CleanLanguage.offensive?(text), "should allow: #{text}"
     end
   end
+
+  test "coded sexual talk is blocked" do
+    [ "your kitty is dripping", "Ur kitty is so wet", "your body is so sexy", "I want to taste you",
+      "lemme lick u", "send me bedroom pics", "sit on my face", "im wet for you", "🍆💦" ].each do |text|
+      assert CleanLanguage.offensive?(text), "should block: #{text}"
+    end
+  end
+
+  test "everyday and Bible words used innocently are fine" do
+    [ "your body is a temple of the Holy Spirit", "taste and see that the Lord is good",
+      "my kitty is sick, pray for her", "send me the pictures from church", "I want to eat with you after service",
+      "your thing is ready, come pick it up", "🍑 peach season!", "is there any thing too hard for me?" ].each do |text|
+      assert_not CleanLanguage.offensive?(text), "should allow: #{text}"
+    end
+  end
 end
