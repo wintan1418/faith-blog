@@ -2,60 +2,45 @@
 
 class FeedController < ApplicationController
   before_action :authenticate_user!
-  before_action :load_sidebar_context
-  before_action :load_onboarding_progress
+  # Infinite scroll (?page=N) only appends cards; it never shows the sidebar or onboarding.
+  before_action :load_sidebar_context, unless: :next_page?
+  before_action :load_onboarding_progress, unless: :next_page?
 
   POSTS_BUFFER    = 60
   RESHARES_BUFFER = 60
   PER_PAGE        = 20
+  # Community-wide sidebar bits are the same for everyone: refresh every few minutes.
+  SIDEBAR_TTL     = 5.minutes
 
   def index
     # Pinned breaths (admin-featured) lead the feed — a community noticeboard.
     @pinned_posts = feed_posts_scope.where(featured: true).recent.limit(2).to_a
 
-    posts    = feed_posts_scope.where.not(id: @pinned_posts.map(&:id)).recent.limit(POSTS_BUFFER)
-    reshares = Reshare.includes(:user, post: feed_post_includes)
-                      .order(created_at: :desc)
-                      .limit(RESHARES_BUFFER)
-
-    @pagy, @items = pagy_array(FeedItem.merge(posts: posts, reshares: reshares), items: PER_PAGE)
+    posts    = Post.published.where.not(id: @pinned_posts.map(&:id)).recent
+    reshares = Reshare.order(created_at: :desc)
+    @items = paged_feed(posts: posts, reshares: reshares)
     respond_to_feed
   end
 
   def threads
-    posts = Post.published
-                .threads_or_active
-                .includes(feed_post_includes)
-                .recent
-                .limit(POSTS_BUFFER)
-
-    @pagy, @items = pagy_array(posts.map { |p| FeedItem.from_post(p) }, items: PER_PAGE)
+    @items = paged_feed(posts: Post.published.threads_or_active.recent)
     respond_to_feed
   end
 
   def trending
-    posts = feed_posts_scope
+    posts = Post.published
                 .where(published_at: 7.days.ago..)
                 .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
-                .limit(POSTS_BUFFER)
-
-    @pagy, @items = pagy_array(posts.map { |p| FeedItem.from_post(p) }, items: PER_PAGE)
+    @items = paged_feed(posts: posts, keep_order: true)
     respond_to_feed
   end
 
   def following
     followed_user_ids = current_user.following.pluck(:id)
 
-    posts    = feed_posts_scope
-                   .where(user_id: followed_user_ids)
-                   .recent
-                   .limit(POSTS_BUFFER)
-    reshares = Reshare.includes(:user, post: feed_post_includes)
-                      .where(user_id: followed_user_ids)
-                      .order(created_at: :desc)
-                      .limit(RESHARES_BUFFER)
-
-    @pagy, @items = pagy_array(FeedItem.merge(posts: posts, reshares: reshares), items: PER_PAGE)
+    posts    = Post.published.where(user_id: followed_user_ids).recent
+    reshares = Reshare.where(user_id: followed_user_ids).order(created_at: :desc)
+    @items = paged_feed(posts: posts, reshares: reshares)
     respond_to_feed
   end
 
@@ -70,6 +55,33 @@ class FeedController < ApplicationController
       breathed: current_user.posts.published.exists?
     }
     @onboard_done = @onboard.values.count(true)
+  end
+
+  # Speed: work out the page from ids and times only (tiny queries), then load full
+  # cards (author, photos, likes, tags…) for just that page's 20 items. Before, all
+  # 60 posts + 60 reposts were loaded with everything attached on every request.
+  def paged_feed(posts:, reshares: nil, keep_order: false)
+    entries = posts.limit(POSTS_BUFFER).pluck(:id, :published_at, :created_at)
+                   .map { |id, published_at, created_at| [ :post, id, published_at || created_at ] }
+    if reshares
+      entries += reshares.limit(RESHARES_BUFFER).pluck(:id, :created_at).map { |id, at| [ :reshare, id, at ] }
+    end
+    entries = entries.sort_by { |_kind, _id, at| -at.to_i } unless keep_order
+
+    @pagy, page = pagy_array(entries, items: PER_PAGE)
+
+    post_ids    = page.filter_map { |kind, id, _| id if kind == :post }
+    reshare_ids = page.filter_map { |kind, id, _| id if kind == :reshare }
+    cards     = Post.includes(feed_post_includes).where(id: post_ids).index_by(&:id)
+    reshared  = Reshare.includes(:user, post: feed_post_includes).where(id: reshare_ids).index_by(&:id)
+
+    page.filter_map do |kind, id, _|
+      if kind == :post
+        cards[id] && FeedItem.from_post(cards[id])
+      else
+        reshared[id]&.post && FeedItem.from_reshare(reshared[id])
+      end
+    end
   end
 
   def feed_posts_scope
@@ -95,26 +107,38 @@ class FeedController < ApplicationController
     end
   end
 
+  def next_page?
+    params[:page].present? && params[:page].to_i > 1
+  end
+
+  # Cached as ids (cheap to reload, safe across deploys) rather than whole records.
+  def cached_ids(key, &block)
+    Rails.cache.fetch([ "feed-sidebar", key ], expires_in: SIDEBAR_TTL, &block)
+  end
+
+  def load_by_ids(scope, ids)
+    records = scope.where(id: ids).index_by(&:id)
+    ids.filter_map { |id| records[id] }
+  end
+
   def load_sidebar_context
-    @prayer_room = Room.prayers.public_rooms.ordered.first
+    @prayer_room = Room.where(id: cached_ids(:prayer_room) { Room.prayers.public_rooms.ordered.limit(1).pluck(:id) }).first
     prayer_room_ids = Room.prayers.select(:id)
-    prayer_posts = Post.published
-                       .where(room_id: prayer_room_ids)
-                       .includes(:user, :room)
-                       .recent
+    prayer_posts = Post.published.where(room_id: prayer_room_ids).recent
 
-    @open_prayer_requests_count = prayer_posts.count
-    @open_prayer_requests = prayer_posts.limit(3)
+    @open_prayer_requests_count = cached_ids(:open_prayer_count) { prayer_posts.count }
+    @open_prayer_requests = load_by_ids(Post.includes(:user, :room), cached_ids(:open_prayers) { prayer_posts.limit(3).pluck(:id) })
 
-    @daily_verses  = BibleVerse.active.ordered.limit(20).to_a
-    @daily_breaths = GoldenBreath.active.ordered.limit(20).to_a
+    @daily_verses  = load_by_ids(BibleVerse, cached_ids(:daily_verses) { BibleVerse.active.ordered.limit(20).pluck(:id) })
+    @daily_breaths = load_by_ids(GoldenBreath, cached_ids(:daily_breaths) { GoldenBreath.active.ordered.limit(20).pluck(:id) })
     @user_reading_plan = current_user.user_reading_plans.where(completed: false).order(updated_at: :desc).first
 
-    @trending_breaths = Post.published
-                            .where(published_at: 7.days.ago..)
-                            .includes(:user, :room)
-                            .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
-                            .limit(4)
+    trending_ids = cached_ids(:trending) do
+      Post.published.where(published_at: 7.days.ago..)
+          .order(Arel.sql("(likes_count * 2 + comments_count * 3 + views_count * 0.1) DESC"))
+          .limit(4).pluck(:id)
+    end
+    @trending_breaths = load_by_ids(Post.includes(:user, :room), trending_ids)
 
     following_ids = current_user.following.pluck(:id) << current_user.id
     active_author_ids = Post.published
@@ -141,7 +165,8 @@ class FeedController < ApplicationController
     @show_onboarding = current_user.posts.none? && current_user.following.empty?
     @onboarding_rooms = Room.public_rooms.ordered.limit(3) if @show_onboarding
 
-    @release_announcement = Announcement.latest_release
-    @new_member_announcements = Announcement.recent_new_members(limit: 4)
+    @release_announcement = Announcement.where(id: cached_ids(:release) { Announcement.latest_release&.id }).first
+    @new_member_announcements = load_by_ids(Announcement.includes(:user),
+                                            cached_ids(:new_members) { Announcement.recent_new_members(limit: 4).pluck(:id) })
   end
 end
