@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -337,6 +337,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "organization_key"
+    t.string "title_key"
+    t.index ["organization_key"], name: "index_experiences_on_organization_key"
+    t.index ["title_key"], name: "index_experiences_on_title_key"
     t.index ["user_id", "start_on"], name: "index_experiences_on_user_id_and_start_on"
     t.index ["user_id"], name: "index_experiences_on_user_id"
   end
@@ -576,6 +580,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
     t.datetime "updated_at", null: false
     t.string "headline", limit: 120
     t.string "skills", default: [], null: false, array: true
+    t.integer "birth_month"
+    t.integer "birth_day"
+    t.integer "birth_year"
+    t.boolean "show_birthday", default: true, null: false
+    t.string "assembly", limit: 120
+    t.string "assembly_key"
+    t.string "city_key"
+    t.index ["assembly_key"], name: "index_profiles_on_assembly_key"
+    t.index ["birth_month", "birth_day"], name: "index_profiles_on_birth_month_and_birth_day"
+    t.index ["city_key"], name: "index_profiles_on_city_key"
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 
@@ -690,6 +704,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
     t.index ["position"], name: "index_rooms_on_position"
     t.index ["room_type"], name: "index_rooms_on_room_type"
     t.index ["slug"], name: "index_rooms_on_slug", unique: true
+  end
+
+  create_table "suggestion_dismissals", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "dismissed_user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["dismissed_user_id"], name: "index_suggestion_dismissals_on_dismissed_user_id"
+    t.index ["user_id", "dismissed_user_id"], name: "index_suggestion_dismissals_on_user_id_and_dismissed_user_id", unique: true
+    t.index ["user_id"], name: "index_suggestion_dismissals_on_user_id"
   end
 
   create_table "tags", force: :cascade do |t|
@@ -855,6 +879,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
   add_foreign_key "resources", "users", column: "approved_by_id"
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
+  add_foreign_key "suggestion_dismissals", "users"
+  add_foreign_key "suggestion_dismissals", "users", column: "dismissed_user_id"
   add_foreign_key "user_badges", "users"
   add_foreign_key "user_reading_plans", "users"
   add_foreign_key "user_risk_profiles", "users"

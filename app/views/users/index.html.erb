@@ -25,6 +25,8 @@
       </div>
     <% end %>
 
+    <%= render "shared/brethren_suggestions", suggestions: @suggestions if @suggestions.present? %>
+
     <% if @users.any? %>
       <ul class="fc-people-list">
         <% @users.each do |user| %>

@@ -121,6 +121,8 @@
         <% end %>
       </header>
 
+      <%= render "feed/birthdays", birthdays: @birthdays_today %>
+
       <%# Activation ring: stays until all three first steps are done, then
           disappears for good. Each pending step is the link to do it. %>
       <% if @onboard && @onboard_done < 3 %>
@@ -402,8 +404,11 @@
 
           <% if @items.any? %>
             <div id="feed_list" class="space-y-3">
-              <% @items.each do |item| %>
+              <% @items.each_with_index do |item, index| %>
                 <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+                <% if index == 3 && @suggestions %>
+                  <%= render "shared/brethren_suggestions", suggestions: @suggestions, nudge: @suggestion_nudge %>
+                <% end %>
               <% end %>
             </div>
 

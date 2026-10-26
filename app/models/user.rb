@@ -12,6 +12,10 @@ class User < ApplicationRecord
 
   # Associations
   has_one :profile, dependent: :destroy
+  has_many :suggestion_dismissals, dependent: :delete_all
+  has_many :dismissed_as_suggestion, class_name: "SuggestionDismissal", foreign_key: :dismissed_user_id,
+                                     dependent: :delete_all, inverse_of: :dismissed_user
+
   # Professional profile (LinkedIn-style)
   has_many :experiences, -> { ordered }, dependent: :destroy
   has_many :educations, -> { ordered }, dependent: :destroy
@@ -269,6 +273,19 @@ class User < ApplicationRecord
 
   def has_sent_connection_to?(user)
     sent_connection_requests.exists?(receiver: user)
+  end
+
+  # Ids of accepted connections, without loading the users.
+  def connection_ids
+    sent_connection_requests.accepted.pluck(:receiver_id) | received_connection_requests.accepted.pluck(:sender_id)
+  end
+
+  # Connections celebrating a birthday today (who chose to share it).
+  def brethren_birthdays_today
+    User.joins(:profile).includes(profile: { avatar_attachment: :blob })
+        .where(id: connection_ids, profiles: { show_birthday: true })
+        .merge(Profile.birthday_on(Profile.today_for_birthdays))
+        .limit(5)
   end
 
   def connections

@@ -24,6 +24,15 @@
             <p class="mt-1 text-xs text-faith-muted">One line under your name. Leave blank to use your current role.</p>
           </div>
           <div>
+            <%= f.label :assembly, "Church / Assembly", class: "label" %>
+            <%= f.text_field :assembly, class: "input", maxlength: 120, list: "assembly-options", autocomplete: "off",
+                             placeholder: "Start typing, e.g. RCCG Jubilee Parish, Lagos" %>
+            <datalist id="assembly-options">
+              <% Profile.popular_assemblies.each do |name| %><option value="<%= name %>"></option><% end %>
+            </datalist>
+            <p class="mt-1 text-xs text-faith-muted">Shown on your profile. Pick from the list if your church is there, so brethren from the same assembly can find you.</p>
+          </div>
+          <div>
             <%= f.label :skills_list, "Skills", class: "label" %>
             <%= f.text_field :skills_list, class: "input", placeholder: "Nursing, Public speaking, Graphic design, Counselling" %>
             <p class="mt-1 text-xs text-faith-muted">Separate with commas (up to <%= Profile::MAX_SKILLS %>).</p>

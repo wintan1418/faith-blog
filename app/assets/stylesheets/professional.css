@@ -1,5 +1,4 @@
-/* ==========================================
-   Professional profile (LinkedIn-style): profile card + settings.
+/* ===================================   Professional profile (LinkedIn-style): profile card + settings.
    ========================================== */
 .profile-headline { margin-top: 0.35rem; font-size: 0.98rem; font-weight: 600; color: var(--fc-ink); }
 
@@ -47,3 +46,123 @@
 
 /* "I currently work here" hides the end date. */
 .pro-form:has(input[name="experience[current]"][type="checkbox"]:checked) .pro-end-date { display: none; }
+=======
+
+/* ── Birthdays ── */
+.profile-birthday-today { display: inline-block; margin-top: 0.4rem; padding: 0.2rem 0.7rem; border-radius: 999px; background: color-mix(in oklch, #f59e0b 18%, transparent); font-size: 0.85rem; font-weight: 700; color: var(--fc-ink); }
+.fc-birthdays {
+  display: flex;
+  gap: 0.85rem;
+  margin: 0.75rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in oklch, #f59e0b 35%, transparent);
+  border-radius: 16px;
+  background: linear-gradient(135deg, color-mix(in oklch, #f59e0b 12%, var(--fc-surface)), var(--fc-surface));
+}
+.fc-birthdays-icon { font-size: 1.8rem; line-height: 1; }
+.fc-birthdays-main { flex: 1; min-width: 0; }
+.fc-birthdays-title { font-weight: 700; color: var(--fc-ink); }
+.fc-birthdays-title a { color: inherit; text-decoration: none; }
+.fc-birthdays-people { display: grid; gap: 0.5rem; margin-top: 0.6rem; }
+.fc-birthday-person { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.fc-birthday-who { display: flex; align-items: center; gap: 0.5rem; min-width: 0; color: var(--fc-ink); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.fc-birthday-who .fc-avatar { width: 32px; height: 32px; }
+.fc-birthday-who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-birthday-form { margin: 0; flex-shrink: 0; }
+.fc-birthday-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  background: #f59e0b;
+  color: #1c1917;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* ── Brethren you may know: swipeable cards ── */
+.profile-assembly { margin-top: 0.2rem; font-size: 0.9rem; color: var(--fc-muted); }
+.bys {
+  margin: 0.75rem 0;
+  padding: 0.9rem 0 0.95rem;
+  border: 1px solid var(--fc-line);
+  border-radius: 16px;
+  background: var(--fc-surface);
+}
+.bys-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0 1rem 0.65rem; }
+.bys-title { font-size: 1rem; font-weight: 800; color: var(--fc-ink); margin: 0; }
+.bys-all { font-size: 0.85rem; font-weight: 700; color: var(--fc-accent); text-decoration: none; }
+.bys-row {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0 1rem 0.2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.bys-row::-webkit-scrollbar { display: none; }
+.bys-card {
+  position: relative;
+  flex: 0 0 172px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 0.75rem 0.8rem;
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  background: var(--fc-surface);
+  text-align: center;
+  scroll-snap-align: start;
+}
+.bys-card--nudge { background: color-mix(in oklch, var(--fc-accent) 8%, var(--fc-surface)); justify-content: center; }
+.bys-nudge-icon { font-size: 2rem; }
+.bys-dismiss-form { position: absolute; top: 0.3rem; right: 0.3rem; margin: 0; }
+.bys-dismiss {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--fc-ink) 8%, transparent);
+  color: var(--fc-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.bys-who { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-width: 0; width: 100%; text-decoration: none; color: var(--fc-ink); }
+.bys-avatar { width: 72px; height: 72px; border-radius: 999px; object-fit: cover; }
+.bys-avatar--initial { display: grid; place-items: center; background: var(--fc-avatar-bg); color: var(--fc-avatar-fg); font-weight: 800; font-size: 1.6rem; }
+.bys-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; font-size: 0.92rem; color: var(--fc-ink); }
+.bys-headline {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--fc-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.1em;
+}
+.bys-reason { font-size: 0.75rem; line-height: 1.35; color: var(--fc-accent); font-weight: 600; min-height: 2.05em; }
+.bys-card form { margin: 0; width: 100%; }
+.bys-connect {
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: auto;
+  padding: 0.4rem 0.6rem;
+  border: 1.5px solid var(--fc-accent);
+  border-radius: 999px;
+  background: none;
+  color: var(--fc-accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.bys-connect:hover { background: color-mix(in oklch, var(--fc-accent) 10%, transparent); }
+.bys-connect--soft { border-color: var(--fc-line-strong, var(--fc-line)); color: var(--fc-muted); font-size: 0.75rem; }
+.bys-connect--sent { border-color: transparent; color: var(--fc-muted); cursor: default; }
+.bys-card form.bys-dismiss-form { position: absolute; top: 0.35rem; right: 0.35rem; width: auto; }
+.bys-card { padding-top: 1.35rem; }

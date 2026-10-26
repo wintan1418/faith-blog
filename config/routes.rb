@@ -203,6 +203,7 @@ Rails.application.routes.draw do
 
   # Brethren Card & Connection Requests
   resources :brethren_cards, only: [ :show ], param: :username
+  resources :suggestion_dismissals, only: [ :create ]
   resources :connection_requests, only: [ :index, :create ] do
     member do
       post :accept
