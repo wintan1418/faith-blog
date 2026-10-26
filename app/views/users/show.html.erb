@@ -50,6 +50,9 @@
                 <% end %>
               </div>
               <p class="profile-handle">@<%= @user.username %></p>
+              <% if @user.profile&.show_birthday && @user.profile.birthday_today? %>
+                <p class="profile-birthday-today">🎂 Birthday today</p>
+              <% end %>
               <% if (headline = @user.professional_headline) %>
                 <p class="profile-headline"><%= headline %></p>
               <% end %>

@@ -271,6 +271,19 @@ class User < ApplicationRecord
     sent_connection_requests.exists?(receiver: user)
   end
 
+  # Ids of accepted connections, without loading the users.
+  def connection_ids
+    sent_connection_requests.accepted.pluck(:receiver_id) | received_connection_requests.accepted.pluck(:sender_id)
+  end
+
+  # Connections celebrating a birthday today (who chose to share it).
+  def brethren_birthdays_today
+    User.joins(:profile).includes(profile: { avatar_attachment: :blob })
+        .where(id: connection_ids, profiles: { show_birthday: true })
+        .merge(Profile.birthday_on(Profile.today_for_birthdays))
+        .limit(5)
+  end
+
   def connections
     accepted_sent = sent_connection_requests.accepted.includes(:receiver).map(&:receiver)
     accepted_received = received_connection_requests.accepted.includes(:sender).map(&:sender)

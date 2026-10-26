@@ -63,6 +63,7 @@
   <%# LinkedIn-style: a roomy text box, then a tool row with Send on the right. %>
   <div class="msg-compose" data-controller="emoji-picker">
     <%= f.text_area :body,
+                    value: (message.body.presence || params[:draft].to_s.first(500).presence),
                     rows: 1,
                     class: "msg-compose-input",
                     maxlength: 4000,

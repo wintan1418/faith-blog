@@ -35,6 +35,42 @@ class Profile < ApplicationRecord
     errors.add(:skills, "can have at most #{MAX_SKILLS}") if skills.size > MAX_SKILLS
   end
 
+  # Birthdays: day and month are celebrated with brethren; the year is optional and never shown.
+  # Dates are judged in West Africa time, where most of the community is.
+  BIRTHDAY_ZONE = "Africa/Lagos"
+
+  validates :birth_month, inclusion: { in: 1..12 }, allow_nil: true
+  validates :birth_year, numericality: { only_integer: true, greater_than: 1900 }, allow_nil: true
+  validate :birthday_is_a_real_date
+
+  # Profiles whose birthday is `date` (Feb 29 birthdays are celebrated on Feb 28 in other years).
+  scope :birthday_on, lambda { |date|
+    scope = where(birth_month: date.month, birth_day: date.day)
+    scope = scope.or(where(birth_month: 2, birth_day: 29)) if date.month == 2 && date.day == 28 && !date.leap?
+    scope
+  }
+
+  def self.today_for_birthdays = Time.current.in_time_zone(BIRTHDAY_ZONE).to_date
+
+  def birthday? = birth_month.present? && birth_day.present?
+
+  def birthday_today?
+    birthday? && Profile.where(id: id).birthday_on(Profile.today_for_birthdays).exists?
+  end
+
+  # "May 14"
+  def birthday_label
+    Date.new(2000, birth_month, birth_day).strftime("%B %-d") if birthday?
+  end
+
+  def birthday_is_a_real_date
+    return if birth_month.blank? && birth_day.blank?
+    return errors.add(:birth_day, "needs a month too") if birth_month.blank? || birth_day.blank?
+
+    errors.add(:birth_day, "isn't a real date") unless Date.valid_date?(2000, birth_month.to_i, birth_day.to_i)
+    errors.add(:birth_year, "can't be in the future") if birth_year.present? && birth_year > Date.current.year
+  end
+
   # Avatar variant helpers
   def avatar_thumbnail
     avatar.variant(resize_to_fill: [ 100, 100 ])

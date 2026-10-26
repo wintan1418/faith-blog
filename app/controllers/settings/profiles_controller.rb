@@ -20,6 +20,7 @@ class Settings::ProfilesController < ApplicationController
   private
 
   def profile_params
-    params.require(:profile).permit(:bio, :location, :faith_background, :website, :public_profile, :avatar)
+    params.require(:profile).permit(:bio, :location, :faith_background, :website, :public_profile, :avatar,
+                                    :birth_month, :birth_day, :birth_year, :show_birthday)
   end
 end

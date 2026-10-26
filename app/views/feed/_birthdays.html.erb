@@ -1,0 +1,33 @@
+<%# Brethren celebrating today. "Say happy birthday" opens a chat with a greeting ready to send. %>
+<% if birthdays.present? %>
+  <section class="fc-birthdays" aria-label="Birthdays today">
+    <div class="fc-birthdays-icon" aria-hidden="true">🎂</div>
+    <div class="fc-birthdays-main">
+      <% first = birthdays.first %>
+      <p class="fc-birthdays-title">
+        <% if birthdays.size == 1 %>
+          Today is <%= link_to first.display_name, user_path(first.username) %>'s birthday
+        <% else %>
+          <%= link_to first.display_name, user_path(first.username) %> and <%= pluralize(birthdays.size - 1, "other") %> are celebrating today
+        <% end %>
+      </p>
+      <div class="fc-birthdays-people">
+        <% birthdays.each do |person| %>
+          <div class="fc-birthday-person">
+            <%= link_to user_path(person.username), class: "fc-birthday-who" do %>
+              <% if person.profile&.avatar&.attached? %>
+                <%= image_tag avatar_src(person.profile), class: "fc-avatar object-cover", alt: "" %>
+              <% else %>
+                <span class="fc-avatar" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+              <% end %>
+              <span><%= person.display_name %></span>
+            <% end %>
+            <%= button_to "Say happy birthday", conversations_path(recipient_id: person.id,
+                          draft: "Happy birthday, #{person.display_name}! 🎂 May God bless you with joy, peace and a wonderful year ahead."),
+                          method: :post, class: "fc-birthday-btn", form: { class: "fc-birthday-form" } %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
