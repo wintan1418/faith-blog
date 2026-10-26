@@ -4,7 +4,7 @@ require "test_helper"
 
 class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(username: "pro_owner", email: "pro_owner@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    @user = User.create!(username: "pro_owner", email: "pro_owner@example.com", password: test_password)
     sign_in @user
   end
 
@@ -31,7 +31,7 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   end
 
   test "you can't edit someone else's experience" do
-    other = User.create!(username: "pro_other", email: "pro_other@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    other = User.create!(username: "pro_other", email: "pro_other@example.com", password: test_password)
     role = other.experiences.create!(title: "Nurse", organization: "LUTH", start_month: "2022-03", current: true)
 
     patch settings_experience_path(role), params: { experience: { title: "Hacked" } }
@@ -40,7 +40,7 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   end
 
   test "dismissing a suggestion removes the card and remembers it" do
-    other = User.create!(username: "pro_suggested", email: "pro_suggested@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    other = User.create!(username: "pro_suggested", email: "pro_suggested@example.com", password: test_password)
     post suggestion_dismissals_path(user_id: other.id), as: :turbo_stream
 
     assert_response :success

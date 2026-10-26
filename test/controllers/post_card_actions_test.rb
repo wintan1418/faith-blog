@@ -6,8 +6,8 @@ require "test_helper"
 class PostCardActionsTest < ActionDispatch::IntegrationTest
   setup do
     ENV["AI_MODERATION_STUB"] = "1"
-    @reader = User.create!(username: "card_reader", email: "card_reader@example.com", password: "Pw-#{SecureRandom.hex(8)}")
-    author = User.create!(username: "card_author", email: "card_author@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    @reader = User.create!(username: "card_reader", email: "card_reader@example.com", password: test_password)
+    author = User.create!(username: "card_author", email: "card_author@example.com", password: test_password)
     room = Room.create!(name: "Card Room", description: "x", room_type: :general, is_public: true)
     @post = Post.create!(user: author, room: room, title: "Grace", content: "Grace and peace.", status: :published,
                          moderation_status: :approved, published_at: Time.current)

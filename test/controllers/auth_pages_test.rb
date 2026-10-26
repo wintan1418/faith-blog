@@ -5,7 +5,7 @@ require "test_helper"
 # The redesigned sign in / join pages.
 class AuthPagesTest < ActionDispatch::IntegrationTest
   # Generated per run so no password-looking literal sits in the repo (secret scanners flag them).
-  setup { @password = "Pw-#{SecureRandom.hex(8)}" }
+  setup { @password = test_password }
 
   test "sign in page has the breathing mark, fields and show-password toggle" do
     get new_user_session_path

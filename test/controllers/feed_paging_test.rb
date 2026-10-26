@@ -7,7 +7,7 @@ require "minitest/mock"
 class FeedPagingTest < ActionDispatch::IntegrationTest
   setup do
     ENV["AI_MODERATION_STUB"] = "1"
-    pw = "Pw-#{SecureRandom.hex(8)}"
+    pw = test_password
     @reader = User.create!(username: "pager", email: "pager@example.com", password: pw)
     @author = User.create!(username: "page_author", email: "page_author@example.com", password: pw)
     room = Room.create!(name: "Paging Room", description: "x", room_type: :general, is_public: true)

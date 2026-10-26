@@ -5,7 +5,7 @@ require "test_helper"
 # The "What's new" pop-up: one slide per line, shown once per person.
 class WhatsNewTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(username: "wn_user", email: "wn_user@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    @user = User.create!(username: "wn_user", email: "wn_user@example.com", password: test_password)
     @user.update_column(:created_at, 1.week.ago)
     Announcement.releases.delete_all
     @release = Announcement.create!(kind: :release, title: "New in Brethreign",
