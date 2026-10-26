@@ -156,6 +156,8 @@
 
         <%= render "reshares/button", post: post %>
         <%= render "posts/share_button", post: post %>
+        <%# Save for later, right on the card (it was only on the post page). %>
+        <%= render "posts/bookmark_button", post: post %>
 
         <% if post.prayer_status_prayer_pending? && user_signed_in? %>
           <% mine = post.user_id == current_user.id %>
