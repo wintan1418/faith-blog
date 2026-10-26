@@ -3,7 +3,5 @@ import "@hotwired/turbo-rails"
 import "./controllers"
 import "./native_back"
 import "./page_cleanup"
+import "./lazy_libs"
 
-import "trix"
-import "@rails/actiontext"
-import "emoji-picker-element"

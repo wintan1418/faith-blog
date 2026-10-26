@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { loadEditor } from "../lazy_libs"
 
 // Opens and closes the post composer <dialog>.
 // Trigger any element with data-action="click->composer-modal#open"
@@ -49,6 +50,7 @@ export default class extends Controller {
 
   open(event) {
     if (event) event.preventDefault()
+    loadEditor()
     const dialog = this.dialogTarget
     if (typeof dialog.showModal === "function") {
       dialog.open || dialog.showModal()

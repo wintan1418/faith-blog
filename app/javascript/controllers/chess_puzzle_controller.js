@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { Chess } from "chess.js"
+import { loadChess } from "../lazy_libs"
 
 // Daily chess puzzle — played fully in-app. The board is rendered from
 // the Lichess puzzle FEN; chess.js handles move legality. The user must
@@ -28,12 +28,13 @@ export default class extends Controller {
       lastMove: (this.lastMoveValue || "").trim()
     }
     this.practice = false
-    try {
+    loadChess().then((Chess) => {
+      this.Chess = Chess
       this.start()
-    } catch (err) {
+    }).catch((err) => {
       console.error("[chess-puzzle] could not start:", err)
       this.showLoadError(err)
-    }
+    })
   }
 
   start() {
@@ -41,7 +42,7 @@ export default class extends Controller {
     this.solution = this.puzzle.solution
     if (this.solution.length === 0) throw new Error("missing puzzle solution")
 
-    this.game = new Chess(this.puzzle.fen)
+    this.game = new this.Chess(this.puzzle.fen)
     this.idx = 0                                // index into the solution list
     this.selected = null
     this.legalTargets = []
