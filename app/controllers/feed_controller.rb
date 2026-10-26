@@ -114,8 +114,13 @@ class FeedController < ApplicationController
   end
 
   # Cached as ids (cheap to reload, safe across deploys) rather than whole records.
+  # If the cache store is unavailable (e.g. its table is missing in production),
+  # just compute the value: the feed must never fail because of caching.
   def cached_ids(key, &block)
     Rails.cache.fetch([ "feed-sidebar", key ], expires_in: SIDEBAR_TTL, &block)
+  rescue StandardError => e
+    Rails.logger.warn("[feed] cache unavailable (#{e.class}: #{e.message}); computing #{key} directly")
+    block.call
   end
 
   def load_by_ids(scope, ids)

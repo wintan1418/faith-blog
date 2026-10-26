@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "minitest/mock"
 
 # The feed works out each page from ids/times, then loads only that page's cards.
 class FeedPagingTest < ActionDispatch::IntegrationTest
@@ -40,5 +41,15 @@ class FeedPagingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match "Breath 6", response.body
+  end
+
+  test "the feed still loads when the cache store is broken" do
+    broken = ->(*) { raise ActiveRecord::StatementInvalid, "relation solid_cache_entries does not exist" }
+    Rails.cache.stub(:fetch, broken) do
+      get feed_path
+    end
+
+    assert_response :success
+    assert_match "Breath 25", response.body
   end
 end
