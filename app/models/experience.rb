@@ -15,6 +15,10 @@ class Experience < ApplicationRecord
   validate :ends_after_start
 
   before_save { self.end_on = nil if current? }
+  before_save do
+    self.organization_key = MatchKey.for(organization)
+    self.title_key = MatchKey.for(title)
+  end
 
   # Current roles first, then most recent.
   scope :ordered, -> { order(current: :desc, start_on: :desc) }

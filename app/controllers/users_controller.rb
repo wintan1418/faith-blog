@@ -6,6 +6,7 @@ class UsersController < ApplicationController
 
   def index
     @query = params[:q].to_s.strip
+    @suggestions = user_signed_in? && @query.blank? ? BrethrenSuggestions.for(current_user, limit: 12) : []
     users = User.active.includes(:profile).order(created_at: :desc)
 
     if @query.present?

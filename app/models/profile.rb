@@ -71,6 +71,20 @@ class Profile < ApplicationRecord
     errors.add(:birth_year, "can't be in the future") if birth_year.present? && birth_year > Date.current.year
   end
 
+  # Public church / assembly (the Brethren Card one stays private), plus match keys.
+  validates :assembly, length: { maximum: 120 }
+  before_save do
+    self.assembly = assembly.to_s.squish.presence
+    self.assembly_key = MatchKey.for(assembly)
+    self.city_key = MatchKey.city(location)
+  end
+
+  # Assemblies people already use, most common first (for pick-from-list as you type).
+  def self.popular_assemblies(limit = 300)
+    where.not(assembly_key: nil).group(:assembly_key).order(Arel.sql("COUNT(*) DESC"))
+         .limit(limit).pluck(Arel.sql("MIN(assembly)"))
+  end
+
   # Avatar variant helpers
   def avatar_thumbnail
     avatar.variant(resize_to_fill: [ 100, 100 ])

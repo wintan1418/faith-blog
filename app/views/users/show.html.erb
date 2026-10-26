@@ -56,6 +56,9 @@
               <% if (headline = @user.professional_headline) %>
                 <p class="profile-headline"><%= headline %></p>
               <% end %>
+              <% if @user.profile&.assembly.present? %>
+                <p class="profile-assembly">⛪ <%= @user.profile.assembly %></p>
+              <% end %>
             </div>
 
             <% if user_signed_in? && @user == current_user %>

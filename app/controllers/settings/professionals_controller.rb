@@ -12,7 +12,7 @@ module Settings
 
     def update
       @profile = current_user.profile || current_user.create_profile!
-      if @profile.update(params.require(:profile).permit(:headline, :skills_list))
+      if @profile.update(params.require(:profile).permit(:headline, :skills_list, :assembly))
         redirect_to edit_settings_professional_path, notice: "Professional profile saved."
       else
         render :edit, status: :unprocessable_entity

@@ -38,4 +38,20 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal "Nurse", role.reload.title
   end
+
+  test "dismissing a suggestion removes the card and remembers it" do
+    other = User.create!(username: "pro_suggested", email: "pro_suggested@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    post suggestion_dismissals_path(user_id: other.id), as: :turbo_stream
+
+    assert_response :success
+    assert_match %r{<turbo-stream action="remove" target="suggestion_user_#{other.id}">}, response.body
+    assert @user.suggestion_dismissals.exists?(dismissed_user: other)
+  end
+
+  test "the public assembly shows on the profile" do
+    patch settings_professional_path, params: { profile: { assembly: "Living Faith Chapel, Lagos" } }
+    get user_path(@user.username)
+
+    assert_select ".profile-assembly", text: /Living Faith Chapel/
+  end
 end

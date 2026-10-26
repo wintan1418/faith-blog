@@ -1,0 +1,47 @@
+<%# "Brethren you may know": a swipeable row of cards (LinkedIn's "People you may know"). %>
+<% suggestions = local_assigns.fetch(:suggestions) %>
+<% nudge = local_assigns.fetch(:nudge, false) %>
+<% if suggestions.any? || nudge %>
+  <section class="bys" aria-label="Brethren you may know">
+    <div class="bys-head">
+      <h2 class="bys-title">Brethren you may know</h2>
+      <%= link_to "See all", people_path, class: "bys-all" %>
+    </div>
+    <div class="bys-row">
+      <% if nudge %>
+        <div class="bys-card bys-card--nudge">
+          <div class="bys-nudge-icon" aria-hidden="true">⛪</div>
+          <p class="bys-name">Help brethren find you</p>
+          <p class="bys-reason">Add your assembly and what you do, and we'll suggest people from your church and your field.</p>
+          <%= link_to "Add details", edit_settings_professional_path, class: "bys-connect" %>
+        </div>
+      <% end %>
+      <% suggestions.each do |s| %>
+        <% person = s.user %>
+        <div class="bys-card" id="<%= dom_id(person, :suggestion) %>">
+          <%= button_to suggestion_dismissals_path(user_id: person.id), method: :post, class: "bys-dismiss",
+                        form: { class: "bys-dismiss-form" }, aria: { label: "Not interested in #{person.display_name}" } do %>×<% end %>
+          <%= link_to user_path(person.username), class: "bys-who" do %>
+            <% if person.profile&.avatar&.attached? %>
+              <%= image_tag avatar_src(person.profile, 160), class: "bys-avatar", alt: "" %>
+            <% else %>
+              <span class="bys-avatar bys-avatar--initial" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+            <% end %>
+            <span class="bys-name"><%= person.display_name %></span>
+            <% if (line = person.professional_headline.presence || person.profile&.bio&.truncate(60)) %>
+              <span class="bys-headline"><%= line %></span>
+            <% end %>
+          <% end %>
+          <% if s.reason %><p class="bys-reason"><%= s.reason %></p><% end %>
+          <div id="<%= dom_id(person, :suggestion_action) %>">
+            <% if current_user.brethren_card&.complete? %>
+              <%= button_to "Connect", connection_requests_path(receiver_id: person.id), method: :post, class: "bys-connect" %>
+            <% else %>
+              <%= link_to "Complete card to connect", edit_settings_brethren_card_path, class: "bys-connect bys-connect--soft" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>

@@ -13,6 +13,7 @@ class FeedController < ApplicationController
   SIDEBAR_TTL     = 5.minutes
 
   def index
+    load_suggestions unless next_page?
     # Pinned breaths (admin-featured) lead the feed — a community noticeboard.
     @pinned_posts = feed_posts_scope.where(featured: true).recent.limit(2).to_a
 
@@ -109,6 +110,15 @@ class FeedController < ApplicationController
 
   # Only the infinite-scroll stream skips the sidebar. A full page at ?page=2 (reload,
   # Back, a shared link) still renders the sidebar, so it needs the data.
+  # "Brethren you may know" row (first page only). Never let it break the feed.
+  def load_suggestions
+    @suggestions = BrethrenSuggestions.for(current_user, limit: 10)
+    @suggestion_nudge = current_user.profile&.assembly.blank? && current_user.experiences.none?
+  rescue StandardError => e
+    Rails.logger.warn("[feed] suggestions failed: #{e.class}: #{e.message}")
+    @suggestions = []
+  end
+
   def next_page?
     params[:page].to_i > 1 && request.format.turbo_stream?
   end

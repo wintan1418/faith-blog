@@ -404,8 +404,11 @@
 
           <% if @items.any? %>
             <div id="feed_list" class="space-y-3">
-              <% @items.each do |item| %>
+              <% @items.each_with_index do |item, index| %>
                 <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+                <% if index == 3 && @suggestions %>
+                  <%= render "shared/brethren_suggestions", suggestions: @suggestions, nudge: @suggestion_nudge %>
+                <% end %>
               <% end %>
             </div>
 

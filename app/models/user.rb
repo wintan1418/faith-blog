@@ -12,6 +12,10 @@ class User < ApplicationRecord
 
   # Associations
   has_one :profile, dependent: :destroy
+  has_many :suggestion_dismissals, dependent: :delete_all
+  has_many :dismissed_as_suggestion, class_name: "SuggestionDismissal", foreign_key: :dismissed_user_id,
+                                     dependent: :delete_all, inverse_of: :dismissed_user
+
   # Professional profile (LinkedIn-style)
   has_many :experiences, -> { ordered }, dependent: :destroy
   has_many :educations, -> { ordered }, dependent: :destroy
