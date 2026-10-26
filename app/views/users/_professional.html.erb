@@ -1,0 +1,61 @@
+<%# LinkedIn-style professional card: Experience, Education, Skills. %>
+<% owner = user_signed_in? && user == current_user %>
+<% if user.professional_profile? || owner %>
+  <section class="mystic-panel-strong pro-card mb-10">
+    <div class="pro-panel-head">
+      <h2 class="pro-card-title">Professional</h2>
+      <% if owner %><%= link_to "Edit", edit_settings_professional_path, class: "pro-item-edit" %><% end %>
+    </div>
+
+    <% if user.professional_profile? %>
+      <% if user.experiences.any? %>
+        <h3 class="pro-card-sub">Experience</h3>
+        <ul class="pro-list">
+          <% user.experiences.each do |experience| %>
+            <li class="pro-item">
+              <%= render "users/org_mark", name: experience.organization %>
+              <div class="pro-item-main">
+                <p class="pro-item-title"><%= experience.title %></p>
+                <p class="pro-item-sub"><%= [ experience.organization, experience.employment_type ].compact_blank.join(" · ") %></p>
+                <p class="pro-item-meta"><%= experience.date_range %> · <%= experience.duration %></p>
+                <% if experience.location.present? %><p class="pro-item-meta"><%= experience.location %></p><% end %>
+                <% if experience.description.present? %>
+                  <p class="pro-item-desc"><%= simple_format(experience.description, {}, wrapper_tag: "span") %></p>
+                <% end %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if user.educations.any? %>
+        <h3 class="pro-card-sub">Education</h3>
+        <ul class="pro-list">
+          <% user.educations.each do |education| %>
+            <li class="pro-item">
+              <%= render "users/org_mark", name: education.school %>
+              <div class="pro-item-main">
+                <p class="pro-item-title"><%= education.school %></p>
+                <% sub = [ education.qualification, education.field_of_study ].compact_blank.join(", ") %>
+                <% if sub.present? %><p class="pro-item-sub"><%= sub %></p><% end %>
+                <% if education.years %><p class="pro-item-meta"><%= education.years %></p><% end %>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if user.profile&.skills.present? %>
+        <h3 class="pro-card-sub">Skills</h3>
+        <div class="pro-skills">
+          <% user.profile.skills.each do |skill| %><span class="pro-skill"><%= skill %></span><% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="pro-empty-cta">
+        <p class="pro-empty">Let brethren in your field find you: add what you do, where you've served and what you studied.</p>
+        <%= link_to "Add professional profile", edit_settings_professional_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </section>
+<% end %>
