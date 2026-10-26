@@ -21,6 +21,8 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("keydown", this.boundEsc)
+    // Leaving the page with the drawer open must not leave it stuck open in the snapshot.
+    if (this.hasPanelTarget && !this.panelTarget.classList.contains("hidden")) this.close()
   }
 
   open(event) {

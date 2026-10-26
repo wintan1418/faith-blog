@@ -2,6 +2,7 @@
 import "@hotwired/turbo-rails"
 import "./controllers"
 import "./native_back"
+import "./page_cleanup"
 
 import "trix"
 import "@rails/actiontext"

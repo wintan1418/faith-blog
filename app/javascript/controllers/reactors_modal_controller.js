@@ -17,7 +17,7 @@ export default class extends Controller {
     if (frame) frame.src = url
 
     if (typeof this.dialogTarget.showModal === "function") {
-      this.dialogTarget.showModal()
+      this.dialogTarget.open || this.dialogTarget.showModal()
     } else {
       this.dialogTarget.setAttribute("open", "")
     }
@@ -36,5 +36,10 @@ export default class extends Controller {
 
   backdropClick(event) {
     if (event.target === this.dialogTarget) this.close()
+  }
+
+  // Leaving the page with the dialog open must not leave it stuck open in the snapshot.
+  disconnect() {
+    if (this.hasDialogTarget && this.dialogTarget.open) this.dialogTarget.close?.()
   }
 }

@@ -1,0 +1,119 @@
+/* ==========================================
+   Comments on phones, LinkedIn-style:
+   photo + soft speech bubble (name, time, text), light text actions below,
+   replies indented once only so nothing squeezes or runs off the edge.
+   ========================================== */
+@media (max-width: 640px) {
+  html .fc-comment {
+    padding: 0.35rem 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+  html .fc-comment-grid {
+    display: grid !important;
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+    gap: 0.5rem !important;
+    align-items: start;
+  }
+  html .fc-comment-avatar .fc-avatar { width: 36px !important; height: 36px !important; font-size: 0.85rem; }
+  html .fc-comment-main { min-width: 0; }
+
+  /* The bubble: head + body share one rounded grey box. */
+  html .fc-comment-head {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem;
+    margin: 0 !important;
+    padding: 0.5rem 0.8rem 0.1rem !important;
+    border-radius: 14px 14px 0 0;
+    background: var(--fc-surface-2, #f1f5f3);
+  }
+  html .fc-comment-head .fc-breath-name { font-size: 0.85rem; font-weight: 700; color: var(--fc-ink) !important; }
+  html .fc-comment-head .fc-breath-handle { display: none !important; }
+  html .fc-comment-head .fc-breath-time,
+  html .fc-comment-head .fc-breath-dot { font-size: 0.75rem; color: var(--fc-muted); }
+  html .fc-comment-body,
+  html .fc-comment-deleted {
+    margin: 0 !important;
+    padding: 0.15rem 0.8rem 0.6rem !important;
+    border-radius: 0 0 14px 14px;
+    background: var(--fc-surface-2, #f1f5f3);
+    font-size: 0.92rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+  html .fc-comment-body p { margin: 0; }
+
+  /* Light text actions under the bubble. */
+  html .fc-comment-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center;
+    gap: 0.1rem 0.15rem !important;
+    margin: 0.15rem 0 0 !important;
+    padding: 0 0.2rem !important;
+    overflow: visible !important;
+  }
+  html .fc-comment-actions .fc-breath-action,
+  html .fc-comment-actions .fc-action,
+  html .fc-comment-actions .fc-reaction-add,
+  html .fc-comment-actions .fc-reaction-pill {
+    min-height: 32px;
+    padding: 0.2rem 0.5rem !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    font-size: 0.78rem !important;
+    font-weight: 700;
+    color: var(--fc-muted) !important;
+  }
+  html .fc-comment-actions .fc-reaction-pill.is-mine,
+  html .fc-comment-actions .fc-reaction-add:hover,
+  html .fc-comment-actions .fc-breath-action:hover { color: var(--fc-accent) !important; }
+  html .fc-comment-actions svg { width: 14px !important; height: 14px !important; }
+  html .fc-comment-actions .fc-reactions { display: inline-flex; flex-wrap: nowrap; }
+
+  /* Replies: one indent, smaller photos, and no deeper stepping. */
+  html .fc-comment-replies {
+    margin: 0.2rem 0 0 !important;
+    padding: 0 0 0 2.6rem !important;
+    border: 0 !important;
+    background: none !important;
+  }
+  html .fc-comment-replies .fc-comment-replies { padding-left: 0 !important; }
+  html .fc-comment-replies .fc-comment-grid { grid-template-columns: 28px minmax(0, 1fr) !important; }
+  html .fc-comment-replies .fc-comment-avatar .fc-avatar { width: 28px !important; height: 28px !important; font-size: 0.75rem; }
+
+  /* Reply / comment boxes: one tidy row of tools, compact Send. */
+  html .fc-inline-reply { gap: 0.5rem !important; }
+  html .fc-inline-reply-input { min-height: 44px; border-radius: 12px !important; font-size: 0.95rem !important; }
+  html .fc-inline-reply-actions { display: flex !important; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: nowrap !important; }
+  html .fc-inline-reply-tools { display: flex; align-items: center; gap: 0.15rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+  html .fc-inline-reply-tools::-webkit-scrollbar { display: none; }
+  html .fc-inline-reply-tools .fc-composer-asst-btn { flex: 0 0 auto; padding: 0.3rem 0.5rem !important; font-size: 0.75rem !important; }
+  html .fc-inline-reply-tools .fc-composer-asst-label { display: none; }
+  html .fc-inline-reply-submit {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-height: 36px;
+    padding: 0.35rem 1rem !important;
+    border-radius: 999px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  html .fc-comment-actions { flex-wrap: nowrap !important; gap: 0 !important; }
+  html .fc-comment-actions .fc-breath-action,
+  html .fc-comment-actions .fc-action,
+  html .fc-comment-actions .fc-reaction-add,
+  html .fc-comment-actions .fc-reaction-pill { padding: 0.2rem 0.4rem !important; gap: 0.25rem !important; white-space: nowrap; }
+  html .fc-comment-actions form { margin: 0; display: inline-flex; }
+}
+@media (max-width: 640px) {
+  /* Replies have less room: Amen and Breathe become icon-only. */
+  html .fc-comment-replies .fc-comment-actions .fc-reaction-add-label,
+  html .fc-comment-replies .fc-comment-actions a.fc-breath-action > span { display: none !important; }
+}
