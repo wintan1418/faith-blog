@@ -58,7 +58,7 @@
 
   <div class="fc-composer-head">
     <% if current_user.profile&.avatar&.attached? %>
-      <%= image_tag current_user.profile.avatar, class: "fc-avatar object-cover" %>
+      <%= image_tag avatar_src(current_user.profile), class: "fc-avatar object-cover" %>
     <% else %>
       <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
     <% end %>

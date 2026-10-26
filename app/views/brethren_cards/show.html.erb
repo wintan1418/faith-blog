@@ -13,7 +13,7 @@
       <header class="text-center">
         <span class="bc-avatar-ring">
           <% if @user.profile&.avatar&.attached? %>
-            <%= image_tag @user.profile.avatar, class: "bc-avatar", alt: @user.display_name %>
+            <%= image_tag avatar_src(@user.profile, 400), class: "bc-avatar", alt: @user.display_name %>
           <% else %>
             <span class="bc-avatar"><%= @user.display_name.first.upcase %></span>
           <% end %>

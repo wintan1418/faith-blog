@@ -104,7 +104,7 @@
           %>
           <button type="button" data-action="click->dropdown#toggle" class="fc-avatar relative" aria-label="Open account menu">
             <% if current_user.profile&.avatar&.attached? %>
-              <%= image_tag current_user.profile.avatar, class: "h-full w-full rounded-full object-cover" %>
+              <%= image_tag avatar_src(current_user.profile), class: "h-full w-full rounded-full object-cover" %>
             <% else %>
               <%= current_user.username.first.upcase %>
             <% end %>

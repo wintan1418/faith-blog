@@ -32,7 +32,7 @@
             <label class="label">Profile Photo</label>
             <div class="flex flex-wrap items-center gap-4">
               <% if @profile.avatar.attached? %>
-                <%= image_tag @profile.avatar, class: "mystic-avatar h-20 w-20 object-cover" %>
+                <%= image_tag avatar_src(@profile, 200), class: "mystic-avatar h-20 w-20 object-cover" %>
               <% else %>
                 <span class="mystic-avatar mystic-avatar-fallback grid h-20 w-20 place-items-center text-2xl font-bold">
                   <%= current_user.username.first.upcase %>

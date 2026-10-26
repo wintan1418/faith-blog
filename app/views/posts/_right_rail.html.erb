@@ -1,7 +1,7 @@
 <% unless post.anonymous? %>
   <div class="post-rail-card post-author-card">
     <% if post.user.profile&.avatar&.attached? %>
-      <%= image_tag post.user.profile.avatar, class: "post-author-card-avatar object-cover" %>
+      <%= image_tag avatar_src(post.user.profile, 160), class: "post-author-card-avatar object-cover" %>
     <% else %>
       <span class="post-author-card-avatar"><%= post.user.username.first.upcase %></span>
     <% end %>

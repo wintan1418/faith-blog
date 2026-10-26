@@ -129,7 +129,7 @@
               <li class="fc-lb-row<%= ' is-me' if row[:user].id == current_user.id %>">
                 <span class="fc-lb-rank<%= " fc-trend-rank is-#{i + 1}" if i < 3 %>"><%= i + 1 %></span>
                 <% if row[:user].profile&.avatar&.attached? %>
-                  <%= image_tag row[:user].profile.avatar, class: "fc-avatar object-cover" %>
+                  <%= image_tag avatar_src(row[:user].profile), class: "fc-avatar object-cover" %>
                 <% else %>
                   <span class="fc-avatar" style="<%= avatar_tint_style(row[:user].username) %>">
                     <%= row[:user].username.first.upcase %>
