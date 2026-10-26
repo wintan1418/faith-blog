@@ -276,6 +276,22 @@ class User < ApplicationRecord
   end
 
   # Ids of accepted connections, without loading the users.
+  # Cards this person closed, remembered across devices ("join-12", "release-3", "onboard-feed").
+  DISMISSED_CARDS_KEPT = 300
+  DISMISSAL_KEY = /\A[a-z0-9_-]{1,60}\z/
+
+  def self.dismissal_key(raw) = raw.to_s.delete_prefix("fc:").downcase.presence&.then { |k| k if k.match?(DISMISSAL_KEY) }
+
+  def card_dismissed?(key) = dismissed_cards.include?(User.dismissal_key(key))
+
+  def dismiss_card!(key)
+    key = User.dismissal_key(key)
+    return false unless key
+    return true if dismissed_cards.include?(key)
+
+    update_column(:dismissed_cards, (dismissed_cards + [ key ]).last(DISMISSED_CARDS_KEPT))
+  end
+
   def connection_ids
     sent_connection_requests.accepted.pluck(:receiver_id) | received_connection_requests.accepted.pluck(:sender_id)
   end
