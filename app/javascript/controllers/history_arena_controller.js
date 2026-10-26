@@ -16,6 +16,7 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("keydown", this.boundEsc)
+    this.closeFigure() // never leave the drawer stuck open in a page snapshot
   }
 
   showEra(event) {

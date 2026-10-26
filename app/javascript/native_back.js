@@ -4,10 +4,21 @@
 window.nativeCloseOverlay = () => {
   const pressEscape = () => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
 
-  if (document.body.classList.contains("fc-lightbox-open") || document.body.classList.contains("fc-bible-open")) {
+  // Only report "closed" if something was really open and really closed; a leftover
+  // body class used to swallow every Back press.
+  const openOverlay = () => document.querySelector(
+    ".fc-lightbox, .fc-bible-drawer:not(.hidden), [data-history-arena-target='drawer']:not(.hidden)"
+  )
+  if (openOverlay()) {
     pressEscape()
+    if (!openOverlay()) return true
+    // Escape wasn't heard (a stale copy from a page snapshot): close it by hand.
+    document.querySelectorAll(".fc-lightbox").forEach((el) => el.remove())
+    document.querySelectorAll(".fc-bible-drawer, [data-history-arena-target='drawer']").forEach((el) => el.classList.add("hidden"))
+    document.body.classList.remove("fc-lightbox-open", "fc-bible-open")
     return true
   }
+  document.body.classList.remove("fc-lightbox-open", "fc-bible-open")
 
   const dialogs = [...document.querySelectorAll("dialog[open]")]
   const top = dialogs[dialogs.length - 1]

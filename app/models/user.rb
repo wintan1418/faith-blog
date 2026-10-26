@@ -221,11 +221,12 @@ class User < ApplicationRecord
 
   # Alerts badge: activity only (messages are counted on the Inbox).
   def unread_notifications_count
-    notifications.activity.unread.count
+    # Memoized: the navbar, layout and app markers ask several times per page.
+    @unread_notifications_count ||= notifications.activity.unread.count
   end
 
   def unread_conversations_count
-    conversation_participants
+    @unread_conversations_count ||= conversation_participants
       .joins("INNER JOIN messages ON messages.conversation_id = conversation_participants.conversation_id")
       .where.not(messages: { sender_id: id })
       .where("conversation_participants.last_read_at IS NULL OR messages.created_at > conversation_participants.last_read_at")
@@ -270,7 +271,7 @@ class User < ApplicationRecord
   # Number of incoming connection requests waiting on this user's reply.
   # Used by the navbar badge.
   def pending_connection_requests_count
-    received_connection_requests.pending.count
+    @pending_connection_requests_count ||= received_connection_requests.pending.count
   end
 
   private

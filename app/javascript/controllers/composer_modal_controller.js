@@ -51,7 +51,7 @@ export default class extends Controller {
     if (event) event.preventDefault()
     const dialog = this.dialogTarget
     if (typeof dialog.showModal === "function") {
-      dialog.showModal()
+      dialog.open || dialog.showModal()
     } else {
       dialog.setAttribute("open", "")
     }

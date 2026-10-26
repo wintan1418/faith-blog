@@ -98,7 +98,9 @@
         Accent-tinted background, brand mark with orbital rings, and a
         3D "breathe breathe breathe" stagger. Only renders on full HTML
         loads, not Turbo navigations (Turbo's progress bar handles those). %>
-    <div id="fc-splash" aria-hidden="true">
+    <%# The apps have their own native launch animation, so no web splash inside them. %>
+    <% unless hotwire_native_app? %>
+    <div id="fc-splash" aria-hidden="true" data-turbo-temporary>
       <div class="fc-splash-stage">
         <span class="fc-splash-orbit fc-splash-orbit--1"></span>
         <span class="fc-splash-orbit fc-splash-orbit--2"></span>
@@ -129,23 +131,30 @@
       (function() {
         var splash = document.getElementById('fc-splash');
         if (!splash) return;
+        // Once per visit: Turbo re-runs this on every page, and a cached page must never bring it back.
+        if (window.__fcSplashShown) { splash.remove(); return; }
+        window.__fcSplashShown = true;
         var startedAt = Date.now();
-        var MIN_VISIBLE = 720; // let the 3D breathe stagger play through
+        var MIN_VISIBLE = 400;
+        var done = false;
         var hide = function() {
-          var elapsed = Date.now() - startedAt;
-          var wait = Math.max(0, MIN_VISIBLE - elapsed);
+          if (done) return;
+          done = true;
+          var wait = Math.max(0, MIN_VISIBLE - (Date.now() - startedAt));
           setTimeout(function() {
             splash.classList.add('is-leaving');
+            splash.style.pointerEvents = 'none';
             setTimeout(function() { splash.remove(); }, 420);
           }, wait);
         };
-        if (document.readyState === 'complete') {
-          hide();
-        } else {
-          window.addEventListener('load', hide);
-        }
+        // Hide as soon as the page is usable (not after every image and font),
+        // and never block for more than 2.5s on a slow connection.
+        if (document.readyState !== 'loading') hide();
+        else document.addEventListener('DOMContentLoaded', hide);
+        setTimeout(hide, 2500);
       })();
     </script>
+    <% end %>
     <%# Ambient scripture / brethren / golden-breath rain in the page
         background, accent-tinted, behind every screen. Subtle by design —
         pointer-events: none, low opacity, paused when the tab is hidden,

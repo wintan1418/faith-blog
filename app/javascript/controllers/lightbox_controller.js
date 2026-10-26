@@ -7,18 +7,23 @@ export default class extends Controller {
   connect() {
     this.imgs = Array.from(this.element.querySelectorAll("img"))
     if (this.imgs.length === 0) return
-    this.boundOpen = this.open.bind(this)
-    this.imgs.forEach((img, i) => {
+    // Keep each handler so disconnect() can remove it (a reconnect used to add a
+    // second one, so one tap opened two viewers).
+    this.handlers = this.imgs.map((img, i) => {
+      const handler = (e) => { e.preventDefault(); e.stopPropagation(); this.open(i) }
       img.style.cursor = "zoom-in"
-      img.addEventListener("click", (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        this.boundOpen(i)
-      })
+      img.addEventListener("click", handler)
+      return [img, handler]
     })
   }
 
+  disconnect() {
+    this.handlers?.forEach(([img, handler]) => img.removeEventListener("click", handler))
+    this.close()
+  }
+
   open(startIndex = 0) {
+    if (this.overlay) this.close()
     this.index = startIndex
     this.overlay = this.buildOverlay()
     document.body.appendChild(this.overlay)
@@ -72,6 +77,7 @@ export default class extends Controller {
   buildOverlay() {
     const overlay = document.createElement("div")
     overlay.className = "fc-lightbox"
+    overlay.setAttribute("data-turbo-temporary", "") // never saved into a page snapshot
     overlay.innerHTML = `
       <button class="fc-lightbox-close" aria-label="Close">×</button>
       <button class="fc-lightbox-prev" aria-label="Previous">‹</button>
