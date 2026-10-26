@@ -87,16 +87,19 @@
 
           <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
             <button type="button"
-                    class="fc-breath-action"
+                    class="fc-breath-action fc-comment-owner-action"
                     data-action="click->comment-edit#edit"
-                    title="Edit comment">
+                    title="Edit comment"
+                    aria-label="Edit comment">
               <%= render_icon("edit", classes: "h-4 w-4") %>
               <span>Edit</span>
             </button>
             <%= button_to post_comment_path(post, comment),
                 method: :delete,
                 form_class: "inline",
-                class: "fc-breath-action",
+                class: "fc-breath-action fc-comment-owner-action",
+                title: "Delete comment",
+                aria: { label: "Delete comment" },
                 data: { turbo_confirm: "Delete this comment?" } do %>
               <%= render_icon("trash", classes: "h-4 w-4") %>
               <span>Delete</span>

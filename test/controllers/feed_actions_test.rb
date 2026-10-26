@@ -35,13 +35,13 @@ class FeedActionsTest < ActionDispatch::IntegrationTest
 
     # The ⋯ trigger and its menu live in the card header now.
     assert_select ".fc-breath-head .fc-breath-more [data-dropdown-target='menu'].fc-breath-menu" do
-      # Save / report live inside the menu, not loose in the action bar.
-      assert_select "form[action=?]", post_bookmark_path(@post)
+      # Report lives inside the menu; Save moved out to the action bar.
       assert_select "form[action=?]", reports_path
+      assert_select "form[action=?]", post_bookmark_path(@post), false
     end
 
-    # And they are not rendered inside the action bar.
-    assert_select ".fc-breath-actions form[action=?]", post_bookmark_path(@post), false
+    # Save is one tap away on the card itself.
+    assert_select ".fc-breath-actions form[action=?]", post_bookmark_path(@post), 1
   end
 
   test "feed shows the reaction summary strip and a single React button" do
@@ -52,9 +52,9 @@ class FeedActionsTest < ActionDispatch::IntegrationTest
     # Engagement meta row lives above the bar; the bar holds the Like segment.
     assert_select "##{ActionView::RecordIdentifier.dom_id(@post, :reaction_summary)}.fc-breath-stats"
     assert_select ".fc-breath-actions .fc-reactions .fc-react-btn .fc-react-label", text: "Like"
-    # Comment / repost / send are present as their own labelled segments.
+    # Comment / repost / share / save are present as their own labelled segments.
     assert_select ".fc-breath-actions .fc-repost"
-    assert_select ".fc-breath-actions .fc-share .fc-action-label", text: "Send"
+    assert_select ".fc-breath-actions .fc-share .fc-action-label", text: "Share"
   end
 
   test "reacting updates both the React button and the summary strip" do

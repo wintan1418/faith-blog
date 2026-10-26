@@ -109,6 +109,8 @@ module IconHelper
       icon_svg("<path d='M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7' /><path d='M18.4 2.6a2.1 2.1 0 0 1 3 3L12.5 14.5 8.5 15.5l1-4Z' />", classes)
     when "lock", "password"
       icon_svg("<rect x='4' y='11' width='16' height='10' rx='2' /><path d='M8 11V7a4 4 0 0 1 8 0v4' />", classes)
+    when "share", "shareup"
+      icon_svg("<path d='M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7' /><path d='M16 6l-4-4-4 4' /><path d='M12 2v13' />", classes)
     when "chevronleft", "back"
       icon_svg("M15 18l-6-6 6-6", classes)
     else
