@@ -67,6 +67,14 @@
             <div class="msg-body"><%= simple_format(message.body) %></div>
           <% end %>
 
+          <% if !mine && MoneyTalk.mentions?(message.body) %>
+            <p class="msg-money-tip" role="note">
+              🛡 <strong>Money mentioned.</strong> Only send money to people you know and trust.
+              Never share your PIN, OTP, BVN or password, not even with Brethreign staff.
+              Something feels off? Tap the message and report it.
+            </p>
+          <% end %>
+
           <% if message.respond_to?(:edited?) && message.edited? %>
             <span class="msg-edited">(edited)</span>
           <% end %>

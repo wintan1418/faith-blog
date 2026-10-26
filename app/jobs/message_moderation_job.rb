@@ -9,7 +9,9 @@ class MessageModerationJob < ApplicationJob
   queue_as :default
   discard_on ActiveJob::DeserializationError
 
-  REMOVE_CATEGORIES = %w[explicit_adult sexual_exploitation occult scam predatory_fundraising harassment hate].freeze
+  REMOVE_CATEGORIES = %w[explicit_adult sexual_exploitation occult harassment hate].freeze
+  # Money talk is often innocent: a suspected scam stays up for a moderator to judge,
+  # and is removed straight away only when the AI is sure (severity high / block).
 
   def perform(message)
     return if message.deleted? || message.moderated_at.present?
