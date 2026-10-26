@@ -4,7 +4,7 @@ require "test_helper"
 
 class BrethrenSuggestionsTest < ActiveSupport::TestCase
   def make_user(name, **profile)
-    User.create!(username: name, email: "#{name}@example.com", password: test_password).tap do |u|
+    User.create!(username: name, email: "#{name}@example.com", password: generated_password).tap do |u|
       u.profile.update!(profile) if profile.any?
     end
   end

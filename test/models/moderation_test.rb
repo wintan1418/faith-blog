@@ -6,7 +6,7 @@ require "test_helper"
 # fraud messages and holds back the recipient's notification.
 class ModerationTest < ActiveSupport::TestCase
   def make_user(name)
-    User.create!(username: name, email: "#{name}@example.com", password: test_password)
+    User.create!(username: name, email: "#{name}@example.com", password: generated_password)
   end
 
   setup do
@@ -33,7 +33,7 @@ class ModerationTest < ActiveSupport::TestCase
   end
 
   test "offensive usernames are refused" do
-    user = User.new(username: "big_bitch", email: "bb@example.com", password: test_password)
+    user = User.new(username: "big_bitch", email: "bb@example.com", password: generated_password)
 
     assert_not user.valid?
     assert user.errors[:username].any?
