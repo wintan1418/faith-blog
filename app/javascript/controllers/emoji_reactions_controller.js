@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import "emoji-picker-element"
+import { loadEmojiPicker } from "../lazy_libs"
 
 // Pop emoji picker, send the chosen emoji to /likes via fetch.
 // On success, reload the page (or replace the reactions partial) so
@@ -27,6 +27,7 @@ export default class extends Controller {
     event.preventDefault()
     event.stopPropagation()
     if (!this.hasPickerTarget) return
+    loadEmojiPicker()
 
     const visible = !this.pickerTarget.classList.contains("hidden")
     if (visible) {

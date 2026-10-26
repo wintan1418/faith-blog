@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import "emoji-picker-element"
+import { loadEmojiPicker } from "../lazy_libs"
 
 export default class extends Controller {
   static targets = ["button", "picker", "editor"]
@@ -40,6 +40,7 @@ export default class extends Controller {
   }
 
   show() {
+    loadEmojiPicker()
     if (this.hasPickerTarget) {
       this.pickerTarget.classList.remove("hidden")
       this.pickerVisible = true

@@ -1,9 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
-import Tribute from "tributejs"
+import { loadTribute } from "../lazy_libs"
 
 export default class extends Controller {
   connect() {
-    this.initializeTribute()
+    loadTribute().then((Tribute) => {
+      if (!this.element.isConnected || this.tribute) return
+      this.Tribute = Tribute
+      this.initializeTribute()
+    })
   }
 
   disconnect() {
@@ -16,7 +20,7 @@ export default class extends Controller {
     const dialog = this.element.closest("dialog")
     const menuContainer = dialog || document.body
 
-    this.tribute = new Tribute({
+    this.tribute = new this.Tribute({
       allowSpaces: false,
       autocompleteMode: false,
       trigger: "@",
