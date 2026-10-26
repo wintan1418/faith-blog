@@ -79,7 +79,7 @@
           <div class="text-center">
             <span class="bc-avatar-ring">
               <% if current_user.profile&.avatar&.attached? %>
-                <%= image_tag current_user.profile.avatar, class: "bc-avatar", alt: current_user.display_name %>
+                <%= image_tag avatar_src(current_user.profile, 400), class: "bc-avatar", alt: current_user.display_name %>
               <% else %>
                 <span class="bc-avatar"><%= current_user.display_name.first.upcase %></span>
               <% end %>

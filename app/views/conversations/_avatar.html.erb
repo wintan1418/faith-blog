@@ -4,7 +4,7 @@
 
 <span class="msg-avatar<%= ' is-online' if online %>">
   <% if user.profile&.avatar&.attached? %>
-    <%= image_tag user.profile.avatar, class: "#{size} rounded-full object-cover", alt: "" %>
+    <%= image_tag avatar_src(user.profile), class: "#{size} rounded-full object-cover", alt: "" %>
   <% else %>
     <span class="<%= size %> msg-avatar-initial" style="<%= avatar_tint_style(user.username) %>">
       <%= user.display_name.first.upcase %>

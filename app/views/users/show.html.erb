@@ -7,7 +7,7 @@
   <div class="profile-minibar" data-profile-hero-target="minibar" style="<%= AccentPalette.css_vars(@user.accent_color) %>">
     <div class="profile-minibar-inner">
       <% if @user.profile&.avatar&.attached? %>
-        <%= image_tag @user.profile.avatar, class: "profile-minibar-avatar object-cover", alt: @user.display_name %>
+        <%= image_tag avatar_src(@user.profile), class: "profile-minibar-avatar object-cover", alt: @user.display_name %>
       <% else %>
         <span class="profile-minibar-avatar" style="<%= avatar_tint_style(@user.username) %>"><%= @user.username.first.upcase %></span>
       <% end %>
@@ -28,7 +28,7 @@
         <div class="profile-cover" aria-hidden="true"></div>
         <div class="profile-avatar-wrap">
           <% if @user.profile&.avatar&.attached? %>
-            <%= image_tag @user.profile.avatar, class: "profile-avatar object-cover", alt: @user.display_name %>
+            <%= image_tag avatar_src(@user.profile, 400), class: "profile-avatar object-cover", alt: @user.display_name %>
           <% else %>
             <span class="profile-avatar profile-avatar-fallback">
               <%= @user.username.first.upcase %>

@@ -51,7 +51,7 @@
           <% if message.has_images? %>
             <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
               <% message.images.each do |img| %>
-                <%= image_tag img, class: "msg-image", loading: "lazy", alt: "Photo" %>
+                <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo" %>
               <% end %>
             </div>
           <% end %>
