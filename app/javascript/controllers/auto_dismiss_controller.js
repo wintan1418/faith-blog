@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { rememberDismissal } from "../remember_dismissal"
 
 // Auto-removes its element after N ms (default 30s) with a soft fade.
 // If `persistKey` is set, the dismissal is remembered in localStorage so
@@ -47,6 +48,7 @@ export default class extends Controller {
   }
 
   recordDismissal() {
+    rememberDismissal(this.persistKeyValue) // on the account, for every device
     try {
       const raw = localStorage.getItem(this.storeKeyValue)
       const set = raw ? JSON.parse(raw) : {}

@@ -302,6 +302,7 @@ Rails.application.routes.draw do
 
   get ".well-known/assetlinks.json", to: "well_known#assetlinks", defaults: { format: :json }
   post "whats_new/:id/seen", to: "whats_new#seen", as: :seen_whats_new
+  post "dismissals", to: "dismissals#create", as: :dismissals
   get "me", to: "me#show", as: :me
   get "configurations/ios_v1.json",     to: "configurations#ios_v1",     defaults: { format: :json }
   get "configurations/android_v1.json", to: "configurations#android_v1", defaults: { format: :json }

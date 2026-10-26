@@ -154,3 +154,37 @@
   /* With Edit + Delete present, Breathe goes icon-only too so the row stays on one line. */
   html .fc-comment-actions:has(.fc-comment-owner-action) a.fc-breath-action > span { display: none !important; }
 }
+
+/* ── Breathing room for actions on phones ── */
+@media (max-width: 520px) {
+  /* Post action bar spans the whole card (it was squeezed beside the author photo). */
+  html .fc-breath .fc-breath-main > .fc-breath-actions {
+    margin-left: -47px !important;
+    width: calc(100% + 47px) !important;
+    padding-top: 0.55rem !important;
+  }
+  html .fc-breath-actions .fc-breath-action,
+  html .fc-breath-actions > span[id^="bookmark_"] .fc-action { min-height: 52px; gap: 5px !important; }
+  html .fc-breath-actions .fc-breath-action svg,
+  html .fc-breath-actions > span[id^="bookmark_"] .fc-action svg { width: 20px !important; height: 20px !important; }
+}
+@media (max-width: 640px) {
+  /* Comment actions: more space between each. */
+  html .fc-comment-actions { gap: 0.25rem 0.5rem !important; margin-top: 0.3rem !important; }
+  html .fc-comment-actions .fc-breath-action,
+  html .fc-comment-actions .fc-action,
+  html .fc-comment-actions .fc-reaction-add,
+  html .fc-comment-actions .fc-reaction-pill { padding: 0.3rem 0.45rem !important; gap: 0.3rem !important; min-height: 36px; }
+  html .fc-comment-actions svg { width: 16px !important; height: 16px !important; }
+}
+@media (max-width: 640px) {
+  /* "Breathe" is icon-only in comments so the row fits on one line with room to breathe. */
+  html .fc-comment-actions a.fc-breath-action > span { display: none !important; }
+}
+@media (max-width: 640px) {
+  html .fc-comment-actions { flex-wrap: nowrap !important; gap: 0 0.35rem !important; }
+  html .fc-comment-actions .fc-breath-action,
+  html .fc-comment-actions .fc-action,
+  html .fc-comment-actions .fc-reaction-add,
+  html .fc-comment-actions .fc-reaction-pill { padding: 0.3rem 0.4rem !important; }
+}

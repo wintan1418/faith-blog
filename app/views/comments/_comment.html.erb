@@ -79,6 +79,7 @@
             <%= link_to new_post_path(from_comment: comment.id),
                         class: "fc-breath-action",
                         title: "Turn this comment into a breath of its own",
+                        aria: { label: "Breathe this comment as a new post" },
                         data: { turbo_frame: "_top" } do %>
               <%= render_icon("repeat", classes: "h-4 w-4") %>
               <span>Breathe<span class="fc-hide-phone"> this</span></span>

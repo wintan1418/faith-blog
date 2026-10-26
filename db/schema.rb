@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_191000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -809,6 +809,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_191000) do
     t.date "streak_updated_on"
     t.string "accent_color", limit: 16, default: "mint", null: false
     t.bigint "seen_release_id"
+    t.string "dismissed_cards", default: [], null: false, array: true
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { rememberDismissal } from "../remember_dismissal"
 
 // First-run welcome card. Hides itself if the user dismissed it previously
 // (localStorage). Server-side, the card only renders for genuinely-new users
@@ -16,6 +17,7 @@ export default class extends Controller {
   dismiss() {
     const key = this.keyValue || "fc:onboard"
     localStorage.setItem(key, "1")
+    rememberDismissal(key) // on the account, for every device
     this.element.style.display = "none"
   }
 }

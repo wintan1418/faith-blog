@@ -209,6 +209,7 @@
         <div class="space-y-2 mb-3">
           <% @new_member_announcements.each do |joiner| %>
             <% next unless joiner.user %>
+            <% next if current_user.card_dismissed?("join-#{joiner.id}") %>
             <div class="fc-join-card"
                  data-controller="auto-dismiss"
                  data-auto-dismiss-after-ms-value="30000"
@@ -236,7 +237,7 @@
       <% end %>
 
       <%# Releases written as slides show in the "What's new" pop-up instead of this banner. %>
-      <% if @release_announcement && @release_announcement.slides.size < 2 %>
+      <% if @release_announcement && @release_announcement.slides.size < 2 && !current_user.card_dismissed?("release-#{@release_announcement.id}") %>
         <section class="fc-release-banner"
                  data-controller="onboarding"
                  data-onboarding-key-value="fc:release-<%= @release_announcement.id %>"
@@ -261,7 +262,7 @@
         </section>
       <% end %>
 
-      <% if @show_onboarding %>
+      <% if @show_onboarding && !current_user.card_dismissed?("onboard-feed") %>
         <section class="fc-onboarding"
                  data-controller="onboarding"
                  data-onboarding-key-value="fc:onboard-feed">
