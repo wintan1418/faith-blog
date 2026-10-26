@@ -9,7 +9,7 @@ class ImageModerationTest < ActiveSupport::TestCase
   def image(name) = { io: StringIO.new(PNG), filename: name, content_type: "image/png" }
 
   def make_user(name)
-    User.create!(username: name, email: "#{name}@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    User.create!(username: name, email: "#{name}@example.com", password: generated_password)
   end
 
   setup do
