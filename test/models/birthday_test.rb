@@ -4,7 +4,7 @@ require "test_helper"
 
 class BirthdayTest < ActiveSupport::TestCase
   def make_user(name)
-    User.create!(username: name, email: "#{name}@example.com", password: test_password)
+    User.create!(username: name, email: "#{name}@example.com", password: generated_password)
   end
 
   def connect(a, b)

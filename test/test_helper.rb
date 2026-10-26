@@ -16,7 +16,7 @@ module ActiveSupport
 
     # A fresh random password for test users. Kept out of the test files so secret
     # scanners (GitGuardian) don't mistake test data for real credentials.
-    def test_password
+    def generated_password
       SecureRandom.hex(12)
     end
   end
