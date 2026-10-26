@@ -85,6 +85,15 @@ class Profile < ApplicationRecord
          .limit(limit).pluck(Arel.sql("MIN(assembly)"))
   end
 
+  # New profile photos get an AI look (see AvatarModerationJob).
+  before_save { @avatar_changed = attachment_changes.key?("avatar") }
+  after_commit :moderate_avatar, if: -> { @avatar_changed && avatar.attached? }
+
+  def moderate_avatar
+    @avatar_changed = false
+    Ai::Moderation::Client.stub? ? AvatarModerationJob.perform_now(self) : AvatarModerationJob.perform_later(self)
+  end
+
   # Avatar variant helpers
   def avatar_thumbnail
     avatar.variant(resize_to_fill: [ 100, 100 ])

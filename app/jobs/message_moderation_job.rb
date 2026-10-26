@@ -37,7 +37,12 @@ class MessageModerationJob < ApplicationJob
   private
 
   def review(message)
-    Ai::Moderation::Reviewer.call(content: content_for(message), kind: "message", author_context: context_for(message))
+    text = if message.body.present?
+      Ai::Moderation::Reviewer.call(content: content_for(message), kind: "message", author_context: context_for(message))
+    end
+    pictures = (ImageModeration.review(message.images.attachments, kind: "message") if message.has_images?)
+    ImageModeration.worse(text, pictures) || Ai::Moderation::Result.new(safe: true, severity: "none", categories: [],
+                                                                       score: 0.0, summary: "", recommended_action: "allow")
   end
 
   # The sender's last few messages in this chat, so a scam or grooming pattern is visible.

@@ -20,8 +20,8 @@ module Ai
         "stub"      => { klass: Providers::Stub,      env_key: nil }
       }.freeze
 
-      def self.call(system:, user:)
-        new.call(system: system, user: user)
+      def self.call(system:, user:, images: [])
+        new.call(system: system, user: user, images: images)
       end
 
       def self.stub?
@@ -61,8 +61,8 @@ module Ai
         @impl = config[:klass].new(api_key: api_key)
       end
 
-      def call(system:, user:)
-        @impl.call(system: system, user: user)
+      def call(system:, user:, images: [])
+        @impl.call(system: system, user: user, images: images)
       end
 
       attr_reader :provider_name

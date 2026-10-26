@@ -7,7 +7,7 @@ module Ai
         DEFAULT_MODEL = "gpt-4o-mini"
         ENDPOINT = URI("https://api.openai.com/v1/chat/completions")
 
-        def call(system:, user:)
+        def call(system:, user:, images: [])
           raise Client::ConfigError, "OPENAI_API_KEY missing" if @api_key.to_s.strip.empty?
 
           body = {
@@ -17,7 +17,8 @@ module Ai
             response_format: { type: "json_object" },
             messages: [
               { role: "system", content: system },
-              { role: "user",   content: user }
+              { role: "user", content: images.empty? ? user : [ { type: "text", text: user } ] +
+                images.map { |i| { type: "image_url", image_url: { url: "data:#{i[:mime]};base64,#{i[:data]}" } } } }
             ]
           }
 

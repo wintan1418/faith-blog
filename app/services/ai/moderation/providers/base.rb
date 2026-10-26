@@ -20,7 +20,8 @@ module Ai
         # Returns a Hash shaped like:
         #   { "model" => "...", "content" => [ { "type" => "text", "text" => "{...json...}" } ] }
         # so Reviewer's parser can stay provider-agnostic.
-        def call(system:, user:)
+        # images: [{ mime: "image/jpeg", data: "<base64>" }] for vision checks (optional).
+        def call(system:, user:, images: [])
           raise NotImplementedError
         end
 
