@@ -12,6 +12,19 @@ class User < ApplicationRecord
 
   # Associations
   has_one :profile, dependent: :destroy
+  # Professional profile (LinkedIn-style)
+  has_many :experiences, -> { ordered }, dependent: :destroy
+  has_many :educations, -> { ordered }, dependent: :destroy
+
+  # One line under the name: the headline they wrote, or "Title at Organisation" from their current role.
+  def professional_headline
+    profile&.headline.presence ||
+      experiences.find(&:current?)&.then { |role| "#{role.title} at #{role.organization}" }
+  end
+
+  def professional_profile?
+    profile&.headline.present? || profile&.skills.present? || experiences.any? || educations.any?
+  end
   has_many :posts, dependent: :destroy
   has_many :announcements, dependent: :destroy
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_22_094940) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -312,6 +312,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_094940) do
     t.index ["last_message_at"], name: "index_conversations_on_last_message_at"
   end
 
+  create_table "educations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "school", limit: 120, null: false
+    t.string "qualification", limit: 100
+    t.string "field_of_study", limit: 100
+    t.integer "start_year"
+    t.integer "end_year"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_educations_on_user_id"
+  end
+
+  create_table "experiences", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "title", limit: 100, null: false
+    t.string "organization", limit: 100, null: false
+    t.string "employment_type", limit: 30
+    t.string "location", limit: 100
+    t.date "start_on", null: false
+    t.date "end_on"
+    t.boolean "current", default: false, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "start_on"], name: "index_experiences_on_user_id_and_start_on"
+    t.index ["user_id"], name: "index_experiences_on_user_id"
+  end
+
   create_table "follows", force: :cascade do |t|
     t.bigint "follower_id", null: false
     t.bigint "following_id", null: false
@@ -545,6 +574,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_094940) do
     t.jsonb "social_links", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "headline", limit: 120
+    t.string "skills", default: [], null: false, array: true
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 
@@ -787,6 +818,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_22_094940) do
   add_foreign_key "connection_requests", "users", column: "sender_id"
   add_foreign_key "conversation_participants", "conversations"
   add_foreign_key "conversation_participants", "users"
+  add_foreign_key "educations", "users"
+  add_foreign_key "experiences", "users"
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "follows", "users", column: "following_id"
   add_foreign_key "game_attempts", "users"

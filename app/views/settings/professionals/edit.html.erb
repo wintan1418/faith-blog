@@ -1,0 +1,84 @@
+<% content_for :title, "Professional Profile" %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-4xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Settings</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Professional</h1>
+      <p class="mystic-copy mt-2 max-w-2xl">What you do, where you've served and studied. Shown on your profile so brethren in your field can find you.</p>
+    </div>
+
+    <%= render "settings/tabs", active: :professional %>
+
+    <div class="pro-settings">
+      <section class="mystic-panel-strong pro-panel">
+        <h2 class="pro-panel-title">Headline & skills</h2>
+        <%= form_with model: @profile, url: settings_professional_path, method: :patch, class: "space-y-5" do |f| %>
+          <% if @profile.errors.any? %>
+            <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= @profile.errors.full_messages.to_sentence %></div>
+          <% end %>
+          <div>
+            <%= f.label :headline, "Headline", class: "label" %>
+            <%= f.text_field :headline, class: "input", maxlength: 120,
+                             placeholder: "Nurse at Lagos University Teaching Hospital · Worship leader" %>
+            <p class="mt-1 text-xs text-faith-muted">One line under your name. Leave blank to use your current role.</p>
+          </div>
+          <div>
+            <%= f.label :skills_list, "Skills", class: "label" %>
+            <%= f.text_field :skills_list, class: "input", placeholder: "Nursing, Public speaking, Graphic design, Counselling" %>
+            <p class="mt-1 text-xs text-faith-muted">Separate with commas (up to <%= Profile::MAX_SKILLS %>).</p>
+          </div>
+          <%= f.submit "Save", class: "btn btn-primary" %>
+        <% end %>
+      </section>
+
+      <section class="mystic-panel-strong pro-panel">
+        <div class="pro-panel-head">
+          <h2 class="pro-panel-title">Experience</h2>
+          <%= link_to "+ Add", new_settings_experience_path, class: "btn btn-secondary btn-sm" %>
+        </div>
+        <% if current_user.experiences.any? %>
+          <ul class="pro-list">
+            <% current_user.experiences.each do |experience| %>
+              <li class="pro-item">
+                <%= render "users/org_mark", name: experience.organization %>
+                <div class="pro-item-main">
+                  <p class="pro-item-title"><%= experience.title %></p>
+                  <p class="pro-item-sub"><%= [ experience.organization, experience.employment_type ].compact_blank.join(" · ") %></p>
+                  <p class="pro-item-meta"><%= experience.date_range %> · <%= experience.duration %></p>
+                </div>
+                <%= link_to "Edit", edit_settings_experience_path(experience), class: "pro-item-edit" %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="pro-empty">Add your current role, or a past one: work, ministry or volunteering.</p>
+        <% end %>
+      </section>
+
+      <section class="mystic-panel-strong pro-panel">
+        <div class="pro-panel-head">
+          <h2 class="pro-panel-title">Education</h2>
+          <%= link_to "+ Add", new_settings_education_path, class: "btn btn-secondary btn-sm" %>
+        </div>
+        <% if current_user.educations.any? %>
+          <ul class="pro-list">
+            <% current_user.educations.each do |education| %>
+              <li class="pro-item">
+                <%= render "users/org_mark", name: education.school %>
+                <div class="pro-item-main">
+                  <p class="pro-item-title"><%= education.school %></p>
+                  <p class="pro-item-sub"><%= [ education.qualification, education.field_of_study ].compact_blank.join(", ") %></p>
+                  <% if education.years %><p class="pro-item-meta"><%= education.years %></p><% end %>
+                </div>
+                <%= link_to "Edit", edit_settings_education_path(education), class: "pro-item-edit" %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="pro-empty">Add a school, university, seminary or course.</p>
+        <% end %>
+      </section>
+    </div>
+  </div>
+</div>

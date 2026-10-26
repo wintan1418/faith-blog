@@ -1,0 +1,49 @@
+/* ==========================================
+   Professional profile (LinkedIn-style): profile card + settings.
+   ========================================== */
+.profile-headline { margin-top: 0.35rem; font-size: 0.98rem; font-weight: 600; color: var(--fc-ink); }
+
+.pro-settings { display: grid; gap: 1.25rem; margin-top: 1.25rem; }
+.pro-panel, .pro-card { padding: 1.25rem 1.25rem 1.1rem; }
+.pro-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem; }
+.pro-panel-title, .pro-card-title { font-size: 1.2rem; font-weight: 800; color: var(--fc-ink); margin: 0 0 0.75rem; }
+.pro-panel-head .pro-panel-title, .pro-panel-head .pro-card-title { margin: 0; }
+.pro-card-sub { margin: 1.1rem 0 0.25rem; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fc-muted); }
+
+.pro-list { list-style: none; margin: 0; padding: 0; }
+.pro-item { display: flex; gap: 0.85rem; align-items: flex-start; padding: 0.85rem 0; border-bottom: 1px solid var(--fc-line); }
+.pro-item:last-child { border-bottom: 0; }
+.pro-org-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--fc-avatar-bg, var(--fc-surface-2));
+  color: var(--fc-avatar-fg, var(--fc-ink));
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+.pro-item-main { flex: 1; min-width: 0; }
+.pro-item-title { font-size: 0.98rem; font-weight: 700; color: var(--fc-ink); }
+.pro-item-sub { font-size: 0.9rem; color: var(--fc-ink); }
+.pro-item-meta { font-size: 0.82rem; color: var(--fc-muted); }
+.pro-item-desc { margin-top: 0.4rem; font-size: 0.9rem; line-height: 1.5; color: var(--fc-soft, var(--fc-ink)); white-space: pre-line; }
+.pro-item-edit { flex-shrink: 0; font-size: 0.85rem; font-weight: 700; color: var(--fc-accent); text-decoration: none; }
+
+.pro-skills { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.4rem; }
+.pro-skill {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--fc-line-strong, var(--fc-line));
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fc-ink);
+}
+.pro-empty { font-size: 0.9rem; line-height: 1.5; color: var(--fc-muted); }
+.pro-empty-cta { display: grid; gap: 0.9rem; justify-items: start; }
+.pro-remove { border: 0; background: none; padding: 0; font-size: 0.85rem; font-weight: 700; color: #dc2626; cursor: pointer; }
+
+/* "I currently work here" hides the end date. */
+.pro-form:has(input[name="experience[current]"][type="checkbox"]:checked) .pro-end-date { display: none; }

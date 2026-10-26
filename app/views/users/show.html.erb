@@ -50,6 +50,9 @@
                 <% end %>
               </div>
               <p class="profile-handle">@<%= @user.username %></p>
+              <% if (headline = @user.professional_headline) %>
+                <p class="profile-headline"><%= headline %></p>
+              <% end %>
             </div>
 
             <% if user_signed_in? && @user == current_user %>
@@ -162,6 +165,8 @@
         <% end %>
       </section>
     <% end %>
+
+    <%= render "users/professional", user: @user %>
 
     <section>
       <div class="profile-section-heading mb-6 flex items-center gap-3">

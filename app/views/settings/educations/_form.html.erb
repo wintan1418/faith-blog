@@ -1,0 +1,41 @@
+<%= form_with model: education, url: (education.persisted? ? settings_education_path(education) : settings_educations_path), class: "space-y-5 pro-form" do |f| %>
+  <% if education.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= education.errors.full_messages.to_sentence %></div>
+  <% end %>
+  <div>
+    <%= f.label :school, "School", class: "label" %>
+    <%= f.text_field :school, class: "input", required: true, maxlength: 120, placeholder: "University of Lagos, a seminary, a course…" %>
+  </div>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= f.label :qualification, "Qualification", class: "label" %>
+      <%= f.text_field :qualification, class: "input", maxlength: 100, placeholder: "BSc, Diploma, Certificate…" %>
+    </div>
+    <div>
+      <%= f.label :field_of_study, "Field of study", class: "label" %>
+      <%= f.text_field :field_of_study, class: "input", maxlength: 100, placeholder: "Nursing, Theology…" %>
+    </div>
+  </div>
+  <div class="grid gap-5 grid-cols-2">
+    <div>
+      <%= f.label :start_year, "Start year", class: "label" %>
+      <%= f.number_field :start_year, class: "input", min: 1950, max: Date.current.year + 1, inputmode: "numeric" %>
+    </div>
+    <div>
+      <%= f.label :end_year, "End year (or expected)", class: "label" %>
+      <%= f.number_field :end_year, class: "input", min: 1950, max: Date.current.year + 8, inputmode: "numeric" %>
+    </div>
+  </div>
+  <div>
+    <%= f.label :description, "Notes (optional)", class: "label" %>
+    <%= f.text_area :description, class: "input min-h-[90px]", maxlength: 1000 %>
+  </div>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <%= f.submit (education.persisted? ? "Save" : "Add education"), class: "btn btn-primary" %>
+    <%= link_to "Cancel", edit_settings_professional_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
+<% if education.persisted? %>
+  <%= button_to "Remove this education", settings_education_path(education), method: :delete, class: "pro-remove",
+                form: { class: "mt-6" }, data: { turbo_confirm: "Remove this education?" } %>
+<% end %>

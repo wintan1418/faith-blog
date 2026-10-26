@@ -194,6 +194,9 @@ Rails.application.routes.draw do
     resource :notifications, only: [ :edit, :update ]
     resource :privacy, only: [ :edit, :update ]
     resource :brethren_card, only: [ :edit, :update ]
+    resource :professional, only: [ :edit, :update ]
+    resources :experiences, only: [ :new, :create, :edit, :update, :destroy ]
+    resources :educations, only: [ :new, :create, :edit, :update, :destroy ]
     resource :dark_mode, only: [ :update ]
     resource :accent,    only: [ :edit, :update ]
   end

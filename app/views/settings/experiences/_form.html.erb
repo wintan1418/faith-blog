@@ -1,0 +1,48 @@
+<%= form_with model: experience, url: (experience.persisted? ? settings_experience_path(experience) : settings_experiences_path), class: "space-y-5 pro-form" do |f| %>
+  <% if experience.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= experience.errors.full_messages.to_sentence %></div>
+  <% end %>
+  <div>
+    <%= f.label :title, "Title", class: "label" %>
+    <%= f.text_field :title, class: "input", required: true, maxlength: 100, placeholder: "Nurse, Software engineer, Youth pastor…" %>
+  </div>
+  <div>
+    <%= f.label :organization, "Organisation", class: "label" %>
+    <%= f.text_field :organization, class: "input", required: true, maxlength: 100, placeholder: "Company, church, ministry or school" %>
+  </div>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= f.label :employment_type, "Type", class: "label" %>
+      <%= f.select :employment_type, Experience::EMPLOYMENT_TYPES, { include_blank: "Choose…" }, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :location, "Location", class: "label" %>
+      <%= f.text_field :location, class: "input", maxlength: 100, placeholder: "Lagos, Nigeria" %>
+    </div>
+  </div>
+  <label class="flex items-center gap-2 text-sm font-semibold">
+    <%= f.check_box :current %> I currently work here
+  </label>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= f.label :start_month, "Start", class: "label" %>
+      <%= f.month_field :start_month, class: "input", required: true %>
+    </div>
+    <div class="pro-end-date">
+      <%= f.label :end_month, "End", class: "label" %>
+      <%= f.month_field :end_month, class: "input" %>
+    </div>
+  </div>
+  <div>
+    <%= f.label :description, "What you do (optional)", class: "label" %>
+    <%= f.text_area :description, class: "input min-h-[110px]", maxlength: 2000 %>
+  </div>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <%= f.submit (experience.persisted? ? "Save" : "Add experience"), class: "btn btn-primary" %>
+    <%= link_to "Cancel", edit_settings_professional_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
+<% if experience.persisted? %>
+  <%= button_to "Remove this experience", settings_experience_path(experience), method: :delete, class: "pro-remove",
+                form: { class: "mt-6" }, data: { turbo_confirm: "Remove this experience?" } %>
+<% end %>
