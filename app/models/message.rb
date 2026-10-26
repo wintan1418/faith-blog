@@ -34,6 +34,8 @@ class Message < ApplicationRecord
   validate  :max_images_count
   validate  :attachments_content_type_and_size
   validate  :scripture_ref_looks_like_a_reference
+  # No offensive language in messages (instant, before saving; see CleanLanguage).
+  validate :language_is_clean, if: :will_save_change_to_body?
 
   def attachments_content_type_and_size
     validate_image_attachment(:images, max_bytes: IMAGE_MAX_BYTES)
@@ -62,11 +64,72 @@ class Message < ApplicationRecord
 
   after_create_commit :touch_conversation
   after_create_commit :broadcast_to_participants
-  after_create_commit :notify_recipient
+  # AI review first; it notifies the recipient once the message is cleared.
+  after_create_commit :moderate
 
   # The message just before this one in its thread (for grouping and day dividers).
   def previous_in_thread
     conversation.messages.visible.where(created_at: ...created_at).order(created_at: :desc).first
+  end
+
+  def language_is_clean
+    errors.add(:base, CleanLanguage::MESSAGE) if CleanLanguage.offensive?(body)
+  end
+
+  # Removed by moderation: the text stays for the review queue, participants see a notice.
+  def removed? = removed_at.present?
+
+  def remove_for_moderation!
+    update_columns(removed_at: Time.current)
+    rebroadcast
+  end
+
+  def restore_after_review!
+    update_columns(removed_at: nil)
+    rebroadcast
+    notify_recipient
+  end
+
+  # Redraw this message in both people's open chats.
+  def rebroadcast
+    conversation.conversation_participants.find_each do |participant|
+      broadcast_replace_to [ conversation, participant.user_id, :messages ],
+                           target: ActionView::RecordIdentifier.dom_id(self),
+                           partial: "conversations/message",
+                           locals: { message: self, viewer_id: participant.user_id }
+    end
+  rescue StandardError => e
+    Rails.logger.warn("[Message##{id}] rebroadcast failed: #{e.class}: #{e.message}")
+  end
+
+  def notify_recipient
+    recipient = conversation.other_participant_for(sender)
+    return unless recipient
+
+    # One unread chat notification per conversation: a burst of messages updates
+    # it (and re-sends the phone notification, which replaces the last one)
+    # instead of piling up a new notification for every line.
+    waiting = recipient.notifications.unread.direct_message
+                       .where(notifiable_type: "Message", notifiable_id: conversation.messages.select(:id))
+                       .order(created_at: :desc).first
+    if waiting
+      waiting.update!(notifiable: self, actor: sender, created_at: Time.current)
+      waiting.deliver_push_notification
+    else
+      Notification.create(user: recipient, actor: sender, notifiable: self, notification_type: :direct_message)
+    end
+  end
+
+  def moderate
+    if body.blank? || Ai::Moderation::Client.stub?
+      # Nothing to read (voice/photo only), or offline/test moderation: decide right away.
+      body.blank? ? notify_recipient : MessageModerationJob.perform_now(self)
+    else
+      MessageModerationJob.perform_later(self)
+    end
+  rescue StandardError => e
+    Rails.logger.warn("[Message##{id}] moderation enqueue failed, notifying anyway: #{e.class}: #{e.message}")
+    notify_recipient
   end
 
   def deleted?
@@ -154,24 +217,6 @@ class Message < ApplicationRecord
           "[Message##{id}] broadcast to user #{participant.user_id} failed: #{e.class}: #{e.message}"
         )
       end
-    end
-  end
-
-  def notify_recipient
-    recipient = conversation.other_participant_for(sender)
-    return unless recipient
-
-    # One unread chat notification per conversation: a burst of messages updates
-    # it (and re-sends the phone notification, which replaces the last one)
-    # instead of piling up a new notification for every line.
-    waiting = recipient.notifications.unread.direct_message
-                       .where(notifiable_type: "Message", notifiable_id: conversation.messages.select(:id))
-                       .order(created_at: :desc).first
-    if waiting
-      waiting.update!(notifiable: self, actor: sender, created_at: Time.current)
-      waiting.deliver_push_notification
-    else
-      Notification.create(user: recipient, actor: sender, notifiable: self, notification_type: :direct_message)
     end
   end
 end

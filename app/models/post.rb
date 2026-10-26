@@ -103,6 +103,7 @@ class Post < ApplicationRecord
   validates :title, length: { maximum: 200 }
   validates :title, presence: true, length: { minimum: 5 }, if: :kind_thread?
   validates :content, presence: true
+  validate :language_is_clean
   validates :slug, presence: true, uniqueness: true
   validate :max_images_count
 
@@ -430,5 +431,13 @@ class Post < ApplicationRecord
     return unless saved_change_to_status? && published? && moderation_approved?
 
     bump_author_streak
+  end
+
+  private
+
+  # No offensive language in the title or text (instant, before saving; the AI gate still reviews).
+  def language_is_clean
+    text = [ title, content&.to_plain_text ].compact.join(" ")
+    errors.add(:base, CleanLanguage::MESSAGE) if CleanLanguage.offensive?(text)
   end
 end

@@ -12,6 +12,7 @@ module Ai
         hate
         harassment
         scam
+        occult
         explicit_adult
         doxxing
         spiritual_manipulation

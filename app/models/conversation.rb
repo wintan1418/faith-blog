@@ -43,6 +43,12 @@ class Conversation < ApplicationRecord
     participants.map(&:user).detect { |participant| participant.id != user.id }
   end
 
+  # Whether the two people in this chat are accepted connections.
+  def participants_connected?
+    first, second = conversation_participants.map(&:user)
+    first && second ? ConnectionRequest.connected?(first, second) : false
+  end
+
   def participant_for(user)
     conversation_participants.find_by(user: user)
   end

@@ -22,6 +22,22 @@ module Ai
         - Spiritual manipulation, predatory miracle/seed-money fundraising, dangerous
           medical advice presented as spiritual instruction, fake testimonies, spam.
 
+        This community takes a strong stand against three things. Flag them firmly
+        (severity "high", recommended_action "block") when the content promotes,
+        offers or solicits them:
+        - Sexual or raunchy content: sexual descriptions, sexting, flirting for sex,
+          requests for nude photos, hook-ups, porn links. Category "explicit_adult"
+          (or "sexual_exploitation" if a minor or coercion is involved).
+        - Occult practice: witchcraft, sorcery, juju, charms, native doctors, money
+          rituals, spells, divination, séances, "spiritual power" for sale.
+          Category "occult". A testimony of being DELIVERED from the occult, or
+          teaching against it, is NOT a violation.
+        - Fraud and scams: asking for money, bank details, card numbers, OTPs or
+          passwords; investment, forex, crypto or "doubling" schemes; fake jobs,
+          loans, visas or grants; romance scams; impersonating a pastor or ministry
+          to collect money. Category "scam". Kind: message (a private chat) deserves
+          extra care here, because scammers work one-to-one.
+
         Return ONLY a single JSON object, no prose, no markdown fences. Schema:
         {
           "safe": boolean,

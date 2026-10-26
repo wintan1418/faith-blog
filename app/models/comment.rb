@@ -23,6 +23,7 @@ class Comment < ApplicationRecord
   # Validations
   validates :content, presence: true
   validate :parent_comment_belongs_to_same_post
+  validate :language_is_clean
 
   # Callbacks
   before_validation :unwrap_leaked_trix_html
@@ -138,5 +139,12 @@ class Comment < ApplicationRecord
 
   def enqueue_ai_moderation_review
     AiModerationReviewJob.perform_later(self)
+  end
+
+  private
+
+  # No offensive language (instant, before saving; the AI moderator still reviews afterwards).
+  def language_is_clean
+    errors.add(:base, CleanLanguage::MESSAGE) if CleanLanguage.offensive?(content&.to_plain_text)
   end
 end

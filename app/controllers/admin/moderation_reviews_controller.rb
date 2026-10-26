@@ -144,9 +144,11 @@ class Admin::ModerationReviewsController < ApplicationController
     when "approve", "dismiss"
       @review.dismissed!
       release_post_if_post!(decision)
+      restore_message_if_message!
     when "hide", "warn", "restrict", "suspend"
       @review.actioned!
       block_post_if_post!
+      remove_message_if_message!
       apply_user_action!(decision)
     end
   end
@@ -176,6 +178,21 @@ class Admin::ModerationReviewsController < ApplicationController
     ) if post.user && decision == "approve"
   rescue StandardError => e
     Rails.logger.warn("[ModerationDecide release] #{e.class}: #{e.message}")
+  end
+
+  # Direct messages: "approve" brings back one the AI removed; "hide" removes it.
+  def restore_message_if_message!
+    message = @review.reviewable
+    message.restore_after_review! if message.is_a?(Message) && message.removed?
+  rescue StandardError => e
+    Rails.logger.warn("[ModerationDecide restore message] #{e.class}: #{e.message}")
+  end
+
+  def remove_message_if_message!
+    message = @review.reviewable
+    message.remove_for_moderation! if message.is_a?(Message) && !message.removed?
+  rescue StandardError => e
+    Rails.logger.warn("[ModerationDecide remove message] #{e.class}: #{e.message}")
   end
 
   def block_post_if_post!
