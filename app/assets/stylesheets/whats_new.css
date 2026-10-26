@@ -1,0 +1,106 @@
+/* ==========================================
+   "What's new" pop-up: animated slides, one per feature.
+   ========================================== */
+dialog.wn {
+  width: min(92vw, 400px);
+  max-width: 400px;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  overflow: visible;
+}
+dialog.wn::backdrop {
+  background: rgba(4, 30, 20, 0.55);
+  backdrop-filter: blur(4px);
+  animation: wn-fade 0.3s ease-out;
+}
+dialog.wn[open] .wn-card { animation: wn-rise 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.15); }
+dialog.wn.is-leaving .wn-card { animation: wn-drop 0.22s ease-in forwards; }
+
+.wn-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(22rem 14rem at 50% -10%, color-mix(in oklch, var(--fc-accent, #10b981) 26%, transparent), transparent 70%),
+    var(--fc-surface, #fff);
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.45);
+  color: var(--fc-ink, #111);
+}
+.wn-top { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1rem 0 1.25rem; }
+.wn-kicker {
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--fc-accent, #10b981) 16%, transparent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fc-accent, #059669);
+}
+.wn-close {
+  width: 34px; height: 34px; border: 0; border-radius: 999px;
+  background: color-mix(in oklch, var(--fc-ink, #111) 7%, transparent);
+  color: var(--fc-muted, #666); font-size: 1.3rem; line-height: 1; cursor: pointer;
+}
+
+.wn-viewport { overflow: hidden; }
+.wn-track { display: flex; transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.wn-slide { flex: 0 0 100%; padding: 1.5rem 1.75rem 0.5rem; text-align: center; }
+
+.wn-emoji-wrap { position: relative; display: inline-grid; place-items: center; width: 116px; height: 116px; margin-bottom: 1rem; }
+.wn-emoji-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in oklch, var(--fc-accent, #10b981) 30%, transparent), transparent 70%);
+  animation: wn-breathe 3.2s ease-in-out infinite;
+}
+.wn-emoji { position: relative; font-size: 3.6rem; line-height: 1; }
+.wn-slide.is-active .wn-emoji { animation: wn-pop 0.65s cubic-bezier(0.2, 0.9, 0.3, 1.4) both, wn-float 3s 0.7s ease-in-out infinite; }
+.wn-spark { position: absolute; width: 8px; height: 8px; border-radius: 999px; background: var(--fc-accent, #10b981); opacity: 0; }
+.wn-spark.is-1 { top: 10px; left: 14px; }
+.wn-spark.is-2 { top: 18px; right: 8px; background: #f59e0b; }
+.wn-spark.is-3 { bottom: 14px; left: 20px; background: #60a5fa; }
+.wn-slide.is-active .wn-spark { animation: wn-spark 0.9s 0.25s ease-out both; }
+.wn-slide.is-active .wn-spark.is-2 { animation-delay: 0.35s; }
+.wn-slide.is-active .wn-spark.is-3 { animation-delay: 0.45s; }
+
+.wn-title { font-family: "Playfair Display", Georgia, serif; font-size: 1.55rem; font-weight: 700; line-height: 1.2; margin: 0; }
+.wn-text { margin: 0.6rem auto 0; max-width: 300px; font-size: 0.98rem; line-height: 1.5; color: var(--fc-muted, #555); }
+.wn-slide.is-active .wn-title { animation: wn-up 0.5s 0.12s ease-out both; }
+.wn-slide.is-active .wn-text { animation: wn-up 0.5s 0.22s ease-out both; }
+
+.wn-dots { display: flex; justify-content: center; gap: 6px; padding: 1rem 0 0.25rem; }
+.wn-dot {
+  width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px;
+  background: color-mix(in oklch, var(--fc-ink, #111) 18%, transparent);
+  transition: width 0.3s, background 0.3s; cursor: pointer;
+}
+.wn-dot.is-active { width: 22px; background: var(--fc-accent, #10b981); }
+
+.wn-actions { display: flex; gap: 0.6rem; padding: 0.9rem 1.25rem 1.25rem; }
+.wn-back, .wn-next { flex: 1; height: 48px; border-radius: 14px; font-size: 0.98rem; font-weight: 700; cursor: pointer; }
+.wn-back { border: 1.5px solid var(--fc-line-strong, #ddd); background: transparent; color: var(--fc-ink, #111); }
+.wn-back[hidden] { display: none; }
+.wn-next { border: 0; background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 10px 24px -10px rgba(5, 150, 105, 0.7); }
+
+@keyframes wn-fade { from { opacity: 0; } }
+@keyframes wn-rise { from { opacity: 0; transform: translateY(40px) scale(0.92); } }
+@keyframes wn-drop { to { opacity: 0; transform: translateY(24px) scale(0.96); } }
+@keyframes wn-pop { 0% { transform: scale(0.3) rotate(-12deg); opacity: 0; } 60% { transform: scale(1.18) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0); } }
+@keyframes wn-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes wn-breathe { 0%, 100% { transform: scale(0.85); opacity: 0.6; } 50% { transform: scale(1.1); opacity: 1; } }
+@keyframes wn-spark { 0% { opacity: 0; transform: scale(0.2) translate(0, 0); } 40% { opacity: 1; } 100% { opacity: 0; transform: scale(1) translate(var(--dx, 0), -18px); } }
+@keyframes wn-up { from { opacity: 0; transform: translateY(12px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.wn[open] .wn-card, .wn-slide.is-active .wn-emoji, .wn-slide.is-active .wn-spark,
+  .wn-emoji-wrap::before, .wn-slide.is-active .wn-title, .wn-slide.is-active .wn-text { animation: none; }
+  .wn-track { transition: none; }
+}
+
+/* Always centred (a general dialog style elsewhere pins dialogs to the top). */
+html dialog.wn[open] { position: fixed; inset: 0; margin: auto; height: fit-content; max-height: 92dvh; }

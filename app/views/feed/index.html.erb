@@ -235,7 +235,8 @@
         </div>
       <% end %>
 
-      <% if @release_announcement %>
+      <%# Releases written as slides show in the "What's new" pop-up instead of this banner. %>
+      <% if @release_announcement && @release_announcement.slides.size < 2 %>
         <section class="fc-release-banner"
                  data-controller="onboarding"
                  data-onboarding-key-value="fc:release-<%= @release_announcement.id %>"

@@ -165,3 +165,6 @@ application.register("local-time", LocalTimeController)
 
 import PasswordFieldController from "./password_field_controller"
 application.register("password-field", PasswordFieldController)
+
+import WhatsNewController from "./whats_new_controller"
+application.register("whats-new", WhatsNewController)
