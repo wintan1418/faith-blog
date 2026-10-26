@@ -127,4 +127,11 @@ class MessagingTest < ActionDispatch::IntegrationTest
     assert_select ".msg-row.is-unread .msg-row-unread", text: "2"
     assert_select ".msg-row-preview", text: "Second line"
   end
+
+  test "a birthday greeting arrives ready to send" do
+    post conversations_path(recipient_id: @maria.id, draft: "Happy birthday, Maria!")
+    follow_redirect!
+
+    assert_select "textarea.msg-compose-input", text: "Happy birthday, Maria!"
+  end
 end

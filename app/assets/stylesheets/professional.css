@@ -1,5 +1,4 @@
-/* ==========================================
-   Professional profile (LinkedIn-style): profile card + settings.
+/* ===================================   Professional profile (LinkedIn-style): profile card + settings.
    ========================================== */
 .profile-headline { margin-top: 0.35rem; font-size: 0.98rem; font-weight: 600; color: var(--fc-ink); }
 
@@ -47,3 +46,36 @@
 
 /* "I currently work here" hides the end date. */
 .pro-form:has(input[name="experience[current]"][type="checkbox"]:checked) .pro-end-date { display: none; }
+=======
+
+/* ── Birthdays ── */
+.profile-birthday-today { display: inline-block; margin-top: 0.4rem; padding: 0.2rem 0.7rem; border-radius: 999px; background: color-mix(in oklch, #f59e0b 18%, transparent); font-size: 0.85rem; font-weight: 700; color: var(--fc-ink); }
+.fc-birthdays {
+  display: flex;
+  gap: 0.85rem;
+  margin: 0.75rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in oklch, #f59e0b 35%, transparent);
+  border-radius: 16px;
+  background: linear-gradient(135deg, color-mix(in oklch, #f59e0b 12%, var(--fc-surface)), var(--fc-surface));
+}
+.fc-birthdays-icon { font-size: 1.8rem; line-height: 1; }
+.fc-birthdays-main { flex: 1; min-width: 0; }
+.fc-birthdays-title { font-weight: 700; color: var(--fc-ink); }
+.fc-birthdays-title a { color: inherit; text-decoration: none; }
+.fc-birthdays-people { display: grid; gap: 0.5rem; margin-top: 0.6rem; }
+.fc-birthday-person { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.fc-birthday-who { display: flex; align-items: center; gap: 0.5rem; min-width: 0; color: var(--fc-ink); text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.fc-birthday-who .fc-avatar { width: 32px; height: 32px; }
+.fc-birthday-who span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-birthday-form { margin: 0; flex-shrink: 0; }
+.fc-birthday-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  background: #f59e0b;
+  color: #1c1917;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -28,7 +28,8 @@ class Notification < ApplicationRecord
     badge_earned:         22,
     circle_breath:          23,
     circle_prayer:          24,
-    circle_prayer_answered: 25
+    circle_prayer_answered: 25,
+    birthday:               26
   }
 
   # Associations
@@ -119,6 +120,8 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} added a prayer to #{circle_name_suffix('your circle')} 🙏"
     when :circle_prayer_answered
       "A prayer in #{circle_name_suffix('your circle')} was marked answered 🌟"
+    when :birthday
+      "🎂 It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
       "You have a new notification"
     end
@@ -155,6 +158,8 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.conversation_path(notifiable.conversation)
     when :circle_breath, :circle_prayer, :circle_prayer_answered
       Rails.application.routes.url_helpers.circle_path(notifiable.circle)
+    when :birthday
+      Rails.application.routes.url_helpers.user_path(actor.username)
     else
       Rails.application.routes.url_helpers.notifications_path
     end
@@ -196,6 +201,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
+    return if birthday? # a push and the feed card are enough; no birthday emails
 
     NotificationMailer.with(notification: self).community_notification.deliver_later
   end

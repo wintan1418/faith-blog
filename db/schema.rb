@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_26_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -576,6 +576,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_160000) do
     t.datetime "updated_at", null: false
     t.string "headline", limit: 120
     t.string "skills", default: [], null: false, array: true
+    t.integer "birth_month"
+    t.integer "birth_day"
+    t.integer "birth_year"
+    t.boolean "show_birthday", default: true, null: false
+    t.index ["birth_month", "birth_day"], name: "index_profiles_on_birth_month_and_birth_day"
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 

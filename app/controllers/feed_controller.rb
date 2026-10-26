@@ -138,6 +138,7 @@ class FeedController < ApplicationController
 
     @daily_verses  = load_by_ids(BibleVerse, cached_ids(:daily_verses) { BibleVerse.active.ordered.limit(20).pluck(:id) })
     @daily_breaths = load_by_ids(GoldenBreath, cached_ids(:daily_breaths) { GoldenBreath.active.ordered.limit(20).pluck(:id) })
+    @birthdays_today = current_user.brethren_birthdays_today.to_a
     @user_reading_plan = current_user.user_reading_plans.where(completed: false).order(updated_at: :desc).first
 
     trending_ids = cached_ids(:trending) do

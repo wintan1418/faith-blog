@@ -39,7 +39,8 @@ class ConversationsController < ApplicationController
     end
 
     @conversation = Conversation.find_or_create_between!(current_user, @recipient)
-    redirect_to conversation_path(@conversation)
+    # A ready-to-send greeting (e.g. "Happy birthday!") can ride along into the composer.
+    redirect_to conversation_path(@conversation, draft: params[:draft].presence&.first(500))
   end
 
   # "Load earlier messages": the previous page, inserted above what's on screen.

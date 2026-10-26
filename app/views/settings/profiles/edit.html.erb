@@ -66,6 +66,21 @@
             <%= f.url_field :website, class: "input", placeholder: "https://yourblog.com" %>
           </div>
 
+          <%# Birthday: day and month are shared with your brethren; the year is optional and private. %>
+          <div>
+            <span class="label">Birthday</span>
+            <div class="grid grid-cols-3 gap-3">
+              <%= f.select :birth_month, Date::MONTHNAMES.compact.each_with_index.map { |m, i| [ m, i + 1 ] },
+                           { include_blank: "Month" }, class: "input", aria: { label: "Birth month" } %>
+              <%= f.select :birth_day, (1..31).to_a, { include_blank: "Day" }, class: "input", aria: { label: "Birth day" } %>
+              <%= f.number_field :birth_year, class: "input", placeholder: "Year (private)", min: 1900, max: Date.current.year,
+                                 inputmode: "numeric", aria: { label: "Birth year (optional, private)" } %>
+            </div>
+            <label class="mt-2 flex items-center gap-2 text-sm text-faith-muted">
+              <%= f.check_box :show_birthday %> Let my brethren see my birthday and celebrate with me
+            </label>
+          </div>
+
           <label class="flex items-center gap-2 border-t border-faith-green/10 pt-4 text-sm font-semibold text-faith-muted">
             <%= f.check_box :public_profile, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
             Make my profile public

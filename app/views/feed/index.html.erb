@@ -121,6 +121,8 @@
         <% end %>
       </header>
 
+      <%= render "feed/birthdays", birthdays: @birthdays_today %>
+
       <%# Activation ring: stays until all three first steps are done, then
           disappears for good. Each pending step is the link to do it. %>
       <% if @onboard && @onboard_done < 3 %>
