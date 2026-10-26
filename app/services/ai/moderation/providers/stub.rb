@@ -9,13 +9,13 @@ module Ai
         FLAGGED_KEYWORDS = %w[kill suicide bomb scam phish stupid hate].freeze
         # Offline stand-ins for the three things Brethreign fights hardest (high severity).
         STRONG_KEYWORDS = {
-          "explicit_adult" => [ "sext", "naked", "hook up" ],
+          "explicit_adult" => [ "sext", "naked", "hook up", "nsfw" ],
           "occult"         => [ "juju", "money ritual", "native doctor", "spell" ],
           "scam"           => [ "bank details", "otp", "double your money", "send me money", "forex" ]
         }.freeze
         HARSH_KEYWORDS   = %w[idiot stupid moron loser shut\ up].freeze
 
-        def call(system:, user:)
+        def call(system:, user:, images: []) # rubocop:disable Lint/UnusedMethodArgument
           # Composer assistants share this provider; branch on the task marker
           # in the system prompt so each task gets the right shape back.
           return wrap(model: "stub", text: JSON.dump(gentleness_payload(user))) if system.to_s.include?("[TASK:GENTLENESS]")

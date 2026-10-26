@@ -49,18 +49,38 @@ module Ai
         }
       PROMPT
 
-      def self.call(content:, kind: "post", author_context: nil)
-        new(content: content, kind: kind, author_context: author_context).call
+      # For pictures: the same JSON answer, judged on what the images show.
+      IMAGE_PROMPT = <<~PROMPT.freeze
+        You are an image safety classifier for Brethreign, a Christian faith community.
+        Look at each image. Flag it firmly (severity "high", recommended_action "block") if it shows:
+        - Nudity, sexual or raunchy content, lingerie/underwear posing, sexual gestures
+          (category "explicit_adult"; "sexual_exploitation" if a minor may be involved).
+        - Occult material: witchcraft or juju items, ritual setups, charms, occult symbols
+          used for practice, "native doctor" adverts (category "occult"). Ordinary church
+          imagery, crosses, Bibles and art are fine.
+        - Fraud: images asking for money, bank or card details, payment QR codes from
+          strangers, fake receipts, investment/forex/crypto adverts (category "scam").
+        - Graphic violence or gore (category "violence"); hate symbols (category "hate").
+        Normal photos (people, worship, food, nature, screenshots of scripture) are safe.
+        Return ONLY one JSON object with the schema:
+        {"safe": boolean, "severity": "none"|"low"|"medium"|"high", "categories": [string],
+         "score": number 0-1, "summary": string (max 200 chars), "recommended_action":
+         "allow"|"suggest_edit"|"require_review"|"hide_pending_review"|"block"}
+      PROMPT
+
+      def self.call(content:, kind: "post", author_context: nil, images: [])
+        new(content: content, kind: kind, author_context: author_context, images: images).call
       end
 
-      def initialize(content:, kind: "post", author_context: nil)
+      def initialize(content:, kind: "post", author_context: nil, images: [])
+        @images = images
         @content = content.to_s
         @kind = kind
         @author_context = author_context
       end
 
       def call
-        raw = Client.call(system: SYSTEM_PROMPT, user: user_prompt)
+        raw = Client.call(system: @images.any? ? IMAGE_PROMPT : SYSTEM_PROMPT, user: user_prompt, images: @images)
         payload = extract_payload(raw)
         safe = payload.fetch("safe", true)
 

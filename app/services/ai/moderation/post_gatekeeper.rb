@@ -41,6 +41,7 @@ module Ai
         self_harm
         doxxing
         scam
+        occult
       ].freeze
 
       def self.call(post:)
@@ -57,6 +58,8 @@ module Ai
           kind: "post",
           author_context: author_context
         )
+        # Photos get their own look; the stricter of the two results decides.
+        result = ImageModeration.worse(result, ImageModeration.review(@post.images.attachments, kind: "post")) if @post.images.attached?
         decision, reason = decide(result)
         Verdict.new(
           decision: decision,

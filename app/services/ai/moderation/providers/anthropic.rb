@@ -8,14 +8,16 @@ module Ai
         ANTHROPIC_VERSION = "2023-06-01"
         ENDPOINT = URI("https://api.anthropic.com/v1/messages")
 
-        def call(system:, user:)
+        def call(system:, user:, images: [])
           raise Client::ConfigError, "ANTHROPIC_API_KEY missing" if @api_key.to_s.strip.empty?
 
           body = {
             model: @model,
             max_tokens: DEFAULT_MAX_TOKENS,
             system: system,
-            messages: [ { role: "user", content: user } ]
+            messages: [ { role: "user", content: images.empty? ? user :
+              images.map { |i| { type: "image", source: { type: "base64", media_type: i[:mime], data: i[:data] } } } +
+              [ { type: "text", text: user } ] } ]
           }
 
           response = post_json(

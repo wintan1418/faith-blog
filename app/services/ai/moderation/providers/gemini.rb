@@ -7,13 +7,13 @@ module Ai
         DEFAULT_MODEL = "gemini-2.5-flash"
         ENDPOINT_TEMPLATE = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent"
 
-        def call(system:, user:)
+        def call(system:, user:, images: [])
           raise Client::ConfigError, "GEMINI_API_KEY missing" if @api_key.to_s.strip.empty?
 
           uri = URI("#{format(ENDPOINT_TEMPLATE, @model)}?key=#{@api_key}")
           body = {
             systemInstruction: { parts: [ { text: system } ] },
-            contents: [ { role: "user", parts: [ { text: user } ] } ],
+            contents: [ { role: "user", parts: [ { text: user } ] + images.map { |i| { inlineData: { mimeType: i[:mime], data: i[:data] } } } } ],
             generationConfig: {
               temperature: 0.0,
               maxOutputTokens: DEFAULT_MAX_TOKENS,

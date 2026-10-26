@@ -29,7 +29,8 @@ class Notification < ApplicationRecord
     circle_breath:          23,
     circle_prayer:          24,
     circle_prayer_answered: 25,
-    birthday:               26
+    birthday:               26,
+    content_removed:        27
   }
 
   # Associations
@@ -120,6 +121,8 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} added a prayer to #{circle_name_suffix('your circle')} 🙏"
     when :circle_prayer_answered
       "A prayer in #{circle_name_suffix('your circle')} was marked answered 🌟"
+    when :content_removed
+      "🛡 Your profile photo was removed because it breaks our community guidelines. Please choose another."
     when :birthday
       "🎂 It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -160,6 +163,8 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.circle_path(notifiable.circle)
     when :birthday
       Rails.application.routes.url_helpers.user_path(actor.username)
+    when :content_removed
+      Rails.application.routes.url_helpers.edit_settings_profile_path
     else
       Rails.application.routes.url_helpers.notifications_path
     end

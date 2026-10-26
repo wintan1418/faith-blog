@@ -121,9 +121,10 @@ class Message < ApplicationRecord
   end
 
   def moderate
-    if body.blank? || Ai::Moderation::Client.stub?
-      # Nothing to read (voice/photo only), or offline/test moderation: decide right away.
-      body.blank? ? notify_recipient : MessageModerationJob.perform_now(self)
+    if body.blank? && !has_images?
+      notify_recipient # voice note only: nothing to read or look at
+    elsif Ai::Moderation::Client.stub?
+      MessageModerationJob.perform_now(self) # offline/test moderation decides right away
     else
       MessageModerationJob.perform_later(self)
     end
