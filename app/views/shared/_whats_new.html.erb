@@ -1,0 +1,42 @@
+<%# "What's new": an animated walk-through of the latest release, shown once per person. %>
+<% if release %>
+  <% slides = release.slides %>
+  <dialog class="wn" data-controller="whats-new" data-turbo-temporary
+          data-whats-new-seen-url-value="<%= seen_whats_new_path(release) %>" aria-labelledby="wn-heading">
+    <div class="wn-card">
+      <div class="wn-top">
+        <span class="wn-kicker" id="wn-heading"><%= release.kicker.presence || "What's new" %></span>
+        <button type="button" class="wn-close" data-action="whats-new#finish" aria-label="Close">×</button>
+      </div>
+
+      <div class="wn-viewport">
+        <div class="wn-track" data-whats-new-target="track">
+          <% slides.each_with_index do |slide, i| %>
+            <section class="wn-slide<%= ' is-active' if i.zero? %>" data-whats-new-target="slide" aria-hidden="<%= i.zero? ? 'false' : 'true' %>">
+              <div class="wn-emoji-wrap" aria-hidden="true">
+                <span class="wn-spark is-1"></span><span class="wn-spark is-2"></span><span class="wn-spark is-3"></span>
+                <span class="wn-emoji"><%= slide.emoji %></span>
+              </div>
+              <h2 class="wn-title"><%= slide.title %></h2>
+              <% if slide.text %><p class="wn-text"><%= slide.text %></p><% end %>
+            </section>
+          <% end %>
+        </div>
+      </div>
+
+      <% if slides.size > 1 %>
+        <div class="wn-dots" role="tablist">
+          <% slides.each_index do |i| %>
+            <button type="button" class="wn-dot<%= ' is-active' if i.zero? %>" data-whats-new-target="dot"
+                    data-action="whats-new#go" data-whats-new-index-param="<%= i %>" aria-label="Feature <%= i + 1 %>"></button>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="wn-actions">
+        <button type="button" class="wn-back" data-whats-new-target="back" data-action="whats-new#prev" hidden>Back</button>
+        <button type="button" class="wn-next" data-whats-new-target="next" data-action="whats-new#next"><%= slides.size > 1 ? "Next" : "Got it" %></button>
+      </div>
+    </div>
+  </dialog>
+<% end %>
