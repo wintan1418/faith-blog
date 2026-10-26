@@ -70,6 +70,8 @@ class MessageModerationJob < ApplicationJob
     return :remove if result.recommended_action == "block"
     return :remove if result.severity == "high"
     return :remove if result.severity == "medium" && (categories & REMOVE_CATEGORIES).any?
+    # Insults aimed at someone are removed even when the AI calls them mild.
+    return :remove if (categories & %w[harassment hate]).any?
 
     :flag
   end
