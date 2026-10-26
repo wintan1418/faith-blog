@@ -107,8 +107,10 @@ class FeedController < ApplicationController
     end
   end
 
+  # Only the infinite-scroll stream skips the sidebar. A full page at ?page=2 (reload,
+  # Back, a shared link) still renders the sidebar, so it needs the data.
   def next_page?
-    params[:page].present? && params[:page].to_i > 1
+    params[:page].to_i > 1 && request.format.turbo_stream?
   end
 
   # Cached as ids (cheap to reload, safe across deploys) rather than whole records.
