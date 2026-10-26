@@ -22,6 +22,9 @@ export default class extends Controller {
     this.onLoad = () => { if (this.nearBottom()) this.jumpToBottom() }
     this.element.addEventListener("load", this.onLoad, true)
 
+    this.lastHeight = this.element.scrollHeight
+    this.onScroll = () => { this.lastHeight = this.element.scrollHeight }
+    this.element.addEventListener("scroll", this.onScroll, { passive: true })
     this.observer = new MutationObserver((mutations) => this.onAppend(mutations))
     this.observer.observe(this.element, { childList: true })
   }
@@ -30,12 +33,21 @@ export default class extends Controller {
     this.observer?.disconnect()
     clearTimeout(this.settleTimer)
     this.element.removeEventListener("load", this.onLoad, true)
+    this.element.removeEventListener("scroll", this.onScroll)
   }
 
   onAppend(mutations) {
     const added = mutations.flatMap((m) => Array.from(m.addedNodes))
       .filter((n) => n.nodeType === Node.ELEMENT_NODE)
     if (added.length === 0) return
+
+    // Older messages inserted above ("Load earlier"): keep the reader exactly where they were.
+    const atEnd = added.some((n) => n === this.element.lastElementChild)
+    if (!atEnd) {
+      this.element.scrollTop += this.element.scrollHeight - (this.lastHeight || this.element.scrollHeight)
+      this.lastHeight = this.element.scrollHeight
+      return
+    }
 
     const mine = added.some((n) => n.classList?.contains("is-mine"))
     if (mine || this.nearBottom()) {

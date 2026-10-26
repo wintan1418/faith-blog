@@ -1,8 +1,9 @@
 <% conversation = local_assigns.fetch(:conversation) %>
 <% active = local_assigns.fetch(:active, false) %>
 <% other_user = conversation.other_participant_for(current_user) %>
-<% latest_message = conversation.messages.visible.order(created_at: :desc).first %>
-<% unread_count = conversation.unread_count_for(current_user) %>
+<%# The list passes these in batch; fall back to per-row queries elsewhere. %>
+<% latest_message = local_assigns.key?(:latest) ? local_assigns[:latest] : conversation.messages.visible.order(created_at: :desc).first %>
+<% unread_count = local_assigns.key?(:unread) ? local_assigns[:unread].to_i : conversation.unread_count_for(current_user) %>
 
 <%= link_to conversation_path(conversation), class: "msg-row#{' is-active' if active}#{' is-unread' if unread_count.positive?}" do %>
   <%= render "conversations/avatar", user: other_user, size: "h-14 w-14", online: other_user.online? %>

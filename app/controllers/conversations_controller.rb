@@ -2,13 +2,14 @@
 
 class ConversationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_conversation, only: [ :show, :archive, :mark_read ]
+  before_action :set_conversation, only: [ :show, :archive, :mark_read, :earlier ]
 
   def index
     @filter = params[:filter] == "unread" ? "unread" : "all"
     @conversations = conversation_scope.reject { |c| c.last_message_at.nil? }
-    @unread_total = @conversations.count { |c| c.unread_count_for(current_user).positive? }
-    @conversations = @conversations.select { |c| c.unread_count_for(current_user).positive? } if @filter == "unread"
+    load_list_meta
+    @unread_total = @conversations.count { |c| @unread_by_conversation[c.id].to_i.positive? }
+    @conversations = @conversations.select { |c| @unread_by_conversation[c.id].to_i.positive? } if @filter == "unread"
     # Computers show the newest conversation beside the list; phones show the list only.
     @conversation = @conversations.first
     load_thread if @conversation
@@ -39,6 +40,18 @@ class ConversationsController < ApplicationController
 
     @conversation = Conversation.find_or_create_between!(current_user, @recipient)
     redirect_to conversation_path(@conversation)
+  end
+
+  # "Load earlier messages": the previous page, inserted above what's on screen.
+  def earlier
+    before = @conversation.messages.find(params[:before])
+    @older = thread_scope.where(created_at: ...before.created_at).order(created_at: :desc).limit(THREAD_PAGE).to_a.reverse
+    @has_earlier = @older.any? && thread_scope.where(created_at: ...@older.first.created_at).exists?
+    @seam = thread_scope.find(before.id)
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to conversation_path(@conversation) }
+    end
   end
 
   def archive
@@ -84,11 +97,35 @@ class ConversationsController < ApplicationController
   # Chats opened but never written in stay out of the list (except the one you're in).
   def load_sidebar
     @conversations = conversation_scope.reject { |c| c.last_message_at.nil? && c != @conversation }
+    load_list_meta
   end
 
+  # Speed: open with the latest messages; "Load earlier messages" fetches the rest in pages.
+  THREAD_PAGE = 50
+
   def load_thread
-    @messages = @conversation.messages.visible.includes(sender: { profile: { avatar_attachment: :blob } }).oldest_first
+    newest = thread_scope.order(created_at: :desc).limit(THREAD_PAGE).to_a
+    @messages = newest.reverse
+    @has_earlier = @messages.any? && thread_scope.where(created_at: ...@messages.first.created_at).exists?
     @message = Message.new
+  end
+
+  def thread_scope
+    @conversation.messages.visible.includes({ sender: { profile: { avatar_attachment: :blob } } }, { likes: :user })
+  end
+
+  # Latest message and unread count for every row in one go (was 3 queries per row).
+  def load_list_meta
+    ids = @conversations.map(&:id)
+    @latest_by_conversation = Message.visible.where(conversation_id: ids)
+                                     .select("DISTINCT ON (messages.conversation_id) messages.*")
+                                     .order("messages.conversation_id, messages.created_at DESC")
+                                     .index_by(&:conversation_id)
+    @unread_by_conversation = Message.visible.where(conversation_id: ids).where.not(sender_id: current_user.id)
+                                     .joins("INNER JOIN conversation_participants cp ON cp.conversation_id = messages.conversation_id")
+                                     .where(cp: { user_id: current_user.id })
+                                     .where("cp.last_read_at IS NULL OR messages.created_at > cp.last_read_at")
+                                     .group("messages.conversation_id").count
   end
 
   def conversation_scope

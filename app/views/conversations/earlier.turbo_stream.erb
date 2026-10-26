@@ -1,0 +1,16 @@
+<%# Older messages go in above what's on screen; chat-scroll keeps the reader's place. %>
+<%= turbo_stream.replace "load_earlier" do %>
+  <%= render "conversations/load_earlier", conversation: @conversation, oldest: @older.first, has_more: @has_earlier %>
+  <% previous = @older.first&.previous_in_thread %>
+  <% @older.each do |msg| %>
+    <%= render "conversations/message", message: msg, previous: previous, viewer_id: current_user.id %>
+    <% previous = msg %>
+  <% end %>
+<% end %>
+
+<%# The message that used to be first now has one before it: redraw it so its day divider / grouping is right. %>
+<% if @older.any? %>
+  <%= turbo_stream.replace dom_id(@seam) do %>
+    <%= render "conversations/message", message: @seam, previous: @older.last, viewer_id: current_user.id %>
+  <% end %>
+<% end %>
