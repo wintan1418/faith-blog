@@ -53,6 +53,7 @@ export default class extends Controller {
         return
       }
       const paragraphs = String(payload.chronicle || "").split(/\n\n+/).map(s => s.trim()).filter(Boolean)
+      if (paragraphs.length === 0) { el.hidden = true; return } // never leave an empty box
       el.innerHTML = paragraphs.map(p => `<p>${this.escape(p)}</p>`).join("")
     } catch {
       el.innerHTML = `<p class="fc-era-chronicle-loading">Network error.</p>`

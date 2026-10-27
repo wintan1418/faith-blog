@@ -4,6 +4,7 @@
 @import "./comments.css";
 @import "./whats_new.css";
 @import "./professional.css";
+@import "./phone_polish.css";
 
 /* ==========================================
    🌿 FAITH COMMUNITY THEME - GARDEN EDITION
@@ -9608,6 +9609,9 @@ html.theme-dark .fc-held-banner {
   border-radius: 14px;
 }
 .fc-join-card .fc-avatar { width: 36px; height: 36px; }
+.fc-join-faces { display: inline-flex; flex-shrink: 0; }
+.fc-join-faces .fc-avatar { margin-left: -10px; border: 2px solid var(--fc-surface, #fff); border-radius: 999px; }
+.fc-join-faces .fc-avatar:first-child { margin-left: 0; }
 .fc-join-card-text {
   font-size: 0.88rem;
   color: var(--fc-soft);
@@ -20221,7 +20225,8 @@ html.theme-dark .aw-chip { color: #fbbf24; }
   margin-top: 0.8rem;
 }
 
-.circle-create-form .circle-input { flex: 1 1 220px; }
+.circle-create-form .circle-input { flex: 1 1 220px; min-width: 0; max-width: 100%; }
+.circle-input { box-sizing: border-box; }
 
 .circle-input {
   border: 1px solid var(--fc-line, #e6ece8);

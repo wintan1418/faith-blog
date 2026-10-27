@@ -1,6 +1,6 @@
 <% active = local_assigns.fetch(:active) %>
 
-<div class="settings-tabs">
+<div class="settings-tabs" data-controller="scroll-active">
   <%= link_to "Profile", edit_settings_profile_path, class: "settings-tab #{'is-active' if active == :profile}" %>
   <%= link_to "Professional", edit_settings_professional_path, class: "settings-tab #{'is-active' if active == :professional}" %>
   <%= link_to "Account", edit_settings_account_path, class: "settings-tab #{'is-active' if active == :account}" %>

@@ -205,34 +205,39 @@
         <% end %>
       </section>
 
-      <% if @new_member_announcements&.any? %>
-        <div class="space-y-2 mb-3">
-          <% @new_member_announcements.each do |joiner| %>
-            <% next unless joiner.user %>
-            <% next if current_user.card_dismissed?("join-#{joiner.id}") %>
-            <div class="fc-join-card"
-                 data-controller="auto-dismiss"
-                 data-auto-dismiss-after-ms-value="30000"
-                 data-auto-dismiss-persist-key-value="join-<%= joiner.id %>"
-                 data-auto-dismiss-store-key-value="fc:joins-dismissed">
-              <% if joiner.user.profile&.avatar&.attached? %>
-                <%= image_tag avatar_src(joiner.user.profile), class: "fc-avatar object-cover" %>
+      <%# New brethren: one card, not one per person. Closing it hides this group;
+          the next person to join brings it back. %>
+      <% joiners = Array(@new_member_announcements).select(&:user) %>
+      <% join_key = "join-#{joiners.map(&:id).max}" %>
+      <% if joiners.any? && !current_user.card_dismissed?(join_key) %>
+        <% people = joiners.map(&:user).uniq.first(5) %>
+        <div class="fc-join-card mb-3"
+             data-controller="auto-dismiss"
+             data-auto-dismiss-after-ms-value="30000"
+             data-auto-dismiss-persist-key-value="<%= join_key %>"
+             data-auto-dismiss-store-key-value="fc:joins-dismissed">
+          <span class="fc-join-faces">
+            <% people.first(3).each do |person| %>
+              <% if person.profile&.avatar&.attached? %>
+                <%= image_tag avatar_src(person.profile), class: "fc-avatar object-cover", alt: "" %>
               <% else %>
-                <span class="fc-avatar" style="<%= avatar_tint_style(joiner.user.username) %>">
-                  <%= joiner.user.username.first.upcase %>
-                </span>
+                <span class="fc-avatar" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
               <% end %>
-              <p class="fc-join-card-text">
-                <%= link_to joiner.user.username, user_path(joiner.user.username), class: "fc-breath-name" %>
-                just joined us
-                <span class="fc-breath-time">· <%= time_ago_in_words(joiner.published_at) %> ago</span>
-              </p>
-              <button type="button"
-                      class="fc-join-card-close"
-                      data-action="click->auto-dismiss#dismiss"
-                      aria-label="Dismiss">×</button>
-            </div>
-          <% end %>
+            <% end %>
+          </span>
+          <p class="fc-join-card-text">
+            <%= link_to people.first.username, user_path(people.first.username), class: "fc-breath-name" %>
+            <% if people.size == 2 %>
+              and <%= link_to people.second.username, user_path(people.second.username), class: "fc-breath-name" %>
+            <% elsif people.size > 2 %>
+              and <%= link_to pluralize(people.size - 1, "other"), people_path, class: "fc-breath-name" %>
+            <% end %>
+            just joined us. Say welcome!
+          </p>
+          <button type="button"
+                  class="fc-join-card-close"
+                  data-action="click->auto-dismiss#dismiss"
+                  aria-label="Dismiss">×</button>
         </div>
       <% end %>
 
