@@ -54,9 +54,9 @@ class CommentsController < ApplicationController
 
     @reply = @post.comments.build(comment_params)
     @reply.user = current_user
-    # Like LinkedIn: replies nest two levels deep; deeper replies join that
-    # level and @mention the person they answer, so the chain never runs off a phone.
-    @reply.parent_comment = @comment.depth >= Comment::MAX_DEPTH ? @comment.parent_comment : @comment
+    # Like LinkedIn: one level of replies. Answering a reply joins the same
+    # chain and @mentions the person, so the thread never runs off a phone.
+    @reply.parent_comment = @comment.thread_root
     mention_replied_to(@reply)
 
     verdict = Ai::Moderation::CommentGatekeeper.call(comment: @reply)
@@ -187,7 +187,7 @@ class CommentsController < ApplicationController
   end
 
   def mention_replied_to(reply)
-    return if @comment.depth < Comment::MAX_DEPTH || @comment.user.nil?
+    return if @comment.parent_comment_id.nil? || @comment.user.nil? || @comment.user == current_user
 
     handle = "@#{@comment.user.username}"
     text = reply.content.to_plain_text.to_s

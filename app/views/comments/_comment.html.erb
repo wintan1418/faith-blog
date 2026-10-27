@@ -1,170 +1,180 @@
+<%#
+  One comment, LinkedIn style: photo, a soft bubble (name, time, ⋯ menu, text),
+  and light actions underneath (reaction · Reply · N replies).
+
+  A top-level comment carries its whole reply chain, indented once and never
+  deeper, so nothing gets squeezed on a phone. Replying to a reply joins the
+  same chain with an @mention. The newest replies show; older ones fold behind
+  "View earlier replies".
+
+  Locals: comment, post
+%>
+<% is_reply = comment.reply? %>
 <% if comment.held_for_review? && !comment.visible_to?(current_user) %>
-  <div class="fc-comment fc-comment-held" id="<%= dom_id(comment) %>">
-    <div class="fc-held-placeholder">
-      <%= render_icon("shield", classes: "h-5 w-5") %>
-      <p>This reply is held for moderator review.</p>
-    </div>
+  <div class="cm cm--held <%= 'cm--reply' if is_reply %>" id="<%= dom_id(comment) %>">
+    <%= render_icon("shield", classes: "h-4 w-4") %>
+    <span>This reply is held for moderator review.</span>
   </div>
 <% else %>
-<div class="fc-comment<%= ' fc-comment-held-author' if comment.held_for_review? %>" id="<%= dom_id(comment) %>" data-controller="reply-toggle comment-edit">
-  <% if comment.held_for_review? && current_user == comment.user %>
-    <div class="fc-held-banner">
-      <%= render_icon("shield", classes: "h-4 w-4") %>
-      <span>Held for moderator review — only you and moderators can see this reply for now.</span>
-    </div>
-  <% end %>
-  <div class="fc-comment-grid">
-    <%= link_to user_path(comment.user.username), class: "fc-comment-avatar" do %>
+<%
+  can_manage = user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?)
+  replies = is_reply ? [] : comment.thread_replies.active.visible_for(current_user).includes(:user, likes: :user).oldest_first.to_a
+  shown_replies = 2
+  folded = [ replies.size - shown_replies, 0 ].max
+%>
+<div class="cm <%= is_reply ? 'cm--reply' : 'cm--root' %><%= ' cm--held-author' if comment.held_for_review? %>"
+     id="<%= dom_id(comment) %>"
+     data-controller="reply-toggle comment-edit<%= ' cm-thread' unless is_reply %>">
+  <div class="cm-row">
+    <%= link_to user_path(comment.user.username), class: "cm-avatar", aria: { label: comment.user.display_name } do %>
       <% if comment.user.profile&.avatar&.attached? %>
-        <%= image_tag avatar_src(comment.user.profile), class: "fc-avatar object-cover", alt: comment.user.username %>
+        <%= image_tag avatar_src(comment.user.profile), class: "fc-avatar object-cover", alt: "" %>
       <% else %>
         <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
       <% end %>
     <% end %>
 
-    <div class="fc-comment-main">
-      <header class="fc-comment-head">
-        <%= link_to comment.user.username, user_path(comment.user.username), class: "fc-breath-name" %>
-        <span class="fc-breath-handle">@<%= comment.user.username %></span>
-        <span class="fc-breath-dot">·</span>
-        <time class="fc-breath-time" datetime="<%= comment.created_at.iso8601 %>">
-          <%= time_ago_in_words(comment.created_at) %> ago
-        </time>
-        <% if comment.edited? %><span class="fc-breath-time">(edited)</span><% end %>
-      </header>
-
-      <% if comment.deleted? %>
-        <p class="fc-comment-deleted"><%= comment.content %></p>
-      <% else %>
-        <div class="fc-comment-body" data-comment-edit-target="display" data-controller="scripture">
-          <%= render_social_text(comment.content, class_name: "fc-social-text") %>
-        </div>
-
-        <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
-          <% edit_plain = comment.content.to_plain_text %>
-          <%= form_with model: [ post, comment ], method: :patch, local: true,
-                        class: "fc-comment-editform hidden",
-                        data: { comment_edit_target: "form" } do |f| %>
-            <%= f.text_area :content,
-                value: edit_plain,
-                class: "fc-inline-reply-input",
-                rows: 3,
-                autocomplete: "off",
-                autocapitalize: "sentences",
-                spellcheck: true,
-                data: { comment_edit_target: "textarea", form_type: "edit",
-                        controller: "pristine-field", pristine_field_value_value: edit_plain } %>
-            <div class="fc-inline-reply-actions">
-              <div class="fc-inline-reply-tools">
-                <button type="button" class="fc-btn" data-action="click->comment-edit#cancel">Cancel</button>
-              </div>
-              <%= f.submit "Save changes", class: "fc-btn fc-btn-primary fc-inline-reply-submit" %>
-            </div>
-          <% end %>
-        <% end %>
-
-        <div class="fc-comment-actions">
-          <%= render "comments/reaction", comment: comment %>
-
-          <% if user_signed_in? %>
-            <button type="button"
-                    class="fc-breath-action"
-                    data-action="click->reply-toggle#toggle">
-              <%= render_icon("message_circle", classes: "h-4 w-4") %>
-              <span>Reply</span>
-            </button>
-          <% end %>
-
-          <% if user_signed_in? && !comment.deleted? %>
-            <%= link_to new_post_path(from_comment: comment.id),
-                        class: "fc-breath-action",
-                        title: "Turn this comment into a breath of its own",
-                        aria: { label: "Breathe this comment as a new post" },
-                        data: { turbo_frame: "_top" } do %>
-              <%= render_icon("repeat", classes: "h-4 w-4") %>
-              <span>Breathe<span class="fc-hide-phone"> this</span></span>
-            <% end %>
-          <% end %>
-
-          <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
-            <button type="button"
-                    class="fc-breath-action fc-comment-owner-action"
-                    data-action="click->comment-edit#edit"
-                    title="Edit comment"
-                    aria-label="Edit comment">
-              <%= render_icon("edit", classes: "h-4 w-4") %>
-              <span>Edit</span>
-            </button>
-            <%= button_to post_comment_path(post, comment),
-                method: :delete,
-                form_class: "inline",
-                class: "fc-breath-action fc-comment-owner-action",
-                title: "Delete comment",
-                aria: { label: "Delete comment" },
-                data: { turbo_confirm: "Delete this comment?" } do %>
-              <%= render_icon("trash", classes: "h-4 w-4") %>
-              <span>Delete</span>
-            <% end %>
-          <% end %>
-
-          <% if user_signed_in? && comment.user != current_user %>
-            <%= render "reports/button", reportable: comment, label: "Report" %>
-          <% end %>
-        </div>
-
-        <% if user_signed_in? %>
-          <div class="fc-comment-reply-form hidden" data-reply-toggle-target="form">
-            <%= form_with url: reply_post_comment_path(post, comment), scope: :comment, class: "fc-inline-reply" do |f| %>
-              <% if current_user.profile&.avatar&.attached? %>
-                <%= image_tag avatar_src(current_user.profile), class: "fc-avatar object-cover" %>
-              <% else %>
-                <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
-              <% end %>
-              <div class="fc-inline-reply-body" data-controller="emoji-picker">
-                <%= f.text_area :content,
-                    class: "fc-inline-reply-input",
-                    rows: 2,
-                    placeholder: "Write a reply...",
-                    value: (comment.depth >= Comment::MAX_DEPTH && comment.user ? "@#{comment.user.username} " : nil),
-                    autocomplete: "off",
-                    autocapitalize: "sentences",
-                    spellcheck: true,
-                    data: { controller: "mentions pristine-field", form_type: "reply", emoji_picker_target: "editor" } %>
-                <div class="fc-inline-reply-actions">
-                  <div class="fc-inline-reply-tools">
-                    <div class="fc-emoji-anchor">
-                      <button type="button"
-                              data-emoji-picker-target="button"
-                              data-action="click->emoji-picker#toggle"
-                              class="fc-composer-icon-btn"
-                              title="Add emoji"
-                              aria-label="Add emoji">
-                        <%= render_icon("smile", classes: "h-4 w-4") %>
-                      </button>
-                      <div data-emoji-picker-target="picker" class="fc-emoji-popover hidden">
-                        <emoji-picker></emoji-picker>
-                      </div>
-                    </div>
-                    <button type="button"
-                            class="fc-composer-icon-btn"
-                            title="Open Bible"
-                            aria-label="Open Bible"
-                            data-action="click->bible-drawer#open">
-                      <%= render_icon("bookopen", classes: "h-4 w-4") %>
-                    </button>
-                  </div>
-                  <%= f.submit "Reply", class: "fc-btn fc-btn-primary fc-inline-reply-submit" %>
-                </div>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
+    <div class="cm-main">
+      <% if comment.held_for_review? && current_user == comment.user %>
+        <p class="cm-held-note">
+          <%= render_icon("shield", classes: "h-3.5 w-3.5") %>
+          Held for review. Only you and moderators can see this for now.
+        </p>
       <% end %>
 
-      <% if comment.replies.active.visible_for(current_user).any? %>
-        <div class="fc-comment-replies">
-          <% comment.replies.active.visible_for(current_user).oldest_first.each do |reply| %>
-            <%= render "comments/comment", comment: reply, post: post %>
+      <div class="cm-bubble">
+        <div class="cm-head">
+          <div class="cm-who">
+            <%= link_to comment.user.username, user_path(comment.user.username), class: "cm-name" %>
+            <% if comment.user_id == post.user_id %><span class="cm-badge">Author</span><% end %>
+            <time class="cm-time" datetime="<%= comment.created_at.iso8601 %>" title="<%= l(comment.created_at, format: :long) %>">
+              <%= time_ago_short(comment.created_at) %><%= " · edited" if comment.edited? %>
+            </time>
+          </div>
+
+          <% if user_signed_in? && !comment.deleted? %>
+            <div class="cm-more" data-controller="dropdown">
+              <button type="button" class="cm-more-btn" data-action="click->dropdown#toggle"
+                      aria-label="More options" aria-haspopup="true">
+                <%= render_icon("more_horizontal", classes: "h-5 w-5") %>
+              </button>
+              <div class="cm-menu hidden" data-dropdown-target="menu" role="menu">
+                <% if can_manage %>
+                  <button type="button" class="cm-menu-item" role="menuitem"
+                          data-action="click->comment-edit#edit click->dropdown#close">
+                    <%= render_icon("edit", classes: "h-4 w-4") %> Edit
+                  </button>
+                <% end %>
+                <%= link_to new_post_path(from_comment: comment.id), class: "cm-menu-item", role: "menuitem",
+                            data: { turbo_frame: "_top" } do %>
+                  <%= render_icon("repeat", classes: "h-4 w-4") %> Breathe as a post
+                <% end %>
+                <% if comment.user != current_user %>
+                  <%= button_to reports_path, method: :post, class: "cm-menu-item", form_class: "cm-menu-form",
+                      params: { reportable_type: "Comment", reportable_id: comment.id, reason: "Submitted for moderator review." },
+                      data: { turbo_confirm: "Report this comment for moderator review?", turbo_frame: "_top" } do %>
+                    <%= render_icon("flag", classes: "h-4 w-4") %> Report
+                  <% end %>
+                <% end %>
+                <% if can_manage %>
+                  <%= button_to post_comment_path(post, comment), method: :delete,
+                      class: "cm-menu-item is-danger", form_class: "cm-menu-form",
+                      data: { turbo_confirm: "Delete this comment?" } do %>
+                    <%= render_icon("trash", classes: "h-4 w-4") %> Delete
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <% if comment.deleted? %>
+          <p class="cm-body cm-body--deleted"><%= comment.content %></p>
+        <% else %>
+          <div class="cm-body" data-comment-edit-target="display" data-controller="scripture">
+            <%= render_social_text(comment.content, class_name: "fc-social-text") %>
+          </div>
+
+          <% if can_manage %>
+            <% edit_plain = comment.content.to_plain_text %>
+            <%= form_with model: [ post, comment ], method: :patch, local: true,
+                          class: "cm-editform hidden", data: { comment_edit_target: "form" } do |f| %>
+              <%= f.text_area :content, value: edit_plain, class: "fc-inline-reply-input", rows: 3,
+                  autocomplete: "off", autocapitalize: "sentences", spellcheck: true,
+                  data: { comment_edit_target: "textarea", form_type: "edit",
+                          controller: "pristine-field", pristine_field_value_value: edit_plain } %>
+              <div class="cm-form-actions">
+                <button type="button" class="cm-btn" data-action="click->comment-edit#cancel">Cancel</button>
+                <%= f.submit "Save", class: "cm-btn cm-btn--primary" %>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% unless comment.deleted? %>
+        <div class="cm-actions">
+          <%= render "comments/reaction", comment: comment %>
+          <% if user_signed_in? && post.allow_comments? %>
+            <span class="cm-sep" aria-hidden="true">·</span>
+            <button type="button" class="cm-action" data-action="click->reply-toggle#toggle">Reply</button>
+          <% end %>
+          <% if replies.any? %>
+            <span class="cm-sep" aria-hidden="true">·</span>
+            <button type="button" class="cm-action cm-action--count" data-action="click->cm-thread#expand">
+              <%= pluralize(replies.size, "reply", plural: "replies") %>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if user_signed_in? && post.allow_comments? && !comment.deleted? %>
+        <div class="cm-replyform hidden" data-reply-toggle-target="form">
+          <%= form_with url: reply_post_comment_path(post, comment), scope: :comment, class: "cm-compose" do |f| %>
+            <div class="cm-compose-body" data-controller="emoji-picker">
+              <%= f.text_area :content,
+                  class: "fc-inline-reply-input",
+                  rows: 2,
+                  placeholder: "Reply to #{comment.user.username}…",
+                  value: (prefill = is_reply && comment.user != current_user ? "@#{comment.user.username} " : ""),
+                  autocomplete: "off",
+                  autocapitalize: "sentences",
+                  spellcheck: true,
+                  data: { controller: "mentions pristine-field", form_type: "reply", emoji_picker_target: "editor",
+                          pristine_field_value_value: prefill } %>
+              <div class="cm-form-actions">
+                <div class="cm-form-tools">
+                  <div class="fc-emoji-anchor">
+                    <button type="button" class="fc-composer-icon-btn" title="Add emoji" aria-label="Add emoji"
+                            data-emoji-picker-target="button" data-action="click->emoji-picker#toggle">
+                      <%= render_icon("smile", classes: "h-4 w-4") %>
+                    </button>
+                    <div data-emoji-picker-target="picker" class="fc-emoji-popover hidden"><emoji-picker></emoji-picker></div>
+                  </div>
+                  <button type="button" class="fc-composer-icon-btn" title="Open Bible" aria-label="Open Bible"
+                          data-action="click->bible-drawer#open">
+                    <%= render_icon("bookopen", classes: "h-4 w-4") %>
+                  </button>
+                </div>
+                <button type="button" class="cm-btn" data-action="click->reply-toggle#toggle">Cancel</button>
+                <%= f.submit "Reply", class: "cm-btn cm-btn--primary" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if replies.any? %>
+        <div class="cm-thread">
+          <% if folded > 0 %>
+            <button type="button" class="cm-thread-more" data-cm-thread-target="more" data-action="click->cm-thread#expand">
+              View <%= pluralize(folded, "earlier reply", plural: "earlier replies") %>
+            </button>
+          <% end %>
+          <% replies.each_with_index do |reply, index| %>
+            <div class="cm-thread-item<%= ' hidden' if index < folded %>"<%= ' data-cm-thread-target="older"'.html_safe if index < folded %>>
+              <%= render "comments/comment", comment: reply, post: post %>
+            </div>
           <% end %>
         </div>
       <% end %>

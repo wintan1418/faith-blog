@@ -2,8 +2,8 @@
 
 require "test_helper"
 
-# LinkedIn-style chains: you can reply to any reply; past two levels the reply
-# joins that level and @mentions the person it answers.
+# LinkedIn-style chains: one level of replies under each comment. Replying to a
+# reply joins the same chain and @mentions the person it answers.
 class DeepRepliesTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 
@@ -15,32 +15,47 @@ class DeepRepliesTest < ActionDispatch::IntegrationTest
     @post = Post.create!(user: @ada, room: room, title: "Reply chains", content: "Testing reply chains.",
                          status: :published, published_at: Time.current)
     @top = @post.comments.create!(user: @ada, content: "Top comment")
-    @level1 = @post.comments.create!(user: @ben, content: "First reply", parent_comment: @top)
-    @level2 = @post.comments.create!(user: @ada, content: "Reply to the reply", parent_comment: @level1)
+    @reply = @post.comments.create!(user: @ada, content: "First reply", parent_comment: @top)
   end
 
-  test "a reply to a deep reply joins that level and mentions the person" do
+  test "replying to a reply joins the chain and mentions the person" do
     sign_in @ben
-    post reply_post_comment_path(@post, @level2), params: { comment: { content: "Amen to that" } }
+    post reply_post_comment_path(@post, @reply), params: { comment: { content: "Amen to that" } }
 
-    reply = Comment.order(:id).last
-    assert_equal @level1, reply.parent_comment
-    assert_equal Comment::MAX_DEPTH, reply.depth
-    assert_equal "@ada_reply Amen to that", reply.content.to_plain_text.strip
+    answer = Comment.order(:id).last
+    assert_equal @top, answer.parent_comment
+    assert_equal "@ada_reply Amen to that", answer.content.to_plain_text.strip
   end
 
-  test "a reply one level down nests as usual" do
+  test "replying to your own reply doesn't mention yourself" do
     sign_in @ada
-    post reply_post_comment_path(@post, @level1), params: { comment: { content: "Thank you" } }
+    post reply_post_comment_path(@post, @reply), params: { comment: { content: "One more thing" } }
 
-    reply = Comment.order(:id).last
-    assert_equal @level1, reply.parent_comment
-    assert_equal "Thank you", reply.content.to_plain_text.strip
+    assert_equal "One more thing", Comment.order(:id).last.content.to_plain_text.strip
   end
 
-  test "deep replies show a Reply button" do
+  test "replying to a top-level comment nests under it" do
+    sign_in @ben
+    post reply_post_comment_path(@post, @top), params: { comment: { content: "Thank you" } }
+
+    answer = Comment.order(:id).last
+    assert_equal @top, answer.parent_comment
+    assert_equal "Thank you", answer.content.to_plain_text.strip
+  end
+
+  test "older two-level chains still show flat under the top comment" do
+    old = @post.comments.create!(user: @ben, content: "Deep from before", parent_comment: @reply)
+    assert_includes @top.thread_replies, old
+    assert_equal @top, old.thread_root
+  end
+
+  test "the post page shows the reply count, folds older replies and has a Reply on every reply" do
+    3.times { |i| @post.comments.create!(user: @ben, content: "More #{i}", parent_comment: @top) }
     sign_in @ben
     get post_path(@post)
-    assert_select "##{ActionView::RecordIdentifier.dom_id(@level2)} .fc-comment-actions", text: /Reply/
+
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@top)} .cm-action--count", text: "4 replies"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@top)} .cm-thread-more", text: "View 2 earlier replies"
+    assert_select ".cm--reply .cm-action", text: "Reply", count: 4
   end
 end

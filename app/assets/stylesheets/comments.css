@@ -1,92 +1,139 @@
 /* ==========================================
-   Comments on phones, LinkedIn-style:
-   photo + soft speech bubble (name, time, text), light text actions below,
-   replies indented once only so nothing squeezes or runs off the edge.
+   Comments, LinkedIn style (all screen sizes)
+   Photo + soft bubble (name, time, ⋯ menu, text), light text actions below.
+   Replies sit one step in, never deeper, joined by a thin thread line.
    ========================================== */
+.cm-list { display: grid; gap: 0.35rem; padding: 0.25rem 0; }
+.cm { position: relative; padding: 0.4rem 0; }
+.cm-row { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 0.6rem; align-items: start; }
+.cm--reply .cm-row { grid-template-columns: 32px minmax(0, 1fr); gap: 0.5rem; }
+.cm-avatar { display: block; line-height: 0; }
+.cm-avatar .fc-avatar {
+  display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 999px;
+  font-size: 0.9rem; font-weight: 700;
+}
+.cm--reply .cm-avatar .fc-avatar { width: 32px; height: 32px; font-size: 0.78rem; }
+.cm-main { min-width: 0; }
+
+.cm-bubble {
+  position: relative;
+  padding: 0.55rem 0.8rem 0.65rem;
+  border-radius: 4px 16px 16px 16px;
+  background: var(--fc-surface-2, #edf4ef);
+}
+.cm--held-author .cm-bubble { outline: 1px dashed color-mix(in oklch, #d97706 50%, transparent); }
+.cm-head { display: flex; align-items: flex-start; gap: 0.4rem; }
+.cm-who { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.4rem; row-gap: 0.05rem; flex: 1; min-width: 0; }
+.cm-name {
+  max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 0.88rem; font-weight: 700; color: var(--fc-ink); text-decoration: none;
+}
+.cm-badge {
+  padding: 0.05rem 0.4rem; border-radius: 999px;
+  background: color-mix(in oklch, var(--fc-accent, #059669) 16%, transparent);
+  font-size: 0.68rem; font-weight: 700; color: var(--fc-accent, #059669);
+}
+.cm-time { font-size: 0.74rem; color: var(--fc-muted); white-space: nowrap; }
+.cm-body { margin-top: 0.2rem; font-size: 0.93rem; line-height: 1.5; color: var(--fc-ink); overflow-wrap: anywhere; }
+.cm-body p { margin: 0; }
+.cm-body--deleted { font-style: italic; color: var(--fc-muted); }
+
+/* ⋯ menu: Edit, Breathe as a post, Report, Delete. */
+.cm-more { position: relative; flex-shrink: 0; margin: -0.3rem -0.45rem 0 0; }
+.cm-more-btn {
+  display: grid; place-items: center;
+  width: 34px; height: 30px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--fc-muted); cursor: pointer;
+}
+.cm-more-btn:hover { background: color-mix(in oklch, var(--fc-ink) 8%, transparent); }
+.cm-menu {
+  position: absolute; z-index: 40; top: calc(100% + 4px); right: 0;
+  min-width: 200px; padding: 0.3rem; white-space: nowrap;
+  border: 1px solid var(--fc-line-strong, rgba(0,0,0,0.12)); border-radius: 12px;
+  background: var(--fc-surface, #fff);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.35);
+}
+.cm-menu-form { margin: 0; display: block; }
+.cm-menu-item {
+  display: flex; align-items: center; gap: 0.65rem; width: 100%;
+  padding: 0.65rem 0.75rem; border: 0; border-radius: 8px;
+  background: none; text-align: left; text-decoration: none;
+  font-size: 0.9rem; font-weight: 600; color: var(--fc-ink); cursor: pointer;
+}
+.cm-menu-item:hover { background: var(--fc-surface-2, #edf4ef); }
+.cm-menu-item svg { flex-shrink: 0; color: var(--fc-muted); }
+.cm-menu-item.is-danger, .cm-menu-item.is-danger svg { color: #dc2626; }
+
+/* Actions under the bubble: 🙏 Amen · Reply · 3 replies */
+.cm-actions {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.15rem;
+  margin: 0.15rem 0 0 0.3rem;
+  font-size: 0.8rem; font-weight: 700; color: var(--fc-muted);
+}
+.cm-sep { color: var(--fc-muted); opacity: 0.6; }
+.cm-action {
+  min-height: 34px; padding: 0.3rem 0.4rem;
+  border: 0; border-radius: 8px; background: none;
+  font: inherit; color: var(--fc-muted); cursor: pointer;
+}
+.cm-action:hover { color: var(--fc-accent); }
+.cm-actions .fc-reactions { display: inline-flex; align-items: center; flex-wrap: nowrap; position: relative; }
+.cm-actions form { margin: 0; display: inline-flex; }
+.cm-actions .fc-reaction-pill,
+.cm-actions .fc-reaction-add {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  min-height: 34px; padding: 0.3rem 0.4rem !important;
+  border: 0 !important; background: none !important; box-shadow: none !important;
+  font-size: 0.8rem !important; font-weight: 700; color: var(--fc-muted) !important;
+}
+.cm-actions .fc-reaction-pill.is-mine { color: var(--fc-accent) !important; }
+.cm-actions svg { width: 16px; height: 16px; }
+
+/* The reply chain: one step in, a thin line ties it to the comment above. */
+.cm-thread {
+  margin: 0.25rem 0 0 -0.1rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--fc-line, rgba(0,0,0,0.1));
+}
+.cm-thread-more {
+  margin: 0.2rem 0 0.1rem; padding: 0.35rem 0.2rem;
+  border: 0; background: none;
+  font-size: 0.82rem; font-weight: 700; color: var(--fc-accent); cursor: pointer;
+}
+.cm--held { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.8rem; font-size: 0.85rem; color: var(--fc-muted); }
+.cm-held-note { display: flex; align-items: center; gap: 0.35rem; margin: 0 0 0.3rem; font-size: 0.75rem; color: #b45309; }
+
+/* Reply and edit boxes. */
+.cm-replyform { margin-top: 0.4rem; }
+.cm-editform { margin-top: 0.4rem; }
+.cm-compose-body { display: grid; gap: 0.4rem; }
+.cm-replyform .fc-inline-reply-input,
+.cm-editform .fc-inline-reply-input {
+  width: 100%; min-height: 44px; padding: 0.6rem 0.8rem;
+  border: 1.5px solid var(--fc-line-strong, rgba(0,0,0,0.14)); border-radius: 12px;
+  background: var(--fc-surface, #fff); font-size: 0.95rem; color: var(--fc-ink);
+}
+.cm-form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; margin-top: 0.4rem; }
+.cm-form-tools { display: flex; align-items: center; gap: 0.1rem; margin-right: auto; }
+.cm-btn {
+  min-height: 34px; padding: 0.35rem 0.9rem;
+  border: 0; border-radius: 999px; background: none;
+  font-size: 0.85rem; font-weight: 700; color: var(--fc-muted); cursor: pointer;
+}
+.cm-btn--primary { background: var(--fc-accent, #059669); color: #fff; }
+
 @media (max-width: 640px) {
-  html .fc-comment {
-    padding: 0.35rem 0 !important;
-    margin: 0 !important;
-    border: 0 !important;
-    background: none !important;
-    box-shadow: none !important;
-  }
-  html .fc-comment-grid {
-    display: grid !important;
-    grid-template-columns: 36px minmax(0, 1fr) !important;
-    gap: 0.5rem !important;
-    align-items: start;
-  }
-  html .fc-comment-avatar .fc-avatar { width: 36px !important; height: 36px !important; font-size: 0.85rem; }
-  html .fc-comment-main { min-width: 0; }
+  .cm-row { grid-template-columns: 36px minmax(0, 1fr); gap: 0.5rem; }
+  .cm-avatar .fc-avatar { width: 36px; height: 36px; }
+  .cm--reply .cm-row { grid-template-columns: 28px minmax(0, 1fr); gap: 0.45rem; }
+  .cm--reply .cm-avatar .fc-avatar { width: 28px; height: 28px; }
+  .cm-thread { padding-left: 0.55rem; }
+  .cm-actions .fc-reaction-add-label { display: none; }
+}
 
-  /* The bubble: head + body share one rounded grey box. */
-  html .fc-comment-head {
-    display: flex !important;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.3rem;
-    margin: 0 !important;
-    padding: 0.5rem 0.8rem 0.1rem !important;
-    border-radius: 14px 14px 0 0;
-    background: var(--fc-surface-2, #f1f5f3);
-  }
-  html .fc-comment-head .fc-breath-name { font-size: 0.85rem; font-weight: 700; color: var(--fc-ink) !important; }
-  html .fc-comment-head .fc-breath-handle { display: none !important; }
-  html .fc-comment-head .fc-breath-time,
-  html .fc-comment-head .fc-breath-dot { font-size: 0.75rem; color: var(--fc-muted); }
-  html .fc-comment-body,
-  html .fc-comment-deleted {
-    margin: 0 !important;
-    padding: 0.15rem 0.8rem 0.6rem !important;
-    border-radius: 0 0 14px 14px;
-    background: var(--fc-surface-2, #f1f5f3);
-    font-size: 0.92rem;
-    line-height: 1.45;
-    overflow-wrap: anywhere;
-  }
-  html .fc-comment-body p { margin: 0; }
-
-  /* Light text actions under the bubble. */
-  html .fc-comment-actions {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center;
-    gap: 0.1rem 0.15rem !important;
-    margin: 0.15rem 0 0 !important;
-    padding: 0 0.2rem !important;
-    overflow: visible !important;
-  }
-  html .fc-comment-actions .fc-breath-action,
-  html .fc-comment-actions .fc-action,
-  html .fc-comment-actions .fc-reaction-add,
-  html .fc-comment-actions .fc-reaction-pill {
-    min-height: 32px;
-    padding: 0.2rem 0.5rem !important;
-    border: 0 !important;
-    background: none !important;
-    box-shadow: none !important;
-    font-size: 0.78rem !important;
-    font-weight: 700;
-    color: var(--fc-muted) !important;
-  }
-  html .fc-comment-actions .fc-reaction-pill.is-mine,
-  html .fc-comment-actions .fc-reaction-add:hover,
-  html .fc-comment-actions .fc-breath-action:hover { color: var(--fc-accent) !important; }
-  html .fc-comment-actions svg { width: 14px !important; height: 14px !important; }
-  html .fc-comment-actions .fc-reactions { display: inline-flex; flex-wrap: nowrap; }
-
-  /* Replies: one indent, smaller photos, and no deeper stepping. */
-  html .fc-comment-replies {
-    margin: 0.2rem 0 0 !important;
-    padding: 0 0 0 2.6rem !important;
-    border: 0 !important;
-    background: none !important;
-  }
-  html .fc-comment-replies .fc-comment-replies { padding-left: 0 !important; }
-  html .fc-comment-replies .fc-comment-grid { grid-template-columns: 28px minmax(0, 1fr) !important; }
-  html .fc-comment-replies .fc-comment-avatar .fc-avatar { width: 28px !important; height: 28px !important; font-size: 0.75rem; }
-
+@media (max-width: 640px) {
   /* Reply / comment boxes: one tidy row of tools, compact Send. */
   html .fc-inline-reply { gap: 0.5rem !important; }
   html .fc-inline-reply-input { min-height: 44px; border-radius: 12px !important; font-size: 0.95rem !important; }
@@ -102,29 +149,6 @@
     padding: 0.35rem 1rem !important;
     border-radius: 999px !important;
   }
-}
-
-@media (max-width: 640px) {
-  /* Never spill past the bubble: wrap to a second line if a row is still too wide. */
-  html .fc-comment-actions { flex-wrap: wrap !important; gap: 0 !important; max-width: 100%; }
-  /* Replies: a smaller step in on phones so the bubble and its actions have room. */
-  html .fc-comment-replies { padding-left: 1.4rem !important; }
-  html .fc-comment-actions .fc-breath-action,
-  html .fc-comment-actions .fc-action,
-  html .fc-comment-actions .fc-reaction-add,
-  html .fc-comment-actions .fc-reaction-pill { padding: 0.2rem 0.4rem !important; gap: 0.25rem !important; white-space: nowrap; }
-  html .fc-comment-actions form { margin: 0; display: inline-flex; }
-}
-@media (max-width: 640px) {
-  /* Replies have less room: Amen and Breathe become icon-only. */
-  html .fc-comment-replies .fc-comment-actions .fc-reaction-add-label,
-  html .fc-comment-replies .fc-comment-actions a.fc-breath-action > span { display: none !important; }
-}
-
-@media (max-width: 640px) {
-  /* Your own comments add Edit + Delete: icons only, and wrap rather than spill off-screen. */
-  html .fc-comment-actions { flex-wrap: wrap !important; }
-  html .fc-comment-actions .fc-comment-owner-action > span { display: none !important; }
 }
 
 /* ── Post cards: Save sits in the action bar (Like · Comment · Repost · Share · Save) ── */
@@ -153,11 +177,6 @@
     font-size: 11px;
   }
 }
-@media (max-width: 640px) {
-  /* With Edit + Delete present, Breathe goes icon-only too so the row stays on one line. */
-  html .fc-comment-actions:has(.fc-comment-owner-action) a.fc-breath-action > span { display: none !important; }
-}
-
 /* ── Breathing room for actions on phones ── */
 @media (max-width: 520px) {
   /* Post action bar spans the whole card (it was squeezed beside the author photo). */
@@ -170,24 +189,4 @@
   html .fc-breath-actions > span[id^="bookmark_"] .fc-action { min-height: 52px; gap: 5px !important; }
   html .fc-breath-actions .fc-breath-action svg,
   html .fc-breath-actions > span[id^="bookmark_"] .fc-action svg { width: 20px !important; height: 20px !important; }
-}
-@media (max-width: 640px) {
-  /* Comment actions: more space between each. */
-  html .fc-comment-actions { gap: 0.25rem 0.5rem !important; margin-top: 0.3rem !important; }
-  html .fc-comment-actions .fc-breath-action,
-  html .fc-comment-actions .fc-action,
-  html .fc-comment-actions .fc-reaction-add,
-  html .fc-comment-actions .fc-reaction-pill { padding: 0.3rem 0.45rem !important; gap: 0.3rem !important; min-height: 36px; }
-  html .fc-comment-actions svg { width: 16px !important; height: 16px !important; }
-}
-@media (max-width: 640px) {
-  /* "Breathe" is icon-only in comments so the row fits on one line with room to breathe. */
-  html .fc-comment-actions a.fc-breath-action > span { display: none !important; }
-}
-@media (max-width: 640px) {
-  html .fc-comment-actions { flex-wrap: nowrap !important; gap: 0 0.35rem !important; }
-  html .fc-comment-actions .fc-breath-action,
-  html .fc-comment-actions .fc-action,
-  html .fc-comment-actions .fc-reaction-add,
-  html .fc-comment-actions .fc-reaction-pill { padding: 0.3rem 0.4rem !important; }
 }
