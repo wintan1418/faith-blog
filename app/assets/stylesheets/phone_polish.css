@@ -1,0 +1,61 @@
+/* ==========================================
+   Phone polish from the Oct 2026 page-by-page audit.
+   ========================================== */
+
+/* Policy and info pages (About, Guidelines, Privacy, Terms, Child Safety):
+   real headings and spacing. Tailwind's typography plugin isn't installed,
+   so "prose" did nothing and every heading looked like body text. */
+.prose { max-width: 68ch; color: var(--fc-ink); line-height: 1.7; }
+.prose > * + * { margin-top: 0.9rem; }
+.prose h2 {
+  margin-top: 2.2rem;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--fc-ink);
+}
+.prose h3 { margin-top: 1.5rem; font-size: 1.08rem; font-weight: 700; color: var(--fc-ink); }
+.prose h2:first-child, .prose h3:first-child { margin-top: 0; }
+.prose ul, .prose ol { padding-left: 1.3rem; }
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+.prose li + li { margin-top: 0.4rem; }
+.prose li::marker { color: var(--fc-accent); }
+.prose a { color: var(--fc-accent); text-decoration: underline; text-underline-offset: 2px; }
+.prose strong { color: var(--fc-ink); }
+@media (max-width: 640px) {
+  .page-header > div { padding-top: 2.5rem !important; padding-bottom: 1.5rem !important; }
+  .page-header h1 { font-size: 2.1rem !important; }
+  .page-header + div { padding-top: 1rem !important; }
+  .prose { font-size: 1rem; }
+}
+
+/* Search boxes with an icon inside: the icon sat on top of the text. */
+html .relative > svg.absolute.left-4 ~ input.input { padding-left: 3rem !important; }
+html .relative > svg.absolute.left-3 ~ input.input { padding-left: 2.5rem !important; }
+
+/* Settings tabs: one swipeable row on phones instead of three rows of buttons. */
+@media (max-width: 640px) {
+  html .settings-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding: 0 1rem 0.85rem;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  html .settings-tabs::-webkit-scrollbar { display: none; }
+  html .settings-tab { flex: 0 0 auto; white-space: nowrap; }
+}
+
+/* Chess: four buttons in a tidy 2 × 2 grid on phones. */
+@media (max-width: 640px) {
+  .fc-chess-control-btns { display: grid !important; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%; }
+  .fc-chess-control-btns .fc-btn { width: 100%; min-height: 42px; white-space: nowrap; justify-content: center; }
+}
+
+/* Writing a post: Check tone / Suggest scripture wrap instead of running off the edge. */
+html .fc-composer-tools { flex-wrap: wrap !important; row-gap: 0.4rem; max-width: 100%; }
+html .fc-composer-tools .fc-composer-asst-btn { white-space: nowrap; }

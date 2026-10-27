@@ -9,6 +9,9 @@ class PostsController < ApplicationController
   before_action :enforce_rate_limit!, only: [ :create ]
 
   def index
+    # There's no posts list page; the feed is where breaths are read.
+    return redirect_to(feed_path) if request.format.html?
+
     @pagy, @posts = pagy(
       Post.published.for_cards.recent
     )
