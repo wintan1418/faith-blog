@@ -59,14 +59,12 @@
 
       <% if user_signed_in? && post.allow_comments? %>
         <div class="fc-inline-comment-actions">
-          <% if comment.depth < 2 %>
-            <button type="button"
-                    class="fc-inline-comment-replybtn"
-                    data-action="click->reply-toggle#toggle">
-              <%= render_icon("message_circle", classes: "h-3.5 w-3.5") %>
-              <span>Reply</span>
-            </button>
-          <% end %>
+          <button type="button"
+                  class="fc-inline-comment-replybtn"
+                  data-action="click->reply-toggle#toggle">
+            <%= render_icon("message_circle", classes: "h-3.5 w-3.5") %>
+            <span>Reply</span>
+          </button>
 
           <% if comment.user == current_user || current_user.admin_or_moderator? %>
             <div class="fc-inline-comment-overflow" data-controller="dropdown">
@@ -110,10 +108,12 @@
                   class: "fc-inline-reply-input",
                   rows: 2,
                   placeholder: "Reply to @#{comment.user.username}…",
+                  value: (prefill = comment.reply? && comment.user != current_user ? "@#{comment.user.username} " : ""),
                   autocomplete: "off",
                   autocapitalize: "sentences",
                   spellcheck: true,
-                  data: { form_type: "reply", controller: "pristine-field mentions", emoji_picker_target: "editor" } %>
+                  data: { form_type: "reply", controller: "pristine-field mentions", emoji_picker_target: "editor",
+                          pristine_field_value_value: prefill } %>
               <div class="fc-inline-reply-actions">
                 <div class="fc-inline-reply-tools">
                   <div class="fc-emoji-anchor">
@@ -145,8 +145,9 @@
       <% end %>
 
       <%
-        replies = comment.replies.active.visible_for(current_user).oldest_first.limit(3)
-        more_replies = comment.replies.active.visible_for(current_user).count - replies.size
+        chain = comment.reply? ? Comment.none : comment.thread_replies.active.visible_for(current_user)
+        replies = chain.oldest_first.limit(3)
+        more_replies = chain.count - replies.size
       %>
       <% if replies.any? %>
         <ul class="fc-inline-comment-replies">

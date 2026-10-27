@@ -6,7 +6,9 @@ class Comment < ApplicationRecord
   # Rich text content
   has_rich_text :content
 
-  MAX_DEPTH = 2 # replies to a reply at this depth join it as siblings
+  # LinkedIn style: one level of replies. Replying to a reply joins the same
+  # chain under the top-level comment, with an @mention of the person.
+  MAX_DEPTH = 1
 
   # Associations
   belongs_to :user
@@ -92,6 +94,17 @@ class Comment < ApplicationRecord
 
   def reply?
     parent_comment_id.present?
+  end
+
+  # The top-level comment this one belongs to.
+  def thread_root
+    parent_comment_id.nil? ? self : parent_comment.thread_root
+  end
+
+  # Every reply in this top-level comment's chain. Older chains could nest two
+  # levels deep; they are shown flat too.
+  def thread_replies
+    Comment.where(parent_comment_id: [ id ] + replies.ids)
   end
 
   def held_for_review?

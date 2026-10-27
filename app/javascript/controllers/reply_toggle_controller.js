@@ -10,6 +10,9 @@ export default class extends Controller {
       const textarea = this.formTarget.querySelector("textarea")
       if (textarea) {
         textarea.focus()
+        // Start typing after a prefilled "@name ".
+        const end = textarea.value.length
+        textarea.setSelectionRange(end, end)
       }
     }
   }

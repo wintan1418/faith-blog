@@ -128,7 +128,9 @@ import ReactorsModalController from "./reactors_modal_controller"
 application.register("reactors-modal", ReactorsModalController)
 
 import ReplyToggleController from "./reply_toggle_controller"
+import CmThreadController from "./cm_thread_controller"
 application.register("reply-toggle", ReplyToggleController)
+application.register("cm-thread", CmThreadController)
 
 import RepostMenuController from "./repost_menu_controller"
 application.register("repost-menu", RepostMenuController)
