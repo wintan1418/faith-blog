@@ -20830,6 +20830,18 @@ body.hotwire-native label {
   color: var(--fc-ink, inherit);
   font-size: 0.9rem;
 }
+.fc-app-update > span { flex: 1; }
+.fc-app-update__close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--fc-muted, #64748b);
+}
 .fc-app-update__action {
   flex-shrink: 0;
   padding: 0.4rem 0.9rem;

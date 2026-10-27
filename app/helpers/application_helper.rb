@@ -157,18 +157,32 @@ module ApplicationHelper
     request.user_agent.to_s.include?("NativeGoogleSignIn")
   end
 
-  # Android app builds before 1.0.2 can't prompt for updates themselves, so the site
-  # nudges them when Play has a newer version (ANDROID_LATEST_VERSION, set on release).
-  FIRST_ANDROID_VERSION_WITH_IN_APP_UPDATES = Gem::Version.new("1.0.2")
+  # The Android app's version from its user agent ("Brethreign/1.0.7; …"); 1.0.0 sent none.
+  def android_app_version
+    return unless hotwire_native_app? && request.user_agent.to_s.include?("Android")
 
-  def outdated_android_app?
-    return false unless hotwire_native_app? && request.user_agent.to_s.include?("Android")
-
-    # 1.0.0 didn't send a version; later builds start their user agent with "Brethreign/x.y.z".
-    version = Gem::Version.new(request.user_agent.to_s[%r{Brethreign/(\d+(?:\.\d+)*)}, 1] || "1.0.0")
-    latest = Gem::Version.new(ENV.fetch("ANDROID_LATEST_VERSION", "1.0.1"))
-    version < latest && version < FIRST_ANDROID_VERSION_WITH_IN_APP_UPDATES
+    Gem::Version.new(request.user_agent.to_s[%r{Brethreign/(\d+(?:\.\d+)*)}, 1] || "1.0.0")
   end
+
+  # Set ANDROID_LATEST_VERSION in Hatchbox once Google Play has approved a release.
+  def android_latest_version
+    Gem::Version.new(ENV.fetch("ANDROID_LATEST_VERSION", "1.0.1"))
+  rescue ArgumentError
+    nil
+  end
+
+  def android_update_available?
+    version = android_app_version
+    latest = android_latest_version
+    version.present? && latest.present? && version < latest
+  end
+
+  # Banner inside the app when Play has a newer version. Closing it hides it until the next release.
+  def outdated_android_app?
+    android_update_available? && !current_user&.card_dismissed?(android_update_card_key)
+  end
+
+  def android_update_card_key = "app-update-#{android_latest_version.to_s.tr('.', '-')}"
 
   def android_store_url
     "https://play.google.com/store/apps/details?id=com.brethreign.app"
