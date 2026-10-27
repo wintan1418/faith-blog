@@ -1,5 +1,8 @@
-<%# Shown inside older Android app versions that can't prompt for updates themselves. %>
-<div class="fc-app-update" role="status">
-  <span>A new version of the Brethreign app is ready.</span>
+<%# Inside the Android app when Google Play has a newer version (ANDROID_LATEST_VERSION). %>
+<div class="fc-app-update" role="status"
+     data-controller="onboarding"
+     data-onboarding-key-value="fc:<%= android_update_card_key %>">
+  <span>Brethreign <%= android_latest_version %> is out. Update for the newest features.</span>
   <%= link_to "Update", android_store_url, class: "fc-btn-primary fc-app-update__action" %>
+  <button type="button" class="fc-app-update__close" data-action="click->onboarding#dismiss" aria-label="Not now">×</button>
 </div>

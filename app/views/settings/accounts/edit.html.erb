@@ -10,6 +10,24 @@
 
     <%= render "settings/tabs", active: :account %>
 
+    <% if android_app_version %>
+      <div class="mystic-panel-strong mb-6 flex flex-wrap items-center justify-between gap-3 p-5">
+        <div>
+          <h2 class="text-base font-bold text-faith-dark">Brethreign app</h2>
+          <p class="mystic-copy text-sm">
+            You have version <%= android_app_version %>.
+            <% if android_update_available? %>
+              <strong>Version <%= android_latest_version %> is available.</strong>
+            <% else %>
+              You're up to date.
+            <% end %>
+          </p>
+        </div>
+        <%= link_to (android_update_available? ? "Update now" : "Check for updates"), android_store_url,
+                    class: (android_update_available? ? "fc-btn-primary fc-app-update__action" : "btn btn-secondary") %>
+      </div>
+    <% end %>
+
     <div class="mystic-panel-strong overflow-hidden">
       <div class="border-b border-faith-green/10 p-6">
         <h2 class="text-xl font-bold text-faith-dark">Account Settings</h2>
