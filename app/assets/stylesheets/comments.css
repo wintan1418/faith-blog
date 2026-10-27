@@ -105,7 +105,10 @@
 }
 
 @media (max-width: 640px) {
-  html .fc-comment-actions { flex-wrap: nowrap !important; gap: 0 !important; }
+  /* Never spill past the bubble: wrap to a second line if a row is still too wide. */
+  html .fc-comment-actions { flex-wrap: wrap !important; gap: 0 !important; max-width: 100%; }
+  /* Replies: a smaller step in on phones so the bubble and its actions have room. */
+  html .fc-comment-replies { padding-left: 1.4rem !important; }
   html .fc-comment-actions .fc-breath-action,
   html .fc-comment-actions .fc-action,
   html .fc-comment-actions .fc-reaction-add,

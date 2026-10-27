@@ -66,7 +66,7 @@
         <div class="fc-comment-actions">
           <%= render "comments/reaction", comment: comment %>
 
-          <% if user_signed_in? && comment.depth < 2 %>
+          <% if user_signed_in? %>
             <button type="button"
                     class="fc-breath-action"
                     data-action="click->reply-toggle#toggle">
@@ -112,7 +112,7 @@
           <% end %>
         </div>
 
-        <% if user_signed_in? && comment.depth < 2 %>
+        <% if user_signed_in? %>
           <div class="fc-comment-reply-form hidden" data-reply-toggle-target="form">
             <%= form_with url: reply_post_comment_path(post, comment), scope: :comment, class: "fc-inline-reply" do |f| %>
               <% if current_user.profile&.avatar&.attached? %>
@@ -125,6 +125,7 @@
                     class: "fc-inline-reply-input",
                     rows: 2,
                     placeholder: "Write a reply...",
+                    value: (comment.depth >= Comment::MAX_DEPTH && comment.user ? "@#{comment.user.username} " : nil),
                     autocomplete: "off",
                     autocapitalize: "sentences",
                     spellcheck: true,

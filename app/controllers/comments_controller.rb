@@ -54,7 +54,10 @@ class CommentsController < ApplicationController
 
     @reply = @post.comments.build(comment_params)
     @reply.user = current_user
-    @reply.parent_comment = @comment
+    # Like LinkedIn: replies nest two levels deep; deeper replies join that
+    # level and @mention the person they answer, so the chain never runs off a phone.
+    @reply.parent_comment = @comment.depth >= Comment::MAX_DEPTH ? @comment.parent_comment : @comment
+    mention_replied_to(@reply)
 
     verdict = Ai::Moderation::CommentGatekeeper.call(comment: @reply)
     apply_verdict_to_comment(@reply, verdict)
@@ -181,6 +184,14 @@ class CommentsController < ApplicationController
       notifiable: @comment,
       notification_type: :new_comment
     )
+  end
+
+  def mention_replied_to(reply)
+    return if @comment.depth < Comment::MAX_DEPTH || @comment.user.nil?
+
+    handle = "@#{@comment.user.username}"
+    text = reply.content.to_plain_text.to_s
+    reply.content = "#{handle} #{text}" unless text.include?(handle)
   end
 
   def create_reply_notification

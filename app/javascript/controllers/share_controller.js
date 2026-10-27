@@ -11,9 +11,17 @@ export default class extends Controller {
     accentDeep:  { type: String, default: "#10b981" }
   }
 
-  static targets = ["menu", "toast"]
+  static targets = ["menu", "toast", "nativeItem", "webItem"]
+
+  // The Android app (1.0.7+) gives us its share sheet; the plain WebView has none.
+  get native() { return window.BrethreignNative }
+  get inApp() { return /Hotwire Native|Turbo Native/.test(navigator.userAgent) }
 
   connect() {
+    if (this.native) {
+      this.nativeItemTargets.forEach(el => el.classList.remove("hidden"))
+      this.webItemTargets.forEach(el => el.classList.add("hidden"))
+    }
     this.boundEsc = this.onEsc.bind(this)
     this.boundOutsideClick = this.outsideClick.bind(this)
   }
@@ -56,28 +64,50 @@ export default class extends Controller {
     if (event.key === "Escape") this.hide()
   }
 
+  shareText() { return `${this.titleValue} — ${this.urlValue}` }
+
+  // Phone share sheet: WhatsApp, X, Instagram, Telegram, email…
+  nativeShare(event) {
+    event.preventDefault()
+    this.native?.share(this.shareText(), this.titleValue)
+    this.hide()
+  }
+
   async copyLink(event) {
     event.preventDefault()
+    this.hide()
+    if (this.native) { this.native.copy(this.urlValue); return }
     try {
       await navigator.clipboard.writeText(this.urlValue)
       this.flash("Link copied")
     } catch {
-      this.flash("Could not copy", true)
+      // Older app versions: the WebView may refuse the clipboard API.
+      const field = Object.assign(document.createElement("textarea"), { value: this.urlValue })
+      field.style.cssText = "position:fixed;opacity:0"
+      document.body.appendChild(field)
+      field.select()
+      const ok = document.execCommand("copy")
+      field.remove()
+      this.flash(ok ? "Link copied" : "Could not copy", !ok)
     }
-    this.hide()
+  }
+
+  // In the app a new window can't open, so go to the link directly instead.
+  openExternal(url) {
+    if (this.inApp) window.location.href = url
+    else window.open(url, "_blank", "noopener")
   }
 
   whatsapp(event) {
     event.preventDefault()
-    const text = `${this.titleValue} — ${this.urlValue}`
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank", "noopener")
+    this.openExternal(`https://api.whatsapp.com/send?text=${encodeURIComponent(this.shareText())}`)
     this.hide()
   }
 
   twitter(event) {
     event.preventDefault()
     const params = new URLSearchParams({ text: this.titleValue, url: this.urlValue })
-    window.open(`https://twitter.com/intent/tweet?${params.toString()}`, "_blank", "noopener")
+    this.openExternal(`https://twitter.com/intent/tweet?${params.toString()}`)
     this.hide()
   }
 
@@ -113,6 +143,17 @@ export default class extends Controller {
 
       this.updateProgress("Saving file…", "Almost done")
       await this.nextFrame()
+
+      if (this.native) {
+        this.native.shareImage(canvas.toDataURL("image/png"), this.shareText())
+        this.closeProgress()
+        return
+      }
+      if (this.inApp) {
+        this.closeProgress()
+        this.flash("Update the Brethreign app to share snapshots", true)
+        return
+      }
 
       const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"))
       if (!blob) throw new Error("toBlob returned null")
