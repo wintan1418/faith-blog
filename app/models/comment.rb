@@ -6,6 +6,8 @@ class Comment < ApplicationRecord
   # Rich text content
   has_rich_text :content
 
+  MAX_DEPTH = 2 # replies to a reply at this depth join it as siblings
+
   # Associations
   belongs_to :user
   belongs_to :post, counter_cache: true
