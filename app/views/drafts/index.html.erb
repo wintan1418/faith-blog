@@ -21,7 +21,7 @@
                   <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= sp.title.presence || "Untitled" %></p>
                   <p class="fc-cms-text"><%= truncate(sp.content.to_plain_text.to_s.strip, length: 200) %></p>
                   <p class="fc-cms-meta">
-                    Goes live <%= sp.scheduled_for.in_time_zone.strftime("%a %b %-d, %l:%M %p") %>
+                    Goes live <time datetime="<%= sp.scheduled_for.utc.iso8601 %>" data-controller="local-time" data-local-time-format-value="full"><%= sp.scheduled_for.in_time_zone.strftime("%a %b %-d, %l:%M %p") %></time>
                     (<%= time_ago_in_words(sp.scheduled_for) %><%= sp.scheduled_for.future? ? " from now" : " ago" %>)
                   </p>
                 </div>

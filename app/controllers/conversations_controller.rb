@@ -112,7 +112,7 @@ class ConversationsController < ApplicationController
   end
 
   def thread_scope
-    @conversation.messages.visible.includes({ sender: { profile: { avatar_attachment: :blob } } }, { likes: :user })
+    @conversation.messages.visible.includes({ sender: { profile: { avatar_attachment: :blob } } }, { likes: :user }, { reply_to: :sender })
   end
 
   # Latest message and unread count for every row in one go (was 3 queries per row).

@@ -230,13 +230,18 @@
           <span>🙏 Prayer request</span>
         </label>
 
+        <%# The picker shows the phone's own time; the hidden field sends it with its time zone. %>
+        <div class="fc-composer-schedule" data-controller="schedule-field" data-schedule-field-utc-value="<%= post.scheduled_for&.utc&.iso8601 %>">
         <label class="fc-composer-pill" title="Pick a future date/time to auto-publish this breath">
           <span class="fc-composer-pill-label">⏱️ Schedule</span>
-          <%= f.datetime_local_field :scheduled_for,
-              value: post.scheduled_for&.in_time_zone&.strftime("%Y-%m-%dT%H:%M"),
-              min: Time.current.strftime("%Y-%m-%dT%H:%M"),
-              class: "fc-composer-pill-select" %>
+          <input type="datetime-local" class="fc-composer-pill-select" aria-label="Schedule for"
+                 data-schedule-field-target="local" data-action="change->schedule-field#sync input->schedule-field#sync">
+          <%= f.hidden_field :scheduled_for, value: post.scheduled_for&.utc&.iso8601, data: { schedule_field_target: "utc" } %>
+          <button type="button" class="fc-composer-pill-clear hidden" aria-label="Clear schedule"
+                  data-schedule-field-target="clear" data-action="schedule-field#clear">×</button>
         </label>
+        <p class="fc-composer-schedule-note hidden" data-schedule-field-target="note" aria-live="polite"></p>
+        </div>
       </div>
     </div>
 

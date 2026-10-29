@@ -613,3 +613,55 @@ html .msg-page .msg-compose-input:focus { box-shadow: none !important; }
   color: #92400e;
 }
 html.theme-dark .msg-money-tip { color: #fcd34d; background: rgba(245, 158, 11, 0.12); }
+
+/* ── Reply to one message ───────────────────────────────────────────── */
+.msg-quote {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0 0 0.4rem;
+  padding: 0.4rem 0.65rem;
+  border-left: 3px solid var(--fc-accent, #059669);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--fc-accent, #059669) 8%, transparent);
+  text-decoration: none;
+  color: inherit;
+  max-width: 100%;
+}
+.msg-quote-name { font-size: 0.75rem; font-weight: 800; color: var(--fc-accent, #059669); }
+.msg-quote-text {
+  font-size: 0.82rem;
+  color: var(--fc-muted, #6b7280);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+}
+/* Jumped to from a quote: a brief glow on the original. */
+.msg-item:target .msg-bubble { animation: msg-found 1.6s ease-out; }
+@keyframes msg-found {
+  0%, 40% { box-shadow: 0 0 0 3px color-mix(in oklch, var(--fc-accent, #059669) 45%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.msg-reply-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.6rem 0.5rem 0.75rem;
+  border-left: 3px solid var(--fc-accent, #059669);
+  border-radius: 10px;
+  background: var(--fc-surface-2, #f3f6f4);
+}
+.msg-reply-bar.hidden { display: none; }
+.msg-reply-bar-icon { flex: none; color: var(--fc-accent, #059669); }
+.msg-reply-bar-text { display: grid; min-width: 0; flex: 1; }
+.msg-reply-bar-label { font-size: 0.78rem; color: var(--fc-muted, #6b7280); }
+.msg-reply-bar-label strong { color: var(--fc-ink, #111); }
+.msg-reply-bar-snippet { font-size: 0.82rem; color: var(--fc-ink, #111); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-reply-bar-close {
+  flex: none; width: 1.9rem; height: 1.9rem; border: 0; border-radius: 999px;
+  background: transparent; color: var(--fc-muted, #6b7280); cursor: pointer;
+}
+.msg-reply-bar-close:hover { background: var(--fc-line, rgba(0,0,0,.08)); }

@@ -1,0 +1,36 @@
+<% content_for(:title) { "Choose a New Password - Brethreign" } %>
+
+<%= render layout: "devise/shared/auth_shell", locals: { title: "Choose a new password", subtitle: "Pick something you haven't used here before. You'll be signed in right after." } do %>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "auth-form" }) do |f| %>
+    <% if resource.errors.any? %>
+      <div class="auth-errors" role="alert">
+        <% resource.errors.full_messages.each do |message| %>
+          <p><%= message.sub("Reset password token", "This reset link") %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= f.hidden_field :reset_password_token %>
+
+    <div class="auth-field" data-controller="password-field" data-password-field-strength-value="true">
+      <%= f.label :password, "New password", class: "auth-label" %>
+      <div class="auth-input-wrap">
+        <%= render_icon("lock", classes: "auth-input-icon") %>
+        <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "auth-input",
+                             placeholder: "At least #{@minimum_password_length || 8} characters", required: true,
+                             minlength: @minimum_password_length || 8,
+                             data: { password_field_target: "input", action: "input->password-field#measure" } %>
+        <button type="button" class="auth-eye" data-action="password-field#toggle" data-password-field-target="toggle"
+                aria-label="Show password" aria-pressed="false">Show</button>
+      </div>
+      <div class="auth-strength" data-password-field-target="meter" data-level="0" aria-live="polite">
+        <span></span><span></span><span></span><span></span>
+        <em data-password-field-target="label">Use 8 or more characters</em>
+      </div>
+    </div>
+
+    <%= f.submit "Save new password", class: "auth-submit", data: { turbo_submits_with: "Saving…" } %>
+  <% end %>
+
+  <p class="auth-switch">Link expired? <%= link_to "Send a new one", new_password_path(resource_name) %></p>
+<% end %>

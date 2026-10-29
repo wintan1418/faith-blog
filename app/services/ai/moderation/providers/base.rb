@@ -38,12 +38,19 @@ module Ai
           http.open_timeout = @timeout
           http.read_timeout = @timeout
 
-          response = http.request(request)
+          response = begin
+            http.request(request)
+          rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, SystemCallError, OpenSSL::SSL::SSLError, IOError => e
+            # A slow or unreachable AI is an API error the callers already handle, not a crash.
+            raise Client::ApiError, "#{provider_name} unreachable: #{e.class}: #{e.message}"
+          end
           unless response.is_a?(Net::HTTPSuccess)
             raise Client::ApiError, "#{provider_name} #{response.code}: #{response.body}"
           end
 
           JSON.parse(response.body)
+        rescue JSON::ParserError => e
+          raise Client::ApiError, "#{provider_name} sent a non-JSON reply: #{e.message}"
         end
 
         def provider_name

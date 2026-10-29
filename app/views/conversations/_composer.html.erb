@@ -13,6 +13,17 @@
     </div>
   <% end %>
 
+  <%# Replying to one message: shows what you're answering, with a way out. %>
+  <div class="msg-reply-bar<%= ' hidden' unless message.reply_to %>" data-dm-composer-target="replyBar">
+    <%= render_icon("reply", classes: "h-4 w-4 msg-reply-bar-icon") %>
+    <div class="msg-reply-bar-text">
+      <span class="msg-reply-bar-label">Replying to <strong data-dm-composer-target="replyName"><%= message.reply_to&.sender&.display_name %></strong></span>
+      <span class="msg-reply-bar-snippet" data-dm-composer-target="replySnippet"><%= message.reply_to&.quote_snippet %></span>
+    </div>
+    <button type="button" class="msg-reply-bar-close" data-action="click->dm-composer#cancelReply" aria-label="Cancel reply">✕</button>
+  </div>
+  <%= f.hidden_field :reply_to_id, data: { dm_composer_target: "replyField" } %>
+
   <%# Inline previews (images + recorded voice note) sit ABOVE the row %>
   <div class="dm-previews-row">
     <div data-dm-composer-target="previews" class="dm-previews hidden"></div>

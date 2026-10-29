@@ -9,6 +9,8 @@ class Message < ApplicationRecord
 
   belongs_to :conversation
   belongs_to :sender, class_name: "User"
+  # The message this one replies to (shown as a quote above it).
+  belongs_to :reply_to, class_name: "Message", optional: true
   has_many :reports, as: :reportable, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
 
@@ -30,6 +32,7 @@ class Message < ApplicationRecord
   validates :body, length: { maximum: 4_000 }, allow_blank: true
   validates :scripture_ref, length: { maximum: 120 }, allow_blank: true
   validate  :sender_is_participant
+  validate  :reply_to_same_conversation
   validate  :sender_is_not_blocked
   validate  :max_images_count
   validate  :attachments_content_type_and_size
@@ -53,6 +56,18 @@ class Message < ApplicationRecord
 
   def has_voice_note?
     voice_note.attached?
+  end
+
+  # A short line describing this message, for the quote shown above a reply.
+  def quote_snippet(length = 90)
+    return "This message was deleted" if deleted?
+    return "This message was removed" if removed?
+    return body.to_s.squish.truncate(length) if body.present?
+    return "📷 Photo" if has_images?
+    return "🎤 Voice note" if has_voice_note?
+    return "📖 #{scripture_ref}" if has_scripture?
+
+    "Message"
   end
 
   def has_scripture?
@@ -166,6 +181,12 @@ class Message < ApplicationRecord
     return if conversation&.conversation_participants&.exists?(user: sender)
 
     errors.add(:sender, "must be part of the conversation")
+  end
+
+  def reply_to_same_conversation
+    return if reply_to.nil? || reply_to.conversation_id == conversation_id
+
+    errors.add(:reply_to, "must be a message in this chat")
   end
 
   def touch_conversation

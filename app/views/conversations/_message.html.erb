@@ -47,6 +47,15 @@
         <% elsif removed %>
           <p class="msg-deleted msg-removed">🛡 This message was removed for breaking our community guidelines.</p>
         <% else %>
+          <% if (quoted = message.reply_to) %>
+            <%# The message this replies to. Tapping it jumps to the original. %>
+            <a href="#<%= dom_id(quoted) %>" class="msg-quote" data-turbo="false"
+               aria-label="Replying to <%= quoted.sender.display_name %>: <%= quoted.quote_snippet %>">
+              <span class="msg-quote-name"><%= quoted.sender_id == viewer_id ? "You" : quoted.sender.display_name %></span>
+              <span class="msg-quote-text"><%= quoted.quote_snippet %></span>
+            </a>
+          <% end %>
+
           <% if message.has_scripture? %>
             <%= render "conversations/scripture_card", message: message %>
           <% end %>
@@ -87,6 +96,12 @@
                data-emoji-reactions-token-value="<%= form_authenticity_token %>">
             <button type="button" class="msg-action" data-action="click->emoji-reactions#toggle" title="React" aria-label="React">
               <%= render_icon("smile", classes: "h-4 w-4") %>
+            </button>
+            <button type="button" class="msg-action msg-action--reply" title="Reply" aria-label="Reply to this message"
+                    data-reply-id="<%= message.id %>"
+                    data-reply-name="<%= mine ? "yourself" : message.sender.display_name %>"
+                    data-reply-snippet="<%= message.quote_snippet %>">
+              <%= render_icon("reply", classes: "h-4 w-4") %>
             </button>
             <% if mine %>
               <button type="button" class="msg-action" data-action="click->message-edit#start"

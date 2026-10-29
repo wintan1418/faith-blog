@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Shows a server time in the reader's own time zone (the server runs on UTC).
-// <time datetime="ISO" data-controller="local-time" data-local-time-format-value="time|short|inbox|day">
+// <time datetime="ISO" data-controller="local-time" data-local-time-format-value="time|short|inbox|day|full">
 export default class extends Controller {
   static values = { format: { type: String, default: "time" } }
 
@@ -31,6 +31,8 @@ export default class extends Controller {
         if (daysAgo < 7) return date.toLocaleDateString([], { weekday: "long" })
         if (date.getFullYear() === now.getFullYear()) return date.toLocaleDateString([], { month: "long", day: "numeric" })
         return date.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" })
+      case "full":
+        return `${date.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}, ${time()}`
       default:
         return time()
     }

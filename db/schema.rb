@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_27_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -455,9 +455,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_090000) do
     t.string "scripture_ref"
     t.datetime "removed_at"
     t.datetime "moderated_at"
+    t.bigint "reply_to_id"
     t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["deleted_at"], name: "index_messages_on_deleted_at"
+    t.index ["reply_to_id"], name: "index_messages_on_reply_to_id"
     t.index ["sender_id", "created_at"], name: "index_messages_on_sender_id_and_created_at"
     t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
@@ -858,6 +860,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_090000) do
   add_foreign_key "message_blocks", "users", column: "blocked_id"
   add_foreign_key "message_blocks", "users", column: "blocker_id"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "messages", column: "reply_to_id", on_delete: :nullify
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "moderation_logs", "ai_moderation_reviews"
   add_foreign_key "moderation_logs", "users", column: "moderator_id"

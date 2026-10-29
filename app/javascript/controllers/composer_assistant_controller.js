@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { copyText } from "../copy_text"
 
 // Wires the two author-facing composer assistants: gentleness check and
 // scripture suggestion. Both POST the current draft to a JSON endpoint and
@@ -170,19 +171,13 @@ export default class extends Controller {
     const btn = event.currentTarget
     const text = btn.dataset.copyText || ""
     if (!text) return
-    try {
-      await navigator.clipboard.writeText(text)
-      const original = btn.innerHTML
-      btn.classList.add("is-copied")
-      btn.innerHTML = "✓ Copied"
-      setTimeout(() => {
-        btn.classList.remove("is-copied")
-        btn.innerHTML = original
-      }, 1400)
-    } catch {
-      btn.innerHTML = "✗ Failed"
-      setTimeout(() => { btn.innerHTML = "⎘ Copy" }, 1400)
-    }
+    const ok = await copyText(text)
+    btn.classList.toggle("is-copied", ok)
+    btn.innerHTML = ok ? "✓ Copied" : "✗ Couldn't copy"
+    setTimeout(() => {
+      btn.classList.remove("is-copied")
+      btn.innerHTML = "⎘ Copy"
+    }, 1400)
   }
 
   showError(msg) {
