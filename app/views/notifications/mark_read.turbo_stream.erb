@@ -1,0 +1,3 @@
+<%# Re-render the page in place: rows, the count and the nav badges all update at once.
+    request_id: nil, or Turbo ignores it as an echo of the click that asked for it. %>
+<%= turbo_stream.refresh(request_id: nil) %>

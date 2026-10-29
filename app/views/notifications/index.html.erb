@@ -46,7 +46,10 @@
         <% end %>
       </div>
       <% if unread_count.positive? %>
-        <%= button_to "Mark all read", mark_all_read_notifications_path, class: "fc-btn" %>
+        <%= button_to mark_all_read_notifications_path, class: "fc-notifpage-markall", form_class: "fc-notifpage-markall-form",
+                      data: { turbo_submits_with: "Marking…" } do %>
+          <%= render_icon("check", classes: "h-4 w-4") %><span>Mark all read</span>
+        <% end %>
       <% end %>
     </header>
 
