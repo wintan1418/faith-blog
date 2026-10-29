@@ -6,10 +6,16 @@ import { Controller } from "@hotwired/stimulus"
 //      to the form via a DataTransfer-backed FileList so submitting the
 //      form ships it like any other file upload.
 export default class extends Controller {
-  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput", "nudge", "nudgeText", "nudgeSuggestion", "recordingBar", "recordingTime", "voiceAudio"]
+  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput", "nudge", "nudgeText", "nudgeSuggestion", "recordingBar", "recordingTime", "voiceAudio", "replyBar", "replyName", "replySnippet", "replyField"]
   static values  = { gentlenessUrl: String }
 
   connect() {
+    // "Reply" on any message in the chat quotes it in this composer.
+    this.onReplyClick = (event) => {
+      const button = event.target.closest?.(".msg-action--reply")
+      if (button) { event.preventDefault(); event.stopPropagation(); this.startReply(button.dataset) }
+    }
+    document.addEventListener("click", this.onReplyClick, true)
     // Hide mic if browser can't record; force send-button visibility.
     if (this.hasRecordBtnTarget && !(navigator.mediaDevices && window.MediaRecorder)) {
       this.recordBtnTarget.classList.add("hidden")
@@ -17,6 +23,26 @@ export default class extends Controller {
     }
     this.syncTrailingAction()
     this.autosize()
+  }
+
+  disconnect() {
+    document.removeEventListener("click", this.onReplyClick, true)
+  }
+
+  startReply({ replyId, replyName, replySnippet }) {
+    if (!this.hasReplyBarTarget || !replyId) return
+    this.replyFieldTarget.value = replyId
+    this.replyNameTarget.textContent = replyName || ""
+    this.replySnippetTarget.textContent = replySnippet || ""
+    this.replyBarTarget.classList.remove("hidden")
+    if (this.hasBodyInputTarget) this.bodyInputTarget.focus()
+  }
+
+  cancelReply(event) {
+    if (event) event.preventDefault()
+    if (!this.hasReplyBarTarget) return
+    this.replyFieldTarget.value = ""
+    this.replyBarTarget.classList.add("hidden")
   }
 
   onInput() {

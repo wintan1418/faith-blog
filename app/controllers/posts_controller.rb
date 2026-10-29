@@ -223,7 +223,13 @@ class PostsController < ApplicationController
     text = composer_text
     return render json: { ok: false, error: "Add a few words first." }, status: :unprocessable_entity if text.length < 20
 
-    result = Ai::Composer::GentlenessCheck.call(content: text)
+    result = begin
+      Ai::Composer::GentlenessCheck.call(content: text)
+    rescue StandardError => e
+      # Busy or unreachable AI: answer from the word filter instead of failing.
+      Rails.logger.warn("[GentlenessCheck] #{e.class}: #{e.message.to_s.first(300)}")
+      Ai::Composer::Fallback.tone(text)
+    end
     render json: {
       ok: true,
       tone: result.tone,
@@ -232,19 +238,23 @@ class PostsController < ApplicationController
       nudge: result.nudge,
       suggestion: result.suggestion
     }
-  rescue Ai::Composer::GentlenessCheck::ParseError, Ai::Moderation::Client::Error => e
-    Rails.logger.warn("[GentlenessCheck] #{e.class}: #{e.message}")
-    render json: { ok: false, error: "Couldn't reach the gentleness check. Try again in a moment." }, status: :bad_gateway
   end
 
   def suggest_scripture
     text = composer_text
     return render json: { ok: false, error: "Add a few sentences first." }, status: :unprocessable_entity if text.length < 40
 
-    result = Ai::Composer::ScriptureSuggester.call(content: text)
+    suggestions = begin
+      Ai::Composer::ScriptureSuggester.call(content: text).verses
+    rescue StandardError => e
+      # Busy or unreachable AI: suggest from themes in the draft instead of failing.
+      Rails.logger.warn("[ScriptureSuggester] #{e.class}: #{e.message.to_s.first(300)}")
+      Ai::Composer::Fallback.scripture(text)
+    end
+    suggestions = Ai::Composer::Fallback.scripture(text) if suggestions.empty?
     # Hydrate each suggestion with the actual verse text (KJV, cached) so the
     # composer can show the scripture itself instead of just the AI's summary.
-    verses = result.verses.map do |v|
+    verses = suggestions.map do |v|
       payload = ScriptureLookup.lookup(v.reference) rescue nil
       {
         reference: payload&.dig(:reference).presence || v.reference,
@@ -254,9 +264,6 @@ class PostsController < ApplicationController
       }
     end
     render json: { ok: true, verses: verses }
-  rescue Ai::Composer::ScriptureSuggester::ParseError, Ai::Moderation::Client::Error => e
-    Rails.logger.warn("[ScriptureSuggester] #{e.class}: #{e.message}")
-    render json: { ok: false, error: "Couldn't reach the scripture suggester. Try again in a moment." }, status: :bad_gateway
   end
 
   private
@@ -348,7 +355,8 @@ class PostsController < ApplicationController
     return "Draft saved — find it under Drafts when you're ready to come back." if post.draft?
 
     if post.scheduled?
-      return "Scheduled for #{post.scheduled_for.in_time_zone.strftime("%a %b %-d, %l:%M %p")}."
+      # Relative, because the server runs on UTC and the reader may not.
+      return "Scheduled. It goes live in #{helpers.distance_of_time_in_words(Time.current, post.scheduled_for)}. Find it under Drafts."
     end
 
     "Posted."

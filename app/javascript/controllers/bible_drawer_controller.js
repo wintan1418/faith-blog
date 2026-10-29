@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { copyText } from "../copy_text"
 
 // Bible drawer: browse books → chapters → verses, or run a natural-language
 // search and tap a result to open the chapter. KJV via /scripture/lookup and
@@ -257,19 +258,15 @@ export default class extends Controller {
     const btn = event.currentTarget
     const text = btn.dataset.copyText || ""
     if (!text) return
-    try {
-      await navigator.clipboard.writeText(text)
-      const original = btn.innerHTML
-      btn.classList.add("is-copied")
-      btn.innerHTML = btn.classList.contains("fc-copy-btn--inline") ? "✓" : "✓ Copied"
-      setTimeout(() => {
-        btn.classList.remove("is-copied")
-        btn.innerHTML = original
-      }, 1400)
-    } catch {
-      btn.innerHTML = btn.classList.contains("fc-copy-btn--inline") ? "✗" : "✗ Failed"
-      setTimeout(() => { btn.innerHTML = "⎘" }, 1400)
-    }
+    const inline = btn.classList.contains("fc-copy-btn--inline")
+    const original = btn.dataset.originalHtml || (btn.dataset.originalHtml = btn.innerHTML)
+    const ok = await copyText(text)
+    btn.classList.toggle("is-copied", ok)
+    btn.innerHTML = ok ? (inline ? "✓" : "✓ Copied") : (inline ? "✗" : "✗ Couldn't copy")
+    setTimeout(() => {
+      btn.classList.remove("is-copied")
+      btn.innerHTML = original
+    }, 1400)
   }
 
   shareVerse(event) {

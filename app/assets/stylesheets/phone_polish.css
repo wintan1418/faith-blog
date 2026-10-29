@@ -59,3 +59,24 @@ html .relative > svg.absolute.left-3 ~ input.input { padding-left: 2.5rem !impor
 /* Writing a post: Check tone / Suggest scripture wrap instead of running off the edge. */
 html .fc-composer-tools { flex-wrap: wrap !important; row-gap: 0.4rem; max-width: 100%; }
 html .fc-composer-tools .fc-composer-asst-btn { white-space: nowrap; }
+
+/* Composer schedule: clear button and "Goes live …" note. */
+.fc-composer-pill-clear {
+  display: inline-grid; place-items: center;
+  width: 1.4rem; height: 1.4rem; border: 0; border-radius: 999px;
+  background: var(--fc-line); color: var(--fc-ink);
+  font-size: 0.95rem; line-height: 1; cursor: pointer;
+}
+.fc-composer-pill-clear.hidden { display: none; }
+.fc-composer-schedule-note {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.8rem; font-weight: 600;
+  color: var(--fc-accent, #059669);
+}
+.fc-composer-schedule-note.hidden { display: none; }
+
+/* Scripture references are real links now: keep the gilded look, no underline. */
+html a.scripture-ref { text-decoration: none; }
+/* The schedule picker's wrapper adds no box of its own: the pill and note sit in the composer row. */
+.fc-composer-schedule { display: contents; }

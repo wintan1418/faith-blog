@@ -19,33 +19,39 @@ export default class extends Controller {
     document.removeEventListener("composer:prefill", this.handlePrefill)
   }
 
-  handlePrefill(event) {
+  async handlePrefill(event) {
     const text = event.detail && event.detail.text
     if (!text) return
     this.open()
-    // Two frames so the dialog is open and trix is mounted before we touch it.
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const editor = this.dialogTarget.querySelector("trix-editor")
-      if (editor && editor.editor) {
-        editor.editor.loadHTML("")
-        editor.editor.insertString(text)
-      }
-    }))
+    const editor = await this.readyEditor()
+    if (!editor) return
+    editor.editor.loadHTML("")
+    editor.editor.insertString(text)
+  }
+
+  // The editor library loads on demand, so wait until the composer's editor
+  // is ready before putting text in it (otherwise the text is silently lost).
+  async readyEditor() {
+    await loadEditor()
+    const el = this.dialogTarget.querySelector("trix-editor")
+    if (!el) return null
+    if (el.editor) return el
+    return new Promise((resolve) => {
+      const done = () => resolve(el.editor ? el : null)
+      el.addEventListener("trix-initialize", done, { once: true })
+      setTimeout(done, 3000)
+    })
   }
 
   // Open with starter text from a data-composer-modal-prefill-param — used by
   // the composer chips ("Prayer request", "Share a verse"). Never clobbers a
   // draft: only inserts when the editor is empty.
-  openWith(event) {
+  async openWith(event) {
     const text = event.params && event.params.prefill
     this.open(event)
     if (!text) return
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const editor = this.dialogTarget.querySelector("trix-editor")
-      if (editor && editor.editor && editor.editor.getDocument().toString().trim() === "") {
-        editor.editor.insertString(text)
-      }
-    }))
+    const editor = await this.readyEditor()
+    if (editor && editor.editor.getDocument().toString().trim() === "") editor.editor.insertString(text)
   }
 
   open(event) {

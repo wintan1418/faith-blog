@@ -5,10 +5,12 @@ class ConnectionRequestsController < ApplicationController
   def index
     @pending_requests = current_user.received_connection_requests.pending.includes(sender: :brethren_card)
     @sent_requests = current_user.sent_connection_requests.includes(receiver: :brethren_card)
+    @suggestions = BrethrenSuggestions.for(current_user, limit: 10)
   end
 
   def connections
     @connections = current_user.connections
+    @suggestions = BrethrenSuggestions.for(current_user, limit: 10)
   end
 
   def create

@@ -47,6 +47,8 @@ module IconHelper
       icon_svg("M6 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M18 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M8.6 14.6 15.4 9.4 M18 11v2a4 4 0 0 1-4 4H9", classes)
     when "globe"
       icon_svg("M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M2 12h20 M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z", classes)
+    when "reply"
+      icon_svg("M9 17 4 12l5-5 M20 18v-2a4 4 0 0 0-4-4H4", classes)
     when "send"
       icon_svg("M22 2L11 13 M22 2l-7 20-4-9-9-4 20-7z", classes)
     when "search"

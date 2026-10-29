@@ -12,17 +12,57 @@ export default class extends Controller {
 
   connect() {
     this.cache = new Map()
+    // One listener on the container, not one per link: Turbo restores pages
+    // from a saved copy when you go back, and that copy keeps the links but
+    // loses per-link listeners (which is why only the first tap used to work).
+    this.onClick = this.onClick.bind(this)
+    this.onOver = (e) => { const ref = this.refFrom(e); if (ref) this.show(ref) }
+    this.onOut = (e) => { if (this.refFrom(e)) this.hide() }
+    this.element.addEventListener("click", this.onClick)
+    this.element.addEventListener("mouseover", this.onOver)
+    this.element.addEventListener("mouseout", this.onOut)
+    this.element.addEventListener("focusin", this.onOver)
     this.linkifyAll(this.element)
+  }
+
+  refFrom(event) {
+    const el = event.target.closest?.(".scripture-ref")
+    return el && this.element.contains(el) ? el : null
+  }
+
+  onClick(event) {
+    const ref = this.refFrom(event)
+    if (!ref) return
+    event.preventDefault()
+    event.stopPropagation() // don't also open the post the reference sits in
+    this.hide()
+    const url = ref.getAttribute("href") || this.pathFor(ref.dataset.reference)
+    if (window.Turbo) window.Turbo.visit(url)
+    else window.location.assign(url)
+  }
+
+  pathFor(reference) {
+    const slug = String(reference).toLowerCase()
+      .replace(/[:\s–—]+/g, "-").replace(/[^a-z0-9\-]/g, "").replace(/\-+/g, "-")
+    return `/scripture/${slug}`
+  }
+
+  // The pattern is global (it remembers where its last match ended), so it is
+  // reset before every use; otherwise short texts like comments get skipped.
+  matches(text) {
+    const re = this.constructor.REGEX
+    re.lastIndex = 0
+    const found = re.test(text)
+    re.lastIndex = 0
+    return found
   }
 
   linkifyAll(root) {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode: (node) => {
         if (!node.nodeValue || node.nodeValue.length < 5) return NodeFilter.FILTER_REJECT
-        if (node.parentElement?.closest("a, .scripture-ref, .mention-link")) return NodeFilter.FILTER_REJECT
-        return this.constructor.REGEX.test(node.nodeValue)
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_REJECT
+        if (node.parentElement?.closest("a, .scripture-ref, .mention-link, textarea, form")) return NodeFilter.FILTER_REJECT
+        return this.matches(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
       }
     })
 
@@ -36,11 +76,12 @@ export default class extends Controller {
   wrap(textNode) {
     const text = textNode.nodeValue
     const frag = document.createDocumentFragment()
+    const re = this.constructor.REGEX
     let lastIndex = 0
-    this.constructor.REGEX.lastIndex = 0
+    re.lastIndex = 0
 
     let match
-    while ((match = this.constructor.REGEX.exec(text)) !== null) {
+    while ((match = re.exec(text)) !== null) {
       const start = match.index
       const end = start + match[0].length
 
@@ -48,27 +89,18 @@ export default class extends Controller {
         frag.appendChild(document.createTextNode(text.slice(lastIndex, start)))
       }
 
-      const span = document.createElement("span")
-      span.className = "scripture-ref"
-      span.dataset.reference = match[0]
-      span.textContent = match[0]
-      span.title = `Open ${match[0]} — the verse and every breath that carries it`
-      span.addEventListener("mouseenter", (e) => this.show(e.currentTarget))
-      span.addEventListener("focus", (e) => this.show(e.currentTarget), true)
-      span.addEventListener("mouseleave", () => this.hide())
-      // Click-through to the verse's own page (/scripture/john-3-16).
-      span.addEventListener("click", (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        const slug = span.dataset.reference.toLowerCase()
-          .replace(/[:\s–—]+/g, "-").replace(/[^a-z0-9\-]/g, "").replace(/\-+/g, "-")
-        window.location.assign(`/scripture/${slug}`)
-      })
-      span.tabIndex = 0
-      frag.appendChild(span)
+      // A real link to the verse's own page (/scripture/john-3-16).
+      const link = document.createElement("a")
+      link.className = "scripture-ref"
+      link.href = this.pathFor(match[0])
+      link.dataset.reference = match[0]
+      link.textContent = match[0]
+      link.title = `Open ${match[0]}: the verse and every breath that carries it`
+      frag.appendChild(link)
 
       lastIndex = end
     }
+    re.lastIndex = 0
 
     if (lastIndex < text.length) {
       frag.appendChild(document.createTextNode(text.slice(lastIndex)))
@@ -126,6 +158,10 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.element.removeEventListener("click", this.onClick)
+    this.element.removeEventListener("mouseover", this.onOver)
+    this.element.removeEventListener("mouseout", this.onOut)
+    this.element.removeEventListener("focusin", this.onOver)
     if (this.tip) {
       this.tip.remove()
       this.tip = null
