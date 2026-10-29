@@ -80,3 +80,18 @@ html .fc-composer-tools .fc-composer-asst-btn { white-space: nowrap; }
 html a.scripture-ref { text-decoration: none; }
 /* The schedule picker's wrapper adds no box of its own: the pill and note sit in the composer row. */
 .fc-composer-schedule { display: contents; }
+
+/* Alerts page: the "Mark all read" action is a compact pill that never squeezes the title. */
+.fc-notifpage-head { flex-wrap: wrap; align-items: center; row-gap: 0.75rem; }
+.fc-notifpage-head > div { min-width: 0; flex: 1 1 14rem; }
+.fc-notifpage-markall-form { flex: none; }
+.fc-notifpage-markall {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 0.95rem; border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--fc-accent, #059669) 35%, var(--fc-line, #e5e7eb));
+  background: color-mix(in oklch, var(--fc-accent, #059669) 9%, var(--fc-surface, #fff));
+  color: var(--fc-accent, #059669);
+  font-size: 0.85rem; font-weight: 700; white-space: nowrap; cursor: pointer;
+}
+.fc-notifpage-markall:hover { background: color-mix(in oklch, var(--fc-accent, #059669) 15%, var(--fc-surface, #fff)); }
+.fc-notifpage-markall:disabled { opacity: 0.7; cursor: progress; }
