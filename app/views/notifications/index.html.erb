@@ -1,4 +1,6 @@
 <% content_for(:title) { "Notifications · Brethreign" } %>
+<%# Never show a saved copy: going back after opening an alert must show it read. %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
 <%
   # One emoji per notification type — a fast visual scent for each row.
@@ -34,20 +36,20 @@
 %>
 
 <div class="fc-page">
-  <div class="fc-notifpage">
+  <div class="fc-notifpage" data-controller="notifications-page">
     <header class="fc-notifpage-head">
       <div>
         <span class="fc-page-kicker">✦ Notifications</span>
         <h1 class="fc-notifpage-title">Updates</h1>
         <% if unread_count.positive? %>
-          <p class="fc-notifpage-sub"><%= pluralize(unread_count, "new update") %> waiting for you.</p>
+          <p class="fc-notifpage-sub" data-notifications-page-target="sub"><%= pluralize(unread_count, "new update") %> waiting for you.</p>
         <% else %>
-          <p class="fc-notifpage-sub">You're all caught up. 🕊️</p>
+          <p class="fc-notifpage-sub" data-notifications-page-target="sub">You're all caught up. 🕊️</p>
         <% end %>
       </div>
       <% if unread_count.positive? %>
         <%= button_to mark_all_read_notifications_path, class: "fc-notifpage-markall", form_class: "fc-notifpage-markall-form",
-                      data: { turbo_submits_with: "Marking…" } do %>
+                      form: { data: { notifications_page_target: "markAll", action: "submit->notifications-page#markAll" } } do %>
           <%= render_icon("check", classes: "h-4 w-4") %><span>Mark all read</span>
         <% end %>
       <% end %>
@@ -62,7 +64,8 @@
           <div class="fc-notifpage-card">
             <% rows.each do |notification| %>
               <%= link_to visit_notification_path(notification),
-                          class: "fc-notifrow#{' is-unread' if notification.unread?}" do %>
+                          class: "fc-notifrow#{' is-unread' if notification.unread?}",
+                          data: { notifications_page_target: "row", action: "notifications-page#open" } do %>
                 <span class="fc-notifrow-avatar">
                   <% if notification.actor %>
                     <% if notification.actor.profile&.avatar&.attached? %>

@@ -37,6 +37,14 @@ export default class extends Controller {
     }
   }
 
+  // The "⋯" button beside a voice note: the audio player swallows taps on
+  // the bubble, so this is how its menu opens on a phone.
+  toggleFromButton(event) {
+    event.preventDefault()
+    if (!this.hasActionsTarget) return
+    this.actionsTarget.classList.contains("is-open") ? this.close() : this.open()
+  }
+
   open() {
     // Only one message menu open at a time.
     document.querySelectorAll(".msg-actions.is-open, .message-actions.is-open").forEach(el => el.classList.remove("is-open"))

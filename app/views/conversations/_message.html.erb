@@ -69,7 +69,15 @@
           <% end %>
 
           <% if message.has_voice_note? %>
-            <audio controls preload="metadata" class="msg-voice" src="<%= url_for(message.voice_note) %>"></audio>
+            <%# The player takes every tap, so voice notes get their own options
+                button (react, reply, edit, delete) on touch screens. %>
+            <div class="msg-voice-row">
+              <audio controls preload="metadata" class="msg-voice" src="<%= url_for(message.voice_note) %>"></audio>
+              <% unless deleted || removed %>
+                <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
+                        title="Message options" aria-label="Message options">&#8943;</button>
+              <% end %>
+            </div>
           <% end %>
 
           <% if message.body.present? %>
@@ -128,6 +136,7 @@
       </div>
 
       <% if !deleted && !removed && (emoji_groups.any? || user_like) %>
+        <%# Chats are one-on-one, so reactions show without a count. %>
         <div class="msg-reactions">
           <% emoji_groups.each do |emoji, group| %>
             <% mine_emoji = user_like&.display_emoji == emoji %>
@@ -135,13 +144,13 @@
             <% if mine_emoji %>
               <%= button_to unlike_path(likeable_type: "Message", likeable_id: message.id),
                   method: :delete, form_class: "inline", class: "msg-reaction is-mine", title: "Remove your reaction" do %>
-                <span><%= emoji %></span><span class="msg-reaction-count"><%= group.size %></span>
+                <span><%= emoji %></span>
                 <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
               <% end %>
             <% else %>
               <%= button_to likes_path(likeable_type: "Message", likeable_id: message.id, reaction_emoji: emoji),
                   form_class: "inline", class: "msg-reaction" do %>
-                <span><%= emoji %></span><span class="msg-reaction-count"><%= group.size %></span>
+                <span><%= emoji %></span>
                 <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
               <% end %>
             <% end %>

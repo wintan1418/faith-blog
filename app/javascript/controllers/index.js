@@ -106,6 +106,9 @@ application.register("onboarding", OnboardingController)
 import NotificationsModalController from "./notifications_modal_controller"
 application.register("notifications-modal", NotificationsModalController)
 
+import NotificationsPageController from "./notifications_page_controller"
+application.register("notifications-page", NotificationsPageController)
+
 import PostFormController from "./post_form_controller"
 application.register("post-form", PostFormController)
 

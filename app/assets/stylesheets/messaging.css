@@ -330,6 +330,16 @@
 .msg-images.is-grid-2, .msg-images.is-grid-3, .msg-images.is-grid-4 { grid-template-columns: 1fr 1fr; }
 .msg-image { width: 100%; max-height: 280px; object-fit: cover; border-radius: 8px; border: 1px solid var(--msg-line); }
 .msg-voice { display: block; width: 100%; max-width: 320px; margin: 4px 0; }
+.msg-voice-row { display: flex; align-items: center; gap: 4px; }
+.msg-voice-row .msg-voice { flex: 1; min-width: 0; }
+.msg-more {
+  flex: none; width: 36px; height: 36px; border-radius: 999px;
+  display: none; align-items: center; justify-content: center;
+  font-size: 1.25rem; line-height: 1; color: var(--msg-muted); background: transparent;
+}
+.msg-more:active { background: var(--msg-soft); }
+/* Phones only; on desktop the actions appear on hover. */
+@media (hover: none), (pointer: coarse) { .msg-more { display: inline-flex; } }
 
 /* Hover (computers) or tap (phones) shows React / Edit / Delete / Report. */
 .msg-actions {

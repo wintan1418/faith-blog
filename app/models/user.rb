@@ -101,6 +101,7 @@ class User < ApplicationRecord
   after_create :create_brethren_card
   after_create :ensure_risk_profile
   after_create_commit :announce_join
+  after_create_commit :accept_pending_invitations
 
   # Scopes
   scope :active, -> { where(active: true) }
@@ -353,6 +354,13 @@ class User < ApplicationRecord
 
   def ensure_risk_profile
     build_risk_profile.save unless risk_profile
+  end
+
+  # Anyone who invited this email sees "Accepted", however the person
+  # signed up: Google, the app, or later without the invite link.
+  def accept_pending_invitations
+    Invitation.pending.where(email: email.to_s.strip.downcase)
+              .update_all(invited_user_id: id, accepted_at: Time.current, updated_at: Time.current)
   end
 
   def announce_join
