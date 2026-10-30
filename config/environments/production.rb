@@ -52,7 +52,8 @@ Rails.application.configure do
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
+  # Jobs use the main connection pool (same database): one fewer set of
+  # connections on the shared database server.
 
   # Set host to be used by links generated in mailer templates.
   # Update this with your actual domain

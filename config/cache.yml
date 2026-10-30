@@ -11,6 +11,7 @@ development:
 test:
   <<: *default
 
+# Production uses the main connection pool (same database) so the cache
+# doesn't hold its own set of connections on the shared server.
 production:
-  database: cache
   <<: *default

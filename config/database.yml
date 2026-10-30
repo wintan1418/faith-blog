@@ -25,6 +25,9 @@ default: &default
   prepared_statements: true
   # Advisory locks for migrations
   advisory_locks: true
+  # Close connections idle for 30s. The database server is shared by several
+  # apps with a limit of 100 connections, so idle ones must not sit around.
+  idle_timeout: 30
 
 
 development:
