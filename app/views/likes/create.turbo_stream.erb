@@ -5,6 +5,10 @@
   <%= turbo_stream.replace dom_id(@likeable, :reaction_summary) do %>
     <%= render "posts/reaction_summary", post: @likeable %>
   <% end %>
+  <%# The bar on the breath's own page. %>
+  <%= turbo_stream.replace dom_id(@likeable, :reactions_bar) do %>
+    <%= render "posts/reactions_bar", post: @likeable %>
+  <% end %>
 <% elsif @likeable.is_a?(Comment) %>
   <%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
     <%= render "comments/reaction", comment: @likeable %>

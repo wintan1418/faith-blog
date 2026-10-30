@@ -31,6 +31,8 @@ export default class extends Controller {
     if (!this.hasPanelTarget) return
     this.panelTarget.classList.remove("hidden")
     this.panelTarget.setAttribute("aria-hidden", "false")
+    this.moveBack()
+    this.moveIntoOpenDialog()
     document.body.classList.add("fc-bible-open")
     document.addEventListener("keydown", this.boundEsc)
     this.showBrowse()
@@ -41,8 +43,28 @@ export default class extends Controller {
     if (!this.hasPanelTarget) return
     this.panelTarget.classList.add("hidden")
     this.panelTarget.setAttribute("aria-hidden", "true")
+    this.moveBack()
     document.body.classList.remove("fc-bible-open")
     document.removeEventListener("keydown", this.boundEsc)
+  }
+
+  // A modal <dialog> (the breath composer) sits above the page and makes
+  // everything outside it untappable, so a Bible opened from the composer
+  // was hidden behind it. Open it inside that dialog instead; the dialog is
+  // within this controller's element, so its buttons keep working.
+  moveIntoOpenDialog() {
+    const panel = this.panelTarget
+    const dialog = [...this.element.querySelectorAll("dialog[open]")].find(d => d.matches(":modal"))
+    if (!dialog || dialog.contains(panel)) return
+    this.homeMarker ||= document.createComment("bible-drawer")
+    panel.before(this.homeMarker)
+    dialog.appendChild(panel)
+  }
+
+  moveBack() {
+    if (this.homeMarker?.isConnected && !this.homeMarker.nextSibling?.isSameNode(this.panelTarget)) {
+      this.homeMarker.after(this.panelTarget)
+    }
   }
 
   onEsc(event) {
@@ -330,7 +352,12 @@ export default class extends Controller {
 
   // ──
 
+  // Also escapes quotes: copy/share text goes inside data-* attributes, and
+  // verses are copied as "…" quotes, which used to end the attribute early
+  // and leave the Copy and Share buttons with nothing to copy.
   escape(s) {
-    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;")
   }
 }

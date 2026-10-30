@@ -7,8 +7,11 @@
                    .sort_by { |_, likes| -likes.size }
                    .first(4)
 %>
-<div class="post-reactions-bar">
-  <div class="post-reactions-left fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions"
+<%# Its own id (not :reactions, which is the feed card's version): after a
+    reaction the server replaces this whole bar, so a breath's page keeps its
+    own layout instead of being swapped for the feed's. %>
+<div class="post-reactions-bar" id="<%= dom_id(post, :reactions_bar) %>">
+  <div class="post-reactions-left fc-reactions" data-controller="emoji-reactions"
        data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
        data-emoji-reactions-token-value="<%= form_authenticity_token %>">
     <% emoji_groups.each do |emoji, group| %>

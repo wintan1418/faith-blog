@@ -21,6 +21,7 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("click", this.boundOutsideClick)
+    this.stopFollowingScroll()
   }
 
   toggle(event) {
@@ -33,18 +34,57 @@ export default class extends Controller {
     if (visible) {
       this.hide()
     } else {
+      this.trigger = event.currentTarget
       this.show()
     }
   }
 
   show() {
     this.pickerTarget.classList.remove("hidden")
+    this.place()
     setTimeout(() => document.addEventListener("click", this.boundOutsideClick), 50)
+    this.boundHideOnScroll ||= () => this.hide()
+    // Page scrolls only (not the picker's own list): it's pinned to the screen.
+    window.addEventListener("scroll", this.boundHideOnScroll, { passive: true })
   }
 
   hide() {
     this.pickerTarget.classList.add("hidden")
     document.removeEventListener("click", this.boundOutsideClick)
+    this.stopFollowingScroll()
+  }
+
+  stopFollowingScroll() {
+    if (this.boundHideOnScroll) window.removeEventListener("scroll", this.boundHideOnScroll)
+  }
+
+  // Pin the picker on screen next to the button that opened it: above when
+  // there's room, otherwise below, never past the screen edges. CSS alone
+  // placed it relative to whichever ancestor happened to be positioned, so on
+  // a breath's own page it opened far off screen and reacting did nothing.
+  place() {
+    const picker = this.pickerTarget
+    const button = this.trigger
+    if (!button) return
+    const margin = 8
+    const header = 64 // the sticky top bar covers the top of the screen
+    Object.assign(picker.style, { position: "fixed", left: "0px", top: "0px", right: "auto", bottom: "auto", marginTop: "0" })
+    picker.style.animation = "none"
+    // A transformed ancestor would offset "fixed": measure where 0,0 really lands.
+    const origin = picker.getBoundingClientRect()
+    picker.style.animation = ""
+    const width = picker.offsetWidth
+    const height = picker.offsetHeight
+    const b = button.getBoundingClientRect()
+
+    let top = b.top - height - margin
+    if (top < header) top = b.bottom + margin
+    top = Math.max(margin, Math.min(top, window.innerHeight - height - margin))
+    const left = Math.max(margin, Math.min(b.left, window.innerWidth - width - margin))
+
+    picker.style.left = `${left - origin.left}px`
+    picker.style.top = `${top - origin.top}px`
+    picker.style.transformOrigin = top < b.top ? "bottom left" : "top left"
   }
 
   outsideClick(event) {
