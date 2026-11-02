@@ -52,15 +52,7 @@
           <h2 class="text-xl font-bold text-faith-dark">Background rain</h2>
           <p class="mystic-copy text-sm">Scripture and breaths drifting gently behind every page. Switch it off if you find it distracting.</p>
         </div>
-        <%= button_to settings_background_rain_path(on: !current_user.background_rain?), method: :patch,
-              form_class: "fc-setting-switch-form",
-              class: "fc-setting-switch#{' is-on' if current_user.background_rain?}",
-              role: "switch", aria: { checked: current_user.background_rain?, label: "Background rain" },
-              data: { controller: "rain-toggle", action: "rain-toggle#toggle",
-                      rain_toggle_url_value: settings_background_rain_path } do %>
-          <span class="fc-setting-switch-track" aria-hidden="true"><span class="fc-setting-switch-knob"></span></span>
-          <span class="fc-setting-switch-label" data-rain-toggle-target="label"><%= current_user.background_rain? ? "On" : "Off" %></span>
-        <% end %>
+        <%= render "settings/rain_switch" %>
       </div>
     </div>
   </div>

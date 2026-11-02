@@ -1,0 +1,11 @@
+<%# On/off switch for the background scripture rain (rain_toggle_controller). %>
+<% on = current_user.background_rain? %>
+<%= button_to settings_background_rain_path(on: !on), method: :patch,
+      form_class: "fc-setting-switch-form",
+      class: "fc-setting-switch#{' is-on' if on}",
+      role: "switch", aria: { checked: on, label: "Background rain" },
+      data: { controller: "rain-toggle", action: "rain-toggle#toggle",
+              rain_toggle_url_value: settings_background_rain_path } do %>
+  <span class="fc-setting-switch-track" aria-hidden="true"><span class="fc-setting-switch-knob"></span></span>
+  <span class="fc-setting-switch-label" data-rain-toggle-target="label"><%= on ? "On" : "Off" %></span>
+<% end %>

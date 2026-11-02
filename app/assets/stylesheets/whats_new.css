@@ -104,3 +104,11 @@ dialog.wn.is-leaving .wn-card { animation: wn-drop 0.22s ease-in forwards; }
 
 /* Always centred (a general dialog style elsewhere pins dialogs to the top). */
 html dialog.wn[open] { position: fixed; inset: 0; margin: auto; height: fit-content; max-height: 92dvh; }
+
+/* A control on a slide (e.g. the Background rain switch): try it right here. */
+.wn-action {
+  display: inline-flex; align-items: center; gap: 0.75rem; margin-top: 1rem;
+  padding: 0.4rem 0.6rem 0.4rem 1rem; border-radius: 999px;
+  background: var(--fc-accent-soft, rgba(95, 152, 112, 0.12));
+}
+.wn-action-label { font-weight: 700; font-size: 0.92rem; }

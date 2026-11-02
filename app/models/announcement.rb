@@ -26,15 +26,19 @@ class Announcement < ApplicationRecord
   # "What's new" slides: each line of a release's body is one feature.
   #   "🎂 Birthdays — Celebrate your brethren on their day"
   # (emoji optional; " — ", " - " or ": " separates the title from the description).
-  Slide = Struct.new(:emoji, :title, :text, keyword_init: true)
+  # A line may end with "[[background_rain]]" to put that control on its slide.
+  Slide = Struct.new(:emoji, :title, :text, :action, keyword_init: true)
+  ACTION = /\s*\[\[([a-z_]+)\]\]\s*\z/
   EMOJI_START = /\A(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)\s*/
 
   def slides
     body.to_s.lines.map { |l| l.strip.sub(/\A[-*•]\s+/, "") }.compact_blank.map do |line|
       emoji = line[EMOJI_START, 1]
       line = line.sub(EMOJI_START, "") if emoji
+      action = line[ACTION, 1]
+      line = line.sub(ACTION, "") if action
       title, text = line.split(/\s+[—–-]\s+|:\s+/, 2)
-      Slide.new(emoji: emoji || "✨", title: title.to_s.strip, text: text.to_s.strip.presence)
+      Slide.new(emoji: emoji || "✨", title: title.to_s.strip, text: text.to_s.strip.presence, action: action)
     end
   end
 

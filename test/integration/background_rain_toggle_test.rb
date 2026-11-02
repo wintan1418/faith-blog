@@ -50,4 +50,20 @@ class BackgroundRainToggleTest < ActionDispatch::IntegrationTest
     patch settings_background_rain_path, params: { on: false }, as: :json
     assert_response :unauthorized
   end
+
+  test "the November What's new leads with the rain switch, live on its slide" do
+    release = Announcement.create!(kind: :release, kicker: "What's new", title: "New in Brethreign · November",
+                                   body: "🌧 Background rain, your choice — Switch it off here. [[background_rain]]\n↩️ Reply to a message — Tap and reply.")
+    @ada.update_columns(created_at: 1.day.ago)
+
+    first = release.slides.first
+    assert_equal [ "🌧", "Background rain, your choice", "Switch it off here.", "background_rain" ],
+                 [ first.emoji, first.title, first.text, first.action ]
+    assert_nil release.slides.last.action
+
+    sign_in @ada
+    get edit_settings_accent_path
+    assert_select "dialog.wn .wn-slide:first-child .wn-action .fc-setting-switch[data-action~='rain-toggle#toggle']"
+    assert_select "dialog.wn .wn-action", count: 1
+  end
 end
