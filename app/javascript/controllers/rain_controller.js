@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 // pointer-events: none, slower spawn rate on phones, paused when the
 // tab isn't visible, fully off for prefers-reduced-motion.
 export default class extends Controller {
-  static values = { items: Array }
+  static values = { items: Array, on: { type: Boolean, default: true } }
 
   connect() {
     this.alive = false
@@ -15,20 +15,38 @@ export default class extends Controller {
     let items = []
     try { items = this.itemsValue } catch { items = [] }
     this.items = Array.isArray(items) ? items : []
-    if (this.items.length === 0) return
 
+    this.onVisibility = this.onVisibility.bind(this)
+    // The on/off switch (settings or account menu) flips the rain instantly.
+    this.onSet = (e) => { this.onValue = !!e.detail?.on }
+    window.addEventListener("rain:set", this.onSet)
+
+    if (this.onValue) this.start()
+  }
+
+  disconnect() {
+    window.removeEventListener("rain:set", this.onSet)
+    this.stop()
+  }
+
+  onValueChanged(on) {
+    if (!this.items) return // runs once before connect(), which starts it
+    on ? this.start() : this.stop()
+  }
+
+  start() {
+    if (this.alive || this.items.length === 0) return
     this.alive = true
     this.live = new Set()
 
     // Honour reduced-motion by SLOWING the rain, not killing it — the
     // drift is already gentle and a missing ambient layer reads as
     // "nothing is happening" to most users, which was the original
-    // complaint.
+    // complaint. (Members who find it distracting can switch it off.)
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     this.spawnInterval = window.innerWidth < 640 ? (reduced ? 5200 : 3400) : (reduced ? 3600 : 2200)
     this.maxLive       = window.innerWidth < 640 ? (reduced ? 3 : 4)       : (reduced ? 5 : 7)
 
-    this.onVisibility = this.onVisibility.bind(this)
     document.addEventListener("visibilitychange", this.onVisibility)
 
     // Seed a few drops mid-flight so the page doesn't start empty,
@@ -39,7 +57,7 @@ export default class extends Controller {
     this.startInterval()
   }
 
-  disconnect() {
+  stop() {
     this.alive = false
     document.removeEventListener("visibilitychange", this.onVisibility)
     this.stopInterval()

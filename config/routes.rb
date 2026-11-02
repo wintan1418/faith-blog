@@ -200,6 +200,7 @@ Rails.application.routes.draw do
     resources :educations, only: [ :new, :create, :edit, :update, :destroy ]
     resource :dark_mode, only: [ :update ]
     resource :accent,    only: [ :edit, :update ]
+    resource :background_rain, only: [ :update ]
   end
 
   # Brethren Card & Connection Requests

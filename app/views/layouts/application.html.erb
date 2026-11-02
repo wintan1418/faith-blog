@@ -161,11 +161,13 @@
     <%# Ambient scripture / brethren / golden-breath rain in the page
         background, accent-tinted, behind every screen. Subtle by design —
         pointer-events: none, low opacity, paused when the tab is hidden,
-        off entirely for prefers-reduced-motion. %>
+        off entirely for prefers-reduced-motion. Members can switch it off
+        (Settings → Accent, or the account menu). %>
     <div id="fc-rain"
          class="fc-rain"
          aria-hidden="true"
          data-controller="rain"
+         data-rain-on-value="<%= !user_signed_in? || current_user.background_rain? %>"
          data-rain-items-value="<%= BackgroundRain.items.to_json %>"></div>
 
     <div class="min-h-full fc-page" data-controller="<%= ["reactors-modal", ("composer-modal notifications-modal bible-drawer notification-sound" if user_signed_in?)].compact.join(" ") %>">
