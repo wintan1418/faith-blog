@@ -20794,11 +20794,8 @@ body.hotwire-native .fc-topbar {
 }
 
 /* ── Inside the apps: feel native, not like a website ──
-   Phones are small, so the scripture rain is a faint shimmer rather than
-   text competing with posts. */
-body.hotwire-native .fc-rain {
-  opacity: 0.3;
-}
+   The scripture rain looks the same as on the website; members who find it
+   distracting switch it off (Settings → Accent, or the What's new slide). */
 /* No grey flash when tapping, and no "open link / copy" pop-up on long-press. */
 body.hotwire-native {
   -webkit-tap-highlight-color: transparent;
@@ -20889,10 +20886,6 @@ html.theme-light .trix-content:not(trix-editor) {
   background: transparent !important;
 }
 
-/* In the apps the scripture rain drifts BEHIND the page, so it never sits on top of
-   posts, cards or inputs; it shows only in the gaps. */
-body.hotwire-native .fc-rain { z-index: 0; }
-body.hotwire-native > .fc-page { position: relative; z-index: 1; }
 
 /* Long posts fade out with a mask, so the fade matches any card background
    (the old white overlay showed as a pale block on tinted cards). */
