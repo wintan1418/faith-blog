@@ -21005,3 +21005,27 @@ body.hotwire-native > .fc-page { position: relative; z-index: 1; }
   .fc-comment-head .fc-breath-handle { display: none; }
 }
 @media (max-width: 520px) { .fc-hide-phone { display: none; } }
+
+/* ── Settings on/off switch (e.g. Background rain) ─────────────────── */
+.fc-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.fc-setting-switch-form { margin: 0; flex: none; }
+.fc-setting-switch {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.25rem; background: none; border: 0; cursor: pointer;
+  font-weight: 700; font-size: 0.9rem; color: var(--fc-muted);
+}
+.fc-setting-switch-track {
+  position: relative; width: 48px; height: 28px; border-radius: 999px;
+  background: var(--fc-line-strong, rgba(33, 63, 45, 0.22)); transition: background-color 0.18s ease;
+}
+.fc-setting-switch-knob {
+  position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 999px;
+  background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); transition: transform 0.18s ease;
+}
+.fc-setting-switch.is-on { color: var(--fc-accent-2, var(--fc-accent)); }
+.fc-setting-switch.is-on .fc-setting-switch-track { background: var(--fc-accent); }
+.fc-setting-switch.is-on .fc-setting-switch-knob { transform: translateX(20px); }
+.fc-setting-switch:focus-visible { outline: 2px solid var(--fc-accent); outline-offset: 3px; border-radius: 999px; }
+@media (prefers-reduced-motion: reduce) {
+  .fc-setting-switch-track, .fc-setting-switch-knob { transition: none; }
+}

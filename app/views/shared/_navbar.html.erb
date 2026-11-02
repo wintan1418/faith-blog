@@ -119,6 +119,14 @@
               <p class="truncate text-xs text-[var(--fc-muted)]"><%= current_user.email %></p>
             </div>
             <%= link_to "Profile", user_path(current_user.username), class: "fc-dropdown-item" %>
+            <%= button_to settings_background_rain_path(on: !current_user.background_rain?), method: :patch,
+                  form_class: "contents",
+                  class: "fc-dropdown-item fc-rain-menu-item w-full text-left",
+                  role: "switch", aria: { checked: current_user.background_rain? },
+                  data: { controller: "rain-toggle", action: "rain-toggle#toggle",
+                          rain_toggle_url_value: settings_background_rain_path } do %>
+              🌧 Background rain: <strong data-rain-toggle-target="label"><%= current_user.background_rain? ? "On" : "Off" %></strong>
+            <% end %>
             <button type="button"
                     class="fc-dropdown-item w-full text-left"
                     data-native-action="bible"

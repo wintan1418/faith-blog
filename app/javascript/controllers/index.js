@@ -124,6 +124,9 @@ application.register("pristine-field", PristineFieldController)
 import RainController from "./rain_controller"
 application.register("rain", RainController)
 
+import RainToggleController from "./rain_toggle_controller"
+application.register("rain-toggle", RainToggleController)
+
 import ReactionsController from "./reactions_controller"
 application.register("reactions", ReactionsController)
 
