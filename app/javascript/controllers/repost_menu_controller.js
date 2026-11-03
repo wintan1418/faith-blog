@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { flipIfNoRoomAbove } from "../menu_flip"
 
 // Controls the Repost dropdown (Quick repost vs Quote). The Quote option
 // is a regular link — it navigates to /posts/new?quote=ID where the full
@@ -29,6 +30,7 @@ export default class extends Controller {
 
   openMenu() {
     this.menuTarget.classList.remove("hidden")
+    flipIfNoRoomAbove(this.menuTarget)
     this.triggerTarget?.setAttribute("aria-expanded", "true")
     setTimeout(() => {
       document.addEventListener("mousedown", this.boundOutside, true)

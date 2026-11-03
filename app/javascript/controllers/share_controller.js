@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { flipIfNoRoomAbove } from "../menu_flip"
 
 export default class extends Controller {
   static values = {
@@ -45,6 +46,7 @@ export default class extends Controller {
 
   show() {
     this.menuTarget.classList.remove("hidden")
+    flipIfNoRoomAbove(this.menuTarget)
     // Capture-phase mousedown so we beat any stopPropagation deeper in the tree.
     document.addEventListener("mousedown", this.boundOutsideClick, true)
     document.addEventListener("keydown", this.boundEsc)

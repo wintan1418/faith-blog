@@ -8668,6 +8668,12 @@ html.theme-dark .fc-held-banner {
 }
 .fc-repost-menu.hidden { display: none !important; }
 
+/* No room above (top of the screen): open below the button instead. */
+@media (min-width: 641px) {
+  .fc-share-menu.opens-down,
+  .fc-repost-menu.opens-down { bottom: auto; top: calc(100% + 8px); }
+}
+
 .fc-repost-menu-form { margin: 0; }
 .fc-repost-menu-form > button.fc-repost-option { width: 100%; }
 
@@ -18229,7 +18235,16 @@ turbo-frame#feed_stream[busy] {
 
 /* ── Card entrances: cascade in on load and tab switch ────────────────── */
 #feed_list .fc-breath {
-  animation: fc-card-in 380ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  /* "backwards", not "both": a transform left on the card after the entrance
+     would trap its menus inside it, under the next post. */
+  animation: fc-card-in 380ms cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+
+/* A post with an open menu (reactions, share, repost, ⋯) sits above the posts
+   around it, so the menu is never drawn behind the next post. */
+.fc-breath:has(.fc-reaction-picker:not(.hidden), .fc-share-menu:not(.hidden),
+               .fc-repost-menu:not(.hidden), .fc-breath-menu:not(.hidden)) {
+  z-index: 60;
 }
 
 #feed_list > :nth-child(1) .fc-breath, #feed_list > .fc-breath:nth-child(1) { animation-delay: 0ms; }
