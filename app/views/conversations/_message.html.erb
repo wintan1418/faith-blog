@@ -61,10 +61,16 @@
           <% end %>
 
           <% if message.has_images? %>
-            <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
-              <% message.images.each do |img| %>
-                <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo" %>
-              <% end %>
+            <%# Tapping a photo opens it full screen, so photos get the same
+                options button as voice notes (react, reply, edit, delete). %>
+            <div class="msg-media-row">
+              <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
+                <% message.images.each do |img| %>
+                  <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo" %>
+                <% end %>
+              </div>
+              <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
+                      title="Message options" aria-label="Message options">&#8943;</button>
             </div>
           <% end %>
 

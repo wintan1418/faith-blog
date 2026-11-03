@@ -30,6 +30,19 @@ class QaBoardFixesOct30Test < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(voice)} .msg-reaction-count", count: 0
   end
 
+  test "a photo has its own options button so it can be replied to" do
+    convo = Conversation.find_or_create_between!(@ada, @ben)
+    photo = convo.messages.new(sender: @ben, body: "")
+    photo.images.attach(io: tiny_png, filename: "photo.png", content_type: "image/png")
+    photo.save!(validate: false)
+    sign_in @ada
+
+    get conversation_path(convo)
+
+    assert_select "##{dom_id(photo)} .msg-media-row button.msg-more[data-action~='message-menu#toggleFromButton']"
+    assert_select "##{dom_id(photo)} .msg-action--reply[data-reply-snippet=?]", "📷 Photo"
+  end
+
   # ── Reacting on a breath's own page keeps that page's bar ──
 
   test "reacting returns the breath page's own reaction bar" do
@@ -70,5 +83,11 @@ class QaBoardFixesOct30Test < ActionDispatch::IntegrationTest
     invite.reload
     assert invite.accepted?
     assert_equal friend, invite.invited_user
+  end
+
+  private
+
+  def tiny_png
+    StringIO.new(Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="))
   end
 end
