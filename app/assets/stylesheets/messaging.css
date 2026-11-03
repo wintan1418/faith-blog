@@ -332,6 +332,8 @@
 .msg-voice { display: block; width: 100%; max-width: 320px; margin: 4px 0; }
 .msg-voice-row { display: flex; align-items: center; gap: 4px; }
 .msg-voice-row .msg-voice { flex: 1; min-width: 0; }
+.msg-media-row { display: flex; align-items: flex-end; gap: 4px; }
+.msg-media-row .msg-images { flex: 1; min-width: 0; }
 .msg-more {
   flex: none; width: 36px; height: 36px; border-radius: 999px;
   display: none; align-items: center; justify-content: center;
