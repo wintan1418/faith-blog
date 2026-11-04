@@ -115,3 +115,84 @@
   .fc-tabs .fc-discover-trigger { padding: 6px 8px; margin-left: 0.15rem; }
   .fc-tabs .fc-discover-trigger span { display: none; }
 }
+
+/* "Meet the Updates bots" banner on the feed: a slow shimmer around the edge
+   and the four bots taking turns. */
+.fc-updates-intro {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem 0.9rem;
+  margin-bottom: 0.75rem;
+  padding: 0.95rem 2.4rem 0.95rem 1rem;
+  border-radius: 16px;
+  background:
+    linear-gradient(var(--fc-surface), var(--fc-surface)) padding-box,
+    linear-gradient(110deg, var(--fc-accent), #f59e0b, #3b82f6, #a855f7, var(--fc-accent)) border-box;
+  background-size: 100% 100%, 300% 100%;
+  border: 1.5px solid transparent;
+  animation: fc-updates-shimmer 8s linear infinite;
+  overflow: hidden;
+}
+.fc-updates-intro-icons {
+  position: relative;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--fc-accent) 14%, var(--fc-surface));
+}
+.fc-updates-intro-icons span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.55rem;
+  opacity: 0;
+  animation: fc-updates-turns 8s ease-in-out infinite;
+}
+.fc-updates-intro-icons span:nth-child(2) { animation-delay: 2s; }
+.fc-updates-intro-icons span:nth-child(3) { animation-delay: 4s; }
+.fc-updates-intro-icons span:nth-child(4) { animation-delay: 6s; }
+.fc-updates-intro-copy { min-width: 0; }
+.fc-updates-intro-kicker { color: var(--fc-accent); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.fc-updates-intro-title { font-family: 'Fraunces', Georgia, serif; font-size: 1.15rem; font-weight: 650; color: var(--fc-ink); line-height: 1.25; }
+.fc-updates-intro-text { margin-top: 0.15rem; color: var(--fc-muted); font-size: 0.86rem; line-height: 1.4; }
+.fc-updates-intro .fc-updates-intro-btn {
+  justify-self: start;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: var(--fc-accent);
+  color: #042f1d !important;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.fc-updates-intro .fc-updates-intro-btn:hover { filter: brightness(1.06); }
+.fc-updates-intro-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.55rem;
+  border: 0;
+  background: none;
+  color: var(--fc-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+/* Phones: the button drops under the text. */
+@media (max-width: 560px) {
+  .fc-updates-intro { grid-template-columns: auto minmax(0, 1fr); }
+  .fc-updates-intro .fc-updates-intro-btn { grid-column: 2; }
+}
+@keyframes fc-updates-shimmer { to { background-position: 0 0, 300% 0; } }
+@keyframes fc-updates-turns {
+  0%, 100% { opacity: 0; transform: translateY(8px) scale(0.85); }
+  5%, 22%  { opacity: 1; transform: none; }
+  27%      { opacity: 0; transform: translateY(-8px) scale(0.85); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fc-updates-intro { animation: none; }
+  .fc-updates-intro-icons span { animation: none; }
+  .fc-updates-intro-icons span:first-child { opacity: 1; }
+}

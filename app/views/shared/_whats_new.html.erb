@@ -19,6 +19,9 @@
               </div>
               <h2 class="wn-title"><%= slide.title %></h2>
               <% if slide.text %><p class="wn-text"><%= slide.text %></p><% end %>
+              <% if slide.action == "updates" %>
+                <div class="wn-action"><%= link_to "Open Updates", feed_updates_path, class: "fc-btn fc-btn-primary" %></div>
+              <% end %>
               <% if slide.action == "background_rain" %>
                 <div class="wn-action"><span class="wn-action-label">Background rain</span><%= render "settings/rain_switch" %></div>
               <% end %>

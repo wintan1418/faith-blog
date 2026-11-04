@@ -134,6 +134,24 @@ class UpdatesBotsTest < ActionDispatch::IntegrationTest
     assert_equal 1, BotItem.live.count
   end
 
+  test "news is chosen topic by topic, so every topic gets a share" do
+    food = BotSource.create!(bot: "news", topic: "food", name: "Example Food", url: "https://food.example.org/rss")
+    food_rss = RSS.sub("Scientists find water on a distant moon", "A bakery revives an ancient grain")
+                  .gsub("news.example.org/moon-water", "food.example.org/grain")
+                  .gsub("news.example.org/odds", "food.example.org/odds")
+    Bots::Http.stub(:get, ->(url, **) { url == food.url ? food_rss : feeds.fetch(url) }) do
+      Bots::ImageFinder.stub(:call, nil) { Bots::Refresh.call("news") }
+    end
+    assert_equal %w[food science], BotItem.live.pluck(:topic).sort
+  end
+
+  test "a quiet bot catches up faster than its usual share" do
+    refresh = Bots::Refresh.new("news")
+    assert_operator refresh.send(:allowance), :>=, Bots::Refresh::CATCH_UP["news"]
+    assert_equal [ 3, 3, 2 ], refresh.send(:shares, 8, 3)
+    assert_equal [ 5, 5 ], refresh.send(:shares, 16, 2), "each AI answer stays within its cap"
+  end
+
   test "each bot keeps to its daily limit" do
     cap = Bots::Catalog.fetch("courses").daily_cap
     cap.times { |i| item_for(@learn, title: "Course #{i}") }
