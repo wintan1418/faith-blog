@@ -4,11 +4,10 @@ module Bots
   # One run for one bot: read its sources, keep what's fresh and unseen, let
   # the editor choose within today's allowance, and post the choices.
   class Refresh
-    RUNS_PER_DAY = 8            # BotsRefreshJob runs every 3 hours
-    PER_SOURCE = 6              # freshest unseen entries per source per run
-    # A bot with little to show (a new tab, or after a quiet spell) catches up
-    # faster than its usual share of the day.
-    CATCH_UP = { "news" => 16, "sports" => 6, "jobs" => 6, "courses" => 6 }.freeze
+    PER_SOURCE = 12             # freshest unseen entries per source per run
+    CHUNK = 8                   # candidates per AI call (its answer is capped at ~600 tokens)
+    # Most one hourly run may add, so a big batch arrives spread over the day.
+    PER_RUN = { "news" => 60, "sports" => 25, "jobs" => 25, "courses" => 15 }.freeze
     KEEP_SKIPPED_FOR = 7.days   # long enough that old links aren't reconsidered
     KEEP_LIVE_FOR = 45.days
 
@@ -21,25 +20,33 @@ module Bots
       @force = force
     end
 
+    # Everything fresh and fit gets in (within the run's and the day's ceiling).
+    # Candidates go to the editor a few at a time, topic by topic in turn, so
+    # every topic is heard before any topic gets a second turn.
     def call
       errors = []
       candidates = gather(errors)
       by_url = candidates.to_h { |c, source| [ c.url, source ] }
+      budget = allowance
       posted = []
       modes = []
+      recent = recent_titles
 
-      # News is chosen topic by topic (world, tech, food…), so every topic gets
-      # its share and each AI answer stays short.
-      groups = candidates.group_by { |_, source| source.topic }.values
-      shares(allowance, groups.size).zip(groups).each do |pick, group|
-        next if pick.zero?
+      chunks = candidates.group_by { |_, source| source.topic }.values.map { |group| group.each_slice(CHUNK).to_a }
+      round_robin(chunks).each do |chunk|
+        break if budget <= 0
 
-        editor = Editor.new(bot: @bot.key, candidates: group, pick: pick)
+        editor = Editor.new(bot: @bot.key, candidates: chunk, pick: [ budget, Editor::MAX_PICKS ].min)
         picks = editor.call
         modes << editor.mode
-        posted += picks.filter_map { |p| post(p, by_url.fetch(p.candidate.url)) }
+        fresh = picks.reject { |p| Editor.same_story_as_any?(p.candidate.title, recent) }
+        added = fresh.filter_map { |p| post(p, by_url.fetch(p.candidate.url)) }
+        posted += added
+        recent += added.map(&:title)
+        budget -= added.size
         # Only an AI pass has judged the rest; offline picks leave them for later.
-        skip(editor.considered - picks.map(&:candidate), by_url) if editor.mode == :ai
+        added_urls = added.map(&:url).to_set
+        skip(editor.considered.reject { |c| added_urls.include?(c.url) }, by_url) if editor.mode == :ai
       end
 
       Result.new(bot: @bot.key, posted: posted.size, mode: modes.uniq.join("+").presence&.to_sym, errors: errors)
@@ -55,26 +62,25 @@ module Bots
 
     private
 
-    # Today's cap, spread over the day's runs (a manual run may use the rest).
+    # What this run may still add: the day's ceiling, at most PER_RUN at once.
     def allowance
       posted_today = BotItem.where(bot: @bot.key, status: [ :live, :hidden ])
                             .where(created_at: Time.current.beginning_of_day..).count
       remaining = [ @bot.daily_cap - posted_today, 0 ].max
-      return remaining if @force
-
-      usual = (@bot.daily_cap / RUNS_PER_DAY.to_f).ceil
-      [ remaining, catching_up? ? [ usual, CATCH_UP.fetch(@bot.key, usual) ].max : usual ].min
+      @force ? remaining : [ remaining, PER_RUN.fetch(@bot.key) ].min
     end
 
-    def catching_up?
-      BotItem.live.where(bot: @bot.key, created_at: 1.day.ago..).count < @bot.daily_cap / 2
+    # Titles posted lately, so another outlet's take on the same story is skipped.
+    def recent_titles
+      BotItem.where(bot: @bot.key, status: [ :live, :hidden ], created_at: 2.days.ago..).pluck(:title)
     end
 
-    # Split a run's allowance across topic groups, at most Editor::MAX_PICKS each.
-    def shares(total, groups)
-      return [] if groups.zero?
-      base, extra = total.divmod(groups)
-      Array.new(groups) { |i| [ base + (i < extra ? 1 : 0), Editor::MAX_PICKS ].min }
+    # [[a1, a2], [b1]] -> [a1, b1, a2]
+    def round_robin(lists)
+      lists = lists.map(&:dup)
+      out = []
+      out.concat(lists.filter_map(&:shift)) until lists.all?(&:empty?)
+      out
     end
 
     def gather(errors)

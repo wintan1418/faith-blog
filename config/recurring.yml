@@ -32,7 +32,7 @@ production:
   updates_bots:
     class: BotsRefreshJob
     queue: default
-    schedule: every 3 hours
+    schedule: every hour at minute 7
 
   moderation_backlog_sweep:
     class: ModerationBacklogSweepJob

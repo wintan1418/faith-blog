@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Every 3 hours: each Updates bot reads its sources and posts what it chose.
+# Every hour: each Updates bot reads its sources and posts what it chose.
 # One bot failing never stops the others.
 class BotsRefreshJob < ApplicationJob
   queue_as :default

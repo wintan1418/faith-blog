@@ -145,11 +145,12 @@ class UpdatesBotsTest < ActionDispatch::IntegrationTest
     assert_equal %w[food science], BotItem.live.pluck(:topic).sort
   end
 
-  test "a quiet bot catches up faster than its usual share" do
+  test "every fit story gets in, a few at a time, and a story told twice is posted once" do
     refresh = Bots::Refresh.new("news")
-    assert_operator refresh.send(:allowance), :>=, Bots::Refresh::CATCH_UP["news"]
-    assert_equal [ 3, 3, 2 ], refresh.send(:shares, 8, 3)
-    assert_equal [ 5, 5 ], refresh.send(:shares, 16, 2), "each AI answer stays within its cap"
+    assert_equal Bots::Refresh::PER_RUN["news"], refresh.send(:allowance)
+    assert_equal %w[a1 b1 a2], refresh.send(:round_robin, [ %w[a1 a2], %w[b1] ])
+    assert Bots::Editor.same_story_as_any?("Parker appointed West Ham head coach", [ "West Ham confirm Parker as head coach" ])
+    assert_not Bots::Editor.same_story_as_any?("A bakery revives an ancient grain", [ "West Ham confirm Parker as head coach" ])
   end
 
   test "each bot keeps to its daily limit" do

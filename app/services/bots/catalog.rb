@@ -20,16 +20,16 @@ module Bots
     ALL = [
       Bot.new(key: "news", name: "Brethreign News", emoji: "📰",
               tagline: "The day's stories from around the world",
-              daily_cap: 60, fresh_for: 2.days, topics: NEWS_TOPICS),
+              daily_cap: 300, fresh_for: 2.days, topics: NEWS_TOPICS),
       Bot.new(key: "sports", name: "Brethreign Sports", emoji: "🏆",
               tagline: "Results and big moments across sport",
-              daily_cap: 20, fresh_for: 2.days, topics: {}),
+              daily_cap: 100, fresh_for: 2.days, topics: {}),
       Bot.new(key: "jobs", name: "Brethreign Jobs", emoji: "💼",
               tagline: "Remote jobs open to people anywhere",
-              daily_cap: 20, fresh_for: 14.days, topics: {}),
+              daily_cap: 100, fresh_for: 14.days, topics: {}),
       Bot.new(key: "courses", name: "Brethreign Learn", emoji: "🎓",
               tagline: "Free courses, scholarships and fellowships",
-              daily_cap: 12, fresh_for: 30.days, topics: {})
+              daily_cap: 50, fresh_for: 30.days, topics: {})
     ].freeze
 
     BY_KEY = ALL.index_by(&:key).freeze
