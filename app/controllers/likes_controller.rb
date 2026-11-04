@@ -52,7 +52,7 @@ class LikesController < ApplicationController
     @likeable_type = params[:likeable_type].to_s.classify
     @likeable_id = params[:likeable_id]
 
-    likeable_class = { "Post" => Post, "Comment" => Comment, "Message" => Message }[@likeable_type]
+    likeable_class = { "Post" => Post, "Comment" => Comment, "Message" => Message, "BotItem" => BotItem }[@likeable_type]
     raise ActiveRecord::RecordNotFound unless likeable_class
 
     @likeable = likeable_class.find(@likeable_id)
@@ -68,7 +68,7 @@ class LikesController < ApplicationController
     case likeable
     when Message
       likeable.conversation.conversation_participants.exists?(user_id: current_user.id)
-    when Post, Comment
+    when Post, Comment, BotItem
       likeable.visible_to?(current_user)
     else
       true
@@ -76,7 +76,7 @@ class LikesController < ApplicationController
   end
 
   def create_notification
-    return if @likeable.is_a?(Message)
+    return unless @likeable.is_a?(Post) || @likeable.is_a?(Comment) # bots and chats don't get notified
     return if @likeable.user == current_user
 
     notification_type = @likeable.is_a?(Post) ? :post_liked : :comment_liked

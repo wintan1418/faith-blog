@@ -13,6 +13,10 @@
   <%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
     <%= render "comments/reaction", comment: @likeable %>
   <% end %>
+<% elsif @likeable.is_a?(BotItem) %>
+  <%= turbo_stream.replace dom_id(@likeable, :reactions) do %>
+    <%= render "bot_items/reactions", item: @likeable, my_reaction: current_user.likes.find_by(likeable: @likeable) %>
+  <% end %>
 <% elsif @likeable.is_a?(Message) %>
   <%= turbo_stream.replace dom_id(@likeable) do %>
     <%= render "conversations/message", message: @likeable, viewer_id: current_user.id %>

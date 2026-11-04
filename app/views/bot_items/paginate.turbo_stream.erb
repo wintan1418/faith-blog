@@ -1,0 +1,17 @@
+<%= turbo_stream.append "bot_list" do %>
+  <% @bot_items.each do |item| %>
+    <%= render "bot_items/card", item: item, my_reaction: @my_bot_reactions[item.id] %>
+  <% end %>
+<% end %>
+
+<% if @pagy.next %>
+  <%= turbo_stream.replace "feed_more" do %>
+    <div id="feed_more" data-controller="infinite-scroll"
+         data-infinite-scroll-url-value="<%= url_for(bot: @bot_filter, topic: @topic_filter, page: @pagy.next) %>">
+      <div class="fc-skel-card"><div class="fc-skel fc-skel-avatar"></div>
+        <div><div class="fc-skel fc-skel-line is-short"></div><div class="fc-skel fc-skel-line is-long"></div></div></div>
+    </div>
+  <% end %>
+<% else %>
+  <%= turbo_stream.remove "feed_more" %>
+<% end %>

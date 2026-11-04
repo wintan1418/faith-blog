@@ -1,0 +1,40 @@
+<%# One bot update in the Updates tab. Local: item (BotItem), my_reaction (Like or nil) %>
+<% bot = item.bot_info %>
+<article class="fc-breath fc-bot-card" id="<%= dom_id(item) %>">
+  <header class="fc-bot-head">
+    <span class="fc-bot-avatar is-<%= item.bot %>" aria-hidden="true"><%= bot.emoji %></span>
+    <div class="fc-bot-who">
+      <p class="fc-bot-name"><%= bot.name %> <span class="fc-bot-badge">Bot</span></p>
+      <p class="fc-bot-meta">
+        <% if item.topic_label %><span class="fc-bot-topic"><%= item.topic_label %></span> · <% end %>
+        via <%= item.source_name %> · <%= time_ago_short(item.published_at) %>
+      </p>
+    </div>
+  </header>
+
+  <%= link_to item.url, class: "fc-bot-link", target: "_blank", rel: "noopener noreferrer nofollow" do %>
+    <% if item.image_url.present? %>
+      <img class="fc-bot-image<%= ' is-logo' if item.bot == 'jobs' %>" src="<%= item.image_url %>" alt=""
+           loading="lazy" referrerpolicy="no-referrer">
+    <% end %>
+    <h3 class="fc-bot-title"><%= item.title %></h3>
+    <% if item.detail_line %><p class="fc-bot-details"><%= item.detail_line %></p><% end %>
+    <% if item.summary.present? %><p class="fc-bot-summary"><%= item.summary %></p><% end %>
+    <span class="fc-bot-read"><%= item.bot == "jobs" ? "View the job" : item.bot == "courses" ? "See the details" : "Read the story" %> ↗</span>
+  <% end %>
+
+  <% if %w[jobs courses].include?(item.bot) %>
+    <p class="fc-bot-safety">🛡 Never pay to apply. Brethreign will never ask you for money.</p>
+  <% end %>
+
+  <footer class="fc-breath-actions">
+    <%= render "bot_items/reactions", item: item, my_reaction: my_reaction %>
+    <button type="button" class="fc-breath-action"
+            data-action="click->composer-modal#openWith"
+            data-composer-modal-prefill-param="<%= "#{item.title}\n#{item.url}\n\n" %>"
+            title="Start a breath about this">
+      <%= render_icon("message_circle", classes: "h-5 w-5") %>
+      <span>Discuss</span>
+    </button>
+  </footer>
+</article>

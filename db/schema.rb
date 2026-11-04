@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_02_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_090100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -140,6 +140,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_100000) do
     t.index ["post_id"], name: "index_bookmarks_on_post_id"
     t.index ["user_id", "post_id"], name: "index_bookmarks_on_user_id_and_post_id", unique: true
     t.index ["user_id"], name: "index_bookmarks_on_user_id"
+  end
+
+  create_table "bot_items", force: :cascade do |t|
+    t.bigint "bot_source_id", null: false
+    t.string "bot", null: false
+    t.string "topic"
+    t.string "title", null: false
+    t.text "summary"
+    t.string "url", null: false
+    t.string "url_digest", null: false
+    t.string "image_url"
+    t.jsonb "details", default: {}, null: false
+    t.integer "status", default: 0, null: false
+    t.string "skip_reason"
+    t.integer "likes_count", default: 0, null: false
+    t.datetime "published_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bot_source_id"], name: "index_bot_items_on_bot_source_id"
+    t.index ["status", "bot", "published_at"], name: "index_bot_items_on_status_and_bot_and_published_at"
+    t.index ["status", "published_at"], name: "index_bot_items_on_status_and_published_at"
+    t.index ["url_digest"], name: "index_bot_items_on_url_digest", unique: true
+  end
+
+  create_table "bot_sources", force: :cascade do |t|
+    t.string "bot", null: false
+    t.string "topic"
+    t.string "name", null: false
+    t.string "url", null: false
+    t.string "format", default: "rss", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "last_fetched_at"
+    t.string "last_error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bot", "active"], name: "index_bot_sources_on_bot_and_active"
+    t.index ["url"], name: "index_bot_sources_on_url", unique: true
   end
 
   create_table "brethren_cards", force: :cascade do |t|
@@ -815,6 +852,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_100000) do
     t.bigint "seen_release_id"
     t.string "dismissed_cards", default: [], null: false, array: true
     t.boolean "background_rain", default: true, null: false
+    t.string "hidden_bots", default: [], null: false, array: true
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -831,6 +869,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_100000) do
   add_foreign_key "announcements", "users"
   add_foreign_key "bookmarks", "posts"
   add_foreign_key "bookmarks", "users"
+  add_foreign_key "bot_items", "bot_sources"
   add_foreign_key "brethren_cards", "users"
   add_foreign_key "broadcasts", "users", column: "sender_id"
   add_foreign_key "circle_breaths", "circles"
