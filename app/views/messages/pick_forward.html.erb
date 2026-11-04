@@ -1,0 +1,49 @@
+<% content_for(:title) { "Forward message" } %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 560px;">
+    <main class="fc-main">
+      <div class="fc-panel msg-forward">
+        <header class="msg-forward-head">
+          <h1 class="msg-forward-title">Forward to…</h1>
+          <%= link_to "Cancel", conversation_path(@conversation), class: "fc-btn" %>
+        </header>
+
+        <div class="msg-forward-preview">
+          <span class="msg-forward-label"><%= render_icon("forward", classes: "h-4 w-4") %> Forwarding</span>
+          <p><%= @message.quote_snippet(160) %></p>
+        </div>
+
+        <% if @targets.any? %>
+          <%= form_with url: forward_conversation_message_path(@conversation, @message), method: :post,
+                data: { turbo_action: "replace", controller: "forward-picker" } do %>
+            <input type="search" class="msg-forward-search" placeholder="Search your chats"
+                   aria-label="Search your chats" data-action="input->forward-picker#filter">
+            <ul class="msg-forward-list">
+              <% @targets.each do |conversation| %>
+                <% other = conversation.other_participant_for(current_user) %>
+                <% next unless other %>
+                <li data-forward-picker-target="row" data-name="<%= other.display_name.downcase %> <%= other.username.to_s.downcase %>">
+                  <label class="msg-forward-row">
+                    <input type="checkbox" name="conversation_ids[]" value="<%= conversation.id %>"
+                           data-action="change->forward-picker#count" data-forward-picker-target="box">
+                    <%= render "conversations/avatar", user: other, size: "h-10 w-10" %>
+                    <span class="msg-forward-name"><%= other.display_name %></span>
+                    <% if conversation.id == @conversation.id %><span class="msg-forward-here">this chat</span><% end %>
+                  </label>
+                </li>
+              <% end %>
+            </ul>
+            <div class="msg-forward-foot">
+              <span class="msg-forward-count" data-forward-picker-target="counter">Choose up to <%= Message::FORWARD_LIMIT %> chats</span>
+              <button type="submit" class="fc-btn fc-btn-primary" data-forward-picker-target="send" disabled>Forward</button>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="fc-empty-text">You don't have any other chats yet.</p>
+        <% end %>
+      </div>
+    </main>
+  </div>
+</div>

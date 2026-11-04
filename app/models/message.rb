@@ -6,6 +6,9 @@ class Message < ApplicationRecord
   MAX_IMAGES = 4
   IMAGE_MAX_BYTES = 10.megabytes
   VOICE_MAX_BYTES = 6.megabytes
+  MAX_DOCUMENTS = 3
+  DOCUMENT_MAX_BYTES = 10.megabytes # the file store's limit for documents
+  FORWARD_LIMIT = 5 # chats one message can be forwarded to at once
 
   belongs_to :conversation
   belongs_to :sender, class_name: "User"
@@ -16,6 +19,7 @@ class Message < ApplicationRecord
 
   has_many_attached :images
   has_one_attached  :voice_note
+  has_many_attached :documents
 
   def edited?
     edited_at.present?
@@ -43,11 +47,17 @@ class Message < ApplicationRecord
   def attachments_content_type_and_size
     validate_image_attachment(:images, max_bytes: IMAGE_MAX_BYTES)
     validate_audio_attachment(:voice_note, max_bytes: VOICE_MAX_BYTES)
+    validate_document_attachment(:documents, max_bytes: DOCUMENT_MAX_BYTES, max_count: MAX_DOCUMENTS)
   end
 
   def has_attachments?
     (images.respond_to?(:attached?) && images.attached?) ||
-      (voice_note.respond_to?(:attached?) && voice_note.attached?)
+      (voice_note.respond_to?(:attached?) && voice_note.attached?) ||
+      (documents.respond_to?(:attached?) && documents.attached?)
+  end
+
+  def has_documents?
+    documents.attached? && documents.any?
   end
 
   def has_images?
@@ -65,6 +75,7 @@ class Message < ApplicationRecord
     return body.to_s.squish.truncate(length) if body.present?
     return "📷 Photo" if has_images?
     return "🎤 Voice note" if has_voice_note?
+    return "📄 #{documents.first.filename}".truncate(length) if has_documents?
     return "📖 #{scripture_ref}" if has_scripture?
 
     "Message"
@@ -72,6 +83,22 @@ class Message < ApplicationRecord
 
   def has_scripture?
     scripture_ref.present?
+  end
+
+  def forwardable?
+    !deleted? && !removed?
+  end
+
+  # Send a copy of this message on to another chat, from `by`. Files aren't
+  # uploaded again: the copy points at the same stored files. Every rule a new
+  # message follows (membership, blocks, clean language) still applies.
+  def forward_to(conversation, by:)
+    copy = conversation.messages.build(sender: by, body: body, scripture_ref: scripture_ref, forwarded: true)
+    copy.images.attach(images.blobs) if has_images?
+    copy.voice_note.attach(voice_note.blob) if has_voice_note?
+    copy.documents.attach(documents.blobs) if has_documents?
+    copy.save
+    copy
   end
 
   scope :visible, -> { where(deleted_at: nil) }
