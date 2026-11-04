@@ -44,7 +44,7 @@
         <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-accent-2)]">
           <%= item.bot_info.emoji %> <%= item.topic_label || item.bot %> · <%= item.source_name %> · <%= time_ago_in_words(item.created_at) %> ago<%= " · HIDDEN" if item.hidden? %>
         </p>
-        <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= link_to item.title, item.url, target: "_blank", rel: "noopener noreferrer" %></p>
+        <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= link_to https_href(item.url), target: "_blank", rel: "noopener noreferrer" do %><%= item.title %><% end %></p>
         <% if item.summary.present? %><p class="fc-cms-text"><%= item.summary %></p><% end %>
       </div>
       <div class="fc-cms-actions">

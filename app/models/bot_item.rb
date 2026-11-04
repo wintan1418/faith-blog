@@ -11,6 +11,12 @@ class BotItem < ApplicationRecord
 
   validates :title, :url, :url_digest, :published_at, presence: true
   validates :url_digest, uniqueness: true
+  validates :url, format: { with: %r{\Ahttps://[^\s]+\z}i }
+
+  # The link to the original, only ever an https:// address.
+  def safe_url
+    url if url.to_s.match?(%r{\Ahttps://[^\s]+\z}i)
+  end
 
   scope :newest, -> { order(published_at: :desc, id: :desc) }
 
