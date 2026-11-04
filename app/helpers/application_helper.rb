@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  # An outside link to use as an href: only https:// addresses, otherwise none.
+  def https_href(url)
+    url.to_s if url.to_s.match?(%r{\Ahttps://[^\s]+\z}i)
+  end
+
   # Where people reach us about privacy, accounts and safety (privacy policy, terms).
   def support_email
     ENV.fetch("SUPPORT_EMAIL", "support@brethreign.com")

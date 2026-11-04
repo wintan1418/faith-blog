@@ -7,7 +7,7 @@ class BotSource < ApplicationRecord
   has_many :bot_items, dependent: :destroy
 
   validates :name, :url, presence: true
-  validates :url, uniqueness: true, format: { with: %r{\Ahttps://}i, message: "must start with https://" }
+  validates :url, uniqueness: true, format: { with: %r{\Ahttps://[^\s]+\z}i, message: "must be an https:// link" }
   validates :bot, inclusion: { in: ->(_) { Bots::Catalog.keys } }
   validates :format, inclusion: { in: FORMATS }
 
