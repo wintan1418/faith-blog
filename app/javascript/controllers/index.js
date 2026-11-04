@@ -78,6 +78,10 @@ application.register("message-edit", MessageEditController)
 
 import MessageMenuController from "./message_menu_controller"
 application.register("message-menu", MessageMenuController)
+import MessageShareController from "./message_share_controller"
+application.register("message-share", MessageShareController)
+import ForwardPickerController from "./forward_picker_controller"
+application.register("forward-picker", ForwardPickerController)
 
 import ProfileHeroController from "./profile_hero_controller"
 application.register("profile-hero", ProfileHeroController)

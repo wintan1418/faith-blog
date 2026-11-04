@@ -3,7 +3,7 @@
 class MessagesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_conversation
-  before_action :set_message,    only: [ :update, :destroy ]
+  before_action :set_message,    only: [ :update, :destroy, :pick_forward, :forward ]
   before_action :authorize_own!, only: [ :update, :destroy ]
 
   def create
@@ -67,7 +67,40 @@ class MessagesController < ApplicationController
     end
   end
 
+  # Choose which chats to forward a message to.
+  def pick_forward
+    return redirect_to(conversation_path(@conversation), alert: "This message can't be forwarded.") unless @message.forwardable?
+
+    @targets = forward_targets.to_a
+  end
+
+  def forward
+    return redirect_to(conversation_path(@conversation), alert: "This message can't be forwarded.") unless @message.forwardable?
+
+    ids = Array(params[:conversation_ids]).map(&:to_i).uniq.first(Message::FORWARD_LIMIT)
+    sent = forward_targets.where(id: ids).map { |target| @message.forward_to(target, by: current_user) }
+    delivered = sent.select(&:persisted?)
+
+    if delivered.size == 1
+      redirect_to conversation_path(delivered.first.conversation), notice: "Forwarded."
+    elsif delivered.any?
+      redirect_to conversation_path(@conversation), notice: "Forwarded to #{delivered.size} chats."
+    else
+      reason = sent.flat_map { |m| m.errors.full_messages }.first || "Choose a chat to forward to."
+      redirect_to forward_conversation_message_path(@conversation, @message), alert: reason
+    end
+  end
+
   private
+
+  # The member's own active chats, newest first.
+  def forward_targets
+    archived = ConversationParticipant.where(user: current_user).where.not(archived_at: nil).select(:conversation_id)
+    current_user.conversations
+                .where.not(id: archived)
+                .preload(conversation_participants: { user: { profile: { avatar_attachment: :blob } } })
+                .recent.limit(40)
+  end
 
   def set_conversation
     @conversation = current_user.conversations.find(params[:conversation_id])
@@ -84,6 +117,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:body, :voice_note, :scripture_ref, :reply_to_id, images: [])
+    params.require(:message).permit(:body, :voice_note, :scripture_ref, :reply_to_id, images: [], documents: [])
   end
 end

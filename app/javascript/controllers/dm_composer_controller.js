@@ -6,7 +6,7 @@ import { Controller } from "@hotwired/stimulus"
 //      to the form via a DataTransfer-backed FileList so submitting the
 //      form ships it like any other file upload.
 export default class extends Controller {
-  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput", "nudge", "nudgeText", "nudgeSuggestion", "recordingBar", "recordingTime", "voiceAudio", "replyBar", "replyName", "replySnippet", "replyField"]
+  static targets = ["previews", "imageInput", "recordBtn", "sendBtn", "voicePreview", "voiceLength", "voiceField", "bodyInput", "scriptureField", "scripturePreview", "scriptureLabel", "versePanel", "verseInput", "nudge", "nudgeText", "nudgeSuggestion", "recordingBar", "recordingTime", "voiceAudio", "replyBar", "replyName", "replySnippet", "replyField", "documentInput", "documentPreviews"]
   static values  = { gentlenessUrl: String }
 
   connect() {
@@ -87,9 +87,10 @@ export default class extends Controller {
     if (!this.hasRecordBtnTarget || !this.hasSendBtnTarget) return
     const hasText  = this.hasBodyInputTarget && this.bodyInputTarget.value.trim().length > 0
     const hasFiles = this.hasImageInputTarget && this.imageInputTarget.files && this.imageInputTarget.files.length > 0
+    const hasDocs  = this.hasDocumentInputTarget && this.documentInputTarget.files && this.documentInputTarget.files.length > 0
     const hasVoice = this.hasVoicePreviewTarget && !this.voicePreviewTarget.classList.contains("hidden")
     const hasVerse = this.hasScriptureFieldTarget && this.scriptureFieldTarget.value.trim().length > 0
-    const showSend = hasText || hasFiles || hasVoice || hasVerse
+    const showSend = hasText || hasFiles || hasDocs || hasVoice || hasVerse
 
     this.recordBtnTarget.classList.toggle("hidden", showSend)
     this.sendBtnTarget.classList.toggle("hidden", !showSend)
@@ -269,6 +270,39 @@ export default class extends Controller {
       .map(f => `<div class="dm-preview"><img src="${URL.createObjectURL(f)}" alt=""></div>`)
       .join("")
     this.syncTrailingAction()
+  }
+
+  // ---- Documents ----------------------------------------------------------
+
+  // Name and size of each chosen file; too many or too big is said up front.
+  previewDocuments() {
+    if (!this.hasDocumentPreviewsTarget || !this.hasDocumentInputTarget) return
+    const files = Array.from(this.documentInputTarget.files || [])
+    const box = this.documentPreviewsTarget
+    box.replaceChildren()
+    box.classList.toggle("hidden", files.length === 0)
+
+    const tooBig = files.filter(f => f.size > 10 * 1024 * 1024)
+    if (files.length > 3 || tooBig.length) {
+      const warn = Object.assign(document.createElement("p"), { className: "msg-doc-warning" })
+      warn.textContent = files.length > 3 ? "Up to 3 documents at a time." : `${tooBig[0].name} is over 10 MB.`
+      box.append(warn)
+    }
+    files.slice(0, 3).forEach(file => {
+      const chip = Object.assign(document.createElement("div"), { className: "msg-doc-chip" })
+      const name = Object.assign(document.createElement("span"), { className: "msg-doc-chip-name", textContent: `📄 ${file.name}` })
+      const size = Object.assign(document.createElement("span"), { className: "msg-doc-chip-size", textContent: this.humanSize(file.size) })
+      chip.append(name, size)
+      box.append(chip)
+    })
+    const clear = Object.assign(document.createElement("button"), { type: "button", className: "msg-doc-clear", textContent: "Remove" })
+    clear.addEventListener("click", () => { this.documentInputTarget.value = ""; this.previewDocuments() })
+    if (files.length) box.append(clear)
+    this.syncTrailingAction()
+  }
+
+  humanSize(bytes) {
+    return bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`
   }
 
   // ---- Voice notes --------------------------------------------------------

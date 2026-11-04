@@ -47,6 +47,10 @@
         <% elsif removed %>
           <p class="msg-deleted msg-removed">🛡 This message was removed for breaking our community guidelines.</p>
         <% else %>
+          <% if message.forwarded? %>
+            <p class="msg-forwarded"><%= render_icon("forward", classes: "h-3.5 w-3.5") %> Forwarded</p>
+          <% end %>
+
           <% if (quoted = message.reply_to) %>
             <%# The message this replies to. Tapping it jumps to the original. %>
             <a href="#<%= dom_id(quoted) %>" class="msg-quote" data-turbo="false"
@@ -71,6 +75,28 @@
               </div>
               <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
                       title="Message options" aria-label="Message options">&#8943;</button>
+            </div>
+          <% end %>
+
+          <% if message.has_documents? %>
+            <%# Opens or downloads the file (in the apps, the phone's browser handles it). %>
+            <div class="msg-media-row">
+            <div class="msg-docs">
+              <% message.documents.each do |doc| %>
+                <%= link_to rails_blob_path(doc, disposition: "attachment"), class: "msg-doc", rel: "noopener",
+                      data: { turbo: false }, title: "Open #{doc.filename}" do %>
+                  <span class="msg-doc-icon" aria-hidden="true"><%= document_icon(doc) %></span>
+                  <span class="msg-doc-text">
+                    <span class="msg-doc-name"><%= doc.filename %></span>
+                    <span class="msg-doc-meta"><%= document_meta(doc) %></span>
+                  </span>
+                  <span class="msg-doc-get" aria-hidden="true"><%= render_icon("download", classes: "h-4 w-4") %></span>
+                <% end %>
+              <% end %>
+            </div>
+            <%# Tapping the file opens it, so it gets the options button too. %>
+            <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
+                    title="Message options" aria-label="Message options">&#8943;</button>
             </div>
           <% end %>
 
@@ -117,6 +143,22 @@
                     data-reply-snippet="<%= message.quote_snippet %>">
               <%= render_icon("reply", classes: "h-4 w-4") %>
             </button>
+            <%= link_to forward_conversation_message_path(message.conversation_id, message), class: "msg-action",
+                  title: "Forward", aria: { label: "Forward to another chat" }, data: { turbo_frame: "_top" } do %>
+              <%= render_icon("forward", classes: "h-4 w-4") %>
+            <% end %>
+            <% share_images = message.has_images? ? message.images.map { |img| photo_src(img, width: 1080) } : [] %>
+            <% share_docs = message.has_documents? ? message.documents.map { |d| { url: rails_blob_path(d, disposition: "attachment"), name: d.filename.to_s, type: d.content_type } } : [] %>
+            <% if message.body.present? || message.has_scripture? || share_images.any? || share_docs.any? %>
+              <button type="button" class="msg-action" title="Share" aria-label="Share outside Brethreign"
+                      data-controller="message-share"
+                      data-message-share-text-value="<%= [ message.body.presence, (message.scripture_ref if message.has_scripture?) ].compact.join("\n") %>"
+                      data-message-share-images-value="<%= share_images.to_json %>"
+                      data-message-share-files-value="<%= share_docs.to_json %>"
+                      data-action="click->message-share#share">
+                <%= render_icon("share", classes: "h-4 w-4") %>
+              </button>
+            <% end %>
             <% if mine %>
               <button type="button" class="msg-action" data-action="click->message-edit#start"
                       data-message-edit-message-id-param="<%= message.id %>" title="Edit" aria-label="Edit">
