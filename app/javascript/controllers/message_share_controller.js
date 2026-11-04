@@ -20,6 +20,12 @@ export default class extends Controller {
         if (await this.shareFiles([ new File([ blob ], "photo.jpg", { type: blob.type || "image/jpeg" }) ], text)) return
       }
 
+      // Android app 1.0.8+: the app downloads the document and shares the file.
+      if (this.filesValue.length && native?.shareFile) {
+        const f = this.filesValue[0]
+        return native.shareFile(new URL(f.url, location.origin).href, f.name, f.type, text)
+      }
+
       if (this.filesValue.length && navigator.canShare) {
         const files = await Promise.all(this.filesValue.map(async f => new File([ await this.download(f.url) ], f.name, { type: f.type })))
         if (await this.shareFiles(files, text)) return
@@ -29,7 +35,8 @@ export default class extends Controller {
       console.warn("[message-share] file share failed", error)
     }
 
-    const words = text || this.filesValue.map(f => new URL(f.url, location.origin).href).join("\n")
+    // No way to send the file itself here (older app): send its name and link.
+    const words = text || this.filesValue.map(f => `📄 ${f.name}\n${new URL(f.url, location.origin).href}`).join("\n\n")
     if (!words) return this.toast("This message can't be shared outside Brethreign.")
     if (native?.share) return native.share(words, "From Brethreign")
     if (navigator.share) {
