@@ -23,11 +23,11 @@
                  data-chess-puzzle-already-value="<%= @already_solved_today %>">
           <div class="fc-chess-head">
             <div>
-              <p class="fc-quiz-kicker">Daily puzzle · <%= @puzzle[:side_to_move].titleize %> to move</p>
-              <h2 class="fc-chess-rating">Rating <%= @puzzle[:rating] %></h2>
-              <p class="fc-chess-themes"><%= @puzzle[:themes].first(4).map(&:titleize).join(" · ") %></p>
+              <p class="fc-quiz-kicker" data-chess-puzzle-target="kicker">Daily puzzle · <%= @puzzle[:side_to_move].titleize %> to move</p>
+              <h2 class="fc-chess-rating" data-chess-puzzle-target="rating">Rating <%= @puzzle[:rating] %></h2>
+              <p class="fc-chess-themes" data-chess-puzzle-target="themes"><%= @puzzle[:themes].first(4).map(&:titleize).join(" · ") %></p>
             </div>
-            <div class="fc-chess-score-tier">
+            <div class="fc-chess-score-tier" data-chess-puzzle-target="tier">
               <% tier = case @puzzle[:rating] when 0..1499 then 1 when 1500..1999 then 2 when 2000..2499 then 3 else 5 end %>
               <span class="fc-chess-score-num">+<%= tier %></span>
               <span class="fc-chess-score-label">points<br>if solved</span>
