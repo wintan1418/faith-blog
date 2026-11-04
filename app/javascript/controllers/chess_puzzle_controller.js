@@ -8,7 +8,7 @@ import { loadChess } from "../lazy_libs"
 const GLYPH = { p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚" }
 
 export default class extends Controller {
-  static targets = ["board", "status", "feedback", "progress", "hintBtn", "resetBtn"]
+  static targets = ["board", "status", "feedback", "progress", "hintBtn", "resetBtn", "kicker", "rating", "themes", "tier"]
   static values  = {
     fen:         String,
     solution:    Array,
@@ -42,6 +42,10 @@ export default class extends Controller {
     this.solution = this.puzzle.solution
     if (this.solution.length === 0) throw new Error("missing puzzle solution")
 
+    // Each start is a new run: a "Show solution" animation or an opponent
+    // reply still pending from the previous run must not touch this board
+    // (it used to finish the new puzzle by itself and lock the pieces).
+    this.run = (this.run || 0) + 1
     this.game = new this.Chess(this.puzzle.fen)
     this.idx = 0                                // index into the solution list
     this.selected = null
@@ -88,19 +92,34 @@ export default class extends Controller {
       }
       this.practice = true
       this.start()
-      this.flash("hint", `Practice puzzle · rating ${data.puzzle.rating} — no points, pure sharpening.`)
+      this.showPracticeHeader(data.puzzle)
     } catch (err) {
       this.flash("bad", "Couldn't fetch a practice puzzle — try again in a moment.")
     }
   }
 
+  // The heading described the daily puzzle; say what this one is, and whose move.
+  showPracticeHeader(puzzle) {
+    const side = this.colorName(this.solverColor)
+    if (this.hasKickerTarget) this.kickerTarget.textContent = `Practice puzzle · ${side} to move`
+    if (this.hasRatingTarget) this.ratingTarget.textContent = `Rating ${puzzle.rating}`
+    if (this.hasThemesTarget) {
+      this.themesTarget.textContent = (puzzle.themes || []).slice(0, 4)
+        .map(t => t.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, c => c.toUpperCase())).join(" · ")
+    }
+    if (this.hasTierTarget) this.tierTarget.style.display = "none" // practice has no points
+    this.flash("hint", `${side} to move — practice puzzle, no points.`)
+  }
+
   // ─── Reveal: watch the solution play out (no points) ─────────
   async revealSolution() {
     if (this.complete) return
+    const run = this.run
     this.revealed = true
     this.clearSelection()
     this.setStatus("Watch the line…")
     while (this.idx < this.solution.length) {
+      if (run !== this.run) return // Restart or New puzzle pressed meanwhile
       const m = this.parseUci(this.solution[this.idx])
       try { this.game.move({ from: m.from, to: m.to, promotion: m.promotion || "q" }) }
       catch { break }
@@ -110,6 +129,7 @@ export default class extends Controller {
       this.updateProgress()
       await new Promise(r => setTimeout(r, 650))
     }
+    if (run !== this.run) return
     this.complete = true
     this.flash("hint", "That was the line. Try a practice puzzle next — you'll spot the next one yourself.")
   }
@@ -191,6 +211,10 @@ export default class extends Controller {
     if (piece && piece.color === this.solverColor) {
       this.select(square)
       this.renderBoard()
+    } else if (piece) {
+      // Tapping the other side used to do nothing, so the board looked frozen.
+      const side = this.colorName(this.solverColor)
+      this.flash("hint", `It's ${side} to move — tap a ${side.toLowerCase()} piece.`)
     }
   }
 
@@ -226,7 +250,8 @@ export default class extends Controller {
     }
 
     this.flash("good", "Correct — keep going.")
-    setTimeout(() => this.autoOpponentMove(), 450)
+    const run = this.run
+    setTimeout(() => { if (run === this.run) this.autoOpponentMove() }, 450)
   }
 
   autoOpponentMove() {
