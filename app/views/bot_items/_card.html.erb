@@ -12,7 +12,7 @@
     </div>
   </header>
 
-  <%= link_to item.url, class: "fc-bot-link", target: "_blank", rel: "noopener noreferrer nofollow" do %>
+  <%= link_to item.safe_url, class: "fc-bot-link", target: "_blank", rel: "noopener noreferrer nofollow" do %>
     <% if item.image_url.present? %>
       <img class="fc-bot-image<%= ' is-logo' if item.bot == 'jobs' %>" src="<%= item.image_url %>" alt=""
            loading="lazy" referrerpolicy="no-referrer">
@@ -31,7 +31,7 @@
     <%= render "bot_items/reactions", item: item, my_reaction: my_reaction %>
     <button type="button" class="fc-breath-action"
             data-action="click->composer-modal#openWith"
-            data-composer-modal-prefill-param="<%= "#{item.title}\n#{item.url}\n\n" %>"
+            data-composer-modal-prefill-param="<%= "#{item.title}\n#{item.safe_url}\n\n" %>"
             title="Start a breath about this">
       <%= render_icon("message_circle", classes: "h-5 w-5") %>
       <span>Discuss</span>
