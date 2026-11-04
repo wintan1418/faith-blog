@@ -375,6 +375,9 @@
         <%= link_to "Following", feed_following_path,
               class: "fc-tab #{current_page?(feed_following_path) ? 'is-active' : ''}",
               data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
+        <%= link_to "Updates", feed_updates_path,
+              class: "fc-tab #{@updates_tab ? 'is-active' : ''}",
+              data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
         <button type="button" class="fc-discover-trigger" data-action="click->discover#open" aria-label="Open discover panel">
           <%= render_icon("sparkles", classes: "h-4 w-4") %>
           <span>Discover</span>
@@ -396,6 +399,9 @@
         </button>
 
         <div class="mt-4 space-y-3">
+          <% if @updates_tab %>
+            <%= render "bot_items/stream" %>
+          <% else %>
           <% if @pinned_posts.present? %>
             <div class="fc-pinned-strip">
               <p class="fc-pinned-label">📌 Pinned for the community</p>
@@ -459,6 +465,7 @@
                 </button>
               </div>
             </div>
+          <% end %>
           <% end %>
         </div>
       </div>

@@ -1,0 +1,117 @@
+/* Updates tab: the bots' news, sport, jobs and free courses. */
+
+.fc-bot-filters {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.15rem 0 0.35rem;
+  scrollbar-width: none;
+}
+.fc-bot-filters::-webkit-scrollbar { display: none; }
+.fc-bot-filters.is-topics { margin-top: -0.1rem; }
+
+.fc-bot-chip {
+  flex: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  background: var(--fc-surface);
+  color: var(--fc-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.fc-bot-chip.is-small { padding: 0.28rem 0.7rem; font-size: 0.78rem; }
+.fc-bot-chip:hover { color: var(--fc-ink); }
+.fc-bot-chip.is-active {
+  border-color: var(--fc-accent);
+  background: color-mix(in srgb, var(--fc-accent) 14%, var(--fc-surface));
+  color: var(--fc-ink);
+}
+
+.fc-bot-choose {
+  border: 1px solid var(--fc-line);
+  border-radius: 12px;
+  background: var(--fc-surface);
+  padding: 0.55rem 0.85rem;
+  font-size: 0.85rem;
+}
+.fc-bot-choose summary { cursor: pointer; color: var(--fc-muted); font-weight: 700; }
+.fc-bot-choose form { display: grid; gap: 0.55rem; margin-top: 0.7rem; justify-items: start; }
+.fc-bot-choice { display: flex; gap: 0.55rem; align-items: flex-start; color: var(--fc-ink); line-height: 1.35; }
+.fc-bot-choice input { margin-top: 0.2rem; accent-color: var(--fc-accent); }
+
+.fc-bot-card { display: block; }
+.fc-bot-head { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.7rem; }
+.fc-bot-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  font-size: 1.3rem;
+  background: color-mix(in srgb, var(--fc-accent) 16%, var(--fc-surface-2, var(--fc-surface)));
+}
+.fc-bot-avatar.is-sports  { background: color-mix(in srgb, #f59e0b 20%, var(--fc-surface)); }
+.fc-bot-avatar.is-jobs    { background: color-mix(in srgb, #3b82f6 18%, var(--fc-surface)); }
+.fc-bot-avatar.is-courses { background: color-mix(in srgb, #a855f7 18%, var(--fc-surface)); }
+.fc-bot-who { min-width: 0; }
+.fc-bot-name { font-weight: 800; color: var(--fc-ink); font-size: 0.95rem; }
+.fc-bot-badge {
+  margin-left: 0.25rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 6px;
+  background: var(--fc-line);
+  color: var(--fc-muted);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 0.12em;
+}
+.fc-bot-meta { color: var(--fc-muted); font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-bot-topic { color: var(--fc-accent-2, var(--fc-accent)); font-weight: 700; }
+
+.fc-bot-link { display: block; color: inherit; text-decoration: none; }
+.fc-bot-image {
+  display: block;
+  width: 100%;
+  max-height: 300px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--fc-line);
+  background: var(--fc-line);
+  margin-bottom: 0.75rem;
+}
+/* Company logos are small squares: show them as a badge, not a banner. */
+.fc-bot-image.is-logo {
+  width: 3.25rem;
+  height: 3.25rem;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: #fff;
+  padding: 0.2rem;
+}
+.fc-bot-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.18rem;
+  line-height: 1.3;
+  font-weight: 650;
+  color: var(--fc-ink);
+}
+.fc-bot-link:hover .fc-bot-title { color: var(--fc-accent); }
+.fc-bot-details { margin-top: 0.25rem; color: var(--fc-muted); font-size: 0.85rem; font-weight: 650; }
+.fc-bot-summary { margin-top: 0.4rem; color: var(--fc-ink); opacity: 0.86; font-size: 0.93rem; line-height: 1.5; }
+.fc-bot-read { display: inline-block; margin-top: 0.55rem; color: var(--fc-accent); font-size: 0.85rem; font-weight: 750; }
+.fc-bot-safety { margin-top: 0.6rem; color: var(--fc-muted); font-size: 0.78rem; }
+
+/* Five feed tabs on a phone: tighter spacing so Updates isn't off the edge. */
+@media (max-width: 480px) {
+  .fc-tabs { gap: 0; }
+  .fc-tabs .fc-tab { padding-left: 0.45rem; padding-right: 0.45rem; font-size: 0.82rem; }
+  /* Discover keeps its button, as an icon. */
+  .fc-tabs .fc-discover-trigger { padding: 6px 8px; margin-left: 0.15rem; }
+  .fc-tabs .fc-discover-trigger span { display: none; }
+}

@@ -1,0 +1,55 @@
+<% content_for(:page_title) { "Updates bots" } %>
+
+<div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+  <p class="text-sm text-[var(--fc-muted)]">
+    The bots read these feeds every 3 hours and post to the Updates tab.
+    Today: <% Bots::Catalog::ALL.each do |b| %><%= b.emoji %> <%= @today[b.key].to_i %>/<%= b.daily_cap %> <% end %>
+  </p>
+  <%= button_to "Fetch now", admin_refresh_bots_path(bot: @bot_filter), class: "fc-btn fc-btn-primary" %>
+</div>
+
+<h2 class="mb-2 text-base font-extrabold text-[var(--fc-ink)]">Sources</h2>
+<ul class="fc-cms-list mb-8">
+  <% @sources.each do |s| %>
+    <li class="fc-cms-row">
+      <div class="fc-cms-body">
+        <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-accent-2)]">
+          <%= s.bot_info.emoji %> <%= s.bot %><%= " · #{s.topic}" if s.topic %>
+        </p>
+        <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= s.name %><%= " (off)" unless s.active %></p>
+        <p class="fc-cms-meta">
+          <%= @live_counts[s.id].to_i %> live ·
+          <%= s.last_fetched_at ? "read #{time_ago_in_words(s.last_fetched_at)} ago" : "not read yet" %>
+          <% if s.last_error.present? %> · <span class="text-red-500">⚠ <%= s.last_error %></span><% end %>
+        </p>
+      </div>
+      <div class="fc-cms-actions">
+        <%= button_to (s.active ? "Switch off" : "Switch on"), admin_toggle_bot_source_path(s), method: :patch, class: "fc-btn" %>
+      </div>
+    </li>
+  <% end %>
+</ul>
+
+<div class="mb-2 flex flex-wrap items-center gap-2">
+  <h2 class="text-base font-extrabold text-[var(--fc-ink)]">Posted</h2>
+  <%= link_to "All", admin_bots_path, class: "fc-btn#{' fc-btn-primary' unless @bot_filter}" %>
+  <% Bots::Catalog::ALL.each do |b| %>
+    <%= link_to "#{b.emoji} #{b.key}", admin_bots_path(bot: b.key), class: "fc-btn#{' fc-btn-primary' if @bot_filter == b.key}" %>
+  <% end %>
+</div>
+<ul class="fc-cms-list">
+  <% @items.each do |item| %>
+    <li class="fc-cms-row">
+      <div class="fc-cms-body">
+        <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-accent-2)]">
+          <%= item.bot_info.emoji %> <%= item.topic_label || item.bot %> · <%= item.source_name %> · <%= time_ago_in_words(item.created_at) %> ago<%= " · HIDDEN" if item.hidden? %>
+        </p>
+        <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= link_to item.title, item.url, target: "_blank", rel: "noopener noreferrer" %></p>
+        <% if item.summary.present? %><p class="fc-cms-text"><%= item.summary %></p><% end %>
+      </div>
+      <div class="fc-cms-actions">
+        <%= button_to (item.live? ? "Hide" : "Show"), admin_toggle_bot_item_path(item), method: :patch, class: "fc-btn" %>
+      </div>
+    </li>
+  <% end %>
+</ul>

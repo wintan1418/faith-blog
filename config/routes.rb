@@ -27,6 +27,7 @@ Rails.application.routes.draw do
   get "feed/trending", to: "feed#trending"
   get "feed/following", to: "feed#following"
   get "feed/threads",   to: "feed#threads"
+  get "feed/updates",   to: "feed#updates"
 
   # Wall of Answered Prayers — public celebration of every answered chain.
   get "answered", to: "answered_prayers#index", as: :answered_prayers
@@ -194,6 +195,7 @@ Rails.application.routes.draw do
     end
     resource :notifications, only: [ :edit, :update ]
     resource :privacy, only: [ :edit, :update ]
+    resource :updates, only: [ :update ] # which Updates bots a member sees
     resource :brethren_card, only: [ :edit, :update ]
     resource :professional, only: [ :edit, :update ]
     resources :experiences, only: [ :new, :create, :edit, :update, :destroy ]
@@ -228,6 +230,10 @@ Rails.application.routes.draw do
   # Admin namespace
   namespace :admin do
     root to: "dashboard#index"
+    get "bots", to: "bots#index", as: :bots
+    post "bots/refresh", to: "bots#refresh", as: :refresh_bots
+    patch "bots/sources/:id/toggle", to: "bots#toggle_source", as: :toggle_bot_source
+    patch "bots/items/:id/toggle", to: "bots#toggle_item", as: :toggle_bot_item
     resources :users do
       member do
         post :suspend

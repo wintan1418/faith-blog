@@ -17,7 +17,14 @@ export default class extends Controller {
     window.addEventListener("resize", this.onResize)
 
     // Fonts shifting widths after first paint would leave the thumb misplaced.
-    requestAnimationFrame(() => this.place(this.activeTab(), false))
+    requestAnimationFrame(() => {
+      this.place(this.activeTab(), false)
+      // On a narrow screen the row scrolls: keep the open tab in view.
+      const tab = this.activeTab()
+      if (tab && this.element.scrollWidth > this.element.clientWidth) {
+        this.element.scrollLeft = Math.max(0, tab.offsetLeft - (this.element.clientWidth - tab.offsetWidth) / 2)
+      }
+    })
   }
 
   disconnect() {

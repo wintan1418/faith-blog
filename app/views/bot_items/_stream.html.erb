@@ -1,0 +1,62 @@
+<%# The Updates tab body: bot filters, then the bots' cards. %>
+<% bots = Bots::Catalog::ALL %>
+<div class="fc-bot-filters" role="navigation" aria-label="Filter updates">
+  <%= link_to "All", feed_updates_path, class: "fc-bot-chip#{' is-active' unless @bot_filter}",
+        data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+  <% bots.each do |b| %>
+    <%= link_to "#{b.emoji} #{b.name.delete_prefix('Brethreign ')}", feed_updates_path(bot: b.key),
+          class: "fc-bot-chip#{' is-active' if @bot_filter == b.key}",
+          data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+  <% end %>
+</div>
+
+<% if @bot_filter == "news" %>
+  <div class="fc-bot-filters is-topics" role="navigation" aria-label="News topics">
+    <%= link_to "All topics", feed_updates_path(bot: "news"), class: "fc-bot-chip is-small#{' is-active' unless @topic_filter}",
+          data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+    <% Bots::Catalog::NEWS_TOPICS.each do |key, label| %>
+      <%= link_to label, feed_updates_path(bot: "news", topic: key), class: "fc-bot-chip is-small#{' is-active' if @topic_filter == key}",
+            data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+    <% end %>
+  </div>
+<% end %>
+
+<details class="fc-bot-choose">
+  <summary>Choose which bots you see</summary>
+  <%= form_with url: settings_updates_path, method: :patch, data: { turbo_frame: "_top" } do %>
+    <% bots.each do |b| %>
+      <label class="fc-bot-choice">
+        <input type="checkbox" name="bots[]" value="<%= b.key %>" <%= "checked" unless current_user.hidden_bots.include?(b.key) %>>
+        <span><%= b.emoji %> <strong><%= b.name %></strong> · <%= b.tagline %></span>
+      </label>
+    <% end %>
+    <button type="submit" class="fc-btn fc-btn-primary">Save</button>
+  <% end %>
+</details>
+
+<% if @bot_items.any? %>
+  <div id="bot_list" class="space-y-3">
+    <% @bot_items.each do |item| %>
+      <%= render "bot_items/card", item: item, my_reaction: @my_bot_reactions[item.id] %>
+    <% end %>
+  </div>
+  <% if @pagy.next %>
+    <div id="feed_more" data-controller="infinite-scroll"
+         data-infinite-scroll-url-value="<%= url_for(bot: @bot_filter, topic: @topic_filter, page: @pagy.next) %>">
+      <div class="fc-skel-card"><div class="fc-skel fc-skel-avatar"></div>
+        <div><div class="fc-skel fc-skel-line is-short"></div><div class="fc-skel fc-skel-line is-long"></div></div></div>
+    </div>
+  <% else %>
+    <div class="fc-caught-up" role="status">
+      <span class="fc-caught-up-line" aria-hidden="true"></span>
+      <span class="fc-caught-up-text">✦ You're all caught up</span>
+      <span class="fc-caught-up-line" aria-hidden="true"></span>
+    </div>
+  <% end %>
+<% else %>
+  <div class="fc-empty">
+    <div class="fc-empty-mark" aria-hidden="true">📰</div>
+    <h2 class="fc-empty-title">Updates are on their way.</h2>
+    <p class="fc-empty-text">The bots bring in news, sport, jobs and free courses every few hours. Check back soon.</p>
+  </div>
+<% end %>

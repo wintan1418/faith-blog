@@ -45,6 +45,29 @@ class FeedController < ApplicationController
     respond_to_feed
   end
 
+  # The Updates tab: news, sports, jobs and free courses the bots brought in.
+  # Kept apart from members' breaths; members choose which bots they see.
+  def updates
+    @updates_tab = true
+    @pinned_posts = []
+    @bot_filter = Bots::Catalog.find(params[:bot])&.key
+    @topic_filter = params[:topic] if @bot_filter == "news" && Bots::Catalog::NEWS_TOPICS.key?(params[:topic])
+
+    scope = BotItem.live.includes(:bot_source).newest
+    scope = @bot_filter ? scope.where(bot: @bot_filter) : scope.where.not(bot: current_user.hidden_bots)
+    scope = scope.where(topic: @topic_filter) if @topic_filter
+    @pagy, @bot_items = pagy(scope, items: PER_PAGE)
+    @my_bot_reactions = current_user.likes.where(likeable_type: "BotItem", likeable_id: @bot_items.map(&:id))
+                                    .index_by(&:likeable_id)
+
+    respond_to do |format|
+      format.html { render :index }
+      format.turbo_stream do
+        params[:page].present? ? render("bot_items/paginate") : render(:index, formats: [ :html ], content_type: "text/html")
+      end
+    end
+  end
+
   private
 
   # The three activation steps behind the progress ring. Cheap EXISTS
