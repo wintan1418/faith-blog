@@ -6,6 +6,9 @@ module Bots
   class Refresh
     RUNS_PER_DAY = 8            # BotsRefreshJob runs every 3 hours
     PER_SOURCE = 6              # freshest unseen entries per source per run
+    # A bot with little to show (a new tab, or after a quiet spell) catches up
+    # faster than its usual share of the day.
+    CATCH_UP = { "news" => 16, "sports" => 6, "jobs" => 6, "courses" => 6 }.freeze
     KEEP_SKIPPED_FOR = 7.days   # long enough that old links aren't reconsidered
     KEEP_LIVE_FOR = 45.days
 
@@ -21,15 +24,25 @@ module Bots
     def call
       errors = []
       candidates = gather(errors)
-      editor = Editor.new(bot: @bot.key, candidates: candidates, pick: allowance)
-      picks = editor.call
       by_url = candidates.to_h { |c, source| [ c.url, source ] }
+      posted = []
+      modes = []
 
-      posted = picks.filter_map { |pick| post(pick, by_url.fetch(pick.candidate.url)) }
-      # Only an AI pass has judged the rest; offline picks leave them for later.
-      skip(editor.considered - picks.map(&:candidate), by_url) if editor.mode == :ai
+      # News is chosen topic by topic (world, tech, food…), so every topic gets
+      # its share and each AI answer stays short.
+      groups = candidates.group_by { |_, source| source.topic }.values
+      shares(allowance, groups.size).zip(groups).each do |pick, group|
+        next if pick.zero?
 
-      Result.new(bot: @bot.key, posted: posted.size, mode: editor.mode, errors: errors)
+        editor = Editor.new(bot: @bot.key, candidates: group, pick: pick)
+        picks = editor.call
+        modes << editor.mode
+        posted += picks.filter_map { |p| post(p, by_url.fetch(p.candidate.url)) }
+        # Only an AI pass has judged the rest; offline picks leave them for later.
+        skip(editor.considered - picks.map(&:candidate), by_url) if editor.mode == :ai
+      end
+
+      Result.new(bot: @bot.key, posted: posted.size, mode: modes.uniq.join("+").presence&.to_sym, errors: errors)
     end
 
     # Old items go so the tables stay small.
@@ -47,7 +60,21 @@ module Bots
       posted_today = BotItem.where(bot: @bot.key, status: [ :live, :hidden ])
                             .where(created_at: Time.current.beginning_of_day..).count
       remaining = [ @bot.daily_cap - posted_today, 0 ].max
-      @force ? remaining : [ remaining, (@bot.daily_cap / RUNS_PER_DAY.to_f).ceil ].min
+      return remaining if @force
+
+      usual = (@bot.daily_cap / RUNS_PER_DAY.to_f).ceil
+      [ remaining, catching_up? ? [ usual, CATCH_UP.fetch(@bot.key, usual) ].max : usual ].min
+    end
+
+    def catching_up?
+      BotItem.live.where(bot: @bot.key, created_at: 1.day.ago..).count < @bot.daily_cap / 2
+    end
+
+    # Split a run's allowance across topic groups, at most Editor::MAX_PICKS each.
+    def shares(total, groups)
+      return [] if groups.zero?
+      base, extra = total.divmod(groups)
+      Array.new(groups) { |i| [ base + (i < extra ? 1 : 0), Editor::MAX_PICKS ].min }
     end
 
     def gather(errors)

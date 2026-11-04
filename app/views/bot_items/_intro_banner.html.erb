@@ -1,0 +1,18 @@
+<%# Animated "New: Updates" banner on the feed. Closing it, or opening the
+    Updates tab, hides it for good (on every device). %>
+<section class="fc-updates-intro" data-controller="onboarding" data-onboarding-key-value="fc:updates-intro"
+         aria-label="New: the Updates tab">
+  <div class="fc-updates-intro-icons" aria-hidden="true">
+    <span>📰</span><span>🏆</span><span>💼</span><span>🎓</span>
+  </div>
+  <div class="fc-updates-intro-copy">
+    <p class="fc-updates-intro-kicker">✦ New on Brethreign</p>
+    <h2 class="fc-updates-intro-title">Meet the Updates bots</h2>
+    <p class="fc-updates-intro-text">
+      World news, sport, remote jobs and free courses, picked for you every few hours.
+    </p>
+  </div>
+  <%= link_to "Open Updates", feed_updates_path, class: "fc-updates-intro-btn",
+        data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->onboarding#dismiss" } %>
+  <button type="button" class="fc-updates-intro-close" data-action="click->onboarding#dismiss" aria-label="Dismiss">×</button>
+</section>

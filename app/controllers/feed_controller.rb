@@ -49,6 +49,7 @@ class FeedController < ApplicationController
   # Kept apart from members' breaths; members choose which bots they see.
   def updates
     @updates_tab = true
+    current_user.dismiss_card!("updates-intro") # they've found it; the banner can go
     @pinned_posts = []
     @bot_filter = Bots::Catalog.find(params[:bot])&.key
     @topic_filter = params[:topic] if @bot_filter == "news" && Bots::Catalog::NEWS_TOPICS.key?(params[:topic])

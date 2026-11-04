@@ -241,6 +241,11 @@
         </div>
       <% end %>
 
+      <%# Introduces the Updates tab until it's closed or the tab is opened. %>
+      <% unless @updates_tab || current_user.card_dismissed?("updates-intro") %>
+        <%= render "bot_items/intro_banner" %>
+      <% end %>
+
       <%# Releases written as slides show in the "What's new" pop-up instead of this banner. %>
       <% if @release_announcement && @release_announcement.slides.size < 2 && !current_user.card_dismissed?("release-#{@release_announcement.id}") %>
         <section class="fc-release-banner"
