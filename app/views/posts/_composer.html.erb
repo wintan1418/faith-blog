@@ -1,8 +1,12 @@
 <%# Lean Twitter-style composer used inside the modal AND on /posts/new.
     Locals: post, rooms %>
 <% mode = local_assigns.fetch(:mode, post.kind || "breath").to_s %>
+<%# page: true when the composer is the whole page (/posts/new, edit), not the
+    pop-up. Publishing then replaces the composer in history, so Back doesn't
+    reopen it after the breath is out. %>
 <%= form_with model: post,
     html: { class: "fc-composer-form", multipart: true, data: {
+      turbo_action: ("replace" if local_assigns[:page]),
       controller: "post-form composer-mode composer-assistant",
       composer_mode_initial_value: mode,
       composer_assistant_gentleness_url_value: check_gentleness_posts_path,
@@ -267,17 +271,20 @@
 
   <div class="fc-composer-footer">
     <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
-    <% unless post.persisted? %>
+    <%# A draft is still unpublished: it keeps "Save draft" and its main button
+        publishes it. (It used to say "Update" and quietly stay a draft.) %>
+    <% editing_live = post.persisted? && !post.draft? %>
+    <% unless editing_live %>
       <button type="submit" name="post[status]" value="draft" class="fc-btn">Save draft</button>
     <% end %>
     <button type="submit"
             name="post[status]"
-            value="<%= post.persisted? ? (post.draft? ? "draft" : "published") : "published" %>"
+            value="published"
             class="fc-btn fc-btn-primary"
             data-composer-mode-target="submit"
-            data-submit-breath="<%= post.persisted? ? "Update" : "Breathe" %>"
-            data-submit-thread="<%= post.persisted? ? "Update thread" : "Open the thread" %>">
-      <%= post.persisted? ? "Update" : "Breathe" %>
+            data-submit-breath="<%= editing_live ? "Update" : "Breathe" %>"
+            data-submit-thread="<%= editing_live ? "Update thread" : "Open the thread" %>">
+      <%= editing_live ? "Update" : "Breathe" %>
     </button>
   </div>
 <% end %>

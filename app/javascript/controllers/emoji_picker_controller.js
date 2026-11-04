@@ -74,7 +74,7 @@ export default class extends Controller {
 
     if (trixEditor && trixEditor.editor) {
       trixEditor.editor.insertString(emoji + " ")
-      trixEditor.focus()
+      if (!this.touchScreen()) trixEditor.focus()
       // Tell pristine-field this content is intentional — don't wipe it.
       trixEditor.setAttribute("data-pristine-touched", "1")
     } else {
@@ -89,11 +89,16 @@ export default class extends Controller {
         textarea.value = text.substring(0, start) + emoji + " " + text.substring(end)
         textarea.selectionStart = textarea.selectionEnd = start + emoji.length + 1
         textarea.setAttribute("data-pristine-touched", "1")
-        textarea.focus()
+        if (!this.touchScreen()) textarea.focus()
         textarea.dispatchEvent(new Event("input", { bubbles: true }))
       }
     }
+    // Stay open so several emoji can go in; the button or a tap outside closes it.
+  }
 
-    this.hide()
+  // On a phone, focusing the box after each emoji pops the keyboard up over
+  // the picker. Leave focus alone there; the text still lands at the caret.
+  touchScreen() {
+    return window.matchMedia("(pointer: coarse)").matches
   }
 }
