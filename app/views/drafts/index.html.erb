@@ -1,4 +1,7 @@
 <% content_for(:title) { "Drafts - Brethreign" } %>
+<%# Never show a saved copy: going Back after publishing a draft must not
+    show it still sitting here. %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
 <div class="fc-app">
   <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 720px;">

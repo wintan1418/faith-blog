@@ -72,11 +72,27 @@ export default class extends Controller {
 
   close(event) {
     if (event) event.preventDefault()
+    // On /posts/new the composer is the page itself, not the pop-up: Cancel
+    // leaves the page instead (it used to do nothing there).
+    const button = event?.currentTarget
+    if (button instanceof Element && !this.dialogTarget.contains(button)) return this.leavePage()
     const dialog = this.dialogTarget
     if (typeof dialog.close === "function") {
       dialog.close()
     } else {
       dialog.removeAttribute("open")
+    }
+  }
+
+  // Back to where they came from. In the apps, close the screen (Hotwire
+  // Native pops it); on the web, go back, or to the feed for a direct link.
+  leavePage() {
+    if (document.body.classList.contains("hotwire-native")) {
+      window.Turbo?.visit("/recede_historical_location")
+    } else if (history.length > 1 && document.referrer.startsWith(location.origin)) {
+      history.back()
+    } else {
+      window.Turbo ? window.Turbo.visit("/feed", { action: "replace" }) : (location.href = "/feed")
     }
   }
 

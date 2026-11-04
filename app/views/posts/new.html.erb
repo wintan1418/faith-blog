@@ -6,9 +6,9 @@
       <div class="fc-panel fc-composer-panel-page">
         <header class="fc-composer-bar">
           <h1 class="fc-composer-bar-title">Take a breath</h1>
-          <%= link_to "Cancel", feed_path, class: "fc-btn" %>
+          <%= link_to "Cancel", feed_path, class: "fc-btn", data: { action: "click->composer-modal#close" } %>
         </header>
-        <%= render "posts/composer", post: @post, rooms: @rooms %>
+        <%= render "posts/composer", post: @post, rooms: @rooms, page: true %>
       </div>
     </main>
   </div>

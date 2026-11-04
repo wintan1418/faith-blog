@@ -25,7 +25,10 @@ class ConfigurationsController < ApplicationController
       settings: {},
       rules: [
         { patterns: [ ".*" ], properties: { context: "default", uri: "hotwire://fragment/web", pull_to_refresh_enabled: true } },
-        { patterns: MODAL_PATTERNS, properties: { context: "modal", uri: "hotwire://fragment/web/modal/sheet", pull_to_refresh_enabled: false } },
+        # Full-screen modal, not a bottom sheet: inside a sheet the keyboard
+        # covered the lower half of long forms (Brethren card) and they
+        # couldn't be scrolled to the end.
+        { patterns: MODAL_PATTERNS, properties: { context: "modal", uri: "hotwire://fragment/web", pull_to_refresh_enabled: false } },
         { patterns: CHAT_PATTERNS, properties: { pull_to_refresh_enabled: false } }
       ]
     }
