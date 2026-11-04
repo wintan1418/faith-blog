@@ -223,7 +223,12 @@ Rails.application.routes.draw do
       post :mark_read
       get :earlier
     end
-    resources :messages, only: [ :create, :update, :destroy ]
+    resources :messages, only: [ :create, :update, :destroy ] do
+      member do
+        get :forward, action: :pick_forward # choose chats to forward to
+        post :forward
+      end
+    end
   end
   resources :message_blocks, only: [ :create, :destroy ], param: :user_id
 

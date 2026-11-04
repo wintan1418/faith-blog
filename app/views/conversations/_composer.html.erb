@@ -27,6 +27,7 @@
   <%# Inline previews (images + recorded voice note) sit ABOVE the row %>
   <div class="dm-previews-row">
     <div data-dm-composer-target="previews" class="dm-previews hidden"></div>
+    <div data-dm-composer-target="documentPreviews" class="msg-doc-previews hidden"></div>
     <%# After recording: listen back, then send or delete. %>
     <div data-dm-composer-target="voicePreview" class="msg-voice-preview hidden">
       <audio controls preload="metadata" class="msg-voice-preview-audio" data-dm-composer-target="voiceAudio"></audio>
@@ -96,6 +97,14 @@
               accept: "image/*",
               class: "sr-only",
               data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
+        </label>
+        <label class="msg-tool" title="Attach a document" aria-label="Attach a document">
+          <%= render_icon("paperclip", classes: "h-5 w-5") %>
+          <%= f.file_field :documents,
+              multiple: true,
+              accept: (AttachmentValidatable::DOCUMENT_TYPES.keys + AttachmentValidatable::DOCUMENT_EXTENSIONS.map { |ext| ".#{ext}" }).uniq.join(","),
+              class: "sr-only",
+              data: { dm_composer_target: "documentInput", action: "change->dm-composer#previewDocuments" } %>
         </label>
         <button type="button" class="msg-tool" data-emoji-picker-target="button" data-action="click->emoji-picker#toggle"
                 title="Add emoji" aria-label="Add emoji">

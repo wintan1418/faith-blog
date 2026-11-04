@@ -45,6 +45,23 @@ module MessagingHelper
   end
 
   # "You: …" for your own last message; a label for media-only messages.
+  # "PDF · 2.4 MB" under a document's name in a chat.
+  def document_meta(attachment)
+    ext = File.extname(attachment.filename.to_s).delete(".").upcase.presence || "File"
+    "#{ext} · #{number_to_human_size(attachment.byte_size)}"
+  end
+
+  def document_icon(attachment)
+    case File.extname(attachment.filename.to_s).downcase
+    when ".pdf" then "📕"
+    when ".doc", ".docx", ".odt", ".rtf" then "📘"
+    when ".xls", ".xlsx", ".ods", ".csv" then "📗"
+    when ".ppt", ".pptx", ".odp" then "📙"
+    when ".epub" then "📚"
+    else "📄"
+    end
+  end
+
   def conversation_preview(message, viewer)
     return "No messages yet" unless message
 
@@ -53,6 +70,7 @@ module MessagingHelper
       elsif message.body.present? then message.body.squish
       elsif message.respond_to?(:has_voice_note?) && message.has_voice_note? then "Sent a voice note"
       elsif message.respond_to?(:has_images?) && message.has_images? then "Sent a photo"
+      elsif message.respond_to?(:has_documents?) && message.has_documents? then "Sent a document"
       elsif message.respond_to?(:has_scripture?) && message.has_scripture? then "Shared a verse"
       else "Sent a message"
       end
