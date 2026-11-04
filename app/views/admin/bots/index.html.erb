@@ -2,7 +2,7 @@
 
 <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
   <p class="text-sm text-[var(--fc-muted)]">
-    The bots read these feeds every 3 hours and post to the Updates tab.
+    The bots read these feeds every hour and post to the Updates tab.
     Today: <% Bots::Catalog::ALL.each do |b| %><%= b.emoji %> <%= @today[b.key].to_i %>/<%= b.daily_cap %> <% end %>
   </p>
   <%= button_to "Fetch now", admin_refresh_bots_path(bot: @bot_filter), class: "fc-btn fc-btn-primary" %>

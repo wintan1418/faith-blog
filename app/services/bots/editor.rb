@@ -7,7 +7,7 @@ module Bots
   # pick (block-list + freshest, spread across sources) keeps the tab alive.
   class Editor
     TASK_MARKER = "[TASK:BOT_EDITOR]"
-    MAX_PICKS = 5 # the AI answer is capped at ~600 tokens
+    MAX_PICKS = 6 # the AI answer is capped at ~600 tokens
 
     Pick = Data.define(:candidate, :summary)
 
@@ -29,8 +29,9 @@ module Bots
       community with members from every country. Members are adults and
       families; politics and news are welcome, told fairly.
 
-      From the numbered candidates, choose the best ones for the beat you are
-      given, up to the number asked (fewer is fine; none is fine).
+      From the numbered candidates, keep EVERY one that fits the beat you are
+      given and breaks none of the rules below, up to the number asked. Leave
+      out only unfit ones and a second candidate about a story already kept.
 
       Never choose:
       - sexual or explicit content, graphic violence or gore described in detail;
@@ -41,7 +42,7 @@ module Bots
       - for jobs and courses: anything asking applicants to pay, MLM, commission-only.
 
       For each choice write a summary: one or two plain, neutral sentences,
-      at most 220 characters, in your own words (no quotes from the article),
+      at most 180 characters, in your own words (no quotes from the article),
       saying what happened or what is on offer. For politics, report facts
       without taking sides.
 
@@ -97,7 +98,7 @@ module Bots
         candidate = @candidates[p["id"].to_i - 1]&.first
         next unless candidate
 
-        Pick.new(candidate: candidate, summary: p["summary"].to_s.squish.truncate(240))
+        Pick.new(candidate: candidate, summary: p["summary"].to_s.squish.truncate(220))
       end.uniq { |p| p.candidate.url }
     end
 
@@ -125,12 +126,16 @@ module Bots
       chosen.map { |c| Pick.new(candidate: c, summary: c.text.to_s.truncate(220).presence) }
     end
 
+    def same_story?(a, b) = self.class.same_story_titles?(a.title, b.title)
+
     # Two outlets, one story: most of the title's longer words in common.
-    def same_story?(a, b)
-      words = ->(c) { c.title.downcase.scan(/[[:alnum:]]{4,}/).to_set }
+    def self.same_story_titles?(a, b)
+      words = ->(t) { t.to_s.downcase.scan(/[[:alnum:]]{4,}/).to_set }
       wa, wb = words.(a), words.(b)
       return false if wa.empty? || wb.empty?
       (wa & wb).size.to_f / [ wa.size, wb.size ].min >= 0.6
     end
+
+    def self.same_story_as_any?(title, titles) = titles.any? { |t| same_story_titles?(title, t) }
   end
 end
