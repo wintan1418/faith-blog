@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   # Dynamic, accent-tinted OG image for social shares.
   get "og.svg", to: "og#show", as: :og_image, defaults: { format: :svg }
+  get "sitemap.xml", to: "sitemaps#show", as: :sitemap, defaults: { format: :xml }
 
   # Static pages
   get "about", to: "pages#about"
