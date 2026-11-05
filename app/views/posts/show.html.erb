@@ -6,6 +6,22 @@
 <% content_for(:og_description) { post_excerpt } %>
 <% content_for(:og_url) { post_url(@post) } %>
 <% content_for(:og_type) { "article" } %>
+<% content_for(:canonical) { post_url(@post) } %>
+<% if @post.visible_to?(nil) && @post.published? %>
+  <% content_for(:structured_data) do %>
+    <script type="application/ld+json"><%= raw({
+      "@context" => "https://schema.org", "@type" => "DiscussionForumPosting",
+      "headline" => page_title.to_s.truncate(110), "text" => post_excerpt,
+      "url" => post_url(@post), "datePublished" => (@post.published_at || @post.created_at)&.iso8601,
+      "dateModified" => @post.updated_at.iso8601,
+      "author" => { "@type" => "Person", "name" => (@post.respond_to?(:anonymous?) && @post.anonymous? ? "A Brethreign member" : @post.user&.display_name.to_s) },
+      "interactionStatistic" => [
+        { "@type" => "InteractionCounter", "interactionType" => "https://schema.org/LikeAction", "userInteractionCount" => @post.likes_count.to_i },
+        { "@type" => "InteractionCounter", "interactionType" => "https://schema.org/CommentAction", "userInteractionCount" => @post.comments_count.to_i }
+      ]
+    }.to_json) %></script>
+  <% end %>
+<% end %>
 <% if @post.has_images? %>
   <% content_for(:og_image) { url_for(@post.images.first) } %>
 <% else %>

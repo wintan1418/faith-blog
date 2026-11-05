@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Renders the link-preview card (app/views/og/show.svg.erb) to a JPEG for each
+# accent colour into public/og/, because WhatsApp, Facebook and LinkedIn don't
+# show SVG previews. Re-run after changing the card or the brand.
+# Needs: a dev server on $PORT (default 3000), Google Chrome, and macOS sips.
+set -euo pipefail
+PORT="${PORT:-3000}"
+CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
+TMP="$(mktemp -d)"
+mkdir -p public/og
+for accent in $(bin/rails runner 'puts AccentPalette.slugs.join(" ")'); do
+  "$CHROME" --headless=new --disable-gpu --hide-scrollbars --window-size=1200,630 \
+    --virtual-time-budget=3000 --screenshot="$TMP/$accent.png" "http://localhost:$PORT/og.svg?accent=$accent" >/dev/null 2>&1
+  sips -s format jpeg -s formatOptions 86 "$TMP/$accent.png" --out "public/og/$accent.jpg" >/dev/null
+  echo "public/og/$accent.jpg"
+done
+rm -rf "$TMP"

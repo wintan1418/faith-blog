@@ -1,1 +1,14 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+# Brethreign. Public breaths, rooms, scripture pages and resources may be indexed.
+User-agent: *
+Disallow: /inbox
+Disallow: /settings
+Disallow: /admin
+Disallow: /notifications
+Disallow: /drafts
+Disallow: /feed
+Disallow: /me
+Disallow: /circles
+Disallow: /users/password
+Disallow: /rails/
+
+Sitemap: https://brethreign.com/sitemap.xml
