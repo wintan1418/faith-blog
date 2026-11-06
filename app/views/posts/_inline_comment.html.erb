@@ -16,14 +16,19 @@
   <li class="fc-inline-comment<%= ' fc-inline-comment-held-author' if comment.held_for_review? %>"
       id="<%= dom_id(comment) %>"
       data-controller="reply-toggle comment-edit">
-    <% if comment.user.profile&.avatar&.attached? %>
-      <%= image_tag avatar_src(comment.user.profile), class: "fc-avatar object-cover" %>
-    <% else %>
-      <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
+    <%# Replies sit inside the breath's thread frame, so profile links open the
+        whole page (_top), and the picture opens the profile too. %>
+    <%= link_to user_path(comment.user.username), class: "fc-inline-comment-avatar", data: { turbo_frame: "_top" },
+          aria: { label: "#{comment.user.username}'s profile" } do %>
+      <% if comment.user.profile&.avatar&.attached? %>
+        <%= image_tag avatar_src(comment.user.profile), class: "fc-avatar object-cover", alt: "" %>
+      <% else %>
+        <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
+      <% end %>
     <% end %>
     <div class="fc-inline-comment-body">
       <div class="fc-inline-comment-head">
-        <%= link_to comment.user.username, user_path(comment.user.username), class: "fc-breath-name" %>
+        <%= link_to comment.user.username, user_path(comment.user.username), class: "fc-breath-name", data: { turbo_frame: "_top" } %>
         <span class="fc-breath-time">· <%= time_ago_in_words(comment.created_at) %> ago</span>
         <% if comment.edited? %><span class="fc-breath-time">(edited)</span><% end %>
         <% if comment.held_for_review? %>

@@ -19,7 +19,9 @@
           <% group.each do |like| %>
             <% next unless like.user %>
             <li class="fc-reactor">
-              <%= link_to user_path(like.user.username), class: "fc-reactor-link" do %>
+              <%# _top: this list is a small frame; a profile has to open as a whole page
+                  (inside the frame it showed "Content missing"). %>
+              <%= link_to user_path(like.user.username), class: "fc-reactor-link", data: { turbo_frame: "_top" } do %>
                 <span class="fc-reactor-avatar"><%= avatar_for(like.user, size: :small) %></span>
                 <span class="fc-reactor-name"><%= like.user.display_name %></span>
               <% end %>
