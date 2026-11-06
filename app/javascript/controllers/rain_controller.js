@@ -55,10 +55,38 @@ export default class extends Controller {
       setTimeout(() => this.spawn(true), i * 700)
     }
     this.startInterval()
+    // Fade a verse to half strength while it passes over a card, so it never
+    // sits on top of text or buttons at full strength.
+    this.overTimer = setInterval(() => this.markOverlaps(), 250)
+  }
+
+  markOverlaps() {
+    if (document.hidden) return
+    this.live?.forEach(drop => {
+      const r = drop.getBoundingClientRect()
+      if (r.bottom < 0 || r.top > window.innerHeight) return
+      const x = r.left + r.width / 2
+      const y = r.top + r.height / 2
+      // The rain ignores the pointer, so this finds what's underneath it.
+      const under = document.elementFromPoint(Math.min(Math.max(x, 0), window.innerWidth - 1), Math.min(Math.max(y, 0), window.innerHeight - 1))
+      drop.classList.toggle("is-over", this.onSurface(under))
+    })
+  }
+
+  // True when the point is on something with its own background (a card,
+  // panel, button, field), not the bare page.
+  onSurface(el) {
+    for (let node = el, hops = 0; node && node !== document.body && hops < 8; node = node.parentElement, hops++) {
+      if (node.matches?.(".fc-page, .fc-shell, .fc-app, main")) return false
+      const bg = getComputedStyle(node).backgroundColor
+      if (bg && bg !== "transparent" && !/rgba\([^)]*,\s*0\)$/.test(bg)) return true
+    }
+    return false
   }
 
   stop() {
     this.alive = false
+    if (this.overTimer) { clearInterval(this.overTimer); this.overTimer = null }
     document.removeEventListener("visibilitychange", this.onVisibility)
     this.stopInterval()
     this.live?.forEach(el => el.remove())

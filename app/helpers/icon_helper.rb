@@ -115,6 +115,8 @@ module IconHelper
       icon_svg("<path d='M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7' /><path d='M16 6l-4-4-4 4' /><path d='M12 2v13' />", classes)
     when "paperclip", "attach"
       icon_svg("m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48", classes)
+    when "cross"
+      icon_svg("<path d='M12 3v18' /><path d='M7 8h10' />", classes)
     when "forward"
       icon_svg("<polyline points='15 17 20 12 15 7' /><path d='M4 18v-2a4 4 0 0 1 4-4h12' />", classes)
     when "chevronleft", "back"

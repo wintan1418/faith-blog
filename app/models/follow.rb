@@ -19,6 +19,11 @@ class Follow < ApplicationRecord
   end
 
   def create_notification
+    # Unfollow and follow again shouldn't stack up "started following you"
+    # alerts: one a week per follower is enough.
+    return if Notification.where(user: following, actor: follower, notification_type: :new_follower)
+                          .where(created_at: 7.days.ago..).exists?
+
     notification = Notification.create(
       user: following,
       actor: follower,

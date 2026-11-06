@@ -21038,3 +21038,104 @@ html.theme-light .trix-content:not(trix-editor) {
 @media (prefers-reduced-motion: reduce) {
   .fc-setting-switch-track, .fc-setting-switch-knob { transition: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UI polish, November 2026 (from the phone review). Last in the file so it
+   wins over the older passes above.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Buttons under a breath: one neutral colour; colour only shows what you did
+   (your reaction in accent, saved in gold). Before, labels, threads and
+   saved each had their own colour and the row looked patchy. */
+.fc-breath-actions .fc-breath-action,
+.fc-breath-actions .fc-action { color: var(--fc-muted); }
+.fc-breath-actions .fc-breath-action span,
+.fc-breath-actions .fc-action span,
+.fc-breath-actions .fc-action-label,
+.fc-breath-actions .fc-react-label { color: inherit; }
+.fc-breath-actions .fc-breath-action.is-thread { color: var(--fc-muted); }
+.fc-breath-actions .fc-breath-action:hover,
+.fc-breath-actions .fc-action:hover { color: var(--fc-ink); }
+.fc-breath-actions .fc-breath-action.fc-react-btn.is-mine { color: var(--fc-accent); }
+.fc-breath-actions .fc-breath-action.text-\[var\(--fc-gold\)\],
+.fc-breath-actions .fc-action.text-\[var\(--fc-gold\)\] { color: var(--fc-gold, #e3b341); }
+.fc-breath-actions .is-muted { opacity: 0.45; }
+
+/* Phones: the picture stays beside the name; the words, photos, tags and
+   buttons below use the card's full width instead of starting 47px in. */
+@media (max-width: 640px) {
+  .fc-breath .fc-breath-grid { grid-template-columns: auto minmax(0, 1fr); column-gap: 0.65rem; row-gap: 0; }
+  .fc-breath .fc-breath-grid > .fc-breath-main { display: contents; }
+  .fc-breath .fc-breath-grid > .fc-breath-avatar { grid-column: 1; grid-row: 1; align-self: center; }
+  .fc-breath .fc-breath-main > * { grid-column: 1 / -1; min-width: 0; }
+  .fc-breath .fc-breath-main > .fc-breath-head { grid-column: 2; grid-row: 1; align-self: center; }
+}
+
+/* Profile: the photo overlaps the colour band instead of floating ~100px
+   below it; four stat tiles sit in an even row (or 2 × 2 on phones). */
+@media (max-width: 640px) {
+  :root .profile-hero-panel.profile-hero-panel { padding-top: 4.75rem; } /* beats html.theme-dark .profile-hero-panel */
+}
+.profile-stats:has(> :nth-child(4)) { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 38rem; }
+@media (max-width: 640px) {
+  .profile-stats:has(> :nth-child(4)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Settings: style the browser's file button like our buttons, and soften
+   the bright divider under panel headings in dark mode. */
+input[type="file"]::file-selector-button {
+  margin-right: 0.75rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  background: var(--fc-surface-2, var(--fc-surface));
+  color: var(--fc-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+input[type="file"]::file-selector-button:hover { border-color: var(--fc-accent); }
+.mystic-panel-strong .border-b { border-color: var(--fc-line); }
+
+/* Touch screens: chips, tags and tabs at least 36px tall so a thumb hits them. */
+@media (pointer: coarse) {
+  .fc-composer-chip,
+  .fc-breath-tags a,
+  .fc-bot-chip,
+  .fc-notif-mark-all { min-height: 36px; display: inline-flex; align-items: center; }
+}
+
+/* Feed on phones: a slimmer Daily Breath card, so the first breath shows sooner. */
+@media (max-width: 640px) {
+  .fc-daily-prompt { padding: 0.8rem 1rem; }
+  .fc-daily-prompt .fc-daily-prompt-q { font-size: 1.1rem; }
+  .fc-daily-prompt .fc-daily-prompt-body { gap: 0.35rem; }
+}
+/* Saved: the label turns gold with its icon. */
+.fc-breath-actions .fc-action.text-\[var\(--fc-gold\)\] .fc-action-label { color: var(--fc-gold, #e3b341) !important; }
+
+/* Scripture rain: half strength while a verse crosses a card, button or text
+   (rain_controller marks it), full strength over the page background. */
+.fc-rain-drop > * { transition: opacity 450ms ease; }
+.fc-rain-drop.is-over > * { opacity: 0.5; }
+
+/* Feed top on phones: the Daily Breath question lives in the composer box,
+   and the four quick chips sit in one row you can swipe. */
+.fc-composer-daily, .fc-composer-done { display: none; }
+@media (max-width: 640px) {
+  .fc-daily-prompt { display: none; }
+  .fc-composer .fc-composer-default { display: none; }
+  .fc-composer .fc-composer-daily { display: inline; }
+  .fc-composer .fc-composer-done { display: block; margin-top: 0.5rem; color: var(--fc-accent); font-size: 0.82rem; font-weight: 700; }
+  .fc-composer .fc-composer-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .fc-composer .fc-composer-chips::-webkit-scrollbar { display: none; }
+  .fc-composer .fc-composer-chip { flex: none; }
+}
+
+/* Profile: label for the faith line. */
+.profile-meta-label { color: var(--fc-muted); font-weight: 500; }
+@media (max-width: 640px) {
+  /* The daily question is longer than the default prompt: let it wrap. */
+  .fc-composer .fc-composer-input { white-space: normal; height: auto; min-height: 44px; }
+  .fc-composer .fc-composer-input .fc-composer-daily { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; font-size: 0.93rem; }
+}

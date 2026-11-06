@@ -179,14 +179,15 @@
 }
 /* ── Breathing room for actions on phones ── */
 @media (max-width: 520px) {
-  /* Post action bar spans the whole card (it was squeezed beside the author photo). */
-  html .fc-breath .fc-breath-main > .fc-breath-actions {
-    margin-left: -47px !important;
-    width: calc(100% + 47px) !important;
-    padding-top: 0.55rem !important;
-  }
+  /* The card's body is full width on phones now (see "UI polish"), so the bar
+     no longer needs pulling out from beside the author photo. */
+  html .fc-breath .fc-breath-main > .fc-breath-actions { padding-top: 0.55rem !important; }
   html .fc-breath-actions .fc-breath-action,
   html .fc-breath-actions > span[id^="bookmark_"] .fc-action { min-height: 52px; gap: 5px !important; }
   html .fc-breath-actions .fc-breath-action svg,
   html .fc-breath-actions > span[id^="bookmark_"] .fc-action svg { width: 20px !important; height: 20px !important; }
 }
+
+/* The reply avatar is a link to the profile now; keep it the same fixed size. */
+.fc-inline-comment-avatar { flex: none; display: block; border-radius: 999px; }
+.fc-inline-comment-avatar:focus-visible { outline: 2px solid var(--fc-accent); outline-offset: 2px; }

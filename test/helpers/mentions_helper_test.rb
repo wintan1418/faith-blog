@@ -13,7 +13,7 @@ class MentionsHelperTest < ActionView::TestCase
     html = render_social_text("Hello there\nsame thought\n\nSecond paragraph for @#{username} https://example.com/path.")
 
     assert_includes html, "<p>Hello there<br>same thought</p>"
-    assert_includes html, %(<p>Second paragraph for <a class="mention-link" href="/u/#{username}">@#{username}</a> )
+    assert_includes html, %(<p>Second paragraph for <a class="mention-link" data-turbo-frame="_top" href="/u/#{username}">@#{username}</a> )
     assert_includes html, %(href="https://example.com/path")
     assert_includes html, "https://example.com/path</a>.</p>"
   end

@@ -138,7 +138,8 @@ module MentionsHelper
       user = users_by_username[handle.downcase]
       return escape_social_text(token) unless user
 
-      link_to("@#{user.username}", user_path(user.username), class: "mention-link")
+      # _top: mentions also appear inside frames (reply threads).
+      link_to("@#{user.username}", user_path(user.username), class: "mention-link", data: { turbo_frame: "_top" })
     end
   end
 
