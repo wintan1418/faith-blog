@@ -21111,3 +21111,5 @@ input[type="file"]::file-selector-button:hover { border-color: var(--fc-accent);
   .fc-daily-prompt .fc-daily-prompt-q { font-size: 1.1rem; }
   .fc-daily-prompt .fc-daily-prompt-body { gap: 0.35rem; }
 }
+/* Saved: the label turns gold with its icon. */
+.fc-breath-actions .fc-action.text-\[var\(--fc-gold\)\] .fc-action-label { color: var(--fc-gold, #e3b341) !important; }
