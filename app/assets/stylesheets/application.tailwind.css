@@ -21113,3 +21113,29 @@ input[type="file"]::file-selector-button:hover { border-color: var(--fc-accent);
 }
 /* Saved: the label turns gold with its icon. */
 .fc-breath-actions .fc-action.text-\[var\(--fc-gold\)\] .fc-action-label { color: var(--fc-gold, #e3b341) !important; }
+
+/* Scripture rain: half strength while a verse crosses a card, button or text
+   (rain_controller marks it), full strength over the page background. */
+.fc-rain-drop > * { transition: opacity 450ms ease; }
+.fc-rain-drop.is-over > * { opacity: 0.5; }
+
+/* Feed top on phones: the Daily Breath question lives in the composer box,
+   and the four quick chips sit in one row you can swipe. */
+.fc-composer-daily, .fc-composer-done { display: none; }
+@media (max-width: 640px) {
+  .fc-daily-prompt { display: none; }
+  .fc-composer .fc-composer-default { display: none; }
+  .fc-composer .fc-composer-daily { display: inline; }
+  .fc-composer .fc-composer-done { display: block; margin-top: 0.5rem; color: var(--fc-accent); font-size: 0.82rem; font-weight: 700; }
+  .fc-composer .fc-composer-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .fc-composer .fc-composer-chips::-webkit-scrollbar { display: none; }
+  .fc-composer .fc-composer-chip { flex: none; }
+}
+
+/* Profile: label for the faith line. */
+.profile-meta-label { color: var(--fc-muted); font-weight: 500; }
+@media (max-width: 640px) {
+  /* The daily question is longer than the default prompt: let it wrap. */
+  .fc-composer .fc-composer-input { white-space: normal; height: auto; min-height: 44px; }
+  .fc-composer .fc-composer-input .fc-composer-daily { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; font-size: 0.93rem; }
+}

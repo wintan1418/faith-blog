@@ -39,4 +39,19 @@ class UiPolishNov6Test < ActionDispatch::IntegrationTest
     get notifications_path
     assert_select "h1.fc-notifpage-title", text: "Alerts"
   end
+
+  test "the faith line on a profile is labelled" do
+    @ada.profile ||= @ada.build_profile
+    @ada.profile.update!(faith_background: "Saved 5 years ago")
+    sign_in @ben
+    get user_path(@ada.username)
+    assert_select ".profile-meta", text: /Faith background:\s*Saved 5 years ago/
+  end
+
+  test "the composer carries the Daily Breath question for phones" do
+    sign_in @ada
+    get feed_path
+    assert_select ".fc-composer .fc-composer-daily", text: "What breath do you have today?"
+    assert_select ".fc-composer .fc-composer-done", text: /You breathed today/ # Ada posted today
+  end
 end

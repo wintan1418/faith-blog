@@ -79,8 +79,9 @@
             <% end %>
             <% if @user.profile.faith_background.present? %>
               <span class="profile-meta">
-                <%= render_icon("church", classes: "w-4 h-4") %>
-                <%= @user.profile.faith_background %>
+                <%= render_icon("cross", classes: "w-4 h-4") %>
+                <%# Labelled: on its own, "Saved 5 years ago" read like a date something was saved. %>
+                <span class="profile-meta-label">Faith background:</span> <%= @user.profile.faith_background %>
               </span>
             <% end %>
             <span class="profile-meta">
