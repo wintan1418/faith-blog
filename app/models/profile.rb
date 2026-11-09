@@ -52,6 +52,26 @@ class Profile < ApplicationRecord
     super(INDUSTRIES.find { |i| i.casecmp?(text) } || text.presence)
   end
 
+  # "Open to": what the member is looking for. The first one they hold, in this
+  # order, colours the ring on their photo.
+  OPEN_TO = {
+    "hiring"       => { label: "Hiring",            badge: "Hiring",        colour: "gold" },
+    "work"         => { label: "New work",          badge: "Open to work",  colour: "blue" },
+    "mentoring"    => { label: "Mentoring others",  badge: "Mentor",        colour: "green" },
+    "freelance"    => { label: "Freelance work",    badge: "Freelance",     colour: "coral" },
+    "volunteering" => { label: "Volunteering",      badge: "Volunteer",     colour: "violet" }
+  }.freeze
+  enum :open_to_visibility, { everyone: 0, connections: 1 }, prefix: :open_to_shown_to
+
+  def open_to=(values)
+    picked = Array(values).map(&:to_s)
+    super(OPEN_TO.keys & picked)
+  end
+
+  # The digital business card's colour.
+  CARD_STYLES = %w[mint midnight gold light].freeze
+  validates :card_style, inclusion: { in: CARD_STYLES }
+
   def skills_are_short
     errors.add(:skills, "can have at most #{MAX_SKILLS}") if skills.size > MAX_SKILLS
   end

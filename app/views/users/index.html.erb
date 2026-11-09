@@ -31,7 +31,7 @@
       <ul class="fc-people-list">
         <% @users.each do |user| %>
           <li class="fc-people-row">
-            <%= link_to user_path(user.username), class: "fc-people-avatar" do %>
+            <%= link_to user_path(user.username), class: "fc-people-avatar #{open_to_ring_class(user)}" do %>
               <% if user.profile&.avatar&.attached? %>
                 <%= image_tag avatar_src(user.profile, 160), class: "object-cover", alt: user.username %>
               <% else %>

@@ -6,10 +6,11 @@
                 form: { class: "bys-dismiss-form" }, aria: { label: "Not interested in #{person.display_name}" } do %>×<% end %>
   <%= link_to user_path(person.username), class: "bys-who" do %>
     <% if person.profile&.avatar&.attached? %>
-      <%= image_tag avatar_src(person.profile, 160), class: "bys-avatar", alt: "" %>
+      <%= image_tag avatar_src(person.profile, 160), class: "bys-avatar #{open_to_ring_class(person)}", alt: "" %>
     <% else %>
-      <span class="bys-avatar bys-avatar--initial" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+      <span class="bys-avatar bys-avatar--initial <%= open_to_ring_class(person) %>" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
     <% end %>
+    <%= open_to_badge(person, extra_class: "ot-badge--card") %>
     <span class="bys-name"><%= person.display_name %></span>
     <span class="bys-headline"><%= person.professional_headline.presence || person.profile&.bio&.truncate(70) %></span>
   <% end %>

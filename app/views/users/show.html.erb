@@ -26,7 +26,7 @@
           the cover, avatar ring, and badges tint to their chosen colour. %>
       <div class="profile-hero-panel" style="<%= AccentPalette.css_vars(@user.accent_color) %>">
         <div class="profile-cover" aria-hidden="true"></div>
-        <div class="profile-avatar-wrap">
+        <div class="profile-avatar-wrap <%= open_to_ring_class(@user) %>">
           <% if @user.profile&.avatar&.attached? %>
             <%= image_tag avatar_src(@user.profile, 400), class: "profile-avatar object-cover", alt: @user.display_name %>
           <% else %>
@@ -34,6 +34,7 @@
               <%= @user.username.first.upcase %>
             </span>
           <% end %>
+          <%= open_to_badge(@user, extra_class: "ot-badge--hero") %>
         </div>
 
         <div class="min-w-0 flex-1">
@@ -62,7 +63,10 @@
             </div>
 
             <% if user_signed_in? && @user == current_user %>
-              <%= link_to "Edit Profile", edit_settings_profile_path, class: "btn btn-secondary" %>
+              <div class="profile-owner-actions">
+                <%= link_to "Edit Profile", edit_settings_profile_path, class: "btn btn-secondary" %>
+                <%= link_to "My card", card_path(@user.username), class: "btn btn-secondary" %>
+              </div>
             <% end %>
           </div>
 
