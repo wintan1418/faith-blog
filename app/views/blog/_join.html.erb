@@ -1,0 +1,17 @@
+<section class="bl-join">
+  <% if user_signed_in? %>
+    <h2>Ready to try it?</h2>
+    <p>Your profile, portfolio and the whole community are a tap away.</p>
+    <div class="bl-join-actions">
+      <%= link_to "Open my profile", user_path(current_user.username, tab: "professional"), class: "bl-btn bl-btn--primary" %>
+      <%= link_to "Go to the feed", feed_path, class: "bl-btn" %>
+    </div>
+  <% else %>
+    <h2>Join Brethreign, free</h2>
+    <p>A safe online home for Christians: breathe, pray, read, chat, and grow in your work.</p>
+    <div class="bl-join-actions">
+      <%= link_to "Create your account", new_user_registration_path, class: "bl-btn bl-btn--primary" %>
+      <%= link_to "Sign in", new_user_session_path, class: "bl-btn" %>
+    </div>
+  <% end %>
+</section>

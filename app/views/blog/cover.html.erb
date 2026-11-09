@@ -1,0 +1,48 @@
+<%# Cover art for a blog article (1200×630). Screenshotted by bin/render-blog-covers. %>
+<% a = @article %>
+<% colours = { "Professional" => "#6f9bf0", "Guides" => "#34d399", "Community" => "#e3b341", "Safety" => "#f08a80", "News" => "#b79cf0" } %>
+<% c = colours[a.category] || "#34d399" %>
+<% shots = a.cover_shots.first(2) %>
+<% wide = shots.first.to_s.start_with?("desk-") %>
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=Source+Sans+3:wght@600;700;800&display=block">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1200px; height: 630px; overflow: hidden; font-family: "Source Sans 3", system-ui, sans-serif; color: #eef5f1;
+    background: radial-gradient(ellipse 70% 90% at 82% 30%, color-mix(in srgb, <%= c %> 38%, #0b1110) 0%, #0b1110 62%),
+                radial-gradient(ellipse 40% 50% at 0% 100%, color-mix(in srgb, <%= c %> 18%, transparent), transparent 70%); }
+  .rings { position: absolute; right: -160px; top: -160px; width: 760px; height: 760px; border-radius: 50%;
+    background: repeating-radial-gradient(circle, transparent 0 46px, color-mix(in srgb, <%= c %> 14%, transparent) 46px 47px); opacity: .7; }
+  .copy { position: absolute; left: 72px; top: 64px; bottom: 64px; width: <%= shots.size == 2 ? 560 : 600 %>px; display: flex; flex-direction: column; }
+  .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; letter-spacing: .01em; }
+  .mark { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #34d399, #0e8a5f); display: grid; place-items: center; color: #04261a; font-size: 26px; font-weight: 800; }
+  .brand span { color: #a9bdb4; font-weight: 700; }
+  .cat { margin-top: auto; width: fit-content; padding: 7px 16px; border-radius: 999px; font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: <%= c %>; background: color-mix(in srgb, <%= c %> 16%, transparent); border: 1px solid color-mix(in srgb, <%= c %> 45%, transparent); }
+  h1 { margin-top: 20px; font-family: "Playfair Display", Georgia, serif; font-weight: 800; font-size: <%= a.cover_title.length > 34 ? 58 : 66 %>px; line-height: 1.06; letter-spacing: -.01em; }
+  .foot { margin-top: 26px; font-size: 20px; color: #a9bdb4; font-weight: 700; }
+  .phones { position: absolute; right: 64px; top: 50%; transform: translateY(-50%); display: flex; gap: 22px; align-items: center; }
+  .phone { width: 238px; padding: 9px; border-radius: 36px; background: #1a2420; box-shadow: 0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.06); }
+  .phone img { display: block; width: 100%; aspect-ratio: 390 / 760; object-fit: cover; object-position: top; border-radius: 28px; }
+  .phones.two .phone:first-child { transform: rotate(-4deg) translateY(18px); }
+  .phones.two .phone:last-child { transform: rotate(4deg) translateY(-12px); }
+  .desk { position: absolute; right: -40px; top: 120px; width: 600px; padding: 10px; border-radius: 16px; background: #1a2420; box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
+  .desk img { display: block; width: 100%; border-radius: 8px; }
+</style></head>
+<body>
+  <div class="rings"></div>
+  <div class="copy">
+    <div class="brand"><div class="mark">~</div>Brethreign <span>· Blog</span></div>
+    <div class="cat"><%= a.category %></div>
+    <h1><%= a.cover_title %></h1>
+    <p class="foot"><%= a.minutes %> min read · brethreign.com/blog</p>
+  </div>
+  <% if wide %>
+    <div class="desk"><img src="/blog/shots/<%= shots.first %>.jpg" alt=""></div>
+  <% elsif shots.any? %>
+    <div class="phones<%= ' two' if shots.size == 2 %>">
+      <% shots.each do |name| %><div class="phone"><img src="/blog/shots/<%= name %>.jpg" alt=""></div><% end %>
+    </div>
+  <% end %>
+</body></html>

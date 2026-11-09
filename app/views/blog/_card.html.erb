@@ -1,0 +1,13 @@
+<%# One article card. Locals: article, size (:wide for the featured one). %>
+<% wide = local_assigns[:size] == :wide %>
+<%= link_to blog_article_path(article.slug), class: "bl-card#{' bl-card--wide' if wide}" do %>
+  <span class="bl-card-cover">
+    <%= image_tag article.cover_path, alt: "", loading: (wide ? "eager" : "lazy"), decoding: "async", width: 1200, height: 630 %>
+  </span>
+  <span class="bl-card-body">
+    <span class="bl-cat bl-cat--<%= article.category.downcase %>"><%= article.category %></span>
+    <span class="bl-card-title"><%= article.title %></span>
+    <span class="bl-card-desc"><%= article.description %></span>
+    <span class="bl-card-meta"><%= article.minutes %> min read<% if wide %> · <b>Read the guide →</b><% end %></span>
+  </span>
+<% end %>
