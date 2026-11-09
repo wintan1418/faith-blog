@@ -4,7 +4,7 @@ require "test_helper"
 
 class ProfessionalStrengthTest < ActiveSupport::TestCase
   setup do
-    @user = User.create!(username: "strength_user", email: "strength_user@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    @user = create_member("strength_user")
   end
 
   test "a new member starts at zero with every step to do" do

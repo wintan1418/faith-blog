@@ -4,7 +4,7 @@ require "test_helper"
 
 class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(username: "pro_owner", email: "pro_owner@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    @user = create_member("pro_owner")
     sign_in @user
   end
 
@@ -31,7 +31,7 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   end
 
   test "you can't edit someone else's experience" do
-    other = User.create!(username: "pro_other", email: "pro_other@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    other = create_member("pro_other")
     role = other.experiences.create!(title: "Nurse", organization: "LUTH", start_month: "2022-03", current: true)
 
     patch settings_experience_path(role), params: { experience: { title: "Hacked" } }
@@ -40,7 +40,7 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   end
 
   test "dismissing a suggestion removes the card and remembers it" do
-    other = User.create!(username: "pro_suggested", email: "pro_suggested@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    other = create_member("pro_suggested")
     post suggestion_dismissals_path(user_id: other.id), as: :turbo_stream
 
     assert_response :success
@@ -84,7 +84,7 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
     get user_path(@user.username, tab: "about")
     assert_select ".profile-card-panel", count: 1
 
-    visitor = User.create!(username: "pro_visitor", email: "pro_visitor@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    visitor = create_member("pro_visitor")
     sign_in visitor
     get user_path(@user.username, tab: "professional")
     assert_select ".pro-strength", count: 0
