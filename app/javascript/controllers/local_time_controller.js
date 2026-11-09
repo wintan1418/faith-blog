@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Shows a server time in the reader's own time zone (the server runs on UTC).
-// <time datetime="ISO" data-controller="local-time" data-local-time-format-value="time|short|inbox|day|full">
+// <time datetime="ISO" data-controller="local-time" data-local-time-format-value="time|short|inbox|day|full|today">
+// "today" ignores the datetime and shows the reader's own date ("Monday, 9 November").
 export default class extends Controller {
   static values = { format: { type: String, default: "time" } }
 
@@ -18,6 +19,8 @@ export default class extends Controller {
     const daysAgo = Math.floor((startOfDay(now) - startOfDay(date)) / 86400000)
 
     switch (this.formatValue) {
+      case "today":
+        return now.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })
       case "short":
         return time().replace(/\s?[AP]M$/i, "")
       case "inbox":

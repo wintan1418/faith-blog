@@ -95,3 +95,66 @@ html a.scripture-ref { text-decoration: none; }
 }
 .fc-notifpage-markall:hover { background: color-mix(in oklch, var(--fc-accent, #059669) 15%, var(--fc-surface, #fff)); }
 .fc-notifpage-markall:disabled { opacity: 0.7; cursor: progress; }
+
+/* ── Feed top, November 2026: the date instead of a greeting, and a roomy
+   one-line prompt on phones. ───────────────────────────────────────── */
+html .fc-main .fc-masthead-date {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--fc-ink) !important;
+}
+html .fc-main .fc-masthead { align-items: center; }
+html .fc-composer-input-pen { display: none; }
+
+@media (max-width: 640px) {
+  html .fc-main .fc-masthead-date { font-size: 1.1rem; }
+
+  /* The prompt opens the composer, so the Breathe button beside it goes and
+     the prompt gets the whole row: one line, with room around the words. */
+  html .fc-main .fc-composer .fc-composer-go { display: none !important; }
+  html .fc-main .fc-composer .fc-composer-row { gap: 0.65rem; }
+  html .fc-main .fc-composer .fc-composer-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: auto;
+    min-height: 48px;
+    padding: 0 0.9rem 0 1.1rem;
+    gap: 0.6rem;
+    justify-content: space-between;
+    text-align: left;
+    white-space: nowrap;
+    border-radius: 999px;
+  }
+  html .fc-main .fc-composer .fc-composer-input .fc-composer-daily,
+  html .fc-main .fc-composer .fc-composer-input .fc-composer-default {
+    order: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.3;
+    font-size: 0.95rem;
+  }
+  html .fc-main .fc-composer .fc-composer-input-pen {
+    order: 2;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--fc-accent);
+    color: var(--fc-on-accent, #04261a);
+  }
+}
+html .fc-main .fc-masthead-date time { color: inherit !important; font: inherit; }
+@media (max-width: 380px) {
+  html .fc-main .fc-composer .fc-composer-input { padding: 0 0.6rem 0 0.95rem; gap: 0.4rem; }
+  html .fc-main .fc-composer .fc-composer-input .fc-composer-daily,
+  html .fc-main .fc-composer .fc-composer-input .fc-composer-default { font-size: 0.88rem; }
+  html .fc-main .fc-composer .fc-composer-input-pen { width: 30px; height: 30px; }
+  html .fc-main .fc-composer .fc-composer-row .fc-avatar { width: 36px; height: 36px; }
+}
