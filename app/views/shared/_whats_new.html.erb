@@ -28,6 +28,9 @@
               <% if slide.action == "linkedin" %>
                 <div class="wn-action"><%= link_to "Import from LinkedIn", new_settings_linkedin_import_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
               <% end %>
+              <% if slide.action == "portfolio" %>
+                <div class="wn-action"><%= link_to "Add your work", new_settings_portfolio_item_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
+              <% end %>
               <% if slide.action == "chess" %>
                 <div class="wn-action"><%= link_to "Play the ladder", games_chess_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
               <% end %>
