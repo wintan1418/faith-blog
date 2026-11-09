@@ -187,6 +187,13 @@ Rails.application.routes.draw do
 
   # Search
   get "search", to: "search#index"
+  # The blog (public).
+  get "blog", to: "blog#index", as: :blog
+  get "blog/feed.xml", to: "blog#feed", as: :blog_feed, defaults: { format: :rss }
+  get "blog/:slug", to: "blog#show", as: :blog_article, constraints: { slug: /[a-z0-9-]+/ }
+  # Development only: the cover art page that bin/render-blog-covers screenshots.
+  get "blog/:slug/cover", to: "blog#cover", constraints: { slug: /[a-z0-9-]+/ } if Rails.env.development?
+
   get "people", to: "users#index", as: :people
   get "people/suggested", to: "users#suggested", as: :suggested_people
 

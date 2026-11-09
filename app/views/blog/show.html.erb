@@ -1,0 +1,69 @@
+<% a = @article %>
+<% url = blog_article_url(a.slug) %>
+<% content_for(:title) { "#{a.title} · Brethreign Blog" } %>
+<% content_for(:meta_description) { a.description } %>
+<% content_for(:og_title) { a.title } %>
+<% content_for(:og_description) { a.description } %>
+<% content_for(:og_image) { "#{request.base_url}#{a.cover_path}" } %>
+<% content_for(:og_type) { "article" } %>
+<% content_for(:canonical) { url } %>
+<% content_for(:structured_data) do %>
+  <script type="application/ld+json"><%= json_escape({
+    "@context" => "https://schema.org", "@type" => "Article", "headline" => a.title, "description" => a.description,
+    "image" => [ "#{request.base_url}#{a.cover_path}" ], "datePublished" => a.date.iso8601, "dateModified" => a.date.iso8601,
+    "articleSection" => a.category, "mainEntityOfPage" => url,
+    "author" => { "@type" => "Organization", "name" => "Brethreign", "url" => "#{request.base_url}/" },
+    "publisher" => { "@id" => "#{request.base_url}/#org" }
+  }.to_json).html_safe %></script>
+<% end %>
+
+<article class="bl">
+  <header class="bl-article-head bl-wrap">
+    <nav class="bl-crumbs" aria-label="Breadcrumb">
+      <%= link_to "Blog", blog_path %> <span aria-hidden="true">/</span>
+      <%= link_to a.category, blog_path(category: a.category.downcase) %>
+    </nav>
+    <h1 class="bl-title"><%= a.title %></h1>
+    <p class="bl-lead"><%= a.description %></p>
+    <p class="bl-meta">
+      <span class="bl-cat bl-cat--<%= a.category.downcase %>"><%= a.category %></span>
+      <span>Brethreign team</span><span aria-hidden="true">·</span>
+      <time datetime="<%= a.date.iso8601 %>"><%= a.date.strftime("%-d %B %Y") %></time><span aria-hidden="true">·</span>
+      <span><%= a.minutes %> min read</span>
+    </p>
+    <div class="bl-cover">
+      <%= image_tag a.cover_path, alt: "", width: 1200, height: 630, decoding: "async" %>
+    </div>
+  </header>
+
+  <div class="bl-wrap bl-layout">
+    <% if a.headings.size >= 3 %>
+      <aside class="bl-toc" aria-label="In this article">
+        <p class="bl-toc-title">In this article</p>
+        <ol>
+          <% a.headings.each do |id, text| %><li><a href="#<%= id %>"><%= text %></a></li><% end %>
+        </ol>
+      </aside>
+    <% end %>
+
+    <div class="bl-body">
+      <%= sanitize a.html, tags: BlogArticle::ALLOWED_TAGS, attributes: BlogArticle::ALLOWED_ATTRIBUTES %>
+
+      <div class="bl-share">
+        <span>Share this guide</span>
+        <%= link_to "WhatsApp", "https://wa.me/?text=#{ERB::Util.url_encode("#{a.title} #{url}")}", class: "bl-btn bl-btn--small", target: "_blank", rel: "noopener" %>
+        <%= link_to "Email", "mailto:?subject=#{ERB::Util.url_encode(a.title)}&body=#{ERB::Util.url_encode(url)}", class: "bl-btn bl-btn--small" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bl-wrap">
+    <section class="bl-related" aria-label="Read next">
+      <h2 class="bl-section-title">Read next</h2>
+      <div class="bl-grid">
+        <% a.related.each do |article| %><%= render "blog/card", article: article %><% end %>
+      </div>
+    </section>
+    <%= render "blog/join" %>
+  </div>
+</article>

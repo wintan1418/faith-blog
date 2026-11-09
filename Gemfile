@@ -67,6 +67,10 @@ gem "pdf-reader", "~> 2.12"
 gem "rubyzip", "~> 3.2", require: "zip"
 gem "csv", "~> 3.3"
 
+# The blog: articles are Markdown files in app/content/blog.
+gem "kramdown", "~> 2.5"
+gem "kramdown-parser-gfm", "~> 1.1"
+
 # Web push notifications (VAPID + service worker delivery)
 gem "web-push", "~> 3.0"
 

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Renders each blog article's cover art (app/views/blog/cover.html.erb) to
+# public/blog/covers/<slug>.jpg (1200×630, also used for link previews).
+# Run after adding or retitling an article: bin/render-blog-covers [slug ...]
+# Needs: a dev server on $PORT (default 3000), Google Chrome, and macOS sips.
+set -euo pipefail
+PORT="${PORT:-3000}"
+CHROME="${CHROME:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
+TMP="$(mktemp -d)"
+mkdir -p public/blog/covers
+SLUGS="${*:-$(bin/rails runner 'puts BlogArticle.all.map(&:slug).join(" ")' 2>/dev/null | tail -1)}"
+for slug in $SLUGS; do
+  "$CHROME" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=1200,630 \
+    --virtual-time-budget=4000 --screenshot="$TMP/$slug.png" "http://localhost:$PORT/blog/$slug/cover" >/dev/null 2>&1
+  sips -s format jpeg -s formatOptions 84 "$TMP/$slug.png" --out "public/blog/covers/$slug.jpg" >/dev/null
+  echo "public/blog/covers/$slug.jpg"
+done
+rm -rf "$TMP"

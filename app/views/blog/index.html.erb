@@ -1,0 +1,57 @@
+<% content_for(:title) { @category ? "#{@category} · Brethreign Blog" : "Brethreign Blog: guides, tutorials and news" } %>
+<% content_for(:meta_description) { "How to get the most out of Brethreign: step-by-step guides to professional profiles, LinkedIn import, portfolios, prayer, chats and more." } %>
+<% content_for(:og_description) { "Guides, tutorials and news from Brethreign, the Christian social network." } %>
+<% content_for(:head) do %>
+  <link rel="alternate" type="application/rss+xml" title="Brethreign Blog" href="<%= blog_feed_url %>">
+<% end %>
+
+<div class="bl">
+  <header class="bl-hero">
+    <div class="bl-wrap">
+      <p class="bl-kicker">The Brethreign Blog</p>
+      <h1 class="bl-hero-title">Learn your way around <em>Brethreign</em></h1>
+      <p class="bl-hero-sub">Step-by-step guides with real screens, from your first breath to a professional profile and portfolio that open doors.</p>
+      <nav class="bl-chips" aria-label="Categories">
+        <%= link_to "All", blog_path, class: "bl-chip#{' is-on' unless @category}" %>
+        <% BlogArticle::CATEGORIES.each do |name| %>
+          <% count = BlogArticle.in_category(name).size %>
+          <% next if count.zero? %>
+          <%= link_to blog_path(category: name.downcase), class: "bl-chip#{' is-on' if @category == name}" do %><%= name %> <small><%= count %></small><% end %>
+        <% end %>
+      </nav>
+    </div>
+  </header>
+
+  <div class="bl-wrap bl-index">
+    <% if @featured %>
+      <section aria-label="Featured">
+        <%= render "blog/card", article: @featured, size: :wide %>
+      </section>
+    <% end %>
+
+    <% if !@category && (pro = BlogArticle.in_category("Professional")).any? %>
+      <section class="bl-series" aria-label="The professional series">
+        <div class="bl-series-head">
+          <p class="bl-kicker">Series</p>
+          <h2>Brethreign Professional, step by step</h2>
+        </div>
+        <ol class="bl-series-list">
+          <% pro.reject { |a| a == @featured }.each do |article| %>
+            <li><%= link_to blog_article_path(article.slug) do %><b><%= article.title %></b><span><%= article.minutes %> min</span><% end %></li>
+          <% end %>
+        </ol>
+      </section>
+    <% end %>
+
+    <section aria-label="<%= @category || 'All articles' %>">
+      <% unless @category %><h2 class="bl-section-title">All guides</h2><% end %>
+      <div class="bl-grid">
+        <% @articles.each do |article| %>
+          <%= render "blog/card", article: article %>
+        <% end %>
+      </div>
+    </section>
+
+    <%= render "blog/join" %>
+  </div>
+</div>
