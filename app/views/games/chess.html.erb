@@ -39,7 +39,10 @@
           <div class="fc-chess-board" data-chess-puzzle-target="board" role="grid" aria-label="Chess puzzle board"></div>
 
           <div class="fc-chess-controls">
-            <span class="fc-chess-progress" data-chess-puzzle-target="progress"></span>
+            <div class="fc-chess-meta">
+              <span class="fc-chess-progress" data-chess-puzzle-target="progress"></span>
+              <span class="fc-chess-tries" data-chess-puzzle-target="tries" role="status" title="Tries left: a wrong move or a hint uses one"></span>
+            </div>
             <div class="fc-chess-control-btns">
               <button type="button"
                       class="fc-btn"
@@ -52,13 +55,34 @@
               <button type="button"
                       class="fc-btn"
                       data-action="click->chess-puzzle#revealSolution">▶ Show solution</button>
-              <button type="button"
+              <button type="button" hidden
                       class="fc-btn fc-btn-primary"
-                      data-action="click->chess-puzzle#nextPractice">♞ New puzzle</button>
+                      data-chess-puzzle-target="nextBtn"
+                      data-action="click->chess-puzzle#nextStage">Next →</button>
             </div>
           </div>
 
           <div class="fc-chess-feedback hidden" data-chess-puzzle-target="feedback"></div>
+
+          <%# The ladder: ten puzzles that get harder as you climb. %>
+          <div class="fc-chess-ladder">
+            <div class="fc-chess-ladder-head">
+              <div>
+                <p class="fc-chess-ladder-title">♞ The ladder</p>
+                <p class="fc-chess-ladder-sub" data-chess-puzzle-target="best">Climb as high as you can.</p>
+              </div>
+              <div class="fc-chess-levels" role="group" aria-label="Choose a level to start a climb">
+                <% { "easy" => "Easy", "medium" => "Medium", "hard" => "Hard" }.each do |key, label| %>
+                  <button type="button" class="fc-chess-level" data-level="<%= key %>" aria-pressed="false"
+                          data-chess-puzzle-target="level" data-action="click->chess-puzzle#chooseLevel"><%= label %></button>
+                <% end %>
+              </div>
+            </div>
+            <div class="fc-chess-stages" data-chess-puzzle-target="stage" hidden aria-hidden="true">
+              <% 10.times do %><i></i><% end %>
+            </div>
+            <p class="fc-chess-ladder-rules">10 stages, each harder than the last. 3 tries per puzzle: a wrong move or a hint uses one. Run out and the climb starts again.</p>
+          </div>
 
           <p class="fc-chess-fine">
             Played <%= number_with_delimiter(@puzzle[:plays]) %> times on Lichess ·

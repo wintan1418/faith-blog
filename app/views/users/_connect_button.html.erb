@@ -1,0 +1,16 @@
+<%# A compact Connect button for people lists. Shares the connection_actions
+    id, so sending a request swaps it for the full state. %>
+<% connection = current_user.connection_with(user) %>
+<div id="<%= dom_id(user, :connection_actions) %>" class="fc-connect-slot">
+  <% if connection&.accepted? %>
+    <%= button_to "Message", conversations_path(recipient_id: user.id), method: :post, class: "fc-btn" %>
+  <% elsif connection&.pending? && connection.sender == current_user %>
+    <span class="fc-btn is-muted" aria-disabled="true">Requested</span>
+  <% elsif connection&.pending? %>
+    <%= button_to "Accept", accept_connection_request_path(connection), method: :post, class: "fc-btn" %>
+  <% elsif current_user.brethren_card&.complete? %>
+    <%= button_to "+ Connect", connection_requests_path(receiver_id: user.id), method: :post, class: "fc-btn" %>
+  <% else %>
+    <%= link_to "+ Connect", edit_settings_brethren_card_path, class: "fc-btn", title: "Complete your Brethren Card to connect" %>
+  <% end %>
+</div>

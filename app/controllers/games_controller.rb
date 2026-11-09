@@ -95,9 +95,10 @@ class GamesController < ApplicationController
                                         .exists?
   end
 
-  # GET /games/chess/practice — a fresh random puzzle, unlimited, no points.
+  # GET /games/chess/practice(?difficulty=easiest…hardest) — a fresh puzzle for
+  # practice and the ladder, unlimited, no points.
   def chess_practice
-    puzzle = Lichess::DailyPuzzle.practice
+    puzzle = Lichess::DailyPuzzle.practice(params[:difficulty])
     if puzzle
       render json: { ok: true, puzzle: puzzle }
     else

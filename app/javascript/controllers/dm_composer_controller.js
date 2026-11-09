@@ -76,11 +76,20 @@ export default class extends Controller {
   }
 
   onKeydown(event) {
-    // Cmd/Ctrl + Enter sends. Plain Enter inserts a newline.
-    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
-      event.preventDefault()
-      this.element.requestSubmit()
-    }
+    if (event.key !== "Enter" || event.isComposing) return
+    // On a computer Enter sends and Shift+Enter starts a new line. On a phone
+    // the keyboard's Enter is a new line (the Send button sends). Cmd/Ctrl +
+    // Enter sends everywhere.
+    const send = event.metaKey || event.ctrlKey || (!event.shiftKey && !event.altKey && !this.touchScreen())
+    if (!send) return
+
+    event.preventDefault()
+    if (this.hasSendBtnTarget && this.sendBtnTarget.classList.contains("hidden")) return // nothing to send yet
+    this.element.requestSubmit()
+  }
+
+  touchScreen() {
+    return window.matchMedia("(pointer: coarse)").matches
   }
 
   syncTrailingAction() {

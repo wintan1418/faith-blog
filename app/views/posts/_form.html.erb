@@ -269,6 +269,23 @@
     </div>
   </div>
 
+  <% unless post.persisted? && post.published? %>
+    <%# Drafts and scheduled breaths can be (re)scheduled from here too. The
+        picker shows the phone's own time; the hidden field sends it with its
+        time zone. With a future time picked, Publish reads "Schedule". %>
+    <div class="fc-composer-schedule pt-4" data-controller="schedule-field" data-schedule-field-utc-value="<%= post.scheduled_for&.utc&.iso8601 %>">
+      <label class="fc-composer-pill" title="Pick a future date and time to publish this breath automatically">
+        <span class="fc-composer-pill-label">⏱️ Schedule</span>
+        <input type="datetime-local" class="fc-composer-pill-select" aria-label="Schedule for"
+               data-schedule-field-target="local" data-action="change->schedule-field#sync input->schedule-field#sync">
+        <%= f.hidden_field :scheduled_for, value: post.scheduled_for&.utc&.iso8601, data: { schedule_field_target: "utc" } %>
+        <button type="button" class="fc-composer-pill-clear hidden" aria-label="Clear schedule"
+                data-schedule-field-target="clear" data-action="schedule-field#clear">×</button>
+      </label>
+      <p class="fc-composer-schedule-note hidden" data-schedule-field-target="note" aria-live="polite"></p>
+    </div>
+  <% end %>
+
   <div class="flex flex-wrap items-center gap-3 pt-4">
     <%# Two submit paths: Save as draft OR Publish. Each carries its own
         status value in the submit's `name` so the controller sees the
@@ -283,6 +300,7 @@
     <button type="submit"
             name="post[status]"
             value="published"
+            data-composer-mode-target="submit"
             class="fc-btn fc-btn-primary">
       <%= post.persisted? && post.published? ? "Update post" : "Publish" %>
     </button>

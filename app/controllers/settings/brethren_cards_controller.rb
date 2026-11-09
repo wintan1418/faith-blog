@@ -8,7 +8,8 @@ module Settings
 
     def update
       if @brethren_card.update(brethren_card_params)
-        redirect_to settings_brethren_card_path, notice: "Your Brethren Card has been updated!"
+        # In the apps this closes the edit screen and goes back to where it was opened.
+        recede_or_redirect_to user_path(current_user.username), notice: "Your Brethren Card has been updated!"
       else
         render :edit, status: :unprocessable_entity
       end

@@ -11,7 +11,7 @@ class Settings::ProfilesController < ApplicationController
     @profile = current_user.profile
 
     if @profile.update(profile_params)
-      redirect_to settings_profile_path, notice: "Profile updated successfully!"
+      recede_or_redirect_to user_path(current_user.username), notice: "Profile updated successfully!"
     else
       render :edit, status: :unprocessable_entity
     end

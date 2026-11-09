@@ -731,3 +731,25 @@ html.theme-dark .msg-money-tip { color: #fcd34d; background: rgba(245, 158, 11, 
 .msg-forward-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.8rem; }
 .msg-forward-count { color: var(--fc-muted); font-size: 0.85rem; }
 .fc-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+/* Save button in the full-screen photo viewer (chat photos). */
+.fc-lightbox-save {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  left: max(14px, env(safe-area-inset-left, 0px));
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 40px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+}
+.fc-lightbox-save:hover { background: rgba(255, 255, 255, 0.24); }
+.fc-lightbox-save[hidden] { display: none; }

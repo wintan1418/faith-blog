@@ -7,7 +7,7 @@
 <%= form_with model: post,
     html: { class: "fc-composer-form", multipart: true, data: {
       turbo_action: ("replace" if local_assigns[:page]),
-      controller: "post-form composer-mode composer-assistant",
+      controller: "post-form composer-mode composer-assistant paste-images",
       composer_mode_initial_value: mode,
       composer_assistant_gentleness_url_value: check_gentleness_posts_path,
       composer_assistant_scripture_url_value: suggest_scripture_posts_path
@@ -120,7 +120,7 @@
               multiple: true,
               accept: "image/*",
               class: "sr-only",
-              data: { action: "change->post-form#previewImages" } %>
+              data: { action: "change->post-form#previewImages", paste_images_target: "input" } %>
         </label>
 
         <div class="fc-voice-recorder" data-controller="voice-recorder">

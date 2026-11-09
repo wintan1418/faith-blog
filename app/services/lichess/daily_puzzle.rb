@@ -30,9 +30,14 @@ module Lichess
       data
     end
 
-    # A fresh random puzzle for unlimited practice — never cached.
-    def self.practice
-      request_puzzle(PRACTICE_ENDPOINT)
+    # Lichess's difficulty steps, easiest first. The ladder climbs them.
+    DIFFICULTIES = %w[easiest easier normal harder hardest].freeze
+
+    # A fresh random puzzle for practice and the ladder — never cached.
+    def self.practice(difficulty = nil)
+      url = PRACTICE_ENDPOINT
+      url += "?difficulty=#{difficulty}" if DIFFICULTIES.include?(difficulty.to_s)
+      request_puzzle(url)
     end
 
     def self.request_puzzle(endpoint)

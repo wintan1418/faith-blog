@@ -196,3 +196,32 @@
   .fc-updates-intro-icons span { animation: none; }
   .fc-updates-intro-icons span:first-child { opacity: 1; }
 }
+
+/* ── Chess: tries, wrong-move flash and the ladder ─────────────────── */
+.fc-chess-meta { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.fc-chess-tries { font-size: 1rem; letter-spacing: 0.1em; line-height: 1; }
+.fc-chess-sq.is-wrong { background: #e38c86; }
+.fc-chess-sq.is-wrong.is-dark { background: #c96b64; }
+.fc-chess-ladder {
+  margin-top: 1rem; padding: 1rem 1.1rem; display: grid; gap: 0.75rem;
+  border: 1px solid var(--fc-line); border-radius: 16px;
+  background: color-mix(in srgb, var(--fc-accent) 6%, var(--fc-surface));
+}
+.fc-chess-ladder-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.fc-chess-ladder-title { font-weight: 800; font-size: 1.05rem; color: var(--fc-ink); }
+.fc-chess-ladder-sub { font-size: 0.85rem; color: var(--fc-muted); }
+.fc-chess-levels { display: inline-grid; grid-template-columns: repeat(3, auto); border: 1px solid var(--fc-line); border-radius: 999px; padding: 3px; gap: 2px; background: var(--fc-surface); }
+.fc-chess-level {
+  min-height: 38px; padding: 0 1rem; border: 0; border-radius: 999px; background: none; cursor: pointer;
+  font-weight: 700; font-size: 0.88rem; color: var(--fc-muted);
+}
+.fc-chess-level:hover { color: var(--fc-ink); }
+.fc-chess-level.is-on { background: var(--fc-accent); color: var(--fc-on-accent, #04261a); }
+.fc-chess-level:focus-visible { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
+.fc-chess-stages { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.fc-chess-stages[hidden] { display: none; }
+.fc-chess-stages i { height: 6px; border-radius: 999px; background: var(--fc-line); }
+.fc-chess-stages i.is-done { background: var(--fc-accent); }
+.fc-chess-stages i.is-now { background: color-mix(in srgb, var(--fc-accent) 45%, var(--fc-line)); }
+.fc-chess-ladder-rules { font-size: 0.82rem; line-height: 1.45; color: var(--fc-muted); }
+.fc-chess-control-btns [hidden] { display: none !important; }
