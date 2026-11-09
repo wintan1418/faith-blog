@@ -504,3 +504,4 @@ html.theme-dark a.card-act { color: var(--fc-ink); }
 .card-qr-box, .card-qr-box svg { width: 190px; height: 190px; display: block; }
 .card-qr-box { position: relative; }
 .card-qr p { color: #33463d !important; }
+.card-act { font-size: 0.76rem; white-space: nowrap; }

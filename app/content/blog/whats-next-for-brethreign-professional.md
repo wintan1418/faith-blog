@@ -19,6 +19,11 @@ Everything in this section is available now, free, to every member.
 - **Import from LinkedIn.** Upload your LinkedIn profile PDF or data export, tick what you want, and Brethreign adds it to your profile. The file is read once and not kept.
 - **A portfolio.** A Portfolio tab for work you're proud of, with photos, a story, skills, a link and an optional PDF for each piece.
 - **Brethren you may know.** Suggestions based on your church, mutual connections, your work, your skills, your city and your rooms.
+- **"Open to" badges.** Say you're open to work, hiring, mentoring, volunteering or freelance work, with a coloured ring on your photo. You choose who sees it.
+- **Skill endorsements.** Your connections can endorse the skills on your profile in one tap.
+- **A digital business card.** A short link (brethreign.com/in/yourname) and a QR code to share at church, at work or anywhere you meet people.
+
+Read [Open to, endorsements and your business card](/blog/open-to-endorsements-and-your-business-card) for how to set them up.
 
 <div class="bl-pair">
 <figure class="bl-shot"><img src="/blog/shots/profile-pro.jpg" alt="The Professional tab on a demo profile with a Profile strength card at 70 percent, Strong, listing Headline and 5 skills as next steps, and an Experience section below"><figcaption>The Professional tab, live now.</figcaption></figure>
@@ -31,11 +36,7 @@ Everything below is **planned**. We're sharing it because we'd rather you knew o
 
 ### Planned for December 2026
 
-**"Open to" badges.** You'll be able to say you're open to work, hiring, mentoring, volunteering or freelance work. It will show as a coloured ring on your photo, and you'll choose who sees it.
-
-**Skill endorsements and recommendations.** Your connections will be able to endorse your skills and write you a recommendation. Nothing will appear on your profile until you approve it.
-
-**A digital business card.** A short link and a QR code for your profile, so you can share it at church, at a conference or anywhere you meet people.
+**Recommendations.** Your connections will be able to write you a recommendation, and you'll be able to ask for one. Nothing will appear on your profile until you approve it.
 
 ### Planned for early 2027
 
@@ -63,7 +64,7 @@ Work takes up a large part of the week for most of us, and many of us serve in c
 
 ## Get ready now
 
-Many of the planned features build on the profile you can set up today. The planned search filters cover industry, skill, city, company, school and church, which are details you can add now. Endorsements will build on the skills you list. Recommendations will come from your connections. The more complete your profile is now, the more you'll get from each new feature when it arrives.
+Many of the planned features build on the profile you can set up today. The planned search filters cover industry, skill, city, company, school and church, which are details you can add now. Endorsements already build on the skills you list. Recommendations will come from your connections. The more complete your profile is now, the more you'll get from each new feature when it arrives.
 
 When a new release ships, you'll see a short "What's new" tour once, with buttons that take you straight to what's new.
 

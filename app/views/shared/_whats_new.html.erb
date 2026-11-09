@@ -28,6 +28,12 @@
               <% if slide.action == "linkedin" %>
                 <div class="wn-action"><%= link_to "Import from LinkedIn", new_settings_linkedin_import_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
               <% end %>
+              <% if slide.action == "open_to" %>
+                <div class="wn-action"><%= link_to "Choose what I'm open to", edit_settings_professional_path(anchor: "open-to"), class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
+              <% end %>
+              <% if slide.action == "card" %>
+                <div class="wn-action"><%= link_to "See my card", card_path(current_user.username), class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
+              <% end %>
               <% if slide.action == "portfolio" %>
                 <div class="wn-action"><%= link_to "Add your work", new_settings_portfolio_item_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
               <% end %>
