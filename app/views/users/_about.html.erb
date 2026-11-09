@@ -1,0 +1,40 @@
+<%# About tab: the member's own words and the facts they've chosen to share. %>
+<% owner = user_signed_in? && user == current_user %>
+<% profile = user.profile %>
+<% name = user.display_name.presence || user.username %>
+
+<section class="mystic-panel-strong pro-card about-card">
+  <div class="pro-panel-head">
+    <h2 class="pro-card-title">About</h2>
+    <% if owner %><%= link_to "Edit", edit_settings_profile_path, class: "pro-item-edit" %><% end %>
+  </div>
+
+  <% if profile&.bio.present? %>
+    <p class="about-bio"><%= profile.bio %></p>
+  <% elsif owner %>
+    <p class="pro-empty">Tell brethren a little about yourself: your story, your calling, what you care about.</p>
+  <% else %>
+    <p class="pro-empty"><%= name %> hasn't written about themselves yet.</p>
+  <% end %>
+
+  <dl class="about-facts">
+    <% if profile&.assembly.present? %>
+      <div><dt>Church</dt><dd><%= profile.assembly %></dd></div>
+    <% end %>
+    <% if profile&.location.present? %>
+      <div><dt>Lives in</dt><dd><%= profile.location %></dd></div>
+    <% end %>
+    <% if (headline = user.professional_headline) %>
+      <div><dt>Work</dt><dd><%= headline %></dd></div>
+    <% end %>
+    <% if profile&.faith_background.present? %>
+      <div><dt>Faith background</dt><dd><%= profile.faith_background %></dd></div>
+    <% end %>
+    <% if (site = https_href(profile&.website)) %>
+      <div><dt>Website</dt><dd><%= link_to site.sub(%r{\Ahttps://(www\.)?}i, "").chomp("/"), site, target: "_blank", rel: "noopener nofollow" %></dd></div>
+    <% end %>
+    <div><dt>Joined</dt><dd><%= user.created_at.strftime("%B %Y") %></dd></div>
+  </dl>
+</section>
+
+<%= render "users/brethren_card_panel" if owner %>

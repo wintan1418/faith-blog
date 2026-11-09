@@ -3,6 +3,6 @@
 <%# Brethren-you-may-know card: show the request was sent, right on the card. %>
 <% if @connection_request&.persisted? %>
   <%= turbo_stream.replace dom_id(@receiver, :suggestion_action) do %>
-    <div id="<%= dom_id(@receiver, :suggestion_action) %>"><span class="bys-connect bys-connect--sent">Request sent ✓</span></div>
+    <div class="bys-action" id="<%= dom_id(@receiver, :suggestion_action) %>"><span class="bys-connect bys-connect--sent">Request sent ✓</span></div>
   <% end %>
 <% end %>
