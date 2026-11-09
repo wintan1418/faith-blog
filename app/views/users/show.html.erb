@@ -80,8 +80,9 @@
             <% if @user.profile.faith_background.present? %>
               <span class="profile-meta">
                 <%= render_icon("cross", classes: "w-4 h-4") %>
-                <%# Labelled: on its own, "Saved 5 years ago" read like a date something was saved. %>
-                <span class="profile-meta-label">Faith background:</span> <%= @user.profile.faith_background %>
+                <%# Labelled: on its own, "Saved 5 years ago" read like a date something was saved.
+                    One span, so the label and the answer wrap together as a sentence. %>
+                <span><span class="profile-meta-label">Faith background:</span> <%= @user.profile.faith_background %></span>
               </span>
             <% end %>
             <span class="profile-meta">
@@ -125,7 +126,7 @@
           </div>
 
           <% if user_signed_in? && @user != current_user %>
-            <div class="mt-6 flex flex-wrap items-center gap-3">
+            <div class="profile-actions mt-6">
               <%= render "users/follow_actions", user: @user %>
               <%= render "users/connection_actions", user: @user %>
             </div>

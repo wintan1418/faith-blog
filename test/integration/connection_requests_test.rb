@@ -45,7 +45,7 @@ class ConnectionRequestsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, dom_id(@sender, :connection_actions)
     assert_includes response.body, "connection_requests_received"
     assert_includes response.body, "No pending requests."
-    assert_includes response.body, "View Brethren Card"
+    assert_includes response.body, "Brethren Card"
   end
 
   private

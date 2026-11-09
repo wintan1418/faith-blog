@@ -21139,3 +21139,55 @@ input[type="file"]::file-selector-button:hover { border-color: var(--fc-accent);
   .fc-composer .fc-composer-input { white-space: normal; height: auto; min-height: 44px; }
   .fc-composer .fc-composer-input .fc-composer-daily { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; font-size: 0.93rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Buttons and borders, November 2026 (phone review, round 2).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Tailwind v4 draws a border in the text colour unless told otherwise, so in
+   dark mode every plain "border" / "border-t" was a bright white line. Give
+   them the theme's line colour; anything with its own colour still wins. */
+@layer base {
+  *, ::before, ::after, ::backdrop, ::file-selector-button { border-color: var(--fc-line-strong, currentColor); }
+}
+.border-faith-green\/10, .border-faith-green\/20 { border-color: var(--fc-line) !important; }
+
+/* One button system for both families (.btn and .fc-btn). Before: two
+   shapes, seven heights, and the old "primary" showing as a dark button with
+   a glow, so main actions looked like minor ones. Now: pill shape, 40px
+   (34px small), no glow. Primary = solid accent; secondary = neutral outline. */
+:root .btn, :root .fc-btn { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.45rem !important; min-height: 40px !important; padding: 0 1.1rem !important; border-radius: 999px !important; border: 1px solid var(--fc-line-strong) !important; background: var(--fc-surface) !important; color: var(--fc-ink) !important; font-size: 0.9rem !important; font-weight: 700 !important; line-height: 1.1 !important; text-decoration: none !important; white-space: nowrap !important; box-shadow: none !important; transform: none !important; transition: background 150ms ease, border-color 150ms ease, color 150ms ease !important; }
+:root .btn:hover, :root .fc-btn:hover { border-color: var(--fc-accent) !important; color: var(--fc-ink) !important; box-shadow: none !important; transform: none !important; }
+:root .btn.btn-primary, :root .fc-btn.fc-btn-primary, :root .bys-connect { box-shadow: none !important; background: var(--fc-accent) !important; border-color: var(--fc-accent) !important; color: #04261a !important; }
+:root .btn.btn-primary:hover, :root .fc-btn.fc-btn-primary:hover, :root .bys-connect:hover { background: color-mix(in srgb, var(--fc-accent) 86%, white) !important; border-color: transparent !important; color: #04261a !important; }
+:root .bys-connect { display: inline-flex !important; align-items: center !important; justify-content: center !important; }
+:root .btn.btn-sm, :root .bys-connect { min-height: 34px !important; padding: 0 0.9rem !important; font-size: 0.82rem !important; }
+:root .btn.btn-danger { background: transparent !important; border-color: color-mix(in srgb, #ef4444 55%, transparent) !important; color: #f87171 !important; }
+:root .btn:disabled, :root .fc-btn:disabled, :root .btn.cursor-not-allowed { opacity: 0.55 !important; cursor: not-allowed !important; }
+:root .btn:focus-visible, :root .fc-btn:focus-visible { outline: 2px solid var(--fc-accent) !important; outline-offset: 2px !important; }
+
+/* Profile actions (Follow, Message, Brethren Card): one even row. */
+.profile-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; width: 100%; max-width: 34rem; min-width: 0; }
+.profile-actions > turbo-frame, .profile-actions > div, .profile-actions > div > form, .profile-actions > turbo-frame > form { display: contents; }
+:root .profile-actions .btn, :root .profile-actions .fc-btn { width: 100% !important; min-width: 0 !important; white-space: normal !important; text-align: center; }
+/* Phones: the main action (Message, Connect) full width on top, the rest in pairs below. */
+@media (max-width: 640px) {
+  .profile-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-inline: auto; }
+  .profile-actions .btn-primary, .profile-actions .fc-btn-primary { grid-column: 1 / -1; order: -1; }
+}
+
+/* Connection cards: View Card, Message, WhatsApp, Email in a 2 × 2 grid. */
+.conn-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.conn-actions > form, .conn-actions > form > button, .conn-actions > .btn { width: 100%; }
+
+/* Profile header: the colour band belongs at the top of the card (an older
+   ".profile-hero-panel > *" rule had pushed it into the flow, leaving an empty
+   strip above it), and it's strong enough to see in dark mode. */
+.profile-hero-panel { position: relative; overflow: hidden; }
+.profile-hero-panel > .profile-cover { position: absolute; inset: 0 0 auto 0; }
+html.theme-dark .profile-cover, :root .profile-cover { opacity: 1; filter: saturate(1.15); }
+.profile-meta .profile-meta-label { margin-right: 0.15rem; }
+/* The faith line can run to two lines: keep its icon beside the text. */
+.profile-meta:has(.profile-meta-label) { align-items: flex-start; gap: 0.4rem; }
+.profile-meta:has(.profile-meta-label) svg { flex: none; margin-top: 0.2rem; }
+.profile-meta:has(.profile-meta-label) > span { text-align: left; min-width: 0; }
