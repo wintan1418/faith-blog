@@ -1,0 +1,117 @@
+<% content_for :title, "Review your LinkedIn import" %>
+<% d = @draft %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <%= link_to "← Choose another file", new_settings_linkedin_import_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
+    <h1 class="mystic-title mt-3 text-3xl sm:text-4xl">Here's what we found</h1>
+    <p class="mystic-copy mt-2">Untick anything you'd rather leave out. Things already on your profile are skipped.</p>
+
+    <%= form_with url: apply_settings_linkedin_import_path, method: :post, class: "li-review" do %>
+      <% details = [
+           [ :headline, "Headline", d.headline, @profile.headline.blank? ],
+           [ :industry, "Industry", d.industry, @profile.industry.blank? ],
+           [ :location, "Location", d.location, @profile.location.blank? ],
+           [ :summary, "About (replaces your bio)", d.summary, @profile.bio.blank? ]
+         ].select { |_, _, value, _| value.present? } %>
+      <% if details.any? %>
+        <section class="mystic-panel-strong li-group">
+          <h2 class="li-group-title">Profile details</h2>
+          <% details.each do |key, label, value, fill| %>
+            <%= hidden_field_tag "import[#{key}]", value %>
+            <label class="li-item">
+              <%= check_box_tag "import[use_#{key}]", "1", fill, id: "use_#{key}" %>
+              <span class="li-item-body"><span class="li-item-label"><%= label %></span><span class="li-item-main li-clamp"><%= value %></span></span>
+            </label>
+          <% end %>
+        </section>
+      <% end %>
+
+      <% if d.positions.any? %>
+        <section class="mystic-panel-strong li-group">
+          <h2 class="li-group-title">Experience <span><%= d.positions.size %></span></h2>
+          <% d.positions.each_with_index do |p, i| %>
+            <% have = @have[:roles].include?([ MatchKey.for(p["title"]), MatchKey.for(p["organization"]) ]) %>
+            <label class="li-item<%= ' is-have' if have %>">
+              <%= check_box_tag "import[positions][]", p.to_json, !have, id: "position_#{i}", disabled: have %>
+              <span class="li-item-body">
+                <span class="li-item-main"><%= p["title"] %></span>
+                <span class="li-item-sub"><%= [ p["organization"], p["employment_type"] ].compact.join(" · ") %></span>
+                <span class="li-item-meta"><%= Date.parse(p["start_on"]).strftime("%b %Y") %> – <%= p["current"] ? "Present" : (p["end_on"] ? Date.parse(p["end_on"]).strftime("%b %Y") : "") %><%= " · Already on your profile" if have %></span>
+              </span>
+            </label>
+          <% end %>
+        </section>
+      <% end %>
+
+      <% if d.educations.any? %>
+        <section class="mystic-panel-strong li-group">
+          <h2 class="li-group-title">Education <span><%= d.educations.size %></span></h2>
+          <% d.educations.each_with_index do |e, i| %>
+            <% have = @have[:schools].include?(e["school"].downcase) %>
+            <label class="li-item<%= ' is-have' if have %>">
+              <%= check_box_tag "import[educations][]", e.to_json, !have, id: "education_#{i}", disabled: have %>
+              <span class="li-item-body">
+                <span class="li-item-main"><%= e["school"] %></span>
+                <span class="li-item-sub"><%= [ e["qualification"], e["field_of_study"] ].compact.join(", ") %></span>
+                <span class="li-item-meta"><%= [ e["start_year"], e["end_year"] ].compact.join(" – ") %><%= " · Already on your profile" if have %></span>
+              </span>
+            </label>
+          <% end %>
+        </section>
+      <% end %>
+
+      <% if d.certifications.any? %>
+        <section class="mystic-panel-strong li-group">
+          <h2 class="li-group-title">Licenses &amp; certifications <span><%= d.certifications.size %></span></h2>
+          <% d.certifications.each_with_index do |c, i| %>
+            <% have = @have[:certifications].include?(c["name"].downcase) %>
+            <label class="li-item<%= ' is-have' if have %>">
+              <%= check_box_tag "import[certifications][]", c.to_json, !have, id: "certification_#{i}", disabled: have %>
+              <span class="li-item-body">
+                <span class="li-item-main"><%= c["name"] %></span>
+                <span class="li-item-sub"><%= c["issuer"] %><%= " · Already on your profile" if have %></span>
+              </span>
+            </label>
+          <% end %>
+        </section>
+      <% end %>
+
+      <% if d.languages.any? %>
+        <section class="mystic-panel-strong li-group">
+          <h2 class="li-group-title">Languages <span><%= d.languages.size %></span></h2>
+          <% d.languages.each_with_index do |l, i| %>
+            <% have = @have[:languages].include?(l["name"].downcase) %>
+            <label class="li-item<%= ' is-have' if have %>">
+              <%= check_box_tag "import[languages][]", l.to_json, !have, id: "language_#{i}", disabled: have %>
+              <span class="li-item-body">
+                <span class="li-item-main"><%= l["name"] %></span>
+                <span class="li-item-sub"><%= UserLanguage::LABELS[l["proficiency"]] %><%= " · Already on your profile" if have %></span>
+              </span>
+            </label>
+          <% end %>
+        </section>
+      <% end %>
+
+      <% if d.skills.any? %>
+        <section class="mystic-panel-strong li-group">
+          <h2 class="li-group-title">Skills <span><%= d.skills.size %></span></h2>
+          <div class="li-chips">
+            <% d.skills.each_with_index do |s, i| %>
+              <% have = @have[:skills].include?(s.downcase) %>
+              <label class="li-chip<%= ' is-have' if have %>">
+                <%= check_box_tag "import[skills][]", s, !have, id: "skill_#{i}", disabled: have %><span><%= s %></span>
+              </label>
+            <% end %>
+          </div>
+          <p class="li-note">Up to <%= Profile::MAX_SKILLS %> skills in total on a profile.</p>
+        </section>
+      <% end %>
+
+      <div class="li-actions">
+        <button type="submit" class="btn btn-primary" data-disable-with="Adding…">Add to my profile</button>
+        <%= link_to "Cancel", edit_settings_professional_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

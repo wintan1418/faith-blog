@@ -62,6 +62,11 @@ gem "image_processing", "~> 1.2"
 # Cloudinary for cloud file storage
 gem "cloudinary"
 
+# Import from LinkedIn: read the profile PDF and the data-export ZIP.
+gem "pdf-reader", "~> 2.12"
+gem "rubyzip", "~> 3.2", require: "zip"
+gem "csv", "~> 3.3"
+
 # Web push notifications (VAPID + service worker delivery)
 gem "web-push", "~> 3.0"
 

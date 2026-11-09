@@ -4,16 +4,19 @@
   <% end %>
   <div>
     <%= f.label :title, "Title", class: "label" %>
-    <%= f.text_field :title, class: "input", required: true, maxlength: 100, placeholder: "Nurse, Software engineer, Youth pastor…" %>
+    <%= f.text_field :title, class: "input", required: true, maxlength: 100, placeholder: "Software engineer, Nurse, Accountant…" %>
   </div>
   <div>
     <%= f.label :organization, "Organisation", class: "label" %>
-    <%= f.text_field :organization, class: "input", required: true, maxlength: 100, placeholder: "Company, church, ministry or school" %>
+    <%= f.text_field :organization, class: "input", required: true, maxlength: 100, placeholder: "Company or organisation" %>
   </div>
   <div class="grid gap-5 sm:grid-cols-2">
     <div>
-      <%= f.label :employment_type, "Type", class: "label" %>
-      <%= f.select :employment_type, Experience::EMPLOYMENT_TYPES, { include_blank: "Choose…" }, class: "input" %>
+      <%= f.label :employment_type, "Employment type", class: "label" %>
+      <%= f.select :employment_type, Experience::TYPE_LABELS.invert,
+                   { include_blank: "Choose…", selected: (experience.new_record? && experience.employment_type.blank? ? "Full-time" : experience.employment_type) },
+                   class: "input" %>
+      <p class="mt-1 text-xs text-faith-muted">Volunteer and church roles show under “Volunteering” on your profile.</p>
     </div>
     <div>
       <%= f.label :location, "Location", class: "label" %>

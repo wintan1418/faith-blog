@@ -16,7 +16,7 @@ class ProfessionalStrengthTest < ActiveSupport::TestCase
 
   test "points add up as the profile fills in" do
     @user.profile.update!(headline: "Nurse · Choir member", skills: %w[Care Triage Teaching Singing Admin],
-                          assembly: "Grace Assembly", location: "Accra, Ghana",
+                          industry: "Healthcare & Medicine", location: "Accra, Ghana",
                           bio: "Paediatric nurse in Accra. I sing in the choir and teach Sunday school.")
     @user.experiences.create!(title: "Nurse", organization: "Korle Bu", start_month: "2020-01", current: true)
     @user.educations.create!(school: "University of Ghana")

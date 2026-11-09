@@ -202,6 +202,11 @@ Rails.application.routes.draw do
     resource :professional, only: [ :edit, :update ]
     resources :experiences, only: [ :new, :create, :edit, :update, :destroy ]
     resources :educations, only: [ :new, :create, :edit, :update, :destroy ]
+    resources :certifications, only: [ :new, :create, :edit, :update, :destroy ]
+    resources :languages, only: [ :create, :destroy ]
+    resource :linkedin_import, only: [ :new, :create ] do
+      post :apply
+    end
     resource :dark_mode, only: [ :update ]
     resource :accent,    only: [ :edit, :update ]
     resource :background_rain, only: [ :update ]

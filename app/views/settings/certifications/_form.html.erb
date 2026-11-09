@@ -1,0 +1,35 @@
+<%= form_with model: certification, url: (certification.persisted? ? settings_certification_path(certification) : settings_certifications_path), class: "space-y-5 pro-form" do |f| %>
+  <% if certification.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= certification.errors.full_messages.to_sentence %></div>
+  <% end %>
+  <div>
+    <%= f.label :name, "Name", class: "label" %>
+    <%= f.text_field :name, class: "input", required: true, maxlength: 150, placeholder: "Registered Nurse, AWS Solutions Architect, ICAN…" %>
+  </div>
+  <div>
+    <%= f.label :issuer, "Issued by", class: "label" %>
+    <%= f.text_field :issuer, class: "input", maxlength: 120, placeholder: "Nursing and Midwifery Council, Amazon Web Services…" %>
+  </div>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= f.label :issued_month, "Issued", class: "label" %>
+      <%= f.month_field :issued_month, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :expires_month, "Expires (optional)", class: "label" %>
+      <%= f.month_field :expires_month, class: "input" %>
+    </div>
+  </div>
+  <div>
+    <%= f.label :credential_url, "Credential link (optional)", class: "label" %>
+    <%= f.url_field :credential_url, class: "input", maxlength: 500, placeholder: "https://…" %>
+  </div>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <%= f.submit (certification.persisted? ? "Save" : "Add certification"), class: "btn btn-primary" %>
+    <%= link_to "Cancel", edit_settings_professional_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
+<% if certification.persisted? %>
+  <%= button_to "Remove this certification", settings_certification_path(certification), method: :delete, class: "pro-remove",
+                form: { class: "mt-6" }, data: { turbo_confirm: "Remove this certification?" } %>
+<% end %>

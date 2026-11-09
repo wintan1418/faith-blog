@@ -25,7 +25,7 @@ class ProfessionalStrength
       step(:education, "Education", @user.educations.any?, 10, "Add", new_settings_education_path),
       skills_step,
       step(:about, "A few lines about you", @profile&.bio.to_s.strip.length.to_i >= ABOUT_MIN, 10, "Write", edit_settings_profile_path),
-      step(:church, "Your church", @profile&.assembly.present?, 10, "Add", edit_settings_professional_path),
+      step(:industry, "Your industry", @profile&.industry.present?, 10, "Add", edit_settings_professional_path),
       step(:city, "Your city", @profile&.location.present?, 10, "Add", edit_settings_profile_path)
     ]
   end

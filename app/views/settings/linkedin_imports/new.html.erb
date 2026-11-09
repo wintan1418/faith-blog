@@ -1,0 +1,39 @@
+<% content_for :title, "Import from LinkedIn" %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <%= link_to "← Professional", edit_settings_professional_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
+    <h1 class="mystic-title mt-3 text-3xl sm:text-4xl">Import from LinkedIn</h1>
+    <p class="mystic-copy mt-2">Bring your roles, education, skills, certifications and languages across in a minute. You'll see everything before anything is added.</p>
+
+    <div class="li-ways">
+      <section class="mystic-panel-strong li-way">
+        <span class="li-badge">Fastest</span>
+        <h2 class="li-way-title">Your LinkedIn profile PDF</h2>
+        <ol class="li-steps">
+          <li>On a computer, open your profile on <b>linkedin.com</b>.</li>
+          <li>Click <b>Resources</b> (or <b>More</b>) under your name, then <b>Save to PDF</b>.</li>
+          <li>Upload the PDF below.</li>
+        </ol>
+      </section>
+      <section class="mystic-panel-strong li-way">
+        <span class="li-badge li-badge--soft">Most complete</span>
+        <h2 class="li-way-title">Your LinkedIn data export</h2>
+        <ol class="li-steps">
+          <li>On LinkedIn go to <b>Settings → Data privacy → Get a copy of your data</b>.</li>
+          <li>Choose the files you want: <b>Profile, Positions, Education, Skills, Certifications, Languages</b>. Then request the archive.</li>
+          <li>LinkedIn emails you a link, usually within minutes. Upload the ZIP below.</li>
+        </ol>
+      </section>
+    </div>
+
+    <%= form_with url: settings_linkedin_import_path, method: :post, multipart: true, data: { turbo: false },
+                  class: "mystic-panel-strong li-upload" do %>
+      <label for="linkedin_file" class="label">PDF or ZIP from LinkedIn</label>
+      <input type="file" id="linkedin_file" name="file" required class="input"
+             accept=".pdf,.zip,application/pdf,application/zip,application/x-zip-compressed">
+      <p class="li-note">Your file is read once to fill in the review page, then thrown away; we don't keep it. A PDF is read with the help of our AI service.</p>
+      <button type="submit" class="btn btn-primary" data-disable-with="Reading your file…">Read my file</button>
+    <% end %>
+  </div>
+</div>

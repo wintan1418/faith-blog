@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_04_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_090100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -203,6 +203,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_170000) do
     t.datetime "updated_at", null: false
     t.index ["sender_id"], name: "index_broadcasts_on_sender_id"
     t.index ["status"], name: "index_broadcasts_on_status"
+  end
+
+  create_table "certifications", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", limit: 150, null: false
+    t.string "issuer", limit: 120
+    t.date "issued_on"
+    t.date "expires_on"
+    t.string "credential_url", limit: 500
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_certifications_on_user_id"
   end
 
   create_table "church_history_eras", force: :cascade do |t|
@@ -629,9 +641,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_170000) do
     t.string "assembly", limit: 120
     t.string "assembly_key"
     t.string "city_key"
+    t.string "industry", limit: 80
     t.index ["assembly_key"], name: "index_profiles_on_assembly_key"
     t.index ["birth_month", "birth_day"], name: "index_profiles_on_birth_month_and_birth_day"
     t.index ["city_key"], name: "index_profiles_on_city_key"
+    t.index ["industry"], name: "index_profiles_on_industry"
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 
@@ -779,6 +793,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_170000) do
     t.index ["user_id"], name: "index_user_badges_on_user_id"
   end
 
+  create_table "user_languages", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", limit: 60, null: false
+    t.integer "proficiency", default: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "user_id, lower((name)::text)", name: "index_user_languages_on_user_and_name", unique: true
+    t.index ["user_id"], name: "index_user_languages_on_user_id"
+  end
+
   create_table "user_reading_plans", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "plan_slug", null: false
@@ -873,6 +897,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_170000) do
   add_foreign_key "bot_items", "bot_sources"
   add_foreign_key "brethren_cards", "users"
   add_foreign_key "broadcasts", "users", column: "sender_id"
+  add_foreign_key "certifications", "users"
   add_foreign_key "circle_breaths", "circles"
   add_foreign_key "circle_breaths", "users"
   add_foreign_key "circle_memberships", "circles"
@@ -930,6 +955,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_170000) do
   add_foreign_key "suggestion_dismissals", "users"
   add_foreign_key "suggestion_dismissals", "users", column: "dismissed_user_id"
   add_foreign_key "user_badges", "users"
+  add_foreign_key "user_languages", "users"
   add_foreign_key "user_reading_plans", "users"
   add_foreign_key "user_risk_profiles", "users"
   add_foreign_key "user_seen_quiz_questions", "bible_quiz_questions"
