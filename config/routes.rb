@@ -92,6 +92,8 @@ Rails.application.routes.draw do
   get "mentions", to: "users#mentions"
 
   # User profiles
+  # A piece of work on someone's Portfolio tab.
+  get "u/:username/work/:id", to: "portfolio_items#show", as: :portfolio_work
   resources :users, only: [ :show ], param: :username, path: "u" do
     member do
       post :follow
@@ -204,6 +206,9 @@ Rails.application.routes.draw do
     resources :educations, only: [ :new, :create, :edit, :update, :destroy ]
     resources :certifications, only: [ :new, :create, :edit, :update, :destroy ]
     resources :languages, only: [ :create, :destroy ]
+    resources :portfolio_items, except: [ :show ] do
+      patch :move, on: :member
+    end
     resource :linkedin_import, only: [ :new, :create ] do
       post :apply
     end

@@ -1,0 +1,80 @@
+<%= form_with model: item, url: (item.persisted? ? settings_portfolio_item_path(item) : settings_portfolio_items_path),
+              class: "space-y-5 pro-form", multipart: true do |f| %>
+  <% if item.errors.any? %>
+    <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= item.errors.full_messages.to_sentence %></div>
+  <% end %>
+  <div>
+    <%= f.label :title, "Title", class: "label" %>
+    <%= f.text_field :title, class: "input", required: true, maxlength: 100, placeholder: "Lumen savings app redesign" %>
+  </div>
+  <div>
+    <%= f.label :summary, "One line about it", class: "label" %>
+    <%= f.text_field :summary, class: "input", maxlength: 160, placeholder: "Helped 40,000 families save weekly, in 3 taps" %>
+  </div>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= f.label :category, "Kind of work", class: "label" %>
+      <%= f.select :category, PortfolioItem::CATEGORIES.map { |name, emoji| [ "#{emoji} #{name}", name ] }, { include_blank: "Choose…" }, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :contribution, "Your part", class: "label" %>
+      <%= f.text_field :contribution, class: "input", maxlength: 80, placeholder: "Lead designer, Author, Project manager…" %>
+    </div>
+  </div>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <%= f.label :completed_month, "Finished (optional)", class: "label" %>
+      <%= f.month_field :completed_month, class: "input" %>
+    </div>
+    <div>
+      <%= f.label :link_url, "Link (optional)", class: "label" %>
+      <%= f.url_field :link_url, class: "input", maxlength: 500, placeholder: "https://…" %>
+    </div>
+  </div>
+  <div>
+    <%= f.label :skills_list, "Skills used (optional)", class: "label" %>
+    <%= f.text_field :skills_list, class: "input", placeholder: "Figma, User research, Prototyping" %>
+    <p class="mt-1 text-xs text-faith-muted">Separate with commas, up to <%= PortfolioItem::MAX_SKILLS %>.</p>
+  </div>
+  <div>
+    <%= f.label :description, "The story (optional)", class: "label" %>
+    <%= f.text_area :description, class: "input min-h-[160px]", maxlength: 3000,
+                    placeholder: "What was the challenge? What did you do? What came of it?" %>
+  </div>
+
+  <div class="pf-form-media">
+    <p class="label">Photos</p>
+    <% if item.persisted? && item.images.attached? %>
+      <div class="pf-thumbs">
+        <% item.images.attachments.each_with_index do |photo, i| %>
+          <label class="pf-thumb">
+            <%= image_tag resized_image_src(photo, width: 240, height: 180, crop: "fill"), alt: "Photo #{i + 1}" %>
+            <span><%= check_box_tag "portfolio_item[remove_image_ids][]", photo.id, false, id: "remove_image_#{photo.id}" %> Remove<%= " · cover" if i.zero? %></span>
+          </label>
+        <% end %>
+      </div>
+    <% end %>
+    <%= f.file_field :images, multiple: true, accept: "image/*", class: "input" %>
+    <p class="mt-1 text-xs text-faith-muted">Up to <%= PortfolioItem::MAX_IMAGES %> photos or screenshots, 10 MB each. The first one is the cover.</p>
+  </div>
+
+  <div class="pf-form-media">
+    <p class="label">PDF (optional)</p>
+    <% if item.persisted? && item.document.attached? %>
+      <p class="text-sm">📕 <%= item.document.filename %>
+        <label class="ml-3 text-sm"><%= check_box_tag "portfolio_item[remove_document]", "1", false %> Remove</label></p>
+    <% end %>
+    <%= f.file_field :document, accept: ".pdf,application/pdf", class: "input" %>
+    <p class="mt-1 text-xs text-faith-muted">A case study, design deck, article or thesis. Up to 10 MB.</p>
+  </div>
+
+  <p class="text-xs text-faith-muted">Work you add is checked against our community guidelines, like breaths are.</p>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <%= f.submit (item.persisted? ? "Save" : "Add to portfolio"), class: "btn btn-primary", data: { disable_with: "Saving…" } %>
+    <%= link_to "Cancel", (item.persisted? ? portfolio_work_path(current_user.username, item) : settings_portfolio_items_path), class: "btn btn-secondary" %>
+  </div>
+<% end %>
+<% if item.persisted? %>
+  <%= button_to "Remove this work", settings_portfolio_item_path(item), method: :delete, class: "pro-remove",
+                form: { class: "mt-6" }, data: { turbo_confirm: "Remove “#{item.title}” from your portfolio?" } %>
+<% end %>

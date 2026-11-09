@@ -139,7 +139,10 @@
   <div class="mystic-container max-w-5xl pb-10 pt-2">
     <%= turbo_frame_tag "profile_tab", target: "_top" do %>
       <nav class="profile-tabs" aria-label="Profile sections">
-        <% { "breaths" => "Breaths", "professional" => "Professional", "about" => "About" }.each do |key, label| %>
+        <% tabs = { "breaths" => "Breaths", "professional" => "Professional", "portfolio" => "Portfolio", "about" => "About" } %>
+        <%# Visitors only see Portfolio when there's work in it. %>
+        <% tabs.delete("portfolio") unless (user_signed_in? && current_user == @user) || @user.portfolio_items.visible.exists? %>
+        <% tabs.each do |key, label| %>
           <%= link_to label, user_path(@user.username, tab: (key == "breaths" ? nil : key)),
                       class: "profile-tab#{' is-active' if @tab == key}",
                       aria: { current: (@tab == key ? "page" : nil) },
@@ -151,6 +154,8 @@
         <% case @tab %>
         <% when "professional" %>
           <%= render "users/professional", user: @user, strength: @strength %>
+        <% when "portfolio" %>
+          <%= render "users/portfolio", user: @user %>
         <% when "about" %>
           <%= render "users/about", user: @user %>
         <% else %>

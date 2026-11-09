@@ -1,0 +1,54 @@
+<%# Portfolio tab: a grid of the member's work. Locals: user. %>
+<% owner = user_signed_in? && user == current_user %>
+<% items = owner ? user.portfolio_items.with_attached_images.to_a : user.portfolio_items.visible.with_attached_images.to_a %>
+<% name = user.display_name.presence || user.username %>
+
+<% if @profile_private && !owner %>
+  <div class="mystic-panel profile-empty-posts p-12 text-center">
+    <h3>This profile is private</h3>
+    <p class="mystic-copy mt-2"><%= name %> keeps their work to themselves.</p>
+  </div>
+<% else %>
+<section class="pf" aria-label="Portfolio">
+  <% if owner %>
+    <div class="pf-head">
+      <p class="pf-head-text">Show your best work: designs, apps, writing, photos, projects you led.</p>
+      <% if items.any? %><%= link_to "Manage", settings_portfolio_items_path, class: "pro-item-edit" %><% end %>
+    </div>
+  <% end %>
+
+  <% if items.any? || owner %>
+    <div class="pf-grid">
+      <% if owner %>
+        <%= link_to new_settings_portfolio_item_path, class: "pf-card pf-card--add" do %>
+          <span class="pf-add-plus" aria-hidden="true">+</span>
+          <span class="pf-add-title">Add work</span>
+          <span class="pf-add-sub">Photos, a link, a PDF</span>
+        <% end %>
+      <% end %>
+      <% items.each do |item| %>
+        <%= link_to portfolio_work_path(user.username, item), class: "pf-card#{' is-hidden' if item.hidden?}" do %>
+          <span class="pf-cover">
+            <% if item.cover %>
+              <%= image_tag resized_image_src(item.cover, width: 640, height: 480, crop: "fill", gravity: "auto"), alt: "", loading: "lazy" %>
+            <% else %>
+              <span class="pf-cover-blank" aria-hidden="true"><%= item.emoji %></span>
+            <% end %>
+            <% if item.images.attachments.size > 1 %><span class="pf-count"><%= item.images.attachments.size %> photos</span><% end %>
+            <% if item.hidden? %><span class="pf-hidden">Hidden by moderation</span><% end %>
+          </span>
+          <span class="pf-card-body">
+            <span class="pf-title"><%= item.title %></span>
+            <% if item.summary.present? %><span class="pf-summary"><%= item.summary %></span><% end %>
+            <span class="pf-meta"><%= [ (item.category.present? ? "#{item.emoji} #{item.category}" : nil), item.completed_on&.year ].compact.join(" · ") %></span>
+          </span>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mystic-panel-strong pro-card pro-card--empty">
+      <p class="pro-empty"><%= name %> hasn't added any work yet.</p>
+    </div>
+  <% end %>
+</section>
+<% end %>
