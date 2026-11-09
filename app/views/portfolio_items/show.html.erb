@@ -1,0 +1,86 @@
+<% name = @user.display_name.presence || @user.username %>
+<% content_for(:title) { "#{@item.title} · #{name} - Brethreign" } %>
+<% content_for(:og_title) { "#{@item.title} by #{name}" } %>
+<% content_for(:og_accent) { @user.accent_color } %>
+<% photos = @item.images.attachments %>
+<% content_for(:og_description) { @item.summary.presence || "A piece of work on Brethreign." } %>
+<%# Link previews (WhatsApp etc.) use the cover photo when it has a public URL. %>
+<% if @item.cover && (og = resized_image_src(@item.cover, width: 1200, height: 630, crop: "fill", gravity: "auto")).is_a?(String) && og.start_with?("http") %>
+  <% content_for(:og_image) { og } %>
+<% end %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-4xl pfw">
+    <div class="pfw-top">
+      <%= link_to "← #{name}'s portfolio", user_path(@user.username, tab: "portfolio"), class: "pfw-back" %>
+      <% if @owner %>
+        <%= link_to "Edit", edit_settings_portfolio_item_path(@item), class: "btn btn-secondary btn-sm" %>
+      <% end %>
+    </div>
+
+    <% if @item.hidden? %>
+      <p class="pfw-hidden">🛡 Hidden from your profile: our check found something that breaks the community guidelines. Edit it or remove it.</p>
+    <% end %>
+
+    <header class="pfw-head">
+      <% if @item.category.present? %><span class="pfw-cat"><%= @item.emoji %> <%= @item.category %></span><% end %>
+      <h1 class="pfw-title"><%= @item.title %></h1>
+      <% if @item.summary.present? %><p class="pfw-summary"><%= @item.summary %></p><% end %>
+      <%= link_to user_path(@user.username), class: "pfw-by" do %>
+        <% if @user.profile&.avatar&.attached? %>
+          <%= image_tag avatar_src(@user.profile, 80), class: "pfw-avatar", alt: "" %>
+        <% else %>
+          <span class="pfw-avatar" style="<%= avatar_tint_style(@user.username) %>"><%= @user.username.first.upcase %></span>
+        <% end %>
+        <span class="pfw-by-text">
+          <b><%= name %></b>
+          <span><%= [ @item.contribution, @item.completed_on&.strftime("%B %Y") ].compact_blank.join(" · ").presence || @user.professional_headline %></span>
+        </span>
+      <% end %>
+    </header>
+
+    <% if photos.any? %>
+      <div class="pfw-gallery<%= ' is-single' if photos.size == 1 %>" data-controller="lightbox">
+        <% photos.each_with_index do |photo, i| %>
+          <%= image_tag photo_src(photo, width: i.zero? ? 1600 : 900), class: "pfw-photo#{' is-lead' if i.zero?}", alt: "#{@item.title}, photo #{i + 1}",
+                        loading: (i.zero? ? "eager" : "lazy"), data: { download: rails_blob_path(photo, disposition: "attachment") } %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="pfw-body">
+      <div class="pfw-main">
+        <% if @item.description.present? %>
+          <div class="pfw-desc"><%= simple_format(@item.description) %></div>
+        <% end %>
+      </div>
+      <aside class="pfw-side">
+        <% if (link = https_href(@item.link_url)) %>
+          <%= link_to link, class: "btn btn-primary pfw-visit", target: "_blank", rel: "noopener nofollow" do %>Visit <%= @item.link_label %> ↗<% end %>
+        <% end %>
+        <% if @item.document.attached? %>
+          <%= link_to rails_blob_path(@item.document, disposition: "attachment"), class: "msg-doc pfw-doc", data: { turbo: false }, rel: "noopener" do %>
+            <span class="msg-doc-icon" aria-hidden="true">📕</span>
+            <span class="msg-doc-text">
+              <span class="msg-doc-name"><%= @item.document.filename %></span>
+              <span class="msg-doc-meta">PDF · <%= number_to_human_size(@item.document.byte_size) %></span>
+            </span>
+          <% end %>
+        <% end %>
+        <% if @item.skills.any? %>
+          <div class="pfw-skills">
+            <p class="pfw-label">Skills used</p>
+            <div class="pro-skills"><% @item.skills.each do |skill| %><span class="pro-skill"><%= skill %></span><% end %></div>
+          </div>
+        <% end %>
+      </aside>
+    </div>
+
+    <% if @previous || @next %>
+      <nav class="pfw-pager" aria-label="More work">
+        <% if @previous %><%= link_to "← #{@previous.title.truncate(36)}", portfolio_work_path(@user.username, @previous), class: "pfw-pager-link" %><% else %><span></span><% end %>
+        <% if @next %><%= link_to "#{@next.title.truncate(36)} →", portfolio_work_path(@user.username, @next), class: "pfw-pager-link is-next" %><% end %>
+      </nav>
+    <% end %>
+  </div>
+</div>

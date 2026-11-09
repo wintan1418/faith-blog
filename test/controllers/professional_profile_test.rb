@@ -57,7 +57,7 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
 
   test "profile tabs: breaths by default, professional and about on request" do
     get user_path(@user.username)
-    assert_select "nav.profile-tabs a.profile-tab", count: 3
+    assert_select "nav.profile-tabs a.profile-tab", count: 4 # the owner also sees Portfolio
     assert_select "a.profile-tab.is-active", text: "Breaths"
     assert_select ".pro-card", count: 0
 

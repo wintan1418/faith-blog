@@ -122,7 +122,11 @@ class Notification < ApplicationRecord
     when :circle_prayer_answered
       "A prayer in #{circle_name_suffix('your circle')} was marked answered 🌟"
     when :content_removed
-      "🛡 Your profile photo was removed because it breaks our community guidelines. Please choose another."
+      if notifiable.is_a?(PortfolioItem)
+        "🛡 “#{notifiable.title.to_s.truncate(40)}” was hidden from your portfolio because it breaks our community guidelines. Edit it or remove it."
+      else
+        "🛡 Your profile photo was removed because it breaks our community guidelines. Please choose another."
+      end
     when :birthday
       "🎂 It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -164,7 +168,11 @@ class Notification < ApplicationRecord
     when :birthday
       Rails.application.routes.url_helpers.user_path(actor.username)
     when :content_removed
-      Rails.application.routes.url_helpers.edit_settings_profile_path
+      if notifiable.is_a?(PortfolioItem)
+        Rails.application.routes.url_helpers.edit_settings_portfolio_item_path(notifiable)
+      else
+        Rails.application.routes.url_helpers.edit_settings_profile_path
+      end
     else
       Rails.application.routes.url_helpers.notifications_path
     end

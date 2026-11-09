@@ -21,6 +21,7 @@ class User < ApplicationRecord
   has_many :educations, -> { ordered }, dependent: :destroy
   has_many :certifications, -> { ordered }, dependent: :destroy
   has_many :languages, -> { ordered }, class_name: "UserLanguage", dependent: :destroy
+  has_many :portfolio_items, -> { ordered }, dependent: :destroy
 
   # One line under the name: the headline they wrote, or "Title at Organisation" from their current role.
   def professional_headline

@@ -321,3 +321,85 @@ html.theme-dark a.li-banner { color: var(--fc-ink); }
 .li-chip input { accent-color: var(--fc-accent); }
 .li-chip:has(input:checked) { border-color: var(--fc-accent); background: color-mix(in srgb, var(--fc-accent) 10%, transparent); }
 .li-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; position: sticky; bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem); padding: 0.75rem; border-radius: 16px; background: color-mix(in srgb, var(--fc-surface) 92%, transparent); backdrop-filter: blur(8px); border: 1px solid var(--fc-line); }
+
+/* ── Portfolio ─────────────────────────────────────────────────────── */
+.pf { display: grid; gap: 0.9rem; }
+.pf-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.pf-head-text { font-size: 0.9rem; color: var(--fc-muted); }
+.pf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+@media (max-width: 520px) { .pf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; } }
+.pf-card {
+  display: flex; flex-direction: column; min-width: 0; overflow: hidden; text-decoration: none; color: var(--fc-ink);
+  border: 1px solid var(--fc-line); border-radius: 16px; background: var(--fc-surface);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+.pf-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--fc-accent) 45%, var(--fc-line)); box-shadow: 0 14px 28px -16px rgba(0, 0, 0, 0.45); }
+.pf-card:focus-visible { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .pf-card { transition: none; } .pf-card:hover { transform: none; } }
+html.theme-dark a.pf-card { color: var(--fc-ink); }
+.pf-card.is-hidden { opacity: 0.6; }
+.pf-cover { position: relative; display: block; aspect-ratio: 4 / 3; background: color-mix(in srgb, var(--fc-accent) 10%, var(--fc-surface-2, var(--fc-surface))); }
+.pf-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-cover-blank { position: absolute; inset: 0; display: grid; place-items: center; font-size: 2.6rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--fc-accent) 28%, var(--fc-surface)), color-mix(in srgb, var(--fc-accent-2, var(--fc-accent)) 12%, var(--fc-surface))); }
+.pf-count, .pf-hidden { position: absolute; left: 0.5rem; bottom: 0.5rem; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: rgba(0, 0, 0, 0.62); color: #fff; }
+.pf-hidden { left: auto; right: 0.5rem; top: 0.5rem; bottom: auto; background: #b91c1c; }
+.pf-card-body { display: grid; gap: 0.2rem; padding: 0.75rem 0.85rem 0.85rem; min-width: 0; }
+.pf-title { font-weight: 800; font-size: 0.98rem; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-summary { font-size: 0.84rem; line-height: 1.4; color: var(--fc-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-meta { font-size: 0.76rem; font-weight: 700; color: var(--fc-muted); }
+.pf-card--add { align-items: center; justify-content: center; gap: 0.25rem; min-height: 200px; border-style: dashed; border-width: 2px; background: color-mix(in srgb, var(--fc-accent) 5%, var(--fc-surface)); text-align: center; padding: 1rem; }
+.pf-add-plus { width: 46px; height: 46px; border-radius: 999px; display: grid; place-items: center; font-size: 1.6rem; font-weight: 700; background: var(--fc-accent); color: var(--fc-on-accent, #04261a); }
+.pf-add-title { font-weight: 800; margin-top: 0.4rem; }
+.pf-add-sub { font-size: 0.8rem; color: var(--fc-muted); }
+
+/* A piece of work, on its own page */
+.pfw { display: grid; gap: 1.25rem; }
+.pfw-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.pfw-back { font-size: 0.88rem; font-weight: 700; color: var(--fc-muted); text-decoration: none; }
+.pfw-hidden { padding: 0.75rem 1rem; border-radius: 12px; background: color-mix(in srgb, #b91c1c 14%, var(--fc-surface)); border: 1px solid color-mix(in srgb, #b91c1c 45%, var(--fc-line)); font-size: 0.9rem; }
+.pfw-head { display: grid; gap: 0.6rem; }
+.pfw-cat { width: fit-content; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.78rem; font-weight: 800; background: color-mix(in srgb, var(--fc-accent) 14%, transparent); color: var(--fc-accent); }
+.pfw-title { font-family: var(--fc-display, "Playfair Display", Georgia, serif); font-size: clamp(1.7rem, 4.5vw, 2.6rem); font-weight: 800; line-height: 1.1; color: var(--fc-ink); margin: 0; text-wrap: balance; }
+.pfw-summary { font-size: 1.05rem; line-height: 1.5; color: var(--fc-muted); max-width: 46rem; }
+.pfw-by { display: flex; align-items: center; gap: 0.7rem; width: fit-content; text-decoration: none; color: var(--fc-ink); margin-top: 0.25rem; }
+html.theme-dark a.pfw-by { color: var(--fc-ink); }
+.pfw-avatar { width: 42px; height: 42px; border-radius: 999px; object-fit: cover; display: grid; place-items: center; font-weight: 800; flex: none; }
+.pfw-by-text { display: grid; line-height: 1.3; }
+.pfw-by-text span { font-size: 0.85rem; color: var(--fc-muted); }
+.pfw-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.pfw-photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; display: block; background: var(--fc-surface); }
+.pfw-photo.is-lead { grid-column: 1 / -1; aspect-ratio: auto; max-height: 72vh; object-fit: contain; background: color-mix(in srgb, var(--fc-ink) 6%, var(--fc-surface)); border-radius: 16px; }
+@media (max-width: 520px) { .pfw-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pfw-body { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 1.5rem; align-items: start; }
+@media (max-width: 760px) { .pfw-body { grid-template-columns: 1fr; } .pfw-side { order: -1; } }
+.pfw-desc { font-size: 1rem; line-height: 1.7; color: var(--fc-ink); overflow-wrap: anywhere; }
+.pfw-desc p + p { margin-top: 0.9rem; }
+.pfw-side { display: grid; gap: 0.9rem; }
+.pfw-visit { justify-content: center; overflow-wrap: anywhere; }
+.pfw-doc { max-width: none; }
+.pfw-label { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fc-muted); margin-bottom: 0.35rem; }
+.pfw-pager { display: flex; justify-content: space-between; gap: 1rem; border-top: 1px solid var(--fc-line); padding-top: 1rem; }
+.pfw-pager-link { font-weight: 700; color: var(--fc-accent); text-decoration: none; font-size: 0.92rem; }
+.pfw-pager-link.is-next { margin-left: auto; text-align: right; }
+
+/* Managing */
+.pf-manage-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.pf-manage { list-style: none; margin: 0; display: grid; }
+.pf-manage-row { display: flex; align-items: center; gap: 0.85rem; padding: 0.7rem 0; border-bottom: 1px solid var(--fc-line); }
+.pf-manage-row:last-child { border-bottom: 0; }
+.pf-manage-cover { flex: none; width: 64px; height: 48px; border-radius: 8px; overflow: hidden; display: grid; place-items: center; font-size: 1.4rem; background: color-mix(in srgb, var(--fc-accent) 12%, var(--fc-surface)); }
+.pf-manage-cover img { width: 100%; height: 100%; object-fit: cover; }
+.pf-manage-text { flex: 1; min-width: 0; display: grid; }
+.pf-manage-text .pro-item-title { text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-manage-tools { display: flex; align-items: center; gap: 0.35rem; flex: none; }
+.pf-manage-tools form { margin: 0; }
+.pf-move { width: 34px; height: 34px; border-radius: 999px; border: 1px solid var(--fc-line); background: none; color: var(--fc-ink); font-weight: 800; cursor: pointer; }
+.pf-move:disabled { opacity: 0.3; cursor: default; }
+.pf-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.5rem; margin-bottom: 0.6rem; }
+.pf-thumb { display: grid; gap: 0.25rem; font-size: 0.8rem; color: var(--fc-muted); }
+.pf-thumb img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+/* A tall photo must not stretch its card: the cover is a fixed 4:3 frame. */
+.pf-cover { overflow: hidden; min-height: 0; }
+.pf-cover img { position: absolute; inset: 0; height: 100% !important; }
+.pfw-photo:not(.is-lead) { height: auto; aspect-ratio: 4 / 3; }

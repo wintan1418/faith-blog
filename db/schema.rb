@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -549,6 +549,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_100000) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "portfolio_items", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "title", limit: 100, null: false
+    t.string "summary", limit: 160
+    t.text "description"
+    t.string "category", limit: 40
+    t.string "contribution", limit: 80
+    t.string "link_url", limit: 500
+    t.string "skills", default: [], null: false, array: true
+    t.date "completed_on"
+    t.integer "position", default: 0, null: false
+    t.datetime "hidden_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "position"], name: "index_portfolio_items_on_user_id_and_position"
+    t.index ["user_id"], name: "index_portfolio_items_on_user_id"
+  end
+
   create_table "post_links", force: :cascade do |t|
     t.bigint "source_post_id", null: false
     t.bigint "target_post_id", null: false
@@ -932,6 +950,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_100000) do
   add_foreign_key "moderation_logs", "users", column: "moderator_id"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "actor_id"
+  add_foreign_key "portfolio_items", "users"
   add_foreign_key "post_links", "posts", column: "source_post_id"
   add_foreign_key "post_links", "posts", column: "target_post_id"
   add_foreign_key "post_tags", "posts"

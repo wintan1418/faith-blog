@@ -27,7 +27,7 @@ class UsersController < ApplicationController
     @suggestions = BrethrenSuggestions.for(current_user, limit: 48)
   end
 
-  PROFILE_TABS = %w[breaths professional about].freeze
+  PROFILE_TABS = %w[breaths professional portfolio about].freeze
 
   def show
     @profile_private = !profile_visible_to_viewer?(@user)

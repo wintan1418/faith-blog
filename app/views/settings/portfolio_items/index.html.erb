@@ -1,0 +1,51 @@
+<% content_for :title, "Portfolio" %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-4xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Settings</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Portfolio</h1>
+      <p class="mystic-copy mt-2 max-w-2xl">Your best work, on the Portfolio tab of your profile. Put the piece you're proudest of first.</p>
+    </div>
+
+    <%= render "settings/tabs", active: :portfolio %>
+
+    <div class="pro-settings">
+      <div class="pf-manage-actions">
+        <%= link_to "+ Add work", new_settings_portfolio_item_path, class: "btn btn-primary" %>
+        <%= link_to "View my portfolio", user_path(current_user.username, tab: "portfolio"), class: "btn btn-secondary" %>
+      </div>
+
+      <% if @items.any? %>
+        <ul class="mystic-panel-strong pro-panel pf-manage">
+          <% @items.each_with_index do |item, i| %>
+            <li class="pf-manage-row">
+              <span class="pf-manage-cover">
+                <% if item.cover %>
+                  <%= image_tag resized_image_src(item.cover, width: 160, height: 120, crop: "fill"), alt: "" %>
+                <% else %>
+                  <span aria-hidden="true"><%= item.emoji %></span>
+                <% end %>
+              </span>
+              <span class="pf-manage-text">
+                <%= link_to item.title, portfolio_work_path(current_user.username, item), class: "pro-item-title" %>
+                <span class="pro-item-meta"><%= [ item.category, ("Hidden by moderation" if item.hidden?) ].compact.join(" · ") %></span>
+              </span>
+              <span class="pf-manage-tools">
+                <%= button_to "↑", move_settings_portfolio_item_path(item, direction: "up"), method: :patch, class: "pf-move",
+                              disabled: i.zero?, aria: { label: "Move #{item.title} up" } %>
+                <%= button_to "↓", move_settings_portfolio_item_path(item, direction: "down"), method: :patch, class: "pf-move",
+                              disabled: i == @items.size - 1, aria: { label: "Move #{item.title} down" } %>
+                <%= link_to "Edit", edit_settings_portfolio_item_path(item), class: "pro-item-edit" %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <section class="mystic-panel-strong pro-panel">
+          <p class="pro-empty">Nothing here yet. Add a design, an app, an article, a photo series, a building, an event you ran: anything you made or led.</p>
+        </section>
+      <% end %>
+    </div>
+  </div>
+</div>
