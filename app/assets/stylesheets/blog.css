@@ -172,3 +172,11 @@ html.theme-dark a.bl-btn--primary { color: var(--fc-on-accent, #04261a); }
   .bl-layout > .bl-body { grid-column: 2; }
 }
 .bl-card--wide .bl-card-cover { align-self: center; width: 100%; height: auto; }
+
+/* Wide screens: the header text starts at the cover's left edge (it used to
+   sit in the reading column while the cover spanned both, so they didn't line up). */
+@media (min-width: 1100px) {
+  .bl-article-head > * { grid-column: 1 / -1; }
+  .bl-article-head .bl-title { max-width: 22ch; }
+  .bl-article-head .bl-lead { max-width: 46rem; }
+}
