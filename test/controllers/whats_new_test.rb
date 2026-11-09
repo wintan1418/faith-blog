@@ -49,4 +49,11 @@ class WhatsNewTest < ActionDispatch::IntegrationTest
     assert_select "dialog.wn a[href=?]", new_settings_linkedin_import_path, text: "Import from LinkedIn"
     assert_select "dialog.wn a[href=?][data-action='whats-new#markSeen']", games_chess_path, text: "Play the ladder"
   end
+
+  test "the portfolio release has an Add your work button" do
+    Announcement.releases.delete_all
+    Announcement.create!(kind: :release, title: "New in Brethreign · Portfolio", body: "🗂️ Your portfolio — Show your work [[portfolio]]")
+    get feed_path
+    assert_select "dialog.wn a[href=?]", new_settings_portfolio_item_path, text: "Add your work"
+  end
 end
