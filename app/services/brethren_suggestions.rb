@@ -8,7 +8,7 @@
 #   shared skills · same city · same rooms
 # Only public information is used (the private Brethren Card is never read).
 class BrethrenSuggestions
-  Suggestion = Struct.new(:user, :score, :reason, keyword_init: true)
+  Suggestion = Struct.new(:user, :score, :reason, :kind, :mutuals, keyword_init: true)
 
   WEIGHTS = { assembly: 40, organization: 25, profession: 15, mutual: 10, city: 8, room: 3, skill: 4 }.freeze
   CAPS = { mutual: 50, room: 12, skill: 12 }.freeze
@@ -20,7 +20,8 @@ class BrethrenSuggestions
   def initialize(user)
     @user = user
     @scores = Hash.new(0)
-    @reasons = Hash.new { |h, k| h[k] = [] } # [weight, text]
+    @reasons = Hash.new { |h, k| h[k] = [] } # [weight, text, kind]
+    @mutual_ids = {} # suggested id => ids of my connections they know
   end
 
   def call(limit)
@@ -35,10 +36,14 @@ class BrethrenSuggestions
 
     ids = (@scores.keys - excluded_ids).sort_by { |id| -@scores[id] }.first(limit)
     users = User.active.where(id: ids).includes(profile: { avatar_attachment: :blob }).index_by(&:id)
+    faces = User.where(id: ids.flat_map { |id| @mutual_ids[id].to_a.first(3) }.uniq)
+                .includes(profile: { avatar_attachment: :blob }).index_by(&:id)
     ids.filter_map do |id|
       next unless users[id]
 
-      Suggestion.new(user: users[id], score: @scores[id], reason: @reasons[id].max_by(&:first)&.last)
+      _points, reason, kind = @reasons[id].max_by(&:first)
+      mutuals = @mutual_ids[id].to_a.first(3).filter_map { |mid| faces[mid] }
+      Suggestion.new(user: users[id], score: @scores[id], reason: reason, kind: kind, mutuals: mutuals)
     end
   end
 
@@ -53,7 +58,7 @@ class BrethrenSuggestions
       points = WEIGHTS[kind] * count
       points = [ points, CAPS[kind] ].min if CAPS[kind]
       @scores[id] += points
-      @reasons[id] << [ points, reason.call(count) ]
+      @reasons[id] << [ points, reason.call(count), kind ]
     end
   end
 
@@ -69,8 +74,11 @@ class BrethrenSuggestions
     return if mine.empty?
 
     accepted = ConnectionRequest.accepted
-    theirs = accepted.where(sender_id: mine).pluck(:receiver_id) + accepted.where(receiver_id: mine).pluck(:sender_id)
-    bump(theirs.tally, :mutual) { |n| "#{n} mutual #{n == 1 ? 'brother or sister' : 'brethren'}" }
+    # [their id, my connection who knows them]
+    pairs = accepted.where(sender_id: mine).pluck(:receiver_id, :sender_id) +
+            accepted.where(receiver_id: mine).pluck(:sender_id, :receiver_id)
+    @mutual_ids = pairs.group_by(&:first).transform_values { |list| list.map(&:last).uniq }
+    bump(@mutual_ids.transform_values(&:size), :mutual) { |n| "#{n} mutual #{n == 1 ? 'brother or sister' : 'brethren'}" }
   end
 
   def add_work
