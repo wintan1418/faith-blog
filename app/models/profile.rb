@@ -31,6 +31,27 @@ class Profile < ApplicationRecord
 
   def skills_list = skills.join(", ")
 
+  # Industries, close to LinkedIn's top-level list so imports map cleanly.
+  INDUSTRIES = [
+    "Accounting", "Administration", "Agriculture", "Architecture & Planning", "Arts & Design", "Aviation",
+    "Banking", "Civil Engineering", "Construction", "Consulting", "Customer Service", "Education",
+    "Energy, Oil & Gas", "Engineering", "Entertainment & Media", "Environmental Services", "Events",
+    "Fashion & Beauty", "Financial Services", "Food & Beverage", "Government & Public Service",
+    "Healthcare & Medicine", "Hospitality & Tourism", "Human Resources", "Information Technology",
+    "Insurance", "Journalism & Publishing", "Law & Legal Services", "Logistics & Supply Chain",
+    "Manufacturing", "Marketing & Advertising", "Military & Security", "Mining", "Ministry & Religious Institutions",
+    "Music", "Non-profit & NGOs", "Pharmaceuticals", "Photography & Film", "Real Estate", "Research & Science",
+    "Retail & E-commerce", "Sales", "Social Work & Counselling", "Software Development", "Sports & Fitness",
+    "Student", "Telecommunications", "Transportation", "Writing & Editing", "Other"
+  ].freeze
+  validates :industry, length: { maximum: 80 }
+
+  # Prefer the list's spelling when an import or a person's typing is close.
+  def industry=(value)
+    text = value.to_s.squish
+    super(INDUSTRIES.find { |i| i.casecmp?(text) } || text.presence)
+  end
+
   def skills_are_short
     errors.add(:skills, "can have at most #{MAX_SKILLS}") if skills.size > MAX_SKILLS
   end

@@ -19,6 +19,8 @@ class User < ApplicationRecord
   # Professional profile (LinkedIn-style)
   has_many :experiences, -> { ordered }, dependent: :destroy
   has_many :educations, -> { ordered }, dependent: :destroy
+  has_many :certifications, -> { ordered }, dependent: :destroy
+  has_many :languages, -> { ordered }, class_name: "UserLanguage", dependent: :destroy
 
   # One line under the name: the headline they wrote, or "Title at Organisation" from their current role.
   def professional_headline

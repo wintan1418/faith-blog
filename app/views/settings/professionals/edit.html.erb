@@ -5,12 +5,18 @@
     <div class="mb-8">
       <span class="mystic-kicker">Settings</span>
       <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Professional</h1>
-      <p class="mystic-copy mt-2 max-w-2xl">What you do, where you've served and studied. Shown on your profile so brethren in your field can find you.</p>
+      <p class="mystic-copy mt-2 max-w-2xl">Your work, education and skills. Shown on your profile so people in your field can find you.</p>
     </div>
 
     <%= render "settings/tabs", active: :professional %>
 
     <div class="pro-settings">
+      <%= link_to new_settings_linkedin_import_path, class: "li-banner" do %>
+        <span class="li-banner-mark" aria-hidden="true">in</span>
+        <span class="li-banner-text"><b>Import from LinkedIn</b><span>Bring your roles, education and skills across in a minute.</span></span>
+        <span class="li-banner-go" aria-hidden="true">→</span>
+      <% end %>
+
       <section class="mystic-panel-strong pro-panel">
         <h2 class="pro-panel-title">Headline & skills</h2>
         <%= form_with model: @profile, url: settings_professional_path, method: :patch, class: "space-y-5" do |f| %>
@@ -22,6 +28,10 @@
             <%= f.text_field :headline, class: "input", maxlength: 120,
                              placeholder: "Nurse at Lagos University Teaching Hospital · Worship leader" %>
             <p class="mt-1 text-xs text-faith-muted">One line under your name. Leave blank to use your current role.</p>
+          </div>
+          <div>
+            <%= f.label :industry, "Industry", class: "label" %>
+            <%= f.select :industry, Profile::INDUSTRIES, { include_blank: "Choose your industry" }, class: "input" %>
           </div>
           <div>
             <%= f.label :assembly, "Church / Assembly", class: "label" %>
@@ -53,7 +63,7 @@
                 <%= render "users/org_mark", name: experience.organization %>
                 <div class="pro-item-main">
                   <p class="pro-item-title"><%= experience.title %></p>
-                  <p class="pro-item-sub"><%= [ experience.organization, experience.employment_type ].compact_blank.join(" · ") %></p>
+                  <p class="pro-item-sub"><%= [ experience.organization, experience.type_label ].compact_blank.join(" · ") %></p>
                   <p class="pro-item-meta"><%= experience.date_range %> · <%= experience.duration %></p>
                 </div>
                 <%= link_to "Edit", edit_settings_experience_path(experience), class: "pro-item-edit" %>
@@ -61,7 +71,7 @@
             <% end %>
           </ul>
         <% else %>
-          <p class="pro-empty">Add your current role, or a past one: work, ministry or volunteering.</p>
+          <p class="pro-empty">Add your current job, or a past one. Volunteer and church roles can go here too.</p>
         <% end %>
       </section>
 
@@ -86,6 +96,52 @@
           </ul>
         <% else %>
           <p class="pro-empty">Add a school, university, seminary or course.</p>
+        <% end %>
+      </section>
+
+      <section class="mystic-panel-strong pro-panel">
+        <div class="pro-panel-head">
+          <h2 class="pro-panel-title">Licenses &amp; certifications</h2>
+          <%= link_to "+ Add", new_settings_certification_path, class: "btn btn-secondary btn-sm" %>
+        </div>
+        <% if current_user.certifications.any? %>
+          <ul class="pro-list">
+            <% current_user.certifications.each do |cert| %>
+              <li class="pro-item">
+                <%= render "users/org_mark", name: cert.issuer.presence || cert.name %>
+                <div class="pro-item-main">
+                  <p class="pro-item-title"><%= cert.name %></p>
+                  <% if cert.issuer.present? %><p class="pro-item-sub"><%= cert.issuer %></p><% end %>
+                  <% if cert.dates.present? %><p class="pro-item-meta"><%= cert.dates %></p><% end %>
+                </div>
+                <%= link_to "Edit", edit_settings_certification_path(cert), class: "pro-item-edit" %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="pro-empty">Professional licenses, certificates and courses you've completed.</p>
+        <% end %>
+      </section>
+
+      <section class="mystic-panel-strong pro-panel" id="languages">
+        <h2 class="pro-panel-title">Languages</h2>
+        <% if current_user.languages.any? %>
+          <ul class="pro-lang-list">
+            <% current_user.languages.each do |lang| %>
+              <li>
+                <span><b><%= lang.name %></b> <span class="pro-item-meta"><%= lang.proficiency_label %></span></span>
+                <%= button_to "Remove", settings_language_path(lang), method: :delete, class: "pro-remove",
+                              aria: { label: "Remove #{lang.name}" } %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+        <%= form_with model: UserLanguage.new, url: settings_languages_path, class: "pro-lang-form" do |f| %>
+          <%= f.text_field :name, class: "input", required: true, maxlength: 60, placeholder: "English, Yoruba, French…",
+                           aria: { label: "Language" } %>
+          <%= f.select :proficiency, UserLanguage::LABELS.invert, { selected: "professional_working" }, class: "input",
+                       aria: { label: "Level" } %>
+          <%= f.submit "Add", class: "btn btn-secondary" %>
         <% end %>
       </section>
     </div>

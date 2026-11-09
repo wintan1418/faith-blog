@@ -3,7 +3,10 @@
 <% owner = user_signed_in? && user == current_user %>
 <% strength = local_assigns[:strength] %>
 <% name = user.display_name.presence || user.username %>
-<% roles = user.experiences.to_a %>
+<% all_roles = user.experiences.to_a %>
+<% roles, volunteering = all_roles.partition { |r| !r.volunteering? } %>
+<% certifications = user.certifications.to_a %>
+<% languages = user.languages.to_a %>
 <% schools = user.educations.to_a %>
 <% skills = user.profile&.skills.to_a %>
 
@@ -36,12 +39,15 @@
   </section>
 <% end %>
 
-<% if roles.empty? && schools.empty? && skills.empty? && user.profile&.headline.blank? %>
+<% if all_roles.empty? && schools.empty? && skills.empty? && certifications.empty? && languages.empty? && user.profile&.headline.blank? %>
   <section class="mystic-panel-strong pro-card pro-card--empty">
     <% if owner %>
       <h2 class="pro-card-title">Your professional side</h2>
       <p class="pro-empty">Let brethren in your field find you: add what you do, where you've served and what you studied.</p>
-      <%= link_to "Add professional details", edit_settings_professional_path, class: "btn btn-primary" %>
+      <div class="pro-empty-actions">
+        <%= link_to "Add professional details", edit_settings_professional_path, class: "btn btn-primary" %>
+        <%= link_to "Import from LinkedIn", new_settings_linkedin_import_path, class: "btn btn-secondary" %>
+      </div>
     <% else %>
       <p class="pro-empty"><%= name %> hasn't added professional details yet.</p>
     <% end %>
@@ -54,26 +60,24 @@
     </div>
     <% if roles.any? %>
       <ul class="pro-list">
-        <% roles.each do |experience| %>
-          <li class="pro-item">
-            <%= render "users/org_mark", name: experience.organization %>
-            <div class="pro-item-main">
-              <p class="pro-item-title"><%= experience.title %></p>
-              <p class="pro-item-sub"><%= [ experience.organization, experience.employment_type ].compact_blank.join(" · ") %></p>
-              <p class="pro-item-meta"><%= experience.date_range %> · <%= experience.duration %></p>
-              <% if experience.location.present? %><p class="pro-item-meta"><%= experience.location %></p><% end %>
-              <% if experience.description.present? %>
-                <p class="pro-item-desc"><%= simple_format(experience.description, {}, wrapper_tag: "span") %></p>
-              <% end %>
-            </div>
-            <% if owner %><%= link_to "Edit", edit_settings_experience_path(experience), class: "pro-item-edit", aria: { label: "Edit #{experience.title}" } %><% end %>
-          </li>
-        <% end %>
+        <%= render partial: "users/pro_role", collection: roles, as: :experience, locals: { owner: owner } %>
       </ul>
     <% else %>
-      <p class="pro-empty"><%= owner ? "Add your current role so brethren know what you do." : "No roles added yet." %></p>
+      <p class="pro-empty"><%= owner ? "Add your current job so people know what you do." : "No roles added yet." %></p>
     <% end %>
   </section>
+
+  <% if volunteering.any? %>
+    <section class="mystic-panel-strong pro-card" aria-label="Volunteering">
+      <div class="pro-panel-head">
+        <h2 class="pro-card-title">Volunteering</h2>
+        <% if owner %><%= link_to "+ Add", new_settings_experience_path, class: "pro-item-edit" %><% end %>
+      </div>
+      <ul class="pro-list">
+        <%= render partial: "users/pro_role", collection: volunteering, as: :experience, locals: { owner: owner } %>
+      </ul>
+    </section>
+  <% end %>
 
   <% if schools.any? || owner %>
     <section class="mystic-panel-strong pro-card" aria-label="Education">
@@ -102,6 +106,35 @@
     </section>
   <% end %>
 
+  <% if certifications.any? || owner %>
+    <section class="mystic-panel-strong pro-card" aria-label="Licenses and certifications">
+      <div class="pro-panel-head">
+        <h2 class="pro-card-title">Licenses &amp; certifications</h2>
+        <% if owner %><%= link_to "+ Add", new_settings_certification_path, class: "pro-item-edit" %><% end %>
+      </div>
+      <% if certifications.any? %>
+        <ul class="pro-list">
+          <% certifications.each do |cert| %>
+            <li class="pro-item">
+              <%= render "users/org_mark", name: cert.issuer.presence || cert.name %>
+              <div class="pro-item-main">
+                <p class="pro-item-title"><%= cert.name %></p>
+                <% if cert.issuer.present? %><p class="pro-item-sub"><%= cert.issuer %></p><% end %>
+                <% if cert.dates.present? %><p class="pro-item-meta"><%= cert.dates %></p><% end %>
+                <% if (link = https_href(cert.credential_url)) %>
+                  <%= link_to "Show credential ↗", link, class: "pro-cred", target: "_blank", rel: "noopener nofollow" %>
+                <% end %>
+              </div>
+              <% if owner %><%= link_to "Edit", edit_settings_certification_path(cert), class: "pro-item-edit", aria: { label: "Edit #{cert.name}" } %><% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="pro-empty">Add a license, certificate or course you've completed.</p>
+      <% end %>
+    </section>
+  <% end %>
+
   <% if skills.any? || owner %>
     <section class="mystic-panel-strong pro-card" aria-label="Skills">
       <div class="pro-panel-head">
@@ -114,6 +147,23 @@
         </div>
       <% else %>
         <p class="pro-empty">List what you're good at, at work or in service.</p>
+      <% end %>
+    </section>
+  <% end %>
+  <% if languages.any? || owner %>
+    <section class="mystic-panel-strong pro-card" aria-label="Languages">
+      <div class="pro-panel-head">
+        <h2 class="pro-card-title">Languages</h2>
+        <% if owner %><%= link_to "Edit", edit_settings_professional_path(anchor: "languages"), class: "pro-item-edit" %><% end %>
+      </div>
+      <% if languages.any? %>
+        <ul class="pro-langs">
+          <% languages.each do |lang| %>
+            <li><b><%= lang.name %></b><span><%= lang.proficiency_label %></span></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="pro-empty">Add the languages you speak.</p>
       <% end %>
     </section>
   <% end %>

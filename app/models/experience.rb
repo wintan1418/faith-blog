@@ -3,7 +3,11 @@
 # A role on someone's professional profile (LinkedIn-style "Experience").
 class Experience < ApplicationRecord
   EMPLOYMENT_TYPES = [ "Full-time", "Part-time", "Self-employed", "Freelance", "Contract", "Internship",
-                       "Volunteer", "Ministry" ].freeze
+                       "Apprenticeship", "Volunteer", "Ministry" ].freeze
+  # Shown under "Volunteering" on the profile instead of "Experience".
+  VOLUNTEER_TYPES = [ "Volunteer", "Ministry" ].freeze
+  # How the form names each type ("Ministry" = serving in a church or ministry).
+  TYPE_LABELS = EMPLOYMENT_TYPES.index_with { |t| t }.merge("Ministry" => "Church or ministry service").freeze
 
   belongs_to :user
 
@@ -22,6 +26,9 @@ class Experience < ApplicationRecord
 
   # Current roles first, then most recent.
   scope :ordered, -> { order(current: :desc, start_on: :desc) }
+
+  def volunteering? = VOLUNTEER_TYPES.include?(employment_type)
+  def type_label = TYPE_LABELS[employment_type]
 
   # The form uses <input type="month"> ("2024-05"); store the first of that month.
   def start_month = start_on&.strftime("%Y-%m")

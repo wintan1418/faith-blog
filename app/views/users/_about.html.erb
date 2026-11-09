@@ -27,6 +27,9 @@
     <% if (headline = user.professional_headline) %>
       <div><dt>Work</dt><dd><%= headline %></dd></div>
     <% end %>
+    <% if profile&.industry.present? %>
+      <div><dt>Industry</dt><dd><%= profile.industry %></dd></div>
+    <% end %>
     <% if profile&.faith_background.present? %>
       <div><dt>Faith background</dt><dd><%= profile.faith_background %></dd></div>
     <% end %>
