@@ -186,6 +186,7 @@ Rails.application.routes.draw do
   # Search
   get "search", to: "search#index"
   get "people", to: "users#index", as: :people
+  get "people/suggested", to: "users#suggested", as: :suggested_people
 
   # Settings
   namespace :settings do

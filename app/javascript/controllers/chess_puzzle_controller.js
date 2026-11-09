@@ -1,14 +1,27 @@
 import { Controller } from "@hotwired/stimulus"
 import { loadChess } from "../lazy_libs"
 
-// Daily chess puzzle — played fully in-app. The board is rendered from
-// the Lichess puzzle FEN; chess.js handles move legality. The user must
-// find each move of the solution; opponent replies auto-play. Solving
-// the whole line records a GameAttempt (unless already claimed today).
+// Chess puzzles, played fully in-app. chess.js handles move legality.
+//
+// Daily puzzle: today's Lichess puzzle; solving it claims points once a day.
+// The ladder: 10 stages that get harder as you climb, at Easy, Medium or Hard.
+//
+// Every puzzle gives 3 tries. A wrong move is played, then taken back, and
+// costs a try; a hint costs a try too. Out of tries shows the solution (and
+// in the ladder ends the climb). Any move that gives checkmate counts, not
+// only the one Lichess lists.
 const GLYPH = { p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚" }
+const TRIES = 3
+const STAGES = 10
+const STEPS = [ "easiest", "easier", "normal", "harder", "hardest" ]
+// Where each level starts on Lichess's difficulty steps; the climb adds one
+// step every few stages.
+const LEVELS = { easy: 0, medium: 1, hard: 3 }
+const BEST_KEY = "brethreign:chess-ladder-best"
 
 export default class extends Controller {
-  static targets = ["board", "status", "feedback", "progress", "hintBtn", "resetBtn", "kicker", "rating", "themes", "tier"]
+  static targets = [ "board", "status", "feedback", "progress", "hintBtn", "resetBtn", "kicker", "rating", "themes", "tier",
+                     "tries", "stage", "best", "level", "nextBtn" ]
   static values  = {
     fen:         String,
     solution:    Array,
@@ -27,7 +40,11 @@ export default class extends Controller {
       solution: Array.isArray(solution) ? solution : [],
       lastMove: (this.lastMoveValue || "").trim()
     }
-    this.practice = false
+    this.mode = "daily"            // "daily" | "ladder"
+    this.level = "medium"
+    this.stage = 0
+    this.showBest()
+    this.markLevel()
     loadChess().then((Chess) => {
       this.Chess = Chess
       this.start()
@@ -42,24 +59,25 @@ export default class extends Controller {
     this.solution = this.puzzle.solution
     if (this.solution.length === 0) throw new Error("missing puzzle solution")
 
-    // Each start is a new run: a "Show solution" animation or an opponent
-    // reply still pending from the previous run must not touch this board
-    // (it used to finish the new puzzle by itself and lock the pieces).
+    // Each start is a new run: a "Show solution" animation, a wrong move
+    // waiting to be taken back, or an opponent reply still pending from the
+    // previous run must not touch this board.
     this.run = (this.run || 0) + 1
     this.game = new this.Chess(this.puzzle.fen)
-    this.idx = 0                                // index into the solution list
+    this.idx = 0
     this.selected = null
     this.legalTargets = []
     this.lastMove = null
     this.complete = false
     this.revealed = false
+    this.failed = false
+    this.busy = false
+    this.triesLeft = TRIES
 
     // Some Lichess payloads give the position BEFORE the opponent's last
-    // move. If the first solution move isn't legal here, play lastMove
-    // first so the board shows the real puzzle position.
+    // move. If the first solution move isn't legal here, play lastMove first.
     const s0 = this.parseUci(this.solution[0])
-    const s0Legal = this.game.moves({ verbose: true })
-                        .some(m => m.from === s0.from && m.to === s0.to)
+    const s0Legal = this.game.moves({ verbose: true }).some(m => m.from === s0.from && m.to === s0.to)
     if (!s0Legal && this.puzzle.lastMove) {
       const lm = this.parseUci(this.puzzle.lastMove)
       try {
@@ -70,19 +88,49 @@ export default class extends Controller {
 
     this.solverColor = this.game.turn()
     this.renderBoard()
-    this.setStatus(`${this.colorName(this.solverColor)} to move — find the strongest line.`)
+    this.renderTries()
+    this.setNextButton(false)
+    this.setStatus(`${this.colorName(this.solverColor)} to move. Find the best move.`)
     this.updateProgress()
     if (this.hasFeedbackTarget) this.feedbackTarget.classList.add("hidden")
   }
 
-  // ─── Practice mode: unlimited fresh puzzles, no points ───────
-  async nextPractice() {
+  // ─── The ladder ──────────────────────────────────────────────
+  chooseLevel(event) {
+    const level = event.currentTarget.dataset.level
+    if (!LEVELS.hasOwnProperty(level)) return
+    this.level = level
+    this.markLevel()
+    this.showBest()
+    this.startLadder()
+  }
+
+  startLadder() {
+    this.stage = 1
+    this.loadStage()
+  }
+
+  nextStage() {
+    if (this.mode !== "ladder" || !this.complete || this.failed) return this.startLadder()
+    if (this.stage >= STAGES) return this.startLadder()
+    this.stage += 1
+    this.loadStage()
+  }
+
+  difficultyFor(stage) {
+    const step = Math.min(LEVELS[this.level] + Math.floor((stage - 1) / 4), STEPS.length - 1)
+    return STEPS[step]
+  }
+
+  async loadStage() {
     if (!this.practiceUrlValue) return
-    this.setStatus("Fetching a fresh puzzle…")
+    this.mode = "ladder"
+    this.setStatus(`Setting up stage ${this.stage}…`)
+    this.setNextButton(false)
     try {
-      const resp = await fetch(this.practiceUrlValue, {
-        headers: { "Accept": "application/json" }, credentials: "same-origin"
-      })
+      const url = new URL(this.practiceUrlValue, location.origin)
+      url.searchParams.set("difficulty", this.difficultyFor(this.stage))
+      const resp = await fetch(url, { headers: { "Accept": "application/json" }, credentials: "same-origin" })
       const data = await resp.json()
       if (!data.ok || !data.puzzle) throw new Error(data.error || "no puzzle")
       this.puzzle = {
@@ -90,39 +138,78 @@ export default class extends Controller {
         solution: Array.isArray(data.puzzle.solution) ? data.puzzle.solution : [],
         lastMove: data.puzzle.last_move || ""
       }
-      this.practice = true
       this.start()
-      this.showPracticeHeader(data.puzzle)
+      this.showLadderHeader(data.puzzle)
     } catch (err) {
-      this.flash("bad", "Couldn't fetch a practice puzzle — try again in a moment.")
+      this.flash("bad", "Couldn't load the next puzzle. Check your connection and tap the button again.")
+      this.setNextButton(true, "Try again")
+      this.stage = Math.max(this.stage - 1, 0)
+      this.complete = true
     }
   }
 
-  // The heading described the daily puzzle; say what this one is, and whose move.
-  showPracticeHeader(puzzle) {
+  showLadderHeader(puzzle) {
     const side = this.colorName(this.solverColor)
-    if (this.hasKickerTarget) this.kickerTarget.textContent = `Practice puzzle · ${side} to move`
-    if (this.hasRatingTarget) this.ratingTarget.textContent = `Rating ${puzzle.rating}`
+    const levelName = this.level[0].toUpperCase() + this.level.slice(1)
+    if (this.hasKickerTarget) this.kickerTarget.textContent = `Ladder · ${levelName} · ${side} to move`
+    if (this.hasRatingTarget) this.ratingTarget.textContent = `Stage ${this.stage} of ${STAGES}`
     if (this.hasThemesTarget) {
-      this.themesTarget.textContent = (puzzle.themes || []).slice(0, 4)
+      this.themesTarget.textContent = `Rating ${puzzle.rating} · ` + (puzzle.themes || []).slice(0, 3)
         .map(t => t.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/^./, c => c.toUpperCase())).join(" · ")
     }
-    if (this.hasTierTarget) this.tierTarget.style.display = "none" // practice has no points
-    this.flash("hint", `${side} to move — practice puzzle, no points.`)
+    if (this.hasTierTarget) this.tierTarget.style.display = "none" // ladder has no points
+    if (this.hasStageTarget) {
+      this.stageTarget.hidden = false
+      this.stageTarget.querySelectorAll("i").forEach((dot, i) => {
+        dot.classList.toggle("is-done", i < this.stage - 1)
+        dot.classList.toggle("is-now", i === this.stage - 1)
+      })
+    }
   }
 
-  // ─── Reveal: watch the solution play out (no points) ─────────
+  markLevel() {
+    if (!this.hasLevelTarget) return
+    this.levelTargets.forEach(btn => {
+      const on = btn.dataset.level === this.level
+      btn.classList.toggle("is-on", on)
+      btn.setAttribute("aria-pressed", on ? "true" : "false")
+    })
+  }
+
+  bestStages() {
+    try { return JSON.parse(localStorage.getItem(BEST_KEY) || "{}") } catch { return {} }
+  }
+
+  saveBest(stage) {
+    const best = this.bestStages()
+    if ((best[this.level] || 0) >= stage) return
+    best[this.level] = stage
+    try { localStorage.setItem(BEST_KEY, JSON.stringify(best)) } catch { /* private mode */ }
+    this.showBest()
+  }
+
+  showBest() {
+    if (!this.hasBestTarget) return
+    const best = this.bestStages()[this.level]
+    this.bestTarget.textContent = best ? `Your best: stage ${best} of ${STAGES}` : "Climb as high as you can."
+  }
+
+  // ─── Reveal: watch the solution play out ─────────────────────
   async revealSolution() {
     if (this.complete) return
+    this.giveUp("Here's the line.")
+  }
+
+  async giveUp(message) {
     const run = this.run
     this.revealed = true
+    this.complete = true
     this.clearSelection()
-    this.setStatus("Watch the line…")
+    this.setStatus(message)
     while (this.idx < this.solution.length) {
-      if (run !== this.run) return // Restart or New puzzle pressed meanwhile
+      if (run !== this.run) return
       const m = this.parseUci(this.solution[this.idx])
-      try { this.game.move({ from: m.from, to: m.to, promotion: m.promotion || "q" }) }
-      catch { break }
+      try { this.game.move({ from: m.from, to: m.to, promotion: m.promotion || "q" }) } catch { break }
       this.lastMove = { from: m.from, to: m.to }
       this.idx += 1
       this.renderBoard()
@@ -130,13 +217,29 @@ export default class extends Controller {
       await new Promise(r => setTimeout(r, 650))
     }
     if (run !== this.run) return
-    this.complete = true
-    this.flash("hint", "That was the line. Try a practice puzzle next — you'll spot the next one yourself.")
+
+    if (this.mode === "ladder") {
+      this.failed = true
+      const reached = this.stage - 1
+      if (reached > 0) this.saveBest(reached)
+      this.flash("bad", reached > 0 ? `The climb ends at stage ${this.stage}. You cleared ${reached}.` : "The climb ends here.")
+      this.showFeedback("Every stage is a new puzzle, so the next climb is different. Try again?")
+      this.setNextButton(true, "Climb again")
+    } else {
+      this.flash("hint", "That was the line. No points this time; try the ladder below.")
+    }
   }
 
   reset() {
+    if (this.mode === "ladder" && this.failed) {
+      this.flash("hint", "This climb is over. Tap “Climb again” to start a new one.")
+      return
+    }
+    // Restart puts the pieces back but keeps the tries you've used.
+    const left = this.complete ? undefined : this.triesLeft
     try {
       this.start()
+      if (left !== undefined) { this.triesLeft = left; this.renderTries() }
     } catch (err) {
       console.error("[chess-puzzle] could not reset:", err)
       this.showLoadError(err)
@@ -146,10 +249,8 @@ export default class extends Controller {
   showLoadError(err) {
     if (this.hasStatusTarget) {
       this.statusTarget.className = "fc-chess-status is-bad"
-      this.statusTarget.textContent =
-        "Couldn't load the board here — use “View on Lichess” below to solve today's puzzle."
+      this.statusTarget.textContent = "Couldn't load the board here. Use “View on Lichess” below to solve today's puzzle."
     }
-    // Surface the real cause in-page (mobile users can't open a console).
     if (this.hasFeedbackTarget) {
       const detail = (err && (err.message || err.toString())) || "unknown error"
       this.feedbackTarget.classList.remove("hidden")
@@ -159,24 +260,23 @@ export default class extends Controller {
 
   // ─── Rendering ───────────────────────────────────────────────
   renderBoard() {
-    const board = this.game.board()             // [rank8 … rank1][fileA … fileH]
+    const board = this.game.board()
     const flip  = this.solverColor === "b"
-    const rankOrder = flip ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7]
-    const fileOrder = flip ? [7, 6, 5, 4, 3, 2, 1, 0] : [0, 1, 2, 3, 4, 5, 6, 7]
+    const order = flip ? [ 7, 6, 5, 4, 3, 2, 1, 0 ] : [ 0, 1, 2, 3, 4, 5, 6, 7 ]
 
     const frag = document.createDocumentFragment()
-    for (const r of rankOrder) {
-      for (const f of fileOrder) {
-        const cell    = board[r][f]
-        const square  = "abcdefgh"[f] + (8 - r)
+    for (const r of order) {
+      for (const f of order) {
+        const cell   = board[r][f]
+        const square = "abcdefgh"[f] + (8 - r)
         const sq = document.createElement("button")
         sq.type = "button"
         sq.className = "fc-chess-sq " + (((r + f) % 2 === 0) ? "is-light" : "is-dark")
         sq.dataset.square = square
-        if (this.selected === square)   sq.classList.add("is-selected")
+        if (this.selected === square) sq.classList.add("is-selected")
         if (this.legalTargets.includes(square)) sq.classList.add(cell ? "is-capture" : "is-target")
         if (this.lastMove && (this.lastMove.from === square || this.lastMove.to === square)) {
-          sq.classList.add("is-lastmove")
+          sq.classList.add(this.lastMove.wrong ? "is-wrong" : "is-lastmove")
         }
         if (cell) {
           const piece = document.createElement("span")
@@ -188,16 +288,27 @@ export default class extends Controller {
         frag.appendChild(sq)
       }
     }
-    // textContent="" + appendChild instead of replaceChildren — the
-    // latter isn't available on older mobile browsers.
     this.boardTarget.textContent = ""
     this.boardTarget.appendChild(frag)
   }
 
+  renderTries() {
+    if (!this.hasTriesTarget) return
+    const hearts = Array.from({ length: TRIES }, (_, i) => (i < this.triesLeft ? "❤️" : "🤍")).join("")
+    this.triesTarget.textContent = hearts
+    this.triesTarget.setAttribute("aria-label", `${this.triesLeft} of ${TRIES} tries left`)
+  }
+
+  setNextButton(show, label) {
+    if (!this.hasNextBtnTarget) return
+    this.nextBtnTarget.hidden = !show
+    if (label) this.nextBtnTarget.textContent = label
+  }
+
   // ─── Interaction ─────────────────────────────────────────────
   onSquareClick(square) {
-    if (this.complete) return
-    if (this.game.turn() !== this.solverColor) return  // opponent's turn — wait
+    if (this.complete || this.busy) return
+    if (this.game.turn() !== this.solverColor) return
 
     const piece = this.game.get(square)
 
@@ -212,9 +323,8 @@ export default class extends Controller {
       this.select(square)
       this.renderBoard()
     } else if (piece) {
-      // Tapping the other side used to do nothing, so the board looked frozen.
       const side = this.colorName(this.solverColor)
-      this.flash("hint", `It's ${side} to move — tap a ${side.toLowerCase()} piece.`)
+      this.flash("hint", `It's ${side} to move. Tap a ${side.toLowerCase()} piece.`)
     }
   }
 
@@ -230,28 +340,55 @@ export default class extends Controller {
 
   tryUserMove(from, to) {
     const expected = this.parseUci(this.solution[this.idx])
-    if (from !== expected.from || to !== expected.to) {
-      this.clearSelection()
-      this.renderBoard()
-      this.flash("bad", "Not the puzzle move — look again.")
-      return
-    }
-
-    this.game.move({ from, to, promotion: expected.promotion || "q" })
-    this.lastMove = { from, to }
-    this.idx += 1
+    const promotion = expected.promotion || "q"
     this.clearSelection()
-    this.renderBoard()
-    this.updateProgress()
 
-    if (this.idx >= this.solution.length) {
-      this.finish()
+    let move
+    try { move = this.game.move({ from, to, promotion }) } catch { move = null }
+    if (!move) { this.renderBoard(); return }
+
+    const isSolution = from === expected.from && to === expected.to
+    // Any checkmate wins, even if Lichess lists a different mating move.
+    const mates = this.game.isCheckmate()
+
+    if (isSolution || mates) {
+      this.lastMove = { from, to }
+      this.idx += 1
+      this.renderBoard()
+      this.updateProgress()
+      if (mates || this.idx >= this.solution.length) return this.finish()
+
+      this.flash("good", "Correct. Keep going.")
+      const run = this.run
+      setTimeout(() => { if (run === this.run) this.autoOpponentMove() }, 450)
       return
     }
 
-    this.flash("good", "Correct — keep going.")
+    // A legal move that isn't the answer: show it, take it back, lose a try.
+    this.lastMove = { from, to, wrong: true }
+    this.renderBoard()
+    this.busy = true
+    this.loseTry("Not the best move here.")
     const run = this.run
-    setTimeout(() => { if (run === this.run) this.autoOpponentMove() }, 450)
+    setTimeout(() => {
+      if (run !== this.run) return
+      this.game.undo()
+      this.lastMove = null
+      this.busy = false
+      this.renderBoard()
+    }, 700)
+  }
+
+  loseTry(reason) {
+    this.triesLeft = Math.max(this.triesLeft - 1, 0)
+    this.renderTries()
+    if (this.triesLeft === 0) {
+      const run = this.run
+      setTimeout(() => { if (run === this.run) this.giveUp(`${reason} Out of tries. Here's the line.`) }, 750)
+      return false
+    }
+    this.flash("bad", `${reason} ${this.triesLeft} ${this.triesLeft === 1 ? "try" : "tries"} left.`)
+    return true
   }
 
   autoOpponentMove() {
@@ -264,39 +401,45 @@ export default class extends Controller {
     this.renderBoard()
     this.updateProgress()
 
-    if (this.idx >= this.solution.length) {
-      this.finish()
-    } else {
-      this.setStatus("Your move.")
-    }
+    if (this.idx >= this.solution.length) this.finish()
+    else this.setStatus("Your move.")
   }
 
   showHint() {
-    if (this.complete || this.game.turn() !== this.solverColor) return
+    if (this.complete || this.busy || this.game.turn() !== this.solverColor) return
+    if (this.triesLeft <= 1) {
+      this.flash("hint", "A hint costs a try, and this is your last one. You've got this.")
+      return
+    }
     const expected = this.parseUci(this.solution[this.idx])
     this.select(expected.from)
     this.renderBoard()
-    this.flash("hint", `Try the piece on ${expected.from}.`)
+    this.triesLeft -= 1
+    this.renderTries()
+    this.flash("hint", `Try the piece on ${expected.from}. (A hint costs a try.)`)
   }
 
   // ─── Finish ──────────────────────────────────────────────────
   finish() {
     this.complete = true
     this.clearSelection()
-    this.flash("good", "Puzzle solved — well played.")
 
-    if (this.practice) {
-      this.showFeedback("Practice solved 🎉 — hit “New puzzle” for another.")
+    if (this.mode === "ladder") {
+      this.saveBest(this.stage)
+      if (this.stage >= STAGES) {
+        this.flash("good", `Ladder complete. All ${STAGES} stages cleared! 🏆`)
+        this.showFeedback("Try the next level up for a harder climb.")
+        this.setNextButton(true, "Climb again")
+      } else {
+        this.flash("good", `Stage ${this.stage} cleared. The next one is a little harder.`)
+        this.setNextButton(true, `Stage ${this.stage + 1} →`)
+      }
       return
     }
-    if (this.revealed) {
-      this.showFeedback("Solution shown — no points this time, but now you've seen the idea.")
-      return
-    }
-    if (this.alreadyValue) {
-      this.showFeedback("You already claimed today's points — nice replay though.")
-      return
-    }
+
+    this.flash("good", "Puzzle solved. Well played.")
+    if (this.revealed) return this.showFeedback("Solution shown: no points this time, but now you've seen the idea.")
+    if (this.alreadyValue) return this.showFeedback("You already claimed today's points. Now try the ladder below.")
     this.recordSolved()
   }
 
@@ -304,17 +447,13 @@ export default class extends Controller {
     try {
       const resp = await fetch(this.solvedUrlValue, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "X-CSRF-Token": this.csrfValue
-        },
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": this.csrfValue },
         credentials: "same-origin"
       })
       const data = await resp.json()
       if (data.ok) {
         this.alreadyValue = true
-        this.showFeedback(`+${data.score} points added. Come back tomorrow for the next puzzle.`)
+        this.showFeedback(`+${data.score} points added. Now try the ladder below, or come back tomorrow.`)
       } else {
         this.showFeedback(data.error || "Couldn't record your solve.")
       }
@@ -350,8 +489,8 @@ export default class extends Controller {
 
   updateProgress() {
     if (!this.hasProgressTarget) return
-    const total = this.solution.length
-    const done  = Math.min(this.idx, total)
-    this.progressTarget.textContent = `Move ${Math.min(done + (this.complete ? 0 : 1), total)} of ${total}`
+    const total = Math.ceil(this.solution.length / 2) // your moves only
+    const done  = Math.min(Math.ceil(this.idx / 2), total)
+    this.progressTarget.textContent = this.complete ? `${total} of ${total} moves` : `Move ${Math.min(done + 1, total)} of ${total}`
   }
 }

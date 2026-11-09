@@ -2,7 +2,7 @@
 
 class UsersController < ApplicationController
   before_action :authenticate_user!, except: [ :show, :posts ]
-  before_action :set_user, except: [ :index, :mentions ]
+  before_action :set_user, except: [ :index, :suggested, :mentions ]
 
   def index
     @query = params[:q].to_s.strip
@@ -20,6 +20,11 @@ class UsersController < ApplicationController
 
     users = users.where.not(id: current_user.id) if user_signed_in?
     @pagy, @users = pagy(users, items: 24)
+  end
+
+  # "See all" from Brethren you may know: every suggestion, as cards with Connect.
+  def suggested
+    @suggestions = BrethrenSuggestions.for(current_user, limit: 48)
   end
 
   PROFILE_TABS = %w[breaths professional about].freeze

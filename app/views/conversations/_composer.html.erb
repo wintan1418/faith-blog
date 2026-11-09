@@ -2,7 +2,7 @@
               class: "msg-composer",
               id: "new_message",
               html: { multipart: true, data: {
-                controller: "dm-composer",
+                controller: "dm-composer paste-images",
                 action: "submit->dm-composer#onSubmit",
                 dm_composer_gentleness_url_value: check_gentleness_posts_path
               } } do |f| %>
@@ -96,7 +96,7 @@
               multiple: true,
               accept: "image/*",
               class: "sr-only",
-              data: { dm_composer_target: "imageInput", action: "change->dm-composer#previewImages" } %>
+              data: { dm_composer_target: "imageInput", paste_images_target: "input", action: "change->dm-composer#previewImages" } %>
         </label>
         <label class="msg-tool" title="Attach a document" aria-label="Attach a document">
           <%= render_icon("paperclip", classes: "h-5 w-5") %>
