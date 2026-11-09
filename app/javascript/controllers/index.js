@@ -187,3 +187,6 @@ application.register("password-field", PasswordFieldController)
 
 import WhatsNewController from "./whats_new_controller"
 application.register("whats-new", WhatsNewController)
+
+import CardShareController from "./card_share_controller"
+application.register("card-share", CardShareController)

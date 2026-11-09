@@ -1,0 +1,96 @@
+<% m = @member %>
+<% name = m.display_name.presence || m.username %>
+<% profile = m.profile %>
+<% role = m.experiences.find(&:current?) %>
+<% open_to = visible_open_to(m) %>
+<% content_for(:title) { "#{name} · Brethreign" } %>
+<% content_for(:og_title) { "#{name} on Brethreign" } %>
+<% content_for(:og_description) { m.professional_headline.presence || "A member of Brethreign, the Christian social network." } %>
+<% content_for(:og_accent) { m.accent_color } %>
+<% content_for(:head) do %><meta name="robots" content="noindex"><% end %>
+
+<div class="card-page">
+  <div class="card-wrap">
+    <% if @owner %>
+      <div class="card-top">
+        <%= link_to "← My profile", user_path(m.username, tab: "professional"), class: "card-back" %>
+        <span class="card-top-title">My card</span>
+      </div>
+    <% end %>
+
+    <%# The card itself %>
+    <section class="bcard bcard--<%= profile&.card_style || "mint" %>" aria-label="<%= name %>'s card">
+      <div class="bcard-brand">
+        <span><%= image_tag "/icon.svg", alt: "", width: 22, height: 22 %> Brethreign</span>
+        <% if open_to.any? %><span class="bcard-open"><%= Profile::OPEN_TO[open_to.first][:badge] %></span><% end %>
+      </div>
+      <div class="bcard-who">
+        <span class="bcard-photo <%= open_to_ring_class(m) %>">
+          <% if profile&.avatar&.attached? %>
+            <%= image_tag avatar_src(profile, 160), alt: "" %>
+          <% else %>
+            <span style="<%= avatar_tint_style(m.username) %>"><%= m.username.first.upcase %></span>
+          <% end %>
+        </span>
+        <div class="bcard-text">
+          <h1 class="bcard-name"><%= name %></h1>
+          <% if (headline = m.professional_headline) %><p class="bcard-role"><%= headline %></p><% end %>
+        </div>
+      </div>
+      <div class="bcard-foot">
+        <span><%= [ profile&.assembly, profile&.location.to_s.split(",").first.presence ].compact_blank.join(" · ") %></span>
+        <span>/in/<%= m.username %></span>
+      </div>
+    </section>
+
+    <div class="card-qr">
+      <div class="card-qr-box" role="img" aria-label="QR code for <%= @card_url %>"><%= sanitize @qr_svg, tags: %w[svg path rect g], attributes: %w[viewBox xmlns width height fill d shape-rendering version x y transform] %></div>
+      <span class="card-qr-avatar">
+        <% if profile&.avatar&.attached? %><%= image_tag avatar_src(profile, 96), alt: "" %><% else %><%= image_tag "/icon.svg", alt: "" %><% end %>
+      </span>
+      <p>Scan to see <%= @owner ? "my" : "#{name}'s" %> profile</p>
+    </div>
+
+    <div class="card-actions" data-controller="card-share" data-card-share-url-value="<%= @card_url %>" data-card-share-title-value="<%= "#{name} on Brethreign" %>">
+      <button type="button" class="card-act card-act--primary" data-action="card-share#share"><span aria-hidden="true">↗</span>Share</button>
+      <%= link_to card_path(m.username, format: :vcf), class: "card-act", data: { turbo: false } do %><span aria-hidden="true">👤</span>Save contact<% end %>
+      <%= link_to "https://wa.me/?text=#{ERB::Util.url_encode("#{name} on Brethreign: #{@card_url}")}", class: "card-act", target: "_blank", rel: "noopener" do %><span aria-hidden="true">💬</span>WhatsApp<% end %>
+      <button type="button" class="card-act" data-action="card-share#copy"><span aria-hidden="true">🔗</span>Copy link</button>
+    </div>
+    <p class="card-link"><%= @card_url.sub(%r{\Ahttps?://}, "") %></p>
+
+    <% if @owner %>
+      <div class="card-styles">
+        <span>Card colour</span>
+        <div>
+          <% Profile::CARD_STYLES.each do |style| %>
+            <%= button_to card_style_path(m.username, card_style: style), method: :patch, class: "card-swatch card-swatch--#{style}#{' is-on' if profile&.card_style == style}",
+                          form: { class: "card-swatch-form" }, aria: { label: "#{style.capitalize} card", pressed: profile&.card_style == style } do %><% end %>
+          <% end %>
+        </div>
+      </div>
+      <p class="card-note">“Save contact” shares your name, current role and this link, never your Brethren Card details.</p>
+    <% else %>
+      <section class="card-summary">
+        <% if open_to.any? %>
+          <div class="ot-chips"><% open_to.each do |key| %><span class="ot-chip ot-chip--<%= Profile::OPEN_TO[key][:colour] %>">Open to <%= Profile::OPEN_TO[key][:label].downcase %></span><% end %></div>
+        <% end %>
+        <% roles = m.experiences.first(2) %>
+        <% if roles.any? %>
+          <p class="card-sec">Experience</p>
+          <% roles.each do |r| %><p class="card-line"><b><%= r.title %></b> · <%= r.organization %></p><% end %>
+        <% end %>
+        <% if profile&.skills.present? %>
+          <p class="card-sec">Skills</p>
+          <p class="card-line"><%= profile.skills.first(6).join(" · ") %></p>
+        <% end %>
+        <% if user_signed_in? %>
+          <%= link_to "View full profile", user_path(m.username, tab: "professional"), class: "bl-btn bl-btn--primary card-cta" %>
+        <% else %>
+          <%= link_to "Join Brethreign to connect", new_user_registration_path, class: "bl-btn bl-btn--primary card-cta" %>
+          <p class="card-note">Free. Contact details stay private until you connect.</p>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+</div>

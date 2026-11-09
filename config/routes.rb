@@ -92,6 +92,12 @@ Rails.application.routes.draw do
   get "mentions", to: "users#mentions"
 
   # User profiles
+  # Skill endorsements (from connections) and the digital business card.
+  post "u/:username/endorse", to: "endorsements#create", as: :endorse_skill
+  delete "u/:username/endorse", to: "endorsements#destroy", as: :unendorse_skill
+  get "in/:username", to: "cards#show", as: :card, constraints: { username: %r{[^/.]+} }
+  patch "in/:username/style", to: "cards#style", as: :card_style, constraints: { username: %r{[^/.]+} }
+
   # A piece of work on someone's Portfolio tab.
   get "u/:username/work/:id", to: "portfolio_items#show", as: :portfolio_work
   resources :users, only: [ :show ], param: :username, path: "u" do

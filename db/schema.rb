@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -660,6 +660,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_130000) do
     t.string "assembly_key"
     t.string "city_key"
     t.string "industry", limit: 80
+    t.string "open_to", default: [], null: false, array: true
+    t.integer "open_to_visibility", default: 0, null: false
+    t.string "card_style", limit: 20, default: "mint", null: false
     t.index ["assembly_key"], name: "index_profiles_on_assembly_key"
     t.index ["birth_month", "birth_day"], name: "index_profiles_on_birth_month_and_birth_day"
     t.index ["city_key"], name: "index_profiles_on_city_key"
@@ -778,6 +781,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_130000) do
     t.index ["position"], name: "index_rooms_on_position"
     t.index ["room_type"], name: "index_rooms_on_room_type"
     t.index ["slug"], name: "index_rooms_on_slug", unique: true
+  end
+
+  create_table "skill_endorsements", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "endorser_id", null: false
+    t.string "skill", limit: 40, null: false
+    t.string "skill_key", limit: 40, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endorser_id"], name: "index_skill_endorsements_on_endorser_id"
+    t.index ["user_id", "endorser_id", "skill_key"], name: "index_endorsements_unique", unique: true
+    t.index ["user_id", "skill_key"], name: "index_skill_endorsements_on_user_id_and_skill_key"
+    t.index ["user_id"], name: "index_skill_endorsements_on_user_id"
   end
 
   create_table "suggestion_dismissals", force: :cascade do |t|
@@ -971,6 +987,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_130000) do
   add_foreign_key "resources", "users", column: "approved_by_id"
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
+  add_foreign_key "skill_endorsements", "users"
+  add_foreign_key "skill_endorsements", "users", column: "endorser_id"
   add_foreign_key "suggestion_dismissals", "users"
   add_foreign_key "suggestion_dismissals", "users", column: "dismissed_user_id"
   add_foreign_key "user_badges", "users"

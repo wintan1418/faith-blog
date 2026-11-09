@@ -22,6 +22,8 @@ class User < ApplicationRecord
   has_many :certifications, -> { ordered }, dependent: :destroy
   has_many :languages, -> { ordered }, class_name: "UserLanguage", dependent: :destroy
   has_many :portfolio_items, -> { ordered }, dependent: :destroy
+  has_many :skill_endorsements, dependent: :destroy # endorsements this member received
+  has_many :given_endorsements, class_name: "SkillEndorsement", foreign_key: :endorser_id, dependent: :destroy, inverse_of: :endorser
 
   # One line under the name: the headline they wrote, or "Title at Organisation" from their current role.
   def professional_headline

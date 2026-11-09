@@ -1,0 +1,35 @@
+<%# One skill with its endorsements. Locals: user, skill, owner. %>
+<% list = endorsements_by_skill(user)[SkillEndorsement.key_for(skill)].to_a %>
+<% mine = user_signed_in? && list.any? { |e| e.endorser_id == current_user.id } %>
+<% can_endorse = !owner && connected_viewer?(user) %>
+<div class="sk-row" id="<%= skill_row_id(user, skill) %>">
+  <div class="sk-main">
+    <span class="pro-skill sk-name"><%= skill %></span>
+    <% if list.any? %>
+      <span class="sk-meta">
+        <span class="sk-faces" aria-hidden="true">
+          <% list.first(3).each do |e| %>
+            <% if e.endorser.profile&.avatar&.attached? %>
+              <%= image_tag avatar_src(e.endorser.profile, 48), class: "sk-face", alt: "" %>
+            <% else %>
+              <span class="sk-face" style="<%= avatar_tint_style(e.endorser.username) %>"><%= e.endorser.username.first.upcase %></span>
+            <% end %>
+          <% end %>
+        </span>
+        <% first = list.first.endorser.display_name %>
+        <%= list.size == 1 ? "Endorsed by #{first}" : "Endorsed by #{first} and #{pluralize(list.size - 1, 'other')}" %>
+      </span>
+    <% elsif owner %>
+      <span class="sk-meta sk-meta--empty">No endorsements yet</span>
+    <% end %>
+  </div>
+  <% if can_endorse %>
+    <% if mine %>
+      <%= button_to "✓ Endorsed", unendorse_skill_path(user.username, skill: skill), method: :delete, class: "sk-btn is-on",
+                    form: { class: "sk-form" }, aria: { label: "Remove your endorsement for #{skill}" } %>
+    <% else %>
+      <%= button_to "+ Endorse", endorse_skill_path(user.username, skill: skill), method: :post, class: "sk-btn",
+                    form: { class: "sk-form" }, aria: { label: "Endorse #{user.display_name} for #{skill}" } %>
+    <% end %>
+  <% end %>
+</div>

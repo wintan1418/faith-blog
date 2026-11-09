@@ -39,6 +39,24 @@
   </section>
 <% end %>
 
+<% open_to = visible_open_to(user) %>
+<% if open_to.any? || owner %>
+  <section class="mystic-panel-strong pro-card ot-card" aria-label="Open to">
+    <div class="pro-panel-head">
+      <h2 class="pro-card-title">Open to</h2>
+      <% if owner %><%= link_to(open_to.any? ? "Edit" : "+ Add", edit_settings_professional_path(anchor: "open-to"), class: "pro-item-edit") %><% end %>
+    </div>
+    <% if open_to.any? %>
+      <div class="ot-chips">
+        <% open_to.each do |key| %><span class="ot-chip ot-chip--<%= Profile::OPEN_TO[key][:colour] %>"><%= Profile::OPEN_TO[key][:label] %></span><% end %>
+      </div>
+      <% if owner && user.profile.open_to_shown_to_connections? %><p class="pro-item-meta mt-2">Only your connections see this.</p><% end %>
+    <% else %>
+      <p class="pro-empty">Open to new work, hiring, mentoring, volunteering or freelance? Say so, and the right people will notice.</p>
+    <% end %>
+  </section>
+<% end %>
+
 <% if all_roles.empty? && schools.empty? && skills.empty? && certifications.empty? && languages.empty? && user.profile&.headline.blank? %>
   <section class="mystic-panel-strong pro-card pro-card--empty">
     <% if owner %>
@@ -142,8 +160,12 @@
         <% if owner %><%= link_to "Edit", edit_settings_professional_path, class: "pro-item-edit" %><% end %>
       </div>
       <% if skills.any? %>
-        <div class="pro-skills">
-          <% skills.each do |skill| %><span class="pro-skill"><%= skill %></span><% end %>
+        <%# Most-endorsed first; connections can endorse with one tap. %>
+        <% counts = endorsements_by_skill(user).transform_values(&:size) %>
+        <div class="sk-list">
+          <% skills.each_with_index.sort_by { |skill, i| [ -counts[SkillEndorsement.key_for(skill)].to_i, i ] }.each do |skill, _i| %>
+            <%= render "users/skill_row", user: user, skill: skill, owner: owner %>
+          <% end %>
         </div>
       <% else %>
         <p class="pro-empty">List what you're good at, at work or in service.</p>

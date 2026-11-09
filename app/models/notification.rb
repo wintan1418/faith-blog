@@ -30,7 +30,8 @@ class Notification < ApplicationRecord
     circle_prayer:          24,
     circle_prayer_answered: 25,
     birthday:               26,
-    content_removed:        27
+    content_removed:        27,
+    skill_endorsed:         28
   }
 
   # Associations
@@ -127,6 +128,8 @@ class Notification < ApplicationRecord
       else
         "🛡 Your profile photo was removed because it breaks our community guidelines. Please choose another."
       end
+    when :skill_endorsed
+      "#{actor&.display_name || 'Someone'} endorsed you for #{notifiable.try(:skill) || 'a skill'} 👍"
     when :birthday
       "🎂 It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -167,6 +170,8 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.circle_path(notifiable.circle)
     when :birthday
       Rails.application.routes.url_helpers.user_path(actor.username)
+    when :skill_endorsed
+      Rails.application.routes.url_helpers.user_path(user.username, tab: "professional")
     when :content_removed
       if notifiable.is_a?(PortfolioItem)
         Rails.application.routes.url_helpers.edit_settings_portfolio_item_path(notifiable)
@@ -214,7 +219,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
-    return if birthday? # a push and the feed card are enough; no birthday emails
+    return if birthday? || skill_endorsed? # a push and the alert are enough; no emails for these
 
     NotificationMailer.with(notification: self).community_notification.deliver_later
   end

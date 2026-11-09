@@ -51,6 +51,30 @@
         <% end %>
       </section>
 
+      <section class="mystic-panel-strong pro-panel" id="open-to">
+        <h2 class="pro-panel-title">Open to</h2>
+        <p class="pro-empty mb-3">Let people know what you're looking for. A coloured ring and a small badge show on your photo.</p>
+        <%= form_with model: @profile, url: settings_professional_path, method: :patch, class: "ot-form" do |f| %>
+          <%= hidden_field_tag "profile[open_to][]", "" %>
+          <div class="ot-options">
+            <% Profile::OPEN_TO.each do |key, info| %>
+              <label class="ot-option ot-option--<%= info[:colour] %>">
+                <%= check_box_tag "profile[open_to][]", key, @profile.open_to.include?(key), id: "open_to_#{key}" %>
+                <span class="ot-dot" aria-hidden="true"></span>
+                <span><b><%= info[:label] %></b><small><%= info[:badge] %> badge</small></span>
+              </label>
+            <% end %>
+          </div>
+          <fieldset class="ot-who">
+            <legend>Who can see this</legend>
+            <label><%= f.radio_button :open_to_visibility, "everyone" %> Everyone on Brethreign</label>
+            <label><%= f.radio_button :open_to_visibility, "connections" %> My connections only</label>
+          </fieldset>
+          <p class="text-xs text-faith-muted">Looking for new work quietly? Choose “My connections only”.</p>
+          <%= f.submit "Save", class: "btn btn-primary" %>
+        <% end %>
+      </section>
+
       <section class="mystic-panel-strong pro-panel">
         <div class="pro-panel-head">
           <h2 class="pro-panel-title">Experience</h2>
