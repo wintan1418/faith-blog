@@ -102,17 +102,13 @@
     </aside>
 
     <main class="fc-main">
-      <%# Personal masthead — the greeting follows the VIEWER's clock via
-          html[data-greet] (set in the layout head script); all variants render
-          and CSS shows the right one, so there's no flash of wrong greeting. %>
+      <%# Masthead: today's date in the reader's own time zone (the server runs
+          on UTC, so the server's date can be a day off late at night). %>
       <header class="fc-masthead">
         <div class="min-w-0">
-          <h1 class="fc-masthead-greet">
-            <%# One line, no spaces between the spans: the hidden greetings would leave a gap before the comma. %>
-            <span class="fc-greet" data-greet="morning">Good morning</span><span class="fc-greet" data-greet="afternoon">Good afternoon</span><span class="fc-greet" data-greet="evening">Good evening</span><span class="fc-greet" data-greet="night">Grace for the night watch</span><span class="fc-greet fc-greet-fallback">Welcome back</span>,
-            <span class="fc-masthead-name"><%= current_user.display_name.presence || current_user.username %></span>
+          <h1 class="fc-masthead-date">
+            <time datetime="<%= Time.current.utc.iso8601 %>" data-controller="local-time" data-local-time-format-value="today"><%= Date.current.strftime("%A, %-d %B") %></time>
           </h1>
-          <p class="fc-masthead-sub"><%= Date.current.strftime("%A, %B %-d") %> · The assembly is gathered. Breathe deep.</p>
         </div>
         <% if current_user.current_breath_streak.to_i.positive? %>
           <span class="fc-masthead-streak" title="Breath streak — days in a row you've breathed">
@@ -166,12 +162,14 @@
           <button type="button"
                   class="fc-composer-input flex items-center text-[var(--fc-muted)]"
                   data-action="click->composer-modal#open">
+            <%# Phones hide the Breathe button beside this box, so the box shows a pen. %>
+            <span class="fc-composer-input-pen" aria-hidden="true"><%= render_icon("pencil", classes: "h-4 w-4") %></span>
             <%# On phones the Daily Breath card folds into this box: its question becomes the prompt. %>
             <span class="fc-composer-input-text fc-composer-default">What's on your heart?<span class="fc-composer-input-more"> Take a breath...</span></span>
             <span class="fc-composer-input-text fc-composer-daily">What breath do you have today?</span>
           </button>
           <button type="button"
-                  class="fc-btn fc-btn-primary"
+                  class="fc-btn fc-btn-primary fc-composer-go"
                   data-action="click->composer-modal#open">
             Breathe
           </button>
