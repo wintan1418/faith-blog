@@ -26,17 +26,18 @@
 
         <div class="flex flex-wrap gap-3">
           <% if user_signed_in? %>
-            <%= link_to new_post_path(room_id: @room.id), class: "btn btn-primary" do %>
+            <%# Not a member yet: joining is the main action. Already in: sharing is. %>
+            <%= link_to new_post_path(room_id: @room.id), class: "btn #{@is_member ? 'btn-primary' : 'btn-secondary'}" do %>
               <%= render_icon("pencil", classes: "w-4 h-4") %>
               Share Here
             <% end %>
             <% if @is_member %>
               <%= button_to "Leave Room", leave_room_path(@room), method: :delete, class: "btn btn-secondary", data: { turbo_confirm: "Leave this room?" } %>
             <% else %>
-              <%= button_to "Join Room", join_room_path(@room), class: "btn btn-secondary" %>
+              <%= button_to "Join Room", join_room_path(@room), class: "btn btn-primary" %>
             <% end %>
           <% else %>
-            <%= link_to "Sign in to participate", new_user_session_path, class: "btn btn-secondary" %>
+            <%= link_to "Sign in to participate", new_user_session_path, class: "btn btn-primary" %>
           <% end %>
         </div>
       </div>

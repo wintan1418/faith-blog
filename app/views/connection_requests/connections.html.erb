@@ -42,8 +42,8 @@
               </div>
             </div>
 
-            <div class="mt-5 flex flex-wrap gap-2 border-t border-faith-green/10 pt-4">
-              <%= link_to "View Card", brethren_card_path(user.username), class: "btn btn-primary btn-sm flex-1" %>
+            <div class="conn-actions mt-5 border-t pt-4">
+              <%= link_to "View Card", brethren_card_path(user.username), class: "btn btn-primary btn-sm" %>
               <%= button_to conversations_path(recipient_id: user.id), method: :post, class: "btn btn-secondary btn-sm" do %>
                 Message
               <% end %>

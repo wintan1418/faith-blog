@@ -4,7 +4,7 @@
   <% if current_user.brethren_card.blank? || !current_user.brethren_card.complete? %>
     <%= link_to "Complete Brethren Card", edit_settings_brethren_card_path, class: "btn btn-primary" %>
   <% elsif connection&.accepted? %>
-    <%= link_to "View Brethren Card", brethren_card_path(user.username), class: "btn btn-secondary" %>
+    <%= link_to "Brethren Card", brethren_card_path(user.username), class: "btn btn-secondary" %>
     <%= button_to conversations_path(recipient_id: user.id), method: :post, class: "btn btn-primary" do %>
       Message
     <% end %>
