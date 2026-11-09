@@ -145,9 +145,13 @@ class PostsController < ApplicationController
       attrs = attrs.except(:images)
     end
 
+    schedule_or_publish(attrs) unless @post.published?
+
     if @post.update(attrs)
       handle_post_links
-      if @post.draft?
+      if @post.scheduled?
+        redirect_to drafts_path, notice: flash_notice_for(@post)
+      elsif @post.draft?
         redirect_to drafts_path, notice: "Draft saved — pick it back up under Drafts when you're ready."
       else
         redirect_to @post, notice: "Post updated successfully!"
@@ -315,6 +319,23 @@ class PostsController < ApplicationController
     if target.nil? || !target.visible_to?(current_user) || target.user_id == current_user.id
       post.quoted_post_id = nil
     end
+  end
+
+  # A draft or scheduled breath sent with "Publish": a future time schedules
+  # it (as in the composer); otherwise it goes out now and drops the old time.
+  def schedule_or_publish(attrs)
+    return if attrs[:status].to_s == "draft"
+
+    when_at = attrs.key?(:scheduled_for) ? Time.zone.parse(attrs[:scheduled_for].to_s) : @post.scheduled_for
+    if when_at.present? && when_at > Time.current
+      attrs[:status] = "scheduled"
+      attrs[:published_at] = nil
+    elsif attrs[:status].to_s.in?(%w[published scheduled])
+      attrs[:status] = "published"
+      attrs[:scheduled_for] = nil
+    end
+  rescue ArgumentError
+    attrs[:scheduled_for] = nil
   end
 
   def scheduled_in_future?(post)

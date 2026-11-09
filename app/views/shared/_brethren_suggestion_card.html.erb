@@ -1,0 +1,42 @@
+<%# One "Brethren you may know" card. Locals: s (a BrethrenSuggestions::Suggestion). %>
+<% person = s.user %>
+<div class="bys-card" id="<%= dom_id(person, :suggestion) %>" style="<%= AccentPalette.css_vars(person.accent_color) %>">
+  <span class="bys-cover" aria-hidden="true"></span>
+  <%= button_to suggestion_dismissals_path(user_id: person.id), method: :post, class: "bys-dismiss",
+                form: { class: "bys-dismiss-form" }, aria: { label: "Not interested in #{person.display_name}" } do %>×<% end %>
+  <%= link_to user_path(person.username), class: "bys-who" do %>
+    <% if person.profile&.avatar&.attached? %>
+      <%= image_tag avatar_src(person.profile, 160), class: "bys-avatar", alt: "" %>
+    <% else %>
+      <span class="bys-avatar bys-avatar--initial" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+    <% end %>
+    <span class="bys-name"><%= person.display_name %></span>
+    <span class="bys-headline"><%= person.professional_headline.presence || person.profile&.bio&.truncate(70) %></span>
+  <% end %>
+  <% if s.reason %>
+    <p class="bys-reason">
+      <% if s.mutuals.present? %>
+        <span class="bys-faces" aria-hidden="true">
+          <% s.mutuals.each do |face| %>
+            <% if face.profile&.avatar&.attached? %>
+              <%= image_tag avatar_src(face.profile, 48), class: "bys-face", alt: "" %>
+            <% else %>
+              <span class="bys-face" style="<%= avatar_tint_style(face.username) %>"><%= face.username.first.upcase %></span>
+            <% end %>
+          <% end %>
+        </span>
+      <% elsif (icon = { assembly: "⛪", organization: "💼", profession: "💼", skill: "✦", city: "📍", room: "💬" }[s.kind]) %>
+        <span class="bys-reason-icon" aria-hidden="true"><%= icon %></span>
+      <% end %>
+      <%# With faces showing, "2 mutual" says enough; the full reason stays as a tooltip. %>
+      <span class="bys-reason-text" title="<%= s.reason %>"><%= s.mutuals.present? ? "#{s.reason[/\A\d+/]} mutual" : s.reason %></span>
+    </p>
+  <% end %>
+  <div class="bys-action" id="<%= dom_id(person, :suggestion_action) %>">
+    <% if current_user.brethren_card&.complete? %>
+      <%= button_to "+ Connect", connection_requests_path(receiver_id: person.id), method: :post, class: "bys-connect" %>
+    <% else %>
+      <%= link_to "Complete card to connect", edit_settings_brethren_card_path, class: "bys-connect bys-connect--soft" %>
+    <% end %>
+  </div>
+</div>

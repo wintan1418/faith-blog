@@ -5,7 +5,7 @@
     <div class="mb-8">
       <span class="mystic-kicker">Community</span>
       <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Find people walking the same road.</h1>
-      <p class="mystic-copy mt-2 max-w-2xl">Browse members, search by username or profile details, then follow or connect from their profile.</p>
+      <p class="mystic-copy mt-2 max-w-2xl">Browse members, search by username or profile details, then connect or follow.</p>
     </div>
 
     <%= form_with url: people_path, method: :get, class: "mystic-panel-strong mb-6 p-4" do %>
@@ -61,6 +61,7 @@
             </div>
 
             <div class="fc-people-actions">
+              <%= render "users/connect_button", user: user %>
               <%= render "users/follow_actions",
                          user: user,
                          follow_class: "fc-btn fc-btn-primary",

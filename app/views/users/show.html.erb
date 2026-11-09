@@ -136,75 +136,27 @@
     </div>
   </section>
 
-  <div class="mystic-container max-w-5xl py-10">
-    <% if user_signed_in? && @user == current_user %>
-      <section class="mystic-panel-strong profile-card-panel mb-10 p-6 sm:p-8">
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <span class="mystic-kicker">Private Profile Card</span>
-            <h2 class="profile-section-title mt-3">My Brethren Card</h2>
-            <p class="mystic-copy mt-2">Shared only when connection requests are accepted.</p>
-          </div>
-          <%= link_to "Edit Card", edit_settings_brethren_card_path, class: "btn btn-secondary" %>
-        </div>
+  <div class="mystic-container max-w-5xl pb-10 pt-2">
+    <%= turbo_frame_tag "profile_tab", target: "_top" do %>
+      <nav class="profile-tabs" aria-label="Profile sections">
+        <% { "breaths" => "Breaths", "professional" => "Professional", "about" => "About" }.each do |key, label| %>
+          <%= link_to label, user_path(@user.username, tab: (key == "breaths" ? nil : key)),
+                      class: "profile-tab#{' is-active' if @tab == key}",
+                      aria: { current: (@tab == key ? "page" : nil) },
+                      data: { turbo_frame: "profile_tab", turbo_action: "advance" } %>
+        <% end %>
+      </nav>
 
-        <% if current_user.brethren_card&.complete? %>
-          <div class="grid gap-4 md:grid-cols-2">
-            <% [
-              ["Church / Assembly", current_user.brethren_card.church_or_assembly],
-              ["Occupation", current_user.brethren_card.occupation],
-              ["WhatsApp", current_user.brethren_card.whatsapp_number],
-              ["Email", current_user.brethren_card.email],
-              ["About", current_user.brethren_card.bio]
-            ].each do |label, value| %>
-              <% next if value.blank? %>
-              <div class="profile-card-field">
-                <p class="profile-card-label"><%= label %></p>
-                <p class="profile-card-value"><%= value %></p>
-              </div>
-            <% end %>
-          </div>
+      <div class="profile-tab-body">
+        <% case @tab %>
+        <% when "professional" %>
+          <%= render "users/professional", user: @user, strength: @strength %>
+        <% when "about" %>
+          <%= render "users/about", user: @user %>
         <% else %>
-          <div class="profile-card-empty">
-            <h3>Complete Your Brethren Card</h3>
-            <p class="mystic-copy mx-auto mt-2 max-w-md">Add the details you want trusted connections to see after a request is accepted.</p>
-            <%= link_to "Complete My Card", edit_settings_brethren_card_path, class: "btn btn-primary mt-6" %>
-          </div>
+          <%= render "users/breaths_tab" %>
         <% end %>
-      </section>
-    <% end %>
-
-    <%= render "users/professional", user: @user %>
-
-    <section>
-      <div class="profile-section-heading mb-6 flex items-center gap-3">
-        <%= render_icon("filetext", classes: "w-6 h-6 text-faith-green") %>
-        <h2>Posts by <%= @user.display_name.presence || @user.username %></h2>
       </div>
-
-      <% if @profile_private %>
-        <div class="mystic-panel profile-empty-posts p-12 text-center">
-          <h3>This profile is private</h3>
-          <p class="mystic-copy mt-2"><%= @user.display_name.presence || @user.username %> keeps their posts to themselves.</p>
-        </div>
-      <% elsif @items.any? %>
-        <div class="space-y-5">
-          <% @items.each do |item| %>
-            <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
-          <% end %>
-        </div>
-
-        <% if @pagy.pages > 1 %>
-          <div class="mt-8">
-            <%== pagy_nav(@pagy) %>
-          </div>
-        <% end %>
-      <% else %>
-        <div class="mystic-panel profile-empty-posts p-12 text-center">
-          <h3>No posts yet</h3>
-          <p class="mystic-copy mt-2">Posts will appear here when published.</p>
-        </div>
-      <% end %>
-    </section>
+    <% end %>
   </div>
 </div>

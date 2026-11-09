@@ -12,7 +12,10 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
-    # Add more helper methods to be used by all tests here...
+    # A throwaway member for a test. The password is random on every run.
+    def create_member(username, **attrs)
+      User.create!(username: username, email: "#{username}@example.com", password: SecureRandom.base58(24), **attrs)
+    end
   end
 end
 

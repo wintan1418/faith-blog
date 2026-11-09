@@ -1,0 +1,32 @@
+<% content_for(:title) { "Brethren you may know - Brethreign" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-5xl">
+    <div class="mb-6">
+      <%= link_to "← People", people_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
+      <h1 class="mystic-title mt-3 text-3xl sm:text-4xl">Brethren you may know</h1>
+      <p class="mystic-copy mt-1">Suggested from your church, your connections, your work and your rooms. Connecting shares Brethren Cards once you both agree.</p>
+    </div>
+
+    <% unless current_user.brethren_card&.complete? %>
+      <div class="mystic-panel bys-page-note">
+        <p>Complete your Brethren Card to send connection requests.</p>
+        <%= link_to "Complete my card", edit_settings_brethren_card_path, class: "fc-btn fc-btn-primary" %>
+      </div>
+    <% end %>
+
+    <% if @suggestions.any? %>
+      <div class="bys-grid">
+        <% @suggestions.each do |s| %>
+          <%= render "shared/brethren_suggestion_card", s: s %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="mystic-panel p-10 text-center">
+        <h2 class="text-xl font-black text-[var(--fc-ink)]">No suggestions right now</h2>
+        <p class="mystic-copy mx-auto mt-2 max-w-md">Add your church, work and skills on your profile, and join a few rooms. We'll suggest brethren who share them.</p>
+        <%= link_to "Add professional details", edit_settings_professional_path, class: "fc-btn fc-btn-primary mt-4" %>
+      </div>
+    <% end %>
+  </div>
+</div>

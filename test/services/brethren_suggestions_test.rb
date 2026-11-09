@@ -42,6 +42,11 @@ class BrethrenSuggestionsTest < ActiveSupport::TestCase
     assert_equal "1 mutual brother or sister", reasons["fof"]
     assert_equal "Also at L.U.T.H.", reasons["colleague"]
     assert_equal "Fellow nurse", reasons["nurse"]
+
+    fof = suggested(@me).find { |s| s.user == friend_of_friend }
+    assert_equal :mutual, fof.kind
+    assert_equal [ friend ], fof.mutuals
+    assert_equal :organization, suggested(@me).find { |s| s.user == colleague }.kind
   end
 
   test "never suggests connections, pending requests, dismissed or blocked people" do

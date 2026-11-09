@@ -70,7 +70,8 @@
             <div class="msg-media-row">
               <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
                 <% message.images.each do |img| %>
-                  <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo" %>
+                  <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo",
+                                data: { download: rails_blob_path(img, disposition: "attachment") } %>
                 <% end %>
               </div>
               <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"

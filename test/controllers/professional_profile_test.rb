@@ -4,7 +4,7 @@ require "test_helper"
 
 class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   setup do
-    @user = User.create!(username: "pro_owner", email: "pro_owner@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    @user = create_member("pro_owner")
     sign_in @user
   end
 
@@ -24,14 +24,14 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
     patch settings_professional_path, params: { profile: { headline: "Engineer · Worship leader", skills_list: "Ruby, Mentoring" } }
     post settings_educations_path, params: { education: { school: "University of Lagos", qualification: "BSc", start_year: 2012, end_year: 2016 } }
 
-    get user_path(@user.username)
+    get user_path(@user.username, tab: "professional")
     assert_select ".profile-headline", text: "Engineer · Worship leader"
     assert_select ".pro-card .pro-item-title", text: "University of Lagos"
     assert_select ".pro-skill", count: 2
   end
 
   test "you can't edit someone else's experience" do
-    other = User.create!(username: "pro_other", email: "pro_other@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    other = create_member("pro_other")
     role = other.experiences.create!(title: "Nurse", organization: "LUTH", start_month: "2022-03", current: true)
 
     patch settings_experience_path(role), params: { experience: { title: "Hacked" } }
@@ -40,7 +40,7 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
   end
 
   test "dismissing a suggestion removes the card and remembers it" do
-    other = User.create!(username: "pro_suggested", email: "pro_suggested@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    other = create_member("pro_suggested")
     post suggestion_dismissals_path(user_id: other.id), as: :turbo_stream
 
     assert_response :success
@@ -53,5 +53,44 @@ class ProfessionalProfileTest < ActionDispatch::IntegrationTest
     get user_path(@user.username)
 
     assert_select ".profile-assembly", text: /Living Faith Chapel/
+  end
+
+  test "profile tabs: breaths by default, professional and about on request" do
+    get user_path(@user.username)
+    assert_select "nav.profile-tabs a.profile-tab", count: 3
+    assert_select "a.profile-tab.is-active", text: "Breaths"
+    assert_select ".pro-card", count: 0
+
+    get user_path(@user.username, tab: "professional")
+    assert_select "a.profile-tab.is-active", text: "Professional"
+    assert_select "turbo-frame#profile_tab[target=_top]"
+
+    get user_path(@user.username, tab: "about")
+    assert_select "a.profile-tab.is-active", text: "About"
+    assert_select ".about-facts dt", text: "Joined"
+  end
+
+  test "an unknown tab falls back to breaths" do
+    get user_path(@user.username, tab: "secrets")
+    assert_response :success
+    assert_select "a.profile-tab.is-active", text: "Breaths"
+  end
+
+  test "only the owner sees profile strength and their Brethren Card" do
+    get user_path(@user.username, tab: "professional")
+    assert_select ".pro-strength .pro-strength-level", text: "Starting"
+    assert_select ".pro-step-label", text: /Headline/
+
+    get user_path(@user.username, tab: "about")
+    assert_select ".profile-card-panel", count: 1
+
+    visitor = create_member("pro_visitor")
+    sign_in visitor
+    get user_path(@user.username, tab: "professional")
+    assert_select ".pro-strength", count: 0
+    assert_select ".pro-empty", text: /hasn't added professional details/
+
+    get user_path(@user.username, tab: "about")
+    assert_select ".profile-card-panel", count: 0
   end
 end

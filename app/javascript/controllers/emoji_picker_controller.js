@@ -26,6 +26,7 @@ export default class extends Controller {
     if (this.boundCloseOnOutside) {
       document.removeEventListener("click", this.boundCloseOnOutside)
     }
+    this.releaseRoom()
   }
 
   toggle(event) {
@@ -44,6 +45,7 @@ export default class extends Controller {
     if (this.hasPickerTarget) {
       this.pickerTarget.classList.remove("hidden")
       this.pickerVisible = true
+      requestAnimationFrame(() => this.keepFieldVisible())
       
       // Close on outside click
       setTimeout(() => {
@@ -56,10 +58,41 @@ export default class extends Controller {
     if (this.hasPickerTarget) {
       this.pickerTarget.classList.add("hidden")
       this.pickerVisible = false
+      this.releaseRoom()
       if (this.boundCloseOnOutside) {
         document.removeEventListener("click", this.boundCloseOnOutside)
       }
     }
+  }
+
+  // On phones the picker is a sheet pinned to the bottom of the screen, which
+  // can sit right on top of a reply box. Scroll the box up so it shows just
+  // above the sheet (adding room at the end of the page if it's needed), so
+  // you can see each emoji land.
+  keepFieldVisible() {
+    if (!this.hasPickerTarget || getComputedStyle(this.pickerTarget).position !== "fixed") return
+    const field = this.field()
+    if (!field) return
+    const sheetTop = this.pickerTarget.getBoundingClientRect().top
+    const overlap = field.getBoundingClientRect().bottom + 12 - sheetTop
+    if (overlap <= 0) return
+
+    const room = Math.ceil(window.innerHeight - sheetTop)
+    this.addedRoom = room
+    document.body.style.paddingBottom = `${room}px`
+    window.scrollBy({ top: overlap, behavior: "smooth" })
+  }
+
+  releaseRoom() {
+    if (!this.addedRoom) return
+    document.body.style.paddingBottom = ""
+    this.addedRoom = null
+  }
+
+  field() {
+    const form = this.element.closest("form") || this.element
+    return (this.hasEditorTarget && this.editorTarget) ||
+      form.querySelector("trix-editor, textarea")
   }
 
   closeOnOutside(event) {

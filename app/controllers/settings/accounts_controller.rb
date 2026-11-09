@@ -9,7 +9,7 @@ class Settings::AccountsController < ApplicationController
   def update
     if current_user.update(account_params)
       bypass_sign_in(current_user)
-      redirect_to settings_account_path, notice: "Account updated successfully!"
+      recede_or_redirect_to edit_settings_account_path, notice: "Account updated successfully!"
     else
       render :edit, status: :unprocessable_entity
     end

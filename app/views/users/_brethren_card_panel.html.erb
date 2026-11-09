@@ -1,0 +1,37 @@
+<%# The owner's private Brethren Card (About tab). %>
+<% if user_signed_in? && @user == current_user %>
+  <section class="mystic-panel-strong profile-card-panel mb-10 p-6 sm:p-8">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <span class="mystic-kicker">Private Profile Card</span>
+        <h2 class="profile-section-title mt-3">My Brethren Card</h2>
+        <p class="mystic-copy mt-2">Shared only when connection requests are accepted.</p>
+      </div>
+      <%= link_to "Edit Card", edit_settings_brethren_card_path, class: "btn btn-secondary" %>
+    </div>
+
+    <% if current_user.brethren_card&.complete? %>
+      <div class="grid gap-4 md:grid-cols-2">
+        <% [
+          ["Church / Assembly", current_user.brethren_card.church_or_assembly],
+          ["Occupation", current_user.brethren_card.occupation],
+          ["WhatsApp", current_user.brethren_card.whatsapp_number],
+          ["Email", current_user.brethren_card.email],
+          ["About", current_user.brethren_card.bio]
+        ].each do |label, value| %>
+          <% next if value.blank? %>
+          <div class="profile-card-field">
+            <p class="profile-card-label"><%= label %></p>
+            <p class="profile-card-value"><%= value %></p>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="profile-card-empty">
+        <h3>Complete Your Brethren Card</h3>
+        <p class="mystic-copy mx-auto mt-2 max-w-md">Add the details you want trusted connections to see after a request is accepted.</p>
+        <%= link_to "Complete My Card", edit_settings_brethren_card_path, class: "btn btn-primary mt-6" %>
+      </div>
+    <% end %>
+  </section>
+<% end %>

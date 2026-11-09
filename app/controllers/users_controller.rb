@@ -2,7 +2,7 @@
 
 class UsersController < ApplicationController
   before_action :authenticate_user!, except: [ :show, :posts ]
-  before_action :set_user, except: [ :index, :mentions ]
+  before_action :set_user, except: [ :index, :suggested, :mentions ]
 
   def index
     @query = params[:q].to_s.strip
@@ -22,10 +22,19 @@ class UsersController < ApplicationController
     @pagy, @users = pagy(users, items: 24)
   end
 
+  # "See all" from Brethren you may know: every suggestion, as cards with Connect.
+  def suggested
+    @suggestions = BrethrenSuggestions.for(current_user, limit: 48)
+  end
+
+  PROFILE_TABS = %w[breaths professional about].freeze
+
   def show
     @profile_private = !profile_visible_to_viewer?(@user)
+    @tab = PROFILE_TABS.include?(params[:tab]) ? params[:tab] : "breaths"
+    @strength = ProfessionalStrength.new(@user) if @tab == "professional" && @user == current_user
 
-    if @profile_private
+    if @profile_private || @tab != "breaths"
       @items = []
       @pagy, @items = pagy_array(@items, items: 20)
       @posts = []
@@ -44,6 +53,8 @@ class UsersController < ApplicationController
     @profile_private = !profile_visible_to_viewer?(@user)
     scope = @profile_private ? @user.posts.none : @user.posts.published
     @pagy, @posts = pagy(scope.for_cards.recent)
+    @tab = "breaths"
+    @items = @posts.map { |post| FeedItem.from_post(post) }
     render :show
   end
 

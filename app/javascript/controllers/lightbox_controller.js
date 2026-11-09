@@ -70,6 +70,13 @@ export default class extends Controller {
     }
     const prev = this.overlay.querySelector(".fc-lightbox-prev")
     const next = this.overlay.querySelector(".fc-lightbox-next")
+    // Photos that carry a download link (chat photos) get a Save button.
+    const save = this.overlay.querySelector(".fc-lightbox-save")
+    const download = this.imgs[this.index].dataset.download
+    if (save) {
+      save.hidden = !download
+      if (download) save.href = download
+    }
     if (prev) prev.style.display = this.imgs.length > 1 ? "" : "none"
     if (next) next.style.display = this.imgs.length > 1 ? "" : "none"
   }
@@ -80,6 +87,7 @@ export default class extends Controller {
     overlay.setAttribute("data-turbo-temporary", "") // never saved into a page snapshot
     overlay.innerHTML = `
       <button class="fc-lightbox-close" aria-label="Close">×</button>
+      <a class="fc-lightbox-save" hidden download data-turbo="false" rel="noopener" aria-label="Save photo">⤓ Save</a>
       <button class="fc-lightbox-prev" aria-label="Previous">‹</button>
       <button class="fc-lightbox-next" aria-label="Next">›</button>
       <span class="fc-lightbox-counter"></span>

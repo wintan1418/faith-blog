@@ -116,6 +116,9 @@ application.register("notifications-page", NotificationsPageController)
 import PostFormController from "./post_form_controller"
 application.register("post-form", PostFormController)
 
+import PasteImagesController from "./paste_images_controller"
+application.register("paste-images", PasteImagesController)
+
 import QuizController from "./quiz_controller"
 application.register("quiz", QuizController)
 

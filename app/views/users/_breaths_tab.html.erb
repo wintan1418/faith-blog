@@ -1,0 +1,26 @@
+<%# Breaths tab: the member's posts and reshares. %>
+<section>
+  <% if @profile_private %>
+    <div class="mystic-panel profile-empty-posts p-12 text-center">
+      <h3>This profile is private</h3>
+      <p class="mystic-copy mt-2"><%= @user.display_name.presence || @user.username %> keeps their posts to themselves.</p>
+    </div>
+  <% elsif @items.any? %>
+    <div class="space-y-5">
+      <% @items.each do |item| %>
+        <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+      <% end %>
+    </div>
+
+    <% if @pagy.pages > 1 %>
+      <div class="mt-8">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="mystic-panel profile-empty-posts p-12 text-center">
+      <h3>No posts yet</h3>
+      <p class="mystic-copy mt-2">Posts will appear here when published.</p>
+    </div>
+  <% end %>
+</section>
