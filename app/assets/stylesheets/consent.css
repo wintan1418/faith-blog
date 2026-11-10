@@ -1,0 +1,20 @@
+/* Cookie choice for ads measurement (shared/_ad_tracking). */
+.fc-consent {
+  position: fixed; z-index: 90; left: 50%; bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%); width: min(560px, calc(100% - 24px));
+  display: grid; gap: 0.75rem; padding: 1rem 1.1rem;
+  background: var(--fc-surface, #fff); color: var(--fc-ink, #10201a);
+  border: 1px solid var(--fc-line-strong, #d6e1da); border-radius: 16px;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.18); font-size: 0.9rem; line-height: 1.5;
+}
+.fc-consent[hidden] { display: none; }
+.fc-consent strong { display: block; margin-bottom: 0.15rem; font-size: 0.95rem; }
+.fc-consent p { color: var(--fc-muted, #4f625a); }
+.fc-consent p strong { color: var(--fc-ink, #10201a); }
+.fc-consent a { color: var(--fc-accent, #0e8a5f); font-weight: 700; }
+.fc-consent__actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+.fc-consent__actions button { min-height: 40px; padding: 0 1.1rem; border-radius: 999px; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
+.fc-consent__no { background: transparent; color: var(--fc-ink, #10201a); border: 1px solid var(--fc-line-strong, #d6e1da); }
+.fc-consent__yes { background: var(--fc-accent, #0e8a5f); color: #fff; border: 1px solid transparent; }
+/* Sit above the phone bottom navigation. */
+@media (max-width: 1023px) { .fc-consent { bottom: calc(84px + env(safe-area-inset-bottom)); } }

@@ -33,6 +33,7 @@
           <li><%= link_to "Guidelines", guidelines_path, class: "hover:text-white" %></li>
           <li><%= link_to "Contact", contact_path, class: "hover:text-white" %></li>
           <li><%= link_to "Child Safety", child_safety_path, class: "hover:text-white" %></li>
+          <% if ad_tracking_enabled? %><li><button type="button" class="hover:text-white" onclick="window.dispatchEvent(new Event('fc:cookie-settings'))">Cookie settings</button></li><% end %>
           <% if user_signed_in? %>
             <li><%= link_to "Bookmarks", bookmarks_path, class: "hover:text-white" %></li>
             <li><%= link_to "Connections", my_connections_path, class: "hover:text-white" %></li>

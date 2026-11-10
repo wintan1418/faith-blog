@@ -193,3 +193,6 @@ application.register("card-share", CardShareController)
 
 import ChartTipController from "./chart_tip_controller"
 application.register("chart-tip", ChartTipController)
+
+import AdConsentController from "./ad_consent_controller"
+application.register("ad-consent", AdConsentController)
