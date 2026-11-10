@@ -1,0 +1,29 @@
+<%# Shown instead of any page when the Android app is older than the minimum version (Admin → App versions). %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Update Brethreign</title>
+  <style>
+    :root { color-scheme: light dark; --bg: #f3f6f2; --ink: #10201a; --muted: #4f625a; --accent: #0e8a5f; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #0b1110; --ink: #eef5f1; --muted: #a9bdb4; --accent: #34d399; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 32px 24px; background: var(--bg); color: var(--ink); font: 400 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; text-align: center; }
+    main { max-width: 360px; display: grid; gap: 16px; justify-items: center; }
+    img { width: 72px; height: 72px; border-radius: 18px; }
+    h1 { margin: 0; font-size: 1.5rem; line-height: 1.2; }
+    p { margin: 0; color: var(--muted); }
+    a.update { display: inline-block; margin-top: 8px; padding: 14px 28px; border-radius: 999px; background: var(--accent); color: #04261a; font-weight: 700; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/icon.png" alt="">
+    <h1>Please update Brethreign</h1>
+    <p>You have version <%= android_app_version %>, which is no longer supported. Update to <%= android_latest_version %> from Google Play to keep using Brethreign.</p>
+    <a class="update" href="<%= android_store_url %>">Update on Google Play</a>
+    <p style="font-size:.85rem">Already updated? Close Brethreign and open it again.</p>
+  </main>
+</body>
+</html>

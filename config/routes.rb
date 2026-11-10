@@ -260,6 +260,9 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index"
     get "bots", to: "bots#index", as: :bots
+    resource :app_release, only: [ :edit, :update ], path: "app-versions" do
+      post :remind
+    end
     post "bots/refresh", to: "bots#refresh", as: :refresh_bots
     patch "bots/sources/:id/toggle", to: "bots#toggle_source", as: :toggle_bot_source
     patch "bots/items/:id/toggle", to: "bots#toggle_item", as: :toggle_bot_item

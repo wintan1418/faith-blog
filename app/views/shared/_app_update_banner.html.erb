@@ -1,8 +1,8 @@
-<%# Inside the Android app when Google Play has a newer version (ANDROID_LATEST_VERSION). %>
+<%# Inside the Android app when Google Play has a newer version (Admin → App versions). "Not now" hides it for a week. %>
 <div class="fc-app-update" role="status"
      data-controller="onboarding"
      data-onboarding-key-value="fc:<%= android_update_card_key %>">
-  <span>Brethreign <%= android_latest_version %> is out. Update for the newest features.</span>
+  <span><strong>Update available.</strong> Brethreign <%= android_latest_version %> is out, and you have <%= android_app_version %>. Update for the newest features and fixes.</span>
   <%= link_to "Update", android_store_url, class: "fc-btn-primary fc-app-update__action" %>
   <button type="button" class="fc-app-update__close" data-action="click->onboarding#dismiss" aria-label="Not now">×</button>
 </div>

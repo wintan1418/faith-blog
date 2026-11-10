@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_10_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_10_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -100,6 +100,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_150000) do
     t.index ["kind"], name: "index_announcements_on_kind"
     t.index ["published_at"], name: "index_announcements_on_published_at"
     t.index ["user_id"], name: "index_announcements_on_user_id"
+  end
+
+  create_table "app_releases", force: :cascade do |t|
+    t.string "platform", null: false
+    t.string "latest_version"
+    t.string "minimum_version"
+    t.datetime "reminded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["platform"], name: "index_app_releases_on_platform", unique: true
   end
 
   create_table "bible_quiz_questions", force: :cascade do |t|
@@ -912,7 +922,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_150000) do
     t.string "dismissed_cards", default: [], null: false, array: true
     t.boolean "background_rain", default: true, null: false
     t.string "hidden_bots", default: [], null: false, array: true
+    t.string "android_app_version"
     t.index ["accent_color"], name: "index_users_on_accent_color"
+    t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["last_seen_at"], name: "index_users_on_last_seen_at"
