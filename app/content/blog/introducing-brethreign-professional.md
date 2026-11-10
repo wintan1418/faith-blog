@@ -78,7 +78,8 @@ The new Portfolio tab is for work you're proud of: an app, a design, an event yo
 
 We are building more, and these are planned (dates may change).
 
-- **December 2026:** "Open to" badges for work, hiring, mentoring, volunteering or freelance, with you choosing who sees them; skill endorsements and written recommendations from your connections, which you approve first; and a digital business card with a short link and QR code.
+- **Now live:** "Open to" badges, skill endorsements from your connections, and a digital business card with a short link and QR code. See [Open to, endorsements and your business card](/blog/open-to-endorsements-and-your-business-card).
+- **December 2026:** written recommendations from your connections, which you approve first.
 - **Early 2027:** people search with filters such as industry, skill, city, company, school and church; "who viewed your profile"; pages for churches, ministries, companies and NGOs with a verified badge; and job posts from verified pages, each marked "never pay to apply".
 
 There is more detail in [What's next for Brethreign Professional](/blog/whats-next-for-brethreign-professional).

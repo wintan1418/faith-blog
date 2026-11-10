@@ -56,4 +56,13 @@ class WhatsNewTest < ActionDispatch::IntegrationTest
     get feed_path
     assert_select "dialog.wn a[href=?]", new_settings_portfolio_item_path, text: "Add your work"
   end
+
+  test "the Open to and card release links to the Open to settings and my card" do
+    Announcement.releases.delete_all
+    Announcement.create!(kind: :release, title: "New in Brethreign · Open to",
+                         body: "🟢 Say what you're open to — Rings [[open_to]]\n🪪 Your business card — QR [[card]]")
+    get feed_path
+    assert_select "dialog.wn a[href=?]", edit_settings_professional_path(anchor: "open-to"), text: "Choose what I'm open to"
+    assert_select "dialog.wn a[href=?]", card_path(@user.username), text: "See my card"
+  end
 end
