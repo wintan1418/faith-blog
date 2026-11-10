@@ -1,110 +1,134 @@
 <% content_for(:page_title) { "Dashboard" } %>
+<% s = @stats %>
 
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-  <%= link_to admin_users_path, class: "fc-card block p-5" do %>
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <p class="text-sm font-bold text-[var(--fc-muted)]">Total Users</p>
-        <p class="mt-4 text-4xl font-extrabold text-[var(--fc-ink)]"><%= @total_users %></p>
-        <p class="mt-1 text-sm font-semibold text-[var(--fc-muted)]">+<%= @new_users_today %> today</p>
-      </div>
-      <span class="grid h-10 w-10 place-items-center rounded-lg bg-[var(--fc-surface-2)] text-[var(--fc-accent)]">
-        <%= render_icon("users", classes: "h-5 w-5") %>
-      </span>
+<div class="adash">
+  <div class="adash-head">
+    <div>
+      <p class="adash-kicker">Brethreign at a glance</p>
+      <p class="adash-sub"><%= s.from.strftime("%-d %b") %> – <%= s.to.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b %Y") %>, compared with the <%= s.days %> days before</p>
     </div>
-  <% end %>
+    <nav class="adash-range" aria-label="Period">
+      <% AdminDashboardStats::RANGES.each do |d| %>
+        <%= link_to "#{d} days", admin_root_path(days: d), class: ("is-on" if d == s.days), "aria-current": (d == s.days ? "true" : nil) %>
+      <% end %>
+    </nav>
+  </div>
 
-  <%= link_to admin_posts_path, class: "fc-card block p-5" do %>
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <p class="text-sm font-bold text-[var(--fc-muted)]">Total Posts</p>
-        <p class="mt-4 text-4xl font-extrabold text-[var(--fc-ink)]"><%= @total_posts %></p>
-        <p class="mt-1 text-sm font-semibold text-[var(--fc-muted)]">+<%= @posts_today %> today</p>
-      </div>
-      <span class="grid h-10 w-10 place-items-center rounded-lg bg-[var(--fc-surface-2)] text-[var(--fc-accent)]">
-        <%= render_icon("filetext", classes: "h-5 w-5") %>
-      </span>
-    </div>
-  <% end %>
-
-  <%= link_to admin_reports_path, class: "fc-card block p-5" do %>
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <p class="text-sm font-bold text-[var(--fc-muted)]">Pending Reports</p>
-        <p class="mt-4 text-4xl font-extrabold text-[var(--fc-ink)]"><%= @pending_reports %></p>
-        <p class="mt-1 text-sm font-semibold <%= @pending_reports.positive? ? 'text-red-600' : 'text-[var(--fc-muted)]' %>">
-          <%= @pending_reports.positive? ? "Needs review" : "All clear" %>
-        </p>
-      </div>
-      <span class="grid h-10 w-10 place-items-center rounded-lg bg-red-50 text-red-600">
-        <%= render_icon("shield", classes: "h-5 w-5") %>
-      </span>
-    </div>
-  <% end %>
-
-  <%= link_to admin_resources_path, class: "fc-card block p-5" do %>
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <p class="text-sm font-bold text-[var(--fc-muted)]">Pending Resources</p>
-        <p class="mt-4 text-4xl font-extrabold text-[var(--fc-ink)]"><%= @pending_resources %></p>
-        <p class="mt-1 text-sm font-semibold <%= @pending_resources.positive? ? 'text-[var(--fc-accent)]' : 'text-[var(--fc-muted)]' %>">
-          <%= @pending_resources.positive? ? "Needs review" : "All clear" %>
-        </p>
-      </div>
-      <span class="grid h-10 w-10 place-items-center rounded-lg bg-[var(--fc-surface-2)] text-[var(--fc-accent)]">
-        <%= render_icon("bookopen", classes: "h-5 w-5") %>
-      </span>
-    </div>
-  <% end %>
-</div>
-
-<div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-  <section class="fc-card overflow-hidden">
-    <header class="fc-card-header-strip flex items-center justify-between">
-      <h2 class="text-sm font-extrabold text-[var(--fc-ink)]">Recent Posts</h2>
-      <%= link_to "View all", admin_posts_path, class: "text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
-    </header>
-    <div class="divide-y divide-[var(--fc-line)]">
-      <% if @recent_posts.any? %>
-        <% @recent_posts.each do |post| %>
-          <%= link_to post_path(post), class: "flex items-start justify-between gap-4 px-5 py-4 hover:bg-[var(--fc-surface-2)]" do %>
-            <span class="min-w-0">
-              <span class="block truncate text-sm font-extrabold text-[var(--fc-ink)]"><%= post.title %></span>
-              <span class="mt-1 block truncate text-xs font-semibold text-[var(--fc-muted)]">
-                <%= post.user.username %><%= " in #{post.room.name}" if post.room %>
-              </span>
-            </span>
-            <span class="shrink-0 text-xs font-semibold text-[var(--fc-muted)]"><%= time_ago_short(post.created_at) %></span>
-          <% end %>
+  <section class="adash-kpis" aria-label="Headline numbers">
+    <% s.kpis.each do |k| %>
+      <div class="adash-kpi">
+        <p class="adash-kpi__label"><%= k.label %></p>
+        <p class="adash-kpi__value"><%= number_with_delimiter(k.value) %></p>
+        <% if (c = k.change) %>
+          <p class="adash-kpi__change <%= c.positive? ? 'is-up' : (c.negative? ? 'is-down' : '') %>">
+            <%= c.positive? ? "▲" : (c.negative? ? "▼" : "•") %> <%= c.abs %>% <span>vs previous <%= s.days %> days</span>
+          </p>
+        <% elsif !k.previous.nil? %>
+          <p class="adash-kpi__change"><span><%= k.previous %> in the previous <%= s.days %> days</span></p>
         <% end %>
-      <% else %>
-        <div class="px-5 py-8 text-center">
-          <p class="text-sm font-semibold text-[var(--fc-muted)]">No posts yet.</p>
+        <p class="adash-kpi__note"><%= k.note %></p>
+      </div>
+    <% end %>
+  </section>
+
+  <div class="adash-grid2">
+    <section class="adash-card">
+      <header><h2>Visitors per day</h2><span><%= number_with_delimiter(s.page_views) %> pages viewed</span></header>
+      <%= render "admin/dashboard/bars", series: s.visitors_by_day, label: "Visitors" %>
+    </section>
+    <section class="adash-card">
+      <header><h2>New members per day</h2><span><%= number_with_delimiter(s.signups_by_day.sum(&:last)) %> joined</span></header>
+      <%= render "admin/dashboard/bars", series: s.signups_by_day, label: "New members" %>
+    </section>
+  </div>
+
+  <section class="adash-card">
+    <header><h2>Activity</h2><span>each chart has its own scale</span></header>
+    <div class="adash-multiples">
+      <% s.activity_series.each do |name, series| %>
+        <div>
+          <p class="adash-multiple__title"><%= name %> <strong><%= number_with_delimiter(series.sum(&:last)) %></strong></p>
+          <%= render "admin/dashboard/bars", series: series, label: name, compact: true %>
         </div>
       <% end %>
     </div>
   </section>
 
-  <section class="fc-card overflow-hidden">
-    <header class="fc-card-header-strip flex items-center justify-between">
-      <h2 class="text-sm font-extrabold text-[var(--fc-ink)]">New Users</h2>
-      <%= link_to "View all", admin_users_path, class: "text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
-    </header>
-    <div class="divide-y divide-[var(--fc-line)]">
-      <% @recent_users.each do |user| %>
-        <%= link_to admin_user_path(user), class: "flex items-center gap-3 px-5 py-4 hover:bg-[var(--fc-surface-2)]" do %>
-          <% if user.profile.avatar.attached? %>
-            <%= image_tag avatar_src(user.profile), class: "fc-avatar object-cover" %>
-          <% else %>
-            <span class="fc-avatar" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
+  <h2 class="adash-section">Where people come from</h2>
+  <div class="adash-grid3">
+    <section class="adash-card"><header><h2>Sources</h2></header><%= render "admin/dashboard/list", rows: s.sources, empty: "No visits recorded yet. Tracking started with this update." %></section>
+    <section class="adash-card"><header><h2>Countries</h2></header><%= render "admin/dashboard/list", rows: s.countries.map { |c, n| [ AdminDashboardStats.country_label(c), n ] } %></section>
+    <section class="adash-card"><header><h2>Devices</h2></header><%= render "admin/dashboard/list", rows: s.devices %></section>
+    <section class="adash-card"><header><h2>First page people land on</h2></header><%= render "admin/dashboard/list", rows: s.landing_pages %></section>
+    <section class="adash-card"><header><h2>Most viewed pages</h2></header><%= render "admin/dashboard/list", rows: s.top_pages %></section>
+    <section class="adash-card adash-tip-card">
+      <header><h2>Track a campaign</h2></header>
+      <p>Add <code>?utm_source=</code> to links you share, and they show up by name under Sources:</p>
+      <ul>
+        <li><code>brethreign.com/?utm_source=whatsapp</code></li>
+        <li><code>brethreign.com/?utm_source=instagram</code></li>
+        <li><code>brethreign.com/?utm_source=flyer</code></li>
+      </ul>
+    </section>
+  </div>
+
+  <h2 class="adash-section">Members</h2>
+  <div class="adash-grid3">
+    <section class="adash-card">
+      <header><h2>New members' first steps</h2><span>joined in this period</span></header>
+      <% funnel = s.funnel %>
+      <% if funnel.any? %>
+        <% base = [ funnel.first.last, 1 ].max %>
+        <ol class="adash-funnel">
+          <% funnel.each do |step, n| %>
+            <li><span><%= step %></span><strong><%= n %></strong><em><%= (n * 100.0 / base).round %>%</em><i style="width: <%= (n * 100.0 / base).round(1) %>%"></i></li>
           <% end %>
-          <span class="min-w-0 flex-1">
-            <span class="block truncate text-sm font-extrabold text-[var(--fc-ink)]"><%= user.username %></span>
-            <span class="block truncate text-xs font-semibold text-[var(--fc-muted)]"><%= user.email %></span>
-          </span>
-          <span class="text-xs font-semibold text-[var(--fc-muted)]"><%= time_ago_short(user.created_at) %></span>
-        <% end %>
+        </ol>
+      <% else %>
+        <p class="adash-empty">Nobody joined in this period.</p>
       <% end %>
-    </div>
+    </section>
+
+    <section class="adash-card">
+      <header><h2>Top rooms</h2><span>by breaths</span></header>
+      <%= render "admin/dashboard/list", rows: s.top_rooms.map { |room, n| [ link_to(room.name, room_path(room)), n ] } %>
+      <header class="mt-4"><h2>Most active members</h2></header>
+      <%= render "admin/dashboard/list", rows: s.top_members.map { |u, n| [ link_to("@#{u.username}", admin_user_path(u)), n ] } %>
+    </section>
+
+    <section class="adash-card">
+      <header><h2>Newest members</h2><%= link_to "All members", admin_users_path %></header>
+      <ul class="adash-people">
+        <% s.recent_members.each do |user| %>
+          <li>
+            <%= link_to admin_user_path(user) do %>
+              <% if user.profile&.avatar&.attached? %>
+                <%= image_tag avatar_src(user.profile), class: "fc-avatar object-cover", alt: "" %>
+              <% else %>
+                <span class="fc-avatar" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
+              <% end %>
+              <span><strong>@<%= user.username %></strong><small><%= user.android_app_version ? "Android app #{user.android_app_version}" : "Web" %></small></span>
+              <time><%= time_ago_short(user.created_at) %></time>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <p class="adash-foot"><%= s.app_users %> use the Android app · <%= s.professional_profiles %> have a professional headline · <%= link_to "App versions", edit_admin_app_release_path %></p>
+    </section>
+  </div>
+
+  <h2 class="adash-section">Safety</h2>
+  <section class="adash-safety">
+    <% s.safety.each do |label, count, path| %>
+      <% body = capture do %>
+        <strong><%= count %></strong><span><%= label %></span>
+        <em><%= count.zero? ? "✓ All clear" : (path ? "Needs attention →" : "in this period") %></em>
+      <% end %>
+      <% if path %>
+        <%= link_to body, path, class: "adash-safety__item#{' is-alert' if count.positive?}" %>
+      <% else %>
+        <div class="adash-safety__item"><%= body %></div>
+      <% end %>
+    <% end %>
   </section>
 </div>

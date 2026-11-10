@@ -1,0 +1,36 @@
+<%# Single-series daily bar chart. series: [[Date, Integer], …]; label: what one bar counts. %>
+<% max = [ series.map(&:last).max.to_i, 1 ].max %>
+<% n = series.size %>
+<% gap = n > 45 ? 1 : 2 %>
+<% bar_w = (600.0 - gap * (n - 1)) / n %>
+<% compact = local_assigns[:compact] %>
+<% height = compact ? 56 : 160 %>
+<div class="adash-chart<%= ' adash-chart--compact' if compact %>" data-controller="chart-tip">
+  <% unless compact %>
+    <div class="adash-chart__axis" aria-hidden="true"><span><%= number_with_delimiter(max) %></span><span>0</span></div>
+  <% end %>
+  <div class="adash-chart__plot">
+    <svg viewBox="0 0 600 <%= height %>" preserveAspectRatio="none" role="img"
+         aria-label="<%= label %> per day: <%= series.sum(&:last) %> in total, highest <%= max %>">
+      <% unless compact %>
+        <line x1="0" y1="<%= height / 2 %>" x2="600" y2="<%= height / 2 %>" class="adash-grid" />
+      <% end %>
+      <% series.each_with_index do |(day, value), i| %>
+        <% h = value.zero? ? 0 : [ (value.to_f / max * (height - 4)), 3 ].max %>
+        <% x = i * (bar_w + gap) %>
+        <g data-tip="<%= day.strftime('%a %-d %b') %> · <%= number_with_delimiter(value) %> <%= label.downcase %>">
+          <rect x="<%= x.round(2) %>" y="0" width="<%= (bar_w + gap).round(2) %>" height="<%= height %>" class="adash-hit" />
+          <% if h.positive? %>
+            <rect x="<%= x.round(2) %>" y="<%= (height - h).round(2) %>" width="<%= bar_w.round(2) %>" height="<%= h.round(2) %>" rx="<%= [ bar_w / 3, 3 ].min.round(2) %>" class="adash-bar" />
+          <% else %>
+            <rect x="<%= x.round(2) %>" y="<%= height - 1 %>" width="<%= bar_w.round(2) %>" height="1" class="adash-zero" />
+          <% end %>
+        </g>
+      <% end %>
+    </svg>
+    <% unless compact %>
+      <div class="adash-chart__dates" aria-hidden="true"><span><%= series.first[0].strftime('%-d %b') %></span><span><%= series.last[0].strftime('%-d %b') %></span></div>
+    <% end %>
+  </div>
+  <div class="adash-tip" data-chart-tip-target="tip" hidden></div>
+</div>

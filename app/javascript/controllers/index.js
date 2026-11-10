@@ -190,3 +190,6 @@ application.register("whats-new", WhatsNewController)
 
 import CardShareController from "./card_share_controller"
 application.register("card-share", CardShareController)
+
+import ChartTipController from "./chart_tip_controller"
+application.register("chart-tip", ChartTipController)

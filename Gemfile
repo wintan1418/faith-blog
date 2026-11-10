@@ -102,3 +102,5 @@ end
 gem "action_push_native", "~> 0.3.1"
 gem "googleauth", "~> 1.14" # verifies Google ID tokens from the apps
 gem "rqrcode", "~> 2.2" # QR codes on the digital business card
+
+gem "ahoy_matey", "~> 5.5"
