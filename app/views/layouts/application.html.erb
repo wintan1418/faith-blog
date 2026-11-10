@@ -35,8 +35,11 @@
 
     <%# PWA %>
     <link rel="manifest" href="/manifest.webmanifest">
+    <%# Favicons: Google search uses /favicon.ico or a PNG that is a multiple of 48px. %>
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#0b0f10">
     <% if user_signed_in? && WebPushConfig.configured? %>
       <meta name="vapid-public-key" content="<%= WebPushConfig.public_key %>">
