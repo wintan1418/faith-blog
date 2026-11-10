@@ -1,0 +1,16 @@
+<%# Ranked list with proportional bars. rows: [[label, count], …] %>
+<% total = [ rows.sum(&:last), 1 ].max %>
+<% max = [ rows.map(&:last).max.to_i, 1 ].max %>
+<% if rows.any? %>
+  <ol class="adash-list">
+    <% rows.each do |label, count| %>
+      <li>
+        <span class="adash-list__bar" style="width: <%= (count * 100.0 / max).round(1) %>%"></span>
+        <span class="adash-list__label"><%= label %></span>
+        <span class="adash-list__value"><%= number_with_delimiter(count) %> <small><%= (count * 100.0 / total).round %>%</small></span>
+      </li>
+    <% end %>
+  </ol>
+<% else %>
+  <p class="adash-empty"><%= local_assigns.fetch(:empty, "Nothing yet for this period.") %></p>
+<% end %>

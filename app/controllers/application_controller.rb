@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :touch_last_seen,                 if: :user_signed_in?
   before_action :require_supported_app_version
+  after_action :track_page_view
 
   helper_method :current_user_admin?, :current_user_moderator?, :current_user_super_admin?
 
@@ -96,5 +97,17 @@ class ApplicationController < ActionController::Base
     return unless helpers.android_update_required?
 
     render "app_updates/required", layout: false
+  end
+
+  # One "$view" per page someone opens, for Admin → Dashboard. Skips admin pages,
+  # frames, background requests and Turbo's hover prefetches.
+  def track_page_view
+    return unless request.get? && request.format.html? && response.successful?
+    return if controller_path.start_with?("admin/") || turbo_frame_request? || request.xhr?
+    return if [ request.headers["Sec-Purpose"], request.headers["X-Sec-Purpose"], request.headers["Purpose"] ].join(" ").include?("prefetch")
+
+    ahoy.track "$view", path: request.path, page: "#{controller_path}##{action_name}"
+  rescue StandardError => e
+    Rails.logger.warn("[ahoy] #{e.class}: #{e.message}")
   end
 end
