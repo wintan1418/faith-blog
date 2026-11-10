@@ -1,0 +1,20 @@
+<%# Ads measurement + cookie choice. Scripts are only added after consent (see ad_consent_controller.js). %>
+<% signup = session.delete(:ad_signup) %>
+<div data-controller="ad-consent"
+     data-ad-consent-pixel-value="<%= meta_pixel_id %>"
+     data-ad-consent-gtag-value="<%= google_tag_id %>"
+     data-ad-consent-conversion-value="<%= google_ads_signup %>"
+     data-ad-consent-required-value="<%= ad_consent_required? %>"
+     data-ad-consent-signup-value="<%= signup.present? %>">
+  <div class="fc-consent" data-ad-consent-target="banner" role="dialog" aria-live="polite" aria-label="Cookie choice" hidden>
+    <p>
+      <strong>Cookies for our ads</strong>
+      We'd like to use cookies from Meta and Google to see which of our adverts bring people to Brethreign.
+      Nothing is shared until you say yes. <%= link_to "Privacy policy", privacy_path %>
+    </p>
+    <div class="fc-consent__actions">
+      <button type="button" class="fc-consent__no" data-action="ad-consent#decline">No thanks</button>
+      <button type="button" class="fc-consent__yes" data-action="ad-consent#accept">Accept</button>
+    </div>
+  </div>
+</div>

@@ -18,6 +18,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
         # The session cookie is 6mo (config/initializers/session_store.rb)
         # and the remember-me cookie extends every visit.
         resource.remember_me = true
+        session[:ad_signup] = true # counted as a sign-up for ads (shared/_ad_tracking)
         accept_invitation_for(resource)
       end
     end
