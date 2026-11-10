@@ -9,7 +9,6 @@ Rails.application.routes.draw do
 
   # Root path
   root "home#index"
-  get "favicon.ico", to: proc { [ 204, { "Content-Type" => "image/x-icon" }, [] ] }
 
   # Dynamic, accent-tinted OG image for social shares.
   get "og.svg", to: "og#show", as: :og_image, defaults: { format: :svg }
