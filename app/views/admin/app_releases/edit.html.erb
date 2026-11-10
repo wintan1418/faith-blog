@@ -1,0 +1,59 @@
+<% content_for(:page_title) { "App versions" } %>
+<% field = "mt-1 w-full rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface-2)] px-3 py-2 text-sm" %>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h2 class="text-lg font-bold text-[var(--fc-ink)]">Android app</h2>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">Set these after Google Play approves a release. Members on an older app see an “Update available” banner; anyone below the minimum is asked to update before they can continue.</p>
+
+    <%= form_with model: @release, url: admin_app_release_path, method: :patch, class: "mt-5 space-y-4" do |f| %>
+      <% if @release.errors.any? %>
+        <div class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= @release.errors.full_messages.to_sentence %></div>
+      <% end %>
+
+      <div>
+        <%= f.label :latest_version, "Latest version on Google Play", class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+        <%= f.text_field :latest_version, placeholder: "1.0.8", inputmode: "decimal", class: field %>
+        <p class="mt-1 text-xs text-[var(--fc-muted)]">Older apps get the update banner.</p>
+      </div>
+
+      <div>
+        <%= f.label :minimum_version, "Minimum version allowed (optional)", class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+        <%= f.text_field :minimum_version, placeholder: "Leave blank to allow all", inputmode: "decimal", class: field %>
+        <p class="mt-1 text-xs text-[var(--fc-muted)]">Older apps see “Please update Brethreign” instead of the page. Only use it once that version is live on Google Play.</p>
+      </div>
+
+      <div class="flex justify-end"><%= f.submit "Save", class: "fc-btn fc-btn-primary" %></div>
+    <% end %>
+  </div>
+
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h2 class="text-lg font-bold text-[var(--fc-ink)]">Who is on which version</h2>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">The Android version each member last opened Brethreign with.</p>
+
+    <% if @version_counts.any? %>
+      <table class="mt-4 w-full text-sm">
+        <thead><tr class="text-left text-[var(--fc-muted)]"><th class="py-1">Version</th><th class="py-1 text-right">Members</th></tr></thead>
+        <tbody>
+          <% @version_counts.each do |version, count| %>
+            <% behind = @release.latest && (Gem::Version.new(version) rescue nil)&.<(@release.latest) %>
+            <tr class="border-t border-[var(--fc-line)]">
+              <td class="py-2"><%= version %><%= " · behind" if behind %></td>
+              <td class="py-2 text-right font-bold"><%= count %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="mt-4 text-sm text-[var(--fc-muted)]">No app versions recorded yet. They appear as members open the app.</p>
+    <% end %>
+
+    <div class="mt-6 border-t border-[var(--fc-line)] pt-5">
+      <p class="text-sm text-[var(--fc-ink)]"><strong><%= @outdated_count %></strong> <%= "member".pluralize(@outdated_count) %> on an older version.</p>
+      <p class="mt-1 text-xs text-[var(--fc-muted)]">Sends each of them an alert and a push: “Brethreign <%= @release.latest_version || "x.y.z" %> is out.” Nobody gets more than one every 3 days.<% if @release.reminded_at %> Last sent <%= time_ago_in_words(@release.reminded_at) %> ago.<% end %></p>
+      <%= button_to "Remind them to update", remind_admin_app_release_path, method: :post,
+                    class: "fc-btn fc-btn-primary mt-3", disabled: @outdated_count.zero?,
+                    form: { data: { turbo_confirm: "Send an update reminder to #{@outdated_count} #{'member'.pluralize(@outdated_count)}?" } } %>
+    </div>
+  </div>
+</div>

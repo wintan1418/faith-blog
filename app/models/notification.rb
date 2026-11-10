@@ -31,7 +31,8 @@ class Notification < ApplicationRecord
     circle_prayer_answered: 25,
     birthday:               26,
     content_removed:        27,
-    skill_endorsed:         28
+    skill_endorsed:         28,
+    app_update:             29
   }
 
   # Associations
@@ -130,6 +131,8 @@ class Notification < ApplicationRecord
       end
     when :skill_endorsed
       "#{actor&.display_name || 'Someone'} endorsed you for #{notifiable.try(:skill) || 'a skill'} 👍"
+    when :app_update
+      "📲 Brethreign #{notifiable.try(:latest_version)} is out. Update the app to get the newest features and fixes."
     when :birthday
       "🎂 It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -172,6 +175,8 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.user_path(actor.username)
     when :skill_endorsed
       Rails.application.routes.url_helpers.user_path(user.username, tab: "professional")
+    when :app_update
+      Rails.application.routes.url_helpers.edit_settings_account_path
     when :content_removed
       if notifiable.is_a?(PortfolioItem)
         Rails.application.routes.url_helpers.edit_settings_portfolio_item_path(notifiable)
@@ -219,7 +224,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
-    return if birthday? || skill_endorsed? # a push and the alert are enough; no emails for these
+    return if birthday? || skill_endorsed? || app_update? # a push and the alert are enough; no emails for these
 
     NotificationMailer.with(notification: self).community_notification.deliver_later
   end

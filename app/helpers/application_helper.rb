@@ -169,9 +169,18 @@ module ApplicationHelper
     Gem::Version.new(request.user_agent.to_s[%r{Brethreign/(\d+(?:\.\d+)*)}, 1] || "1.0.0")
   end
 
-  # Set ANDROID_LATEST_VERSION in Hatchbox once Google Play has approved a release.
+  # The Android release settings from Admin → App versions (nil if the table isn't there yet).
+  def android_release
+    return @android_release if defined?(@android_release)
+
+    @android_release = AppRelease.find_by(platform: "android")
+  rescue ActiveRecord::ActiveRecordError
+    @android_release = nil
+  end
+
+  # Newest version on Google Play: set on Admin → App versions (ANDROID_LATEST_VERSION is the old fallback).
   def android_latest_version
-    Gem::Version.new(ENV.fetch("ANDROID_LATEST_VERSION", "1.0.1"))
+    android_release&.latest || Gem::Version.new(ENV.fetch("ANDROID_LATEST_VERSION", "1.0.1"))
   rescue ArgumentError
     nil
   end
@@ -182,12 +191,19 @@ module ApplicationHelper
     version.present? && latest.present? && version < latest
   end
 
-  # Banner inside the app when Play has a newer version. Closing it hides it until the next release.
+  # Older than the minimum set by an admin: the app shows "Update required" instead of the page.
+  def android_update_required?
+    version = android_app_version
+    minimum = android_release&.minimum
+    version.present? && minimum.present? && version < minimum
+  end
+
+  # Banner inside the app when Play has a newer version. "Not now" hides it for a week.
   def outdated_android_app?
     android_update_available? && !current_user&.card_dismissed?(android_update_card_key)
   end
 
-  def android_update_card_key = "app-update-#{android_latest_version.to_s.tr('.', '-')}"
+  def android_update_card_key = "app-update-#{android_latest_version.to_s.tr('.', '-')}-w#{Date.current.cweek}"
 
   def android_store_url
     "https://play.google.com/store/apps/details?id=com.brethreign.app"

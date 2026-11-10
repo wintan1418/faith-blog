@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :touch_last_seen,                 if: :user_signed_in?
+  before_action :require_supported_app_version
 
   helper_method :current_user_admin?, :current_user_moderator?, :current_user_super_admin?
 
@@ -71,9 +72,29 @@ class ApplicationController < ActionController::Base
   def touch_last_seen
     return unless current_user
 
+    record_app_version
     last = current_user.last_seen_at
     return if last.present? && last > 1.minute.ago
 
     current_user.update_column(:last_seen_at, Time.current)
+  end
+
+  # Remember which Android app version a member uses, so Admin → App versions can show who is behind.
+  def record_app_version
+    version = helpers.android_app_version&.to_s
+    return if version.nil? || current_user.android_app_version == version
+
+    current_user.update_column(:android_app_version, version)
+  end
+
+  APP_VERSION_EXEMPT = %w[pages well_known configurations push_devices rails/health].freeze
+
+  # An app older than the minimum version sees "Update required" instead of the page.
+  def require_supported_app_version
+    return unless request.get? && request.format.html?
+    return if controller_path.in?(APP_VERSION_EXEMPT)
+    return unless helpers.android_update_required?
+
+    render "app_updates/required", layout: false
   end
 end
