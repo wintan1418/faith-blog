@@ -26,12 +26,18 @@ module Ai
                         attributed to them if it's well-attested.
 
         Stay factual. If you're not sure about a detail, omit it rather
-        than invent. Don't include verse numbers unless they're part of a
+        than invent.
+
+        The quote must be something this person is well documented as
+        having said or written. Never use a Bible verse as their quote,
+        never borrow a line from someone else, and skip popular sayings
+        of doubtful origin. If you aren't certain, return "" for quote.
+        Any scripture you mention must use King James Version wording. Don't include verse numbers unless they're part of a
         widely-known quotation.
 
         Return ONLY a single JSON object, no prose, no markdown fences:
         { "bio": "<paragraph 1>\\n\\n<paragraph 2>\\n\\n<paragraph 3>",
-          "quote": "<one famous quote with no attribution suffix>" }
+          "quote": "<one well-attested quote with no attribution suffix, or empty>" }
       PROMPT
 
       def self.call(figure:)
