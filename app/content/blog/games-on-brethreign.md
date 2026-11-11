@@ -63,15 +63,15 @@ Here is how it works.
 
 ## More games
 
-There is plenty more on the Games page:
+There is plenty more on the Games page, and each one has its own guide:
 
-- **Church History.** Questions on the people and moments that shaped the church.
-- **Character Match**
-- **Verse Memory**
-- **Reference Scramble**
-- **Picture-Word**
+- **Church History.** Questions on the people and moments that shaped the church, plus the Church History Arena. [Read the guide](/blog/church-history-quiz-and-arena).
+- **Character Match.** Read a description and name the Bible figure. [Read the guide](/blog/character-match-guide).
+- **Verse Memory.** Fill the blanks in five KJV verses. [Read the guide](/blog/verse-memory-guide).
+- **Reference Scramble.** Place a famous verse in the right book and chapter. [Read the guide](/blog/reference-scramble-guide).
+- **4 Pics 1 Word.** Four emoji, one Bible story. [Read the guide](/blog/four-pics-one-word-bible-puzzles).
 
-Open any of them from the Games page and give it a go. Trying each one once is the best way to find your favourite.
+Trying each one once is the best way to find your favourite.
 
 ## Scores and the leaderboard
 
@@ -88,6 +88,9 @@ Games are meant to be fun, and they can be more than that. A quiz round can send
 
 ## Keep going
 
+- [How to play the Bible Quiz](/blog/how-to-play-the-bible-quiz)
+- [Scores, streaks and the leaderboard](/blog/scores-streaks-and-the-leaderboard)
+- [Bible game night with Brethreign](/blog/bible-game-night-with-brethreign)
 - [The Bible in Brethreign](/blog/the-bible-in-brethreign)
 - [Getting started on Brethreign](/blog/getting-started-on-brethreign)
 - [Welcome to Brethreign](/blog/welcome-to-brethreign)
