@@ -1,0 +1,56 @@
+<% status = card["status"].presence || "draft" %>
+<% image_message = OfficeMessage.find_by(id: card["image_message_id"]) if card["image_message_id"].present? %>
+<article class="office-card office-card--breath">
+  <header class="office-card-head">
+    <span class="office-card-kicker">~ Breath</span>
+    <span class="office-badge is-<%= status %>"><%= status == "draft" ? "Draft" : status.capitalize %></span>
+    <% if card["room_name"].present? %><span class="office-badge"><%= card["room_name"] %></span><% end %>
+    <% if card["prayer"] %><span class="office-badge">🙏 Prayer request</span><% end %>
+  </header>
+
+  <% if image_message&.image&.attached? %>
+    <%= image_tag rails_blob_path(image_message.image, only_path: true), class: "office-card-image office-card-image--small", alt: "Flyer for this breath", loading: "lazy" %>
+  <% end %>
+  <% if card["title"].present? %><h3 class="office-card-title"><%= card["title"] %></h3><% end %>
+  <% if card["body"].present? %>
+    <div class="office-card-text"><%= office_plain(card["body"]) %></div>
+  <% elsif status == "draft" %>
+    <p class="office-muted">Write the words for this breath below.</p>
+  <% end %>
+
+  <% if card["error"].present? %><p class="office-card-error"><%= card["error"] %></p><% end %>
+
+  <% case status %>
+  <% when "draft" %>
+    <p class="office-card-note">Will post as @<%= card["author"].presence || "you" %><%= " · scheduled time suggested: #{office_time(card['schedule_at'])}" if card["schedule_at"].present? %></p>
+    <div class="office-card-actions">
+      <% if card["body"].present? %>
+        <%= button_to "Post now", post_breath_admin_office_card_path(message), class: "fc-btn fc-btn-primary", form_class: "inline",
+              form: { data: { turbo_confirm: "Post this breath now? It goes live on the feed straight away." } } %>
+      <% end %>
+      <details class="office-card-more"<%= " open" if card["schedule_at"].present? && card["body"].present? %>>
+        <summary class="fc-btn">Schedule</summary>
+        <%= form_with url: post_breath_admin_office_card_path(message), class: "office-card-form" do |f| %>
+          <label class="fc-admin-label" for="schedule_<%= message.id %>">Post at (Lagos time)</label>
+          <%= f.datetime_local_field :schedule_at, id: "schedule_#{message.id}", value: office_datetime_value(card["schedule_at"]), class: "fc-admin-input", required: true %>
+          <%= f.submit "Schedule", class: "fc-btn fc-btn-primary", disabled: card["body"].blank? %>
+        <% end %>
+      </details>
+      <details class="office-card-more"<%= " open" if card["editing"] %>>
+        <summary class="fc-btn">Edit</summary>
+        <%= form_with url: update_breath_admin_office_card_path(message), method: :patch, class: "office-card-form" do |f| %>
+          <%= f.text_field :title, value: card["title"], placeholder: "Title (optional)", class: "fc-admin-input", maxlength: 200 %>
+          <%= f.text_area :body, value: card["body"], rows: 6, class: "fc-admin-input", required: true, placeholder: "What would you like to say?" %>
+          <%= f.select :room_id, options_for_select([ [ "Main feed (no room)", "" ] ] + Room.public_rooms.ordered.pluck(:name, :id), card["room_id"]), {}, class: "fc-admin-input" %>
+          <label class="office-check"><%= f.check_box :prayer, { checked: card["prayer"] }, "1", "0" %> Prayer request</label>
+          <%= f.submit "Save", class: "fc-btn fc-btn-primary" %>
+        <% end %>
+      </details>
+    </div>
+  <% when "posted", "scheduled" %>
+    <p class="office-card-note">
+      <%= status == "scheduled" ? "Scheduled for #{office_time(card['scheduled_for'])}" : "Posted" %> as @<%= card["author"] %>.
+      <%= link_to (status == "scheduled" ? "Open it" : "View breath"), post_path(card["post_slug"].presence || card["post_id"]), target: "_top" %>
+    </p>
+  <% end %>
+</article>

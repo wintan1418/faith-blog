@@ -9,6 +9,7 @@
 @import "./phone_polish.css";
 @import "./admin_dashboard.css";
 @import "./consent.css";
+@import "./office.css";
 
 /* ==========================================
    🌿 FAITH COMMUNITY THEME - GARDEN EDITION
@@ -6502,7 +6503,18 @@ html.theme-dark .fc-admin .border-red-200 {
 
   .admin-mobile-nav {
     display: flex;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
+
+  .admin-mobile-nav::-webkit-scrollbar { display: none; }
+  .admin-mobile-link { flex: none; }
+
+  /* Let the section icons wrap under the title and scroll sideways
+     instead of running off the screen. */
+  .admin-topbar { flex-wrap: wrap; row-gap: 0.6rem; }
+  .admin-topbar > div:last-child { flex-shrink: 1; min-width: 0; max-width: 100%; }
 
   .admin-content,
   .admin-topbar,

@@ -1,0 +1,21 @@
+<% status = card["status"].presence || "draft" %>
+<article class="office-card office-card--announcement">
+  <header class="office-card-head">
+    <span class="office-card-kicker">Announcement · <%= card["announcement_kind"] == "custom" ? "notice" : "What's new" %></span>
+    <span class="office-badge is-<%= status %>"><%= status.capitalize %></span>
+  </header>
+  <% if card["kicker"].present? %><p class="office-card-eyebrow"><%= card["kicker"] %></p><% end %>
+  <h3 class="office-card-title"><%= card["title"] %></h3>
+  <% if card["body"].present? %><div class="office-card-text"><%= office_plain(card["body"]) %></div><% end %>
+  <% if card["error"].present? %><p class="office-card-error"><%= card["error"] %></p><% end %>
+  <div class="office-card-actions">
+    <% if status == "draft" %>
+      <%= button_to "Publish announcement", publish_announcement_admin_office_card_path(message), class: "fc-btn fc-btn-primary", form_class: "inline",
+            form: { data: { turbo_confirm: "Publish this announcement in the app now?" } } %>
+      <button type="button" class="fc-btn" data-action="office#copy" data-text="<%= [ card['kicker'], card['title'], card['body'] ].compact_blank.join("\n\n") %>">Copy text</button>
+    <% else %>
+      <span class="office-card-note">Live in the app.</span>
+      <%= link_to "Announcements →", admin_announcements_path, class: "fc-btn", target: "_top" %>
+    <% end %>
+  </div>
+</article>

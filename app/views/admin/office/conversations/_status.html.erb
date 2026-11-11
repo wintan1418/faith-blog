@@ -1,0 +1,8 @@
+<% busy = conversation.busy? %>
+<div id="office_status" class="office-status" data-thinking="<%= busy %>" aria-live="polite">
+  <% if busy %>
+    <span class="office-avatar" aria-hidden="true">~</span>
+    <span class="office-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="office-muted">Thinking…</span>
+  <% end %>
+</div>

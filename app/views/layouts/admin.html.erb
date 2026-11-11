@@ -50,6 +50,7 @@
     <% queue_count = AiModerationReview.where(status: %i[pending flagged]).count %>
     <% admin_nav_items = [
       ["Dashboard", admin_root_path, "home", current_page?(admin_root_path)],
+      ["The Office", admin_office_path, "compose", request.path.start_with?("/admin/office")],
       ["Users", admin_users_path, "users", request.path.include?("/admin/users")],
       ["Posts", admin_posts_path, "filetext", request.path.include?("/admin/posts")],
       ["Rooms", admin_rooms_path, "message_circle", request.path.include?("/admin/rooms")],
