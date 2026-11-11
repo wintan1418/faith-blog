@@ -1,0 +1,75 @@
+<% content_for(:page_title) { "The Office" } %>
+<% content_for(:title) { @conversation ? "#{@conversation.title} · Office" : "The Office" } %>
+
+<div class="office" data-controller="office"
+     <% if @conversation %>data-office-refresh-url-value="<%= refresh_admin_office_conversation_path(@conversation) %>"<% end %>>
+  <aside class="office-side" aria-label="Office conversations">
+    <%= render "admin/office/conversations/sidebar", current: @conversation %>
+  </aside>
+
+  <section class="office-main">
+    <details class="office-threads-mobile">
+      <summary>
+        <span>Conversations</span>
+        <span class="office-muted"><%= pluralize(sidebar_conversations.size, "thread") %> ▾</span>
+      </summary>
+      <%= render "admin/office/conversations/sidebar", current: @conversation %>
+    </details>
+
+    <% if @conversation %>
+      <%= turbo_stream_from @conversation.stream %>
+
+      <header class="office-head">
+        <details class="office-rename">
+          <summary title="Rename"><h2><%= @conversation.title %></h2></summary>
+          <%= form_with model: @conversation, url: admin_office_conversation_path(@conversation), scope: :conversation, method: :patch, class: "office-rename-form" do |f| %>
+            <%= f.text_field :title, class: "fc-admin-input", maxlength: 120, "aria-label": "Conversation title" %>
+            <%= f.submit "Rename", class: "fc-btn fc-btn-primary" %>
+          <% end %>
+        </details>
+        <div class="office-head-actions">
+          <span class="office-model" title="Model answering in the Office"><%= Ai::Office::Client.label %></span>
+          <%= button_to admin_office_conversation_path(@conversation), method: :delete, class: "office-icon-btn", title: "Delete conversation",
+                form: { data: { turbo_confirm: "Delete this conversation? Posts, drafts and images it made are kept." } } do %>
+            <%= render_icon("trash", classes: "h-4 w-4") %>
+          <% end %>
+        </div>
+      </header>
+
+      <div id="office_messages" class="office-messages" data-office-target="messages">
+        <%= render partial: "admin/office/messages/message", collection: @messages, as: :message %>
+      </div>
+      <%= render "admin/office/conversations/status", conversation: @conversation %>
+    <% else %>
+      <div class="office-welcome">
+        <span class="office-mark" aria-hidden="true">~</span>
+        <h2>Good to see you, <%= current_user.display_name.split.first %>.</h2>
+        <p class="office-muted">Talk it through here: breaths, flyers, emails to members, announcements, numbers. Drafts come back as cards; nothing goes out until you press the button.</p>
+        <div class="office-suggestions">
+          <% [
+            "Draft a breath for this morning about rest in God",
+            "How many people signed up this week?",
+            "Make a square flyer inviting people to the Bible Quiz",
+            "Draft a short thank-you email to all members"
+          ].each do |idea| %>
+            <button type="button" class="office-chip" data-action="office#suggest" data-text="<%= idea %>"><%= idea %></button>
+          <% end %>
+        </div>
+
+        <details class="office-import" id="import">
+          <summary>Import notes from another conversation</summary>
+          <%= form_with url: import_admin_office_conversations_path, class: "office-import-form" do |f| %>
+            <%= f.text_field :title, class: "fc-admin-input", placeholder: "Title (optional)", maxlength: 120 %>
+            <%= f.text_area :notes, class: "fc-admin-input", rows: 8, required: true,
+                  placeholder: "Paste a transcript or notes. They become the first message of a new conversation, and the Office reads them as context." %>
+            <%= f.submit "Import", class: "fc-btn fc-btn-primary" %>
+          <% end %>
+        </details>
+      </div>
+      <div id="office_messages" class="office-messages" data-office-target="messages"></div>
+    <% end %>
+
+    <p id="office_notice" class="office-notice" role="status"></p>
+    <%= render "admin/office/conversations/composer", conversation: @conversation %>
+  </section>
+</div>

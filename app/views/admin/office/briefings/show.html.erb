@@ -1,0 +1,27 @@
+<% content_for(:page_title) { "Office briefing" } %>
+
+<div class="office office--page">
+  <aside class="office-side" aria-label="Office conversations">
+    <%= render "admin/office/conversations/sidebar", current: nil %>
+  </aside>
+
+  <section class="office-main office-briefing">
+    <%= link_to "← Back to the Office", admin_office_path, class: "office-back" %>
+    <h2>Briefing</h2>
+    <p class="office-muted">The Office reads this before every reply: who you are, how you sign off, how to write, what's going on. Keep it current, and keep it to what matters.</p>
+
+    <%= form_with model: @briefing, url: admin_office_briefing_path, method: :patch, scope: :office_briefing, class: "office-briefing-form" do |f| %>
+      <% if @briefing.errors.any? %>
+        <div class="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-800"><%= @briefing.errors.full_messages.to_sentence %></div>
+      <% end %>
+      <%= f.text_area :body, rows: 28, class: "fc-admin-input office-briefing-input", maxlength: OfficeBriefing::MAX_LENGTH, spellcheck: true %>
+      <div class="office-card-actions">
+        <%= f.submit "Save briefing", class: "fc-btn fc-btn-primary" %>
+        <span class="office-muted">
+          <%= number_with_delimiter(@briefing.body.length) %> of <%= number_with_delimiter(OfficeBriefing::MAX_LENGTH) %> characters
+          <% if @briefing.updated_by %>· last saved by @<%= @briefing.updated_by.username %> <%= time_ago_in_words(@briefing.updated_at) %> ago<% end %>
+        </span>
+      </div>
+    <% end %>
+  </section>
+</div>

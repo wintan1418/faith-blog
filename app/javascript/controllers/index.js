@@ -104,6 +104,9 @@ application.register("new-posts-pill", NewPostsPillController)
 import NotificationSoundController from "./notification_sound_controller"
 application.register("notification-sound", NotificationSoundController)
 
+import OfficeController from "./office_controller"
+application.register("office", OfficeController)
+
 import OnboardingController from "./onboarding_controller"
 application.register("onboarding", OnboardingController)
 

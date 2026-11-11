@@ -1,0 +1,21 @@
+<article class="office-card office-card--flyer">
+  <header class="office-card-head">
+    <span class="office-card-kicker">Flyer</span>
+    <span class="office-badge"><%= card["size"].to_s.capitalize %></span>
+    <% if card["model"] == "stub" %><span class="office-badge">Placeholder (no image key)</span><% end %>
+  </header>
+  <% if message.image.attached? %>
+    <%= link_to rails_blob_path(message.image, only_path: true), target: "_blank", rel: "noopener" do %>
+      <%= image_tag rails_blob_path(message.image, only_path: true), class: "office-card-image", alt: card["brief"].to_s.truncate(120), loading: "lazy" %>
+    <% end %>
+  <% end %>
+  <p class="office-card-note"><%= card["brief"].to_s.truncate(220) %></p>
+  <div class="office-card-actions">
+    <% if message.image.attached? %>
+      <%= link_to rails_blob_path(message.image, disposition: "attachment", only_path: true), class: "fc-btn", download: "" do %>
+        <%= render_icon("download", classes: "h-4 w-4") %> Download
+      <% end %>
+      <%= button_to "Use in a breath", use_in_breath_admin_office_card_path(message), class: "fc-btn fc-btn-primary", form_class: "inline" %>
+    <% end %>
+  </div>
+</article>

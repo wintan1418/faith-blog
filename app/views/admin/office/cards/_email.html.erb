@@ -1,0 +1,26 @@
+<% broadcast = Broadcast.find_by(id: card["broadcast_id"]) %>
+<article class="office-card office-card--email">
+  <header class="office-card-head">
+    <span class="office-card-kicker">Email to members</span>
+    <span class="office-badge is-<%= broadcast&.status || 'draft' %>"><%= broadcast ? broadcast.status.capitalize : "Deleted" %></span>
+  </header>
+  <h3 class="office-card-title"><%= broadcast&.subject || card["subject"] %></h3>
+  <% preheader = broadcast&.preheader.presence || card["preheader"] %>
+  <% if preheader.present? %><p class="office-card-note"><em><%= preheader %></em></p><% end %>
+  <% if broadcast %>
+    <div class="office-card-text office-card-text--clamp"><%= broadcast.body.to_plain_text.truncate(600) %></div>
+    <p class="office-card-note">
+      <% if broadcast.draft? %>
+        Saved as a draft. Nothing has been sent. <%= number_with_delimiter(card["recipients"] || Broadcast.eligible_user_count) %> members would receive it.
+      <% elsif broadcast.sent? %>
+        Sent to <%= number_with_delimiter(broadcast.recipients_count) %> members.
+      <% end %>
+    </p>
+    <div class="office-card-actions">
+      <%= link_to "Review and send on Broadcasts →", admin_broadcast_path(broadcast), class: "fc-btn fc-btn-primary", target: "_top" %>
+      <% if broadcast.draft? %><%= link_to "Edit", edit_admin_broadcast_path(broadcast), class: "fc-btn", target: "_top" %><% end %>
+    </div>
+  <% else %>
+    <p class="office-card-note">This draft was deleted from Broadcasts.</p>
+  <% end %>
+</article>
