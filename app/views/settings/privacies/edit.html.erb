@@ -36,6 +36,17 @@
             </span>
           </label>
 
+          <label class="mystic-panel flex items-start gap-3 p-5">
+            <%= hidden_field_tag "user[show_online_status]", "0", id: nil %>
+            <%= check_box_tag "user[show_online_status]", "1", current_user.show_online_status?,
+                  id: "user_show_online_status",
+                  class: "mt-1 h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+            <span>
+              <span class="block font-bold text-faith-dark">Show when I'm online</span>
+              <span class="mt-1 block text-sm text-faith-muted">Brethren see a green dot and "Active now" on your picture, and you appear in "Online now" on the feed. Turn this off to browse quietly.</span>
+            </span>
+          </label>
+
           <%= f.submit "Save Changes", class: "btn btn-primary" %>
         <% end %>
       </div>

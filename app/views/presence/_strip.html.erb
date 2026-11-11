@@ -1,0 +1,31 @@
+<%# "Online now" row on the feed. Reloads itself every 30s while the page is
+    visible (frame-refresh); renders nothing when nobody else is online. %>
+<%= turbo_frame_tag "online_now",
+      class: "fc-online-frame",
+      data: { controller: "frame-refresh", frame_refresh_url_value: presence_strip_path, frame_refresh_interval_value: 30 } do %>
+  <% if online.any? %>
+    <section class="fc-online" aria-label="Members online now">
+      <p class="fc-online-head">
+        <span class="presence-pulse" aria-hidden="true"></span>
+        <span><strong><%= online.count %></strong> online now</span>
+      </p>
+      <div class="fc-online-row">
+        <% online.users.each do |person| %>
+          <%= link_to user_path(person.username), class: "fc-online-person", title: "#{person.display_name} · Active now", data: { turbo_frame: "_top" } do %>
+            <span class="fc-online-avatar">
+              <% if person.profile&.avatar&.attached? %>
+                <%= image_tag avatar_src(person.profile), class: "fc-avatar object-cover", alt: "" %>
+              <% else %>
+                <span class="fc-avatar" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+              <% end %>
+            </span>
+            <span class="fc-online-name"><%= person.display_name %></span>
+          <% end %>
+        <% end %>
+        <% if (more = online.count - online.users.size).positive? %>
+          <span class="fc-online-more">+<%= more %></span>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+<% end %>

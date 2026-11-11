@@ -1,0 +1,5 @@
+<%# Heartbeat for "who's online" (presence_controller.js). Permanent across Turbo visits so one timer runs per tab. %>
+<% if user_signed_in? %>
+  <div id="presence-heartbeat" hidden data-turbo-permanent
+       data-controller="presence" data-presence-url-value="<%= presence_ping_path %>"></div>
+<% end %>

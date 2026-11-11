@@ -142,6 +142,21 @@ class AdminDashboardStats
 
   def recent_members = User.includes(profile: { avatar_attachment: :blob }).order(created_at: :desc).limit(6)
 
+  # ── Online now (live; ignores the chosen period) ──────────────────
+  # Admin counts and lists everyone, including members who hide their online
+  # status from other members (Settings → Privacy).
+
+  ONLINE_LIST_LIMIT = 60
+
+  def online_now = User.active.online.count
+  def active_last_15_minutes = User.active.where(last_seen_at: 15.minutes.ago..).count
+  def active_today = User.active.where(last_seen_at: Time.current.in_time_zone(TZ).beginning_of_day..).count
+
+  def online_members
+    User.active.online.includes(profile: { avatar_attachment: :blob })
+        .order(last_seen_at: :desc).limit(ONLINE_LIST_LIMIT)
+  end
+
   # ── Safety ────────────────────────────────────────────────────────
 
   def safety

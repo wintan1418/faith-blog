@@ -6,7 +6,7 @@
 <% unread_count = local_assigns.key?(:unread) ? local_assigns[:unread].to_i : conversation.unread_count_for(current_user) %>
 
 <%= link_to conversation_path(conversation), class: "msg-row#{' is-active' if active}#{' is-unread' if unread_count.positive?}" do %>
-  <%= render "conversations/avatar", user: other_user, size: "h-14 w-14", online: other_user.online? %>
+  <%= render "conversations/avatar", user: other_user, size: "h-14 w-14", online: other_user.visible_online? %>
   <span class="msg-row-main">
     <span class="msg-row-top">
       <span class="msg-row-name"><%= other_user.display_name %></span>

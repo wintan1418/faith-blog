@@ -29,6 +29,10 @@ Rails.application.routes.draw do
   get "feed/threads",   to: "feed#threads"
   get "feed/updates",   to: "feed#updates"
 
+  # Who's online: heartbeat from the signed-in layout, and the feed's "Online now" row.
+  post "presence/ping", to: "presence#ping", as: :presence_ping
+  get "presence/strip", to: "presence#strip", as: :presence_strip
+
   # Wall of Answered Prayers — public celebration of every answered chain.
   get "answered", to: "answered_prayers#index", as: :answered_prayers
 
@@ -259,6 +263,7 @@ Rails.application.routes.draw do
   # Admin namespace
   namespace :admin do
     root to: "dashboard#index"
+    get "online", to: "online#index", as: :online
     get "bots", to: "bots#index", as: :bots
     resource :app_release, only: [ :edit, :update ], path: "app-versions" do
       post :remind

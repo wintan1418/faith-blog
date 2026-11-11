@@ -14,10 +14,12 @@
     <% end %>
 
     <%= link_to user_path(other_user.username), class: "msg-thread-who" do %>
-      <%= render "conversations/avatar", user: other_user, size: "h-10 w-10", online: other_user.online? %>
+      <%= render "conversations/avatar", user: other_user, size: "h-10 w-10", online: other_user.visible_online? %>
       <span class="min-w-0">
         <span class="msg-thread-name"><%= other_user.display_name %></span>
-        <span class="msg-thread-status<%= ' is-online' if other_user.online? %>"><%= other_user.last_seen_label %></span>
+        <% if (presence = other_user.presence_label) %>
+          <span class="msg-thread-status<%= ' is-online' if other_user.visible_online? %>"><%= presence %></span>
+        <% end %>
       </span>
     <% end %>
 

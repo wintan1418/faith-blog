@@ -1,0 +1,45 @@
+<%# Live "Online now" card. Reloads every 15s while the page is visible (frame-refresh). %>
+<%= turbo_frame_tag "admin_online_now",
+      data: { controller: "frame-refresh", frame_refresh_url_value: admin_online_path, frame_refresh_interval_value: 15 } do %>
+  <% online = stats.online_now %>
+  <section class="adash-card adash-online" aria-label="Online now">
+    <div class="adash-online__now">
+      <p class="adash-online__label"><span class="presence-pulse" aria-hidden="true"></span>Online now</p>
+      <p class="adash-online__value"><%= number_with_delimiter(online) %><small><%= online == 1 ? "member" : "members" %></small></p>
+      <p class="adash-online__sub">
+        <span><strong><%= number_with_delimiter(stats.active_last_15_minutes) %></strong> in the last 15 min</span>
+        <span><strong><%= number_with_delimiter(stats.active_today) %></strong> today</span>
+      </p>
+      <p class="adash-online__note">Seen in the last <%= (User::ONLINE_WINDOW / 60).to_i %> minutes · updates every 15s</p>
+    </div>
+    <div class="adash-online__list">
+      <% if online.zero? %>
+        <p class="adash-empty">Nobody is online right now.</p>
+      <% else %>
+        <ul class="adash-people">
+          <% stats.online_members.each do |user| %>
+            <li>
+              <%= link_to admin_user_path(user), data: { turbo_frame: "_top" } do %>
+                <span class="presence-dot">
+                  <% if user.profile&.avatar&.attached? %>
+                    <%= image_tag avatar_src(user.profile), class: "fc-avatar object-cover", alt: "" %>
+                  <% else %>
+                    <span class="fc-avatar" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
+                  <% end %>
+                </span>
+                <span>
+                  <strong>@<%= user.username %><% unless user.show_online_status? %><span class="adash-online__hidden" title="Hidden from other members">· hidden</span><% end %></strong>
+                  <small><%= user.android_app_version ? "Android app" : "Web" %></small>
+                </span>
+                <time datetime="<%= user.last_seen_at.utc.iso8601 %>"><%= time_ago_short(user.last_seen_at) %> ago</time>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+        <% if online > AdminDashboardStats::ONLINE_LIST_LIMIT %>
+          <p class="adash-foot">Showing the <%= AdminDashboardStats::ONLINE_LIST_LIMIT %> most recent.</p>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+<% end %>

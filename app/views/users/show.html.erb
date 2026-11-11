@@ -51,6 +51,9 @@
                 <% end %>
               </div>
               <p class="profile-handle">@<%= @user.username %></p>
+              <% if @user.visible_online? %>
+                <p class="profile-presence is-online"><span class="presence-pulse" aria-hidden="true"></span>Active now</p>
+              <% end %>
               <% if @user.profile&.show_birthday && @user.profile.birthday_today? %>
                 <p class="profile-birthday-today">🎂 Birthday today</p>
               <% end %>

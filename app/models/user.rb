@@ -184,10 +184,27 @@ class User < ApplicationRecord
     likes.exists?(likeable: likeable)
   end
 
-  # Online if we touched last_seen_at within the past minute. Touch is
-  # done by ApplicationController on every authenticated request.
+  # "Online" = seen within this window. The signed-in layout pings every 45s
+  # while the page is visible (PresenceController), so two minutes covers one
+  # missed beat plus network slack. Page loads also touch last_seen_at.
+  ONLINE_WINDOW = 2.minutes
+
+  scope :online, -> { where(last_seen_at: ONLINE_WINDOW.ago..) }
+  # Members who let others see when they're online (Settings → Privacy).
+  scope :sharing_presence, -> { where(show_online_status: true) }
+
   def online?
-    last_seen_at.present? && last_seen_at > 1.minute.ago
+    last_seen_at.present? && last_seen_at > ONLINE_WINDOW.ago
+  end
+
+  # What other members may see: online only if they share their status.
+  def visible_online?
+    show_online_status? && online?
+  end
+
+  # "Active now" / "Last seen 5m ago", or nil when the member hides it.
+  def presence_label
+    last_seen_label if show_online_status?
   end
 
   def last_seen_label
@@ -196,11 +213,10 @@ class User < ApplicationRecord
 
     diff = Time.current - last_seen_at
     case diff
-    when 0..(60)            then "Active now"
-    when 60..(60 * 60)      then "Last seen #{(diff / 60).to_i}m ago"
-    when (60 * 60)..(24 * 60 * 60)
+    when 0...(60 * 60)      then "Last seen #{[ (diff / 60).to_i, 1 ].max}m ago"
+    when (60 * 60)...(24 * 60 * 60)
       "Last seen #{(diff / 3600).to_i}h ago"
-    when (24 * 60 * 60)..(7 * 24 * 60 * 60)
+    when (24 * 60 * 60)...(7 * 24 * 60 * 60)
       "Last seen #{(diff / 86_400).to_i}d ago"
     else
       "Last seen #{last_seen_at.strftime("%b %-d")}"

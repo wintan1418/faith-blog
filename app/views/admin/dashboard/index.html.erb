@@ -14,6 +14,8 @@
     </nav>
   </div>
 
+  <%= render "admin/dashboard/online", stats: s %>
+
   <section class="adash-kpis" aria-label="Headline numbers">
     <% s.kpis.each do |k| %>
       <div class="adash-kpi">
