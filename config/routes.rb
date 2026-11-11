@@ -320,6 +320,28 @@ Rails.application.routes.draw do
       end
     end
     resources :announcements, only: [ :index, :new, :create, :destroy ]
+
+    # The Office: the founder's AI assistant.
+    get "office", to: "office/conversations#index", as: :office
+    namespace :office do
+      resources :conversations, only: [ :show, :create, :update, :destroy ] do
+        collection { post :import }
+        member do
+          post :retry
+          get :refresh
+        end
+        resources :messages, only: [ :create ]
+      end
+      resources :cards, only: [] do
+        member do
+          patch :update_breath
+          post :post_breath
+          post :use_in_breath
+          post :publish_announcement
+        end
+      end
+      resource :briefing, only: [ :show, :update ]
+    end
   end
 
   # Web Push subscriptions — endpoint-keyed (client doesn't know its row id).

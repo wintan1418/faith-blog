@@ -1,0 +1,25 @@
+<div class="office-side-actions">
+  <%= link_to admin_office_path, class: "fc-btn fc-btn-primary office-new" do %>
+    <%= render_icon("compose", classes: "h-4 w-4") %> New conversation
+  <% end %>
+  <%= link_to admin_office_briefing_path, class: "office-side-link#{' is-active' if controller_name == 'briefings'}" do %>
+    <%= render_icon("bookopen", classes: "h-4 w-4") %> Briefing
+  <% end %>
+  <%= link_to admin_office_path(anchor: "import"), class: "office-side-link" do %>
+    <%= render_icon("download", classes: "h-4 w-4") %> Import notes
+  <% end %>
+</div>
+
+<nav class="office-thread-list" aria-label="Conversations">
+  <% threads = sidebar_conversations %>
+  <% if threads.any? %>
+    <% threads.each do |conversation| %>
+      <%= link_to admin_office_conversation_path(conversation), class: "office-thread#{' is-active' if conversation == current}" do %>
+        <span class="office-thread-title"><%= conversation.title %></span>
+        <span class="office-thread-time"><%= time_ago_in_words(conversation.last_message_at || conversation.created_at) %> ago</span>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p class="office-muted office-thread-empty">Your conversations will appear here.</p>
+  <% end %>
+</nav>

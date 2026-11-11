@@ -1,0 +1,11 @@
+<%= form_with url: conversation ? admin_office_conversation_messages_path(conversation) : admin_office_conversations_path,
+      scope: :message, id: "office_composer", class: "office-composer",
+      data: { office_target: "form", action: "turbo:submit-start->office#sending turbo:submit-end->office#sent" } do |f| %>
+  <%= f.text_area :content, value: "", rows: 1, required: true, maxlength: 20_000, autofocus: conversation.nil?,
+        placeholder: conversation ? "Reply to the Office…" : "What shall we work on?",
+        "aria-label": "Message the Office", enterkeyhint: "send",
+        data: { office_target: "input", action: "keydown->office#keydown input->office#resize" } %>
+  <button type="submit" class="office-send" aria-label="Send" title="Send (Enter). Shift+Enter for a new line." data-office-target="send">
+    <%= render_icon("send", classes: "h-4 w-4") %>
+  </button>
+<% end %>

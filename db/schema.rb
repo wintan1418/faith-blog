@@ -597,6 +597,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_203000) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
+  create_table "office_briefings", force: :cascade do |t|
+    t.text "body", default: "", null: false
+    t.bigint "updated_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["updated_by_id"], name: "index_office_briefings_on_updated_by_id"
+  end
+
+  create_table "office_conversations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "title", default: "New conversation", null: false
+    t.boolean "thinking", default: false, null: false
+    t.datetime "last_message_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "last_message_at"], name: "index_office_conversations_on_user_id_and_last_message_at"
+    t.index ["user_id"], name: "index_office_conversations_on_user_id"
+  end
+
+  create_table "office_messages", force: :cascade do |t|
+    t.bigint "office_conversation_id", null: false
+    t.integer "role", default: 0, null: false
+    t.text "content"
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["office_conversation_id"], name: "index_office_messages_on_office_conversation_id"
+  end
+
   create_table "portfolio_items", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "title", limit: 100, null: false
@@ -1017,6 +1046,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_203000) do
   add_foreign_key "moderation_logs", "users", column: "moderator_id"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "actor_id"
+  add_foreign_key "office_briefings", "users", column: "updated_by_id", on_delete: :nullify
+  add_foreign_key "office_conversations", "users"
+  add_foreign_key "office_messages", "office_conversations"
   add_foreign_key "portfolio_items", "users"
   add_foreign_key "post_links", "posts", column: "source_post_id"
   add_foreign_key "post_links", "posts", column: "target_post_id"

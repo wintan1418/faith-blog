@@ -55,6 +55,7 @@ class User < ApplicationRecord
   has_many :reviewed_reports, class_name: "Report", foreign_key: :reviewed_by_id, dependent: :nullify
   has_many :approved_resources, class_name: "Resource", foreign_key: :approved_by_id, dependent: :nullify
   has_many :sent_broadcasts, class_name: "Broadcast", foreign_key: :sender_id, dependent: :nullify
+  has_many :office_conversations, dependent: :destroy
   has_many :reports, foreign_key: :reporter_id, dependent: :destroy
   has_many :moderation_logs, foreign_key: :moderator_id, dependent: :nullify
   has_one  :risk_profile, class_name: "UserRiskProfile", dependent: :destroy

@@ -6,6 +6,7 @@ class BibleQuizQuestion < ApplicationRecord
   validates :prompt, :correct_index, :fingerprint, presence: true
   validates :fingerprint, uniqueness: true
   validate  :choices_well_formed
+  validate  :text_well_formed
 
   before_validation :set_fingerprint, on: :create
 
@@ -87,6 +88,22 @@ class BibleQuizQuestion < ApplicationRecord
 
   def set_fingerprint
     self.fingerprint ||= Digest::SHA1.hexdigest(prompt.to_s.downcase.strip)
+  end
+
+  # Guards against the AI's common slips: lettered options typed into the
+  # question ("A) … B) …"), bare letters as choices, and reference
+  # questions whose choices lack a book name ("1:2").
+  LETTERED_OPTIONS = /(?:^|\s)[A-D]\)\s/
+  REFERENCE_CHOICE = /[[:alpha:]]{2,}.*\d+:\d+/
+
+  def text_well_formed
+    errors.add(:prompt, "contains lettered options") if prompt.to_s.match?(LETTERED_OPTIONS)
+    return unless choices.is_a?(Array)
+
+    errors.add(:choices, "are bare letters") if choices.any? { |c| c.to_s.strip.match?(/\A[A-D]\.?\z/) }
+    return unless kind.to_s == "reference"
+
+    errors.add(:choices, "must be full references") unless choices.all? { |c| c.to_s.match?(REFERENCE_CHOICE) }
   end
 
   def choices_well_formed

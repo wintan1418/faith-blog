@@ -1,0 +1,38 @@
+<% case message.role %>
+<% when "user" %>
+  <div id="<%= dom_id(message) %>" class="office-msg office-msg--user">
+    <% if message.imported? %>
+      <details class="office-bubble office-imported">
+        <summary>Imported notes · <%= number_with_delimiter(message.content.to_s.length) %> characters</summary>
+        <div class="office-imported-body"><%= office_plain(message.content) %></div>
+      </details>
+    <% else %>
+      <div class="office-bubble"><%= office_plain(message.content) %></div>
+    <% end %>
+  </div>
+<% when "assistant" %>
+  <div id="<%= dom_id(message) %>" class="office-msg office-msg--assistant<%= ' is-empty' if message.content.blank? && !message.failed? %>">
+    <% if message.failed? %>
+      <span class="office-avatar" aria-hidden="true">~</span>
+      <div class="office-error">
+        <p><%= message.content %></p>
+        <%= button_to "Try again", retry_admin_office_conversation_path(message.conversation), class: "fc-btn", form_class: "inline" %>
+      </div>
+    <% elsif message.content.present? %>
+      <span class="office-avatar" aria-hidden="true">~</span>
+      <div class="office-prose"><%= office_markdown(message.content) %></div>
+    <% end %>
+  </div>
+<% when "tool", "card" %>
+  <div id="<%= dom_id(message) %>" class="office-msg office-msg--tool">
+    <% kind = message.card_kind %>
+    <% if kind.in?(%w[breath flyer email announcement]) %>
+      <%= render "admin/office/cards/#{kind}", message: message, card: message.card_data %>
+    <% else %>
+      <% error = message.payload.dig("result", "error") %>
+      <span class="office-tool-chip<%= ' is-error' if error %>">
+        <%= error ? "⚠︎ #{error}" : "✓ #{office_tool_label(message.tool_name)}" %>
+      </span>
+    <% end %>
+  </div>
+<% end %>
