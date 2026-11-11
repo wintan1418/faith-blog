@@ -23,7 +23,7 @@ Open the Games page at [/games](/games) and tap **Character Match**. The start s
 4. **Tap Next** for the following figure.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/character-match.jpg" alt="Character Match question 2 of 5, Easy: Who said, Whither thou goest, I will go? Ruth is marked right among Naomi, Esther and Hannah, with the reference Ruth 1:16">
+  <img src="/blog/shots/character-match.jpg" alt="Character Match question 2 of 5, Medium: I was a fisherman called to follow Jesus, and I walked on water. My name means 'rock'. Peter is marked right among James, John and Andrew, with the reference Matthew 14:22-33">
   <figcaption>A description, four names, and the story behind the answer.</figcaption>
 </figure>
 

@@ -25,7 +25,7 @@ A round is five questions.
 4. **Tap Next** for the next verse.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/reference-scramble.jpg" alt="Reference Scramble question 2 of 5: Trust in the LORD with all thine heart; and lean not unto thine own understanding. Proverbs 3:5 is marked right among Psalm 37:5, Isaiah 26:3 and Proverbs 16:3, with a link to report a wrong answer">
+  <img src="/blog/shots/reference-scramble.jpg" alt="Reference Scramble question 2 of 5: For all have sinned, and come short of the glory of God. Romans 3:23 is marked right among Philippians 3:20, Ephesians 1:7 and Galatians 2:16, with a link to report a wrong answer">
   <figcaption>One verse, four references. Pick where it lives.</figcaption>
 </figure>
 

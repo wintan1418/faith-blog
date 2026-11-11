@@ -25,13 +25,13 @@ A round is five puzzles.
 4. **See the answer** with a short note, then tap **Next**.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/pic-word.jpg" alt="A 4 Pics 1 Word puzzle showing a lion, a pit, praying hands and a crown. Daniel in the lions’ den is marked right among David vs Goliath, Joseph in prison and Paul shipwrecked, with the note Daniel 6">
+  <img src="/blog/shots/pic-word.jpg" alt="A 4 Pics 1 Word puzzle showing a ship, a wave, a bird and a rainbow. Noah's Ark is marked right among Elijah and the Ravens, Moses and the Red Sea, and David and Goliath, with the reference Genesis 6-9">
   <figcaption>Four emoji, one Bible story. Which is it?</figcaption>
 </figure>
 
 ## How to read the clues
 
-Take the puzzle in the picture above: 🦁 🕳️ 🙏 👑. A lion, a pit, prayer and a crown. Put together, they point to Daniel in the lions' den: a man who prayed, was thrown to the lions by order of the king, and was kept safe.
+Take the puzzle in the picture above: 🛳️ 🌊 🐦 🌈. A ship, a wave, a bird and a rainbow. Put together, they point to Noah's Ark: the ark on the flood waters, the dove sent out to find dry land, and the rainbow of God's promise.
 
 Some ways in:
 

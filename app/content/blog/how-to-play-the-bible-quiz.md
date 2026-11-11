@@ -41,7 +41,7 @@ Each question has four choices. Tap the one you think is right.
 Under the choices you'll see "✓ Right." or "The answer is…", followed by the Bible reference and a short note explaining the answer. Take a moment to read it. This is where most of the learning happens. Then tap **Next** to carry on.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/quiz-question.jpg" alt="Question 1 of 5 on Salvation, Easy: By what are we saved through faith, according to Ephesians 2:8? The answer Grace is marked green, with Right, the reference Ephesians 2:8 and the verse quoted, a link reading Answer looks wrong? Report it, and the score and streak in the top corner">
+  <img src="/blog/shots/quiz-question.jpg" alt="Question 1 of 5 on Salvation, Easy: Which book contains the verse 'For by grace are ye saved through faith'? Ephesians is marked green among Philippians, Galatians and Romans, with Right, the reference Ephesians 2:8 and the verse quoted, a link reading Answer looks wrong? Report it, and the score and streak in the top corner">
   <figcaption>After each answer you see the reference and a short note.</figcaption>
 </figure>
 
@@ -70,7 +70,7 @@ Below that are your stats, including your best streak and how long the round too
 - **Play again** starts a new round with the same settings.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/quiz-result.jpg" alt="A finished Bible Quiz round: a gold medal, 4 out of 5, Almost flawless, tiles for 80% correct, a best streak of 3 and 41 seconds, a share line, and buttons for Share to feed, Copy share line and Play again">
+  <img src="/blog/shots/quiz-result.jpg" alt="A finished Bible Quiz round: a gold medal, 4 out of 5, Almost flawless, tiles for 80% correct, a best streak of 3 and 37 seconds, a share line, and buttons for Share to feed, Copy share line and Play again">
   <figcaption>The result screen, with ways to share or play again.</figcaption>
 </figure>
 

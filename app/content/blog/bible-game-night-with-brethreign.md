@@ -36,7 +36,7 @@ Brethreign's games work well on your own, and they're even better together. All 
 **5. Close with a story from the Church History Arena (5 to 10 minutes).** Open [/history](/history), pick one person and read their story. Talk about one thing you can learn from their faith. Then pray together. See [Church History](/blog/church-history-quiz-and-arena).
 
 <figure class="bl-shot">
-  <img src="/blog/shots/pic-word.jpg" alt="A 4 Pics 1 Word puzzle showing a lion, a pit, praying hands and a crown, with Daniel in the lions’ den marked as the answer">
+  <img src="/blog/shots/pic-word.jpg" alt="A 4 Pics 1 Word puzzle showing a ship, a wave, a bird and a rainbow, with Noah's Ark marked as the answer">
   <figcaption>4 Pics 1 Word is a good opener for mixed ages.</figcaption>
 </figure>
 

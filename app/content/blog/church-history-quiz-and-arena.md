@@ -23,7 +23,7 @@ Open the Games page at [/games](/games) and tap **Church History**. The quiz is 
 Your score is added to your week on the leaderboard, and the result screen lets you share it to your feed, copy a share line or play again.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/history-quiz.jpg" alt="Church History question 1 of 5: Who posted the Ninety-five Theses in Wittenberg in 1517? John Wycliffe is marked red, Martin Luther green, with a note on Wittenberg, 31 October 1517">
+  <img src="/blog/shots/history-quiz.jpg" alt="Church History question 1 of 5: Which hymn writer is known for 'Joy to the World'? Charles Wesley is marked red and Isaac Watts green, with the note that Watts wrote it in 1719, based on Psalm 98">
   <figcaption>Five questions per round, with a short note after each answer.</figcaption>
 </figure>
 
@@ -45,8 +45,8 @@ Tabs across the top take you through six eras:
 Each era opens with a short chronicle, a few paragraphs telling the story of that period.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/history-arena.jpg" alt="The Church History Arena on the Apostolic (33–100) tab, with tabs for six eras, a short chronicle beginning From an upper room in Jerusalem, and cards for Peter the Apostle and Paul the Apostle with their years">
-  <figcaption>The Arena. Pick an era, then tap a figure to read their story.</figcaption>
+  <img src="/blog/shots/history-arena.jpg" alt="The Church History Arena on the Apostolic (33–100) tab, with tabs for six eras, the era description, and the start of its chronicle: The Apostolic era opens in a world transformed by the life, death, and resurrection of Jesus Christ">
+  <figcaption>The Arena. Pick an era and read its chronicle, then scroll down to its figures.</figcaption>
 </figure>
 
 ### Tap a figure to read their story

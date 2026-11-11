@@ -25,7 +25,7 @@ Every round has five questions, each on a different verse:
 After each answer you'll see whether you were right, along with the reference, so you know where the verse lives in the Bible.
 
 <figure class="bl-shot">
-  <img src="/blog/shots/verse-memory.jpg" alt="Verse Memory question 2 of 5: The LORD is my blank: I shall not want. Shepherd is marked right, with the reference Psalm 23:1">
+  <img src="/blog/shots/verse-memory.jpg" alt="Verse Memory question 2 of 5: The name of the LORD is a strong blank: the righteous runneth into it, and is safe. Tower is marked right among shelter, fortress and refuge, with the reference Proverbs 18:10">
   <figcaption>A KJV verse with one blank and four choices.</figcaption>
 </figure>
 
