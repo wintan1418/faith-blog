@@ -117,6 +117,8 @@
         <% end %>
       </header>
 
+      <%= render "presence/strip", online: OnlinePresence.new(current_user) %>
+
       <%= render "feed/birthdays", birthdays: @birthdays_today %>
 
       <%# Activation ring: stays until all three first steps are done, then

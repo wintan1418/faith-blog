@@ -21,7 +21,7 @@
         <% @connections.each do |user| %>
           <%= button_to conversations_path(recipient_id: user.id), method: :post, class: "msg-row msg-row--person",
                         form: { data: { list_filter_target: "row", list_filter_text: "#{user.display_name} #{user.username}".downcase } } do %>
-            <%= render "conversations/avatar", user: user, size: "h-12 w-12", online: user.online? %>
+            <%= render "conversations/avatar", user: user, size: "h-12 w-12", online: user.visible_online? %>
             <span class="msg-row-main">
               <span class="msg-row-name"><%= user.display_name %></span>
               <span class="msg-row-preview">@<%= user.username %></span>

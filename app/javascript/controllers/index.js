@@ -199,3 +199,9 @@ application.register("chart-tip", ChartTipController)
 
 import AdConsentController from "./ad_consent_controller"
 application.register("ad-consent", AdConsentController)
+
+import PresenceController from "./presence_controller"
+application.register("presence", PresenceController)
+
+import FrameRefreshController from "./frame_refresh_controller"
+application.register("frame-refresh", FrameRefreshController)

@@ -1,0 +1,145 @@
+/* Who's online (Nov 2026): feed "Online now" row, online dots, Admin → Online now. */
+:root { --presence-green: #22c55e; }
+
+/* Pulsing green dot beside "N online". */
+.presence-pulse {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--presence-green);
+}
+.presence-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--presence-green);
+  animation: presence-pulse 1.8s ease-out infinite;
+}
+@keyframes presence-pulse {
+  from { transform: scale(1); opacity: 0.6; }
+  to { transform: scale(3); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .presence-pulse::after { animation: none; }
+}
+
+/* ── Feed: Online now ── */
+.fc-online-frame { display: block; }
+.fc-online {
+  margin: 0.75rem 0;
+  padding: 0.75rem 0 0.7rem;
+  border: 1px solid var(--fc-line);
+  border-radius: 16px;
+  background: var(--fc-surface);
+}
+.fc-online-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0 1rem 0.55rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--fc-muted);
+}
+.fc-online-head strong { color: var(--fc-ink); font-weight: 800; font-variant-numeric: tabular-nums; }
+.fc-online-row {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0 1rem 0.1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.fc-online-row::-webkit-scrollbar { display: none; }
+.fc-online-person {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  width: 56px;
+  text-decoration: none;
+}
+.fc-online-avatar { position: relative; display: block; }
+.fc-online-avatar .fc-avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 1.05rem;
+  box-shadow: 0 0 0 2px var(--fc-surface), 0 0 0 4px color-mix(in oklch, var(--presence-green) 55%, transparent);
+}
+.fc-online-avatar::after,
+.presence-dot::after,
+.fc-people-avatar.is-online::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--presence-green);
+  box-shadow: 0 0 0 2px var(--fc-surface);
+}
+.fc-online-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--fc-ink);
+}
+.fc-online-person:hover .fc-online-name { color: var(--fc-accent); }
+.fc-online-more {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  align-self: flex-start;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px dashed var(--fc-line-strong);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--fc-muted);
+}
+
+/* ── Online dots on avatars elsewhere ── */
+.fc-people-avatar.is-online { position: relative; overflow: visible; }
+.fc-people-avatar.is-online img,
+.fc-people-avatar.is-online > span { border-radius: inherit; }
+.fc-people-avatar.is-online img { overflow: hidden; }
+.fc-people-avatar.is-online::after { right: 1px; bottom: 1px; }
+
+.profile-presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fc-muted);
+}
+.profile-presence.is-online { color: #16a34a; }
+:root.theme-dark .profile-presence.is-online { color: #4ade80; }
+
+/* ── Admin → Online now ── */
+.adash-online { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); padding: 1.1rem 1.2rem; }
+@media (min-width: 900px) { .adash-online { grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr); } }
+.adash-online__now { display: grid; gap: 0.35rem; align-content: start; }
+.adash-online__label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fc-muted); }
+.adash-online__value { font-size: 3.25rem; font-weight: 800; line-height: 1; color: var(--fc-ink); font-variant-numeric: tabular-nums; }
+.adash-online__value small { margin-left: 0.4rem; font-size: 0.95rem; font-weight: 600; color: var(--fc-muted); }
+.adash-online__sub { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin-top: 0.4rem; font-size: 0.85rem; color: var(--fc-muted); }
+.adash-online__sub strong { color: var(--fc-ink); font-variant-numeric: tabular-nums; }
+.adash-online__note { font-size: 0.75rem; color: var(--fc-muted); }
+.adash-online__list { min-width: 0; }
+.adash-online__list .adash-people { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 2px 0.75rem; }
+.adash-online__list .adash-people a > span.presence-dot { position: relative; display: block; flex: 0 0 auto; }
+.adash-online__list .adash-people .presence-dot::after { width: 10px; height: 10px; }
+.adash-online__hidden { margin-left: 0.3rem; font-size: 0.7rem; font-weight: 700; color: var(--fc-muted); }

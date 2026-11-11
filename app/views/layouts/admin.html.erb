@@ -45,6 +45,7 @@
         document.body.classList.toggle('theme-light', !dark);
       })();
     </script>
+    <%= render "shared/presence_heartbeat" %>
 
     <% pending_count = Report.pending.count %>
     <% queue_count = AiModerationReview.where(status: %i[pending flagged]).count %>
