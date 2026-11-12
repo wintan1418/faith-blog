@@ -125,6 +125,9 @@ application.register("post-form", PostFormController)
 import PasteImagesController from "./paste_images_controller"
 application.register("paste-images", PasteImagesController)
 
+import CaretClearController from "./caret_clear_controller"
+application.register("caret-clear", CaretClearController)
+
 import QuizController from "./quiz_controller"
 application.register("quiz", QuizController)
 
