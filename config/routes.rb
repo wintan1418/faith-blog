@@ -338,6 +338,11 @@ Rails.application.routes.draw do
           post :post_breath
           post :use_in_breath
           post :publish_announcement
+          get :image_picker
+          post :attach_image
+          post :remove_image
+          get :breath_picker
+          post :add_to_breath
         end
       end
       resource :briefing, only: [ :show, :update ]

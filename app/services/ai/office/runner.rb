@@ -52,7 +52,7 @@ module Ai
         records.flat_map do |m|
           case m.role
           when "user" then [ { role: :user, text: m.imported? ? imported_text(m) : m.content.to_s } ]
-          when "card" then [ { role: :user, text: "[Office note] #{m.content}" } ]
+          when "card" then [ { role: :user, text: card_note(m) } ]
           when "tool" then [ tool_entry(m) ]
           when "assistant"
             entry = { role: :assistant, text: m.content.to_s, tool_calls: m.tool_calls, raw: m.payload["raw"] }
@@ -88,15 +88,43 @@ module Ai
         )
         message.image.attach(outcome.blob) if outcome.blob
         message.save!
+        extra = outcome.after_save&.call(message)
+        return if extra.blank?
+
+        result = outcome.result.merge(extra)
+        message.update_columns(content: JSON.dump(result), payload: message.payload.merge("result" => result))
       end
 
       # Tool results plus anything the founder has since done on the card
       # (posted it, scheduled it), so the model knows where things stand.
+      # Cards made before ids were part of tool results get theirs from the
+      # message id, which is what update_breath and flyer_id take.
       def tool_entry(message)
-        result = message.payload["result"] || {}
-        card = message.card_data.slice("status", "post_id", "scheduled_for", "announcement_id", "error")
+        result = (message.payload["result"] || {}).merge(card_ids(message))
+        card = card_now(message)
         result = result.merge("card_now" => card) if card.any?
         { role: :tool, tool_call_id: message.payload["tool_call_id"], name: message.tool_name, result: result }
+      end
+
+      def card_note(message)
+        ids = card_ids(message)
+        details = ids.merge(card_now(message)).map { |k, v| "#{k}: #{v}" }.join(", ")
+        "[Office note] #{message.content}#{" (#{details})" if details.present?}"
+      end
+
+      def card_ids(message)
+        case message.card_kind
+        when "breath" then { "breath_id" => message.id }
+        when "flyer" then { "flyer_id" => message.id }
+        else {}
+        end
+      end
+
+      def card_now(message)
+        card = message.card_data
+        now = card.slice("status", "title", "post_id", "scheduled_for", "announcement_id", "error").compact_blank
+        now["flyer_id"] = card["image_message_id"] if message.card_kind == "breath" && card["image_message_id"].present?
+        now
       end
 
       def imported_text(message)

@@ -19,6 +19,7 @@
     <div class="office-card-actions">
       <%= link_to "Review and send on Broadcasts →", admin_broadcast_path(broadcast), class: "fc-btn fc-btn-primary", target: "_top" %>
       <% if broadcast.draft? %><%= link_to "Edit", edit_admin_broadcast_path(broadcast), class: "fc-btn", target: "_top" %><% end %>
+      <%= office_copy_button([ broadcast.subject, broadcast.body.to_plain_text ].map { |t| t.to_s.strip }.compact_blank.join("\n\n")) %>
     </div>
   <% else %>
     <p class="office-card-note">This draft was deleted from Broadcasts.</p>

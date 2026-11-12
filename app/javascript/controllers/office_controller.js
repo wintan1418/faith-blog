@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { copyText } from "../copy_text"
 
 // Admin → Office chat.
 // - Enter sends, Shift+Enter makes a new line (on touch screens Enter is a new
@@ -18,8 +19,14 @@ export default class extends Controller {
     this.scrollToBottom()
     setTimeout(() => this.scrollToBottom(), 300)
 
+    // Only follow new messages while the reader is at the bottom; changes to
+    // a card further up (an image added, a picker loading) don't jump the page.
+    this.pinned = true
+    this.onScroll = () => { this.pinned = this.nearBottom() }
+    window.addEventListener("scroll", this.onScroll, { passive: true })
+
     if (this.hasMessagesTarget) {
-      this.observer = new MutationObserver(() => this.scrollToBottom())
+      this.observer = new MutationObserver(() => { if (this.pinned) this.scrollToBottom() })
       this.observer.observe(this.messagesTarget, { childList: true, subtree: true })
     }
     this.statusObserver = new MutationObserver(() => this.syncPolling())
@@ -28,6 +35,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    window.removeEventListener("scroll", this.onScroll)
     this.observer?.disconnect()
     this.statusObserver?.disconnect()
     this.stopPolling()
@@ -53,6 +61,8 @@ export default class extends Controller {
 
   sent(event) {
     if (this.hasSendTarget) this.sendTarget.disabled = false
+    this.pinned = true
+    this.scrollToBottom()
     if (event.detail.success && this.hasInputTarget) {
       this.inputTarget.value = ""
       this.resize()
@@ -65,13 +75,46 @@ export default class extends Controller {
     this.inputTarget.focus()
   }
 
-  copy(event) {
+  // Copies the complete text from the <template> beside the button (never
+  // the rendered page). copyText uses the Android app's bridge, then the
+  // Clipboard API, then a hidden textarea for older WebViews.
+  async copy(event) {
     const button = event.currentTarget
-    navigator.clipboard?.writeText(button.dataset.text).then(() => {
-      const label = button.textContent
-      button.textContent = "Copied"
-      setTimeout(() => { button.textContent = label }, 1500)
-    })
+    const source = button.parentElement?.querySelector("template[data-office-copy-source]")
+    const text = source ? source.content.textContent : (button.dataset.text || "")
+    const ok = await copyText(text)
+    const label = button.dataset.label || button.textContent
+    button.textContent = ok ? "Copied" : "Couldn't copy"
+    clearTimeout(button._copyTimer)
+    button._copyTimer = setTimeout(() => { button.textContent = label }, 1600)
+  }
+
+  // Pickers on cards load into a lazy turbo frame; reopening one reloads it
+  // so flyers and breaths made since then appear.
+  loadPicker(event) {
+    const details = event.currentTarget
+    if (!details.open) return
+    const frame = details.querySelector("turbo-frame[src]")
+    if (frame && frame.complete) frame.reload()
+  }
+
+  // Upload as soon as a file is chosen (after checking its size here too).
+  upload(event) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    if (!file) return
+    const max = Number(input.dataset.maxBytes || 0)
+    if (max && file.size > max) {
+      alert(`That image is too large (max ${Math.round(max / 1048576)}MB).`)
+      input.value = ""
+      return
+    }
+    input.form.requestSubmit()
+  }
+
+  nearBottom() {
+    const doc = document.documentElement
+    return doc.scrollHeight - (window.scrollY + window.innerHeight) < 160
   }
 
   scrollToBottom() {

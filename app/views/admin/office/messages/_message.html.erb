@@ -20,7 +20,10 @@
       </div>
     <% elsif message.content.present? %>
       <span class="office-avatar" aria-hidden="true">~</span>
-      <div class="office-prose"><%= office_markdown(message.content) %></div>
+      <div class="office-reply">
+        <div class="office-prose"><%= office_markdown(message.content) %></div>
+        <div class="office-reply-tools"><%= office_copy_button(message.content, class_name: "office-copy-btn") %></div>
+      </div>
     <% end %>
   </div>
 <% when "tool", "card" %>
