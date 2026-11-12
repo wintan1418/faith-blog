@@ -176,6 +176,23 @@ class AdminDashboardStats
     [ [ "Joined", ids.size ], [ "Added a photo", with_photo ], [ "Shared a breath", posted ], [ "Made a connection", connected ] ]
   end
 
+  # The getting-started list on the feed: how many members have done each
+  # step, for everyone and for those who joined in this period. Shows where
+  # new members stop.
+  def onboarding(members)
+    total = members.count
+    {
+      total: total,
+      steps: OnboardingChecklist.step_counts(members),
+      all_done: total.zero? ? 0 : OnboardingChecklist.all_steps_count(members)
+    }
+  end
+
+  def onboarding_all = onboarding(User.all)
+  def onboarding_new = onboarding(User.where(created_at: period))
+  def onboarding_hidden = User.where.not(onboarding_dismissed_at: nil).where(onboarding_completed_at: nil).count
+  def tour_taken = User.where.not(tour_completed_at: nil).count
+
   def app_users = User.where.not(android_app_version: nil).count
   def professional_profiles = Profile.where.not(headline: [ nil, "" ]).count
 

@@ -11,6 +11,7 @@
         <% end %>
         <button type="button"
                 class="fc-rail-link w-full text-left"
+                data-tour-anchor="bible"
                 data-action="click->bible-drawer#open">
           <%= render_icon("bookopen", classes: "h-4 w-4") %>
           Open Bible
@@ -59,7 +60,7 @@
         <% end %>
       </nav>
 
-      <div class="fc-rail-games-card">
+      <div class="fc-rail-games-card" data-tour-anchor="discover">
         <div class="fc-rail-games-head">
           <span class="fc-rail-games-kicker">🎯 Play</span>
           <%= link_to "Leaderboard →", games_path, class: "fc-rail-games-link" %>
@@ -81,7 +82,7 @@
       </div>
 
       <div class="fc-section-label">Your Rooms</div>
-      <nav class="space-y-1">
+      <nav class="space-y-1" data-tour-anchor="rooms">
         <% Room.public_rooms.ordered.limit(6).each do |room| %>
           <%
             tint = case room.slug.to_s
@@ -125,39 +126,6 @@
 
       <%= render "feed/birthdays", birthdays: @birthdays_today %>
 
-      <%# Activation ring: stays until all three first steps are done, then
-          disappears for good. Each pending step is the link to do it. %>
-      <% if @onboard && @onboard_done < 3 %>
-        <section class="fc-onboard-ring" aria-label="Getting started progress">
-          <svg viewBox="0 0 40 40" class="fc-ring" aria-hidden="true">
-            <circle class="fc-ring-track" cx="20" cy="20" r="16"/>
-            <circle class="fc-ring-fill" cx="20" cy="20" r="16"
-                    style="stroke-dashoffset: <%= (100.5 * (1 - @onboard_done / 3.0)).round(1) %>"/>
-            <text x="20" y="24.5" class="fc-ring-text"><%= @onboard_done %>/3</text>
-          </svg>
-          <div class="fc-onboard-mini">
-            <p class="fc-onboard-mini-title">Make Brethreign feel like home</p>
-            <div class="fc-onboard-mini-steps">
-              <% if @onboard[:followed] %>
-                <span class="fc-onboard-chip is-done">✓ Brethren someone</span>
-              <% else %>
-                <%= link_to "Brethren someone", people_path, class: "fc-onboard-chip" %>
-              <% end %>
-              <% if @onboard[:roomed] %>
-                <span class="fc-onboard-chip is-done">✓ Step into a room</span>
-              <% else %>
-                <%= link_to "Step into a room", rooms_path, class: "fc-onboard-chip" %>
-              <% end %>
-              <% if @onboard[:breathed] %>
-                <span class="fc-onboard-chip is-done">✓ Take a breath</span>
-              <% else %>
-                <button type="button" class="fc-onboard-chip" data-action="click->composer-modal#open">Take a breath</button>
-              <% end %>
-            </div>
-          </div>
-        </section>
-      <% end %>
-
       <div class="fc-panel fc-composer">
         <div class="fc-composer-row">
           <% if current_user.profile&.avatar&.attached? %>
@@ -167,6 +135,7 @@
           <% end %>
           <button type="button"
                   class="fc-composer-input flex items-center text-[var(--fc-muted)]"
+                  data-tour-anchor="composer"
                   data-action="click->composer-modal#open">
             <%# Phones hide the Breathe button beside this box, so the box shows a pen. %>
             <span class="fc-composer-input-pen" aria-hidden="true"><%= render_icon("pencil", classes: "h-4 w-4") %></span>
@@ -184,14 +153,14 @@
           <p class="fc-composer-done">✓ You breathed today</p>
         <% end %>
         <div class="fc-composer-chips">
-          <button type="button" class="fc-composer-chip is-prayer"
+          <button type="button" class="fc-composer-chip is-prayer" data-tour-anchor="prayer" data-tour-rank="1"
                   data-action="click->composer-modal#openWith"
                   data-composer-modal-prefill-param="🙏 Brethren, please pray with me — ">🙏 Prayer request</button>
           <button type="button" class="fc-composer-chip is-verse"
                   data-action="click->composer-modal#openWith"
                   data-composer-modal-prefill-param="📖 A verse on my heart today: ">📖 Share a verse</button>
           <button type="button" class="fc-composer-chip is-voice" data-action="click->composer-modal#open">🎙️ Voice note</button>
-          <button type="button" class="fc-composer-chip is-read" data-action="click->bible-drawer#open">✨ Read first</button>
+          <button type="button" class="fc-composer-chip is-read" data-tour-anchor="bible" data-tour-rank="1" data-action="click->bible-drawer#open">✨ Read first</button>
         </div>
       </div>
 
@@ -213,6 +182,16 @@
           </button>
         <% end %>
       </section>
+
+      <%# Getting started: first steps that tick themselves, until done or hidden. %>
+      <% if @onboarding %>
+        <%= render "feed/onboarding_checklist", checklist: @onboarding, prayer_room: @prayer_room %>
+      <% elsif @onboarding_celebrate %>
+        <p class="fc-side-card fc-checklist-done" role="status">
+          <span aria-hidden="true">✓</span>
+          <span><strong>You're all set.</strong> Every first step is done. Welcome home, <%= current_user.username %>.</span>
+        </p>
+      <% end %>
 
       <%# New brethren: one card, not one per person. Closing it hides this group;
           the next person to join brings it back. %>
@@ -281,96 +260,6 @@
         </section>
       <% end %>
 
-      <% if @show_onboarding && !current_user.card_dismissed?("onboard-feed") %>
-        <section class="fc-onboarding"
-                 data-controller="onboarding"
-                 data-onboarding-key-value="fc:onboard-feed">
-          <header class="fc-onboarding-head">
-            <div>
-              <p class="fc-onboarding-kicker">Welcome to Brethreign</p>
-              <h2 class="fc-onboarding-title">Three quick steps to make your feed feel like home.</h2>
-            </div>
-            <button type="button"
-                    class="fc-onboarding-close"
-                    data-action="click->onboarding#dismiss"
-                    aria-label="Dismiss welcome">×</button>
-          </header>
-
-          <ol class="fc-onboarding-steps">
-            <li class="fc-onboarding-step">
-              <div class="fc-onboarding-step-num">1</div>
-              <div class="fc-onboarding-step-body">
-                <h3>Brethren a few people</h3>
-                <p>Their breaths will start showing up in your feed.</p>
-                <% if @who_to_brethren.any? %>
-                  <ul class="fc-onboarding-people">
-                    <% @who_to_brethren.first(3).each do |u| %>
-                      <li>
-                        <% if u.profile&.avatar&.attached? %>
-                          <%= image_tag avatar_src(u.profile), class: "fc-avatar object-cover" %>
-                        <% else %>
-                          <span class="fc-avatar" style="<%= avatar_tint_style(u.username) %>"><%= u.username.first.upcase %></span>
-                        <% end %>
-                        <%= link_to u.username, user_path(u.username), class: "fc-onboarding-person-name" %>
-                        <%= button_to follow_user_path(u.username),
-                            method: :post,
-                            form_class: "inline ml-auto",
-                            class: "fc-btn fc-btn-primary",
-                            data: { turbo: false } do %>
-                          Brethren
-                        <% end %>
-                      </li>
-                    <% end %>
-                  </ul>
-                <% end %>
-              </div>
-            </li>
-
-            <li class="fc-onboarding-step">
-              <div class="fc-onboarding-step-num">2</div>
-              <div class="fc-onboarding-step-body">
-                <h3>Step into a room</h3>
-                <p>Rooms are smaller spaces for specific kinds of breaths.</p>
-                <% if @onboarding_rooms&.any? %>
-                  <ul class="fc-onboarding-rooms">
-                    <% @onboarding_rooms.each do |room| %>
-                      <li>
-                        <%= link_to room_path(room), class: "fc-onboarding-room" do %>
-                          <% if room.icon.present? %>
-                            <span class="fc-onboarding-room-icon"><%= render_icon(room.icon, classes: "h-4 w-4") %></span>
-                          <% end %>
-                          <span><%= room.name %></span>
-                        <% end %>
-                      </li>
-                    <% end %>
-                  </ul>
-                <% end %>
-              </div>
-            </li>
-
-            <li class="fc-onboarding-step">
-              <div class="fc-onboarding-step-num">3</div>
-              <div class="fc-onboarding-step-body">
-                <h3>Take your first breath</h3>
-                <p>A verse, a prayer, or just what's on your heart.</p>
-                <div class="fc-onboarding-cta">
-                  <button type="button"
-                          class="fc-btn fc-btn-primary"
-                          data-action="click->composer-modal#open click->onboarding#dismiss">
-                    Take a breath
-                  </button>
-                  <button type="button"
-                          class="fc-btn"
-                          data-action="click->bible-drawer#open">
-                    📖 Read scripture
-                  </button>
-                </div>
-              </div>
-            </li>
-          </ol>
-        </section>
-      <% end %>
-
       <%# The stream (tabs + list) lives in a frame so switching tabs swaps
           just this region — no full page reload. target: "_top" keeps every
           link inside the cards navigating normally; only the tab links opt
@@ -392,7 +281,7 @@
         <%= link_to "Updates", feed_updates_path,
               class: "fc-tab #{@updates_tab ? 'is-active' : ''}",
               data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
-        <button type="button" class="fc-discover-trigger" data-action="click->discover#open" aria-label="Open discover panel">
+        <button type="button" class="fc-discover-trigger" data-tour-anchor="discover" data-action="click->discover#open" aria-label="Open discover panel">
           <%= render_icon("sparkles", classes: "h-4 w-4") %>
           <span>Discover</span>
         </button>
@@ -653,7 +542,7 @@
         </div>
       <% end %>
 
-      <div class="fc-side-card">
+      <div class="fc-side-card" data-tour-anchor="prayer">
         <div class="mb-3 flex items-center justify-between">
           <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Open prayer requests</h3>
           <span class="text-sm text-[var(--fc-muted)]"><%= @open_prayer_requests_count %></span>
@@ -782,3 +671,5 @@
     <span class="fc-scroll-progress-bar" data-scroll-progress-target="bar"></span>
   </div>
 </div>
+
+<%= render "feed/tour" if @show_tour %>

@@ -110,6 +110,9 @@ application.register("office", OfficeController)
 import OnboardingController from "./onboarding_controller"
 application.register("onboarding", OnboardingController)
 
+import TourController from "./tour_controller"
+application.register("tour", TourController)
+
 import NotificationsModalController from "./notifications_modal_controller"
 application.register("notifications-modal", NotificationsModalController)
 

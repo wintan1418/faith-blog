@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -993,6 +993,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_180000) do
     t.string "android_app_version"
     t.boolean "show_online_status", default: true, null: false
     t.datetime "welcomed_at"
+    t.datetime "onboarding_dismissed_at"
+    t.datetime "onboarding_completed_at"
+    t.datetime "tour_completed_at"
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true

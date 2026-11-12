@@ -1,0 +1,22 @@
+<%# Getting-started list: how many members have done each step (counts and
+    % of the group), for everyone and for this period's new members. %>
+<% groups = [ [ "All members", stats.onboarding_all ], [ "Joined in this period", stats.onboarding_new ] ] %>
+<div class="adash-grid2" id="adash-onboarding">
+  <% groups.each do |name, data| %>
+    <section class="adash-card">
+      <header><h2><%= name %></h2><span><%= number_with_delimiter(data[:total]) %> <%= data[:total] == 1 ? "member" : "members" %></span></header>
+      <% if data[:total].zero? %>
+        <p class="adash-empty">Nobody joined in this period.</p>
+      <% else %>
+        <ol class="adash-funnel">
+          <% data[:steps].each do |step, n| %>
+            <% pct = (n * 100.0 / data[:total]).round %>
+            <li><span><%= step %></span><strong><%= number_with_delimiter(n) %></strong><em><%= pct %>%</em><i style="width: <%= (n * 100.0 / data[:total]).round(1) %>%"></i></li>
+          <% end %>
+        </ol>
+        <p class="adash-foot"><strong><%= number_with_delimiter(data[:all_done]) %></strong> (<%= (data[:all_done] * 100.0 / data[:total]).round %>%) have done every step.</p>
+      <% end %>
+    </section>
+  <% end %>
+</div>
+<p class="adash-foot"><%= number_with_delimiter(stats.onboarding_hidden) %> hid the list before finishing it · <%= number_with_delimiter(stats.tour_taken) %> finished or skipped the feed tour</p>

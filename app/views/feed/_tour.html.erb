@@ -1,0 +1,39 @@
+<%# First-visit tour: a few tips pointed at the real feed, once per account
+    (users.tour_completed_at). The tour controller skips any tip whose place
+    isn't on screen (e.g. Rooms inside the apps) and waits for open dialogs. %>
+<%
+  steps = [
+    { anchor: "composer", title: "This is where you breathe",
+      body: "A post here is called a breath: a thought, a verse, a prayer request, or simply what's on your heart." },
+    { anchor: "prayer", title: "Pray with the brethren",
+      body: "Ask for prayer, or tap Praying on someone's request so they know they're not alone." },
+    { anchor: "rooms", title: "Find your room",
+      body: "Rooms are smaller spaces for prayer, Bible study, young adults and more. Join the ones that fit you." },
+    { anchor: "bible", title: "The Bible is always close",
+      body: "Open it from here to read, search, or start a reading plan at your own pace." },
+    { anchor: "discover", title: "Games and more",
+      body: "Bible quizzes, chess puzzles and church history, for when you'd like to learn something together." }
+  ]
+%>
+<div class="fc-tour"
+     hidden
+     data-controller="tour"
+     data-tour-finish-url-value="<%= onboarding_finish_tour_path %>"
+     data-tour-steps-value="<%= steps.to_json %>"
+     data-turbo-temporary>
+  <div class="fc-tour-shade" data-tour-target="shade"></div>
+  <div class="fc-tour-spot" data-tour-target="spot" aria-hidden="true"></div>
+  <div class="fc-tour-pop" role="dialog" aria-modal="true" aria-labelledby="fc-tour-title" aria-describedby="fc-tour-body"
+       data-tour-target="pop">
+    <p class="fc-tour-count" data-tour-target="count"></p>
+    <h2 class="fc-tour-title" id="fc-tour-title" data-tour-target="title"></h2>
+    <p class="fc-tour-body" id="fc-tour-body" data-tour-target="body"></p>
+    <div class="fc-tour-actions">
+      <button type="button" class="fc-tour-skip" data-action="tour#skip">Skip tour</button>
+      <span class="fc-tour-nav">
+        <button type="button" class="fc-btn fc-tour-back" data-tour-target="back" data-action="tour#back">Back</button>
+        <button type="button" class="fc-btn fc-btn-primary fc-tour-next" data-tour-target="next" data-action="tour#next">Next</button>
+      </span>
+    </div>
+  </div>
+</div>
