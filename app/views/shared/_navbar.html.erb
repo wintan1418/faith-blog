@@ -36,7 +36,7 @@
             Feed
           <% end %>
         <% end %>
-        <%= link_to rooms_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/rooms')}" do %>
+        <%= link_to rooms_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/rooms')}", data: { tour_anchor: "rooms", tour_rank: 1 } do %>
           <%= render_icon("users", classes: "h-4 w-4") %>
           Rooms
         <% end %>
@@ -194,7 +194,7 @@
       <%= render_icon("message_circle", classes: "h-5 w-5") %>
       <span>Feed</span>
     <% end %>
-    <%= link_to rooms_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/rooms')}" do %>
+    <%= link_to rooms_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/rooms')}", data: { tour_anchor: "rooms" } do %>
       <%= render_icon("users", classes: "h-5 w-5") %>
       <span>Rooms</span>
     <% end %>
@@ -204,6 +204,7 @@
     </button>
     <button type="button"
             class="fc-bottom-nav-item"
+            data-tour-anchor="bible"
             data-action="click->bible-drawer#open">
       <%= render_icon("bookopen", classes: "h-5 w-5") %>
       <span>Bible</span>

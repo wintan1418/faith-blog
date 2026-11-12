@@ -123,6 +123,10 @@
     </section>
   </div>
 
+  <h2 class="adash-section">Onboarding</h2>
+  <p class="adash-sub">Members who have done each step of the getting-started list on the feed</p>
+  <%= render "admin/dashboard/onboarding", stats: s %>
+
   <h2 class="adash-section">Safety</h2>
   <section class="adash-safety">
     <% s.safety.each do |label, count, path| %>

@@ -1,0 +1,53 @@
+<%# Getting started: a few first steps that tick themselves from what the
+    member has really done (OnboardingChecklist). Hidden with "Hide for now";
+    gone for good once every step is done. %>
+<% done = checklist.done_count %>
+<% total = checklist.total %>
+<% next_key = checklist.next_step&.key %>
+
+<section id="onboarding_checklist" class="fc-side-card fc-checklist" aria-labelledby="fc-checklist-title">
+  <header class="fc-checklist-head">
+    <svg viewBox="0 0 40 40" class="fc-ring" aria-hidden="true">
+      <circle class="fc-ring-track" cx="20" cy="20" r="16"/>
+      <circle class="fc-ring-fill" cx="20" cy="20" r="16"
+              style="stroke-dashoffset: <%= (100.5 * (1 - done / total.to_f)).round(1) %>"/>
+      <text x="20" y="24.5" class="fc-ring-text"><%= done %>/<%= total %></text>
+    </svg>
+    <div class="fc-checklist-titles">
+      <p class="fc-checklist-kicker">Getting started</p>
+      <h2 class="fc-checklist-title" id="fc-checklist-title">Make yourself at home</h2>
+      <p class="fc-checklist-count"><%= done %> of <%= total %> done</p>
+    </div>
+    <%= button_to "Hide for now", onboarding_hide_path, class: "fc-checklist-hide", form_class: "fc-checklist-hide-form" %>
+  </header>
+
+  <ol class="fc-checklist-steps">
+    <% checklist.steps.each do |step| %>
+      <li class="fc-checklist-step<%= ' is-done' if step.done? %><%= ' is-next' if step.key == next_key %>" data-step="<%= step.key %>">
+        <span class="fc-checklist-tick" aria-hidden="true"><%= step.done? ? "✓" : "" %></span>
+        <span class="fc-checklist-text">
+          <span class="fc-checklist-label"><%= step.title %><span class="sr-only"><%= step.done? ? " (done)" : " (to do)" %></span></span>
+          <% if step.key == next_key %>
+            <span class="fc-checklist-hint"><%= step.hint %></span>
+          <% end %>
+        </span>
+        <% unless step.done? %>
+          <% case step.key %>
+          <% when :photo %>
+            <%= link_to "Add photo", edit_settings_profile_path, class: "fc-checklist-go" %>
+          <% when :breath %>
+            <button type="button" class="fc-checklist-go" data-action="click->composer-modal#open">Breathe</button>
+          <% when :prayed %>
+            <%= link_to "Find a request", (prayer_room ? room_path(prayer_room) : rooms_path), class: "fc-checklist-go" %>
+          <% when :room %>
+            <%= link_to "Browse rooms", rooms_path, class: "fc-checklist-go" %>
+          <% when :card %>
+            <%= link_to "Fill it in", edit_settings_brethren_card_path, class: "fc-checklist-go" %>
+          <% when :connected %>
+            <%= link_to "Find people", people_path, class: "fc-checklist-go" %>
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</section>

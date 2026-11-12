@@ -375,6 +375,13 @@ Rails.application.routes.draw do
   get ".well-known/assetlinks.json", to: "well_known#assetlinks", defaults: { format: :json }
   post "whats_new/:id/seen", to: "whats_new#seen", as: :seen_whats_new
   post "dismissals", to: "dismissals#create", as: :dismissals
+  # First-run onboarding: hide or bring back the getting-started list; finish or retake the tour.
+  scope "onboarding", controller: "onboarding", as: "onboarding" do
+    post "hide", action: :hide, as: :hide
+    post "show", action: :show_checklist, as: :show
+    post "tour/finish", action: :finish_tour, as: :finish_tour
+    post "tour/restart", action: :restart_tour, as: :restart_tour
+  end
   get "me", to: "me#show", as: :me
   get "configurations/ios_v1.json",     to: "configurations#ios_v1",     defaults: { format: :json }
   get "configurations/android_v1.json", to: "configurations#android_v1", defaults: { format: :json }

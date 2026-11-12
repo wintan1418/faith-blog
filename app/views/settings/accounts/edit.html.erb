@@ -28,6 +28,19 @@
       </div>
     <% end %>
 
+    <div class="mystic-panel-strong mb-6 flex flex-wrap items-center justify-between gap-3 p-5" id="getting-started">
+      <div>
+        <h2 class="text-base font-bold text-faith-dark">Getting started</h2>
+        <p class="mystic-copy text-sm">A short tour of the feed, and the list of first steps.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <%= button_to "Take the tour again", onboarding_restart_tour_path, class: "btn btn-secondary", data: { turbo: false } %>
+        <% if current_user.onboarding_dismissed_at && current_user.onboarding_completed_at.nil? %>
+          <%= button_to "Show the getting-started list", onboarding_show_path, class: "btn btn-secondary", data: { turbo: false } %>
+        <% end %>
+      </div>
+    </div>
+
     <div class="mystic-panel-strong overflow-hidden">
       <div class="border-b border-faith-green/10 p-6">
         <h2 class="text-xl font-bold text-faith-dark">Account Settings</h2>

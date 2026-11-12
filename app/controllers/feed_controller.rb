@@ -71,15 +71,19 @@ class FeedController < ApplicationController
 
   private
 
-  # The three activation steps behind the progress ring. Cheap EXISTS
-  # queries; the ring renders only while something is still missing.
+  # The getting-started list (until it's finished or hidden) and the
+  # first-visit tour (once per account). A few cheap EXISTS queries, and none
+  # at all once the list is done.
   def load_onboarding_progress
-    @onboard = {
-      followed: current_user.following.exists?,
-      roomed:   current_user.room_memberships.exists?,
-      breathed: current_user.posts.published.exists?
-    }
-    @onboard_done = @onboard.values.count(true)
+    @show_tour = current_user.tour_completed_at.nil?
+    return unless current_user.onboarding_completed_at.nil?
+
+    checklist = OnboardingChecklist.new(current_user)
+    if checklist.record_completion!
+      @onboarding_celebrate = current_user.onboarding_dismissed_at.nil? # quietly, if they'd hidden it
+    elsif checklist.visible?
+      @onboarding = checklist
+    end
   end
 
   # Speed: work out the page from ids and times only (tiny queries), then load full
@@ -201,11 +205,6 @@ class FeedController < ApplicationController
       fillers = fillers.where.not(id: already_ids).order(created_at: :desc).limit(need).includes(:profile)
       @who_to_brethren += fillers.to_a
     end
-
-    # Brand-new users see an onboarding card: no posts, no follows. Once they
-    # take their first action the condition flips and the card stops rendering.
-    @show_onboarding = current_user.posts.none? && current_user.following.empty?
-    @onboarding_rooms = Room.public_rooms.ordered.limit(3) if @show_onboarding
 
     @release_announcement = Announcement.where(id: cached_ids(:release) { Announcement.latest_release&.id }).first
     @new_member_announcements = load_by_ids(Announcement.includes(:user),
