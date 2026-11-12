@@ -7,7 +7,7 @@
 <%= form_with model: post,
     html: { class: "fc-composer-form", multipart: true, data: {
       turbo_action: ("replace" if local_assigns[:page]),
-      controller: "post-form composer-mode composer-assistant paste-images",
+      controller: "post-form composer-mode composer-assistant paste-images caret-clear",
       composer_mode_initial_value: mode,
       composer_assistant_gentleness_url_value: check_gentleness_posts_path,
       composer_assistant_scripture_url_value: suggest_scripture_posts_path
@@ -269,7 +269,7 @@
     </div>
   <% end %>
 
-  <div class="fc-composer-footer">
+  <div class="fc-composer-footer" data-caret-clear-target="bar">
     <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
     <%# A draft is still unpublished: it keeps "Save draft" and its main button
         publishes it. (It used to say "Update" and quietly stay a draft.) %>

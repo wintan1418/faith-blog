@@ -20849,6 +20849,17 @@ body.hotwire-native label {
   -webkit-user-select: none;
   user-select: none;
 }
+/* ...but a box you type into must never be unselectable, even when it sits
+   inside a label or nav (the New message search, the Room and Schedule pills).
+   In WebKit a field under user-select:none can lose its caret and typed text. */
+body.hotwire-native input,
+body.hotwire-native textarea,
+body.hotwire-native select,
+body.hotwire-native trix-editor,
+body.hotwire-native [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+}
 
 /* "Update the app" bar inside older Android app versions */
 .fc-app-update {
@@ -20950,6 +20961,8 @@ html.theme-light .trix-content:not(trix-editor) {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    /* Focusing a field scrolls it clear of the sticky Cancel / Breathe bar. */
+    scroll-padding-bottom: 6rem;
   }
   dialog.fc-composer-dialog .fc-composer-footer {
     position: sticky;
