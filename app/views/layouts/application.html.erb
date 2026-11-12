@@ -3,12 +3,14 @@
   <head>
     <script>
       // Apply theme immediately to prevent flash
+      // Saved choice on this device → legacy key → account setting → light.
+      // New members start in light mode (the OS dark setting no longer decides).
       (function() {
         const saved = localStorage.getItem('fc-dark');
         const legacy = localStorage.getItem('theme');
         const serverDark = <%= current_user&.respond_to?(:dark_mode?) && current_user.dark_mode? ? "true" : "false" %>;
         const dark = saved === null
-          ? (legacy ? legacy === 'dark' : (serverDark || window.matchMedia('(prefers-color-scheme: dark)').matches))
+          ? (legacy ? legacy === 'dark' : serverDark)
           : saved === '1';
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
         document.documentElement.classList.toggle('theme-dark', dark);
@@ -91,11 +93,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <%# Fonts load without blocking the page: text shows straight away in a system font
         and switches when the web fonts arrive (display=swap). Only weights in use. %>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap"></noscript>
     
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "actiontext", "data-turbo-track": "reload" %>
+    <%# Royal Emerald polish: loaded last so it overrides the earlier passes. %>
+    <%= stylesheet_link_tag "brand_polish", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
     <%= yield :head %>
   </head>

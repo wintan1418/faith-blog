@@ -5,12 +5,6 @@ export default class extends Controller {
 
   connect() {
     this.applyTheme()
-
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-      if (localStorage.getItem("fc-dark") === null && localStorage.getItem("theme") === null) {
-        this.applyTheme()
-      }
-    })
   }
 
   toggle() {
@@ -24,9 +18,11 @@ export default class extends Controller {
   applyTheme() {
     const saved = localStorage.getItem("fc-dark")
     const legacyTheme = localStorage.getItem("theme")
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+    // No choice saved on this device: keep what the layout's head script
+    // decided (the account's dark-mode setting, otherwise light). New members
+    // start in light mode; the system dark setting no longer picks for them.
     const dark = saved === null
-      ? (legacyTheme ? legacyTheme === "dark" : prefersDark)
+      ? (legacyTheme ? legacyTheme === "dark" : document.documentElement.classList.contains("theme-dark"))
       : saved === "1"
 
     this.apply(dark)
