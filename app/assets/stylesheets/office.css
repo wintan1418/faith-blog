@@ -171,12 +171,69 @@ html.theme-dark .office-card-error, html.theme-dark .office-tool-chip.is-error {
 .office-card-actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0.5rem; }
 .office-card-actions .fc-btn { display: inline-flex; align-items: center; gap: 0.4rem; }
 .office-card-more { display: contents; }
+/* Newer Chrome wraps details content in its own box; let the form inside it
+   be a flex item so it drops below all the buttons (order: 10). */
+.office-card-more[open]::details-content { display: contents; }
 .office-card-more > summary { list-style: none; cursor: pointer; }
 .office-card-more > summary::-webkit-details-marker { display: none; }
 .office-card-more[open] > summary { background: var(--admin-panel-2); }
 .office-card-form { order: 10; flex-basis: 100%; display: grid; gap: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--admin-line); }
 .office-card-form .fc-btn { justify-self: start; }
 .office-check { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; color: var(--admin-soft); }
+
+/* Text the founder may want to select and copy stays selectable (the
+   Android app turns selection off for buttons, labels and nav). */
+.office-prose, .office-bubble, .office-imported-body, .office-card-text, .office-card-title, .office-card-note {
+  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
+}
+
+/* Copy buttons */
+.office-copy { display: contents; }
+.office-reply { min-width: 0; flex: 1; display: grid; gap: 0.35rem; }
+.office-reply-tools { display: flex; gap: 0.4rem; }
+.office-copy-btn {
+  font-size: 0.75rem; font-weight: 700; color: var(--admin-muted);
+  padding: 0.2rem 0.55rem; border-radius: 6px; border: 1px solid transparent; background: none;
+}
+.office-copy-btn:hover, .office-copy-btn:focus-visible { color: var(--admin-ink); border-color: var(--admin-line-strong); }
+@media (hover: hover) {
+  .office-msg--assistant .office-copy-btn { opacity: 0.55; }
+  .office-msg--assistant:hover .office-copy-btn, .office-copy-btn:focus-visible { opacity: 1; }
+}
+
+/* Breath image and pickers */
+.office-card-figure { display: grid; gap: 0.3rem; justify-items: start; }
+.office-card-figure a { display: block; }
+.office-card-image--small { max-height: 220px; object-fit: cover; }
+.office-badge.is-updated { background: color-mix(in srgb, var(--office-green) 18%, transparent); color: var(--admin-ink); }
+.office-picker { gap: 0.6rem; }
+.office-picker turbo-frame { display: grid; gap: 0.6rem; }
+.office-picker, .office-picker turbo-frame { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.office-picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 0.5rem; }
+.office-picker-grid form { display: block; }
+.office-picker-thumb {
+  width: 100%; display: grid; gap: 0.25rem; padding: 0.3rem; border-radius: 10px;
+  border: 1px solid var(--admin-line-strong); background: var(--admin-panel-2); color: var(--admin-soft);
+  font-size: 0.72rem; font-weight: 700; text-align: center; cursor: pointer;
+}
+.office-picker-thumb img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 7px; }
+.office-picker-thumb:hover { border-color: var(--office-green); color: var(--admin-ink); }
+.office-picker-thumb.is-current { border-color: var(--office-green); box-shadow: 0 0 0 2px color-mix(in srgb, var(--office-mint) 40%, transparent); cursor: default; }
+.office-picker-upload { display: grid; gap: 0.45rem; padding-top: 0.5rem; border-top: 1px dashed var(--admin-line); }
+.office-picker-upload .fc-btn { justify-self: start; }
+.office-picker-list { display: grid; gap: 0.35rem; }
+.office-picker-list { grid-template-columns: minmax(0, 1fr); }
+.office-picker-list li { min-width: 0; }
+.office-picker-form { display: block; width: 100%; min-width: 0; }
+.office-picker-row {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+  padding: 0.55rem 0.7rem; border-radius: 10px; border: 1px solid var(--admin-line-strong);
+  background: var(--admin-panel); color: var(--admin-ink); text-align: left; cursor: pointer;
+}
+.office-picker-row:hover { border-color: var(--office-green); }
+.office-picker-row:disabled { cursor: default; opacity: 0.7; }
+.office-picker-title { min-width: 0; font-size: 0.88rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.office-picker-row .office-badge { flex: none; }
 
 /* Thinking */
 .office-status { display: flex; align-items: center; gap: 0.6rem; min-height: 0; }

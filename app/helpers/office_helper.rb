@@ -18,10 +18,25 @@ module OfficeHelper
     safe_join(text.to_s.split("\n").map { |line| h(line) }, tag.br)
   end
 
+  # A Copy button for the complete text. The text sits in a <template> next to
+  # the button (not read from the rendered page), so long drafts copy whole.
+  def office_copy_button(text, label: "Copy", class_name: "fc-btn")
+    return if text.blank?
+
+    tag.span(class: "office-copy") do
+      tag.template(text.to_s, data: { office_copy_source: true }) +
+        tag.button(label, type: "button", class: class_name, data: { action: "office#copy", label: label }, title: "Copy the full text")
+    end
+  end
+
+  # Breath card text as the founder would paste it: title, blank line, body.
+  def office_breath_text(card) = [ card["title"], card["body"] ].map { |t| t.to_s.strip }.compact_blank.join("\n\n")
+
   TOOL_LABELS = {
     "site_stats" => "Checked the site numbers",
     "recent_activity" => "Looked at recent activity",
     "draft_breath" => "Drafted a breath",
+    "update_breath" => "Updated a breath",
     "generate_flyer" => "Made a flyer",
     "draft_email" => "Saved an email draft",
     "draft_announcement" => "Drafted an announcement"

@@ -12,10 +12,10 @@
     <% if status == "draft" %>
       <%= button_to "Publish announcement", publish_announcement_admin_office_card_path(message), class: "fc-btn fc-btn-primary", form_class: "inline",
             form: { data: { turbo_confirm: "Publish this announcement in the app now?" } } %>
-      <button type="button" class="fc-btn" data-action="office#copy" data-text="<%= [ card['kicker'], card['title'], card['body'] ].compact_blank.join("\n\n") %>">Copy text</button>
     <% else %>
       <span class="office-card-note">Live in the app.</span>
       <%= link_to "Announcements →", admin_announcements_path, class: "fc-btn", target: "_top" %>
     <% end %>
+    <%= office_copy_button([ card["kicker"], card["title"], card["body"] ].map { |t| t.to_s.strip }.compact_blank.join("\n\n")) %>
   </div>
 </article>

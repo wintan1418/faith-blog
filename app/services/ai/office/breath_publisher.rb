@@ -29,6 +29,19 @@ module Ai
         nil
       end
 
+      # Plain text from a card → simple paragraphs for Action Text.
+      def self.html_body(text)
+        text.to_s.strip.split(/\n{2,}/).map do |para|
+          "<p>#{ERB::Util.h(para.strip).gsub("\n", '<br>')}</p>"
+        end.join
+      end
+
+      # What a card should remember once its breath is posted or scheduled.
+      def self.card_attrs_for(post)
+        { "status" => post.scheduled? ? "scheduled" : "posted", "post_id" => post.id, "post_slug" => post.slug,
+          "scheduled_for" => post.scheduled_for&.iso8601, "post_image_blob_id" => post.images.first&.blob_id, "error" => nil }
+      end
+
       def initialize(card:, admin:, schedule_at: nil)
         @card = card.stringify_keys
         @admin = admin
@@ -39,7 +52,7 @@ module Ai
         post = Post.new(
           user: self.class.author_for(@admin),
           title: @card["title"].to_s.strip.presence,
-          content: html_body,
+          content: self.class.html_body(@card["body"]),
           room_id: room&.id,
           kind: :breath,
           prayer_status: ActiveModel::Type::Boolean.new.cast(@card["prayer"]) ? :prayer_pending : :not_a_prayer,
@@ -69,13 +82,6 @@ module Ai
       def image_blob
         id = @card["image_message_id"]
         OfficeMessage.find_by(id: id)&.image&.blob if id.present?
-      end
-
-      # Plain text from the card → simple paragraphs for Action Text.
-      def html_body
-        @card["body"].to_s.strip.split(/\n{2,}/).map do |para|
-          "<p>#{ERB::Util.h(para.strip).gsub("\n", '<br>')}</p>"
-        end.join
       end
     end
   end

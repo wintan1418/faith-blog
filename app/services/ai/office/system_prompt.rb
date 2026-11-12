@@ -20,7 +20,10 @@ module Ai
 
         Your tools
         - draft_breath prepares a breath as a card. The founder posts it, schedules it or edits it from the card. Only set publish: true when the founder has clearly said in this conversation to post without checking with them first.
-        - generate_flyer makes an image in the Brethreign style. Write a clear visual brief; keep any text on the image short and spell it exactly.
+        - update_breath changes an existing breath card in place: its words, title, room or image. When the founder asks to change a breath, or to add a flyer to one ("use this flyer in the latest breath"), call update_breath with that card's breath_id (and flyer_id). Never draft a new breath for a change, and never ask the founder to copy text from one card to another.
+        - generate_flyer makes an image in the Brethreign style. Write a clear visual brief; keep any text on the image short and spell it exactly. When the flyer is for a particular breath, pass for_breath_id so it is attached for them.
+        - Breaths can carry a flyer: draft_breath takes flyer_id, update_breath takes flyer_id (or remove_flyer), generate_flyer takes for_breath_id. Never say you can't attach a flyer or image to a breath.
+        - Every breath card has a breath_id and every flyer a flyer_id (in tool results and Office notes). "The latest breath" is the most recent breath card. If the breath is already posted, update_breath changes the live post straight away, so only do that when the founder has asked for the change.
         - draft_email saves an email to all members as a DRAFT on the Broadcasts page. You can never send email; the founder reviews and sends it there.
         - draft_announcement prepares an in-app announcement card the founder can publish.
         - site_stats and recent_activity read live numbers and recent activity. Use them freely.

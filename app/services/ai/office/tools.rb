@@ -10,10 +10,12 @@ module Ai
       # Who's asking and where the result will land.
       Context = Data.define(:user, :conversation)
 
-      # result: what the model is told. card: what the founder sees (nil for none).
-      # blob:   an Active Storage blob to show on the card (flyers).
-      Outcome = Data.define(:result, :card, :blob) do
-        def initialize(result:, card: nil, blob: nil)
+      # result:     what the model is told. card: what the founder sees (nil for none).
+      # blob:       an Active Storage blob to show on the card (flyers).
+      # after_save: called with the saved tool message once it has an id (the
+      #             card's id the model uses later); returns more for result.
+      Outcome = Data.define(:result, :card, :blob, :after_save) do
+        def initialize(result:, card: nil, blob: nil, after_save: nil)
           super
         end
 
@@ -23,6 +25,7 @@ module Ai
       def self.registry
         {
           "draft_breath" => DraftBreath,
+          "update_breath" => UpdateBreath,
           "generate_flyer" => GenerateFlyer,
           "draft_email" => DraftEmail,
           "draft_announcement" => DraftAnnouncement,
@@ -55,6 +58,26 @@ module Ai
         attr_reader :input, :context
 
         def user = context.user
+        def conversation = context.conversation
+
+        # A breath card in this conversation, by the id the model was given.
+        def find_breath(id)
+          message = conversation.messages.find_by(id: id.to_i) if id.present?
+          message if BreathCard.breath?(message)
+        end
+
+        # A public room by (roughly) its name.
+        def find_room(name)
+          return nil if name.blank?
+
+          rooms = Room.public_rooms
+          rooms.find_by("LOWER(name) = ?", name.to_s.downcase.strip) ||
+            rooms.find_by(slug: name.to_s.parameterize) ||
+            rooms.where("name ILIKE ?", "%#{Room.sanitize_sql_like(name.to_s.strip)}%").first
+        end
+
+        # A flyer (or any message with an image) in this conversation.
+        def find_image(id) = BreathCard.image_source(conversation, id)
         def routes = Rails.application.routes.url_helpers
       end
     end

@@ -1,0 +1,30 @@
+<% card = message.card_data %>
+<% live = card["status"].in?(%w[posted scheduled]) %>
+<% confirm = live ? { turbo_confirm: "Add this image to your posted breath?" } : {} %>
+<%= turbo_frame_tag "image_picker_#{message.id}" do %>
+  <% if images.any? %>
+    <p class="fc-admin-label">Images in this conversation</p>
+    <div class="office-picker-grid">
+      <% images.each do |source| %>
+        <% current = source.id.to_s == card["image_message_id"].to_s %>
+        <% flyer = source.card_kind == "flyer" %>
+        <%= button_to attach_image_admin_office_card_path(message), params: { source_id: source.id },
+              class: "office-picker-thumb#{' is-current' if current}", form_class: "inline", disabled: current,
+              title: flyer ? source.card_data["brief"].to_s.truncate(120) : "Uploaded image",
+              form: { data: confirm.merge(turbo_frame: "_top") } do %>
+          <%= image_tag rails_blob_path(source.image, only_path: true), alt: flyer ? "Flyer" : "Uploaded image", loading: "lazy" %>
+          <span><%= current ? "On this breath" : (flyer ? "Flyer" : "Upload") %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="office-muted">No flyers in this conversation yet. Ask for one, or upload an image.</p>
+  <% end %>
+  <%= form_with url: attach_image_admin_office_card_path(message), multipart: true, class: "office-picker-upload",
+        data: confirm.merge(turbo_frame: "_top") do |f| %>
+    <label class="fc-admin-label" for="upload_<%= message.id %>">Upload an image (JPEG, PNG, WebP or GIF, up to <%= Admin::Office::CardsController::UPLOAD_MAX_BYTES / 1.megabyte %>MB)</label>
+    <%= f.file_field :image, id: "upload_#{message.id}", accept: "image/*", required: true, class: "fc-admin-input",
+          data: { action: "change->office#upload", max_bytes: Admin::Office::CardsController::UPLOAD_MAX_BYTES } %>
+    <%= f.submit "Upload", class: "fc-btn fc-btn-primary" %>
+  <% end %>
+<% end %>

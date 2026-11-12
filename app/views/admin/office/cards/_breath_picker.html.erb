@@ -1,0 +1,26 @@
+<%= turbo_frame_tag "breath_picker_#{message.id}" do %>
+  <% if breaths.any? %>
+    <p class="fc-admin-label">Breaths in this conversation</p>
+    <ul class="office-picker-list">
+      <% breaths.each do |breath| %>
+        <% card = breath.card_data %>
+        <% status = card["status"].presence || "draft" %>
+        <% live = status.in?(%w[posted scheduled]) %>
+        <% current = card["image_message_id"].to_s == message.id.to_s %>
+        <% label = card["title"].presence || card["body"].to_s.squish.truncate(70).presence || "Untitled breath" %>
+        <li>
+          <%= button_to add_to_breath_admin_office_card_path(message), params: { breath_id: breath.id }, class: "office-picker-row", form_class: "office-picker-form",
+                disabled: current,
+                form: { data: { turbo_frame: "_top" }.merge(live ? { turbo_confirm: "Add this image to your posted breath?" } : {}) } do %>
+            <span class="office-picker-title"><%= label %></span>
+            <span class="office-badge is-<%= status %>"><%= current ? "Has this image" : (status == "draft" ? "Draft" : status.capitalize) %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="office-muted">No breaths in this conversation yet.</p>
+  <% end %>
+  <%= button_to "New breath with this flyer", use_in_breath_admin_office_card_path(message), class: "fc-btn", form_class: "inline",
+        form: { data: { turbo_frame: "_top" } } %>
+<% end %>

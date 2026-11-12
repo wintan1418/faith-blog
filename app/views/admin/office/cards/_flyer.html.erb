@@ -15,7 +15,14 @@
       <%= link_to rails_blob_path(message.image, disposition: "attachment", only_path: true), class: "fc-btn", download: "" do %>
         <%= render_icon("download", classes: "h-4 w-4") %> Download
       <% end %>
-      <%= button_to "Use in a breath", use_in_breath_admin_office_card_path(message), class: "fc-btn fc-btn-primary", form_class: "inline" %>
+      <details class="office-card-more" data-action="toggle->office#loadPicker">
+        <summary class="fc-btn fc-btn-primary">Add to a breath</summary>
+        <div class="office-card-form office-picker">
+          <%= turbo_frame_tag "breath_picker_#{message.id}", src: breath_picker_admin_office_card_path(message), loading: "lazy" do %>
+            <p class="office-muted">Loading breaths…</p>
+          <% end %>
+        </div>
+      </details>
     <% end %>
   </div>
 </article>
