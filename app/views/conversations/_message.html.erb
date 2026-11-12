@@ -71,7 +71,7 @@
               <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
                 <% message.images.each do |img| %>
                   <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo",
-                                data: { download: rails_blob_path(img, disposition: "attachment") } %>
+                                data: { download: message_file_download_path(message, img) } %>
                 <% end %>
               </div>
               <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
@@ -80,11 +80,11 @@
           <% end %>
 
           <% if message.has_documents? %>
-            <%# Opens or downloads the file (in the apps, the phone's browser handles it). %>
+            <%# Downloads the file under its original name (the apps save it to the phone). %>
             <div class="msg-media-row">
             <div class="msg-docs">
               <% message.documents.each do |doc| %>
-                <%= link_to rails_blob_path(doc, disposition: "attachment"), class: "msg-doc", rel: "noopener",
+                <%= link_to message_file_download_path(message, doc), class: "msg-doc", rel: "noopener", download: doc.filename.to_s,
                       data: { turbo: false }, title: "Open #{doc.filename}" do %>
                   <span class="msg-doc-icon" aria-hidden="true"><%= document_icon(doc) %></span>
                   <span class="msg-doc-text">

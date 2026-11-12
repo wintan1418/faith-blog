@@ -256,6 +256,9 @@ Rails.application.routes.draw do
         get :forward, action: :pick_forward # choose chats to forward to
         post :forward
       end
+      # A file from the message, saved under its original name (participants only).
+      # The name in the URL is only for the phone's download list; the id decides.
+      get "files/:id/:filename", to: "message_files#show", as: :file, format: false, constraints: { filename: %r{[^/]+} }
     end
   end
   resources :message_blocks, only: [ :create, :destroy ], param: :user_id
