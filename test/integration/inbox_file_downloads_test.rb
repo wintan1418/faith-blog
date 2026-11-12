@@ -46,6 +46,7 @@ class InboxFileDownloadsTest < ActionDispatch::IntegrationTest
       assert_includes disposition, %(filename="#{name}")
       assert_includes disposition, "filename*=UTF-8''#{ERB::Util.url_encode(name)}"
       assert_equal type, response.media_type
+      assert_equal body.bytesize.to_s, response.headers["Content-Length"]
       assert_equal body.b, response.body.b
     end
   end
@@ -106,9 +107,13 @@ class InboxFileDownloadsTest < ActionDispatch::IntegrationTest
     get conversation_path(@chat)
 
     doc = @message.documents.first
-    assert_select "##{dom_id(@message)} a.msg-doc[href=?][download=?]", download_path(doc), "Quarterly Report.pdf"
+    assert_select "##{dom_id(@message)} a.msg-doc[href=?]", download_path(doc)
     assert_select "##{dom_id(@message)} a.msg-doc[href=?]", download_path(@message.documents.second)
     assert_select "##{dom_id(@message)} img.msg-image[data-download=?]", download_path(@message.images.first)
     assert_select "##{dom_id(@message)} a.msg-doc[href*='/rails/active_storage/']", count: 0
+
+    # App builds without native downloads fall back to the old file-store link (chat_downloads.js).
+    assert_select "##{dom_id(@message)} a.msg-doc[data-legacy-href*='/rails/active_storage/']", count: 2
+    assert_select "##{dom_id(@message)} img.msg-image[data-download-legacy*='/rails/active_storage/']", count: 1
   end
 end

@@ -2,6 +2,7 @@
 import "@hotwired/turbo-rails"
 import "./controllers"
 import "./native_back"
+import "./chat_downloads"
 import "./page_cleanup"
 import "./lazy_libs"
 

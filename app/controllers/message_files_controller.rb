@@ -21,6 +21,8 @@ class MessageFilesController < ApplicationController
     raise ActiveRecord::RecordNotFound if message.removed?
 
     attachment = ActiveStorage::Attachment.where(record: message, name: ATTACHMENT_NAMES).find(params[:id])
+    # The size up front lets phones show download progress.
+    response.headers["Content-Length"] = attachment.blob.byte_size.to_s
     send_blob_stream attachment.blob, disposition: :attachment
   end
 end
