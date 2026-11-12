@@ -1,4 +1,5 @@
-<%# Single-series daily bar chart. series: [[Date, Integer], …]; label: what one bar counts. %>
+<%# Single-series bar chart. series: [[Date, Integer], …]; label: what one bar counts; per: "day" (default) or "week". %>
+<% per = local_assigns.fetch(:per, "day") %>
 <% max = [ series.map(&:last).max.to_i, 1 ].max %>
 <% n = series.size %>
 <% gap = n > 45 ? 1 : 2 %>
@@ -11,14 +12,14 @@
   <% end %>
   <div class="adash-chart__plot">
     <svg viewBox="0 0 600 <%= height %>" preserveAspectRatio="none" role="img"
-         aria-label="<%= label %> per day: <%= series.sum(&:last) %> in total, highest <%= max %>">
+         aria-label="<%= label %> per <%= per %>: <%= per == "week" ? "#{series.last&.last.to_i} now" : "#{series.sum(&:last)} in total" %>, highest <%= max %>">
       <% unless compact %>
         <line x1="0" y1="<%= height / 2 %>" x2="600" y2="<%= height / 2 %>" class="adash-grid" />
       <% end %>
       <% series.each_with_index do |(day, value), i| %>
         <% h = value.zero? ? 0 : [ (value.to_f / max * (height - 4)), 3 ].max %>
         <% x = i * (bar_w + gap) %>
-        <g data-tip="<%= day.strftime('%a %-d %b') %> · <%= number_with_delimiter(value) %> <%= label.downcase %>">
+        <g data-tip="<%= per == "week" ? "Week of #{day.strftime('%-d %b')}" : day.strftime('%a %-d %b') %> · <%= number_with_delimiter(value) %> <%= label.downcase %>">
           <rect x="<%= x.round(2) %>" y="0" width="<%= (bar_w + gap).round(2) %>" height="<%= height %>" class="adash-hit" />
           <% if h.positive? %>
             <rect x="<%= x.round(2) %>" y="<%= (height - h).round(2) %>" width="<%= bar_w.round(2) %>" height="<%= h.round(2) %>" rx="<%= [ bar_w / 3, 3 ].min.round(2) %>" class="adash-bar" />

@@ -16,6 +16,10 @@
 
   <%= render "admin/dashboard/online", stats: s %>
 
+  <%= render "admin/dashboard/members", stats: s %>
+
+  <h2 class="adash-section">This period</h2>
+
   <section class="adash-kpis" aria-label="Headline numbers">
     <% s.kpis.each do |k| %>
       <div class="adash-kpi">
