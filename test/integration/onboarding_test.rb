@@ -17,6 +17,7 @@ class OnboardingTest < ActionDispatch::IntegrationTest
   PNG = Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")
 
   def finish_everything(user)
+    user.profile.update_columns(headline: "Teacher and choir leader")
     user.profile.avatar.attach(io: StringIO.new(PNG), filename: "me.png", content_type: "image/png")
     user.profile.save!
     Post.create!(user: user, room: @room, title: "Hello", content: "Grace and peace", status: :published, moderation_status: :approved)
@@ -38,14 +39,16 @@ class OnboardingTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_select "#onboarding_checklist" do
-      assert_select ".fc-checklist-count", text: "0 of 6 done"
-      assert_select ".fc-checklist-step", 6
+      assert_select ".fc-checklist-count", text: "0 of 7 done"
+      assert_select ".fc-checklist-step", 7
       assert_select ".fc-checklist-step.is-done", 0
       assert_select ".fc-checklist-step.is-next[data-step=photo]"
       assert_select "a[href=?]", edit_settings_profile_path, text: "Add photo"
       assert_select "button[data-action='click->composer-modal#open']", text: "Breathe"
       assert_select "a[href=?]", rooms_path, text: "Browse rooms"
       assert_select "a[href=?]", edit_settings_brethren_card_path, text: "Fill it in"
+      assert_select "a[href=?]", edit_settings_professional_path, text: "Set it up"
+      assert_select "a[href=?]", blog_path
       assert_select "a[href=?]", people_path, text: "Find people"
       assert_select "form[action=?] button", onboarding_hide_path, text: "Hide for now"
     end
@@ -57,7 +60,7 @@ class OnboardingTest < ActionDispatch::IntegrationTest
     sign_in @user
     get feed_path
 
-    assert_select ".fc-checklist-count", text: "2 of 6 done"
+    assert_select ".fc-checklist-count", text: "2 of 7 done"
     assert_select ".fc-checklist-step.is-done[data-step=room]"
     assert_select ".fc-checklist-step.is-done[data-step=connected]"
     assert_select ".fc-checklist-step.is-done a", count: 0 # no button on a done step
@@ -148,7 +151,7 @@ class OnboardingTest < ActionDispatch::IntegrationTest
 
     assert_select ".adash-section", text: "Onboarding"
     assert_select "#adash-onboarding .adash-card", 2
-    assert_select "#adash-onboarding .adash-card:first-child li", 6
+    assert_select "#adash-onboarding .adash-card:first-child li", 7
     room_row = css_select("#adash-onboarding .adash-card:first-child li").find { |li| li.text.include?("Join a room") }
     assert_equal "1", room_row.at_css("strong").text
     assert_equal "#{(100.0 / User.count).round}%", room_row.at_css("em").text

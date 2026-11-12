@@ -28,7 +28,11 @@
         <span class="fc-checklist-text">
           <span class="fc-checklist-label"><%= step.title %><span class="sr-only"><%= step.done? ? " (done)" : " (to do)" %></span></span>
           <% if step.key == next_key %>
-            <span class="fc-checklist-hint"><%= step.hint %></span>
+            <span class="fc-checklist-hint"><%= step.hint %>
+              <% if (guide = OnboardingChecklist.guide_slug(step.key)) %>
+                <%= link_to "How it works →", blog_article_path(guide), class: "fc-checklist-guide" %>
+              <% end %>
+            </span>
           <% end %>
         </span>
         <% unless step.done? %>
@@ -45,9 +49,13 @@
             <%= link_to "Fill it in", edit_settings_brethren_card_path, class: "fc-checklist-go" %>
           <% when :connected %>
             <%= link_to "Find people", people_path, class: "fc-checklist-go" %>
+          <% when :professional %>
+            <%= link_to "Set it up", edit_settings_professional_path, class: "fc-checklist-go" %>
           <% end %>
         <% end %>
       </li>
     <% end %>
   </ol>
+
+  <p class="fc-checklist-guides">New here? <%= link_to "Read our guides to using Brethreign →", blog_path %></p>
 </section>

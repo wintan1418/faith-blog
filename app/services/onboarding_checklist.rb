@@ -19,8 +19,25 @@ class OnboardingChecklist
     prayed: [ "Pray for someone", "Tap Praying on a request so they know they're not alone." ],
     room: [ "Join a room", "Smaller spaces for prayer, Bible study and more." ],
     card: [ "Complete your Brethren Card", "Your private card for the brethren you connect with." ],
-    connected: [ "Follow or connect with someone", "Their breaths will start to fill your feed." ]
+    connected: [ "Follow or connect with someone", "Their breaths will start to fill your feed." ],
+    professional: [ "Set up your professional profile", "Your work, skills and church service, so faith and work meet." ]
   }.freeze
+
+  # The blog guide that explains each step in more detail.
+  GUIDES = {
+    photo: "getting-started-on-brethreign",
+    breath: "take-your-first-breath",
+    prayed: "praying-together-on-brethreign",
+    room: "getting-started-on-brethreign",
+    card: "your-brethren-card-and-connecting",
+    connected: "brethren-you-may-know",
+    professional: "set-up-your-professional-profile"
+  }.freeze
+
+  def self.guide_slug(key)
+    slug = GUIDES[key]
+    slug if slug && BlogArticle.all.any? { |a| a.slug == slug }
+  end
 
   # Which members have done each step, as a narrowing of a User relation.
   # Used for one member (the feed) and for everyone (the admin dashboard).
@@ -38,6 +55,9 @@ class OnboardingChecklist
       rel.where(id: Follow.select(:follower_id))
          .or(rel.where(id: ConnectionRequest.select(:sender_id)))
          .or(rel.where(id: ConnectionRequest.accepted.select(:receiver_id)))
+    },
+    professional: ->(rel) {
+      rel.where(id: Profile.where.not(headline: [ nil, "" ]).select(:user_id)).or(rel.where(id: Experience.select(:user_id)))
     }
   }.freeze
 
