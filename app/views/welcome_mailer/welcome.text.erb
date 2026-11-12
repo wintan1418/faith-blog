@@ -1,0 +1,28 @@
+Welcome home, <%= @user.username %>
+
+Dear <%= @user.username %>,
+
+<%= WelcomeNote.opening(existing: @existing) %>
+
+<%= WelcomeNote.paragraphs.first %>
+
+"<%= WelcomeNote::PSALM[0] %>" (<%= WelcomeNote::PSALM[1] %>)
+
+<%= WelcomeNote.paragraphs.last %>
+
+A few first steps, whenever you're ready:
+<% WelcomeNote::STEPS.each do |lead, rest| %>
+- <%= lead %> <%= rest %>
+<% end %>
+
+<%= WelcomeNote.safety %>
+
+"<%= WelcomeNote::HEBREWS[0] %>" (<%= WelcomeNote::HEBREWS[1] %>)
+
+<%= WelcomeNote.closing %>
+
+<%= WelcomeNote::SIGN_OFF.join("\n") %>
+
+Take your first breath: <%= @feed_url %>
+
+Unsubscribe: <%= @unsubscribe_url %>

@@ -225,6 +225,7 @@ class Notification < ApplicationRecord
   def deliver_email_notification
     return unless user.email_notifications_enabled?
     return if birthday? || skill_endorsed? || app_update? # a push and the alert are enough; no emails for these
+    return if notifiable.is_a?(Message) && notifiable.quiet? # e.g. the welcome note, which has its own email
 
     NotificationMailer.with(notification: self).community_notification.deliver_later
   end
