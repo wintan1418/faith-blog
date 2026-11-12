@@ -1,0 +1,347 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ✦ BRAND POLISH — "Royal Emerald" (November 2026)
+   Not a rebrand: the same green, made calmer and warmer.
+     1. Mint (#34D399) only for small highlights; big fills use brand green.
+     2. Dark mode: deep forest green-black instead of flat charcoal.
+     3. Fraunces serif for headings and scripture; UI stays Source Sans 3.
+     4. A little gold for "reign" moments (Amen, Praying, streaks, champions).
+     5. Light mode: warm cream canvas, deep green-black ink.
+
+   Loaded as its own stylesheet AFTER application.css (see the layouts), so
+   it overrides the earlier passes without touching them. Fill and colour
+   changes are scoped to the default accent: a member who picked an accent in
+   Settings → Accent keeps exactly the look they had (their picks are set as
+   inline --fc-accent* variables on <body>).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens: light (the default for new members) ─────────────────────── */
+html.theme-light,
+html:not(.theme-dark),
+:root {
+  --fc-serif: "Fraunces", "Playfair Display", Georgia, "Times New Roman", serif;
+  --fc-sans: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Warm cream canvas, near-white cards */
+  --fc-bg:          #f6f1e6;
+  --fc-bg-2:        #efe8d9;
+  --fc-surface:     #fffdf8;
+  --fc-surface-2:   #f8f3e9;
+  --fc-surface-3:   #efe8da;
+  --fc-surface-4:   #e3dac7;
+
+  /* Ink: deep green-black */
+  --fc-ink:    #0e1a14;
+  --fc-soft:   #2c3b33;
+  --fc-muted:  #5a6b62;   /* 5.0:1 on cream */
+  --fc-faint:  #646e62;   /* small labels: 4.7:1 on cream */
+
+  --fc-line:        rgba(52, 48, 24, 0.10);
+  --fc-line-strong: rgba(52, 48, 24, 0.18);
+
+  /* Brand green. Text-safe on cream (4.75:1); mint is too light for text here. */
+  --fc-accent:      #0b7a54;
+  --fc-accent-2:    #0a6e4c;
+  --fc-accent-deep: #08603f;
+  --fc-accent-soft: rgba(14, 138, 95, 0.10);
+  --fc-accent-glow: rgba(14, 138, 95, 0.26);
+
+  /* Solid fills (primary buttons, selected chips): brand green, white text 4.6:1 */
+  --fc-fill:        #0d855b;
+  --fc-fill-hover:  #0a6e4c;
+  --fc-on-fill:     #ffffff;
+
+  /* Gold — reign moments only */
+  --fc-gold:        #84651c;  /* text on cream 4.8:1 */
+  --fc-gold-fill:   #c8a24a;
+  --fc-on-gold:     #1f1806;
+  --fc-gold-soft:   rgba(200, 162, 74, 0.16);
+  --fc-gold-line:   rgba(160, 124, 40, 0.42);
+
+  --bg-translucent: rgba(246, 241, 230, 0.86);
+
+  --sh-sm: 0 1px 2px rgba(40, 34, 14, 0.05);
+  --sh-md: 0 4px 14px rgba(40, 34, 14, 0.07), 0 1px 2px rgba(40, 34, 14, 0.04);
+  --sh-lg: 0 18px 44px rgba(40, 34, 14, 0.10), 0 4px 10px rgba(40, 34, 14, 0.05);
+}
+
+/* ── Tokens: dark — deep forest, not void ─────────────────────────────── */
+html.theme-dark {
+  --fc-bg:          #0e1a15;
+  --fc-bg-2:        #11201a;
+  --fc-surface:     #14231c;
+  --fc-surface-2:   #1b2d24;
+  --fc-surface-3:   #24392e;
+  --fc-surface-4:   #2f473a;
+
+  --fc-ink:    #eef3ee;
+  --fc-soft:   #cbd7cf;
+  --fc-muted:  #a9bbb1;   /* 8.1:1 on surface */
+  --fc-faint:  #84998d;
+
+  --fc-line:        rgba(169, 214, 190, 0.09);
+  --fc-line-strong: rgba(169, 214, 190, 0.16);
+
+  /* Mint stays for links, underlines and small badges on dark */
+  --fc-accent:      #34d399;
+  --fc-accent-2:    #6ee7b7;
+  --fc-accent-deep: #0d855b;
+  --fc-accent-soft: rgba(52, 211, 153, 0.12);
+  --fc-accent-glow: rgba(52, 211, 153, 0.30);
+
+  --fc-fill:        #0d855b;
+  --fc-fill-hover:  #0f9666;
+  --fc-on-fill:     #ffffff;
+
+  --fc-gold:        #d9b866;  /* text on surface 8:1 */
+  --fc-gold-fill:   #c8a24a;
+  --fc-on-gold:     #1f1806;
+  --fc-gold-soft:   rgba(200, 162, 74, 0.14);
+  --fc-gold-line:   rgba(217, 184, 102, 0.40);
+
+  --bg-translucent: rgba(14, 26, 21, 0.82);
+
+  --sh-sm: 0 1px 2px rgba(0, 8, 4, 0.45);
+  --sh-md: 0 4px 12px rgba(0, 8, 4, 0.40), 0 1px 2px rgba(0, 8, 4, 0.5);
+  --sh-lg: 0 16px 40px rgba(0, 8, 4, 0.55), 0 4px 10px rgba(0, 8, 4, 0.35);
+}
+
+/* ── Canvas ───────────────────────────────────────────────────────────── */
+html.theme-dark,
+html.theme-dark body,
+body.theme-dark {
+  background:
+    radial-gradient(ellipse 70rem 32rem at 50% -8rem, rgba(13, 133, 91, 0.16), transparent 62%),
+    var(--fc-bg) !important;
+  background-attachment: fixed !important;
+}
+
+html.theme-light,
+html.theme-light body,
+html:not(.theme-dark),
+html:not(.theme-dark) body,
+body.theme-light {
+  background:
+    radial-gradient(ellipse 70rem 32rem at 50% -8rem, rgba(200, 162, 74, 0.08), transparent 65%),
+    var(--fc-bg) !important;
+  background-attachment: fixed !important;
+}
+
+/* Native apps paint behind the page with the body colour they read. */
+body.hotwire-native.theme-light { background-color: var(--fc-bg) !important; }
+body.hotwire-native.theme-dark  { background-color: var(--fc-bg) !important; }
+
+/* Top bar / bottom bar sit on the canvas colour, slightly translucent */
+html.theme-dark nav.fc-topbar,
+html.theme-dark .fc-bottom-nav {
+  background: rgba(14, 26, 21, 0.88) !important;
+  border-color: var(--fc-line) !important;
+}
+html:not(.theme-dark) nav.fc-topbar,
+html:not(.theme-dark) .fc-bottom-nav {
+  background: rgba(250, 246, 237, 0.9) !important;
+  border-color: var(--fc-line) !important;
+}
+
+/* ── 1. Fills: brand green, not bright mint ───────────────────────────────
+   Scoped to the default accent (no inline --fc-accent on <body>). */
+body:not([style*="--fc-accent"]) :is(
+  .btn.btn-primary, .fc-btn.fc-btn-primary, .bys-connect, .btn-primary,
+  .home-btn-primary, .gradient-faith, .bl-btn--primary, .msg-send,
+  .auth-submit, .home-composer-post
+) {
+  background: var(--fc-fill) !important;
+  border-color: var(--fc-fill) !important;
+  color: var(--fc-on-fill) !important;
+  box-shadow: none !important;
+}
+body:not([style*="--fc-accent"]) :is(.fc-btn-primary, .btn-primary, .home-btn-primary, .bl-btn--primary) * {
+  color: var(--fc-on-fill) !important;
+  background: transparent !important;
+}
+body:not([style*="--fc-accent"]) :is(
+  .btn.btn-primary, .fc-btn.fc-btn-primary, .bys-connect, .btn-primary,
+  .home-btn-primary, .gradient-faith, .bl-btn--primary, .msg-send,
+  .auth-submit, .home-composer-post
+):hover {
+  background: var(--fc-fill-hover) !important;
+  border-color: var(--fc-fill-hover) !important;
+  color: var(--fc-on-fill) !important;
+}
+body:not([style*="--fc-accent"]) :is(.btn, .fc-btn, .bys-connect, .bl-btn):focus-visible {
+  outline: 2px solid var(--fc-accent) !important;
+  outline-offset: 2px !important;
+}
+
+/* Selected chips, pills and segmented tabs */
+body:not([style*="--fc-accent"]) :is(
+  .msg-filter.is-active, .settings-tab.is-active, .bl-chip.is-on,
+  .fc-quiz-themepill.is-selected, .fc-quiz-diffpill.is-selected, .fc-quiz-lengthpill.is-selected,
+  .fc-discover-quicklink.is-bible, .fc-chess-level.is-on, .bg-faith-green.text-white,
+  .admin-side-link.is-active
+) {
+  background: var(--fc-fill) !important;
+  border-color: var(--fc-fill) !important;
+  color: var(--fc-on-fill) !important;
+}
+body:not([style*="--fc-accent"]) :is(.msg-filter.is-active, .settings-tab.is-active, .bl-chip.is-on,
+  .fc-quiz-themepill.is-selected, .fc-quiz-diffpill.is-selected, .fc-quiz-lengthpill.is-selected, .fc-chess-level.is-on, .admin-side-link.is-active) * {
+  color: var(--fc-on-fill) !important;
+}
+
+/* The phone bar's Breathe button */
+body:not([style*="--fc-accent"]) .fc-bottom-nav-compose svg {
+  background: var(--fc-fill) !important;
+  color: var(--fc-on-fill) !important;
+  box-shadow:
+    0 6px 16px rgba(13, 133, 91, 0.32),
+    0 0 0 4px color-mix(in srgb, var(--fc-surface) 85%, transparent) !important;
+}
+
+/* Letter avatars (no photo) on the accent: deep green, white letter */
+body:not([style*="--fc-accent"]) .fc-avatar:not(img):not([style*="--fc-avatar-bg"]) {
+  background: var(--fc-fill) !important;
+  color: var(--fc-on-fill) !important;
+}
+
+/* Mentor badge text was white on mid-green (3:1) */
+body:not([style*="--fc-accent"]) .ot-badge--green {
+  background: var(--fc-fill) !important;
+  color: var(--fc-on-fill) !important;
+}
+
+/* Light mode: soft accent tints read better a touch greener-warm */
+html:not(.theme-dark) body:not([style*="--fc-accent"]) .fc-nav-link.is-active {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent-2) !important;
+  border-color: rgba(14, 138, 95, 0.22) !important;
+}
+
+/* ── 3. Serif: Fraunces for headings and scripture ─────────────────────── */
+:is(
+  h1, h2, h3, h4,
+  .mystic-title, .home-title, .home-summary blockquote, .home-section-head h2, .home-room-card h3,
+  .home-story-card h3, .profile-title, .home-feed-head h1, .home-feed-card h2, .home-verse-panel blockquote,
+  .fc-breath-title, .fc-notifpage-title, .fc-daily-prompt-q, .fc-masthead-greet, .fc-masthead-date,
+  .fc-living-quote, .fc-golden-quote, .aw-title, .aw-card-title, .aw-empty h2,
+  .circles-title, .circle-section-title, .circle-card-name, .circle-room-title,
+  .sp-ref, .sp-verse, .sp-section-title, .sp-empty h2, .auth-side-verse, .auth-title,
+  .pfw-title, .bcard-name, .wn-title, .bl-card-title, .bl-hero-title, .bl-title,
+  .post-verse-quote, .fc-page-title, .fc-room-card-name,
+  .prose h2, .prose h3, .prose blockquote, .bl-body blockquote, .trix-content blockquote
+) {
+  font-family: var(--fc-serif) !important;
+  font-optical-sizing: auto;
+}
+
+/* Big titles: slightly tighter, a calm 600 rather than heavy 700–900 */
+:is(h1, .mystic-title, .home-title, .profile-title, .bl-hero-title, .bl-title, .aw-title, .fc-page-title, .post-title, .sp-ref) {
+  font-weight: 600 !important;
+  letter-spacing: -0.012em !important;
+}
+
+/* Scripture reads in the serif */
+:is(.sp-verse, .fc-living-quote, .post-verse-quote, .home-verse-panel blockquote, .fc-golden-quote, .auth-side-verse) {
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Small uppercase labels were set in the display serif; they read better in the UI sans */
+:is(h2, h3, h4):is(.uppercase, .text-xs),
+h2.text-sm.font-extrabold, h3.text-sm.font-extrabold,
+.fc-notifpage-daylabel, .fc-section-label, .fc-bible-section-title {
+  font-family: var(--fc-sans) !important;
+  letter-spacing: 0.06em !important;
+}
+/* Scripture references (chips inside posts) stay sans: they're UI */
+.scripture-ref, html.theme-dark .scripture-ref { font-family: inherit !important; }
+
+/* ── 4. Gold for reign moments ─────────────────────────────────────────── */
+
+/* Your own reaction (Amen) */
+.fc-reaction-pill.is-mine,
+.cm-actions .fc-reaction-pill.is-mine,
+.reaction-btn-active {
+  background: var(--fc-gold-soft) !important;
+  border-color: var(--fc-gold-line) !important;
+  color: var(--fc-gold) !important;
+}
+
+/* Praying (joined the chain) */
+.fc-breath-action.is-prayer-action.is-joined {
+  background: var(--fc-gold-soft) !important;
+  color: var(--fc-gold) !important;
+}
+
+/* Answered prayers */
+.fc-prayer-chip.is-answered {
+  background: var(--fc-gold-soft) !important;
+  border-color: var(--fc-gold-line) !important;
+  color: var(--fc-gold) !important;
+}
+.fc-breath.is-answered {
+  border-color: var(--fc-gold-line) !important;
+}
+
+/* Streaks */
+.fc-masthead-streak,
+html.theme-dark .fc-masthead-streak {
+  color: var(--fc-gold) !important;
+  background: var(--fc-gold-soft) !important;
+  border-color: var(--fc-gold-line) !important;
+}
+.fc-masthead-streak small { color: var(--fc-gold) !important; opacity: 0.85; }
+html.theme-dark div.profile-stat.profile-stat-streak,
+html:not(.theme-dark) div.profile-stat.profile-stat-streak {
+  background: var(--fc-gold-soft) !important;
+  box-shadow: inset 0 0 0 1px var(--fc-gold-line) !important;
+}
+.profile-stat-streak span {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  color: var(--fc-gold) !important;
+}
+.profile-stat-streak small { color: var(--fc-gold) !important; }
+
+/* Weekly champions + leaderboard podium */
+.fc-champ-card {
+  border-color: var(--fc-gold-line) !important;
+  background: linear-gradient(140deg, var(--fc-gold-soft), transparent 65%), var(--fc-surface) !important;
+}
+.fc-champ-score { color: var(--fc-gold) !important; }
+
+/* Today's verse kicker / living scriptures label get a gold rule */
+.fc-golden-quote { color: var(--fc-ink); }
+
+/* Professional "Hiring" badge: white on amber was 3:1 */
+.ot-badge--gold {
+  background: var(--fc-gold-fill) !important;
+  color: var(--fc-on-gold) !important;
+}
+
+/* Unread count badges: white on #ef4444 was 3.8:1 */
+.fc-count-badge, .fc-avatar-attention { background-color: #dc2626 !important; }
+
+/* First-load splash stays dark (it shows before the theme matters) but in
+   forest green, and keeps bright mint words now that light-mode accent is deeper. */
+#fc-splash {
+  background:
+    radial-gradient(ellipse 72rem 44rem at 50% 36%, rgba(52, 211, 153, 0.14), transparent 62%),
+    radial-gradient(ellipse 28rem 18rem at 50% 80%, rgba(200, 162, 74, 0.08), transparent 60%),
+    #0e1a15 !important;
+}
+body:not([style*="--fc-accent"]) #fc-splash {
+  --fc-accent: #34d399;
+  --fc-accent-2: #6ee7b7;
+  --fc-accent-soft: rgba(52, 211, 153, 0.16);
+  --fc-accent-glow: rgba(52, 211, 153, 0.45);
+}
+
+/* Bible reader: scripture in the serif, a little larger and airier */
+.fc-bible-read-ref { font-family: var(--fc-serif) !important; font-weight: 600 !important; }
+.fc-bible-verse-text {
+  font-family: var(--fc-serif);
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+.fc-bible-verse-num { font-family: var(--fc-sans); }
