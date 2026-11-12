@@ -1,10 +1,36 @@
 <% content_for(:page_title) { "Users" } %>
 
-<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+<div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+  <div>
+    <p class="text-3xl font-extrabold text-gray-900"><%= number_with_delimiter(@total) %> <span class="text-base font-semibold text-gray-500">members in total</span></p>
+    <% if @filter != "all" || @query.present? %>
+      <p class="text-sm text-gray-500"><%= number_with_delimiter(@matching) %> shown<%= " matching “#{@query}”" if @query.present? %></p>
+    <% end %>
+  </div>
+  <%= form_with url: admin_users_path, method: :get, class: "flex gap-2" do %>
+    <%= hidden_field_tag :filter, @filter %>
+    <%= search_field_tag :q, @query, placeholder: "Search username or email", class: "rounded-lg border border-gray-300 px-3 py-2 text-sm", "aria-label": "Search members" %>
+    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+  <% end %>
+</div>
+
+<nav class="mb-4 flex flex-wrap gap-2" aria-label="Filter members">
+  <% Admin::UsersController::FILTERS.each do |key, label| %>
+    <%= link_to admin_users_path(filter: key, q: @query.presence),
+          class: "rounded-full border px-3 py-1.5 text-sm font-semibold #{key == @filter ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-700'}",
+          "aria-current": (key == @filter ? "true" : nil) do %>
+      <%= label %> <span class="opacity-70"><%= number_with_delimiter(@counts[key]) %></span>
+    <% end %>
+  <% end %>
+</nav>
+
+<div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
   <table class="w-full">
     <thead class="border-b border-gray-200 bg-gray-50">
       <tr>
         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">User</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Joined</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Last seen</th>
         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Role</th>
         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Status</th>
         <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Actions</th>
@@ -14,8 +40,19 @@
       <% @users.each do |user| %>
         <tr class="hover:bg-gray-50">
           <td class="px-6 py-4">
-            <p class="font-semibold text-gray-900"><%= user.username %></p>
+            <p class="font-semibold text-gray-900"><%= link_to user.username, admin_user_path(user) %></p>
             <p class="text-sm text-gray-500"><%= user.email %></p>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap"><%= user.created_at.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b %Y") %></td>
+          <td class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
+            <% if user.last_seen_at && user.last_seen_at > User::ONLINE_WINDOW.ago %>
+              <span class="font-semibold text-green-700">● Online</span>
+            <% elsif user.last_seen_at %>
+              <%= time_ago_in_words(user.last_seen_at) %> ago
+            <% else %>
+              <span class="text-gray-400">Never</span>
+            <% end %>
+            <span class="block text-xs text-gray-500"><%= user.android_app_version ? "Android #{user.android_app_version}" : "Web" %></span>
           </td>
           <td class="px-6 py-4"><span class="badge badge-secondary"><%= user.role.humanize %></span></td>
           <td class="px-6 py-4">

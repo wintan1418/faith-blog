@@ -5,8 +5,23 @@ class Admin::UsersController < ApplicationController
   layout "admin"
   before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin ]
 
+  FILTERS = {
+    "all" => "All", "online" => "Online now", "active" => "Active in 7 days", "new" => "Joined this week",
+    "android" => "Android app", "suspended" => "Suspended"
+  }.freeze
+
   def index
-    @pagy, @users = pagy(User.includes(:profile).order(created_at: :desc), items: 20)
+    @filter = FILTERS.key?(params[:filter]) ? params[:filter] : "all"
+    @query = params[:q].to_s.strip
+    scope = filtered(User.includes(:profile))
+    if @query.present?
+      like = "%#{User.sanitize_sql_like(@query)}%"
+      scope = scope.where("users.username ILIKE :q OR users.email ILIKE :q", q: like)
+    end
+    @total = User.count
+    @matching = scope.count
+    @counts = FILTERS.keys.index_with { |key| filtered(User.all, key).count }
+    @pagy, @users = pagy(scope.order(created_at: :desc), items: 25)
   end
 
   def show
@@ -53,6 +68,17 @@ class Admin::UsersController < ApplicationController
   end
 
   private
+
+  def filtered(scope, key = @filter)
+    case key
+    when "online" then scope.online
+    when "active" then scope.where(last_seen_at: 7.days.ago..)
+    when "new" then scope.where(created_at: Time.current.in_time_zone(AdminDashboardStats::TZ).beginning_of_week..)
+    when "android" then scope.where.not(android_app_version: nil)
+    when "suspended" then scope.where(active: false)
+    else scope
+    end
+  end
 
   def set_user
     @user = User.find(params[:id])

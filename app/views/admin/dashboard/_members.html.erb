@@ -1,0 +1,37 @@
+<%# Members, all time: the headline total, how it is growing, and who they are. %>
+<% total = stats.members_total %>
+<% growth = stats.members_growth %>
+<% grown = growth.last.last - growth.first.last %>
+<section class="adash-members" aria-labelledby="adash-members-title">
+  <div class="adash-card adash-members__total">
+    <p class="adash-members__label" id="adash-members-title">Members</p>
+    <p class="adash-members__value"><%= number_with_delimiter(total) %></p>
+    <p class="adash-members__sub">all time · <%= link_to "See every member", admin_users_path %></p>
+    <p class="adash-members__growth"><strong>+<%= number_with_delimiter(grown) %></strong> in the last <%= growth.size %> weeks</p>
+  </div>
+  <div class="adash-card adash-members__chart">
+    <header><h2>Members over time</h2><span>total at the end of each week</span></header>
+    <%= render "admin/dashboard/bars", series: growth, label: "Members", per: "week" %>
+  </div>
+</section>
+
+<section class="adash-kpis adash-members__tiles" aria-label="Members breakdown">
+  <% stats.members_overview.each do |label, value, note| %>
+    <div class="adash-kpi">
+      <p class="adash-kpi__label"><%= label %></p>
+      <p class="adash-kpi__value"><%= number_with_delimiter(value) %></p>
+      <% if note %><p class="adash-kpi__note"><%= note %></p><% end %>
+    </div>
+  <% end %>
+</section>
+
+<div class="adash-grid2">
+  <section class="adash-card">
+    <header><h2>Where members are</h2><span>from their latest visit</span></header>
+    <%= render "admin/dashboard/list", rows: stats.member_countries, empty: "No member visits recorded yet." %>
+  </section>
+  <section class="adash-card">
+    <header><h2>How members signed up</h2></header>
+    <%= render "admin/dashboard/list", rows: stats.members_by_signup %>
+  </section>
+</div>

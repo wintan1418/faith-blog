@@ -88,3 +88,15 @@
 .adash-tip-card p, .adash-tip-card li { font-size: 0.82rem; color: var(--fc-muted); }
 .adash-tip-card ul { margin: 0.5rem 0 0; padding-left: 1rem; display: grid; gap: 0.25rem; }
 .adash-tip-card code { font-size: 0.78rem; color: var(--fc-ink); background: var(--fc-surface-2); padding: 0.1rem 0.35rem; border-radius: 5px; }
+
+/* Members (all time) */
+.adash-members { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr); }
+@media (max-width: 760px) { .adash-members { grid-template-columns: 1fr; } }
+.adash-members__total { display: grid; gap: 0.35rem; align-content: center; }
+.adash-members__label { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fc-muted); }
+.adash-members__value { font-size: clamp(2.6rem, 6vw, 3.6rem); font-weight: 800; line-height: 1; color: var(--fc-ink); font-variant-numeric: tabular-nums; }
+.adash-members__sub { font-size: 0.85rem; color: var(--fc-muted); }
+.adash-members__sub a { color: var(--fc-accent, #0e8a5f); font-weight: 700; }
+.adash-members__growth { font-size: 0.9rem; color: var(--fc-muted); }
+.adash-members__growth strong { color: var(--fc-ink); }
+.adash-members__chart { min-width: 0; }

@@ -49,7 +49,7 @@ class AdminDashboardTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
 
-    assert_select ".adash-kpi", 6
+    assert_select ".adash-kpis[aria-label=\"Headline numbers\"] .adash-kpi", 6
     assert_select ".adash-list__label", text: "Instagram"
     assert_select ".adash-list__label", text: "WhatsApp"
     assert_select ".adash-list__label", text: /Ghana/

@@ -41,6 +41,57 @@ class AdminDashboardStats
   def previous_period = prev_from...from
   def dates = (0...days).map { |i| (from + i.days).to_date }
 
+  # ── Members: all-time totals (not limited to the chosen period) ───
+
+  def members_total = User.count
+
+  def members_overview
+    now = Time.current.in_time_zone(TZ)
+    total = members_total
+    active7 = User.where(last_seen_at: 7.days.ago..).count
+    active30 = User.where(last_seen_at: 30.days.ago..).count
+    pct = ->(n) { total.zero? ? 0 : (n * 100.0 / total).round }
+    [
+      [ "Joined today", User.where(created_at: now.beginning_of_day..).count, nil ],
+      [ "Joined this week", User.where(created_at: now.beginning_of_week..).count, "since Monday" ],
+      [ "Joined this month", User.where(created_at: now.beginning_of_month..).count, now.strftime("since 1 %b") ],
+      [ "Active in 7 days", active7, "#{pct.(active7)}% of members" ],
+      [ "Active in 30 days", active30, "#{pct.(active30)}% of members" ],
+      [ "On the Android app", app_users, "#{pct.(app_users)}% of members" ],
+      [ "Can be emailed", Broadcast.eligible_user_count, "email updates switched on" ],
+      [ "Professional profiles", professional_profiles, "have a headline" ]
+    ]
+  end
+
+  # Running total of members at the end of each of the last 26 weeks.
+  def members_growth(weeks = 26)
+    start = Time.current.in_time_zone(TZ).beginning_of_week - (weeks - 1).weeks
+    before = User.where(created_at: ...start).count
+    per_week = User.where(created_at: start..).group(Arel.sql("date_trunc('week', users.created_at AT TIME ZONE 'UTC' AT TIME ZONE '#{TZ}')::date")).count
+    running = before
+    (0...weeks).map do |i|
+      week = (start + i.weeks).to_date
+      running += per_week[week] || 0
+      [ week, running ]
+    end
+  end
+
+  def members_by_signup
+    google = User.where.not(provider: [ nil, "" ]).count
+    [ [ "Email and password", members_total - google ], [ "Google", google ] ]
+  end
+
+  # Each member's most recent country, from their visits.
+  def member_countries(limit = 8)
+    latest = Ahoy::Visit.where.not(user_id: nil).where.not(country: [ nil, "" ])
+                        .select("DISTINCT ON (user_id) user_id, country").order(:user_id, started_at: :desc)
+    rows = Ahoy::Visit.from(latest, :ahoy_visits).group(:country).count
+    known = rows.values.sum
+    list = top(rows, limit).map { |code, n| [ self.class.country_label(code), n ] }
+    unknown = members_total - known
+    unknown.positive? ? list + [ [ "Not known yet", unknown ] ] : list
+  end
+
   # ── Headline numbers ──────────────────────────────────────────────
 
   def kpis
