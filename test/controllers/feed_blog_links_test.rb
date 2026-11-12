@@ -5,7 +5,7 @@ require "test_helper"
 class FeedBlogLinksTest < ActionDispatch::IntegrationTest
   setup do
     ENV["AI_MODERATION_STUB"] = "1"
-    sign_in User.create!(username: "blog_reader", email: "blog-reader@example.com", password: "Pw-#{SecureRandom.hex(8)}")
+    sign_in create_member("blog_reader")
   end
 
   test "the feed links to the blog and shows the latest guides" do
