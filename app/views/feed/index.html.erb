@@ -35,6 +35,10 @@
           <%= render_icon("bookmark", classes: "h-4 w-4") %>
           Bookmarks
         <% end %>
+        <%= link_to blog_path, class: "fc-rail-link" do %>
+          <%= render_icon("bookopen", classes: "h-4 w-4") %>
+          Blog &amp; guides
+        <% end %>
         <%= link_to user_path(current_user.username), class: "fc-rail-link" do %>
           <%= render_icon("users", classes: "h-4 w-4") %>
           Profile
@@ -511,6 +515,9 @@
         <%= link_to games_path, class: "fc-discover-quicklink", title: "Games", aria: { label: "Games" } do %>
           <span class="fc-discover-quicklink-emoji">🎯</span>
         <% end %>
+        <%= link_to blog_path, class: "fc-discover-quicklink", title: "Blog & guides", aria: { label: "Blog and guides" } do %>
+          <span class="fc-discover-quicklink-emoji">📰</span>
+        <% end %>
       </nav>
       <%
         verses = @daily_verses.presence || [
@@ -623,6 +630,26 @@
           <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">📖 Reading plan</p>
           <p class="mt-2 text-sm text-[var(--fc-soft)]">Pick a slow rhythm in scripture — psalms, John, or Proverbs.</p>
           <%= link_to "Browse plans", reading_plans_path, class: "mt-3 inline-block text-sm font-bold text-[var(--fc-accent-2)] hover:text-[var(--fc-ink)]" %>
+        </div>
+      <% end %>
+
+      <% latest_articles = BlogArticle.all.sort_by { |a| [ -a.date.jd, a.order ] }.first(3) %>
+      <% if latest_articles.any? %>
+        <div class="fc-side-card fc-blog-card">
+          <div class="mb-2 flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">📰 From the blog</h3>
+            <%= link_to "All guides →", blog_path, class: "text-sm font-bold text-[var(--fc-accent-2)] hover:text-[var(--fc-ink)]" %>
+          </div>
+          <ul class="space-y-2">
+            <% latest_articles.each do |article| %>
+              <li>
+                <%= link_to blog_article_path(article.slug), class: "group block" do %>
+                  <span class="block text-sm font-bold leading-snug text-[var(--fc-ink)] group-hover:text-[var(--fc-accent-2)]"><%= article.title %></span>
+                  <span class="block text-xs text-[var(--fc-muted)]"><%= article.category %> · <%= article.minutes %> min read</span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
         </div>
       <% end %>
 
