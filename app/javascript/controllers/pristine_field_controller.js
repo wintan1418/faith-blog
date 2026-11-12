@@ -14,6 +14,16 @@ import { Controller } from "@hotwired/stimulus"
 // Attach to a <textarea> directly, or to a wrapper/<form> that holds a
 // <trix-editor> (the rich-text reply). For Trix, only the empty case
 // is enforced — we never want to wipe a real draft.
+//
+// "Typing" means any real input, not just keydown: Android keyboards
+// (Gboard, Samsung) type through composition and beforeinput events and
+// often send no usable keydown at all. Listening to keydown alone made
+// this controller wipe what Android users typed into comments.
+// Every way a person can put text in a field. Browser autofill sets the
+// value directly and sends none of these (except a plain "input", which
+// isn't listed), so they still mean "the user is typing".
+const TYPING_EVENTS = [ "keydown", "beforeinput", "compositionstart", "compositionupdate", "paste", "drop" ]
+
 export default class extends Controller {
   static values = { value: { type: String, default: "" } }
 
@@ -31,10 +41,14 @@ export default class extends Controller {
 
     this.watched = [this.field, this.trix].filter(Boolean)
     for (const node of this.watched) {
-      node.addEventListener("keydown", this.markTouched)
-      node.addEventListener("paste", this.markTouched)
+      TYPING_EVENTS.forEach(type => node.addEventListener(type, this.markTouched))
       node.addEventListener("focus", this.onFocus)
     }
+    // Trix's own change event means the editor content really changed
+    // under the user's hands (autofill can't reach a contenteditable).
+    this.trix?.addEventListener("trix-change", this.markTouchedIfFocused = () => {
+      if (document.activeElement === this.trix) this.markTouched()
+    })
 
     this.enforce()
     this.timers = [40, 120, 300, 600, 1100, 1800].map(ms =>
@@ -44,10 +58,10 @@ export default class extends Controller {
 
   disconnect() {
     for (const node of this.watched || []) {
-      node.removeEventListener("keydown", this.markTouched)
-      node.removeEventListener("paste", this.markTouched)
+      TYPING_EVENTS.forEach(type => node.removeEventListener(type, this.markTouched))
       node.removeEventListener("focus", this.onFocus)
     }
+    if (this.markTouchedIfFocused) this.trix?.removeEventListener("trix-change", this.markTouchedIfFocused)
     ;(this.timers || []).forEach(clearTimeout)
   }
 
