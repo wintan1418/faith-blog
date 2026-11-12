@@ -30,7 +30,7 @@ class OnboardingChecklistTest < ActiveSupport::TestCase
     checklist = OnboardingChecklist.new(@user)
     assert_equal [], done
     assert_equal 0, checklist.done_count
-    assert_equal 6, checklist.total
+    assert_equal 7, checklist.total
     assert_equal :photo, checklist.next_step.key
     assert checklist.visible?
   end
@@ -116,6 +116,7 @@ class OnboardingChecklistTest < ActiveSupport::TestCase
   end
 
   def finish_everything(user)
+    user.profile.update_columns(headline: "Teacher and choir leader")
     user.profile.avatar.attach(io: StringIO.new(PNG), filename: "me.png", content_type: "image/png")
     user.profile.save!
     publish(user)
@@ -124,5 +125,17 @@ class OnboardingChecklistTest < ActiveSupport::TestCase
     user.brethren_card.update!(church_or_assembly: "Grace Assembly", bio: "Hello", occupation: "Teacher",
                                whatsapp_number: "+2348012345678", email: user.email)
     user.active_follows.find_or_create_by!(following: @other)
+  end
+
+  test "a headline or a role ticks the professional step" do
+    assert_not_includes done, :professional
+    @user.profile.update!(headline: "Nurse and worship leader")
+    assert_includes done, :professional
+  end
+
+  test "each step points to a blog guide that exists" do
+    OnboardingChecklist::STEPS.each_key do |key|
+      assert OnboardingChecklist.guide_slug(key), "no guide for #{key}"
+    end
   end
 end

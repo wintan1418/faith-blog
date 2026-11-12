@@ -278,3 +278,8 @@ body.hotwire-native .fc-tour-pop button { min-height: 40px; }
   .fc-tour-spot,
   .fc-tour-pop { transition: none; }
 }
+
+/* Links to the blog guides */
+.fc-checklist-guide { display: inline-block; margin-left: 0.35rem; font-weight: 700; color: var(--fc-accent-2, var(--fc-accent)); white-space: nowrap; }
+.fc-checklist-guides { margin: 0.75rem 0 0; padding-top: 0.75rem; border-top: 1px solid var(--fc-line, rgba(0,0,0,0.08)); font-size: 0.85rem; color: var(--fc-muted); }
+.fc-checklist-guides a { font-weight: 700; color: var(--fc-accent-2, var(--fc-accent)); }
