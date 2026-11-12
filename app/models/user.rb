@@ -107,6 +107,7 @@ class User < ApplicationRecord
   after_create :create_brethren_card
   after_create :ensure_risk_profile
   after_create_commit :announce_join
+  after_create_commit :send_welcome_note
   after_create_commit :accept_pending_invitations
 
   # Scopes
@@ -383,6 +384,12 @@ class User < ApplicationRecord
   def accept_pending_invitations
     Invitation.pending.where(email: email.to_s.strip.downcase)
               .update_all(invited_user_id: id, accepted_at: Time.current, updated_at: Time.current)
+  end
+
+  def send_welcome_note
+    WelcomeNoteJob.perform_later(self)
+  rescue StandardError => e
+    Rails.logger.warn("[User##{id}] welcome note failed: #{e.class}: #{e.message}")
   end
 
   def announce_join

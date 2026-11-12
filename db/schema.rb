@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_203000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -554,6 +554,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_203000) do
     t.datetime "moderated_at"
     t.bigint "reply_to_id"
     t.boolean "forwarded", default: false, null: false
+    t.boolean "quiet", default: false, null: false
     t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["deleted_at"], name: "index_messages_on_deleted_at"
@@ -961,7 +962,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_203000) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.boolean "show_online_status", default: true, null: false
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
@@ -991,6 +991,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_203000) do
     t.boolean "background_rain", default: true, null: false
     t.string "hidden_bots", default: [], null: false, array: true
     t.string "android_app_version"
+    t.boolean "show_online_status", default: true, null: false
+    t.datetime "welcomed_at"
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
