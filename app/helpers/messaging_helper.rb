@@ -77,4 +77,10 @@ module MessagingHelper
     prefix = message.sender_id == viewer.id ? "You: " : ""
     "#{prefix}#{text}"
   end
+
+  # Download link for a file in a chat: served from our own site, under the
+  # file's original name, to the people in that conversation only.
+  def message_file_download_path(message, attachment)
+    conversation_message_file_path(message.conversation_id, message, attachment.id, filename: attachment.filename.to_s)
+  end
 end

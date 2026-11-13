@@ -76,6 +76,10 @@ export default class extends Controller {
     if (save) {
       save.hidden = !download
       if (download) save.href = download
+      // Older app builds use the file-store link instead (see chat_downloads.js).
+      const legacy = this.imgs[this.index].dataset.downloadLegacy
+      if (legacy) save.dataset.legacyHref = legacy
+      else delete save.dataset.legacyHref
     }
     if (prev) prev.style.display = this.imgs.length > 1 ? "" : "none"
     if (next) next.style.display = this.imgs.length > 1 ? "" : "none"
@@ -87,7 +91,7 @@ export default class extends Controller {
     overlay.setAttribute("data-turbo-temporary", "") // never saved into a page snapshot
     overlay.innerHTML = `
       <button class="fc-lightbox-close" aria-label="Close">×</button>
-      <a class="fc-lightbox-save" hidden download data-turbo="false" rel="noopener" aria-label="Save photo">⤓ Save</a>
+      <a class="fc-lightbox-save" hidden data-turbo="false" rel="noopener" aria-label="Save photo">⤓ Save</a>
       <button class="fc-lightbox-prev" aria-label="Previous">‹</button>
       <button class="fc-lightbox-next" aria-label="Next">›</button>
       <span class="fc-lightbox-counter"></span>
