@@ -105,8 +105,27 @@ export default class extends Controller {
 
   handleSubmitEnd(event) {
     if (!this.element.contains(event.target)) return
+    this.clearSendError()
     if (event.detail.success) {
       this.close()
+    } else if (!event.detail.fetchResponse) {
+      // Nothing came back: the upload never left the phone or the connection
+      // dropped. Say so, instead of a button that seems to do nothing.
+      this.showSendError(event.target)
     }
+  }
+
+  showSendError(form) {
+    const note = document.createElement("p")
+    note.className = "fc-composer-send-error"
+    note.setAttribute("role", "alert")
+    note.textContent = "Your post didn't send. Check your connection and tap the button again. " +
+      "If you added a photo, remove it and choose it again. Your words are still here."
+    const actions = form.querySelector("[type=submit]")?.parentElement
+    actions ? actions.before(note) : form.prepend(note)
+  }
+
+  clearSendError() {
+    this.element.querySelectorAll(".fc-composer-send-error").forEach(n => n.remove())
   }
 }

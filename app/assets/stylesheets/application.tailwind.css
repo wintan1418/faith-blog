@@ -8519,6 +8519,19 @@ html.theme-dark .fc-composer-errors {
   margin-top: 0.5rem;
 }
 .fc-composer-previews.hidden { display: none !important; }
+/* "Your post didn't send" — shown above the buttons when an upload fails. */
+.fc-composer-send-error {
+  margin: 0.5rem 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #b42318 45%, transparent);
+  background: color-mix(in srgb, #b42318 10%, transparent);
+  color: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+/* Photos are being copied for upload: the send button waits. */
+form.is-preparing-photos [type=submit][aria-busy="true"] { opacity: 0.6; cursor: progress; }
 .fc-composer-previews img {
   width: 100%;
   height: 96px;
