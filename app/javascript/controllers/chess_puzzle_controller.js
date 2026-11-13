@@ -9,7 +9,9 @@ import { loadChess } from "../lazy_libs"
 // Every puzzle gives 3 tries. A wrong move is played, then taken back, and
 // costs a try; a hint costs a try too. Out of tries shows the solution (and
 // in the ladder ends the climb). Any move that gives checkmate counts, not
-// only the one Lichess lists.
+// only the one Lichess lists, and in a mating puzzle any move that still
+// forces mate in time counts too (the board then plays on "off script",
+// defending as stubbornly as it can).
 const GLYPH = { p: "♟", n: "♞", b: "♝", r: "♜", q: "♛", k: "♚" }
 const TRIES = 3
 const STAGES = 10
@@ -18,6 +20,11 @@ const STEPS = [ "easiest", "easier", "normal", "harder", "hardest" ]
 // step every few stages.
 const LEVELS = { easy: 0, medium: 1, hard: 3 }
 const BEST_KEY = "brethreign:chess-ladder-best"
+// How many of your moves ahead the board checks an unlisted move for a forced
+// mate, and how long it may think before calling the move wrong.
+const MATE_SEARCH_DEPTH = 2
+const MATE_SEARCH_MS = 300
+class SearchTimeout extends Error {}
 
 export default class extends Controller {
   static targets = [ "board", "status", "feedback", "progress", "hintBtn", "resetBtn", "kicker", "rating", "themes", "tier",
@@ -87,6 +94,9 @@ export default class extends Controller {
     }
 
     this.solverColor = this.game.turn()
+    this.offScript = false   // you found a different forced mate than the listed line
+    this.offLeft = 0         // your moves left to mate when off script
+    this.mateLine = this.lineEndsInMate()
     this.renderBoard()
     this.renderTries()
     this.setNextButton(false)
@@ -206,7 +216,17 @@ export default class extends Controller {
     this.complete = true
     this.clearSelection()
     this.setStatus(message)
-    while (this.idx < this.solution.length) {
+    while (this.offScript && !this.game.isGameOver()) {
+      if (run !== this.run) return
+      const m = this.game.turn() === this.solverColor ? this.findMate(this.offLeft) : this.stubbornReply()
+      if (!m) break
+      this.game.move(m.san)
+      if (this.game.turn() !== this.solverColor) this.offLeft -= 1
+      this.lastMove = { from: m.from, to: m.to }
+      this.renderBoard()
+      await new Promise(r => setTimeout(r, 650))
+    }
+    while (!this.offScript && this.idx < this.solution.length) {
       if (run !== this.run) return
       const m = this.parseUci(this.solution[this.idx])
       try { this.game.move({ from: m.from, to: m.to, promotion: m.promotion || "q" }) } catch { break }
@@ -339,17 +359,30 @@ export default class extends Controller {
   }
 
   tryUserMove(from, to) {
-    const expected = this.parseUci(this.solution[this.idx])
-    const promotion = expected.promotion || "q"
+    const expected = this.offScript ? null : this.parseUci(this.solution[this.idx])
+    const promotion = expected?.promotion || "q"
     this.clearSelection()
 
     let move
     try { move = this.game.move({ from, to, promotion }) } catch { move = null }
     if (!move) { this.renderBoard(); return }
 
-    const isSolution = from === expected.from && to === expected.to
+    const isSolution = !!expected && from === expected.from && to === expected.to
     // Any checkmate wins, even if Lichess lists a different mating move.
     const mates = this.game.isCheckmate()
+
+    // A different move that still forces mate in time: play on from here.
+    if (!isSolution && !mates && this.stillMates()) {
+      this.offScript = true
+      this.offLeft = this.userMovesLeft() - 1
+      this.lastMove = { from, to }
+      this.renderBoard()
+      this.updateProgress()
+      this.flash("good", "That works too. Keep going.")
+      const run = this.run
+      setTimeout(() => { if (run === this.run) this.autoOpponentMove() }, 450)
+      return
+    }
 
     if (isSolution || mates) {
       this.lastMove = { from, to }
@@ -392,6 +425,15 @@ export default class extends Controller {
   }
 
   autoOpponentMove() {
+    if (this.offScript) {
+      const reply = this.stubbornReply()
+      if (!reply) return this.finish()
+      this.game.move(reply.san)
+      this.lastMove = { from: reply.from, to: reply.to }
+      this.renderBoard()
+      this.updateProgress()
+      return this.setStatus("Your move.")
+    }
     const uci = this.solution[this.idx]
     if (!uci) return
     const m = this.parseUci(uci)
@@ -411,7 +453,8 @@ export default class extends Controller {
       this.flash("hint", "A hint costs a try, and this is your last one. You've got this.")
       return
     }
-    const expected = this.parseUci(this.solution[this.idx])
+    const expected = this.offScript ? this.findMate(this.offLeft) : this.parseUci(this.solution[this.idx])
+    if (!expected) return
     this.select(expected.from)
     this.renderBoard()
     this.triesLeft -= 1
@@ -462,6 +505,89 @@ export default class extends Controller {
     }
   }
 
+  // ─── Other ways to mate ──────────────────────────────────────
+  // Lichess lists one line, but a mating puzzle can often be mated another
+  // way. These look a couple of moves ahead with chess.js (moves are tried
+  // and taken back on the real game, so nothing shows on the board).
+
+  lineEndsInMate() {
+    const game = new this.Chess(this.game.fen())
+    for (const uci of this.solution) {
+      const m = this.parseUci(uci)
+      try { game.move({ from: m.from, to: m.to, promotion: m.promotion || "q" }) } catch { return false }
+    }
+    return game.isCheckmate()
+  }
+
+  // Your moves still to make, counting the one being played.
+  userMovesLeft() {
+    return this.offScript ? this.offLeft : Math.ceil((this.solution.length - this.idx) / 2)
+  }
+
+  // Called right after your move: does it still force mate in the moves left?
+  stillMates() {
+    const left = this.userMovesLeft() - 1
+    if (!this.mateLine || left < 1 || left > MATE_SEARCH_DEPTH) return false
+    try {
+      return this.matedWithin(left, performance.now() + MATE_SEARCH_MS)
+    } catch (err) {
+      if (err instanceof SearchTimeout) return false
+      throw err
+    }
+  }
+
+  // Your move: one that mates within n moves, or null.
+  findMate(n, deadline = performance.now() + MATE_SEARCH_MS * 3) {
+    try { return this.mateWithin(n, deadline) } catch (err) {
+      if (err instanceof SearchTimeout) return null
+      throw err
+    }
+  }
+
+  mateWithin(n, deadline) {
+    for (const m of this.forcingFirst(this.game.moves({ verbose: true }))) {
+      if (performance.now() > deadline) throw new SearchTimeout()
+      this.game.move(m.san)
+      const ok = this.game.isCheckmate() || (n > 1 && this.matedWithin(n - 1, deadline))
+      this.game.undo()
+      if (ok) return m
+    }
+    return null
+  }
+
+  // The other side to move: is every reply met by mate within n of your moves?
+  matedWithin(n, deadline) {
+    if (this.game.isCheckmate()) return true
+    const replies = this.game.moves({ verbose: true })
+    if (replies.length === 0) return false // stalemate
+    for (const r of replies) {
+      if (performance.now() > deadline) throw new SearchTimeout()
+      this.game.move(r.san)
+      const ok = n === 1 ? this.game.moves().some(san => san.endsWith("#")) : !!this.mateWithin(n, deadline)
+      this.game.undo()
+      if (!ok) return false
+    }
+    return true
+  }
+
+  // Off script, the board defends: it avoids a reply that allows mate at once
+  // when it has one, so you still have to find the mate.
+  stubbornReply() {
+    const replies = this.game.moves({ verbose: true })
+    for (const r of replies) {
+      this.game.move(r.san)
+      const mateNext = this.game.moves().some(san => san.endsWith("#"))
+      this.game.undo()
+      if (!mateNext) return r
+    }
+    return replies[0] || null
+  }
+
+  forcingFirst(moves) {
+    const rank = (m) => (m.san.endsWith("#") ? 0 : m.san.endsWith("+") ? 1 : m.captured ? 2 : 3)
+    return moves.sort((a, b) => rank(a) - rank(b))
+  }
+
   // ─── Helpers ─────────────────────────────────────────────────
   parseUci(uci) {
     return { from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] }
@@ -490,7 +616,7 @@ export default class extends Controller {
   updateProgress() {
     if (!this.hasProgressTarget) return
     const total = Math.ceil(this.solution.length / 2) // your moves only
-    const done  = Math.min(Math.ceil(this.idx / 2), total)
+    const done  = this.offScript ? total - this.offLeft : Math.min(Math.ceil(this.idx / 2), total)
     this.progressTarget.textContent = this.complete ? `${total} of ${total} moves` : `Move ${Math.min(done + 1, total)} of ${total}`
   }
 }

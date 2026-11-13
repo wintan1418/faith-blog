@@ -27,6 +27,7 @@ export default class extends Controller {
       document.removeEventListener("click", this.boundCloseOnOutside)
     }
     this.releaseRoom()
+    this.unfreeSheet()
   }
 
   toggle(event) {
@@ -45,6 +46,7 @@ export default class extends Controller {
     if (this.hasPickerTarget) {
       this.pickerTarget.classList.remove("hidden")
       this.pickerVisible = true
+      this.freeSheet()
       requestAnimationFrame(() => this.keepFieldVisible())
       
       // Close on outside click
@@ -59,6 +61,7 @@ export default class extends Controller {
       this.pickerTarget.classList.add("hidden")
       this.pickerVisible = false
       this.releaseRoom()
+      this.unfreeSheet()
       if (this.boundCloseOnOutside) {
         document.removeEventListener("click", this.boundCloseOnOutside)
       }
@@ -73,20 +76,61 @@ export default class extends Controller {
     if (!this.hasPickerTarget || getComputedStyle(this.pickerTarget).position !== "fixed") return
     const field = this.field()
     if (!field) return
-    const sheetTop = this.pickerTarget.getBoundingClientRect().top
+    // From layout, not getBoundingClientRect: the sheet is still sliding in
+    // (translateY) at this point, which would understate the overlap.
+    const sheetBottom = parseFloat(getComputedStyle(this.pickerTarget).bottom) || 0
+    const sheetTop = window.innerHeight - sheetBottom - this.pickerTarget.offsetHeight
     const overlap = field.getBoundingClientRect().bottom + 12 - sheetTop
     if (overlap <= 0) return
 
-    const room = Math.ceil(window.innerHeight - sheetTop)
-    this.addedRoom = room
-    document.body.style.paddingBottom = `${room}px`
+    // Room at the end of the page so even the last breath can scroll up. A
+    // spacer, not body padding: body is height: 100% with the page
+    // overflowing it, so padding on it adds no scroll room.
+    this.releaseRoom()
+    this.spacer = document.createElement("div")
+    this.spacer.setAttribute("aria-hidden", "true")
+    this.spacer.style.height = `${Math.ceil(window.innerHeight - sheetTop)}px`
+    document.body.appendChild(this.spacer)
     window.scrollBy({ top: overlap, behavior: "smooth" })
   }
 
+  // position: fixed only pins the sheet to the screen when no ancestor has a
+  // transform, filter or similar. Breath cards lift with a transform on
+  // :hover, and on Android a tap leaves :hover stuck on the card, so the
+  // "sheet" ended up pinned to the bottom of the card, right over the reply
+  // box. While the sheet is open, switch those effects off on its ancestors.
+  freeSheet() {
+    this.unfreeSheet()
+    if (!this.sheetMode()) return
+    this.hosts = []
+    for (let el = this.pickerTarget.parentElement; el && el !== document.documentElement; el = el.parentElement) {
+      if (this.trapsFixed(getComputedStyle(el))) {
+        el.classList.add("fc-emoji-sheet-host")
+        this.hosts.push(el)
+      }
+    }
+  }
+
+  unfreeSheet() {
+    (this.hosts || []).forEach((el) => el.classList.remove("fc-emoji-sheet-host"))
+    this.hosts = []
+  }
+
+  sheetMode() {
+    return this.hasPickerTarget && getComputedStyle(this.pickerTarget).position === "fixed"
+  }
+
+  trapsFixed(style) {
+    return style.transform !== "none" || style.filter !== "none" ||
+      (style.backdropFilter && style.backdropFilter !== "none") ||
+      (style.perspective && style.perspective !== "none") ||
+      /paint|layout|strict|content/.test(style.contain || "") ||
+      /transform|filter|perspective/.test(style.willChange || "")
+  }
+
   releaseRoom() {
-    if (!this.addedRoom) return
-    document.body.style.paddingBottom = ""
-    this.addedRoom = null
+    this.spacer?.remove()
+    this.spacer = null
   }
 
   field() {

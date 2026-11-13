@@ -28,7 +28,9 @@
     <% end %>
   </nav>
 
-  <div class="msg-rows">
+  <%# New messages move their chat to the top of this list live (Message#broadcast_inbox_rows). %>
+  <%= turbo_stream_from current_user, :inbox %>
+  <div class="msg-rows" id="msg_rows">
     <% if conversations.any? %>
       <% conversations.each do |conversation| %>
         <% if defined?(@latest_by_conversation) && @latest_by_conversation %>
@@ -39,12 +41,12 @@
         <% end %>
       <% end %>
     <% elsif filter == "unread" %>
-      <div class="msg-empty">
+      <div class="msg-empty" id="msg_rows_empty">
         <p class="msg-empty-title">You're all caught up</p>
         <p class="msg-empty-text">No unread messages.</p>
       </div>
     <% else %>
-      <div class="msg-empty">
+      <div class="msg-empty" id="msg_rows_empty">
         <span class="msg-empty-icon"><%= render_icon("mail", classes: "h-7 w-7") %></span>
         <p class="msg-empty-title">No messages yet</p>
         <p class="msg-empty-text">Reach out to a brother or sister: encourage them, pray with them, or just say hello.</p>

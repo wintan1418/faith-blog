@@ -8,6 +8,7 @@ class BrethrenCard < ApplicationRecord
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, on: :update
 
   before_save :check_completeness
+  after_commit -> { OnboardingChecklist.broadcast_refresh(user) }, if: -> { saved_change_to_is_complete? }
 
   def whatsapp_link
     return nil unless whatsapp_number.present?

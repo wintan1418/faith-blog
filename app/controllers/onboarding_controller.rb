@@ -13,6 +13,13 @@ class OnboardingController < ApplicationController
     end
   end
 
+  # The list on its own, for the feed's frame to reload itself.
+  def checklist
+    checklist, celebrate = OnboardingChecklist.feed_state(current_user)
+    prayer_room = Room.prayers.public_rooms.ordered.first
+    render partial: "feed/onboarding_frame", locals: { checklist: checklist, celebrate: celebrate, prayer_room: prayer_room }
+  end
+
   # Settings → "Show the getting-started list again".
   def show_checklist
     current_user.update_column(:onboarding_dismissed_at, nil)

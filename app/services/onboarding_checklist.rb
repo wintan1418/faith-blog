@@ -34,6 +34,39 @@ class OnboardingChecklist
     professional: "set-up-your-professional-profile"
   }.freeze
 
+  # What the feed shows: [checklist or nil, celebrate?]. The checklist while
+  # it's unfinished and not hidden; the "all set" line once, the first time
+  # everything is done (quietly skipped if they'd hidden the list).
+  def self.feed_state(user)
+    return [ nil, false ] unless user.onboarding_completed_at.nil?
+
+    checklist = new(user)
+    if checklist.record_completion!
+      [ nil, user.onboarding_dismissed_at.nil? ]
+    elsif checklist.visible?
+      [ checklist, false ]
+    else
+      [ nil, false ]
+    end
+  end
+
+  # Something behind a step changed (e.g. the professional profile was set
+  # up): tell an open feed to reload its list. The frame fetches itself, so
+  # it's drawn for the member with their own session.
+  def self.broadcast_refresh(user)
+    return if user.nil? || user.onboarding_completed_at || user.onboarding_dismissed_at
+
+    path = Rails.application.routes.url_helpers.onboarding_checklist_path
+    Turbo::StreamsChannel.broadcast_replace_to(
+      user, :onboarding,
+      target: "onboarding_checklist_frame",
+      html: %(<turbo-frame id="onboarding_checklist_frame" target="_top" src="#{ERB::Util.h(path)}" ) +
+            %(data-controller="stale-frame" data-stale-frame-url-value="#{ERB::Util.h(path)}"></turbo-frame>)
+    )
+  rescue StandardError => e
+    Rails.logger.warn("[OnboardingChecklist] refresh broadcast failed: #{e.class}: #{e.message}")
+  end
+
   def self.guide_slug(key)
     slug = GUIDES[key]
     slug if slug && BlogArticle.all.any? { |a| a.slug == slug }

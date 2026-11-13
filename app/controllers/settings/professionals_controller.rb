@@ -13,8 +13,9 @@ module Settings
     def update
       @profile = current_user.profile || current_user.create_profile!
       if @profile.update(params.require(:profile).permit(:headline, :industry, :skills_list, :assembly, :open_to_visibility, open_to: []))
-        anchor = params.dig(:profile, :open_to) ? "open-to" : nil
-        redirect_to edit_settings_professional_path(anchor: anchor), notice: "Professional profile saved."
+        # Saved: close the page and go back to the professional profile (in
+        # the app this closes the screen), like the other settings pages.
+        recede_or_redirect_to user_path(current_user.username, tab: "professional"), notice: "Professional profile saved."
       else
         render :edit, status: :unprocessable_entity
       end

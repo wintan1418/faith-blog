@@ -76,14 +76,7 @@ class FeedController < ApplicationController
   # at all once the list is done.
   def load_onboarding_progress
     @show_tour = current_user.tour_completed_at.nil?
-    return unless current_user.onboarding_completed_at.nil?
-
-    checklist = OnboardingChecklist.new(current_user)
-    if checklist.record_completion!
-      @onboarding_celebrate = current_user.onboarding_dismissed_at.nil? # quietly, if they'd hidden it
-    elsif checklist.visible?
-      @onboarding = checklist
-    end
+    @onboarding, @onboarding_celebrate = OnboardingChecklist.feed_state(current_user)
   end
 
   # Speed: work out the page from ids and times only (tiny queries), then load full

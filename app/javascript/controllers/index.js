@@ -211,3 +211,6 @@ application.register("presence", PresenceController)
 
 import FrameRefreshController from "./frame_refresh_controller"
 application.register("frame-refresh", FrameRefreshController)
+
+import StaleFrameController from "./stale_frame_controller"
+application.register("stale-frame", StaleFrameController)

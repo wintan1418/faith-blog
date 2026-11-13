@@ -43,3 +43,8 @@ production:
     class: ModerationBacklogSweepJob
     queue: default
     schedule: every 5 minutes
+
+  bible_quiz_warm_pool:
+    class: BibleQuizWarmPoolJob
+    queue: default
+    schedule: every 6 hours

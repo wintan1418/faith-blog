@@ -22,9 +22,10 @@ class BibleQuizQuestion < ApplicationRecord
   # Questions two players have flagged as wrong stop being served.
   scope :trusted, -> { where("flags_count < 2") }
 
-  def self.sample_for(user:, theme: nil, difficulty: nil, kind: nil, count: 5)
+  def self.sample_for(user:, theme: nil, difficulty: nil, kind: nil, count: 5, exclude_ids: [])
     candidates = trusted.by_theme(theme).by_difficulty(difficulty).by_kind(kind)
-    return [] if candidates.none?
+    candidates = candidates.where.not(id: exclude_ids) if exclude_ids.present?
+    return [] if count <= 0 || candidates.none?
 
     seen_ids = UserSeenQuizQuestion
                 .where(user_id: user.id)
@@ -45,6 +46,45 @@ class BibleQuizQuestion < ApplicationRecord
     filler = candidates.where(id: fill_ids).order(Arel.sql("RANDOM()")).limit(need).to_a
 
     fresh + filler
+  end
+
+  # Pool size the background top-up aims for, per theme × difficulty.
+  POOL_TARGET = 40
+  # Beyond this a filter only grows when we're short (see needs_top_up?);
+  # stops a heavy player's "unseen" pressure from generating forever.
+  POOL_CAP = 400
+
+  # Build a round from the pool WITHOUT touching the AI. When the exact
+  # theme/difficulty filter is short, widen progressively (drop difficulty,
+  # then theme) so a round is never empty while any trusted question
+  # exists. sample_for already falls back to least-recently-seen rows.
+  def self.serve_round(user:, theme: nil, difficulty: nil, count: 5)
+    rows = []
+    [ [ theme, difficulty ], [ theme, nil ], [ nil, nil ] ].uniq.each do |t, d|
+      break if rows.size >= count
+
+      rows += sample_for(user: user, theme: t, difficulty: d,
+                         count: count - rows.size, exclude_ids: rows.map(&:id))
+    end
+    rows
+  end
+
+  def self.pool_size(theme: nil, difficulty: nil)
+    trusted.by_theme(theme).by_difficulty(difficulty).count
+  end
+
+  # True when the filter's pool is below target, or this user has fewer
+  # than two rounds' worth of unseen questions left in it.
+  def self.needs_top_up?(user:, theme: nil, difficulty: nil, length: 5)
+    size = pool_size(theme: theme, difficulty: difficulty)
+    return true if size < POOL_TARGET
+    return false if size >= POOL_CAP || user.nil?
+
+    seen_ids = UserSeenQuizQuestion.where(user_id: user.id)
+                                   .where("last_seen_at >= ?", 30.days.ago)
+                                   .select(:bible_quiz_question_id)
+    unseen = trusted.by_theme(theme).by_difficulty(difficulty).where.not(id: seen_ids).count
+    unseen < length * 2
   end
 
   # Legacy entrypoint kept for any callers that don't have a user context.

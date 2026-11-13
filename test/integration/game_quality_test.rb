@@ -7,6 +7,8 @@ require "minitest/mock"
 # retire a question from the pool), and game results can be shared to
 # the feed via the composer prefill.
 class GameQualityTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   setup do
     @player = User.create!(username: "gq_player", email: "gq_player@example.com",
                            password: "password123", password_confirmation: "password123")
@@ -43,26 +45,24 @@ class GameQualityTest < ActionDispatch::IntegrationTest
     assert_equal @question.id, payload["questions"].first["id"]
   end
 
-  test "a 10-question round tops the pool up with several batches" do
-    batch_num = 0
-    fake_batch = lambda do |**|
-      batch_num += 1
-      Array.new(5) do |i|
-        Ai::Bible::QuizGenerator::Question.new(
-          kind: "which_book", prompt: "Batch #{batch_num} question #{i} of the round?",
-          choices: %w[Romans Acts John Jude], correct_index: 0,
-          reference: "Romans 1:1", explanation: "KJV", theme: "faith", difficulty: "easy"
-        )
-      end
+  test "a 10-question round never blocks on the AI — serves the pool and tops up in the background" do
+    9.times do |i|
+      BibleQuizQuestion.create!(
+        kind: "which_book", prompt: "Pool question #{i} of the round?",
+        choices: %w[Romans Acts John Jude], correct_index: 0,
+        reference: "Romans 1:1", explanation: "KJV", theme: "faith", difficulty: "easy"
+      )
     end
 
-    Ai::Bible::QuizGenerator.stub :call, fake_batch do
-      post games_quiz_generate_path, params: { length: 10 }, as: :json
+    Ai::Bible::QuizGenerator.stub :call, ->(**) { flunk "quiz_generate must not call the AI when the pool has questions" } do
+      assert_enqueued_with(job: BibleQuizTopUpJob) do
+        post games_quiz_generate_path, params: { length: 10 }, as: :json
+      end
     end
 
     payload = JSON.parse(response.body)
     assert payload["ok"]
-    assert_equal 10, payload["questions"].size, "long rounds must fill from multiple batches"
+    assert_equal 10, payload["questions"].size, "long rounds fill from the whole pool"
   end
 
   test "the composer prefills a shared game result as plain text" do
