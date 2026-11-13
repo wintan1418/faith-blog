@@ -34,10 +34,11 @@ class OnboardingChecklistRefreshTest < ApplicationSystemTestCase
       visit edit_settings_professional_path
       fill_in "Headline", with: "Teacher and worship leader"
       within("form", text: "Headline") { click_on "Save" }
-      # Save closes the page and lands on the professional profile, saved.
-      assert_text "Professional profile saved."
-      assert_text "Teacher and worship leader"
+      # Save closes the page (where it lands differs for the app and the web;
+      # see ProfessionalProfileFlowTest).
+      assert_no_current_path edit_settings_professional_path
     end
+    assert_equal "Teacher and worship leader", @member.profile.reload.headline
     settings.close
 
     switch_to_window(feed)
