@@ -345,3 +345,148 @@ body:not([style*="--fc-accent"]) #fc-splash {
   line-height: 1.7;
 }
 .fc-bible-verse-num { font-family: var(--fc-sans); }
+
+/* ── 5. Card action bar: contained highlights, no bleed (Nov 2026) ───────
+   Founder report (Android app): the action icons' borders "bleed" when tapped
+   or focused, and the "🙏 Praying · N" button looks off. Causes, from the
+   earlier passes in application.tailwind.css / comments.css:
+     • a 999px pill radius on segments that are ~55×52px on phones, so the
+       hover/joined background becomes a stretched blob;
+     • focus drawn OUTSIDE the button (3px box-shadow ring, or the theme files'
+       2px outline with a 2px offset), spilling over the zero-gap neighbours
+       and past the card edge;
+     • `transform: scale(.97)` on :active, plus Android's own tap-highlight
+       rectangle and a :hover that sticks after a tap on touch screens;
+     • the prayer button squeezed in as a 6th segment, its emoji a bare text
+       node (different size/baseline to the 18–20px icons) and its label
+       wrapping to "Praying ·" / "1".
+   Fix: every highlight is a background inside the button's own box with a
+   modest radius; keyboard focus is drawn inset; hover only on devices that
+   really hover; the prayer action gets its own full-width row. */
+
+html .fc-breath-actions { flex-wrap: wrap; row-gap: 6px; }
+/* Segments need a real minimum (also a fair tap target), otherwise five
+   zero-basis segments + the 100% prayer row "fit" on one line and the
+   segments collapse to nothing instead of the prayer row wrapping. */
+html .fc-breath-actions > :not(.fc-prayer-action-form) { min-width: 44px; }
+
+html .fc-breath-actions :is(.fc-breath-action, .fc-action),
+html .fc-breath-actions .fc-reaction-add {
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  outline: none;
+  transform: none !important;
+  transition: background-color 140ms ease, color 140ms ease !important;
+}
+/* Pressed: a slightly stronger tint, still inside the button. */
+html .fc-breath-actions :is(.fc-breath-action, .fc-action):not(.is-muted):active {
+  background: color-mix(in srgb, var(--fc-accent) 14%, transparent) !important;
+}
+/* Keyboard focus stays visible, but inset so it can't spill over neighbours. */
+html .fc-breath-actions :is(.fc-breath-action, .fc-action):focus-visible,
+html .fc-breath-actions .fc-reaction-add:focus-visible {
+  outline: 2px solid var(--fc-accent) !important;
+  outline-offset: -2px !important;
+  box-shadow: none !important;
+}
+html .fc-breath-actions :is(.fc-breath-action, .fc-action):focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+/* Touch screens (the Android/iOS apps): no hover, so a tap can't leave a
+   stuck highlight or an enlarged icon behind. */
+@media (hover: none) {
+  html .fc-breath-actions :is(.fc-breath-action, .fc-action):not(.is-prayer-action):hover:not(:active) {
+    background: transparent !important;
+  }
+  html .fc-breath-actions .fc-breath-action:not(.is-mine):not(.is-prayer-action):not(.is-thread):hover,
+  html .fc-breath-actions .fc-action:not(.text-\[var\(--fc-gold\)\]):hover {
+    color: var(--fc-muted) !important;
+  }
+  html .fc-breath-actions :is(.fc-breath-action, .fc-action, .fc-reaction-add):hover svg {
+    transform: none !important;
+  }
+}
+
+/* Emoji in the bar (prayer, your chosen Like reaction) sized like the icons. */
+html .fc-breath-actions :is(.fc-prayer-emoji, .fc-react-emoji) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* Prayer chain: its own full-width row under Like · Comment · Repost · Share · Save. */
+html .fc-breath-actions > .fc-prayer-action-form {
+  flex: 1 0 100%;
+  display: flex;
+  margin: 0;
+}
+html .fc-breath-actions .fc-breath-action.is-prayer-action {
+  flex-direction: row !important;
+  width: 100%;
+  height: 40px !important;
+  min-height: 40px !important;
+  padding: 0 14px !important;
+  gap: 8px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700;
+  white-space: nowrap;
+}
+html .fc-breath-actions .is-prayer-action .fc-action-label {
+  font-size: inherit !important;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Not joined yet / Mark answered: soft lavender */
+html:not(.theme-dark) .fc-breath-actions .fc-breath-action.is-prayer-action:not(.is-joined) {
+  background: rgba(124, 58, 237, 0.08) !important;
+  color: #6d28d9 !important;
+}
+html.theme-dark .fc-breath-actions .fc-breath-action.is-prayer-action:not(.is-joined) {
+  background: rgba(167, 139, 250, 0.12) !important;
+  color: #c4b5fd !important;
+}
+/* Praying (joined): gold */
+html .fc-breath-actions .fc-breath-action.is-prayer-action.is-joined {
+  background: var(--fc-gold-soft) !important;
+  color: var(--fc-gold) !important;
+}
+html:not(.theme-dark) .fc-breath-actions .fc-breath-action.is-prayer-action:not(.is-joined):active {
+  background: rgba(124, 58, 237, 0.15) !important;
+}
+html.theme-dark .fc-breath-actions .fc-breath-action.is-prayer-action:not(.is-joined):active {
+  background: rgba(167, 139, 250, 0.2) !important;
+}
+html .fc-breath-actions .fc-breath-action.is-prayer-action.is-joined:active {
+  background: color-mix(in srgb, var(--fc-gold) 22%, transparent) !important;
+}
+@media (hover: hover) {
+  html:not(.theme-dark) .fc-breath-actions .fc-breath-action.is-prayer-action:not(.is-joined):hover {
+    background: rgba(124, 58, 237, 0.13) !important;
+  }
+  html.theme-dark .fc-breath-actions .fc-breath-action.is-prayer-action:not(.is-joined):hover {
+    background: rgba(167, 139, 250, 0.18) !important;
+  }
+  html .fc-breath-actions .fc-breath-action.is-prayer-action.is-joined:hover {
+    background: color-mix(in srgb, var(--fc-gold) 20%, transparent) !important;
+  }
+}
+
+/* Reaction pills and the sidebar Pray button: no grey tap flash on Android,
+   no stuck hover after a tap. Their focus ring stays (they have room). */
+:is(.fc-reaction-pill, .reaction-btn, .fc-btn) { -webkit-tap-highlight-color: transparent; }
+:is(.fc-reaction-pill, .reaction-btn):focus-visible {
+  outline: 2px solid var(--fc-accent) !important;
+  outline-offset: -2px !important;
+  box-shadow: none !important;
+}
+@media (hover: none) {
+  :is(.fc-reaction-pill, .reaction-btn):active { transform: none !important; }
+}

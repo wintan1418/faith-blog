@@ -165,25 +165,28 @@
           <% if mine %>
             <%= button_to mark_prayer_answered_post_path(post),
                 method: :post,
-                form_class: "inline",
+                form_class: "inline fc-prayer-action-form",
                 class: "fc-breath-action is-prayer-action",
                 data: { turbo_confirm: "Mark this prayer answered? Everyone in the chain will be notified." } do %>
-              🌟 <span>Mark answered</span>
+              <span class="fc-prayer-emoji" aria-hidden="true">🌟</span>
+              <span class="fc-action-label">Mark answered</span>
             <% end %>
           <% elsif joined %>
             <%= button_to leave_prayer_chain_post_path(post),
                 method: :delete,
-                form_class: "inline",
+                form_class: "inline fc-prayer-action-form",
                 class: "fc-breath-action is-prayer-action is-joined",
                 title: "Leave the prayer chain" do %>
-              🙏 <span>Praying<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
+              <span class="fc-prayer-emoji" aria-hidden="true">🙏</span>
+              <span class="fc-action-label">Praying<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
             <% end %>
           <% else %>
             <%= button_to join_prayer_chain_post_path(post),
                 method: :post,
-                form_class: "inline",
+                form_class: "inline fc-prayer-action-form",
                 class: "fc-breath-action is-prayer-action" do %>
-              🙏 <span>Join chain<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
+              <span class="fc-prayer-emoji" aria-hidden="true">🙏</span>
+              <span class="fc-action-label">Join chain<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
             <% end %>
           <% end %>
         <% end %>
