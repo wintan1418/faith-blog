@@ -27,6 +27,7 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("click", this.onReplyClick, true)
+    clearTimeout(this.toneTimer)
   }
 
   startReply({ replyId, replyName, replySnippet }) {
@@ -48,6 +49,7 @@ export default class extends Controller {
   onInput() {
     this.syncTrailingAction()
     this.autosize()
+    this.scheduleToneCheck()
   }
 
   // Grow the textarea with its content, up to the CSS max-height, then let
@@ -106,43 +108,40 @@ export default class extends Controller {
   }
 
   // ---- Kindness nudge -----------------------------------------------------
-  // Before sending a longer text message, quietly check its tone. Only a
-  // confident "harsh" reading pauses to offer a gentler rephrase — anything
-  // else (gentle, firm, an error, a timeout) sends straight through.
+  // The tone of a longer message is read in the background while it's being
+  // typed. Send never waits for it: tapping Send sends at once, unless the
+  // reading for exactly this text already came back confidently "harsh",
+  // which pauses to offer a gentler rephrase. (It used to be checked only
+  // when Send was tapped, holding the message for the AI's 1-4 seconds.)
 
-  onSubmit(event) {
-    if (this.toneApproved) return                       // already cleared this text
-    if (!this.hasGentlenessUrlValue || !this.gentlenessUrlValue) return
-    if (!this.hasBodyInputTarget) return
-
+  scheduleToneCheck() {
+    clearTimeout(this.toneTimer)
+    this.toneApproved = false
+    if (!this.hasGentlenessUrlValue || !this.gentlenessUrlValue || !this.hasBodyInputTarget) return
     const text = this.bodyInputTarget.value.trim()
     if (text.length < 25) return                        // too short to read tone
-
-    event.preventDefault()
-    this.checkTone(text)
+    this.toneTimer = setTimeout(() => this.readTone(text), 1200)
   }
 
-  async checkTone(text) {
-    if (this.checking) return
-    this.checking = true
-    this.setChecking(true)
-
+  async readTone(text) {
+    if (this.toneText === text) return                  // already read (or reading) this text
+    this.toneText = text
+    this.toneResult = null
     let data = null
-    try {
-      data = await this.postJson(this.gentlenessUrlValue, { content: text })
-    } catch (_e) {
-      data = null                                        // network / timeout → fail open
-    } finally {
-      this.checking = false
-      this.setChecking(false)
-    }
+    try { data = await this.postJson(this.gentlenessUrlValue, { content: text }) } catch (_e) { data = null }
+    if (this.toneText === text) this.toneResult = data
+  }
 
+  onSubmit(event) {
+    clearTimeout(this.toneTimer)
+    if (this.toneApproved || !this.hasBodyInputTarget) return
+    const text = this.bodyInputTarget.value.trim()
+    const data = this.toneText === text ? this.toneResult : null
     const harsh = data && data.ok && data.tone === "harsh" && Number(data.confidence || 0) >= 0.5
-    if (harsh) {
-      this.showNudge(data)
-    } else {
-      this.approveAndSend()
-    }
+    if (!harsh) return                                  // send now
+
+    event.preventDefault()
+    this.showNudge(data)
   }
 
   approveAndSend() {
@@ -178,7 +177,7 @@ export default class extends Controller {
       this.bodyInputTarget.focus()
     }
     this.hideNudge()
-    this.toneApproved = false        // sending again re-checks the softened text
+    this.toneApproved = false        // the softened text gets its own reading
   }
 
   sendAnyway(event) {
@@ -190,14 +189,6 @@ export default class extends Controller {
     if (event) event.preventDefault()
     this.hideNudge()
     if (this.hasBodyInputTarget) this.bodyInputTarget.focus()
-  }
-
-  setChecking(on) {
-    if (this.hasSendBtnTarget) {
-      this.sendBtnTarget.classList.toggle("is-checking", on)
-      this.sendBtnTarget.disabled = on
-    }
-    if (this.hasRecordBtnTarget) this.recordBtnTarget.disabled = on
   }
 
   postJson(url, body) {
