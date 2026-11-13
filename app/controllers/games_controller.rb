@@ -27,7 +27,9 @@ class GamesController < ApplicationController
 
   # POST /games/quiz/generate — JSON: returns N questions filtered by
   # theme + difficulty, preferring questions THIS user hasn't seen lately.
-  # Falls back to on-demand AI generation if the filtered pool is too thin.
+  # Always served straight from the pool (widening the filter if it's
+  # short) — AI generation happens in BibleQuizTopUpJob, never on this
+  # request, except one last-resort call when the pool is completely empty.
   def quiz_generate
     theme       = params[:theme].to_s.presence
     theme       = nil unless theme.nil? || Ai::Bible::QuizGenerator::THEMES.key?(theme)
@@ -36,21 +38,22 @@ class GamesController < ApplicationController
     length      = params[:length].to_i
     length      = 5 unless QUIZ_LENGTHS.include?(length)
 
-    rows = BibleQuizQuestion.sample_for(user: current_user, theme: theme, difficulty: difficulty, count: length)
+    rows = BibleQuizQuestion.serve_round(user: current_user, theme: theme, difficulty: difficulty, count: length)
 
-    # Top up the pool on demand. Each AI batch yields ~5 questions, so a
-    # 10- or 20-question round needs SEVERAL batches when the pool is thin —
-    # a single batch used to leave long rounds failing with an empty result.
-    attempts = 0
-    while rows.size < length && attempts < 5
+    # Nothing to play at all (fresh install / every question retired):
+    # one synchronous batch so the player isn't stuck. Provider HTTP
+    # timeout is 12s (Ai::Moderation::Providers::Base::DEFAULT_TIMEOUT).
+    if rows.empty? && !Ai::Moderation::Client.stub?
       begin
-        generated = Ai::Bible::QuizGenerator.call(theme: theme, difficulty: difficulty)
-        BibleQuizQuestion.import_from_generator!(generated)
-      rescue Ai::Bible::QuizGenerator::ParseError, Ai::Moderation::Client::Error => e
+        BibleQuizQuestion.import_from_generator!(Ai::Bible::QuizGenerator.call(theme: theme, difficulty: difficulty))
+      rescue StandardError => e
         Rails.logger.warn("[QuizGenerator] #{e.class}: #{e.message}")
       end
-      attempts += 1
-      rows = BibleQuizQuestion.sample_for(user: current_user, theme: theme, difficulty: difficulty, count: length)
+      rows = BibleQuizQuestion.serve_round(user: current_user, theme: theme, difficulty: difficulty, count: length)
+    end
+
+    if BibleQuizQuestion.needs_top_up?(user: current_user, theme: theme, difficulty: difficulty, length: length)
+      BibleQuizTopUpJob.enqueue_once(theme: theme, difficulty: difficulty)
     end
 
     BibleQuizQuestion.mark_seen!(user: current_user, question_ids: rows.map(&:id))

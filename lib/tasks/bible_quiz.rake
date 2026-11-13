@@ -53,6 +53,26 @@ namespace :bible_quiz do
     puts "\nDone. Theme '#{theme}' now has #{BibleQuizQuestion.where(theme: theme).count} questions (+#{inserted} this run)."
   end
 
+  desc "Top up every theme × difficulty to the pool target, inline (e.g. bible_quiz:warm_pool[40])"
+  task :warm_pool, [ :target ] => :environment do |_t, args|
+    target = (args[:target] || BibleQuizQuestion::POOL_TARGET).to_i
+    if Ai::Moderation::Client.stub?
+      warn "AI provider not configured (stub) — nothing to generate."
+      next
+    end
+
+    short = BibleQuizWarmPoolJob.short_filters(target)
+    puts "#{short.size} theme × difficulty filters below #{target} trusted questions."
+    total = 0
+    short.each do |theme, diff|
+      batches = ((target - BibleQuizQuestion.pool_size(theme: theme, difficulty: diff)) / 4.0).ceil.clamp(1, 12)
+      added = BibleQuizTopUpJob.perform_now(theme, diff, batches, target)
+      total += added.to_i
+      puts "  #{theme.ljust(14)} #{diff.ljust(6)} +#{added} (now #{BibleQuizQuestion.pool_size(theme: theme, difficulty: diff)})"
+    end
+    puts "Done. Pool size: #{BibleQuizQuestion.trusted.count} trusted (+#{total} this run)."
+  end
+
   desc "Show pool stats by theme / difficulty"
   task stats: :environment do
     puts "Total: #{BibleQuizQuestion.count}"
