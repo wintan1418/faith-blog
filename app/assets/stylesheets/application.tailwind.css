@@ -17818,7 +17818,12 @@ html.theme-dark div.profile-stat.profile-stat-streak {
   box-shadow:
     0 12px 32px rgba(0, 0, 0, 0.10),
     0 2px 8px rgba(0, 0, 0, 0.06);
-  transform: translateY(-1px);
+}
+/* The lift only where there's a real pointer: on touch screens :hover sticks
+   after a tap, and a transform on the card traps fixed-position children
+   (the phone emoji sheet) inside the card. */
+@media (hover: hover) and (pointer: fine) {
+  .fc-breath:hover { transform: translateY(-1px); }
 }
 
 .fc-breath:hover::before { opacity: 1; top: 10%; bottom: 10%; }
@@ -21012,3 +21017,18 @@ html.theme-dark .profile-cover, :root .profile-cover { opacity: 1; filter: satur
 .profile-meta:has(.profile-meta-label) { align-items: flex-start; gap: 0.4rem; }
 .profile-meta:has(.profile-meta-label) svg { flex: none; margin-top: 0.2rem; }
 .profile-meta:has(.profile-meta-label) > span { text-align: left; min-width: 0; }
+
+/* While the phone emoji sheet is open, ancestors that would trap a fixed
+   element (transform, filter…) are switched off so the sheet really sits at
+   the bottom of the screen (emoji_picker_controller#freeSheet). */
+.fc-emoji-sheet-host {
+  transform: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  perspective: none !important;
+  contain: none !important;
+  will-change: auto !important;
+  transition: none !important;
+  animation: none !important;
+}
