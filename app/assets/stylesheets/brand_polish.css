@@ -490,3 +490,35 @@ html .fc-breath-actions .fc-breath-action.is-prayer-action.is-joined:active {
 @media (hover: none) {
   :is(.fc-reaction-pill, .reaction-btn):active { transform: none !important; }
 }
+
+/* ── 6. Feed shortcuts row (phones) ───────────────────────────────────────
+   The sidebar is hidden under 760px, so its links show here as chips. */
+.fc-feed-shortcuts { display: none; }
+@media (max-width: 760px) {
+  .fc-feed-shortcuts {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 10px;
+    margin-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .fc-feed-shortcuts::-webkit-scrollbar { display: none; }
+  .fc-feed-shortcut {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--fc-line);
+    background: var(--fc-surface);
+    color: var(--fc-ink);
+    font-size: 0.8rem;
+    font-weight: 650;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fc-feed-shortcut:active { background: var(--fc-accent-soft); }
+}
