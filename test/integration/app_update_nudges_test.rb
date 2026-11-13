@@ -98,6 +98,9 @@ class AppUpdateNudgesTest < ActionDispatch::IntegrationTest
     perform_enqueued_jobs { post remind_admin_app_release_path }
     assert_equal 1, @user.notifications.app_update.count
     assert_match "1.0.8 is out", @user.notifications.app_update.last.message
+    assert_equal app_update_store_path, @user.notifications.app_update.last.target_path
+    get app_update_store_path
+    assert_redirected_to "https://play.google.com/store/apps/details?id=com.brethreign.app"
 
     perform_enqueued_jobs { post remind_admin_app_release_path }
     assert_equal 1, @user.notifications.app_update.count
