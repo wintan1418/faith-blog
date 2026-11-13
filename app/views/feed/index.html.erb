@@ -261,6 +261,16 @@
           just this region — no full page reload. target: "_top" keeps every
           link inside the cards navigating normally; only the tab links opt
           into the frame. %>
+      <%# Phones hide the sidebar, so its shortcuts sit here as a swipeable row. %>
+      <nav class="fc-feed-shortcuts" aria-label="Shortcuts">
+        <%= link_to "🙏 Prayer Circles", circles_path, class: "fc-feed-shortcut" %>
+        <%= link_to "🌟 Answered Prayers", answered_prayers_path, class: "fc-feed-shortcut" %>
+        <%= link_to "📰 Blog & guides", blog_path, class: "fc-feed-shortcut" %>
+        <%= link_to "🎯 Games", games_path, class: "fc-feed-shortcut" %>
+        <%= link_to "⛪ Church History", church_history_path, class: "fc-feed-shortcut" %>
+        <%= link_to "🔖 Bookmarks", bookmarks_path, class: "fc-feed-shortcut" %>
+      </nav>
+
       <%= turbo_frame_tag "feed_stream", target: "_top" do %>
       <div class="fc-tabs" data-controller="feed-tabs">
         <%= link_to "Recent", feed_path,
