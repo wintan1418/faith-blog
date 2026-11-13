@@ -1,4 +1,7 @@
 <% content_for :title, "Connection Requests" %>
+<%# Accepting from someone's profile and tapping back used to show the old
+    snapshot with the request still pending: always load this page fresh. %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
 <div class="mystic-shell py-8">
   <div class="mystic-container max-w-5xl">
@@ -18,37 +21,13 @@
       <%= render "shared/brethren_suggestions", suggestions: @suggestions if @suggestions.present? %>
     </div>
 
+    <%# Requests accepted, declined or sent elsewhere update these lists live. %>
+    <%= turbo_stream_from current_user, :connection_requests %>
+
     <div class="grid gap-6 lg:grid-cols-2">
       <%= render "received_requests", pending_requests: @pending_requests %>
 
-      <section class="mystic-panel p-6">
-        <h2 class="mb-5 text-xl font-bold text-faith-dark">Sent Requests</h2>
-
-        <% if @sent_requests.any? %>
-          <div class="divide-y divide-faith-green/10">
-            <% @sent_requests.each do |request| %>
-              <div class="flex items-center gap-4 py-4">
-                <% if request.receiver.profile&.avatar&.attached? %>
-                  <%= image_tag avatar_src(request.receiver.profile, 128), class: "mystic-avatar h-12 w-12 object-cover" %>
-                <% else %>
-                  <span class="mystic-avatar mystic-avatar-fallback grid h-12 w-12 place-items-center font-bold">
-                    <%= request.receiver.display_name.first.upcase %>
-                  </span>
-                <% end %>
-                <div class="min-w-0 flex-1">
-                  <%= link_to request.receiver.display_name, user_path(request.receiver.username), class: "font-bold text-faith-dark hover:text-faith-green" %>
-                  <p class="text-sm text-faith-muted">Sent <%= time_ago_in_words(request.created_at) %> ago</p>
-                </div>
-                <span class="mystic-badge px-3 py-1"><%= request.status.titleize %></span>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="rounded-2xl bg-white/45 p-8 text-center">
-            <p class="font-semibold text-faith-muted">You have not sent any requests yet.</p>
-          </div>
-        <% end %>
-      </section>
+      <%= render "sent_requests", sent_requests: @sent_requests %>
     </div>
   </div>
 </div>

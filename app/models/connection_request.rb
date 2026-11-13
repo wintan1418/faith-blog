@@ -14,6 +14,10 @@ class ConnectionRequest < ApplicationRecord
 
   after_create :create_notification
   after_update :notify_on_acceptance
+  # Keep an open Connection Requests page in step for both people, so a
+  # request accepted from the sender's profile (or another device) stops
+  # showing as pending without a refresh.
+  after_commit :broadcast_request_lists
 
   def self.between(user1, user2)
     where(sender: user1, receiver: user2)
@@ -26,6 +30,30 @@ class ConnectionRequest < ApplicationRecord
   end
 
   private
+
+  def broadcast_request_lists
+    receiver_now = User.find_by(id: receiver_id)
+    sender_now = User.find_by(id: sender_id)
+    if receiver_now
+      Turbo::StreamsChannel.broadcast_replace_to(
+        receiver_now, :connection_requests,
+        target: "connection_requests_received",
+        partial: "connection_requests/received_requests",
+        locals: { pending_requests: receiver_now.received_connection_requests.pending.includes(sender: :brethren_card) }
+      )
+    end
+    if sender_now
+      Turbo::StreamsChannel.broadcast_replace_to(
+        sender_now, :connection_requests,
+        target: "connection_requests_sent",
+        partial: "connection_requests/sent_requests",
+        locals: { sent_requests: sender_now.sent_connection_requests.includes(receiver: :brethren_card) }
+      )
+    end
+  rescue StandardError => e
+    # A live update must never undo an accept/decline.
+    Rails.logger.warn("[ConnectionRequest] broadcast failed: #{e.class}: #{e.message}")
+  end
 
   def cannot_request_self
     if sender_id == receiver_id
