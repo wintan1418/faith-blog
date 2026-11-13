@@ -404,6 +404,12 @@
         <%= link_to blog_path, class: "fc-discover-quicklink", title: "Blog & guides", aria: { label: "Blog and guides" } do %>
           <span class="fc-discover-quicklink-emoji">📰</span>
         <% end %>
+        <%= link_to circles_path, class: "fc-discover-quicklink", title: "Prayer Circles", aria: { label: "Prayer Circles" } do %>
+          <span class="fc-discover-quicklink-emoji">🙏</span>
+        <% end %>
+        <%= link_to answered_prayers_path, class: "fc-discover-quicklink", title: "Answered Prayers", aria: { label: "Answered Prayers" } do %>
+          <span class="fc-discover-quicklink-emoji">🌟</span>
+        <% end %>
       </nav>
       <%
         verses = @daily_verses.presence || [
