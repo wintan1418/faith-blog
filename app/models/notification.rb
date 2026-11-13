@@ -176,7 +176,7 @@ class Notification < ApplicationRecord
     when :skill_endorsed
       Rails.application.routes.url_helpers.user_path(user.username, tab: "professional")
     when :app_update
-      Rails.application.routes.url_helpers.edit_settings_account_path
+      Rails.application.routes.url_helpers.app_update_store_path # straight on to the Play Store
     when :content_removed
       if notifiable.is_a?(PortfolioItem)
         Rails.application.routes.url_helpers.edit_settings_portfolio_item_path(notifiable)

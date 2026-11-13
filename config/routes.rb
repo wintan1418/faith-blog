@@ -392,4 +392,6 @@ Rails.application.routes.draw do
 
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
+  # "Update the app" alerts land here and go straight to the Play Store listing.
+  get "app/update", to: redirect("https://play.google.com/store/apps/details?id=com.brethreign.app", status: 302), as: :app_update_store
 end
