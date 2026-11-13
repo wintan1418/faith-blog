@@ -1,6 +1,9 @@
 <% content_for(:title) { "#{@user.username} - Brethreign" } %>
 <% content_for(:og_accent) { @user.accent_color } %>
 <% content_for(:og_title) { "#{@user.username} on Brethreign" } %>
+<%# Your own profile changes from the settings pages you open on top of it:
+    coming back (or the app closing that page) should show it fresh. %>
+<% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } if user_signed_in? && @user == current_user %>
 
 <div class="mystic-shell profile-page" data-controller="profile-hero">
   <%# Sticky mini-bar: slides in when the hero scrolls out of view. %>
