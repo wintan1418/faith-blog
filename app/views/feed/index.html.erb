@@ -184,13 +184,10 @@
       </section>
 
       <%# Getting started: first steps that tick themselves, until done or hidden. %>
-      <% if @onboarding %>
-        <%= render "feed/onboarding_checklist", checklist: @onboarding, prayer_room: @prayer_room %>
-      <% elsif @onboarding_celebrate %>
-        <p class="fc-side-card fc-checklist-done" role="status">
-          <span aria-hidden="true">✓</span>
-          <span><strong>You're all set.</strong> Every first step is done. Welcome home, <%= current_user.username %>.</span>
-        </p>
+      <% if @onboarding || @onboarding_celebrate %>
+        <%# Steps done on other pages tick here without a refresh (OnboardingChecklist.broadcast_refresh). %>
+        <%= turbo_stream_from current_user, :onboarding if @onboarding %>
+        <%= render "feed/onboarding_frame", checklist: @onboarding, celebrate: @onboarding_celebrate, prayer_room: @prayer_room %>
       <% end %>
 
       <%# New brethren: one card, not one per person. Closing it hides this group;

@@ -129,6 +129,9 @@ class Profile < ApplicationRecord
   # New profile photos get an AI look (see AvatarModerationJob).
   before_save { @avatar_changed = attachment_changes.key?("avatar") }
   after_commit :moderate_avatar, if: -> { @avatar_changed && avatar.attached? }
+  # The headline (professional profile) and photo are getting-started steps.
+  before_save { @onboarding_changed = will_save_change_to_headline? || attachment_changes.key?("avatar") }
+  after_commit -> { OnboardingChecklist.broadcast_refresh(user) }, if: -> { @onboarding_changed }
 
   def moderate_avatar
     @avatar_changed = false

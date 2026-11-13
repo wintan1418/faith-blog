@@ -11,6 +11,9 @@ class Experience < ApplicationRecord
 
   belongs_to :user
 
+  # A first role sets up the professional profile: tick it on an open feed.
+  after_commit -> { OnboardingChecklist.broadcast_refresh(user) }, on: %i[create destroy]
+
   validates :title, :organization, presence: true, length: { maximum: 100 }
   validates :start_on, presence: true
   validates :employment_type, inclusion: { in: EMPLOYMENT_TYPES }, allow_blank: true

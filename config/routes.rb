@@ -378,6 +378,7 @@ Rails.application.routes.draw do
   # First-run onboarding: hide or bring back the getting-started list; finish or retake the tour.
   scope "onboarding", controller: "onboarding", as: "onboarding" do
     post "hide", action: :hide, as: :hide
+    get "checklist", action: :checklist, as: :checklist
     post "show", action: :show_checklist, as: :show
     post "tour/finish", action: :finish_tour, as: :finish_tour
     post "tour/restart", action: :restart_tour, as: :restart_tour

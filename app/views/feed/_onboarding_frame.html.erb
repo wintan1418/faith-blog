@@ -1,0 +1,18 @@
+<%#
+  The getting-started list in a frame that reloads itself when the feed is
+  shown from Turbo's saved copy (going back to it, or returning to the Feed
+  in the app), so a step done elsewhere, e.g. the professional profile,
+  shows as done without restarting the app.
+  Locals: checklist (OnboardingChecklist or nil), celebrate, prayer_room
+%>
+<%= turbo_frame_tag "onboarding_checklist_frame", target: "_top",
+      data: { controller: "stale-frame", stale_frame_url_value: onboarding_checklist_path } do %>
+  <% if checklist %>
+    <%= render "feed/onboarding_checklist", checklist: checklist, prayer_room: prayer_room %>
+  <% elsif celebrate %>
+    <p class="fc-side-card fc-checklist-done" role="status">
+      <span aria-hidden="true">✓</span>
+      <span><strong>You're all set.</strong> Every first step is done. Welcome home, <%= current_user.username %>.</span>
+    </p>
+  <% end %>
+<% end %>
