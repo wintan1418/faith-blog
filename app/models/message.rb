@@ -106,6 +106,7 @@ class Message < ApplicationRecord
 
   after_create_commit :touch_conversation
   after_create_commit :broadcast_to_participants
+  after_create_commit :broadcast_inbox_rows
   # AI review first; it notifies the recipient once the message is cleared.
   after_create_commit :moderate
 
@@ -234,6 +235,28 @@ class Message < ApplicationRecord
     return if images.count <= MAX_IMAGES
 
     errors.add(:images, "cannot exceed #{MAX_IMAGES} images per message")
+  end
+
+  # Move this chat to the top of each participant's open inbox list, with the
+  # new preview and unread count, so it shows without a refresh.
+  def broadcast_inbox_rows
+    conversation.conversation_participants.includes(:user).find_each do |participant|
+      next if participant.archived_at.present? || participant.user.nil?
+
+      stream = [ participant.user, :inbox ]
+      row_id = ActionView::RecordIdentifier.dom_id(conversation, :inbox_row)
+      Turbo::StreamsChannel.broadcast_remove_to(stream, target: row_id)
+      Turbo::StreamsChannel.broadcast_remove_to(stream, target: "msg_rows_empty")
+      Turbo::StreamsChannel.broadcast_prepend_to(
+        stream,
+        target: "msg_rows",
+        partial: "conversations/conversation_row",
+        locals: { conversation: conversation, viewer: participant.user, active: false, latest: self }
+      )
+    rescue StandardError => e
+      # Never let a live-update failure break sending.
+      Rails.logger.error("[Message##{id}] inbox broadcast to user #{participant.user_id} failed: #{e.class}: #{e.message}")
+    end
   end
 
   def broadcast_to_participants
