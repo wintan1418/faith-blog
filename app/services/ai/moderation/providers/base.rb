@@ -21,7 +21,7 @@ module Ai
         #   { "model" => "...", "content" => [ { "type" => "text", "text" => "{...json...}" } ] }
         # so Reviewer's parser can stay provider-agnostic.
         # images: [{ mime: "image/jpeg", data: "<base64>" }] for vision checks (optional).
-        def call(system:, user:, images: [])
+        def call(system:, user:, images: [], max_tokens: nil)
           raise NotImplementedError
         end
 

@@ -8,7 +8,7 @@ module Ai
         THINKING_BUDGET = 512
         ENDPOINT_TEMPLATE = "https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent"
 
-        def call(system:, user:, images: [])
+        def call(system:, user:, images: [], max_tokens: nil)
           raise Client::ConfigError, "GEMINI_API_KEY missing" if @api_key.to_s.strip.empty?
 
           uri = URI("#{format(ENDPOINT_TEMPLATE, @model)}?key=#{@api_key}")
@@ -17,7 +17,7 @@ module Ai
             contents: [ { role: "user", parts: [ { text: user } ] + images.map { |i| { inlineData: { mimeType: i[:mime], data: i[:data] } } } } ],
             generationConfig: {
               temperature: 0.0,
-              maxOutputTokens: DEFAULT_MAX_TOKENS + THINKING_BUDGET,
+              maxOutputTokens: (max_tokens || DEFAULT_MAX_TOKENS) + THINKING_BUDGET,
               responseMimeType: "application/json"
             }.merge(thinking_config)
           }

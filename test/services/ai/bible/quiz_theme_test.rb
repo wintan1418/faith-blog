@@ -18,7 +18,7 @@ class Ai::Bible::QuizThemeTest < ActiveSupport::TestCase
     assert_equal Ai::Bible::QuizGenerator::THEMES.keys.sort, Ai::Bible::QuizGenerator::THEME_BOOKS.keys.sort
 
     prompts = []
-    fake = lambda do |system:, user:, images: []|
+    fake = lambda do |system:, user:, images: [], max_tokens: nil|
       prompts << user
       ai_reply("questions" => [ question("Why did Paul glory only in the cross?") ])
     end
@@ -65,7 +65,7 @@ class Ai::Bible::QuizThemeTest < ActiveSupport::TestCase
     off = BibleQuizQuestion.create!(kind: "which_book", prompt: "Which book mentions Diotrephes?",
                                     choices: [ "3 John", "Jude", "Titus", "Acts" ], correct_index: 0, theme: "the_cross")
     seen = nil
-    fake = lambda do |system:, user:, images: []|
+    fake = lambda do |system:, user:, images: [], max_tokens: nil|
       seen = user
       ai_reply("off_theme_ids" => [ off.id, 999_999 ])
     end
