@@ -1,0 +1,39 @@
+<%# The reported Bible Quiz question, exactly as players saw it. %>
+<section class="mt-6 rounded-lg border border-gray-200 bg-gray-50 p-5" aria-label="Reported question">
+  <div class="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+    <span>Theme: <%= question.theme.present? ? question.theme.humanize : "none" %></span>
+    <span>· <%= question.difficulty.to_s.humanize %></span>
+    <span>· <%= question.kind.to_s.humanize %></span>
+    <span>· <%= pluralize(question.flags_count, "flag") %></span>
+    <% if question.retired? %>
+      <span class="rounded bg-red-100 px-2 py-0.5 text-red-700">Out of the quiz</span>
+    <% else %>
+      <span class="rounded bg-green-100 px-2 py-0.5 text-green-700">In the quiz</span>
+    <% end %>
+  </div>
+  <p class="text-lg font-semibold text-gray-900"><%= question.prompt %></p>
+  <ol class="mt-3 grid gap-2 sm:grid-cols-2">
+    <% question.choices.each_with_index do |choice, i| %>
+      <li class="rounded-md border px-3 py-2 text-sm <%= i == question.correct_index ? 'border-green-400 bg-green-50 font-semibold text-green-800' : 'border-gray-200 bg-white text-gray-800' %>">
+        <%= ("A".ord + i).chr %>. <%= choice %><%= " ✓ marked correct" if i == question.correct_index %>
+      </li>
+    <% end %>
+  </ol>
+  <% if question.reference.present? %>
+    <p class="mt-3 text-sm text-gray-700"><strong>Reference:</strong> <%= question.reference %></p>
+  <% end %>
+  <% if question.explanation.present? %>
+    <p class="mt-1 text-sm text-gray-700"><strong>Explanation:</strong> <%= question.explanation %></p>
+  <% end %>
+  <% others = question.reports.where.not(id: @report.id).includes(:reporter).recent.limit(10) %>
+  <% if others.any? %>
+    <div class="mt-4">
+      <p class="text-sm font-bold text-gray-500">Other reports of this question</p>
+      <ul class="mt-1 space-y-1 text-sm text-gray-700">
+        <% others.each do |r| %>
+          <li><%= r.reporter&.username || "Unknown" %> · <%= r.status.humanize %> · <%= r.reason %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</section>

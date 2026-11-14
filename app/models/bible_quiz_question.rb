@@ -2,6 +2,20 @@
 
 class BibleQuizQuestion < ApplicationRecord
   has_many :user_seen_quiz_questions, dependent: :delete_all
+  # Players' "Report this question" reports, reviewed in Admin → Reports.
+  has_many :reports, as: :reportable, dependent: :destroy
+
+  # Why a player can report a question. Every reason but "other" also counts
+  # as a flag, and RETIRE_AT flags take the question out of the pool until an
+  # admin looks at it.
+  REPORT_REASONS = {
+    "wrong_answer"    => "Wrong answer",
+    "unclear"         => "Unclear question",
+    "wrong_reference" => "Not in the Bible / wrong reference",
+    "off_theme"       => "Doesn't fit the theme",
+    "other"           => "Other"
+  }.freeze
+  RETIRE_AT = 2
 
   validates :prompt, :correct_index, :fingerprint, presence: true
   validates :fingerprint, uniqueness: true
@@ -20,7 +34,7 @@ class BibleQuizQuestion < ApplicationRecord
   # pool is exhausted so the round is never short. theme/difficulty/kind
   # are optional filters; pass nil/"" to sample across all.
   # Questions two players have flagged as wrong stop being served.
-  scope :trusted, -> { where("flags_count < 2") }
+  scope :trusted, -> { where("flags_count < ?", RETIRE_AT) }
 
   def self.sample_for(user:, theme: nil, difficulty: nil, kind: nil, count: 5, exclude_ids: [])
     candidates = trusted.by_theme(theme).by_difficulty(difficulty).by_kind(kind)
@@ -104,6 +118,39 @@ class BibleQuizQuestion < ApplicationRecord
     end
     UserSeenQuizQuestion.upsert_all(rows, unique_by: :idx_seen_user_q,
                                           update_only: [ :last_seen_at ])
+  end
+
+  # A player reports this question. One report per player per question:
+  # reporting again updates their reason instead of counting twice.
+  # Returns the Report.
+  def report!(reporter:, reason:, note: nil)
+    reason = REPORT_REASONS.key?(reason.to_s) ? reason.to_s : "wrong_answer"
+    note = note.to_s.squish.truncate(300).presence
+    text = [ "Quiz question: #{REPORT_REASONS[reason]}.", (note && "Note: #{note}") ].compact.join(" ")
+
+    transaction do
+      report = reports.pending.find_by(reporter: reporter)
+      if report
+        report.update!(reason: text)
+      else
+        report = reports.create!(reporter: reporter, reason: text)
+        self.class.increment_counter(:flags_count, id) unless reason == "other"
+      end
+      report
+    end
+  end
+
+  def retired?
+    flags_count >= RETIRE_AT
+  end
+
+  # Admin: take the question out of the pool, or put it back after review.
+  def retire!
+    update_column(:flags_count, [ flags_count, RETIRE_AT ].max)
+  end
+
+  def restore!
+    update_column(:flags_count, 0)
   end
 
   def self.import_from_generator!(questions)

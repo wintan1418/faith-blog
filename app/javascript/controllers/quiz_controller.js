@@ -9,7 +9,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["stage", "modeSelect", "themeGrid", "diffRow", "lengthRow"]
   static values  = { generateUrl: String, submitUrl: String, csrf: String,
-                     gameName: String, flagUrl: String }
+                     gameName: String, flagUrl: String, reportReasons: Object }
 
   connect() {
     this.theme      = ""
@@ -123,10 +123,6 @@ export default class extends Controller {
         </p>
         ${q.reference ? `<p class="fc-quiz-ref">${this.escape(q.reference)}</p>` : ""}
         ${q.explanation ? `<p class="fc-quiz-note">${this.escape(q.explanation)}</p>` : ""}
-        ${q.id && this.flagUrlValue ? `
-          <button type="button" class="fc-quiz-flag" data-action="click->quiz#flagQuestion" data-qid="${q.id}">
-            ⚑ Answer looks wrong? Report it
-          </button>` : ""}
       `
     }
 
@@ -217,6 +213,12 @@ export default class extends Controller {
                   data-action="click->quiz#next">
             ${this.index + 1 === total ? "See result →" : "Next question →"}
           </button>
+          ${q.id && this.flagUrlValue ? `
+            <div class="fc-quiz-report" data-qid="${q.id}">
+              <button type="button" class="fc-quiz-flag" data-action="click->quiz#openReport">
+                ⚑ Report this question
+              </button>
+            </div>` : ""}
         </div>
       </div>
     `
@@ -281,19 +283,71 @@ export default class extends Controller {
     this.start()
   }
 
-  async flagQuestion(event) {
-    const btn = event.currentTarget
-    btn.disabled = true
+  // "Report this question": a short reason (wrong answer, unclear, not in the
+  // Bible / wrong reference, off theme, other) and an optional note. Works
+  // before or after answering, so a broken question needn't be guessed at.
+  openReport(event) {
+    const box = event.currentTarget.closest(".fc-quiz-report")
+    if (!box) return
+    const reasons = Object.keys(this.reportReasonsValue || {}).length
+      ? this.reportReasonsValue
+      : { wrong_answer: "Wrong answer", unclear: "Unclear question",
+          wrong_reference: "Not in the Bible / wrong reference", other: "Other" }
+    // "Doesn't fit the theme" only makes sense when the player chose one.
+    const options = Object.entries(reasons).filter(([key]) => key !== "off_theme" || this.theme)
+    box.innerHTML = `
+      <form class="fc-quiz-report-form" data-action="submit->quiz#sendReport">
+        <fieldset>
+          <legend class="fc-quiz-report-title">What's wrong with this question?</legend>
+          <div class="fc-quiz-report-reasons">
+            ${options.map(([key, label]) => `
+              <label class="fc-quiz-report-reason">
+                <input type="radio" name="reason" value="${this.escape(key)}" required>
+                <span>${this.escape(label)}</span>
+              </label>`).join("")}
+          </div>
+        </fieldset>
+        <textarea name="note" class="fc-quiz-report-note" rows="2" maxlength="300"
+                  aria-label="Add a note (optional)" placeholder="Add a note (optional)"></textarea>
+        <div class="fc-quiz-report-actions">
+          <button type="submit" class="fc-btn fc-btn-primary">Send report</button>
+          <button type="button" class="fc-btn" data-action="click->quiz#closeReport">Cancel</button>
+        </div>
+        <p class="fc-quiz-report-error hidden" role="alert"></p>
+      </form>
+    `
+    box.querySelector("input[name=reason]")?.focus()
+  }
+
+  closeReport(event) {
+    const box = event.currentTarget.closest(".fc-quiz-report")
+    if (!box) return
+    box.innerHTML = `
+      <button type="button" class="fc-quiz-flag" data-action="click->quiz#openReport">⚑ Report this question</button>
+    `
+  }
+
+  async sendReport(event) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const box = form.closest(".fc-quiz-report")
+    const data = new FormData(form)
+    const send = form.querySelector("button[type=submit]")
+    const error = form.querySelector(".fc-quiz-report-error")
+    send.disabled = true
     try {
-      await fetch(this.flagUrlValue, {
+      const response = await fetch(this.flagUrlValue, {
         method: "POST",
         headers: this.headers(),
         credentials: "same-origin",
-        body: JSON.stringify({ question_id: btn.dataset.qid })
+        body: JSON.stringify({ question_id: box.dataset.qid, reason: data.get("reason"), note: data.get("note") || "" })
       })
-      btn.textContent = "✓ Reported — thank you, we'll review it"
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      box.innerHTML = `<p class="fc-quiz-report-done" role="status">✓ Thanks, question reported. We'll review it.</p>`
     } catch {
-      btn.disabled = false
+      send.disabled = false
+      error.textContent = "Couldn't send the report. Please try again."
+      error.classList.remove("hidden")
     }
   }
 
