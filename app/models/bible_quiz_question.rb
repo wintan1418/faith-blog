@@ -55,12 +55,17 @@ class BibleQuizQuestion < ApplicationRecord
   POOL_CAP = 400
 
   # Build a round from the pool WITHOUT touching the AI. When the exact
-  # theme/difficulty filter is short, widen progressively (drop difficulty,
-  # then theme) so a round is never empty while any trusted question
-  # exists. sample_for already falls back to least-recently-seen rows.
+  # theme/difficulty filter is short, drop the difficulty — but never the
+  # theme: a player who picked "The Cross" gets only questions on the cross,
+  # even if that makes the round shorter (quiz_generate says so and tops the
+  # theme up). With no theme picked, any trusted question will do.
+  # sample_for already falls back to least-recently-seen rows.
   def self.serve_round(user:, theme: nil, difficulty: nil, count: 5)
+    widenings = [ [ theme, difficulty ], [ theme, nil ] ]
+    widenings << [ nil, nil ] if theme.blank?
+
     rows = []
-    [ [ theme, difficulty ], [ theme, nil ], [ nil, nil ] ].uniq.each do |t, d|
+    widenings.uniq.each do |t, d|
       break if rows.size >= count
 
       rows += sample_for(user: user, theme: t, difficulty: d,

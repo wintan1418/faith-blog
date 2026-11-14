@@ -18818,6 +18818,19 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
   }
 }
 
+/* ── Quiz: short themed round notice ──────────────────────────────────── */
+.fc-quiz-notice {
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--fc-accent) 30%, var(--fc-line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--fc-accent) 10%, var(--fc-surface));
+  color: var(--fc-ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 /* ── Quiz: "answer looks wrong" flag ──────────────────────────────────── */
 .fc-quiz-flag {
   display: inline-block;

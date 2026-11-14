@@ -27,9 +27,12 @@ class GamesController < ApplicationController
 
   # POST /games/quiz/generate — JSON: returns N questions filtered by
   # theme + difficulty, preferring questions THIS user hasn't seen lately.
-  # Always served straight from the pool (widening the filter if it's
-  # short) — AI generation happens in BibleQuizTopUpJob, never on this
-  # request, except one last-resort call when the pool is completely empty.
+  # Always served straight from the pool (widening the difficulty if it's
+  # short, never the theme) — AI generation happens in BibleQuizTopUpJob,
+  # never on this request, except one last-resort call when the pool has
+  # nothing at all for the filter. A theme with fewer questions than the
+  # round length gives a shorter round and says so, rather than mixing in
+  # questions from other themes.
   def quiz_generate
     theme       = params[:theme].to_s.presence
     theme       = nil unless theme.nil? || Ai::Bible::QuizGenerator::THEMES.key?(theme)
@@ -40,9 +43,10 @@ class GamesController < ApplicationController
 
     rows = BibleQuizQuestion.serve_round(user: current_user, theme: theme, difficulty: difficulty, count: length)
 
-    # Nothing to play at all (fresh install / every question retired):
-    # one synchronous batch so the player isn't stuck. Provider HTTP
-    # timeout is 12s (Ai::Moderation::Providers::Base::DEFAULT_TIMEOUT).
+    # Nothing to play at all (fresh install / every question retired / a
+    # theme not written yet): one synchronous batch on that theme so the
+    # player isn't stuck. Provider HTTP timeout is 12s
+    # (Ai::Moderation::Providers::Base::DEFAULT_TIMEOUT).
     if rows.empty? && !Ai::Moderation::Client.stub?
       begin
         BibleQuizQuestion.import_from_generator!(Ai::Bible::QuizGenerator.call(theme: theme, difficulty: difficulty))
@@ -54,6 +58,12 @@ class GamesController < ApplicationController
 
     if BibleQuizQuestion.needs_top_up?(user: current_user, theme: theme, difficulty: difficulty, length: length)
       BibleQuizTopUpJob.enqueue_once(theme: theme, difficulty: difficulty)
+    end
+
+    theme_name = theme&.titleize
+    if theme && rows.empty?
+      return render json: { ok: false, theme: theme, difficulty: difficulty,
+                            error: "We're still writing questions on #{theme_name}. Try again in a minute, or pick another theme." }
     end
 
     BibleQuizQuestion.mark_seen!(user: current_user, question_ids: rows.map(&:id))
@@ -71,7 +81,10 @@ class GamesController < ApplicationController
         difficulty: r.difficulty
       }
     end
-    render json: { ok: true, questions: questions, theme: theme, difficulty: difficulty }
+    notice = if theme && rows.size < length
+      "Only #{rows.size} #{"question".pluralize(rows.size)} on #{theme_name} so far. More are being written, so play again soon for a full round."
+    end
+    render json: { ok: true, questions: questions, theme: theme, difficulty: difficulty, notice: notice }.compact
   end
 
   # POST /games/quiz/flag — a player says this question's answer is wrong.

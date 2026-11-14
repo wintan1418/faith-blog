@@ -64,6 +64,9 @@ export default class extends Controller {
         return
       }
       this.questions = payload.questions
+      // A theme with fewer questions than asked for gives a shorter round,
+      // never questions from other themes; the server says so here.
+      this.notice = payload.notice || ""
       this.index = 0
       this.score = 0
       this.streak = 0
@@ -198,6 +201,7 @@ export default class extends Controller {
           </div>
         </div>
         <div class="fc-quiz-bar"><span style="width: ${(n / total) * 100}%"></span></div>
+        ${this.index === 0 && this.notice ? `<p class="fc-quiz-notice" role="status">${this.escape(this.notice)}</p>` : ""}
         <div class="fc-quiz-card">
           <h2 class="fc-quiz-prompt">${this.escape(q.prompt)}</h2>
           <div class="fc-quiz-choices">

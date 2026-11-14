@@ -73,6 +73,32 @@ namespace :bible_quiz do
     puts "Done. Pool size: #{BibleQuizQuestion.trusted.count} trusted (+#{total} this run)."
   end
 
+  desc "Take off-theme questions out of the quiz, checked by the AI (all themes, or e.g. bible_quiz:audit_themes[the_cross])"
+  task :audit_themes, [ :theme ] => :environment do |_t, args|
+    if Ai::Moderation::Client.stub?
+      warn "AI provider not configured (stub) — can't check themes."
+      next
+    end
+
+    themes = args[:theme].present? ? [ args[:theme].to_s ] : Ai::Bible::QuizGenerator::THEMES.keys
+    retired = 0
+    themes.each do |theme|
+      raise "unknown theme: #{theme}" unless Ai::Bible::QuizGenerator::THEMES.key?(theme)
+
+      off = []
+      BibleQuizQuestion.trusted.where(theme: theme).find_in_batches(batch_size: Ai::Bible::QuizThemeCheck::BATCH) do |batch|
+        off += Ai::Bible::QuizThemeCheck.call(theme: theme, questions: batch)
+      rescue StandardError => e
+        warn "  #{theme}: a batch failed: #{e.class}: #{e.message}"
+      end
+      # Retired the same way as two player flags (see BibleQuizQuestion.trusted).
+      BibleQuizQuestion.where(id: off).update_all(flags_count: 2) if off.any?
+      retired += off.size
+      puts "  #{theme.ljust(14)} #{off.size} off-theme retired, #{BibleQuizQuestion.pool_size(theme: theme)} left"
+    end
+    puts "Done. Retired #{retired} off-theme questions. Run bible_quiz:warm_pool to refill thin themes."
+  end
+
   desc "Show pool stats by theme / difficulty"
   task stats: :environment do
     puts "Total: #{BibleQuizQuestion.count}"

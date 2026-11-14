@@ -63,19 +63,86 @@ class BibleQuizGenerateTest < ActionDispatch::IntegrationTest
     assert_equal 3, payload["questions"].size
   end
 
-  test "a short filter widens to other difficulties, then other themes" do
+  test "a short filter widens to other difficulties, never other themes" do
     exact = make_questions(2, theme: "prayer", difficulty: "easy")
     same_theme = make_questions(2, theme: "prayer", difficulty: "hard")
-    other = make_questions(6, theme: "holiness", difficulty: "medium")
+    make_questions(6, theme: "holiness", difficulty: "medium")
 
     payload = Ai::Bible::QuizGenerator.stub(:call, NO_AI) { generate(theme: "prayer", difficulty: "easy", length: 5) }
 
     ids = payload["questions"].map { |q| q["id"] }
-    assert_equal 5, ids.size
     assert_equal ids.uniq, ids, "no duplicates across widening steps"
-    assert_empty exact.map(&:id) - ids, "exact-filter questions come first"
-    assert_empty same_theme.map(&:id) - ids, "then the same theme at any difficulty"
-    assert_equal 1, (ids & other.map(&:id)).size
+    assert_equal (exact + same_theme).map(&:id).sort, ids.sort, "only prayer questions, exact filter first"
+    assert_equal exact.map(&:id).sort, ids.first(2).sort
+    assert(payload["questions"].all? { |q| q["theme"] == "prayer" })
+    assert_equal "Only 4 questions on Prayer so far. More are being written, so play again soon for a full round.", payload["notice"]
+  end
+
+  # Trello #102: "I picked The Cross and got unrelated questions."
+  test "a theme only ever yields questions on that theme" do
+    cross = make_questions(3, theme: "the_cross", difficulty: "medium")
+    %w[faith grace prayer bible_history].each { |other| make_questions(15, theme: other, difficulty: "medium") }
+
+    [ 5, 10, 20 ].each do |length|
+      [ nil, "medium", "easy" ].each do |difficulty|
+        payload = Ai::Bible::QuizGenerator.stub(:call, NO_AI) { generate(theme: "the_cross", difficulty: difficulty, length: length) }
+        assert payload["ok"]
+        themes = payload["questions"].map { |q| q["theme"] }.uniq
+        assert_equal [ "the_cross" ], themes, "length #{length}, difficulty #{difficulty.inspect}"
+        assert_equal cross.map(&:id).sort, payload["questions"].map { |q| q["id"] }.sort
+        assert_match(/Only 3 questions on The Cross so far/, payload["notice"])
+      end
+    end
+  end
+
+  test "a full themed round has no notice" do
+    make_questions(5, theme: "the_cross", difficulty: "easy")
+    payload = Ai::Bible::QuizGenerator.stub(:call, NO_AI) { generate(theme: "the_cross", difficulty: "easy", length: 5) }
+    assert_equal 5, payload["questions"].size
+    assert_nil payload["notice"]
+  end
+
+  test "a theme with no questions yet says so instead of serving other themes" do
+    make_questions(10, theme: "faith", difficulty: "easy")
+    payload = Ai::Bible::QuizGenerator.stub(:call, NO_AI) { generate(theme: "the_cross", length: 5) }
+
+    refute payload["ok"]
+    assert_nil payload["questions"]
+    assert_equal "We're still writing questions on The Cross. Try again in a minute, or pick another theme.", payload["error"]
+  end
+
+  test "an empty theme is written on that theme, on the spot, when the AI is available" do
+    make_questions(10, theme: "faith", difficulty: "easy")
+    asked = []
+    fake = lambda do |theme:, difficulty:|
+      asked << theme
+      Array.new(5) do |i|
+        Ai::Bible::QuizGenerator::Question.new(
+          kind: "what_does", prompt: "Cross question #{i} #{SecureRandom.hex(3)}?",
+          choices: %w[Atonement Exile Famine Jubilee], correct_index: 0,
+          reference: "Romans 3:25", explanation: "KJV", theme: theme, difficulty: difficulty || "medium"
+        )
+      end
+    end
+
+    payload = nil
+    Ai::Moderation::Client.stub :stub?, false do
+      Ai::Bible::QuizGenerator.stub(:call, fake) { payload = generate(theme: "the_cross", length: 5) }
+    end
+
+    assert_equal [ "the_cross" ], asked
+    assert payload["ok"]
+    assert_equal 5, payload["questions"].size
+    assert(payload["questions"].all? { |q| q["theme"] == "the_cross" })
+  end
+
+  test "with no theme picked, a round still draws on every theme" do
+    make_questions(2, theme: "faith", difficulty: "easy")
+    make_questions(3, theme: "grace", difficulty: "hard")
+    payload = Ai::Bible::QuizGenerator.stub(:call, NO_AI) { generate(length: 5) }
+    assert_equal 5, payload["questions"].size
+    assert_equal %w[faith grace], payload["questions"].map { |q| q["theme"] }.uniq.sort
+    assert_nil payload["notice"]
   end
 
   test "an empty pool makes at most one synchronous AI call" do
