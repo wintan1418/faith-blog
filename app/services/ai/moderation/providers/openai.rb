@@ -7,13 +7,13 @@ module Ai
         DEFAULT_MODEL = "gpt-4o-mini"
         ENDPOINT = URI("https://api.openai.com/v1/chat/completions")
 
-        def call(system:, user:, images: [])
+        def call(system:, user:, images: [], max_tokens: nil)
           raise Client::ConfigError, "OPENAI_API_KEY missing" if @api_key.to_s.strip.empty?
 
           body = {
             model: @model,
             temperature: 0.0,
-            max_tokens: DEFAULT_MAX_TOKENS,
+            max_tokens: (max_tokens || DEFAULT_MAX_TOKENS),
             response_format: { type: "json_object" },
             messages: [
               { role: "system", content: system },

@@ -133,6 +133,8 @@ module Ai
         }
       PROMPT
 
+      REPLY_TOKENS = 2500
+
       Question = Struct.new(:kind, :prompt, :choices, :correct_index,
                             :reference, :explanation, :theme, :difficulty,
                             keyword_init: true)
@@ -151,7 +153,9 @@ module Ai
       end
 
       def call
-        raw = Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: user_prompt)
+        # Five questions with explanations and theme links need far more than the
+        # default 600-token reply; at 600 the JSON was cut off mid-question.
+        raw = Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: user_prompt, max_tokens: REPLY_TOKENS)
         payload = extract_payload(raw)
         questions = Array(payload["questions"]).first(5).filter_map do |q|
           choices = Array(q["choices"]).map(&:to_s).first(4)

@@ -15,7 +15,7 @@ module Ai
         }.freeze
         HARSH_KEYWORDS   = %w[idiot stupid moron loser shut\ up].freeze
 
-        def call(system:, user:, images: []) # rubocop:disable Lint/UnusedMethodArgument
+        def call(system:, user:, images: [], max_tokens: nil) # rubocop:disable Lint/UnusedMethodArgument
           # Composer assistants share this provider; branch on the task marker
           # in the system prompt so each task gets the right shape back.
           return wrap(model: "stub", text: JSON.dump(gentleness_payload(user))) if system.to_s.include?("[TASK:GENTLENESS]")

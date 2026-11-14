@@ -20,8 +20,10 @@ module Ai
         "stub"      => { klass: Providers::Stub,      env_key: nil }
       }.freeze
 
-      def self.call(system:, user:, images: [])
-        new.call(system: system, user: user, images: images)
+      # max_tokens: the reply's length limit; nil keeps the provider default
+      # (600, enough for a verdict). Longer replies (quiz batches) pass more.
+      def self.call(system:, user:, images: [], max_tokens: nil)
+        new.call(system: system, user: user, images: images, max_tokens: max_tokens)
       end
 
       def self.stub?
@@ -61,8 +63,8 @@ module Ai
         @impl = config[:klass].new(api_key: api_key)
       end
 
-      def call(system:, user:, images: [])
-        @impl.call(system: system, user: user, images: images)
+      def call(system:, user:, images: [], max_tokens: nil)
+        @impl.call(system: system, user: user, images: images, max_tokens: max_tokens)
       end
 
       attr_reader :provider_name
