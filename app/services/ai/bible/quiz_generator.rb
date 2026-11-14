@@ -48,12 +48,43 @@ module Ai
         "1 John", "2 John", "3 John", "Jude", "Revelation"
       ].freeze
 
+      # Where each theme is actually taught. The book hint used to be any NT
+      # book at random, so "the cross" could be told to draw from Philemon or
+      # 3 John and the model wrote questions about whatever those books say.
+      # Now the hint is always a book that speaks to the theme.
+      THEME_BOOKS = {
+        "salvation"     => [ "John", "Acts", "Romans", "Galatians", "Ephesians", "Titus" ],
+        "eternal_life"  => [ "John", "Romans", "1 Corinthians", "2 Corinthians", "1 Peter", "1 John" ],
+        "brethren_love" => [ "John", "Acts", "Romans", "Philippians", "1 Thessalonians", "1 Peter", "1 John" ],
+        "charity"       => [ "Matthew", "Luke", "John", "1 Corinthians", "1 John", "James" ],
+        "faith"         => [ "Mark", "Luke", "Romans", "Galatians", "Hebrews", "James" ],
+        "epistles"      => [ "Romans", "1 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians",
+                             "1 Timothy", "Hebrews", "James", "1 Peter", "1 John" ],
+        "grace"         => [ "John", "Romans", "2 Corinthians", "Ephesians", "Titus", "Hebrews" ],
+        "repentance"    => [ "Matthew", "Luke", "Acts", "2 Corinthians", "2 Peter", "Revelation" ],
+        "holiness"      => [ "Romans", "Galatians", "1 Thessalonians", "Hebrews", "1 Peter" ],
+        "prayer"        => [ "Matthew", "Luke", "John", "Acts", "Philippians", "James" ],
+        "forgiveness"   => [ "Matthew", "Luke", "Acts", "Ephesians", "Colossians", "1 John" ],
+        "the_cross"     => [ "Matthew", "Mark", "Luke", "John", "Romans", "1 Corinthians", "Galatians",
+                             "Colossians", "Hebrews", "1 Peter" ],
+        "holy_spirit"   => [ "John", "Acts", "Romans", "1 Corinthians", "Galatians", "Ephesians" ],
+        "hope_of_glory" => [ "John", "1 Corinthians", "Philippians", "1 Thessalonians", "Titus", "Revelation" ],
+        "obedience"     => [ "Matthew", "John", "Romans", "Philippians", "Hebrews", "1 John" ],
+        "bible_history" => [ "Genesis", "Exodus", "Joshua", "Judges", "1 Samuel", "2 Samuel", "1 Kings",
+                             "2 Kings", "Daniel", "Matthew", "Luke", "Acts" ]
+      }.freeze
+
       SYSTEM_PROMPT = <<~PROMPT.freeze
         #{TASK_MARKER}
         You write Bible quiz questions that form Christians spiritually.
 
-        Each question must connect to the assigned THEME (a spiritual reality
-        the question is about) and the assigned DIFFICULTY level.
+        Every question must be ABOUT the assigned THEME (a spiritual reality)
+        and at the assigned DIFFICULTY level. A player who picked the theme
+        "the cross" must only see questions about the cross; a verse that
+        merely comes from a suggested book is NOT enough. If the suggested
+        book has nothing on the theme, use another passage that does. For
+        each question, "theme_link" says in a few words how it is about the
+        theme; if you can't say, the question is off-theme: replace it.
 
         Difficulty calibration:
           - easy: an attentive Sunday-school answer; one well-known verse.
@@ -95,7 +126,8 @@ module Ai
               "choices": [string, string, string, string],
               "correct_index": 0|1|2|3,
               "reference": string,
-              "explanation": string
+              "explanation": string,
+              "theme_link": string
             }
           ]
         }
@@ -108,7 +140,7 @@ module Ai
       def self.call(theme: nil, difficulty: nil, book: nil)
         theme      = theme.to_s.presence || THEMES.keys.sample
         difficulty = difficulty.to_s.presence_in(DIFFICULTIES) || DIFFICULTIES.sample
-        book       = book.presence || BOOK_HINTS.sample
+        book       = book.presence || THEME_BOOKS.fetch(theme, BOOK_HINTS).sample
         new(theme: theme, difficulty: difficulty, book: book).call
       end
 
@@ -125,6 +157,8 @@ module Ai
           choices = Array(q["choices"]).map(&:to_s).first(4)
           correct = q["correct_index"].to_i
           next if choices.size != 4 || !(0..3).cover?(correct) || q["prompt"].to_s.strip.empty?
+          # No stated link to the theme: the model drifted off it, so drop it.
+          next if q["theme_link"].to_s.strip.empty?
 
           # Re-shuffle server-side — models favour certain answer slots and
           # regulars learn the pattern.
@@ -152,10 +186,10 @@ module Ai
           #{TASK_MARKER}
           THEME: #{@theme} — #{THEMES[@theme]}
           DIFFICULTY: #{@difficulty}
-          DRAW FROM (preferred): #{@book}
+          SUGGESTED BOOK (only where it speaks to the theme): #{@book}
 
-          Generate 5 questions on this theme at this difficulty. Vary the
-          kinds. Seed: #{SecureRandom.hex(4)}
+          Generate 5 questions that are each clearly about #{THEMES[@theme] || @theme},
+          at this difficulty. Vary the kinds. Seed: #{SecureRandom.hex(4)}
         PROMPT
       end
 
