@@ -116,4 +116,39 @@ class InboxFileDownloadsTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(@message)} a.msg-doc[data-legacy-href*='/rails/active_storage/']", count: 2
     assert_select "##{dom_id(@message)} img.msg-image[data-download-legacy*='/rails/active_storage/']", count: 1
   end
+  # Trello #94: every photo, document and voice note has its own download arrow.
+  test "each photo, document and voice note in a chat has its own download arrow" do
+    @message.images.attach(io: file_fixture_or_jpeg, filename: "IMG_2042.jpeg", content_type: "image/jpeg")
+    @message.save!
+    voice = @chat.messages.new(sender: @ada, body: "")
+    voice.voice_note.attach(io: StringIO.new("OggS voice"), filename: "voice-note.ogg", content_type: "audio/ogg")
+    voice.save!
+
+    sign_in @ben
+    get conversation_path(@chat)
+    assert_response :success
+
+    @message.images.each do |img|
+      assert_select "##{dom_id(@message)} .msg-image-wrap a.msg-media-get.is-on-photo[href=?][data-turbo=false]", download_path(img)
+    end
+    assert_select "##{dom_id(@message)} a.msg-media-get.is-on-photo[data-legacy-href*='/rails/active_storage/']", count: 2
+    assert_select "##{dom_id(@message)} a.msg-doc .msg-doc-get svg", count: 2
+
+    assert_select "##{dom_id(voice)} .msg-voice-row a.msg-media-get[href=?]", download_path(voice.voice_note.attachment, message: voice)
+    assert_select "##{dom_id(voice)} .msg-voice-row a.msg-media-get[data-legacy-href*='/rails/active_storage/']"
+    assert_select "##{dom_id(voice)} a.msg-media-get[aria-label=?]", "Download voice note: voice-note.ogg"
+
+    # And the arrow's link hands out the voice note itself.
+    sign_in @ben
+    get download_path(voice.voice_note.attachment, message: voice)
+    assert_response :success
+    assert_includes response.headers["Content-Disposition"], "voice-note.ogg"
+  end
+
+  test "deleted messages show no download arrows" do
+    @message.update_columns(deleted_at: Time.current)
+    sign_in @ben
+    get conversation_path(@chat)
+    assert_select "##{dom_id(@message)} a.msg-media-get", count: 0
+  end
 end

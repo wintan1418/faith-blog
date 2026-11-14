@@ -70,9 +70,15 @@
             <div class="msg-media-row">
               <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
                 <% message.images.each do |img| %>
-                  <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo",
-                                data: { download: message_file_download_path(message, img),
-                                        download_legacy: rails_blob_path(img, disposition: "attachment") } %>
+                  <%# Each photo has its own download arrow, so saving it doesn't
+                      mean opening it full screen first. %>
+                  <div class="msg-image-wrap">
+                    <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo",
+                                  data: { download: message_file_download_path(message, img),
+                                          download_legacy: rails_blob_path(img, disposition: "attachment") } %>
+                    <%= render "conversations/media_download", message: message, attachment: img,
+                               label: "Download photo", class_name: "msg-media-get is-on-photo" %>
+                  </div>
                 <% end %>
               </div>
               <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
@@ -108,6 +114,8 @@
                 button (react, reply, edit, delete) on touch screens. %>
             <div class="msg-voice-row">
               <audio controls preload="metadata" class="msg-voice" src="<%= url_for(message.voice_note) %>"></audio>
+              <%= render "conversations/media_download", message: message, attachment: message.voice_note,
+                         label: "Download voice note", class_name: "msg-media-get" %>
               <% unless deleted || removed %>
                 <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
                         title="Message options" aria-label="Message options">&#8943;</button>

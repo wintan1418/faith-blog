@@ -1,0 +1,9 @@
+<%# The download arrow on a chat photo or voice note. It links to our own file
+    route, so the file saves under its original name: browsers download it, and
+    app builds with "NativeDownloads" save it to the phone themselves. Older app
+    builds swap in the file-store link (data-legacy-href, see chat_downloads.js). %>
+<%= link_to message_file_download_path(message, attachment), class: class_name, rel: "noopener",
+      title: "#{label} (#{attachment.filename})", aria: { label: "#{label}: #{attachment.filename}" },
+      data: { turbo: false, legacy_href: rails_blob_path(attachment, disposition: "attachment") } do %>
+  <%= render_icon("download", classes: "h-4 w-4") %>
+<% end %>
