@@ -299,6 +299,7 @@ Rails.application.routes.draw do
       member do
         post :resolve
         post :dismiss
+        post :retire_question
       end
     end
     resources :moderation_logs, only: [ :index, :show ]

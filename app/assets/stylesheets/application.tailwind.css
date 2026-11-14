@@ -18818,7 +18818,7 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
   }
 }
 
-/* ── Quiz: "answer looks wrong" flag ──────────────────────────────────── */
+/* ── Quiz: "Report this question" ─────────────────────────────────────── */
 .fc-quiz-flag {
   display: inline-block;
   margin-top: 0.5rem;
@@ -18833,6 +18833,45 @@ html.theme-dark .scripture-ref:hover { color: #ffe9a8; }
 }
 .fc-quiz-flag:hover { color: #d97706; }
 .fc-quiz-flag:disabled { text-decoration: none; color: var(--fc-accent-2, var(--fc-accent)); cursor: default; }
+.fc-quiz-report { margin-top: 0.75rem; text-align: center; }
+.fc-quiz-report-form {
+  text-align: left;
+  border: 1px solid var(--fc-line);
+  border-radius: 14px;
+  background: var(--fc-surface-2, var(--fc-surface));
+  padding: 0.85rem;
+}
+.fc-quiz-report-form fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.fc-quiz-report-title { padding: 0; font-size: 0.85rem; font-weight: 800; color: var(--fc-ink); margin-bottom: 0.5rem; }
+.fc-quiz-report-reasons { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.fc-quiz-report-reason {
+  position: relative;
+  display: inline-flex; align-items: center;
+  min-height: 36px; padding: 0.35rem 0.75rem;
+  border: 1px solid var(--fc-line-strong, var(--fc-line));
+  border-radius: 999px;
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+  font-size: 0.8rem; font-weight: 700;
+  cursor: pointer;
+}
+.fc-quiz-report-reason input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.fc-quiz-report-reason:has(input:checked) {
+  border-color: var(--fc-accent);
+  background: color-mix(in srgb, var(--fc-accent) 14%, var(--fc-surface));
+  color: var(--fc-accent-deep, var(--fc-ink));
+}
+html.theme-dark .fc-quiz-report-reason:has(input:checked) { color: var(--fc-ink); }
+.fc-quiz-report-reason:has(input:focus-visible) { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
+.fc-quiz-report-note {
+  display: block; width: 100%; margin-top: 0.6rem;
+  border: 1px solid var(--fc-line-strong, var(--fc-line)); border-radius: 10px;
+  background: var(--fc-surface); color: var(--fc-ink);
+  padding: 0.5rem 0.65rem; font-size: 0.85rem; resize: vertical;
+}
+.fc-quiz-report-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.6rem; }
+.fc-quiz-report-error { margin-top: 0.4rem; color: #dc2626; font-size: 0.8rem; font-weight: 700; }
+.fc-quiz-report-done { font-size: 0.8rem; font-weight: 700; color: var(--fc-accent-2, var(--fc-accent)); }
 
 /* ── Game share card: a result shared to the feed as its own block ────── */
 .fc-game-card {

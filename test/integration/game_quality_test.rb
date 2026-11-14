@@ -21,12 +21,19 @@ class GameQualityTest < ActionDispatch::IntegrationTest
     sign_in @player
   end
 
-  test "flagging a question twice retires it from the pool" do
+  test "two players flagging a question retires it from the pool" do
     post games_quiz_flag_path, params: { question_id: @question.id }, as: :json
     assert_response :success
     assert_equal 1, @question.reload.flags_count
     assert_includes BibleQuizQuestion.trusted, @question
 
+    # The same player again doesn't count twice.
+    post games_quiz_flag_path, params: { question_id: @question.id }, as: :json
+    assert_equal 1, @question.reload.flags_count
+
+    other = User.create!(username: "gq_other", email: "gq_other@example.com",
+                         password: "password123", password_confirmation: "password123")
+    sign_in other
     post games_quiz_flag_path, params: { question_id: @question.id }, as: :json
     assert_equal 2, @question.reload.flags_count
     refute_includes BibleQuizQuestion.trusted, @question
