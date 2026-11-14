@@ -76,4 +76,20 @@ class Ai::Bible::QuizThemeTest < ActiveSupport::TestCase
     assert_includes seen, "Diotrephes"
     assert_equal [], Ai::Bible::QuizThemeCheck.call(theme: "not_a_theme", questions: [ on ])
   end
+
+  test "a wrongly marked fill-in-the-blank is corrected from the KJV; one that can't be checked is dropped" do
+    wrong_key = { "kind" => "fill_blank", "prompt" => "1 Corinthians 15:33: 'Be not deceived: evil ______ corrupt good manners.'",
+                  "choices" => %w[communications companions thoughts actions], "correct_index" => 1,
+                  "reference" => "1 Corinthians 15:33", "explanation" => "KJV", "theme_link" => "Conduct in the church" }
+    unknown = wrong_key.merge("prompt" => "Jude 1:99 ____", "reference" => "Jude 1:99")
+    reply = ai_reply("questions" => [ wrong_key, unknown ])
+    kjv = ->(ref) { ref == "1 Corinthians 15:33" ? { text: "Be not deceived: evil communications corrupt good manners." } : nil }
+
+    questions = ScriptureLookup.stub(:lookup, kjv) do
+      Ai::Moderation::Client.stub(:call, reply) { Ai::Bible::QuizGenerator.call(theme: "brethren_love") }
+    end
+
+    assert_equal 1, questions.size
+    assert_equal "communications", questions.first.choices[questions.first.correct_index]
+  end
 end

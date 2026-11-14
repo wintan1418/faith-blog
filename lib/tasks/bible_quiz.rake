@@ -99,6 +99,24 @@ namespace :bible_quiz do
     puts "Done. Retired #{retired} off-theme questions. Run bible_quiz:warm_pool to refill thin themes."
   end
 
+  desc "Check marked answers against the Bible: fix clear mistakes, retire the rest (fill_blank / reference / which_book)"
+  task audit_answers: :environment do
+    counts = Hash.new(0)
+    BibleQuizQuestion.trusted.where(kind: BibleQuiz::AnswerCheck::CHECKED_KINDS).find_each do |q|
+      result = BibleQuiz::AnswerCheck.call(kind: q.kind, choices: q.choices, correct_index: q.correct_index, reference: q.reference)
+      counts[result.status] += 1
+      case result.status
+      when :fixed
+        q.update_columns(correct_index: result.correct_index, updated_at: Time.current)
+        puts "  fixed   ##{q.id} #{q.reference}: now #{q.choices[result.correct_index].inspect}"
+      when :wrong
+        q.update_columns(flags_count: 2, updated_at: Time.current) # retired, as by two player flags
+        puts "  retired ##{q.id} #{q.reference}: no choice matches the Bible"
+      end
+    end
+    puts "Done. ok=#{counts[:ok]} fixed=#{counts[:fixed]} retired=#{counts[:wrong]} unchecked=#{counts[:unknown]}"
+  end
+
   desc "Show pool stats by theme / difficulty"
   task stats: :environment do
     puts "Total: #{BibleQuizQuestion.count}"

@@ -164,7 +164,7 @@ module Ai
           # regulars learn the pattern.
           order = (0..3).to_a.shuffle
 
-          Question.new(
+          question = Question.new(
             kind: q["kind"].to_s,
             prompt: q["prompt"].to_s.strip,
             choices: order.map { |i| choices[i] },
@@ -174,12 +174,28 @@ module Ai
             theme: @theme,
             difficulty: @difficulty
           )
+          checked_answer(question)
         end
         raise ParseError, "no valid questions" if questions.empty?
         questions
       end
 
       private
+
+      # The marked answer must match the Bible (BibleQuiz::AnswerCheck): a
+      # wrongly marked one is corrected when the right choice is clear,
+      # otherwise the question is dropped. A fill-in-the-blank we couldn't
+      # check against the KJV is dropped too, so players never see a wrong key.
+      def checked_answer(question)
+        result = BibleQuiz::AnswerCheck.call(kind: question.kind, choices: question.choices,
+                                             correct_index: question.correct_index, reference: question.reference)
+        case result.status
+        when :ok then question
+        when :fixed then question.tap { |q| q.correct_index = result.correct_index }
+        when :wrong then nil
+        else question.kind == "fill_blank" ? nil : question
+        end
+      end
 
       def user_prompt
         <<~PROMPT
