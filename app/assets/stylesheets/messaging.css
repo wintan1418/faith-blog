@@ -329,6 +329,32 @@
 .msg-images { display: grid; gap: 4px; max-width: 360px; margin: 4px 0; }
 .msg-images.is-grid-2, .msg-images.is-grid-3, .msg-images.is-grid-4 { grid-template-columns: 1fr 1fr; }
 .msg-image { width: 100%; max-height: 280px; object-fit: cover; border-radius: 8px; border: 1px solid var(--msg-line); }
+.msg-image-wrap { position: relative; min-width: 0; }
+.msg-image-wrap .msg-image { display: block; }
+
+/* Download arrow on each photo and voice note (documents have .msg-doc-get).
+   Scoped under .msg-bubble so the site-wide "html.theme-light a:hover" link
+   colours don't win. */
+.msg-bubble .msg-media-get {
+  flex: none; display: inline-grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 999px;
+  color: var(--msg-accent); background: var(--msg-soft);
+  border: 1px solid var(--msg-line); text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.msg-bubble .msg-media-get:hover { color: var(--msg-accent); filter: brightness(0.96); }
+.msg-bubble .msg-media-get:focus-visible { outline: 2px solid var(--msg-accent); outline-offset: 2px; }
+/* On a photo: a dark chip in the corner reads on any picture, light or dark theme. */
+.msg-bubble .msg-media-get.is-on-photo {
+  position: absolute; right: 6px; bottom: 6px;
+  width: 32px; height: 32px;
+  color: #fff; background: rgba(17, 24, 39, 0.62); border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+}
+.msg-bubble .msg-media-get.is-on-photo:hover { color: #fff; background: rgba(17, 24, 39, 0.78); filter: none; }
+/* A bigger tap target than it looks on touch screens. */
+.msg-bubble .msg-media-get.is-on-photo::after { content: ""; position: absolute; inset: -6px; }
 .msg-voice { display: block; width: 100%; max-width: 320px; margin: 4px 0; }
 .msg-voice-row { display: flex; align-items: center; gap: 4px; }
 .msg-voice-row .msg-voice { flex: 1; min-width: 0; }
@@ -694,7 +720,11 @@ html.theme-dark .msg-money-tip { color: #fcd34d; background: rgba(245, 158, 11, 
 .msg-doc-text { display: grid; min-width: 0; flex: 1; }
 .msg-doc-name { font-weight: 700; font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .msg-doc-meta { color: var(--msg-muted); font-size: 0.75rem; }
-.msg-doc-get { color: var(--msg-muted); }
+.msg-doc-get {
+  flex: none; display: inline-grid; place-items: center;
+  width: 32px; height: 32px; border-radius: 999px;
+  color: var(--msg-accent); background: var(--msg-soft);
+}
 
 .msg-doc-previews { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 0; }
 .msg-doc-chip {
