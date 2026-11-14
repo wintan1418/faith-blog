@@ -87,13 +87,15 @@ class GamesController < ApplicationController
     render json: { ok: true, questions: questions, theme: theme, difficulty: difficulty, notice: notice }.compact
   end
 
-  # POST /games/quiz/flag — a player says this question's answer is wrong.
-  # Two flags retire the question from the pool.
+  # POST /games/quiz/flag — a player reports a faulty question: the answer
+  # is wrong, the question is unclear, it's not in the Bible / the reference
+  # is wrong, it doesn't fit the theme, or something else (+ optional note).
+  # Reports go to Admin → Reports; two flags retire the question meanwhile.
   def quiz_flag
     question = BibleQuizQuestion.find_by(id: params[:question_id])
     return render(json: { ok: false }, status: :not_found) unless question
 
-    BibleQuizQuestion.increment_counter(:flags_count, question.id)
+    question.report!(reporter: current_user, reason: params[:reason], note: params[:note])
     render json: { ok: true }
   end
 
