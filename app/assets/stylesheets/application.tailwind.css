@@ -21097,3 +21097,12 @@ html.theme-dark .profile-cover, :root .profile-cover { opacity: 1; filter: satur
   transition: none !important;
   animation: none !important;
 }
+
+/* Like button: holding it opens the reaction picker, so a long press must not
+   select text or pop the phone's own callout menu. */
+.fc-react-btn {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}

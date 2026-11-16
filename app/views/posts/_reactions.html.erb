@@ -1,19 +1,23 @@
-<%# "Like" segment of the action bar (LinkedIn). Tap to open the emoji picker;
-    when you've reacted it shows your emoji and highlights. Count lives in the
-    meta row above. Local: post %>
+<%# "Like" segment of the action bar. A tap Loves the breath (tap again to take
+    it back); hold or right-click for the other reactions. When you've reacted
+    it shows your emoji and highlights. Count lives in the meta row above.
+    Local: post %>
 <%
   loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
   user_like    = user_signed_in? ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
 %>
 <div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions"
      data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
+     data-emoji-reactions-unlike-url-value="<%= unlike_path(likeable_type: "Post", likeable_id: post.id) %>"
+     data-emoji-reactions-mine-value="<%= user_like.present? %>"
      data-emoji-reactions-token-value="<%= form_authenticity_token %>">
   <% if user_signed_in? %>
     <button type="button"
             class="fc-breath-action fc-react-btn<%= ' is-mine' if user_like %>"
-            data-action="click->emoji-reactions#toggle"
-            aria-label="Like this breath"
-            title="Like">
+            data-action="pointerdown->emoji-reactions#holdStart pointerup->emoji-reactions#cancelHold pointerleave->emoji-reactions#cancelHold pointercancel->emoji-reactions#cancelHold click->emoji-reactions#press contextmenu->emoji-reactions#more"
+            aria-label="<%= user_like ? "Remove your reaction" : "Love this breath" %>"
+            aria-description="Hold for more reactions"
+            title="<%= user_like ? "Remove your reaction (hold for more)" : "Love (hold for more reactions)" %>">
       <% if user_like %>
         <span class="fc-react-emoji"><%= user_like.display_emoji %></span>
       <% else %>

@@ -1,9 +1,13 @@
-<%# Like button for a bot update (same emoji picker as breaths). Local: item, my_reaction %>
+<%# Like button for a bot update (tap to Love, hold for the picker, as breaths). Local: item, my_reaction %>
 <div class="fc-reactions" id="<%= dom_id(item, :reactions) %>" data-controller="emoji-reactions"
      data-emoji-reactions-url-value="<%= likes_path(likeable_type: "BotItem", likeable_id: item.id) %>"
+     data-emoji-reactions-unlike-url-value="<%= unlike_path(likeable_type: "BotItem", likeable_id: item.id) %>"
+     data-emoji-reactions-mine-value="<%= my_reaction.present? %>"
      data-emoji-reactions-token-value="<%= form_authenticity_token %>">
   <button type="button" class="fc-breath-action fc-react-btn<%= ' is-mine' if my_reaction %>"
-          data-action="click->emoji-reactions#toggle" aria-label="React to this update" title="Like">
+          data-action="pointerdown->emoji-reactions#holdStart pointerup->emoji-reactions#cancelHold pointerleave->emoji-reactions#cancelHold pointercancel->emoji-reactions#cancelHold click->emoji-reactions#press contextmenu->emoji-reactions#more"
+          aria-label="<%= my_reaction ? "Remove your reaction" : "Love this update" %>" aria-description="Hold for more reactions"
+          title="<%= my_reaction ? "Remove your reaction (hold for more)" : "Love (hold for more reactions)" %>">
     <% if my_reaction %>
       <span class="fc-react-emoji"><%= my_reaction.display_emoji %></span>
     <% else %>
