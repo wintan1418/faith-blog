@@ -4,9 +4,16 @@ import { loadEmojiPicker } from "../lazy_libs"
 // Pop emoji picker, send the chosen emoji to /likes via fetch.
 // On success, reload the page (or replace the reactions partial) so
 // counts and "is-mine" state refresh.
+//
+// The feed's Like button (action "press"): a tap Loves the breath at once and
+// a second tap takes it back; holding it (or right-clicking) opens the picker
+// for the other reactions. Testers found a picker on every tap too much for
+// a simple like.
+const HOLD_MS = 450
+
 export default class extends Controller {
   static targets = ["picker"]
-  static values  = { url: String, token: String }
+  static values  = { url: String, unlikeUrl: String, token: String, mine: Boolean, quick: { type: String, default: "❤️" } }
 
   connect() {
     this.boundOutsideClick = this.outsideClick.bind(this)
@@ -22,6 +29,52 @@ export default class extends Controller {
   disconnect() {
     document.removeEventListener("click", this.boundOutsideClick)
     this.stopFollowingScroll()
+    this.cancelHold()
+  }
+
+  // pointerdown: start the hold timer; holding opens the picker.
+  holdStart(event) {
+    if (event.button > 0) return
+    this.held = false
+    this.cancelHold()
+    const button = event.currentTarget
+    this.holdTimer = setTimeout(() => {
+      this.held = true
+      this.openPicker(button)
+      navigator.vibrate?.(10)
+    }, HOLD_MS)
+  }
+
+  cancelHold() {
+    clearTimeout(this.holdTimer)
+    this.holdTimer = null
+  }
+
+  // click: a quick tap reacts (or takes the reaction back); the click that
+  // ends a hold does nothing, the picker is already open.
+  press(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    this.cancelHold()
+    if (this.held) { this.held = false; return }
+    if (this.hasPickerTarget && !this.pickerTarget.classList.contains("hidden")) return this.hide()
+    if (this.mineValue && this.unlikeUrlValue) this.send(this.unlikeUrlValue, "DELETE")
+    else this.choose(this.quickValue)
+  }
+
+  // Right-click (and a long press on some phones) opens the picker too.
+  more(event) {
+    event.preventDefault()
+    this.cancelHold()
+    this.held = true
+    this.openPicker(event.currentTarget)
+  }
+
+  openPicker(button) {
+    if (!this.hasPickerTarget) return
+    loadEmojiPicker()
+    this.trigger = button
+    this.show()
   }
 
   toggle(event) {
@@ -91,16 +144,22 @@ export default class extends Controller {
     if (!this.element.contains(event.target)) this.hide()
   }
 
-  async choose(emoji) {
+  choose(emoji) {
     this.hide()
-
     const form = new FormData()
-    form.set("authenticity_token", this.tokenValue)
     form.set("reaction_emoji", emoji)
+    // urlValue already carries likeable_type/id as query params; preserve them.
+    return this.send(this.urlValue, "POST", form)
+  }
+
+  async send(url, method, form = new FormData()) {
+    if (this.sending) return
+    this.sending = true
+    form.set("authenticity_token", this.tokenValue)
+    if (method !== "POST") form.set("_method", method.toLowerCase())
 
     try {
-      // urlValue already carries likeable_type/id as query params; preserve them.
-      const response = await fetch(this.urlValue, {
+      const response = await fetch(url, {
         method: "POST",
         body: form,
         headers: { "Accept": "text/vnd.turbo-stream.html, text/html" },
@@ -122,6 +181,8 @@ export default class extends Controller {
       }
     } catch (err) {
       console.error(err)
+    } finally {
+      this.sending = false
     }
   }
 }
