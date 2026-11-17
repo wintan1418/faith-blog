@@ -1,6 +1,7 @@
-<%# LinkedIn-style engagement meta row: reaction emojis + total on the left,
-    "N comments · N reposts" on the right. Hidden entirely when a breath has no
-    engagement yet. Re-rendered by the like turbo-stream. Local: post %>
+<%# Engagement row above the action bar: the top reactions as small coloured
+    icon circles + total on the left, "N comments · N reposts" on the right.
+    Hidden entirely when a breath has no engagement yet. Re-rendered by the
+    like turbo-stream. Local: post %>
 <%
   loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
   reacted      = loaded_likes.reject { |l| l.reaction_emoji.to_s.empty? }
@@ -12,6 +13,14 @@
   comments     = post.comments_count.to_i
   reposts      = post.reshares_count.to_i
   has_any      = total.positive? || comments.positive? || reposts.positive?
+  # The common reactions get an icon in a coloured circle; any other emoji a
+  # member picked shows as itself.
+  reaction_icons = {
+    "❤️" => %w[heart is-love], "❤" => %w[heart is-love], "💖" => %w[heart is-love], "🥰" => %w[heart is-love],
+    "🙏" => %w[pray is-pray], "✝️" => %w[pray is-pray],
+    "🙌" => %w[praise is-praise], "👏" => %w[praise is-praise], "💪" => %w[praise is-praise], "👍" => %w[praise is-praise],
+    "✨" => %w[lightbulb is-insight], "💡" => %w[lightbulb is-insight]
+  }
 %>
 <div class="fc-breath-stats<%= ' is-empty' unless has_any %>" id="<%= dom_id(post, :reaction_summary) %>">
   <% if total.positive? %>
@@ -19,8 +28,15 @@
             data-action="reactors-modal#open"
             data-reactors-modal-url-param="<%= reactions_post_path(post) %>"
             title="See who reacted">
-      <span class="fc-breath-stats-emojis">
-        <% top_emojis.each do |emoji| %><span class="fc-breath-stats-emoji"><%= emoji %></span><% end %>
+      <span class="eg-react-dots">
+        <% top_emojis.each do |emoji| %>
+          <% icon, tone = reaction_icons[emoji] %>
+          <% if icon %>
+            <span class="eg-react-dot <%= tone %>" title="<%= emoji %>"><%= render_icon(icon, classes: "eg-react-dot-ico") %></span>
+          <% else %>
+            <span class="eg-react-dot is-emoji"><%= emoji %></span>
+          <% end %>
+        <% end %>
       </span>
       <span class="fc-breath-stats-count"><%= number_with_delimiter(total) %></span>
     </button>

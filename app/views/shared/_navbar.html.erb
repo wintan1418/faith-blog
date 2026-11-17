@@ -1,241 +1,261 @@
-<nav class="fc-topbar sticky top-0 z-50">
-  <div class="fc-topbar-inner">
-    <div class="flex min-w-0 items-center gap-4">
-      <%= link_to root_path, class: "brethreign-brand", aria: { label: "Brethreign" } do %>
-        <%# Custom brand mark — soft mint disc with a stylized 'breath' wave %>
-        <span class="brethreign-mark" aria-hidden="true">
-          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="brthGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"   style="stop-color: var(--fc-accent, #34d399)"/>
-                <stop offset="100%" style="stop-color: var(--fc-accent-2, #059669)"/>
-              </linearGradient>
-            </defs>
-            <circle cx="16" cy="16" r="15" fill="url(#brthGrad)"/>
-            <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19"
-                  fill="none" stroke="#042f1d" stroke-width="2.4"
-                  stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="22" cy="11" r="1.6" fill="#042f1d"/>
-          </svg>
-        </span>
-        <span class="brethreign-wordmark">
-          <span class="brethreign-word">brethre<span class="brethreign-accent">i</span>gn</span>
-          <span class="brethreign-tag">breathe!</span>
-        </span>
-      <% end %>
+<%#
+  Top bar: logo, the pill nav, search, messages and alerts (one red badge
+  style), Breathe and the account menu. Phones get a compact bar plus the
+  bottom nav below. Inside the iOS/Android apps this bar is hidden (the apps
+  draw their own) but stays in the page: the native bar clicks the buttons
+  marked data-native-action (compose, bible, theme, sign-out), so each of
+  those must exist once here.
+%>
+<% wave = "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3" %>
+<nav class="fc-topbar eg-topbar sticky top-0 z-50">
+  <div class="fc-topbar-inner eg-topbar-inner">
+    <%= link_to (user_signed_in? ? feed_path : root_path), class: "eg-brand", aria: { label: "Brethreign home" } do %>
+      <span class="eg-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="<%= wave %>"/></svg>
+      </span>
+      <span class="eg-brand-word">Brethreign</span>
+    <% end %>
 
-      <div class="hidden items-center gap-0.5 md:flex">
-        <% if user_signed_in? %>
-          <%= link_to feed_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/feed')}" do %>
-            <%= render_icon("message_circle", classes: "h-4 w-4") %>
-            Feed
-          <% end %>
-        <% else %>
-          <%= link_to root_path, class: "fc-nav-link #{'is-active' if current_page?(root_path)}" do %>
-            <%= render_icon("message_circle", classes: "h-4 w-4") %>
-            Feed
-          <% end %>
-        <% end %>
-        <%= link_to rooms_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/rooms')}", data: { tour_anchor: "rooms", tour_rank: 1 } do %>
-          <%= render_icon("users", classes: "h-4 w-4") %>
-          Rooms
-        <% end %>
-        <%= link_to resources_root_path, class: "fc-nav-link #{'is-active' if request.path.start_with?('/resources') || request.path.start_with?('/resource_categories')}" do %>
-          <%= render_icon("bookopen", classes: "h-4 w-4") %>
-          Library
-        <% end %>
-      </div>
+    <div class="eg-pills" role="navigation" aria-label="Main">
+      <% feed_active = user_signed_in? ? request.path.start_with?("/feed") : current_page?(root_path) %>
+      <%= link_to (user_signed_in? ? feed_path : root_path), class: "eg-pill #{'is-active' if feed_active}", title: "Feed", aria: { current: (feed_active ? "page" : nil) } do %>
+        <%= render_icon("feed", classes: "eg-pill-ico") %><span class="eg-pill-label">Feed</span>
+      <% end %>
+      <% rooms_active = request.path.start_with?("/rooms") %>
+      <%= link_to rooms_path, class: "eg-pill #{'is-active' if rooms_active}", title: "Rooms", aria: { current: (rooms_active ? "page" : nil) }, data: { tour_anchor: "rooms", tour_rank: 1 } do %>
+        <%= render_icon("users", classes: "eg-pill-ico") %><span class="eg-pill-label">Rooms</span>
+      <% end %>
+      <% if user_signed_in? %>
+        <button type="button" class="eg-pill" title="Bible" data-native-action="bible" data-action="click->bible-drawer#open">
+          <%= render_icon("bookopen", classes: "eg-pill-ico") %><span class="eg-pill-label">Bible</span>
+        </button>
+      <% end %>
+      <% games_active = request.path.start_with?("/games") %>
+      <%= link_to games_path, class: "eg-pill #{'is-active' if games_active}", title: "Games", aria: { current: (games_active ? "page" : nil) } do %>
+        <%= render_icon("games", classes: "eg-pill-ico") %><span class="eg-pill-label">Games</span>
+      <% end %>
+      <% library_active = request.path.start_with?("/resources") || request.path.start_with?("/resource_categories") %>
+      <%= link_to resources_root_path, class: "eg-pill #{'is-active' if library_active}", title: "Library", aria: { current: (library_active ? "page" : nil) } do %>
+        <%= render_icon("library", classes: "eg-pill-ico") %><span class="eg-pill-label">Library</span>
+      <% end %>
     </div>
 
-    <div class="fc-topbar-actions">
+    <div class="fc-topbar-actions eg-actions-bar">
       <% if user_signed_in? %>
-        <%= form_with url: search_path, method: :get, class: "relative hidden min-w-0 lg:block" do %>
-          <%= render_icon("search", classes: "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#75847a]") %>
-          <input type="text" name="q" placeholder="Search posts, people, resources..." class="fc-search">
+        <%
+          n_notif    = current_user.unread_notifications_count.to_i
+          n_inbox    = current_user.unread_conversations_count.to_i
+          n_requests = current_user.pending_connection_requests_count.to_i
+          badge      = ->(n) { n > 99 ? "99+" : n }
+        %>
+        <%= form_with url: search_path, method: :get, class: "eg-search", role: "search" do %>
+          <%= render_icon("search", classes: "eg-search-ico") %>
+          <input type="search" name="q" placeholder="Search Brethreign" aria-label="Search posts, people, resources" class="eg-search-input">
+        <% end %>
+        <%= link_to search_path, class: "eg-round eg-search-btn", title: "Search", aria: { label: "Search" } do %>
+          <%= render_icon("search", classes: "eg-round-ico") %>
         <% end %>
 
+        <%= link_to conversations_path, class: "eg-round fc-nav-inbox", title: "Messages",
+              aria: { label: (n_inbox.positive? ? "Messages, #{n_inbox} unread" : "Messages") } do %>
+          <%= render_icon("chat", classes: "eg-round-ico") %>
+          <% if n_inbox.positive? %>
+            <span class="fc-count-badge eg-badge" aria-hidden="true"><%= badge.(n_inbox) %></span>
+          <% end %>
+        <% end %>
+
+        <button type="button" class="eg-round fc-nav-notifications" title="Notifications"
+                aria-label="<%= n_notif.positive? ? "Notifications, #{n_notif} new" : "Notifications" %>"
+                data-action="click->notifications-modal#open">
+          <%= render_icon("bell", classes: "eg-round-ico") %>
+          <% if n_notif.positive? %>
+            <span class="fc-count-badge eg-badge" aria-hidden="true"><%= badge.(n_notif) %></span>
+          <% end %>
+        </button>
+
         <button type="button"
-                class="fc-btn fc-btn-primary fc-compose-btn hidden sm:inline-flex"
+                class="eg-breathe fc-compose-btn"
                 data-native-action="compose"
                 data-action="click->composer-modal#open">
-          <span class="text-lg leading-none">+</span>
+          <svg class="eg-breathe-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="<%= wave %>"/></svg>
           Breathe
         </button>
 
-        <div class="fc-topbar-icons">
-          <%
-            n_notif    = current_user.unread_notifications_count.to_i
-            n_inbox    = current_user.unread_conversations_count.to_i
-            n_requests = current_user.pending_connection_requests_count.to_i
-          %>
-
-          <button type="button" class="fc-icon-btn relative fc-nav-notifications" title="Notifications (#{n_notif})" data-action="click->notifications-modal#open">
-            <%= render_icon("sparkles", classes: "h-4 w-4") %>
-            <% if n_notif.positive? %>
-              <span class="fc-count-badge"><%= n_notif > 99 ? "99+" : n_notif %></span>
-            <% end %>
-          </button>
-
-          <%= link_to conversations_path, class: "fc-icon-btn relative fc-nav-inbox hidden sm:inline-flex", title: "Inbox (#{n_inbox})" do %>
-            <%= render_icon("mail", classes: "h-4 w-4") %>
-            <% if n_inbox.positive? %>
-              <span class="fc-count-badge is-mint"><%= n_inbox > 99 ? "99+" : n_inbox %></span>
-            <% end %>
-          <% end %>
-
-          <%= link_to connection_requests_path, class: "fc-icon-btn relative hidden sm:inline-flex", title: "Connection requests (#{n_requests})" do %>
-            <%= render_icon("users", classes: "h-4 w-4") %>
-            <% if n_requests.positive? %>
-              <span class="fc-count-badge"><%= n_requests > 99 ? "99+" : n_requests %></span>
-            <% end %>
-          <% end %>
-
-          <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-native-action="theme" data-controller="theme" data-action="theme#toggle">
-            <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
-            <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
-          </button>
-        </div>
-
         <div class="relative" data-controller="dropdown">
-          <%
-            attn_total = current_user.unread_notifications_count.to_i +
-                         current_user.unread_conversations_count.to_i +
-                         current_user.pending_connection_requests_count.to_i
-          %>
-          <button type="button" data-action="click->dropdown#toggle" class="fc-avatar relative" aria-label="Open account menu">
+          <button type="button" data-action="click->dropdown#toggle" class="eg-me"
+                  aria-label="<%= n_requests.positive? ? "Account menu, #{n_requests} connection requests" : "Account menu" %>">
             <% if current_user.profile&.avatar&.attached? %>
-              <%= image_tag avatar_src(current_user.profile), class: "h-full w-full rounded-full object-cover" %>
+              <%= image_tag avatar_src(current_user.profile), class: "eg-me-img", alt: "" %>
             <% else %>
-              <%= current_user.username.first.upcase %>
+              <span class="eg-me-img" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
             <% end %>
-            <% if attn_total.positive? %>
-              <span class="fc-avatar-attention"><%= attn_total > 99 ? "99+" : attn_total %></span>
+            <% if n_requests.positive? %>
+              <span class="fc-count-badge eg-badge" aria-hidden="true"><%= badge.(n_requests) %></span>
             <% end %>
           </button>
 
-          <div data-dropdown-target="menu" class="fc-dropdown-menu hidden absolute right-0 mt-2 w-56 py-2 shadow-xl">
-            <div class="fc-dropdown-head px-4 py-3">
-              <p class="truncate text-sm font-bold text-[var(--fc-ink)]"><%= current_user.username %></p>
-              <p class="truncate text-xs text-[var(--fc-muted)]"><%= current_user.email %></p>
+          <div data-dropdown-target="menu" class="fc-dropdown-menu eg-menu hidden" role="menu">
+            <div class="fc-dropdown-head eg-menu-head">
+              <p class="eg-menu-name"><%= current_user.username %></p>
+              <p class="eg-menu-mail"><%= current_user.email %></p>
             </div>
-            <%= link_to "Profile", user_path(current_user.username), class: "fc-dropdown-item" %>
+            <%= link_to user_path(current_user.username), class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("user", classes: "eg-menu-ico") %> Profile
+            <% end %>
+            <%= link_to connection_requests_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("userplus", classes: "eg-menu-ico") %>
+              <span class="eg-menu-grow">Connection requests</span>
+              <% if n_requests.positive? %>
+                <span class="fc-count-badge eg-badge is-inline"><%= badge.(n_requests) %></span>
+              <% end %>
+            <% end %>
+            <%= link_to conversations_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("chat", classes: "eg-menu-ico") %>
+              <span class="eg-menu-grow">Inbox</span>
+              <% if n_inbox.positive? %>
+                <span class="fc-count-badge eg-badge is-inline"><%= badge.(n_inbox) %></span>
+              <% end %>
+            <% end %>
+            <%= link_to people_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("usersearch", classes: "eg-menu-ico") %> People
+            <% end %>
+            <%= link_to my_connections_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("users", classes: "eg-menu-ico") %> Connections
+            <% end %>
+            <%= link_to invitations_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("send", classes: "eg-menu-ico") %> Invites
+            <% end %>
+            <%= link_to drafts_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("pencil", classes: "eg-menu-ico") %> Drafts
+            <% end %>
+
+            <div class="eg-menu-sep" role="separator"></div>
+            <%= link_to circles_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("pray", classes: "eg-menu-ico") %> Prayer Circles
+            <% end %>
+            <%= link_to answered_prayers_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("answered", classes: "eg-menu-ico") %> Answered Prayers
+            <% end %>
+            <%= link_to games_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("games", classes: "eg-menu-ico") %> Games
+            <% end %>
+            <%= link_to resources_root_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("library", classes: "eg-menu-ico") %> Library
+            <% end %>
+            <%= link_to church_history_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("church", classes: "eg-menu-ico") %> Church History
+            <% end %>
+            <%= link_to blog_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("blog", classes: "eg-menu-ico") %> Blog &amp; guides
+            <% end %>
+
+            <div class="eg-menu-sep" role="separator"></div>
+            <button type="button" class="fc-dropdown-item eg-menu-item w-full text-left"
+                    data-native-action="theme" data-controller="theme" data-action="theme#toggle">
+              <span class="eg-menu-swap" data-theme-target="lightIcon"><%= render_icon("moon", classes: "eg-menu-ico") %> Dark mode</span>
+              <span class="eg-menu-swap hidden" data-theme-target="darkIcon"><%= render_icon("sun", classes: "eg-menu-ico") %> Light mode</span>
+            </button>
             <%= button_to settings_background_rain_path(on: !current_user.background_rain?), method: :patch,
                   form_class: "contents",
-                  class: "fc-dropdown-item fc-rain-menu-item w-full text-left",
+                  class: "fc-dropdown-item fc-rain-menu-item eg-menu-item w-full text-left",
                   role: "switch", aria: { checked: current_user.background_rain? },
                   data: { controller: "rain-toggle", action: "rain-toggle#toggle",
                           rain_toggle_url_value: settings_background_rain_path } do %>
-              🌧 Background rain: <strong data-rain-toggle-target="label"><%= current_user.background_rain? ? "On" : "Off" %></strong>
+              <%= render_icon("sparkles", classes: "eg-menu-ico") %>
+              <span>Background rain: <strong data-rain-toggle-target="label"><%= current_user.background_rain? ? "On" : "Off" %></strong></span>
             <% end %>
             <button type="button"
-                    class="fc-dropdown-item w-full text-left"
-                    data-native-action="bible"
-                    data-action="click->bible-drawer#open click->dropdown#close">
-              📖 Open Bible
-            </button>
-            <button type="button"
-                    class="fc-dropdown-item w-full text-left"
+                    class="fc-dropdown-item eg-menu-item w-full text-left"
                     data-pwa-target="enableBtn"
                     data-action="click->pwa#togglePush click->dropdown#close">
-              🔕 Turn on push
+              Turn on push
             </button>
             <button type="button"
-                    class="fc-dropdown-item w-full text-left"
+                    class="fc-dropdown-item eg-menu-item w-full text-left"
                     data-notification-sound-toggle
-                    data-on-label="🔔 Sounds on"
-                    data-off-label="🔇 Sounds muted"
+                    data-on-label="Sounds on"
+                    data-off-label="Sounds muted"
                     data-action="click->notification-sound#toggle">
-              🔔 Sounds on
+              Sounds on
             </button>
-            <%= link_to "Library", resources_root_path, class: "fc-dropdown-item" %>
-            <%= link_to "🙏 Prayer Circles", circles_path, class: "fc-dropdown-item" %>
-            <%= link_to "🌟 Answered Prayers", answered_prayers_path, class: "fc-dropdown-item" %>
-            <%= link_to "📰 Blog & guides", blog_path, class: "fc-dropdown-item" %>
-            <%= link_to "🎯 Games", games_path, class: "fc-dropdown-item" %>
-            <%= link_to "⛪ Church History", church_history_path, class: "fc-dropdown-item" %>
-            <%= link_to "Drafts", drafts_path, class: "fc-dropdown-item" %>
-            <%= link_to conversations_path, class: "fc-dropdown-item flex items-center justify-between" do %>
-              <span>Inbox</span>
-              <% if (n = current_user.unread_conversations_count.to_i).positive? %>
-                <span class="fc-count-chip is-mint"><%= n > 99 ? "99+" : n %></span>
-              <% end %>
+            <%= link_to edit_settings_profile_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("settings", classes: "eg-menu-ico") %> Settings
             <% end %>
-            <%= link_to connection_requests_path, class: "fc-dropdown-item flex items-center justify-between" do %>
-              <span>Connection requests</span>
-              <% if (n = current_user.pending_connection_requests_count.to_i).positive? %>
-                <span class="fc-count-chip"><%= n > 99 ? "99+" : n %></span>
-              <% end %>
+            <%= link_to edit_settings_accent_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("palette", classes: "eg-menu-ico") %> Accent color
             <% end %>
-            <%= link_to "Invites", invitations_path, class: "fc-dropdown-item" %>
-            <%= link_to "People", people_path, class: "fc-dropdown-item" %>
-            <%= link_to "Connections", my_connections_path, class: "fc-dropdown-item" %>
-            <%= link_to "Settings", edit_settings_profile_path, class: "fc-dropdown-item" %>
-            <%= link_to "🎨 Accent color", edit_settings_accent_path, class: "fc-dropdown-item" %>
             <% if current_user_admin? %>
-              <%= link_to "Admin Dashboard", admin_root_path, class: "fc-dropdown-item" %>
+              <%= link_to admin_root_path, class: "fc-dropdown-item eg-menu-item" do %>
+                <%= render_icon("dashboard", classes: "eg-menu-ico") %> Admin Dashboard
+              <% end %>
             <% end %>
-            <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "fc-dropdown-item fc-dropdown-danger w-full text-left", data: { native_action: "sign-out" } %>
+            <div class="eg-menu-sep" role="separator"></div>
+            <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "fc-dropdown-item fc-dropdown-danger eg-menu-item w-full text-left", data: { native_action: "sign-out" } %>
           </div>
         </div>
       <% else %>
-        <button type="button" class="fc-icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
-          <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "h-4 w-4") %></span>
-          <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "h-4 w-4") %></span>
+        <button type="button" class="eg-round" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
+          <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "eg-round-ico") %></span>
+          <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "eg-round-ico") %></span>
         </button>
-        <%= link_to "Sign In", new_user_session_path, class: "fc-nav-link" %>
-        <%= link_to "Join", new_user_registration_path, class: "fc-btn fc-btn-primary" %>
+        <%= link_to "Sign In", new_user_session_path, class: "eg-signin" %>
+        <%= link_to "Join", new_user_registration_path, class: "eg-breathe eg-join" %>
       <% end %>
     </div>
   </div>
 </nav>
 
-<%# ── Mobile bottom navigation bar ── %>
-<nav class="fc-bottom-nav" aria-label="Mobile navigation">
+<%# ── Phone bottom navigation (the apps hide it: they have a native tab bar) ── %>
+<nav class="fc-bottom-nav eg-bottom" aria-label="Mobile navigation">
   <% if user_signed_in? %>
-    <%= link_to feed_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/feed')}" do %>
-      <%= render_icon("message_circle", classes: "h-5 w-5") %>
+    <% on_feed = request.path.start_with?("/feed") %>
+    <%= link_to feed_path, class: "fc-bottom-nav-item #{'is-active' if on_feed}", aria: { current: (on_feed ? "page" : nil) } do %>
+      <%= render_icon("feed", classes: "eg-bottom-ico") %>
       <span>Feed</span>
     <% end %>
-    <%= link_to rooms_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/rooms')}", data: { tour_anchor: "rooms" } do %>
-      <%= render_icon("users", classes: "h-5 w-5") %>
+    <% on_rooms = request.path.start_with?("/rooms") %>
+    <%= link_to rooms_path, class: "fc-bottom-nav-item #{'is-active' if on_rooms}", aria: { current: (on_rooms ? "page" : nil) }, data: { tour_anchor: "rooms" } do %>
+      <%= render_icon("users", classes: "eg-bottom-ico") %>
       <span>Rooms</span>
     <% end %>
     <button type="button" class="fc-bottom-nav-item fc-bottom-nav-compose" data-action="click->composer-modal#open">
-      <%= render_icon("send", classes: "h-5 w-5") %>
+      <span class="eg-bottom-bubble">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="<%= wave %>"/></svg>
+      </span>
       <span>Breathe</span>
     </button>
     <button type="button"
             class="fc-bottom-nav-item"
             data-tour-anchor="bible"
             data-action="click->bible-drawer#open">
-      <%= render_icon("bookopen", classes: "h-5 w-5") %>
+      <%= render_icon("bookopen", classes: "eg-bottom-ico") %>
       <span>Bible</span>
     </button>
-    <%= link_to user_path(current_user.username), class: "fc-bottom-nav-item #{'is-active' if request.path == user_path(current_user.username)}" do %>
-      <%= render_icon("users", classes: "h-5 w-5") %>
+    <% on_me = request.path == user_path(current_user.username) %>
+    <%= link_to user_path(current_user.username), class: "fc-bottom-nav-item #{'is-active' if on_me}", aria: { current: (on_me ? "page" : nil) } do %>
+      <%= render_icon("user", classes: "eg-bottom-ico") %>
       <span>Profile</span>
     <% end %>
   <% else %>
     <%= link_to root_path, class: "fc-bottom-nav-item #{'is-active' if current_page?(root_path)}" do %>
-      <%= render_icon("message_circle", classes: "h-5 w-5") %>
+      <%= render_icon("feed", classes: "eg-bottom-ico") %>
       <span>Feed</span>
     <% end %>
     <%= link_to rooms_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/rooms')}" do %>
-      <%= render_icon("users", classes: "h-5 w-5") %>
+      <%= render_icon("users", classes: "eg-bottom-ico") %>
       <span>Rooms</span>
     <% end %>
     <%= link_to resources_root_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/resources')}" do %>
-      <%= render_icon("bookopen", classes: "h-5 w-5") %>
+      <%= render_icon("library", classes: "eg-bottom-ico") %>
       <span>Library</span>
     <% end %>
     <%= link_to search_path, class: "fc-bottom-nav-item #{'is-active' if request.path.start_with?('/search')}" do %>
-      <%= render_icon("search", classes: "h-5 w-5") %>
+      <%= render_icon("search", classes: "eg-bottom-ico") %>
       <span>Search</span>
     <% end %>
     <%= link_to new_user_session_path, class: "fc-bottom-nav-item" do %>
-      <%= render_icon("users", classes: "h-5 w-5") %>
+      <%= render_icon("user", classes: "eg-bottom-ico") %>
       <span>Sign In</span>
     <% end %>
   <% end %>
 </nav>
-

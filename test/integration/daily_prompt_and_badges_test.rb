@@ -17,11 +17,11 @@ class DailyPromptAndBadgesTest < ActionDispatch::IntegrationTest
 
   teardown { ENV.delete("AI_MODERATION_STUB") }
 
-  test "the feed shows the daily breath card until you've posted" do
+  test "the feed asks the daily breath question in the composer until you've posted" do
     get feed_path
     assert_response :success
-    assert_match "What breath do you have today?", response.body
-    assert_match "Breathe it out", response.body
+    assert_select ".eg-composer .fc-composer-daily", "What breath do you have today?"
+    assert_no_match "You breathed today", response.body
 
     Post.create!(user: @user, room: @room, title: "Answered it",
                  content: "Body", status: :published, moderation_status: :approved)

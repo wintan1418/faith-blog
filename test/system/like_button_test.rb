@@ -4,7 +4,9 @@ require "application_system_test_case"
 
 # A tester found the feed's Like button opened a whole emoji picker on every
 # tap — too much for a simple like. Now a tap Loves the breath at once, a
-# second tap takes it back, and holding the button opens the picker.
+# second tap takes it back, and holding the button opens the picker. The
+# button always shows the heart icon (filled once you've reacted); the
+# reaction you chose is on data-reaction and in the summary row.
 class LikeButtonTest < ApplicationSystemTestCase
   include Warden::Test::Helpers
 
@@ -26,7 +28,7 @@ class LikeButtonTest < ApplicationSystemTestCase
     button = "##{reactions_id} .fc-react-btn"
 
     find(button).click
-    assert_selector "#{button}.is-mine .fc-react-emoji", text: "❤️"
+    assert_selector "#{button}.is-mine[data-reaction='❤️'] svg"
     assert_equal "❤️", @member.likes.find_by(likeable: @post)&.reaction_emoji
     assert_selector "##{reactions_id} .fc-reaction-picker.hidden", visible: :all
 
@@ -48,7 +50,7 @@ class LikeButtonTest < ApplicationSystemTestCase
       document.querySelector("##{reactions_id} emoji-picker")
         .dispatchEvent(new CustomEvent("emoji-click", { detail: { unicode: "🙏" }, bubbles: true }))
     JS
-    assert_selector "##{reactions_id} .fc-react-btn.is-mine .fc-react-emoji", text: "🙏"
+    assert_selector "##{reactions_id} .fc-react-btn.is-mine[data-reaction='🙏'] svg"
     assert_equal "🙏", @member.likes.find_by(likeable: @post)&.reaction_emoji
   end
 

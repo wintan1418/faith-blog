@@ -22,11 +22,13 @@
     <% if user_signed_in? && current_user.admin_or_moderator? %>
       <% if post.featured? %>
         <%= button_to unfeature_post_path(post), form_class: "contents", class: "fc-action w-full", role: "menuitem" do %>
-          <span class="fc-action-label">📌 Unpin breath</span>
+          <%= render_icon("pin", classes: "h-4 w-4") %>
+          <span class="fc-action-label">Unpin breath</span>
         <% end %>
       <% else %>
         <%= button_to feature_post_path(post), form_class: "contents", class: "fc-action w-full", role: "menuitem" do %>
-          <span class="fc-action-label">📌 Pin for everyone</span>
+          <%= render_icon("pin", classes: "h-4 w-4") %>
+          <span class="fc-action-label">Pin for everyone</span>
         <% end %>
       <% end %>
     <% end %>
