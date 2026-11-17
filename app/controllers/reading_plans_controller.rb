@@ -27,7 +27,7 @@ class ReadingPlansController < ApplicationController
     return redirect_to(reading_plans_path, alert: "Start the plan first.") unless user_plan
 
     user_plan.check_in!
-    flash_message = user_plan.completed ? "🌟 Plan complete. Well done." : "Marked Day #{user_plan.current_day - 1} done. See you tomorrow."
+    flash_message = user_plan.completed ? "Plan complete. Well done." : "Marked Day #{user_plan.current_day - 1} done. See you tomorrow."
     redirect_to reading_plan_path(@plan.slug), notice: flash_message
   end
 

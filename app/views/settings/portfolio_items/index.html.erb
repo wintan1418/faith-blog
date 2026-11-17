@@ -24,7 +24,7 @@
                 <% if item.cover %>
                   <%= image_tag resized_image_src(item.cover, width: 160, height: 120, crop: "fill"), alt: "" %>
                 <% else %>
-                  <span aria-hidden="true"><%= item.emoji %></span>
+                  <%= render_icon(item.icon, classes: "h-6 w-6") %>
                 <% end %>
               </span>
               <span class="pf-manage-text">
@@ -32,10 +32,10 @@
                 <span class="pro-item-meta"><%= [ item.category, ("Hidden by moderation" if item.hidden?) ].compact.join(" · ") %></span>
               </span>
               <span class="pf-manage-tools">
-                <%= button_to "↑", move_settings_portfolio_item_path(item, direction: "up"), method: :patch, class: "pf-move",
-                              disabled: i.zero?, aria: { label: "Move #{item.title} up" } %>
-                <%= button_to "↓", move_settings_portfolio_item_path(item, direction: "down"), method: :patch, class: "pf-move",
-                              disabled: i == @items.size - 1, aria: { label: "Move #{item.title} down" } %>
+                <%= button_to move_settings_portfolio_item_path(item, direction: "up"), method: :patch, class: "pf-move",
+                              disabled: i.zero?, aria: { label: "Move #{item.title} up" } do %><%= render_icon("arrowup", classes: "h-4 w-4") %><% end %>
+                <%= button_to move_settings_portfolio_item_path(item, direction: "down"), method: :patch, class: "pf-move",
+                              disabled: i == @items.size - 1, aria: { label: "Move #{item.title} down" } do %><%= render_icon("arrowdown", classes: "h-4 w-4") %><% end %>
                 <%= link_to "Edit", edit_settings_portfolio_item_path(item), class: "pro-item-edit" %>
               </span>
             </li>

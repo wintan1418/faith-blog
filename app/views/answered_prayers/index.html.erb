@@ -4,7 +4,7 @@
 <div class="mystic-shell answered-wall">
   <section class="aw-hero">
     <div class="mystic-container max-w-4xl py-14 text-center">
-      <p class="aw-kicker">🌟 Testimony</p>
+      <p class="aw-kicker"><%= render_icon("answered", classes: "h-4 w-4") %> Testimony</p>
       <h1 class="aw-title">The Wall of Answered Prayers</h1>
       <p class="aw-sub">
         Every request the assembly carried together, answered.
@@ -56,10 +56,10 @@
 
             <footer class="aw-card-foot">
               <% if carried %>
-                <span class="aw-chip">🕯️ Carried for <%= carried %></span>
+                <span class="aw-chip"><%= render_icon("clock", classes: "h-3.5 w-3.5") %> Carried for <%= carried %></span>
               <% end %>
               <% if post.intercessions_count.to_i.positive? %>
-                <span class="aw-chip">🙏 <%= post.intercessions_count %> in the chain</span>
+                <span class="aw-chip"><%= render_icon("pray", classes: "h-3.5 w-3.5") %> <%= post.intercessions_count %> in the chain</span>
               <% end %>
               <%= link_to "Read the testimony →", post_path(post), class: "aw-card-link" %>
             </footer>

@@ -25,8 +25,8 @@
   </div>
   <% if can_endorse %>
     <% if mine %>
-      <%= button_to "✓ Endorsed", unendorse_skill_path(user.username, skill: skill), method: :delete, class: "sk-btn is-on",
-                    form: { class: "sk-form" }, aria: { label: "Remove your endorsement for #{skill}" } %>
+      <%= button_to unendorse_skill_path(user.username, skill: skill), method: :delete, class: "sk-btn is-on",
+                    form: { class: "sk-form" }, aria: { label: "Remove your endorsement for #{skill}" } do %><%= render_icon("check", classes: "h-3.5 w-3.5") %> Endorsed<% end %>
     <% else %>
       <%= button_to "+ Endorse", endorse_skill_path(user.username, skill: skill), method: :post, class: "sk-btn",
                     form: { class: "sk-form" }, aria: { label: "Endorse #{user.display_name} for #{skill}" } %>

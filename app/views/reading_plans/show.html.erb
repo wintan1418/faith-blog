@@ -23,13 +23,13 @@
           <% if @user_plan.can_check_in_today? %>
             <%= button_to "Mark today done", check_in_reading_plan_path(@plan.slug), method: :post, form_class: "inline mt-4", class: "fc-btn fc-btn-primary" %>
           <% else %>
-            <p class="mt-4 text-sm font-bold text-[var(--fc-accent-2)]">✓ Done for today. See you tomorrow.</p>
+            <p class="mt-4 text-sm font-bold text-[var(--fc-accent-2)] inline-flex items-center gap-1.5"><%= render_icon("checkcircle", classes: "h-4 w-4") %> Done for today. See you tomorrow.</p>
           <% end %>
         </div>
       <% elsif @user_plan&.completed %>
         <div class="fc-plan-today is-done">
           <p class="fc-plan-today-kicker">Plan complete</p>
-          <p class="text-base text-[var(--fc-soft)] mt-2">🌟 You finished this plan on <%= @user_plan.last_completed_on.strftime("%B %-d, %Y") %>. Want to take it again?</p>
+          <p class="text-base text-[var(--fc-soft)] mt-2"><%= render_icon("answered", classes: "h-4 w-4 inline -mt-0.5 text-[var(--fc-accent)]") %> You finished this plan on <%= @user_plan.last_completed_on.strftime("%B %-d, %Y") %>. Want to take it again?</p>
           <%= button_to "Restart plan", leave_reading_plan_path(@plan.slug), method: :delete, form_class: "inline mt-3", class: "fc-btn" %>
         </div>
       <% else %>
@@ -47,7 +47,7 @@
             <span class="fc-plan-day-num">Day <%= day[:day] %></span>
             <span class="fc-plan-day-ref"><%= day[:reference] %></span>
             <% if done %>
-              <span class="fc-plan-day-check">✓</span>
+              <span class="fc-plan-day-check"><%= render_icon("check", classes: "h-4 w-4") %><span class="sr-only">Done</span></span>
             <% end %>
           </li>
         <% end %>

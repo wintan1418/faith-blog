@@ -19,6 +19,16 @@ class PortfolioItem < ApplicationRecord
     "Ministry & outreach" => "🕊️", "Community & charity" => "🤝", "Other" => "✨"
   }.freeze
 
+  # What the site shows for each category (CATEGORIES keeps the emoji for text).
+  CATEGORY_ICONS = {
+    "Design" => "palette", "Software & apps" => "laptop", "Writing" => "pen", "Photography" => "camera",
+    "Video & film" => "film", "Music & audio" => "music", "Architecture & building" => "building",
+    "Engineering" => "wrench", "Research" => "flask", "Marketing & brand" => "megaphone",
+    "Business & startups" => "rocket", "Events" => "calendar", "Teaching & training" => "graduationcap",
+    "Health & care" => "stethoscope", "Fashion & beauty" => "shirt", "Food" => "utensils", "Art & craft" => "brush",
+    "Ministry & outreach" => "dove", "Community & charity" => "handshake", "Other" => "sparkles"
+  }.freeze
+
   belongs_to :user
   has_many_attached :images
   has_one_attached :document
@@ -44,6 +54,7 @@ class PortfolioItem < ApplicationRecord
 
   def hidden? = hidden_at.present?
   def emoji = CATEGORIES[category] || "✨"
+  def icon = CATEGORY_ICONS[category] || "sparkles"
   def cover = images.attachments.first
 
   def skills_list = skills.join(", ")

@@ -68,7 +68,33 @@ class Notification < ApplicationRecord
     !read?
   end
 
-  def message
+  # The icon that marks each type on the web (the push and email text keep
+  # their emoji; the site shows a real icon instead).
+  WEB_ICONS = {
+    new_comment: "comment", comment_reply: "reply", new_follower: "userplus",
+    post_featured: "star", new_post_in_room: "users", resource_approved: "library",
+    resource_rejected: "library", mentioned: "megaphone", post_liked: "heart",
+    comment_liked: "heart", connection_request: "handshake", connection_accepted: "handshake",
+    post_reshared: "repost", direct_message: "mail", breath_from_followee: "leaf",
+    everyone_mention: "megaphone", prayer_joined: "pray", prayer_answered: "answered",
+    post_blocked: "shield", post_held_for_review: "shield", post_moderation_approved: "checkcircle",
+    thread_new_voice: "comment", badge_earned: "trophy", circle_breath: "users",
+    circle_prayer: "pray", circle_prayer_answered: "answered", birthday: "cake",
+    content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone"
+  }.freeze
+
+  def web_icon
+    WEB_ICONS[notification_type.to_sym] || "bell"
+  end
+
+  # Push and email text (keeps its emoji).
+  def message = message_text(emoji: true)
+
+  # The same words for the site, where the row's icon does the emoji's job.
+  def web_message = message_text(emoji: false)
+
+  def message_text(emoji:)
+    e = ->(mark) { emoji ? mark : "" }
     case notification_type.to_sym
     when :new_comment
       "#{actor&.display_name || 'Someone'} commented on your post"
@@ -103,14 +129,14 @@ class Notification < ApplicationRecord
     when :everyone_mention
       "#{actor&.display_name || 'Someone'} mentioned everyone"
     when :thread_new_voice
-      "#{actor&.display_name || 'Someone'} added their breath to a thread you're in 🧵"
+      "#{actor&.display_name || 'Someone'} added their breath to a thread you're in#{e.(" 🧵")}"
     when :badge_earned
       badge = notifiable.respond_to?(:info) ? notifiable.info : nil
-      badge ? "You earned the #{badge[:name]} badge #{badge[:emoji]}" : "You earned a new badge ✦"
+      badge ? "You earned the #{badge[:name]} badge#{e.(" #{badge[:emoji]}")}" : "You earned a new badge#{e.(" ✦")}"
     when :prayer_joined
       "#{actor&.display_name || 'Someone'} joined your prayer chain"
     when :prayer_answered
-      "A prayer you joined was just marked answered 🌟"
+      "A prayer you joined was just marked answered#{e.(" 🌟")}"
     when :post_blocked
       "Your post couldn't be published — it appears to violate our community guidelines."
     when :post_held_for_review
@@ -120,21 +146,21 @@ class Notification < ApplicationRecord
     when :circle_breath
       "#{actor&.display_name || 'Someone'} breathed in your circle #{circle_name_suffix}"
     when :circle_prayer
-      "#{actor&.display_name || 'Someone'} added a prayer to #{circle_name_suffix('your circle')} 🙏"
+      "#{actor&.display_name || 'Someone'} added a prayer to #{circle_name_suffix('your circle')}#{e.(" 🙏")}"
     when :circle_prayer_answered
-      "A prayer in #{circle_name_suffix('your circle')} was marked answered 🌟"
+      "A prayer in #{circle_name_suffix('your circle')} was marked answered#{e.(" 🌟")}"
     when :content_removed
       if notifiable.is_a?(PortfolioItem)
-        "🛡 “#{notifiable.title.to_s.truncate(40)}” was hidden from your portfolio because it breaks our community guidelines. Edit it or remove it."
+        "#{e.("🛡 ")}“#{notifiable.title.to_s.truncate(40)}” was hidden from your portfolio because it breaks our community guidelines. Edit it or remove it."
       else
-        "🛡 Your profile photo was removed because it breaks our community guidelines. Please choose another."
+        "#{e.("🛡 ")}Your profile photo was removed because it breaks our community guidelines. Please choose another."
       end
     when :skill_endorsed
-      "#{actor&.display_name || 'Someone'} endorsed you for #{notifiable.try(:skill) || 'a skill'} 👍"
+      "#{actor&.display_name || 'Someone'} endorsed you for #{notifiable.try(:skill) || 'a skill'}#{e.(" 👍")}"
     when :app_update
-      "📲 Brethreign #{notifiable.try(:latest_version)} is out. Update the app to get the newest features and fixes."
+      "#{e.("📲 ")}Brethreign #{notifiable.try(:latest_version)} is out. Update the app to get the newest features and fixes."
     when :birthday
-      "🎂 It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
+      "#{e.("🎂 ")}It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
       "You have a new notification"
     end

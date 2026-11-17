@@ -59,7 +59,7 @@ class ProStep3Test < ActionDispatch::IntegrationTest
 
     post endorse_skill_path(@ada.username, skill: "ux design"), as: :turbo_stream
     assert_response :success
-    assert_match "✓ Endorsed", response.body
+    assert_match "Endorsed", response.body
     endorsement = @ada.skill_endorsements.sole
     assert_equal "UX design", endorsement.skill # stored as the member wrote it
     assert @ada.notifications.where(notification_type: :skill_endorsed, actor: @ben).exists?

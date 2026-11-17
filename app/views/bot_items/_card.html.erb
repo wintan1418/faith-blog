@@ -2,7 +2,7 @@
 <% bot = item.bot_info %>
 <article class="fc-breath fc-bot-card" id="<%= dom_id(item) %>">
   <header class="fc-bot-head">
-    <span class="fc-bot-avatar is-<%= item.bot %>" aria-hidden="true"><%= bot.emoji %></span>
+    <span class="fc-bot-avatar is-<%= item.bot %>" aria-hidden="true"><%= render_icon(bot.icon, classes: "h-5 w-5") %></span>
     <div class="fc-bot-who">
       <p class="fc-bot-name"><%= bot.name %> <span class="fc-bot-badge">Bot</span></p>
       <p class="fc-bot-meta">
@@ -24,7 +24,7 @@
   <% end %>
 
   <% if %w[jobs courses].include?(item.bot) %>
-    <p class="fc-bot-safety">🛡 Never pay to apply. Brethreign will never ask you for money.</p>
+    <p class="fc-bot-safety"><%= render_icon("shield", classes: "h-4 w-4") %> Never pay to apply. Brethreign will never ask you for money.</p>
   <% end %>
 
   <footer class="fc-breath-actions">

@@ -40,7 +40,7 @@ class CirclesController < ApplicationController
       redirect_to circle_path(circle)
     else
       circle.circle_memberships.create!(user: current_user)
-      redirect_to circle_path(circle), notice: "Welcome into “#{circle.name}”. 🕊️"
+      redirect_to circle_path(circle), notice: "Welcome into “#{circle.name}”."
     end
   end
 

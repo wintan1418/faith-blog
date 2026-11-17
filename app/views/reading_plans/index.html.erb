@@ -21,7 +21,7 @@
 
             <% if mine %>
               <% if mine.completed %>
-                <p class="fc-plan-status is-done">🌟 Completed on <%= mine.last_completed_on.strftime("%b %-d") %></p>
+                <p class="fc-plan-status is-done"><%= render_icon("answered", classes: "h-4 w-4") %> Completed on <%= mine.last_completed_on.strftime("%b %-d") %></p>
               <% else %>
                 <div class="fc-plan-progress">
                   <div class="fc-plan-progress-bar" style="width: <%= mine.progress_percent %>%"></div>

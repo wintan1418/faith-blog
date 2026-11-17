@@ -3,7 +3,7 @@
 <div class="mystic-shell circles-page">
   <section class="circles-hero">
     <div class="mystic-container max-w-4xl py-12 text-center">
-      <p class="circles-kicker">🕊️ Close company</p>
+      <p class="circles-kicker"><%= render_icon("dove", classes: "h-4 w-4") %> Close company</p>
       <h1 class="circles-title">Prayer Circles</h1>
       <p class="circles-sub">
         A circle is a small, private room — your cell group, your family, your closest brethren.
@@ -28,7 +28,7 @@
         <% @circles.each do |circle| %>
           <%= link_to circle_path(circle), class: "circle-card" do %>
             <div class="circle-card-head">
-              <span class="circle-card-mark">🕯️</span>
+              <span class="circle-card-mark"><%= render_icon("flame", classes: "h-5 w-5") %></span>
               <h3 class="circle-card-name"><%= circle.name %></h3>
             </div>
             <% if circle.description.present? %>

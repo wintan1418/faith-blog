@@ -10,54 +10,55 @@ class UserBadge < ApplicationRecord
 
   validates :slug, presence: true, uniqueness: { scope: :user_id }
 
+  # `emoji` is for push and email text; `icon` is what the site shows.
   CATALOG = {
     "first_breath" => {
-      name: "First Breath", emoji: "🌱",
+      name: "First Breath", emoji: "🌱", icon: "sprout",
       blurb: "Published your first breath",
       earned: ->(u) { u.posts.published.exists? }
     },
     "streak_7" => {
-      name: "Seven Days of Breath", emoji: "🔥",
+      name: "Seven Days of Breath", emoji: "🔥", icon: "flame",
       blurb: "Breathed seven days in a row",
       earned: ->(u) { u.current_breath_streak.to_i >= 7 }
     },
     "streak_30" => {
-      name: "Faithful Month", emoji: "🌟",
+      name: "Faithful Month", emoji: "🌟", icon: "calendar",
       blurb: "A thirty-day breath streak",
       earned: ->(u) { u.current_breath_streak.to_i >= 30 }
     },
     "encourager" => {
-      name: "Encourager", emoji: "💪",
+      name: "Encourager", emoji: "💪", icon: "heart",
       blurb: "Gave 100 reactions to the brethren",
       earned: ->(u) { Like.where(user: u).count >= 100 }
     },
     "prayer_warrior" => {
-      name: "Prayer Warrior", emoji: "🙏",
+      name: "Prayer Warrior", emoji: "🙏", icon: "pray",
       blurb: "Joined 10 prayer chains",
       earned: ->(u) { PrayerIntercession.where(user: u).count >= 10 }
     },
     "testimony" => {
-      name: "Testimony", emoji: "🕊️",
+      name: "Testimony", emoji: "🕊️", icon: "answered",
       blurb: "A prayer you shared was answered",
       earned: ->(u) { u.posts.where(prayer_status: :prayer_answered).exists? }
     },
     "voice_in_the_assembly" => {
-      name: "Voice in the Assembly", emoji: "🧵",
+      name: "Voice in the Assembly", emoji: "🧵", icon: "comment",
       blurb: "Added 25 comments to the conversation",
       earned: ->(u) { Comment.where(user: u).count >= 25 }
     },
     "scholar" => {
-      name: "Scholar", emoji: "📖",
+      name: "Scholar", emoji: "📖", icon: "bookopen",
       blurb: "Played 10 rounds in the games room",
       earned: ->(u) { u.game_attempts.count >= 10 }
     },
     "perfect_round" => {
-      name: "Perfect Round", emoji: "🎯",
+      name: "Perfect Round", emoji: "🎯", icon: "target",
       blurb: "A flawless game round (5+ questions)",
       earned: ->(u) { u.game_attempts.where("score = max_score AND max_score >= 5").exists? }
     },
     "gatherer" => {
-      name: "Gatherer", emoji: "🤝",
+      name: "Gatherer", emoji: "🤝", icon: "handshake",
       blurb: "Someone you invited joined the brethren",
       earned: ->(u) { Invitation.accepted.where(inviter: u).exists? }
     }
@@ -84,6 +85,6 @@ class UserBadge < ApplicationRecord
   end
 
   def info
-    CATALOG[slug] || { name: slug.humanize, emoji: "✦", blurb: "" }
+    CATALOG[slug] || { name: slug.humanize, emoji: "✦", icon: "trophy", blurb: "" }
   end
 end
