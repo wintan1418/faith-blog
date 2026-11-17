@@ -46,7 +46,7 @@ class ChessOtherMatesTest < ApplicationSystemTestCase
       assert_includes %w[f8 h8], king
       play("b5", "b8") # mate on the back rank
       assert_selector "[data-chess-puzzle-target=status]", text: "Puzzle solved"
-      assert_selector "[data-chess-puzzle-target=tries]", text: "❤️❤️❤️"
+      assert_selector "[data-chess-puzzle-target=tries] .fc-chess-heart.is-full", count: 3
     end
   end
 

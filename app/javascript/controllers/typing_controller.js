@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
-import consumer from "../channels/consumer"
+import { subscribeTyping } from "../channels/typing_hub"
 
+// "Name is typing…" in an open chat: animated dots in the thread and a green
+// "typing…" under the name in the header (the element gets .is-typing).
 export default class extends Controller {
   static values = {
     conversationId: Number,
@@ -13,15 +15,12 @@ export default class extends Controller {
   connect() {
     this.hideTimer = null
     this.stopTimer = null
-    this.subscription = consumer.subscriptions.create(
-      { channel: "ConversationTypingChannel", conversation_id: this.conversationIdValue },
-      { received: (data) => this.received(data) }
-    )
+    this.subscription = subscribeTyping(this.conversationIdValue, (data) => this.received(data))
   }
 
   disconnect() {
     this.sendTyping(false)
-    if (this.subscription) consumer.subscriptions.remove(this.subscription)
+    if (this.subscription) this.subscription.unsubscribe()
     clearTimeout(this.hideTimer)
     clearTimeout(this.stopTimer)
   }
@@ -39,6 +38,8 @@ export default class extends Controller {
       const text = this.indicatorTarget.querySelector(".typing-text")
       if (text) text.textContent = `${data.username} is typing`
       this.indicatorTarget.classList.remove("hidden")
+      this.element.classList.add("is-typing")
+      this.keepNewestInView()
       clearTimeout(this.hideTimer)
       this.hideTimer = setTimeout(() => this.hide(), 2200)
     } else {
@@ -47,10 +48,20 @@ export default class extends Controller {
   }
 
   hide() {
+    this.element.classList.remove("is-typing")
     if (this.hasIndicatorTarget) {
       this.indicatorTarget.classList.add("hidden")
       const text = this.indicatorTarget.querySelector(".typing-text")
       if (text) text.textContent = ""
+    }
+  }
+
+  // The dots take a line under the thread; keep the newest message in view
+  // for someone already reading the bottom of the chat.
+  keepNewestInView() {
+    const thread = document.getElementById("messages")
+    if (thread && thread.scrollHeight - thread.scrollTop - thread.clientHeight < 160) {
+      requestAnimationFrame(() => { thread.scrollTop = thread.scrollHeight })
     }
   }
 

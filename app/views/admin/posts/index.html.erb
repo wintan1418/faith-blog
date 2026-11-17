@@ -1,7 +1,7 @@
 <% content_for(:page_title) { "Posts" } %>
 
-<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-  <table class="w-full">
+<div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+  <table class="w-full min-w-[720px]">
     <thead class="border-b border-gray-200 bg-gray-50">
       <tr>
         <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Post</th>
@@ -15,7 +15,7 @@
       <% @posts.each do |post| %>
         <tr class="hover:bg-gray-50">
           <td class="px-6 py-4">
-            <p class="font-semibold text-gray-900"><%= truncate(post.title, length: 52) %></p>
+            <p class="font-semibold text-gray-900"><%= truncate(post.title.presence || post.content&.to_plain_text.to_s.squish.presence || "Untitled breath", length: 52) %></p>
             <p class="text-xs text-gray-500"><%= time_ago_in_words(post.created_at) %> ago</p>
           </td>
           <td class="px-6 py-4 text-sm text-gray-700"><%= post.room&.name || "No room" %></td>

@@ -143,4 +143,37 @@ class MessagingTest < ActionDispatch::IntegrationTest
     assert_match "keep it kind", response.body
     assert_match "f*ck this", response.body
   end
+
+  test "Evergreen inbox: Active now shows chat partners who are online and share it" do
+    @maria.update_columns(last_seen_at: Time.current, show_online_status: true)
+    @james.update_columns(last_seen_at: Time.current, show_online_status: false)
+    get conversations_path
+
+    assert_select ".msg-list-title", text: "Messages"
+    assert_select ".msg-active .msg-active-person[href=?]", conversation_path(@with_maria)
+    assert_select ".msg-active .msg-active-person", count: 1, message: "James hides his status"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(@with_maria, :inbox_row)}[data-controller='inbox-typing'][data-inbox-typing-conversation-id-value=?]", @with_maria.id.to_s do
+      assert_select ".msg-avatar.is-online"
+      assert_select ".msg-row-typing", text: "typing…"
+    end
+  end
+
+  test "Evergreen chat: bubbles carry their time, voice notes get a player, and no emoji icons" do
+    voice = @with_maria.messages.new(sender: @maria, body: "")
+    voice.voice_note.attach(io: StringIO.new("OggS voice"), filename: "voice-note.ogg", content_type: "audio/ogg")
+    voice.save!
+    get conversation_path(@with_maria)
+
+    assert_select ".msg-thread[data-controller='typing'] .msg-thread-typing", text: "typing…"
+    assert_select ".msg-item.is-theirs .msg-bubble .msg-stamp time"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(voice)} .msg-voice-player[data-controller='voice-player']" do
+      assert_select "button.msg-voice-play[aria-label='Play voice note']"
+      assert_select ".msg-wave .msg-wave-bars i", count: MessagingHelper::VOICE_BARS * 2
+    end
+    assert_select "#new_message .msg-attach-btn[aria-label='Add photo or file']"
+    assert_select "#new_message button.msg-send[aria-label='Send'] svg"
+    assert_select ".typing-indicator .typing-dots"
+    composer = css_select("#new_message").to_html
+    %w[✕ ⚠️ 🛡].each { |glyph| assert_not_includes composer, glyph }
+  end
 end

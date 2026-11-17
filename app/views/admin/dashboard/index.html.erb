@@ -4,7 +4,7 @@
 <div class="adash">
   <div class="adash-head">
     <div>
-      <p class="adash-kicker">Brethreign at a glance</p>
+      <h2 class="adash-kicker">Brethreign at a glance</h2>
       <p class="adash-sub"><%= s.from.strftime("%-d %b") %> – <%= s.to.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b %Y") %>, compared with the <%= s.days %> days before</p>
     </div>
     <nav class="adash-range" aria-label="Period">
@@ -132,7 +132,7 @@
     <% s.safety.each do |label, count, path| %>
       <% body = capture do %>
         <strong><%= count %></strong><span><%= label %></span>
-        <em><%= count.zero? ? "✓ All clear" : (path ? "Needs attention →" : "in this period") %></em>
+        <em><% if count.zero? %><%= render_icon("check", classes: "h-4 w-4") %> All clear<% elsif path %>Needs attention <%= render_icon("arrowright", classes: "h-4 w-4") %><% else %>in this period<% end %></em>
       <% end %>
       <% if path %>
         <%= link_to body, path, class: "adash-safety__item#{' is-alert' if count.positive?}" %>

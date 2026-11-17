@@ -46,9 +46,13 @@ export default class extends Controller {
   // Open with starter text from a data-composer-modal-prefill-param — used by
   // the composer chips ("Prayer request", "Share a verse"). Never clobbers a
   // draft: only inserts when the editor is empty.
+  // A data-composer-modal-mode-param ("prayer", "verse", "thread") also picks
+  // the matching kind on the composer's Breath / Prayer / Verse / Thread switch.
   async openWith(event) {
     const text = event.params && event.params.prefill
+    const mode = event.params && event.params.mode
     this.open(event)
+    if (mode) document.dispatchEvent(new CustomEvent("composer:mode", { detail: { mode } }))
     if (!text) return
     const editor = await this.readyEditor()
     if (editor && editor.editor.getDocument().toString().trim() === "") editor.editor.insertString(text)

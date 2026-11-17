@@ -9,7 +9,7 @@
   </div>
   <%= form_with url: admin_users_path, method: :get, class: "flex gap-2" do %>
     <%= hidden_field_tag :filter, @filter %>
-    <%= search_field_tag :q, @query, placeholder: "Search username or email", class: "rounded-lg border border-gray-300 px-3 py-2 text-sm", "aria-label": "Search members" %>
+    <%= search_field_tag :q, @query, placeholder: "Search username or email", class: "admin-search-input", "aria-label": "Search members" %>
     <button type="submit" class="btn btn-primary btn-sm">Search</button>
   <% end %>
 </div>
@@ -17,7 +17,7 @@
 <nav class="mb-4 flex flex-wrap gap-2" aria-label="Filter members">
   <% Admin::UsersController::FILTERS.each do |key, label| %>
     <%= link_to admin_users_path(filter: key, q: @query.presence),
-          class: "rounded-full border px-3 py-1.5 text-sm font-semibold #{key == @filter ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-700'}",
+          class: "admin-filter-pill#{' is-active' if key == @filter}",
           "aria-current": (key == @filter ? "true" : nil) do %>
       <%= label %> <span class="opacity-70"><%= number_with_delimiter(@counts[key]) %></span>
     <% end %>
@@ -46,7 +46,7 @@
           <td class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap"><%= user.created_at.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b %Y") %></td>
           <td class="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
             <% if user.last_seen_at && user.last_seen_at > User::ONLINE_WINDOW.ago %>
-              <span class="font-semibold text-green-700">● Online</span>
+              <span class="admin-online-dot">Online</span>
             <% elsif user.last_seen_at %>
               <%= time_ago_in_words(user.last_seen_at) %> ago
             <% else %>

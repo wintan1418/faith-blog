@@ -1,15 +1,9 @@
 <% content_for(:title) { "4 Pics 1 Word · Brethreign" } %>
 
 <div class="fc-app">
-  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 720px;">
-    <main class="fc-main">
-      <header class="mb-5">
-        <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
-          ← Back to games
-        <% end %>
-        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">🖼️ 4 Pics 1 Word</h1>
-        <p class="text-sm text-[var(--fc-muted)]">Read the four emoji — guess the Bible story or concept.</p>
-      </header>
+  <div class="fc-shell fc-games-shell is-narrow" style="grid-template-columns: minmax(0, 1fr);">
+    <main class="fc-main fc-games">
+      <%= game_header("pic_word", title: "4 Pics 1 Word", intro: "Read the four emoji and guess the Bible story or concept.") %>
 
       <section data-controller="quiz"
                data-quiz-game-name-value="4 Pics 1 Word"
@@ -22,7 +16,8 @@
             <h2 class="fc-quiz-headline">What story is this?</h2>
             <p class="fc-quiz-sub">Four emoji together hint at a Bible story, character, miracle, or parable. Pick the right one.</p>
             <button type="button" class="fc-btn fc-btn-primary fc-quiz-start" data-action="click->quiz#start">
-              ▶ Start puzzles
+              <%= render_icon("play", classes: "h-4 w-4 fc-icon-fill") %>
+              Start puzzles
             </button>
           </div>
         </div>

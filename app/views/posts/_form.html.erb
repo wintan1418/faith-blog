@@ -87,7 +87,7 @@
               data-composer-assistant-target="gentlenessBtn"
               data-action="click->composer-assistant#checkGentleness"
               title="Run a quick tone check">
-        🕊️ <span>Check tone</span>
+        <%= render_icon("tone", classes: "h-4 w-4") %> <span data-label>Check tone</span>
       </button>
 
       <button type="button"
@@ -95,7 +95,7 @@
               data-composer-assistant-target="scriptureBtn"
               data-action="click->composer-assistant#suggestScripture"
               title="Suggest a fitting scripture">
-        📖 <span>Suggest scripture</span>
+        <%= render_icon("sparkles", classes: "h-4 w-4") %> <span data-label>Suggest scripture</span>
       </button>
 
       <button type="button"
@@ -104,7 +104,7 @@
               data-action="click->composer-assistant#toggleAutoScripture"
               title="Suggest scripture automatically as you type"
               aria-pressed="false">
-        ⚡ <span class="fc-composer-asst-label">Auto: off</span>
+        <%= render_icon("sparkles", classes: "h-4 w-4") %> <span class="fc-composer-asst-label">Auto: off</span>
       </button>
     </div>
 
@@ -275,7 +275,7 @@
         time zone. With a future time picked, Publish reads "Schedule". %>
     <div class="fc-composer-schedule pt-4" data-controller="schedule-field" data-schedule-field-utc-value="<%= post.scheduled_for&.utc&.iso8601 %>">
       <label class="fc-composer-pill" title="Pick a future date and time to publish this breath automatically">
-        <span class="fc-composer-pill-label">⏱️ Schedule</span>
+        <span class="fc-composer-pill-label"><%= render_icon("clock", classes: "h-4 w-4 inline") %> Schedule</span>
         <input type="datetime-local" class="fc-composer-pill-select" aria-label="Schedule for"
                data-schedule-field-target="local" data-action="change->schedule-field#sync input->schedule-field#sync">
         <%= f.hidden_field :scheduled_for, value: post.scheduled_for&.utc&.iso8601, data: { schedule_field_target: "utc" } %>

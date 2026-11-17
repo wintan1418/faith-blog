@@ -1,15 +1,9 @@
 <% content_for(:title) { "Chess Puzzle · Brethreign" } %>
 
 <div class="fc-app">
-  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 640px;">
-    <main class="fc-main">
-      <header class="mb-5">
-        <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
-          ← Back to games
-        <% end %>
-        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">♚ Chess Puzzle of the Day</h1>
-        <p class="text-sm text-[var(--fc-muted)]">Today's puzzle from Lichess — play it right here, claim your points when you solve it.</p>
-      </header>
+  <div class="fc-shell fc-games-shell is-narrow" style="grid-template-columns: minmax(0, 1fr);">
+    <main class="fc-main fc-games">
+      <%= game_header("chess_puzzle", title: "Chess Puzzle of the Day", intro: "Today's puzzle from Lichess. Play it right here and claim your points when you solve it.") %>
 
       <% if @puzzle %>
         <section class="fc-chess-card"
@@ -47,14 +41,14 @@
               <button type="button"
                       class="fc-btn"
                       data-chess-puzzle-target="hintBtn"
-                      data-action="click->chess-puzzle#showHint">💡 Hint</button>
+                      data-action="click->chess-puzzle#showHint"><%= render_icon("lightbulb", classes: "h-4 w-4") %> Hint</button>
               <button type="button"
                       class="fc-btn"
                       data-chess-puzzle-target="resetBtn"
-                      data-action="click->chess-puzzle#reset">↺ Restart</button>
+                      data-action="click->chess-puzzle#reset"><%= render_icon("rotateccw", classes: "h-4 w-4") %> Restart</button>
               <button type="button"
                       class="fc-btn"
-                      data-action="click->chess-puzzle#revealSolution">▶ Show solution</button>
+                      data-action="click->chess-puzzle#revealSolution"><%= render_icon("eye", classes: "h-4 w-4") %> Show solution</button>
               <button type="button" hidden
                       class="fc-btn fc-btn-primary"
                       data-chess-puzzle-target="nextBtn"
@@ -68,7 +62,7 @@
           <div class="fc-chess-ladder">
             <div class="fc-chess-ladder-head">
               <div>
-                <p class="fc-chess-ladder-title">♞ The ladder</p>
+                <p class="fc-chess-ladder-title"><%= render_icon("trophy", classes: "h-[18px] w-[18px]") %> The ladder</p>
                 <p class="fc-chess-ladder-sub" data-chess-puzzle-target="best">Climb as high as you can.</p>
               </div>
               <div class="fc-chess-levels" role="group" aria-label="Choose a level to start a climb">
@@ -86,15 +80,14 @@
 
           <p class="fc-chess-fine">
             Played <%= number_with_delimiter(@puzzle[:plays]) %> times on Lichess ·
-            <%= link_to "View on Lichess →", @puzzle[:link], target: "_blank", rel: "noopener",
-                class: "font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
+            <%= link_to @puzzle[:link], target: "_blank", rel: "noopener", class: "fc-chess-lichess" do %>View on Lichess <%= render_icon("externallink", classes: "h-4 w-4") %><% end %>
           </p>
         </section>
       <% else %>
         <div class="fc-empty">
-          <div class="fc-empty-mark" aria-hidden="true">♟️</div>
+          <div class="fc-empty-mark fc-games-empty-mark" aria-hidden="true"><%= render_icon("chess", classes: "h-7 w-7") %></div>
           <h3 class="fc-empty-title">Couldn't reach Lichess.</h3>
-          <p class="fc-empty-text">Try again in a moment — the API is occasionally rate-limited.</p>
+          <p class="fc-empty-text">Try again in a moment. The API is occasionally rate-limited.</p>
           <div class="fc-empty-actions">
             <%= link_to "Back to Games", games_path, class: "fc-btn" %>
           </div>
