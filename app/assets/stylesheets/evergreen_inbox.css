@@ -27,7 +27,6 @@ html.theme-dark .msg-page {
 
 .msg-shell {
   grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
-  height: calc(100dvh - 116px);
   border: 0;
   border-radius: 24px;
   box-shadow: 0 0 0 1px var(--fc-line);
@@ -801,3 +800,16 @@ html body .msg-page .msg-send.hidden { opacity: 0.4; pointer-events: none; }
 body.hotwire-native .msg-list-head { display: none; }
 body.hotwire-native .msg-compose-inline { display: inline-grid; }
 body.hotwire-native .msg-search-row { padding-top: 12px; }
+
+/* The list must always scroll. Desktop: a fixed-height panel whose rows
+   scroll inside it. Phones: the page grows and scrolls as a whole. */
+@media (min-width: 900px) {
+  .msg-shell { height: calc(100dvh - 116px); overflow: hidden; }
+  .msg-list { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  .msg-list .msg-rows { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+}
+@media (max-width: 899px) {
+  .msg-shell { height: auto !important; min-height: 0; overflow: visible; }
+  .msg-page--index .msg-list { overflow: visible; }
+  .msg-page--index .msg-rows { overflow: visible; }
+}
