@@ -377,6 +377,8 @@ Rails.application.routes.draw do
   post "auth/google/native",       to: "users/native_google_sessions#create", as: :native_google_sign_in
 
   get ".well-known/assetlinks.json", to: "well_known#assetlinks", defaults: { format: :json }
+  get ".well-known/apple-app-site-association", to: "well_known#apple_app_site_association", defaults: { format: :json }
+  get "apple-app-site-association", to: "well_known#apple_app_site_association", defaults: { format: :json }
   post "whats_new/:id/seen", to: "whats_new#seen", as: :seen_whats_new
   post "dismissals", to: "dismissals#create", as: :dismissals
   # First-run onboarding: hide or bring back the getting-started list; finish or retake the tour.
