@@ -4,14 +4,39 @@ import { Controller } from "@hotwired/stimulus"
 // the hidden field sends that moment with its time zone (ISO 8601), so a
 // breath set for 9:00 PM in Lagos goes out at 9:00 PM in Lagos.
 // With a future time picked, the main button reads "Schedule".
+// In the composer the picker sits behind a Schedule switch (toggle target):
+// switching it on reveals the picker, switching it off clears the time.
 export default class extends Controller {
-  static targets = ["local", "utc", "clear", "note"]
+  static targets = ["local", "utc", "clear", "note", "toggle", "picker"]
   static values = { utc: String }
 
   connect() {
     this.localTarget.min = this.toLocalInput(new Date())
     if (this.utcValue) this.localTarget.value = this.toLocalInput(new Date(this.utcValue))
+    if (this.hasToggleTarget) this.toggleTarget.checked = !!this.localTarget.value
+    this.reveal()
     this.sync()
+  }
+
+  toggle() {
+    this.localTarget.min = this.toLocalInput(new Date())
+    if (!this.toggleTarget.checked) {
+      this.localTarget.value = ""
+      this.sync()
+    }
+    this.reveal()
+    if (this.toggleTarget.checked) {
+      requestAnimationFrame(() => {
+        this.localTarget.focus({ preventScroll: true })
+        this.pickerTarget.scrollIntoView?.({ block: "nearest" })
+      })
+    }
+  }
+
+  reveal() {
+    if (!this.hasPickerTarget) return
+    const on = this.hasToggleTarget ? this.toggleTarget.checked : true
+    this.pickerTarget.classList.toggle("hidden", !on)
   }
 
   sync() {
@@ -33,11 +58,12 @@ export default class extends Controller {
   setButton(scheduled) {
     const button = this.element.closest("form")?.querySelector('[data-composer-mode-target="submit"]')
     if (!button || button.value === "draft") return
+    const label = button.querySelector("[data-label]") || button
     if (scheduled) {
-      if (!button.dataset.unscheduledLabel) button.dataset.unscheduledLabel = button.textContent.trim()
-      button.textContent = "Schedule"
+      if (!button.dataset.unscheduledLabel) button.dataset.unscheduledLabel = label.textContent.trim()
+      label.textContent = "Schedule"
     } else if (button.dataset.unscheduledLabel) {
-      button.textContent = button.dataset.unscheduledLabel
+      label.textContent = button.dataset.unscheduledLabel
       delete button.dataset.unscheduledLabel
     }
   }
