@@ -12,6 +12,25 @@ class WellKnownController < ApplicationController
     "CC:2D:4E:52:81:38:0B:78:BF:29:4D:3C:B0:69:84:C6:70:E3:B9:1F:52:A5:61:37:B8:D1:CC:0C:35:4E:6E:CD"
   ].freeze
 
+  # Paths that open in the app (same list as the Android app's App Links).
+  APP_PATHS = %w[/posts /u/ /rooms /circles /feed /notifications /inbox /scripture
+                 /reading_plans /resources /games /answered /people].freeze
+
+  IOS_BUNDLE_ID = "com.brethreign.app"
+
+  # iPhone: Apple fetches this to trust brethreign.com links for the app. The
+  # app ID is our Apple Team ID + bundle ID; with no Team ID set there's no file.
+  def apple_app_site_association
+    team_id = ENV["APPLE_TEAM_ID"].presence || ENV["APNS_TEAM_ID"].presence
+    return head :not_found unless team_id
+
+    expires_in 1.hour, public: true
+    components = APP_PATHS.map { |path| { "/" => "#{path}*" } }
+    render json: {
+      applinks: { details: [ { appIDs: [ "#{team_id}.#{IOS_BUNDLE_ID}" ], components: components } ] }
+    }
+  end
+
   def assetlinks
     expires_in 1.hour, public: true
     render json: [
