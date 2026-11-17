@@ -1,6 +1,119 @@
 module IconHelper
+  # One outline icon set for the whole app (Lucide shapes, 24px grid, bold
+  # 2.25 stroke). These win over the older shapes further down.
+  ICONS = {
+    "home" => "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+    "feed" => "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+    "users" => "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+    "user" => "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+    "userplus" => "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6",
+    "usersearch" => "M10 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM2 21a8 8 0 0 1 10.4-7.6M18 20a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM22 22l-1.9-1.9",
+    "bookopen" => "M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z",
+    "bible" => "M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z",
+    "messagecircle" => "M7.9 20A9 9 0 1 0 4 16.1L2 22z",
+    "chat" => "M7.9 20A9 9 0 1 0 4 16.1L2 22z",
+    "comment" => "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
+    "bell" => "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0",
+    "notifications" => "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0",
+    "pray" => "M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16M7 20l1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9M2 15l6 6M19.5 8.5c.7-.7 1.5-1.6 1.5-2.7A2.73 2.73 0 0 0 16 4a2.78 2.78 0 0 0-5 1.8c0 1.2.8 2 1.5 2.8L16 12z",
+    "answered" => "M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3",
+    "checkcircle" => "M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3",
+    "checkcheck" => "M18 7l-8 8-4-4M22 7l-8 8",
+    "badgecheck" => "M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76zM9 12l2 2 4-4",
+    "games" => "M6 11h4M8 9v4M15 12h.01M18 10h.01M17.3 5H6.7a4 4 0 0 0-4 3.6l-.9 7.4a3 3 0 0 0 3 3.3c1.2 0 2-.6 2.6-1.5L8.5 16h7l1.1 1.8c.6.9 1.4 1.5 2.6 1.5a3 3 0 0 0 3-3.3l-.9-7.4a4 4 0 0 0-4-3.6z",
+    "gamepad" => "M6 11h4M8 9v4M15 12h.01M18 10h.01M17.3 5H6.7a4 4 0 0 0-4 3.6l-.9 7.4a3 3 0 0 0 3 3.3c1.2 0 2-.6 2.6-1.5L8.5 16h7l1.1 1.8c.6.9 1.4 1.5 2.6 1.5a3 3 0 0 0 3-3.3l-.9-7.4a4 4 0 0 0-4-3.6z",
+    "quiz" => "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01",
+    "chess" => "M6 21h12M7.5 17.5h9M9 17.5c.3-2.6 1.6-4 1.6-6.3-2.4.5-4 0-4.6-1.7L10 5l.5-2.5 1.8 1.6C16.6 4.6 19 8 18.6 13c-.2 2-.7 3.3-1.1 4.5M11.5 8.5h.01",
+    "church" => "M10 9h4M12 7v5M14 22v-4a2 2 0 0 0-4 0v4M18 22V5.6l-6-3-6 3V22M18 9l4 2v11H2V11l4-2",
+    "quote" => "M3 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 0-1 1v3c0 1 0 1 1 1zM15 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z",
+    "shuffle" => "M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22M18 2l4 4-4 4M2 6h1.9c1.5 0 2.9.9 3.6 2.2M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8M18 14l4 4-4 4",
+    "grid" => "M4 3h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM15 3h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM15 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1zM4 14h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1z",
+    "trophy" => "M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.7V17c0 .6-.5 1-1 1.2C7.9 18.8 7 20.2 7 22M14 14.7V17c0 .6.5 1 1 1.2 1.1.6 2 2 2 3.8M18 2H6v7a6 6 0 0 0 12 0z",
+    "flame" => "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z",
+    "breathe" => "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3",
+    "wave" => "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3",
+    "newspaper" => "M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5M10 6h8v4h-8z",
+    "blog" => "M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5M10 6h8v4h-8z",
+    "cake" => "M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1M2 21h20M7 8v3M12 8v3M17 8v3M7 4h.01M12 4h.01M17 4h.01",
+    "calendar" => "M8 2v4M16 2v4M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM3 10h18",
+    "bookmark" => "M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z",
+    "image" => "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM21 15l-3.1-3.1a2 2 0 0 0-2.8 0L6 21",
+    "mic" => "M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2M12 19v3",
+    "heart" => "M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z",
+    "praise" => "M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.3l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15",
+    "lightbulb" => "M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4",
+    "repost" => "M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3",
+    "send" => "M22 2 11 13M22 2l-7 20-4-9-9-4z",
+    "pin" => "M12 17v5M9 10.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.2V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.8a2 2 0 0 0-1.1-1.8l-1.8-.9a2 2 0 0 1-1.1-1.8V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z",
+    "sparkles" => "M9.9 14.1 12 21l2.1-6.9L21 12l-6.9-2.1L12 3 9.9 9.9 3 12z",
+    "search" => "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3",
+    "plus" => "M12 5v14M5 12h14",
+    "chevrondown" => "m6 9 6 6 6-6",
+    "chevronright" => "m9 18 6-6-6-6",
+    "chevronleft" => "m15 18-6-6 6-6",
+    "back" => "m15 18-6-6 6-6",
+    "eyeoff" => "M9.9 4.2A10 10 0 0 1 12 4c7 0 10 8 10 8a13 13 0 0 1-1.7 2.7M6.6 6.6A13.5 13.5 0 0 0 2 12s3 8 10 8a9.7 9.7 0 0 0 5.4-1.6M2 2l20 20M14.1 14.1a3 3 0 1 1-4.2-4.2",
+    "clock" => "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
+    "thread" => "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
+    "play" => "M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z",
+    "settings" => "M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.8l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.8l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+    "megaphone" => "m3 11 18-5v12L3 14v-3zM11.6 16.8a3 3 0 1 1-5.8-1.6",
+    "dashboard" => "M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z",
+    "smartphone" => "M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM12 18h.01",
+    "shield" => "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+    "shieldcheck" => "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4",
+    "flag" => "M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7",
+    "sword" => "M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2",
+    "dumbbell" => "M6.5 6.5h11M6.5 17.5h11M6 20V4M18 20V4M3 15V9M21 15V9",
+    "laptop" => "M4 5h16a1 1 0 0 1 1 1v10H3V6a1 1 0 0 1 1-1zM2 20h20",
+    "sunrise" => "M12 2v8M4.9 10.9l1.4 1.4M2 18h2M20 18h2M19.1 10.9l-1.4 1.4M22 22H2M8 6l4-4 4 4M16 18a4 4 0 0 0-8 0",
+    "utensils" => "M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7",
+    "palette" => "M12 22a10 10 0 1 1 10-10c0 2.2-1.8 3-3.5 3H16a2 2 0 0 0-1.6 3.2A2 2 0 0 1 12 22zM7.5 10.5h.01M10.5 7.5h.01M15.5 8.5h.01",
+    "sprout" => "M7 20h10M10 20c5.5-2.5.8-6.4 3-10M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8zM14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z",
+    "globe" => "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z",
+    "graduationcap" => "M22 10v6M2 10l10-5 10 5-10 5zM6 12v5c3 3 9 3 12 0v-5",
+    "briefcase" => "M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z",
+    "music" => "M9 18V5l12-2v13M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+    "library" => "M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20",
+    "dot" => "M12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"
+  }.freeze
+
+  ALIASES = {
+    "book_open" => "bookopen", "message_circle" => "messagecircle", "prayer" => "pray", "handheart" => "pray",
+    "hand_heart" => "pray", "game" => "games", "chesspuzzle" => "chess", "answeredprayers" => "answered",
+    "reshare" => "repost", "retweet" => "repost", "repeat" => "repost", "like" => "heart", "amen" => "pray",
+    "microphone" => "mic", "profile" => "user", "connections" => "users", "rooms" => "users",
+    "verse" => "bookopen", "streak" => "flame", "leaderboard" => "trophy", "birthday" => "cake",
+    "report" => "flag", "moderation" => "shieldcheck", "announcements" => "megaphone", "appversions" => "smartphone"
+  }.freeze
+
+  # Rooms (and a few older records) store an emoji as their icon. Map each one
+  # to a real icon, so nothing falls back to a generic mark.
+  EMOJI_ICONS = {
+    "⚔️" => "sword", "⚔" => "sword", "💪" => "dumbbell", "👨" => "user", "👩" => "user", "👴" => "user",
+    "🎵" => "music", "💻" => "laptop", "❓" => "quiz", "📖" => "bookopen", "🎓" => "graduationcap",
+    "🌅" => "sunrise", "🍳" => "utensils", "💼" => "briefcase", "🙏" => "pray", "🌟" => "answered",
+    "📚" => "library", "💑" => "heart", "👨‍👩‍👧‍👦" => "users", "🎨" => "palette", "🌍" => "globe",
+    "🌱" => "sprout", "✨" => "sparkles", "⛪" => "church", "🎯" => "games", "🔥" => "flame"
+  }.freeze
+
+  # The icon name a room should show: its emoji mapped, else its name, else a group.
+  def room_icon_name(room)
+    raw = room.respond_to?(:icon) ? room.icon.to_s.strip : ""
+    EMOJI_ICONS[raw] || (raw.match?(/\A[a-z_]+\z/i) ? raw : "users")
+  end
+
   def render_icon(name, classes: "w-6 h-6")
-    icon_name = name.to_s.downcase.gsub(/[^a-z0-9]/, "")
+    raw_name = name.to_s.strip
+    if (mapped = EMOJI_ICONS[raw_name])
+      raw_name = mapped
+    end
+    icon_name = raw_name.downcase.gsub(/[^a-z0-9_]/, "")
+    icon_name = ALIASES[icon_name] || icon_name
+    icon_name = icon_name.delete("_")
+    if (path = ICONS[icon_name] || ICONS[ALIASES[icon_name].to_s])
+      return icon_svg(path, classes)
+    end
 
     case icon_name
     when "heart", "hearthandshake"
@@ -122,15 +235,15 @@ module IconHelper
     when "chevronleft", "back"
       icon_svg("M15 18l-6-6 6-6", classes)
     else
-      # Default Sparkles
-      icon_svg("m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z", classes)
+      # Unknown name: a quiet dot rather than a sparkle that pretends to mean something.
+      icon_svg(ICONS["dot"], classes)
     end
   end
 
   private
 
   def icon_svg(path, classes)
-    content_tag(:svg, class: classes, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round") do
+    content_tag(:svg, class: classes, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2.25", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true") do
       raw(if path.include?("<") then path else "<path d='#{path}' />" end)
     end
   end

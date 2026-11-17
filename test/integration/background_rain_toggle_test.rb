@@ -11,12 +11,12 @@ class BackgroundRainToggleTest < ActionDispatch::IntegrationTest
     @ada = User.create!(username: "ada_rain", email: "ada-rain@example.com", password: pass, password_confirmation: pass)
   end
 
-  test "rain is on by default and the switch is in settings and the account menu" do
+  test "rain is off by default and the switch is in settings and the account menu" do
     sign_in @ada
     get edit_settings_accent_path
 
-    assert_select "#fc-rain[data-rain-on-value='true']"
-    assert_select ".fc-setting-switch[role='switch'][aria-checked='true'][data-action~='rain-toggle#toggle']"
+    assert_select "#fc-rain[data-rain-on-value='false']"
+    assert_select ".fc-setting-switch[role='switch'][aria-checked='false'][data-action~='rain-toggle#toggle']"
     assert_select ".fc-rain-menu-item[data-rain-toggle-url-value=?]", settings_background_rain_path
   end
 
@@ -43,9 +43,9 @@ class BackgroundRainToggleTest < ActionDispatch::IntegrationTest
     assert @ada.reload.background_rain?
   end
 
-  test "guests keep the rain and can't change settings" do
+  test "guests see no rain and can't change settings" do
     get root_path
-    assert_select "#fc-rain[data-rain-on-value='true']"
+    assert_select "#fc-rain[data-rain-on-value='false']"
 
     patch settings_background_rain_path, params: { on: false }, as: :json
     assert_response :unauthorized

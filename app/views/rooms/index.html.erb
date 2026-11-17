@@ -67,7 +67,7 @@
             <div class="fc-room-card-band"></div>
             <div class="fc-room-card-head">
               <span class="fc-room-card-icon">
-                <%= render_icon(room.icon || "sparkles", classes: "h-6 w-6") %>
+                <%= render_icon(room_icon_name(room), classes: "h-6 w-6") %>
               </span>
               <% if room.posts_count.to_i >= 30 %>
                 <span class="fc-room-card-badge">Active</span>

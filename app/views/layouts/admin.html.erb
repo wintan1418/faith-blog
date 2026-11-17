@@ -21,13 +21,15 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Sans+3:wght@400;500;600;700&display=swap"></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Sans+3:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Sans+3:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "actiontext", "data-turbo-track": "reload" %>
     <%# Royal Emerald polish: loaded last so it overrides the earlier passes. %>
     <%= stylesheet_link_tag "brand_polish", "data-turbo-track": "reload" %>
+    <%# Evergreen design language: loaded last, on every page. %>
+    <%= stylesheet_link_tag "evergreen", "evergreen_feed", "evergreen_composer", "evergreen_inbox", "evergreen_games", "evergreen_admin", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
   </head>
 
@@ -52,20 +54,20 @@
     <% pending_count = Report.pending.count %>
     <% queue_count = AiModerationReview.where(status: %i[pending flagged]).count %>
     <% admin_nav_items = [
-      ["Dashboard", admin_root_path, "home", current_page?(admin_root_path)],
+      ["Dashboard", admin_root_path, "dashboard", current_page?(admin_root_path)],
       ["The Office", admin_office_path, "compose", request.path.start_with?("/admin/office")],
       ["Users", admin_users_path, "users", request.path.include?("/admin/users")],
       ["Posts", admin_posts_path, "filetext", request.path.include?("/admin/posts")],
-      ["Rooms", admin_rooms_path, "message_circle", request.path.include?("/admin/rooms")],
+      ["Rooms", admin_rooms_path, "users", request.path.include?("/admin/rooms")],
       ["Resources", admin_resources_path, "bookopen", request.path.include?("/admin/resources")],
       ["Reports", admin_reports_path, "shield", request.path.include?("/admin/reports")],
-      ["Moderation", admin_moderation_reviews_path, "sparkles", request.path.include?("/admin/moderation_reviews")],
+      ["Moderation", admin_moderation_reviews_path, "shieldcheck", request.path.include?("/admin/moderation_reviews")],
       ["Verses", admin_bible_verses_path, "bookopen", request.path.include?("/admin/bible_verses")],
-      ["Golden Breaths", admin_golden_breaths_path, "sparkles", request.path.include?("/admin/golden_breaths")],
+      ["Golden Breaths", admin_golden_breaths_path, "flame", request.path.include?("/admin/golden_breaths")],
       ["Broadcasts", admin_broadcasts_path, "send", request.path.include?("/admin/broadcasts")],
-      ["Announcements", admin_announcements_path, "sparkles", request.path.include?("/admin/announcements")],
-      ["Updates bots", admin_bots_path, "send", request.path.include?("/admin/bots")],
-      ["App versions", edit_admin_app_release_path, "sparkles", request.path.include?("/admin/app-versions")],
+      ["Announcements", admin_announcements_path, "megaphone", request.path.include?("/admin/announcements")],
+      ["Updates bots", admin_bots_path, "newspaper", request.path.include?("/admin/bots")],
+      ["App versions", edit_admin_app_release_path, "smartphone", request.path.include?("/admin/app-versions")],
       ["Push test", admin_push_test_path, "bell", request.path.include?("/admin/push-test")]
     ] %>
 
@@ -73,7 +75,7 @@
       <div class="admin-shell">
         <aside class="admin-sidebar">
           <%= link_to admin_root_path, class: "admin-brand" do %>
-            <span class="fc-brand-mark"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
+            <span class="fc-brand-mark"><%= render_icon("breathe", classes: "h-4 w-4") %></span>
             <span>
               <span class="block text-sm font-extrabold text-[var(--fc-ink)]">Brethreign</span>
               <span class="block text-xs font-bold text-[var(--fc-muted)]">Admin Console</span>

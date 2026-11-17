@@ -100,6 +100,8 @@
     <%= stylesheet_link_tag "actiontext", "data-turbo-track": "reload" %>
     <%# Royal Emerald polish: loaded last so it overrides the earlier passes. %>
     <%= stylesheet_link_tag "brand_polish", "data-turbo-track": "reload" %>
+    <%# Evergreen design language: loaded last, on every page. %>
+    <%= stylesheet_link_tag "evergreen", "evergreen_feed", "evergreen_composer", "evergreen_inbox", "evergreen_games", "evergreen_admin", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
     <%= yield :head %>
   </head>
@@ -194,7 +196,7 @@
          class="fc-rain"
          aria-hidden="true"
          data-controller="rain"
-         data-rain-on-value="<%= !user_signed_in? || current_user.background_rain? %>"
+         data-rain-on-value="<%= user_signed_in? && current_user.background_rain? %>"
          data-rain-items-value="<%= BackgroundRain.items.to_json %>"></div>
 
     <div class="min-h-full fc-page" data-controller="<%= ["reactors-modal", ("composer-modal notifications-modal bible-drawer notification-sound" if user_signed_in?)].compact.join(" ") %>">

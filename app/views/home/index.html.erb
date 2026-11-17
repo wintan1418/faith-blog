@@ -34,7 +34,7 @@
         <div class="home-room-list">
           <% @rooms.first(6).each do |room| %>
             <%= link_to room_path(room), class: "home-room-row" do %>
-              <span><%= render_icon(room.icon || "sparkles", classes: "h-4 w-4") %></span>
+              <span><%= render_icon(room_icon_name(room), classes: "h-4 w-4") %></span>
               <div>
                 <strong><%= room.name %></strong>
                 <small><%= pluralize(room.posts_count, "post") %></small>
