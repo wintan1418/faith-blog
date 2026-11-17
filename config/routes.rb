@@ -268,6 +268,7 @@ Rails.application.routes.draw do
     root to: "dashboard#index"
     get "online", to: "online#index", as: :online
     get "bots", to: "bots#index", as: :bots
+    resource :push_test, only: [ :show, :create ], path: "push-test"
     resource :app_release, only: [ :edit, :update ], path: "app-versions" do
       post :remind
     end
