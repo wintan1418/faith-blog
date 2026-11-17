@@ -162,6 +162,11 @@ module ApplicationHelper
     request.user_agent.to_s.include?("NativeGoogleSignIn")
   end
 
+  # iPhone app builds with Sign in with Apple add "NativeAppleSignIn" to their user agent.
+  def native_apple_sign_in_supported?
+    request.user_agent.to_s.include?("NativeAppleSignIn")
+  end
+
   # The Android app's version from its user agent ("Brethreign/1.0.7; …"); 1.0.0 sent none.
   def android_app_version
     return unless hotwire_native_app? && request.user_agent.to_s.include?("Android")

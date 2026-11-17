@@ -240,3 +240,7 @@ html .auth .auth-divider span { background: none; padding: 0; }
 
 /* Keep the sign-in pages calm: no floating scripture text over the form. */
 body:has(.auth) .fc-rain { display: none; }
+
+/* Sign in with Apple (iPhone app): Apple's black button. */
+html .auth .apple-auth-button { background: #000; border-color: #000; color: #fff; margin-bottom: 0.7rem; }
+html .auth .apple-auth-button:hover { border-color: #000; }
