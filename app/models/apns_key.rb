@@ -22,6 +22,9 @@ module ApnsKey
 
     body = text.sub(/.*?-----BEGIN PRIVATE KEY-----/m, "").sub(/-----END PRIVATE KEY-----.*/m, "")
     body = body.gsub(/[^A-Za-z0-9+\/=]/, "")
+    # Pasted without the BEGIN line, a stray "n" (from "\n") can lead the body;
+    # every Apple .p8 key body starts with "MIG".
+    body = body[body.index("MIG")..] if !text.include?("BEGIN") && body.index("MIG").to_i.between?(1, 3)
     "#{HEADER}\n#{body.scan(/.{1,64}/).join("\n")}\n#{FOOTER}\n"
   end
 
