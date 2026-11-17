@@ -4,7 +4,8 @@
   <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
     <h2 class="text-lg font-bold text-[var(--fc-ink)]">Push keys on the server</h2>
     <ul class="mt-3 space-y-1 text-sm">
-      <li>iPhone (Apple): <strong><%= NativePushConfig.apple? ? "set" : "missing (APNS_KEY_ID, APNS_KEY, APNS_TEAM_ID)" %></strong></li>
+      <li>iPhone (Apple): <strong><%= NativePushConfig.apple? ? "set" : "missing (APNS_KEY_ID, APNS_KEY, APNS_TEAM_ID)" %></strong>
+        <% if NativePushConfig.apple? %> · key <strong><%= ApnsKey.readable? ? "readable" : "NOT readable — paste APNS_KEY again" %></strong><% end %></li>
       <li>Android (Google): <strong><%= NativePushConfig.google? ? "set" : "missing (FCM_PROJECT_ID, FCM_SERVICE_ACCOUNT_JSON)" %></strong></li>
     </ul>
   </div>
