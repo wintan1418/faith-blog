@@ -30,9 +30,12 @@ class Users::NativeGoogleSessionsController < ApplicationController
     refuse(e.record.errors.full_messages.to_sentence, :unprocessable_entity)
   end
 
+  # The iPhone app's OAuth client (public, like every OAuth client ID).
+  IOS_CLIENT_ID = "465735091377-paqcrc2j9t30bm3m2j8fklqanqs1riek.apps.googleusercontent.com"
+
   # ID tokens from the apps are issued for our web client (Android) or the iOS client.
   def self.audiences
-    [ ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_IOS_CLIENT_ID"] ].compact_blank
+    [ ENV["GOOGLE_CLIENT_ID"], ENV.fetch("GOOGLE_IOS_CLIENT_ID", IOS_CLIENT_ID) ].compact_blank
   end
 
   private
