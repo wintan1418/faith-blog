@@ -1,1 +1,234 @@
-/* Evergreen: admin screens. See evergreen.css for the shared language. */
+/* Evergreen: admin screens. See evergreen.css for the shared language.
+   Admin is the same product as the app: linen page, white cards, serif page
+   titles, pill buttons, bold icons, sentence-case labels, evergreen actions. */
+
+/* ── Admin tokens follow the Evergreen ones (light and dark) ───────────── */
+html .fc-admin,
+html.theme-dark .fc-admin {
+  --admin-bg: var(--fc-bg);
+  --admin-sidebar: var(--fc-surface);
+  --admin-sidebar-strong: var(--fc-surface-2);
+  --admin-panel: var(--fc-surface);
+  --admin-panel-2: var(--fc-surface-2);
+  --admin-line: var(--fc-line);
+  --admin-line-strong: var(--fc-line-strong);
+  --admin-ink: var(--fc-ink);
+  --admin-soft: var(--fc-soft);
+  --admin-muted: var(--fc-muted);
+  --admin-accent: var(--fc-fill);
+  --admin-accent-ink: var(--fc-on-fill);
+  background: var(--fc-bg) !important;
+  color: var(--fc-ink) !important;
+  font-family: var(--fc-sans);
+}
+
+/* ── Sidebar: white rail, hairline edge, evergreen active pill ─────────── */
+.fc-admin .admin-sidebar {
+  background: var(--fc-surface) !important;
+  border-right: 1px solid var(--fc-line);
+  padding: 1.25rem 1rem;
+}
+.fc-admin .admin-brand { border-bottom-color: var(--fc-line); }
+.fc-admin .admin-brand .text-sm { font-family: var(--fc-display); font-size: 1.125rem; font-weight: 700; }
+.fc-admin .admin-side-nav { gap: 2px; overflow-y: auto; }
+.fc-admin .admin-side-link {
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 14px;
+  color: var(--fc-ink) !important;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.fc-admin .admin-side-link:hover { background: var(--fc-surface-2) !important; color: var(--fc-ink) !important; }
+.fc-admin .admin-side-link.is-active,
+body:not([style*="--fc-accent"]) .fc-admin .admin-side-link.is-active {
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent) !important;
+  font-weight: 700;
+}
+body:not([style*="--fc-accent"]) .fc-admin .admin-side-link.is-active * { color: var(--fc-accent) !important; }
+.fc-admin .admin-side-icon svg { stroke-width: 2.25; }
+.fc-admin .admin-count,
+body:not([style*="--fc-accent"]) .fc-admin .admin-side-link.is-active .admin-count {
+  min-width: 1.5rem; height: 1.5rem; padding: 0 6px;
+  background: #d93025 !important; color: #ffffff !important;
+  font-size: 0.75rem; font-weight: 700;
+}
+.fc-admin .admin-sidebar-footer { border-top-color: var(--fc-line); }
+
+/* ── Top bar: linen, serif page title ──────────────────────────────────── */
+.fc-admin .admin-topbar {
+  background: var(--fc-bg) !important;
+  border-bottom: 1px solid var(--fc-line);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  padding: 1.25rem 2rem;
+}
+.fc-admin .admin-topbar .fc-section-label { margin-bottom: 2px; }
+.fc-admin .admin-page-title {
+  margin: 0;
+  font-family: var(--fc-display) !important;
+  font-size: clamp(1.6rem, 3.5vw, 2.125rem);
+  font-weight: 700; line-height: 1.15;
+}
+.fc-admin .admin-content { max-width: 1200px; padding: 1.75rem 2rem 3rem; }
+.fc-admin .admin-flashes { padding: 1rem 2rem 0; }
+.fc-admin .admin-flash {
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--fc-line);
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+  font-size: 0.9375rem; font-weight: 600;
+}
+.fc-admin .admin-flash.is-alert { border-color: #f1b8b3; background: #fdf0ef; color: #8f1d14; }
+html.theme-dark .fc-admin .admin-flash.is-alert { border-color: rgba(252, 165, 165, 0.3); background: rgba(127, 29, 29, 0.24); color: #fecaca; }
+
+.fc-admin .admin-mobile-link {
+  width: 44px; height: 44px;
+  border-radius: 999px;
+  border-color: var(--fc-line);
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+}
+.fc-admin .admin-mobile-link.is-active { background: var(--fc-fill); border-color: var(--fc-fill); color: var(--fc-on-fill); }
+.fc-admin .admin-back-to-app { height: 44px; background: var(--fc-surface); border-color: var(--fc-line-strong); font-size: 0.875rem; font-weight: 700; }
+.fc-admin .admin-topbar .fc-icon-btn { width: 44px; height: 44px; }
+
+@media (max-width: 1023px) {
+  .fc-admin .admin-topbar { padding: 1rem; }
+  .fc-admin .admin-content { padding: 1.25rem 1rem 2.5rem; }
+  .fc-admin .admin-flashes { padding: 1rem 1rem 0; }
+}
+
+/* ── Cards and panels: white, 20px corners, hairline ───────────────────── */
+.fc-admin .admin-content :is(.fc-card, .fc-panel, .rounded-xl, .rounded-2xl, .adash-kpi, .adash-card, .fc-cms-card) {
+  border-radius: var(--fc-radius) !important;
+  border-color: var(--fc-line) !important;
+  box-shadow: none !important;
+}
+.fc-admin .admin-content .rounded-lg { border-radius: 12px !important; }
+.fc-admin .shadow-sm, .fc-admin .shadow, .fc-admin .shadow-md { box-shadow: none !important; }
+.fc-admin .admin-content :is(.bg-white, .bg-gray-50, .bg-stone-50) { background: var(--fc-surface) !important; }
+
+/* Headings inside admin pages use the serif, like the app */
+.fc-admin .admin-content :is(h2, h3).font-extrabold,
+.fc-admin .admin-content :is(h2, h3).font-bold,
+.fc-admin .adash-kicker,
+.fc-admin .adash-section,
+.fc-admin .adash-card > header h2 {
+  font-family: var(--fc-display);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.fc-admin .adash-kicker { margin: 0; font-size: 1.5rem; }
+.fc-admin .adash-section { font-size: 1.375rem; margin-top: 0.75rem; }
+.fc-admin .adash-card > header h2 { font-size: 1.125rem; }
+
+/* Sentence-case labels everywhere: no tiny uppercase */
+.fc-admin .admin-content .uppercase,
+.fc-admin :is(.adash-kpi__label, .adash-members__label, .adash-online__label, .admin-topbar .fc-section-label) {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+.fc-admin .admin-content :is(.text-\[10px\], .text-\[11px\]) { font-size: 0.75rem !important; }
+.fc-admin :is(.adash-kpi__label, .adash-members__label, .adash-online__label) { font-size: 0.875rem; font-weight: 600; color: var(--fc-muted); }
+.fc-admin .adash-range { background: var(--fc-surface); border-color: var(--fc-line); padding: 4px; }
+.fc-admin .adash-range a { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; font-size: 0.875rem; color: var(--fc-soft); }
+.fc-admin .adash-range a.is-on { background: var(--fc-fill); color: var(--fc-on-fill); box-shadow: none; }
+.fc-admin .adash-safety__item { border-radius: var(--fc-radius); border-color: var(--fc-line); }
+.fc-admin .adash-safety__item em { display: inline-flex; align-items: center; gap: 4px; color: var(--fc-accent); }
+.fc-admin .adash-safety__item.is-alert { border-color: var(--fc-gold-line); background: var(--fc-gold-soft); }
+.fc-admin .adash-safety__item.is-alert em { color: var(--fc-gold); }
+.fc-admin .adash-kpi__change.is-up { color: var(--fc-accent); }
+.fc-admin .adash-kpi__change.is-down { color: var(--fc-gold); }
+
+/* ── Tables: readable, roomy, sentence-case headers ────────────────────── */
+.fc-admin .admin-content table { border-collapse: separate; border-spacing: 0; }
+.fc-admin .admin-content thead,
+.fc-admin .admin-content thead.bg-gray-50 { background: var(--fc-surface-2) !important; }
+.fc-admin .admin-content th {
+  font-size: 0.8125rem !important;
+  font-weight: 700 !important;
+  color: var(--fc-muted) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+.fc-admin .admin-content td { font-size: 0.9375rem; color: var(--fc-soft); vertical-align: middle; }
+.fc-admin .admin-content td a:not(.btn):not(.fc-btn) { color: var(--fc-ink); font-weight: 700; }
+.fc-admin .admin-content td a:not(.btn):not(.fc-btn):hover { color: var(--fc-accent); }
+.fc-admin .admin-content tbody tr:hover { background: var(--fc-surface-2) !important; }
+.fc-admin .admin-content :is(.divide-y, .divide-gray-200) > :not([hidden]) ~ :not([hidden]) { border-color: var(--fc-line) !important; }
+
+/* ── Buttons: pills, 44px targets, evergreen primary ──────────────────── */
+.fc-admin :is(.btn, .fc-btn) {
+  border-radius: 999px !important;
+  min-height: 40px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-weight: 700;
+}
+.fc-admin .btn-sm { min-height: 36px; padding: 0 14px; font-size: 0.8125rem; }
+@media (pointer: coarse) { .fc-admin :is(.btn, .fc-btn, .btn-sm) { min-height: 44px; } }
+.fc-admin :is(.btn-primary, .fc-btn-primary) {
+  background: var(--fc-fill) !important; border-color: var(--fc-fill) !important; color: var(--fc-on-fill) !important;
+}
+.fc-admin :is(.btn-primary, .fc-btn-primary):hover { background: var(--fc-fill-hover) !important; border-color: var(--fc-fill-hover) !important; }
+.fc-admin :is(.btn-secondary, .fc-btn:not(.fc-btn-primary)) {
+  background: var(--fc-surface) !important; border: 1px solid var(--fc-line-strong) !important; color: var(--fc-ink) !important;
+}
+.fc-admin .btn-secondary.text-red-600 { color: #b3261e !important; }
+html.theme-dark .fc-admin .btn-secondary.text-red-600 { color: #fca5a5 !important; }
+.fc-admin :is(.btn-secondary, .fc-btn:not(.fc-btn-primary)):hover { border-color: var(--fc-accent) !important; color: var(--fc-accent) !important; }
+
+/* Badges: soft pills, sentence case */
+.fc-admin .badge {
+  border-radius: 999px; padding: 3px 10px;
+  font-size: 0.8125rem; font-weight: 700; text-transform: none; letter-spacing: 0;
+  background: var(--fc-surface-3); color: var(--fc-soft); border: 0;
+}
+.fc-admin .badge-success { background: var(--fc-accent-soft); color: var(--fc-accent); }
+.fc-admin .badge-primary { background: #fdf0ef; color: #8f1d14; }
+html.theme-dark .fc-admin .badge-primary { background: rgba(248, 113, 113, 0.14); color: #fecaca; }
+.fc-admin .badge-faith { background: var(--fc-gold-soft); color: var(--fc-gold); }
+
+/* Forms */
+.fc-admin .admin-content :is(input[type="text"], input[type="search"], input[type="email"], input[type="url"], input[type="number"], input[type="datetime-local"], input[type="date"], select, textarea):not([type="checkbox"]):not([type="radio"]) {
+  border-radius: 12px;
+  border-color: var(--fc-line-strong);
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+}
+.fc-admin .admin-content :is(input, select, textarea):focus {
+  outline: 2px solid var(--fc-accent-glow); outline-offset: 0; border-color: var(--fc-accent);
+}
+.fc-admin .admin-search-input {
+  min-height: 44px; min-width: 0; width: 16rem; max-width: 100%;
+  padding: 0 16px; border: 1px solid var(--fc-line-strong); border-radius: 999px !important;
+  font-size: 0.9375rem;
+}
+
+/* Users: filter pills */
+.fc-admin .admin-filter-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--fc-line-strong);
+  background: var(--fc-surface); color: var(--fc-ink);
+  font-size: 0.875rem; font-weight: 600;
+}
+.fc-admin .admin-filter-pill:hover { border-color: var(--fc-accent); }
+.fc-admin .admin-filter-pill.is-active { background: var(--fc-fill); border-color: var(--fc-fill); color: var(--fc-on-fill); }
+.fc-admin .admin-online-dot { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--fc-accent); }
+.fc-admin .admin-online-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+/* Small icon + text rows that replaced emoji */
+.fc-admin .admin-icon-badge { display: inline-flex; align-items: center; gap: 4px; }
+.fc-admin .admin-inline-alert { display: inline-flex; align-items: center; gap: 4px; color: #b3261e; font-weight: 600; }
+html.theme-dark .fc-admin .admin-inline-alert { color: #fca5a5; }
+.fc-admin .admin-health-line { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 0.9375rem; font-weight: 700; }
+.fc-admin .admin-health-line.is-ok { color: var(--fc-accent); }
+.fc-admin .admin-health-line.is-down { color: #b3261e; }
+html.theme-dark .fc-admin .admin-health-line.is-down { color: #fca5a5; }
+.fc-admin .office-tool-chip { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Pagination */
+.fc-admin nav.pagy a, .fc-admin .pagy a { border-radius: 999px; min-width: 40px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; }

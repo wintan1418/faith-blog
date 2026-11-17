@@ -34,7 +34,8 @@
     <% else %>
       <% error = message.payload.dig("result", "error") %>
       <span class="office-tool-chip<%= ' is-error' if error %>">
-        <%= error ? "⚠︎ #{error}" : "✓ #{office_tool_label(message.tool_name)}" %>
+        <%= render_icon(error ? "alerttriangle" : "check", classes: "h-4 w-4") %>
+        <%= error ? error : office_tool_label(message.tool_name) %>
       </span>
     <% end %>
   </div>

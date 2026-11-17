@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { loadChess } from "../lazy_libs"
+import { icon } from "../helpers/game_icons"
 
 // Chess puzzles, played fully in-app. chess.js handles move legality.
 //
@@ -314,8 +315,9 @@ export default class extends Controller {
 
   renderTries() {
     if (!this.hasTriesTarget) return
-    const hearts = Array.from({ length: TRIES }, (_, i) => (i < this.triesLeft ? "❤️" : "🤍")).join("")
-    this.triesTarget.textContent = hearts
+    // Bold heart icons: filled for each try left, outlined for each one used.
+    this.triesTarget.innerHTML = Array.from({ length: TRIES }, (_, i) =>
+      icon("heart", `fc-chess-heart${i < this.triesLeft ? " is-full" : ""}`)).join("")
     this.triesTarget.setAttribute("aria-label", `${this.triesLeft} of ${TRIES} tries left`)
   }
 
@@ -470,7 +472,7 @@ export default class extends Controller {
     if (this.mode === "ladder") {
       this.saveBest(this.stage)
       if (this.stage >= STAGES) {
-        this.flash("good", `Ladder complete. All ${STAGES} stages cleared! 🏆`)
+        this.flash("good", `Ladder complete. All ${STAGES} stages cleared!`)
         this.showFeedback("Try the next level up for a harder climb.")
         this.setNextButton(true, "Climb again")
       } else {

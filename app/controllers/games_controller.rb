@@ -9,6 +9,10 @@ class GamesController < ApplicationController
     @my_rank = GameAttempt.user_rank(current_user, window: @window.to_sym)
     @my_stats = my_stats
     @recent_attempts = current_user.game_attempts.recent.limit(5)
+    # Your best single run per game, for the "Best: …" line on each card.
+    @best_by_kind = current_user.game_attempts.group(:kind).maximum(:score).transform_keys(&:to_s)
+    @chess_solved_today = current_user.game_attempts.game_chess_puzzle
+                                      .where("played_at >= ?", Time.current.beginning_of_day).exists?
     # This week's champion per game — one crown per discipline.
     @champions = GameAttempt.kinds.keys.filter_map do |kind|
       row = GameAttempt.leaderboard(window: :week, limit: 1, kind: kind).first

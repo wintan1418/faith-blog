@@ -1,15 +1,9 @@
 <% content_for(:title) { "Church History Quiz · Brethreign" } %>
 
 <div class="fc-app">
-  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 640px;">
-    <main class="fc-main">
-      <header class="mb-5">
-        <%= link_to games_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
-          ← Back to games
-        <% end %>
-        <h1 class="mt-2 text-2xl font-extrabold text-[var(--fc-ink)]">⛪ Church History</h1>
-        <p class="text-sm text-[var(--fc-muted)]">5 questions on the people and moments that shaped the church — fathers, reformers, missionaries, hymn writers.</p>
-      </header>
+  <div class="fc-shell fc-games-shell is-narrow" style="grid-template-columns: minmax(0, 1fr);">
+    <main class="fc-main fc-games">
+      <%= game_header("church_history", title: "Church History", intro: "Five questions on the people and moments that shaped the church: fathers, reformers, missionaries, hymn writers.") %>
 
       <section data-controller="quiz"
                data-quiz-game-name-value="Church History"
@@ -24,6 +18,7 @@
             <button type="button"
                     class="fc-btn fc-btn-primary fc-quiz-start"
                     data-action="click->quiz#start">
+              <%= render_icon("play", classes: "h-4 w-4 fc-icon-fill") %>
               Start quiz
             </button>
           </div>

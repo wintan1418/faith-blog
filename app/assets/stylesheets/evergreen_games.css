@@ -1,1 +1,288 @@
-/* Evergreen: games screens. See evergreen.css for the shared language. */
+/* Evergreen: games screens. See evergreen.css for the shared language.
+   Hub (/games), every game screen, results, and the Church History arena. */
+
+/* ── Per-game tints: a soft tile with the icon in a deeper matching colour.
+   The only raw colours on these screens; everything else uses tokens. ── */
+:root, html.theme-light, html:not(.theme-dark) {
+  --game-tint-quiz-bg: #e3f2ec;      --game-tint-quiz-fg: #0e5c43;
+  --game-tint-verse-bg: #e3ecfb;     --game-tint-verse-fg: #2557d6;
+  --game-tint-history-bg: #fdf1dc;   --game-tint-history-fg: #8a4b00;
+  --game-tint-character-bg: #eee6fa; --game-tint-character-fg: #6b3fa0;
+  --game-tint-scramble-bg: #fce7ec;  --game-tint-scramble-fg: #b0234f;
+  --game-tint-picword-bg: #e0f2f4;   --game-tint-picword-fg: #0e6f7a;
+  --game-tint-chess-bg: #ecebe6;     --game-tint-chess-fg: #343a37;
+}
+html.theme-dark {
+  --game-tint-quiz-bg: rgba(76, 201, 149, 0.15);      --game-tint-quiz-fg: #6fd6aa;
+  --game-tint-verse-bg: rgba(125, 160, 255, 0.16);    --game-tint-verse-fg: #a3bcff;
+  --game-tint-history-bg: rgba(233, 190, 104, 0.15);  --game-tint-history-fg: #e9be68;
+  --game-tint-character-bg: rgba(186, 150, 240, 0.17);--game-tint-character-fg: #cbb0f6;
+  --game-tint-scramble-bg: rgba(255, 128, 160, 0.16); --game-tint-scramble-fg: #ffa3b9;
+  --game-tint-picword-bg: rgba(95, 205, 220, 0.16);   --game-tint-picword-fg: #86d9e3;
+  --game-tint-chess-bg: rgba(255, 255, 255, 0.09);    --game-tint-chess-fg: #dbe1de;
+}
+
+.fc-gtile {
+  width: 52px; height: 52px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 14px;
+  background: var(--game-tint-quiz-bg); color: var(--game-tint-quiz-fg);
+}
+.fc-gtile-icon { width: 28px; height: 28px; stroke-width: 2.25; }
+.fc-gtile.is-sm { width: 40px; height: 40px; border-radius: 12px; }
+.fc-gtile.is-sm .fc-gtile-icon { width: 22px; height: 22px; }
+.fc-gtile.is-verse     { background: var(--game-tint-verse-bg);     color: var(--game-tint-verse-fg); }
+.fc-gtile.is-history   { background: var(--game-tint-history-bg);   color: var(--game-tint-history-fg); }
+.fc-gtile.is-character { background: var(--game-tint-character-bg); color: var(--game-tint-character-fg); }
+.fc-gtile.is-scramble  { background: var(--game-tint-scramble-bg);  color: var(--game-tint-scramble-fg); }
+.fc-gtile.is-picword   { background: var(--game-tint-picword-bg);   color: var(--game-tint-picword-fg); }
+.fc-gtile.is-chess     { background: var(--game-tint-chess-bg);     color: var(--game-tint-chess-fg); }
+
+/* Inline icons built in JS (game_icons.js) follow the text colour. */
+.fc-games .fc-ico { width: 1.1em; height: 1.1em; flex: none; vertical-align: -0.18em; }
+.fc-icon-fill { fill: currentColor; }
+
+/* ── Page frame ────────────────────────────────────────────────────── */
+.fc-games-shell { max-width: 1000px !important; }
+.fc-games-shell.is-narrow { max-width: 760px !important; }
+.fc-games-shell.is-wide { max-width: 920px !important; }
+.fc-main.fc-games { max-width: none; }
+.fc-games { display: flex; flex-direction: column; gap: 24px; padding-top: 8px; padding-bottom: 48px; }
+
+.fc-games-head { display: flex; flex-direction: column; gap: 6px; }
+.fc-games-head--hub { flex-direction: row; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.fc-games-head-copy { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fc-games-back {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; margin: -10px 0 -6px;
+  font-size: 0.875rem; font-weight: 600; color: var(--fc-soft) !important; text-decoration: none;
+}
+.fc-games-back svg { stroke-width: 2.5; }
+.fc-games-back:hover { color: var(--fc-accent) !important; }
+.fc-games-titlerow { display: flex; align-items: center; gap: 14px; }
+.fc-games-title {
+  margin: 0;
+  font-family: var(--fc-display) !important;
+  font-size: clamp(1.9rem, 4.5vw, 2.375rem);
+  font-weight: 700; line-height: 1.12;
+  color: var(--fc-ink);
+}
+.fc-games-intro { margin: 0; font-size: 1rem; line-height: 1.5; color: var(--fc-soft); max-width: 60ch; }
+
+.fc-games-lbpill {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 18px;
+  border-radius: 999px;
+  background: var(--fc-surface); border: 1px solid var(--fc-line-strong);
+  font-size: 0.9375rem; font-weight: 700; color: var(--fc-ink) !important; text-decoration: none;
+}
+.fc-games-lbpill:hover { border-color: var(--fc-gold-line); background: var(--fc-gold-soft); }
+.fc-games-lbpill-icon { width: 22px; height: 22px; color: var(--fc-gold); }
+.fc-games-lbpill-meta { font-size: 0.8125rem; font-weight: 600; color: var(--fc-muted); }
+
+/* ── Stats: one card split in four (2 × 2 on a phone) ──────────────── */
+.fc-games-stats {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: var(--fc-surface); border: 1px solid var(--fc-line); border-radius: var(--fc-radius);
+  overflow: hidden;
+}
+.fc-games-stat { display: flex; flex-direction: column; gap: 2px; padding: 18px 22px; min-width: 0; }
+.fc-games-stat + .fc-games-stat { box-shadow: inset 1px 0 0 var(--fc-line); }
+.fc-games-stat-num { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; color: var(--fc-ink); font-variant-numeric: tabular-nums; }
+.fc-games-stat-label { font-size: 0.8125rem; font-weight: 600; color: var(--fc-muted); }
+@media (max-width: 640px) {
+  .fc-games-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fc-games-stat { padding: 14px 16px; }
+  .fc-games-stat + .fc-games-stat { box-shadow: none; }
+  .fc-games-stat:nth-child(even) { box-shadow: inset 1px 0 0 var(--fc-line); }
+  .fc-games-stat:nth-child(n + 3) { box-shadow: inset 0 1px 0 var(--fc-line); }
+  .fc-games-stat:nth-child(4) { box-shadow: inset 1px 1px 0 var(--fc-line); }
+  .fc-games-stat-num { font-size: 1.5rem; }
+}
+
+/* ── Today's challenge (the chess puzzle) ──────────────────────────── */
+.fc-games-feature {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 20px;
+  padding: 24px 28px;
+  border-radius: var(--fc-radius);
+  background: var(--fc-fill); color: var(--fc-on-fill) !important; text-decoration: none;
+}
+.fc-games-feature:hover { background: var(--fc-fill-hover); }
+.fc-games-feature-tile {
+  width: 72px; height: 72px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--fc-on-fill) 13%, transparent);
+}
+.fc-games-feature-tile svg { stroke-width: 2; }
+.fc-games-feature-copy { flex: 1 1 300px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fc-games-feature-kicker { font-size: 0.875rem; font-weight: 700; color: color-mix(in srgb, var(--fc-on-fill) 80%, var(--fc-fill)); }
+.fc-games-feature-title { font-family: var(--fc-display); font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.fc-games-feature-body { font-size: 0.9375rem; line-height: 1.5; color: color-mix(in srgb, var(--fc-on-fill) 88%, var(--fc-fill)); }
+.fc-games-feature-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 48px; padding: 0 24px;
+  border-radius: 999px;
+  background: var(--fc-on-fill); color: var(--fc-fill);
+  font-size: 1rem; font-weight: 800; white-space: nowrap;
+}
+.fc-games-feature-cta svg { stroke-width: 2.5; }
+@media (max-width: 640px) {
+  .fc-games-feature { padding: 20px; gap: 16px; }
+  .fc-games-feature-tile { width: 56px; height: 56px; }
+  .fc-games-feature-cta { width: 100%; justify-content: center; }
+}
+
+/* ── Section headings + game grid ──────────────────────────────────── */
+.fc-games-section { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 80px; }
+.fc-games-h2 {
+  margin: 0;
+  font-family: var(--fc-display); font-size: 1.375rem; font-weight: 700;
+  color: var(--fc-ink); text-transform: none; letter-spacing: 0;
+}
+.fc-games-h2--icon { display: flex; align-items: center; gap: 10px; }
+.fc-games-h2-icon { display: inline-flex; width: 36px; height: 36px; align-items: center; justify-content: center; border-radius: 10px; }
+.fc-games-h2-icon.is-gold { background: var(--fc-gold-soft); color: var(--fc-gold); }
+
+.fc-games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.fc-games-card {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 20px;
+  background: var(--fc-surface); border: 1px solid var(--fc-line); border-radius: var(--fc-radius);
+  color: var(--fc-ink) !important; text-decoration: none;
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+.fc-games-card:hover { border-color: var(--fc-line-strong); transform: translateY(-1px); }
+.fc-games-card:focus-visible { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
+.fc-games-card-top { display: flex; align-items: center; gap: 14px; }
+.fc-games-card-name-wrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fc-games-card-name { font-size: 1.0625rem; font-weight: 700; color: var(--fc-ink); }
+.fc-games-card-meta { font-size: 0.8125rem; font-weight: 600; color: var(--fc-muted); }
+.fc-games-card-body { font-size: 0.875rem; line-height: 1.5; color: var(--fc-soft); }
+.fc-games-card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fc-games-card-best { font-size: 0.8125rem; font-weight: 600; color: var(--fc-muted); }
+.fc-games-play {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 0 18px;
+  border-radius: 999px;
+  background: var(--fc-fill); color: var(--fc-on-fill);
+  font-size: 0.875rem; font-weight: 700;
+}
+.fc-games-play svg { width: 16px; height: 16px; }
+.fc-games-card:hover .fc-games-play { background: var(--fc-fill-hover); }
+@media (max-width: 400px) { .fc-games-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.fc-games-more { margin: 4px 0 0; font-size: 0.9375rem; color: var(--fc-soft); }
+.fc-games-more-link { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-weight: 700; color: var(--fc-accent); }
+
+/* ── Champions + leaderboard ───────────────────────────────────────── */
+.fc-games .fc-champ-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.fc-games .fc-champ-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px !important;
+  border: 1px solid var(--fc-gold-line) !important;
+  background: var(--fc-gold-soft) !important;
+}
+.fc-games .fc-champ-card.is-me { border-color: var(--fc-gold-fill) !important; }
+.fc-games .fc-champ-body { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.fc-games .fc-champ-game { font-size: 0.8125rem; font-weight: 600; color: var(--fc-muted); text-transform: none; letter-spacing: 0; }
+.fc-games .fc-champ-name { font-weight: 700; color: var(--fc-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fc-games .fc-champ-score { font-size: 1.25rem; font-weight: 800; color: var(--fc-gold) !important; font-variant-numeric: tabular-nums; }
+
+.fc-games-lbhead { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.fc-games .fc-lb-reset { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; font-size: 0.875rem; font-weight: 600; color: var(--fc-muted); }
+.fc-games .fc-lb-reset svg { color: var(--fc-gold); }
+.fc-games .fc-window-tabs { background: var(--fc-surface); border: 1px solid var(--fc-line); padding: 4px; gap: 2px; }
+.fc-games .fc-window-tab { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; font-size: 0.875rem; font-weight: 700; color: var(--fc-soft); }
+.fc-games .fc-window-tab.is-active { background: var(--fc-fill); color: var(--fc-on-fill); }
+.fc-games .fc-leaderboard { gap: 0; background: var(--fc-surface); border: 1px solid var(--fc-line); border-radius: var(--fc-radius); overflow: hidden; }
+.fc-games .fc-lb-row { border: 0; border-radius: 0; padding: 12px 18px; background: transparent; }
+.fc-games .fc-lb-row + .fc-lb-row { border-top: 1px solid var(--fc-line); }
+.fc-games .fc-lb-row.is-me { background: var(--fc-accent-soft); }
+.fc-games .fc-lb-rank { color: var(--fc-muted); }
+.fc-games .fc-lb-row:nth-child(-n + 3) .fc-lb-rank { color: var(--fc-gold); }
+.fc-games .fc-lb-name { font-weight: 700; }
+.fc-games .fc-lb-meta { font-size: 0.8125rem; }
+.fc-games .fc-lb-score { color: var(--fc-accent); font-weight: 800; font-variant-numeric: tabular-nums; }
+.fc-games-empty-mark { border-radius: 16px !important; background: var(--fc-gold-soft) !important; color: var(--fc-gold) !important; }
+
+/* ── Game screens: one card, serif headline, pill controls ─────────── */
+.fc-games .fc-quiz,
+.fc-games .fc-chess-card {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line) !important;
+  border-radius: var(--fc-radius) !important;
+  box-shadow: none !important;
+}
+.fc-games .fc-quiz-screen { padding: 24px; gap: 12px; }
+.fc-games .fc-quiz-kicker,
+.fc-games .fc-quiz-field-label {
+  font-size: 0.875rem; font-weight: 700;
+  text-transform: none; letter-spacing: 0;
+  color: var(--fc-accent);
+}
+.fc-games .fc-quiz-field-label { color: var(--fc-ink); }
+.fc-games .fc-quiz-headline { font-family: var(--fc-display); font-size: 1.5rem; font-weight: 700; letter-spacing: 0; }
+.fc-games .fc-quiz-sub { font-size: 0.9375rem; color: var(--fc-soft); }
+.fc-games :is(.fc-quiz-themepill, .fc-quiz-diffpill, .fc-quiz-lengthpill, .fc-chess-level) {
+  min-height: 44px; border-radius: 999px !important; font-weight: 700;
+}
+.fc-games :is(.fc-quiz-start, .fc-quiz-startbtn) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 24px; font-size: 1rem; font-weight: 800;
+}
+.fc-games .fc-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; }
+.fc-games .fc-btn svg { stroke-width: 2.5; }
+
+/* In-round HUD */
+.fc-games .fc-quiz-hud-progress { text-transform: none; letter-spacing: 0; font-size: 0.875rem; font-weight: 700; }
+.fc-games .fc-quiz-tag { text-transform: capitalize; letter-spacing: 0; }
+.fc-games .fc-quiz-hud-streak { display: inline-flex; align-items: center; gap: 4px; color: var(--fc-gold); font-weight: 800; }
+.fc-games .fc-quiz-prompt { font-family: var(--fc-display); font-weight: 700; letter-spacing: 0; }
+.fc-games .fc-quiz-choice { min-height: 52px; border-radius: 14px; }
+.fc-games .fc-quiz-verdict { display: flex; align-items: center; gap: 6px; }
+.fc-games .fc-quiz-flag { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.fc-games .fc-quiz-report-done { display: flex; align-items: center; gap: 6px; }
+.fc-games .fc-quiz-combo { display: inline-flex; align-items: center; gap: 6px; background: var(--fc-gold-fill); color: var(--fc-on-gold); text-transform: none; letter-spacing: 0; }
+
+/* Results */
+.fc-games .fc-quiz-result { align-items: center; text-align: center; }
+.fc-games .fc-quiz-result-medal {
+  width: 72px; height: 72px; display: flex; align-items: center; justify-content: center;
+  border-radius: 20px; font-size: 0;
+  background: var(--fc-gold-soft); color: var(--fc-gold);
+}
+.fc-games .fc-quiz-result-medal .fc-ico { width: 40px; height: 40px; vertical-align: 0; }
+.fc-games .fc-quiz-result-medal.is-sprout { background: var(--fc-accent-soft); color: var(--fc-accent); }
+.fc-games .fc-quiz-stat-label { text-transform: none; letter-spacing: 0; font-size: 0.8125rem; font-weight: 600; }
+.fc-games .fc-quiz-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+/* Chess */
+.fc-games .fc-chess-tries { display: inline-flex; gap: 3px; letter-spacing: 0; }
+.fc-chess-heart { width: 20px; height: 20px; color: var(--fc-muted); }
+.fc-chess-heart.is-full { color: #d93025; fill: currentColor; }
+html.theme-dark .fc-chess-heart.is-full { color: #ff6b5e; }
+.fc-games .fc-chess-ladder-title { display: flex; align-items: center; gap: 6px; font-family: var(--fc-display); font-size: 1.125rem; font-weight: 700; }
+.fc-games .fc-chess-ladder-title svg { color: var(--fc-gold); }
+.fc-games .fc-chess-score-label { text-transform: none; letter-spacing: 0; }
+.fc-chess-lichess { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-weight: 700; color: var(--fc-accent); }
+
+/* Church History arena */
+.fc-games .fc-era-tab { min-height: 44px; border-radius: 999px; font-weight: 700; }
+.fc-games .fc-era-title, .fc-games .fc-era-figures-heading { font-family: var(--fc-display); text-transform: none; letter-spacing: 0; }
+.fc-games .fc-era-figures-heading { font-size: 1.125rem; font-weight: 700; color: var(--fc-ink); }
+.fc-games .fc-figure-card { border-radius: 16px; border-color: var(--fc-line); background: var(--fc-surface); }
+.fc-games .fc-arena-footer .fc-btn { min-height: 48px; padding: 0 24px; }
+
+@media (max-width: 640px) {
+  .fc-games { gap: 20px; }
+  .fc-games .fc-quiz-screen { padding: 20px 16px; }
+  .fc-games-head--hub { align-items: flex-start; }
+}
+
+/* Phone: keep a 16px gutter on every games screen */
+@media (max-width: 767px) {
+  .fc-shell.fc-games-shell { padding-left: 16px !important; padding-right: 16px !important; }
+}
