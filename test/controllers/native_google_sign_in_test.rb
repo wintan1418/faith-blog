@@ -85,4 +85,9 @@ class NativeGoogleSignInTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_user_session_path
   end
+
+  test "tokens from the iPhone app's Google client are accepted" do
+    assert_includes Users::NativeGoogleSessionsController.audiences,
+                    "465735091377-paqcrc2j9t30bm3m2j8fklqanqs1riek.apps.googleusercontent.com"
+  end
 end
