@@ -4,6 +4,36 @@
 
 import { application } from "./application"
 
+import AccentPickerController from "./accent_picker_controller"
+application.register("accent-picker", AccentPickerController)
+
+import AdConsentController from "./ad_consent_controller"
+application.register("ad-consent", AdConsentController)
+
+import AutoDismissController from "./auto_dismiss_controller"
+application.register("auto-dismiss", AutoDismissController)
+
+import BibleDrawerController from "./bible_drawer_controller"
+application.register("bible-drawer", BibleDrawerController)
+
+import CardShareController from "./card_share_controller"
+application.register("card-share", CardShareController)
+
+import CaretClearController from "./caret_clear_controller"
+application.register("caret-clear", CaretClearController)
+
+import ChartTipController from "./chart_tip_controller"
+application.register("chart-tip", ChartTipController)
+
+import ChatScrollController from "./chat_scroll_controller"
+application.register("chat-scroll", ChatScrollController)
+
+import ChessPuzzleController from "./chess_puzzle_controller"
+application.register("chess-puzzle", ChessPuzzleController)
+
+import CmThreadController from "./cm_thread_controller"
+application.register("cm-thread", CmThreadController)
+
 import CommentEditController from "./comment_edit_controller"
 application.register("comment-edit", CommentEditController)
 
@@ -37,14 +67,29 @@ application.register("emoji-reactions", EmojiReactionsController)
 import ExpandTextController from "./expand_text_controller"
 application.register("expand-text", ExpandTextController)
 
+import FeedTabsController from "./feed_tabs_controller"
+application.register("feed-tabs", FeedTabsController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
+
+import ForwardPickerController from "./forward_picker_controller"
+application.register("forward-picker", ForwardPickerController)
+
+import FrameRefreshController from "./frame_refresh_controller"
+application.register("frame-refresh", FrameRefreshController)
 
 import GoldenCarouselController from "./golden_carousel_controller"
 application.register("golden-carousel", GoldenCarouselController)
 
+import HelloController from "./hello_controller"
+application.register("hello", HelloController)
+
 import HistoryArenaController from "./history_arena_controller"
 application.register("history-arena", HistoryArenaController)
+
+import InboxTypingController from "./inbox_typing_controller"
+application.register("inbox-typing", InboxTypingController)
 
 import InfiniteScrollController from "./infinite_scroll_controller"
 application.register("infinite-scroll", InfiniteScrollController)
@@ -55,20 +100,11 @@ application.register("invite-link", InviteLinkController)
 import LightboxController from "./lightbox_controller"
 application.register("lightbox", LightboxController)
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
+import ListFilterController from "./list_filter_controller"
+application.register("list-filter", ListFilterController)
 
-import AccentPickerController from "./accent_picker_controller"
-application.register("accent-picker", AccentPickerController)
-
-import AutoDismissController from "./auto_dismiss_controller"
-application.register("auto-dismiss", AutoDismissController)
-
-import BibleDrawerController from "./bible_drawer_controller"
-application.register("bible-drawer", BibleDrawerController)
-
-import ChessPuzzleController from "./chess_puzzle_controller"
-application.register("chess-puzzle", ChessPuzzleController)
+import LocalTimeController from "./local_time_controller"
+application.register("local-time", LocalTimeController)
 
 import MentionsController from "./mentions_controller"
 application.register("mentions", MentionsController)
@@ -78,25 +114,9 @@ application.register("message-edit", MessageEditController)
 
 import MessageMenuController from "./message_menu_controller"
 application.register("message-menu", MessageMenuController)
+
 import MessageShareController from "./message_share_controller"
 application.register("message-share", MessageShareController)
-import ForwardPickerController from "./forward_picker_controller"
-application.register("forward-picker", ForwardPickerController)
-
-import ProfileHeroController from "./profile_hero_controller"
-application.register("profile-hero", ProfileHeroController)
-
-import FeedTabsController from "./feed_tabs_controller"
-application.register("feed-tabs", FeedTabsController)
-
-import ScrollTopController from "./scroll_top_controller"
-application.register("scroll-top", ScrollTopController)
-
-import ScrollProgressController from "./scroll_progress_controller"
-application.register("scroll-progress", ScrollProgressController)
-
-import ChatScrollController from "./chat_scroll_controller"
-application.register("chat-scroll", ChatScrollController)
 
 import NewPostsPillController from "./new_posts_pill_controller"
 application.register("new-posts-pill", NewPostsPillController)
@@ -104,38 +124,41 @@ application.register("new-posts-pill", NewPostsPillController)
 import NotificationSoundController from "./notification_sound_controller"
 application.register("notification-sound", NotificationSoundController)
 
-import OfficeController from "./office_controller"
-application.register("office", OfficeController)
-
-import OnboardingController from "./onboarding_controller"
-application.register("onboarding", OnboardingController)
-
-import TourController from "./tour_controller"
-application.register("tour", TourController)
-
 import NotificationsModalController from "./notifications_modal_controller"
 application.register("notifications-modal", NotificationsModalController)
 
 import NotificationsPageController from "./notifications_page_controller"
 application.register("notifications-page", NotificationsPageController)
 
-import PostFormController from "./post_form_controller"
-application.register("post-form", PostFormController)
+import OfficeController from "./office_controller"
+application.register("office", OfficeController)
+
+import OnboardingController from "./onboarding_controller"
+application.register("onboarding", OnboardingController)
+
+import PasswordFieldController from "./password_field_controller"
+application.register("password-field", PasswordFieldController)
 
 import PasteImagesController from "./paste_images_controller"
 application.register("paste-images", PasteImagesController)
 
-import CaretClearController from "./caret_clear_controller"
-application.register("caret-clear", CaretClearController)
+import PostFormController from "./post_form_controller"
+application.register("post-form", PostFormController)
 
-import QuizController from "./quiz_controller"
-application.register("quiz", QuizController)
+import PresenceController from "./presence_controller"
+application.register("presence", PresenceController)
+
+import PristineFieldController from "./pristine_field_controller"
+application.register("pristine-field", PristineFieldController)
+
+import ProfileHeroController from "./profile_hero_controller"
+application.register("profile-hero", ProfileHeroController)
 
 import PwaController from "./pwa_controller"
 application.register("pwa", PwaController)
 
-import PristineFieldController from "./pristine_field_controller"
-application.register("pristine-field", PristineFieldController)
+import QuizController from "./quiz_controller"
+application.register("quiz", QuizController)
 
 import RainController from "./rain_controller"
 application.register("rain", RainController)
@@ -150,22 +173,31 @@ import ReactorsModalController from "./reactors_modal_controller"
 application.register("reactors-modal", ReactorsModalController)
 
 import ReplyToggleController from "./reply_toggle_controller"
-import CmThreadController from "./cm_thread_controller"
-import ScrollActiveController from "./scroll_active_controller"
-import ScheduleFieldController from "./schedule_field_controller"
 application.register("reply-toggle", ReplyToggleController)
-application.register("cm-thread", CmThreadController)
-application.register("scroll-active", ScrollActiveController)
-application.register("schedule-field", ScheduleFieldController)
 
 import RepostMenuController from "./repost_menu_controller"
 application.register("repost-menu", RepostMenuController)
 
+import ScheduleFieldController from "./schedule_field_controller"
+application.register("schedule-field", ScheduleFieldController)
+
 import ScriptureController from "./scripture_controller"
 application.register("scripture", ScriptureController)
 
+import ScrollActiveController from "./scroll_active_controller"
+application.register("scroll-active", ScrollActiveController)
+
+import ScrollProgressController from "./scroll_progress_controller"
+application.register("scroll-progress", ScrollProgressController)
+
+import ScrollTopController from "./scroll_top_controller"
+application.register("scroll-top", ScrollTopController)
+
 import ShareController from "./share_controller"
 application.register("share", ShareController)
+
+import StaleFrameController from "./stale_frame_controller"
+application.register("stale-frame", StaleFrameController)
 
 import ThemeController from "./theme_controller"
 application.register("theme", ThemeController)
@@ -176,44 +208,20 @@ application.register("thread-toggle", ThreadToggleController)
 import TocController from "./toc_controller"
 application.register("toc", TocController)
 
+import TourController from "./tour_controller"
+application.register("tour", TourController)
+
+import TypingController from "./typing_controller"
+application.register("typing", TypingController)
+
+import VisibleAreaController from "./visible_area_controller"
+application.register("visible-area", VisibleAreaController)
+
 import VoicePlayerController from "./voice_player_controller"
 application.register("voice-player", VoicePlayerController)
 
 import VoiceRecorderController from "./voice_recorder_controller"
 application.register("voice-recorder", VoiceRecorderController)
 
-import TypingController from "./typing_controller"
-application.register("typing", TypingController)
-
-import InboxTypingController from "./inbox_typing_controller"
-application.register("inbox-typing", InboxTypingController)
-
-import ListFilterController from "./list_filter_controller"
-application.register("list-filter", ListFilterController)
-
-import LocalTimeController from "./local_time_controller"
-application.register("local-time", LocalTimeController)
-
-import PasswordFieldController from "./password_field_controller"
-application.register("password-field", PasswordFieldController)
-
 import WhatsNewController from "./whats_new_controller"
 application.register("whats-new", WhatsNewController)
-
-import CardShareController from "./card_share_controller"
-application.register("card-share", CardShareController)
-
-import ChartTipController from "./chart_tip_controller"
-application.register("chart-tip", ChartTipController)
-
-import AdConsentController from "./ad_consent_controller"
-application.register("ad-consent", AdConsentController)
-
-import PresenceController from "./presence_controller"
-application.register("presence", PresenceController)
-
-import FrameRefreshController from "./frame_refresh_controller"
-application.register("frame-refresh", FrameRefreshController)
-
-import StaleFrameController from "./stale_frame_controller"
-application.register("stale-frame", StaleFrameController)
