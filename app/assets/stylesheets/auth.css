@@ -243,13 +243,13 @@ body:has(.auth) .fc-rain { display: none; }
 
 /* Sign in with Apple (iPhone app): Apple's black button. The shared
    .google-auth-button styles use !important, so these must too. */
-html .auth .apple-auth-button,
-html .auth .apple-auth-button:hover,
-html .auth .apple-auth-button:active {
+html .auth a.google-auth-button.apple-auth-button,
+html .auth a.google-auth-button.apple-auth-button:hover,
+html .auth a.google-auth-button.apple-auth-button:active {
   background: #000 !important;
   border-color: #000 !important;
   color: #fff !important;
 }
-html .auth .apple-auth-button { margin-bottom: 0.7rem; }
-html .auth .apple-auth-button::before,
-html .auth .apple-auth-button::after { display: none !important; }
+html .auth a.google-auth-button.apple-auth-button { margin-bottom: 0.7rem; }
+html .auth a.google-auth-button.apple-auth-button::before,
+html .auth a.google-auth-button.apple-auth-button::after { display: none !important; }
