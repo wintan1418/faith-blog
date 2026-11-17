@@ -119,6 +119,7 @@ class User < ApplicationRecord
     username
   end
 
+  # Also used for Sign in with Apple (provider "apple").
   def self.from_google(auth)
     email = auth.info.email.to_s.downcase
     user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: email)

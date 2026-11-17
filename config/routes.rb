@@ -375,6 +375,9 @@ Rails.application.routes.draw do
   # Native Google sign-in for the mobile apps (see Users::NativeGoogleSessionsController)
   get  "auth/google/native/start", to: "users/native_google_sessions#start", as: :native_google_start
   post "auth/google/native",       to: "users/native_google_sessions#create", as: :native_google_sign_in
+  # Sign in with Apple for the iPhone app (see Users::NativeAppleSessionsController)
+  get  "auth/apple/native/start",  to: "users/native_apple_sessions#start", as: :native_apple_start
+  post "auth/apple/native",        to: "users/native_apple_sessions#create", as: :native_apple_sign_in
 
   get ".well-known/assetlinks.json", to: "well_known#assetlinks", defaults: { format: :json }
   get ".well-known/apple-app-site-association", to: "well_known#apple_app_site_association", defaults: { format: :json }

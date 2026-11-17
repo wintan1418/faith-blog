@@ -2,7 +2,21 @@
     native code catches (it shows the phone's Google account picker). Older app
     versions without native Google sign-in get no button at all. %>
 <% native_google = hotwire_native_app? && native_google_sign_in_supported? %>
-<% if ENV["GOOGLE_CLIENT_ID"].present? && (native_google || (!hotwire_native_app? && ENV["GOOGLE_CLIENT_SECRET"].present?)) %>
+<% native_apple = hotwire_native_app? && native_apple_sign_in_supported? %>
+<% show_google = ENV["GOOGLE_CLIENT_ID"].present? && (native_google || (!hotwire_native_app? && ENV["GOOGLE_CLIENT_SECRET"].present?)) %>
+<% if native_apple %>
+  <%# Apple asks for its button first and as prominent as the others. %>
+  <%= link_to native_apple_start_path, class: "google-auth-button apple-auth-button" do %>
+    <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5" fill="currentColor">
+      <path d="M16.37 12.6c-.02-2.1 1.72-3.12 1.8-3.17-.98-1.43-2.5-1.63-3.04-1.65-1.29-.13-2.52.76-3.18.76-.66 0-1.67-.74-2.75-.72-1.41.02-2.72.82-3.44 2.09-1.47 2.55-.38 6.32 1.05 8.39.7 1.01 1.53 2.15 2.62 2.11 1.05-.04 1.45-.68 2.72-.68 1.27 0 1.63.68 2.74.66 1.13-.02 1.85-1.03 2.54-2.05.8-1.17 1.13-2.31 1.15-2.37-.03-.01-2.2-.84-2.21-3.37zM14.29 6.43c.58-.71.97-1.69.86-2.67-.84.03-1.85.56-2.45 1.26-.54.62-1.01 1.62-.88 2.58.93.07 1.89-.47 2.47-1.17z"/>
+    </svg>
+    <span>Continue with Apple</span>
+  <% end %>
+  <% unless show_google %>
+    <div class="auth-divider"><span>or continue with email</span></div>
+  <% end %>
+<% end %>
+<% if show_google %>
   <% google_button = capture do %>
     <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
