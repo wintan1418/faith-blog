@@ -25,6 +25,17 @@ module ApnsKey
     "#{HEADER}\n#{body.scan(/.{1,64}/).join("\n")}\n#{FOOTER}\n"
   end
 
+  # What's wrong with the pasted key, without revealing it (Admin → Push test).
+  # A P-256 .p8 key is 200 base64 characters between the markers.
+  def describe(raw = ENV["APNS_KEY"])
+    text = raw.to_s
+    body = pem(raw).lines[1..-2].to_a.join.delete("\n")
+    "#{text.length} characters pasted; " \
+      "start marker #{text.include?('BEGIN PRIVATE KEY') ? 'found' : 'missing'}, " \
+      "end marker #{text.include?('END PRIVATE KEY') ? 'found' : 'missing'}; " \
+      "key body #{body.length} of 200 characters"
+  end
+
   # True when the key parses (Admin → Push test shows this).
   def readable?(raw = ENV["APNS_KEY"])
     OpenSSL::PKey.read(pem(raw)).is_a?(OpenSSL::PKey::EC)
