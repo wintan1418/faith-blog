@@ -32,7 +32,7 @@
               <span class="fc-accent-swatch-dot" aria-hidden="true"></span>
               <span class="fc-accent-swatch-name"><%= swatch[:name] %></span>
               <% if @current == slug %>
-                <span class="fc-accent-swatch-check" aria-hidden="true">✓</span>
+                <span class="fc-accent-swatch-check" aria-hidden="true"><%= render_icon("check", classes: "h-3.5 w-3.5") %></span>
               <% end %>
             </label>
           <% end %>

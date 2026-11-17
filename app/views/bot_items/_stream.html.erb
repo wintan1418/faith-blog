@@ -4,9 +4,9 @@
   <%= link_to "All", feed_updates_path, class: "fc-bot-chip#{' is-active' unless @bot_filter}",
         data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
   <% bots.each do |b| %>
-    <%= link_to "#{b.emoji} #{b.name.delete_prefix('Brethreign ')}", feed_updates_path(bot: b.key),
+    <%= link_to feed_updates_path(bot: b.key),
           class: "fc-bot-chip#{' is-active' if @bot_filter == b.key}",
-          data: { turbo_frame: "feed_stream", turbo_action: "advance" } %>
+          data: { turbo_frame: "feed_stream", turbo_action: "advance" } do %><%= render_icon(b.icon, classes: "h-4 w-4") %><span><%= b.name.delete_prefix('Brethreign ') %></span><% end %>
   <% end %>
 </div>
 
@@ -27,7 +27,7 @@
     <% bots.each do |b| %>
       <label class="fc-bot-choice">
         <input type="checkbox" name="bots[]" value="<%= b.key %>" <%= "checked" unless current_user.hidden_bots.include?(b.key) %>>
-        <span><%= b.emoji %> <strong><%= b.name %></strong> · <%= b.tagline %></span>
+        <span class="fc-bot-choice-icon is-<%= b.key %>"><%= render_icon(b.icon, classes: "h-4 w-4") %></span><span><strong><%= b.name %></strong> · <%= b.tagline %></span>
       </label>
     <% end %>
     <button type="submit" class="fc-btn fc-btn-primary">Save</button>
@@ -49,13 +49,13 @@
   <% else %>
     <div class="fc-caught-up" role="status">
       <span class="fc-caught-up-line" aria-hidden="true"></span>
-      <span class="fc-caught-up-text">✦ You're all caught up</span>
+      <span class="fc-caught-up-text"><%= render_icon("checkcircle", classes: "h-4 w-4") %> You're all caught up</span>
       <span class="fc-caught-up-line" aria-hidden="true"></span>
     </div>
   <% end %>
 <% else %>
   <div class="fc-empty">
-    <div class="fc-empty-mark" aria-hidden="true">📰</div>
+    <div class="fc-empty-mark" aria-hidden="true"><%= render_icon("newspaper", classes: "h-7 w-7") %></div>
     <h2 class="fc-empty-title">Updates are on their way.</h2>
     <p class="fc-empty-text">The bots bring in news, sport, jobs and free courses all day long. Check back soon.</p>
   </div>

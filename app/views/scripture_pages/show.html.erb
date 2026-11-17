@@ -6,7 +6,7 @@
 <div class="mystic-shell scripture-page">
   <section class="sp-hero">
     <div class="mystic-container max-w-3xl py-14 text-center">
-      <p class="sp-kicker">📖 Scripture</p>
+      <p class="sp-kicker"><%= render_icon("bookopen", classes: "h-4 w-4") %> Scripture</p>
       <h1 class="sp-ref"><%= @verse&.dig(:reference).presence || @reference %></h1>
       <% if @verse&.dig(:text).present? %>
         <blockquote class="sp-verse">“<%= @verse[:text] %>”</blockquote>

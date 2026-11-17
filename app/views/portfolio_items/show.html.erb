@@ -19,11 +19,11 @@
     </div>
 
     <% if @item.hidden? %>
-      <p class="pfw-hidden">🛡 Hidden from your profile: our check found something that breaks the community guidelines. Edit it or remove it.</p>
+      <p class="pfw-hidden"><%= render_icon("shield", classes: "h-4 w-4") %> Hidden from your profile: our check found something that breaks the community guidelines. Edit it or remove it.</p>
     <% end %>
 
     <header class="pfw-head">
-      <% if @item.category.present? %><span class="pfw-cat"><%= @item.emoji %> <%= @item.category %></span><% end %>
+      <% if @item.category.present? %><span class="pfw-cat"><%= render_icon(@item.icon, classes: "h-4 w-4") %> <%= @item.category %></span><% end %>
       <h1 class="pfw-title"><%= @item.title %></h1>
       <% if @item.summary.present? %><p class="pfw-summary"><%= @item.summary %></p><% end %>
       <%= link_to user_path(@user.username), class: "pfw-by" do %>
@@ -60,7 +60,7 @@
         <% end %>
         <% if @item.document.attached? %>
           <%= link_to rails_blob_path(@item.document, disposition: "attachment"), class: "msg-doc pfw-doc", data: { turbo: false }, rel: "noopener" do %>
-            <span class="msg-doc-icon" aria-hidden="true">📕</span>
+            <span class="msg-doc-icon" aria-hidden="true"><%= render_icon("filetext", classes: "h-5 w-5") %></span>
             <span class="msg-doc-text">
               <span class="msg-doc-name"><%= @item.document.filename %></span>
               <span class="msg-doc-meta">PDF · <%= number_to_human_size(@item.document.byte_size) %></span>

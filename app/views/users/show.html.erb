@@ -58,13 +58,13 @@
                 <p class="profile-presence is-online"><span class="presence-pulse" aria-hidden="true"></span>Active now</p>
               <% end %>
               <% if @user.profile&.show_birthday && @user.profile.birthday_today? %>
-                <p class="profile-birthday-today">🎂 Birthday today</p>
+                <p class="profile-birthday-today"><%= render_icon("cake", classes: "h-4 w-4") %> Birthday today</p>
               <% end %>
               <% if (headline = @user.professional_headline) %>
                 <p class="profile-headline"><%= headline %></p>
               <% end %>
               <% if @user.profile&.assembly.present? %>
-                <p class="profile-assembly">⛪ <%= @user.profile.assembly %></p>
+                <p class="profile-assembly"><%= render_icon("church", classes: "h-4 w-4") %> <%= @user.profile.assembly %></p>
               <% end %>
             </div>
 
@@ -107,7 +107,7 @@
               <% badges.each do |badge| %>
                 <% info = badge.info %>
                 <span class="profile-badge" title="<%= info[:name] %> — <%= info[:blurb] %>">
-                  <span class="profile-badge-emoji"><%= info[:emoji] %></span>
+                  <span class="profile-badge-emoji"><%= render_icon(info[:icon] || "trophy", classes: "h-3.5 w-3.5") %></span>
                   <span class="profile-badge-name"><%= info[:name] %></span>
                 </span>
               <% end %>
@@ -129,7 +129,7 @@
             </div>
             <% if @user.current_breath_streak.to_i.positive? %>
               <div class="profile-stat profile-stat-streak" title="Current breath streak">
-                <span>🔥 <%= @user.current_breath_streak %></span>
+                <span><%= render_icon("flame", classes: "h-4 w-4") %> <%= @user.current_breath_streak %></span>
                 <small><%= @user.current_breath_streak == 1 ? "day" : "days" %> streak</small>
               </div>
             <% end %>

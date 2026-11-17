@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { iconSvg, iconLabel } from "../helpers/ui_icons"
 
 // Copy the inviter's signup URL to the clipboard with a brief "Copied" pulse.
 export default class extends Controller {
@@ -10,12 +11,12 @@ export default class extends Controller {
     const text = this.inputTarget.value
     try {
       await navigator.clipboard.writeText(text)
-      this.flash("✓ Copied")
+      this.flash(iconLabel("check", "Copied"))
     } catch {
       // Fallback for older browsers: select + execCommand
       this.inputTarget.focus()
       this.inputTarget.select()
-      try { document.execCommand("copy"); this.flash("✓ Copied") }
+      try { document.execCommand("copy"); this.flash(iconLabel("check", "Copied")) }
       catch { this.flash("Couldn't copy") }
     }
   }

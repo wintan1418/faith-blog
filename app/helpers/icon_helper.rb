@@ -14,6 +14,42 @@ module IconHelper
     "chat" => "M7.9 20A9 9 0 1 0 4 16.1L2 22z",
     "comment" => "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
     "bell" => "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0",
+    # pages
+    "x" => "M18 6 6 18M6 6l12 12",
+    "close" => "M18 6 6 18M6 6l12 12",
+    "check" => "M20 6 9 17l-5-5",
+    "reply" => "M9 17 4 12l5-5M20 18v-2a4 4 0 0 0-4-4H4",
+    "mail" => "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6",
+    "star" => "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z",
+    "leaf" => "M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10zM2 21c0-3 1.9-5.4 5.1-6C9.5 14.5 12 13 13 12",
+    "thumbsup" => "M7 10v12M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 8a2 2 0 0 1-1.9 1.4H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9z",
+    "link" => "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7",
+    "externallink" => "M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6",
+    "mappin" => "M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+    "dove" => "M16 7h.01M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.3-2.3L2 20M20 7l2 .5-2 .5M10 18v3M14 17.8V21M7 18a6 6 0 0 0 3.8-10.6",
+    "handshake" => "M11 17l2 2a1 1 0 1 0 3-3M14 14l2.5 2.5a1 1 0 1 0 3-3l-3.9-3.9a3 3 0 0 0-4.2 0l-.9.9a1 1 0 1 1-3-3l2.8-2.8a5.8 5.8 0 0 1 7.1-.9l.5.3a2 2 0 0 0 1.4.3L21 4M21 3l1 11h-2M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3M3 4h8",
+    "target" => "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+    "filetext" => "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zM14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8",
+    "belloff" => "M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5M17 17H3s3-2 3-9a4.7 4.7 0 0 1 .3-1.7M10.3 21a1.94 1.94 0 0 0 3.4 0M2 2l20 20",
+    "volumeoff" => "M11 5 6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6",
+    "volume" => "M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14",
+    "ban" => "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2",
+    "download" => "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",
+    "wifioff" => "M12 20h.01M8.5 16.4a5 5 0 0 1 7 0M2 8.8a15 15 0 0 1 4.2-2.8M22 8.8a15 15 0 0 0-11.3-3.8M16.9 12.6a10 10 0 0 1 2.1 1.4M5 12.9a10 10 0 0 1 5.2-2.4M2 2l20 20",
+    "inbox" => "M22 12h-6l-2 3h-4l-2-3H2M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z",
+    "pen" => "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z",
+    "camera" => "M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+    "film" => "M3 3h18v18H3zM7 3v18M17 3v18M3 7.5h4M3 12h18M3 16.5h4M17 7.5h4M17 16.5h4",
+    "building" => "M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18zM6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2M10 6h4M10 10h4M10 14h4M10 18h4",
+    "wrench" => "M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z",
+    "flask" => "M10 2v7.5L4 20a1 1 0 0 0 .9 1.5h14.2A1 1 0 0 0 20 20l-6-10.5V2M8.5 2h7M7 16h10",
+    "rocket" => "M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2c.7-.8.7-2.1-.1-2.9a2.2 2.2 0 0 0-2.9-.1zM12 15l-3-3a22 22 0 0 1 2-4A12.9 12.9 0 0 1 22 2c0 2.7-.8 7.5-6 11a22.4 22.4 0 0 1-4 2zM9 12H4s.6-3 2-4c1.6-1.1 5 0 5 0M12 15v5s3-.6 4-2c1.1-1.6 0-5 0-5",
+    "stethoscope" => "M11 2v2M5 2v2M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1M8 15a6 6 0 0 0 12 0v-3M20 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+    "shirt" => "M20.4 3.5 16 2a4 4 0 0 1-8 0L3.6 3.5a2 2 0 0 0-1.3 2.2l.6 3.5a1 1 0 0 0 1 .8H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.2a1 1 0 0 0 1-.8l.6-3.5a2 2 0 0 0-1.3-2.2z",
+    "brush" => "M9.1 11.2 3.3 17a2.1 2.1 0 1 0 3 3l5.8-5.8M14 13.5l7.4-7.4a2.1 2.1 0 0 0-3-3l-7.4 7.4M9.5 12.5l2 2",
+    "arrowup" => "M12 19V5M5 12l7-7 7 7",
+    "arrowdown" => "M12 5v14M19 12l-7 7-7-7",
+    "copy" => "M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2",
     "notifications" => "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0",
     "pray" => "M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 16M7 20l1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9M2 15l6 6M19.5 8.5c.7-.7 1.5-1.6 1.5-2.7A2.73 2.73 0 0 0 16 4a2.78 2.78 0 0 0-5 1.8c0 1.2.8 2 1.5 2.8L16 12z",
     "answered" => "M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3",
@@ -94,13 +130,25 @@ module IconHelper
     "🎵" => "music", "💻" => "laptop", "❓" => "quiz", "📖" => "bookopen", "🎓" => "graduationcap",
     "🌅" => "sunrise", "🍳" => "utensils", "💼" => "briefcase", "🙏" => "pray", "🌟" => "answered",
     "📚" => "library", "💑" => "heart", "👨‍👩‍👧‍👦" => "users", "🎨" => "palette", "🌍" => "globe",
-    "🌱" => "sprout", "✨" => "sparkles", "⛪" => "church", "🎯" => "games", "🔥" => "flame"
+    "🌱" => "sprout", "✨" => "sparkles", "⛪" => "church", "🎯" => "games", "🔥" => "flame",
+    "📰" => "newspaper", "🏆" => "trophy", "🎂" => "cake", "🕊️" => "dove", "🕊" => "dove", "🤝" => "handshake",
+    "🛡" => "shield", "🛡️" => "shield", "📣" => "megaphone", "🔔" => "bell", "💬" => "comment", "📍" => "mappin",
+    "🔗" => "link", "📲" => "smartphone", "🎉" => "sparkles", "⭐" => "star", "❤️" => "heart", "👤" => "user",
+    "📷" => "camera", "🎙️" => "mic", "🎙" => "mic", "📌" => "pin", "🔍" => "search", "🎮" => "games",
+    "📸" => "camera", "🗓️" => "calendar", "📅" => "calendar", "💡" => "lightbulb", "🙌" => "praise", "🔒" => "shield"
   }.freeze
 
   # The icon name a room should show: its emoji mapped, else its name, else a group.
   def room_icon_name(room)
     raw = room.respond_to?(:icon) ? room.icon.to_s.strip : ""
     EMOJI_ICONS[raw] || (raw.match?(/\A[a-z_]+\z/i) ? raw : "users")
+  end
+
+  # An icon for an emoji stored in data (announcement slides and the like),
+  # with a fallback when the emoji has no match.
+  def emoji_icon_name(emoji, fallback: "sparkles")
+    raw = emoji.to_s.strip
+    EMOJI_ICONS[raw] || EMOJI_ICONS[raw.delete("\uFE0F")] || fallback
   end
 
   def render_icon(name, classes: "w-6 h-6")

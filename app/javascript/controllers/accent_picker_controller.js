@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { iconSvg, iconLabel } from "../helpers/ui_icons"
 
 // Live-apply the chosen accent to the body CSS variables on click,
 // then auto-submit the form so the choice persists. The user sees
@@ -52,7 +53,7 @@ export default class extends Controller {
       const tick = document.createElement("span")
       tick.className = "fc-accent-swatch-check"
       tick.setAttribute("aria-hidden", "true")
-      tick.textContent = "✓"
+      tick.innerHTML = iconSvg("check", "h-3.5 w-3.5")
       swatch.appendChild(tick)
     }
   }

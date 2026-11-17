@@ -1,0 +1,192 @@
+/* Evergreen — member pages (notifications, profile, circles, rooms, plans,
+   updates, settings and shared partials). Emoji UI marks became outline
+   icons; this sizes, aligns and tints them. Tokens come from evergreen.css. */
+
+/* ── Shared: an icon tile and label rows that line up with their icon ──── */
+.eg-tile {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent);
+}
+
+:is(.fc-page-kicker, .circles-kicker, .aw-kicker, .sp-kicker, .fc-updates-intro-kicker,
+    .circle-section-title, .circle-answered-heading, .profile-assembly, .profile-birthday-today,
+    .fc-plan-status, .pfw-cat, .pfw-hidden, .fc-bot-safety, .fc-caught-up-text, .circle-amen,
+    .circle-answered-btn, .sk-btn, .bys-connect--sent, .fc-asst-headline, .fc-copy-btn,
+    .fc-bible-share-btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+:is(.circle-section-title, .pfw-hidden, .fc-bot-safety, .fc-plan-status) { display: flex; }
+:is(.circle-section-title, .circle-answered-heading, .aw-kicker, .sp-kicker) svg { flex: none; }
+
+/* Kickers: sentence case, readable, no tiny tracked capitals */
+:is(.circles-kicker, .aw-kicker, .sp-kicker, .fc-updates-intro-kicker, .circle-answered-heading, .fc-caught-up-text) {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+}
+.fc-page-kicker svg { color: var(--fc-accent); }
+:is(.aw-kicker, .sp-kicker, .circle-answered-heading, .circle-answered-btn) { color: var(--fc-gold) !important; }
+.circles-kicker { color: var(--fc-accent) !important; }
+
+/* ── Notifications: the type marker is an icon in a small tinted disc ──── */
+.fc-notifrow-badge {
+  width: 22px;
+  height: 22px;
+  right: -5px;
+  bottom: -5px;
+  background: var(--fc-accent);
+  border: 2px solid var(--fc-surface);
+  color: var(--fc-on-accent);
+  box-shadow: none;
+}
+.fc-notifrow-badge svg { width: 12px; height: 12px; stroke-width: 2.5; }
+.fc-notifrow-badge:is(.is-heart) { background: #c2255c; color: #fff; }
+.fc-notifrow-badge:is(.is-pray, .is-answered, .is-trophy, .is-cake, .is-star) { background: var(--fc-gold-fill); color: var(--fc-on-gold); }
+.fc-notifrow-badge:is(.is-shield) { background: var(--fc-ink); color: var(--fc-surface); }
+html.theme-dark .fc-notifrow-badge:is(.is-heart) { background: #f06595; color: #2b0613; }
+.fc-notifpage-card { border-radius: var(--fc-radius); }
+.fc-notifpage-title { font-family: var(--fc-display); }
+
+/* ── Profile: badges, streak, assembly ─────────────────────────────────── */
+.profile-badge-emoji {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: var(--fc-gold-soft);
+  color: var(--fc-gold);
+}
+.profile-stat-streak span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.profile-stat-streak svg { color: var(--fc-gold); }
+.profile-assembly svg, .profile-birthday-today svg { color: var(--fc-accent); flex: none; }
+.profile-birthday-today { display: inline-flex; background: var(--fc-gold-soft) !important; color: var(--fc-ink); }
+.profile-birthday-today svg { color: var(--fc-gold); }
+
+/* Portfolio: an icon on the blank cover and the category chip */
+.pf-cover-blank { color: var(--fc-accent); background: var(--fc-accent-soft); }
+.pf-meta { display: inline-flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
+.pf-meta svg { color: var(--fc-accent); }
+.pf-manage-cover { color: var(--fc-accent); }
+.pf-move { display: inline-grid; place-items: center; }
+.pfw-hidden svg { flex: none; }
+
+/* Business card buttons: icon centred in the round chip */
+.card-act span svg { display: block; }
+
+/* Endorse / suggestions */
+.bys-reason-icon { display: inline-grid; place-items: center; color: var(--fc-muted); }
+.bys-nudge-icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-inline: auto;
+  border-radius: 14px;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent);
+}
+.bys-connect--sent { justify-content: center; }
+
+/* ── Circles ───────────────────────────────────────────────────────────── */
+.circle-card, .circle-create-panel, .circle-head-panel, .circle-prayer-list, .circle-stream { border-radius: var(--fc-radius); }
+.circle-card-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  background: var(--fc-gold-soft);
+  color: var(--fc-gold);
+}
+.circle-room-title { display: flex; align-items: center; gap: 0.6rem; font-family: var(--fc-display); }
+.circle-room-title .eg-tile { background: var(--fc-gold-soft); color: var(--fc-gold); }
+.circle-section-title svg { color: var(--fc-accent); }
+.circle-back { display: inline-flex; align-items: center; gap: 0.25rem; }
+.circle-x { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 999px; }
+.circle-x:hover { background: var(--fc-surface-2); color: var(--fc-ink); }
+
+/* ── Answered prayers, plans, scripture ────────────────────────────────── */
+.aw-chip svg { flex: none; }
+.fc-plan-status.is-done { color: var(--fc-gold) !important; }
+.fc-plan-day-check { display: inline-grid; place-items: center; color: var(--fc-accent); }
+
+/* ── Updates tab: bot chips, avatars, intro banner ─────────────────────── */
+.fc-bot-chip { display: inline-flex; align-items: center; gap: 0.35rem; }
+.fc-bot-avatar { color: var(--fc-accent); font-size: 0; }
+.fc-bot-avatar.is-sports  { background: var(--fc-gold-soft); color: var(--fc-gold); }
+.fc-bot-avatar.is-jobs    { background: color-mix(in srgb, #2557d6 12%, var(--fc-surface)); color: #2557d6; }
+.fc-bot-avatar.is-courses { background: color-mix(in srgb, #7c3aed 12%, var(--fc-surface)); color: #6d28d9; }
+html.theme-dark .fc-bot-avatar.is-jobs    { background: rgba(110, 150, 255, 0.14); color: #a9c1ff; }
+html.theme-dark .fc-bot-avatar.is-courses { background: rgba(180, 140, 255, 0.14); color: #cdb4ff; }
+.fc-bot-choice-icon {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 8px;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent);
+}
+.fc-bot-safety svg { flex: none; color: var(--fc-gold); }
+.fc-caught-up-text svg { color: var(--fc-accent); }
+.fc-updates-intro-icons { color: var(--fc-accent); }
+.fc-updates-intro-icons span { font-size: 0; }
+
+/* ── Empty states and status pages ─────────────────────────────────────── */
+.fc-empty-mark { color: var(--fc-accent); }
+.fc-offline-icon {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 0.75rem;
+  border-radius: 18px;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent);
+  font-size: 0;
+}
+
+/* What's new slides: the icon sits where the big emoji was */
+.wn-emoji { color: var(--fc-accent); display: inline-grid; place-items: center; }
+
+/* Close buttons whose × became an icon */
+:is(.fc-toast-close, .fc-app-update__close, .wn-close, .fc-updates-intro-close, .bys-dismiss, .fc-bible-drawer-close) {
+  display: inline-grid;
+  place-items: center;
+}
+
+/* Settings: accent tick, push buttons */
+.fc-accent-swatch-check { display: inline-grid; place-items: center; }
+[data-pwa-target="enableBtn"]:not(.hidden), [data-pwa-target="installBtn"]:not(.hidden) { display: inline-flex; align-items: center; gap: 0.45rem; }
+[data-invite-link-target="copyBtn"] { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+/* Notification day groups: sentence case, not tracked capitals */
+.fc-notifpage-daylabel {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  font-family: var(--fc-sans) !important;
+}
+
+/* Page kickers ("Settings", …): a quiet sentence-case pill like the notifications one */
+.mystic-kicker {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  border-color: transparent !important;
+  background: var(--fc-accent-soft) !important;
+  color: var(--fc-accent) !important;
+}

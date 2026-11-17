@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { iconSvg, iconLabel } from "../helpers/ui_icons"
 
 // Plays a soft Web-Audio chime when fresh content arrives via Turbo Streams.
 // No audio file shipped — the chime is synthesised in-browser on demand.
@@ -38,9 +39,9 @@ export default class extends Controller {
 
   reflectToggle() {
     document.querySelectorAll("[data-notification-sound-toggle]").forEach(el => {
-      const onLabel  = el.dataset.onLabel  || "🔔 Sounds on"
-      const offLabel = el.dataset.offLabel || "🔇 Sounds muted"
-      el.textContent = this.muted ? offLabel : onLabel
+      const onLabel  = el.dataset.onLabel  || "Sounds on"
+      const offLabel = el.dataset.offLabel || "Sounds muted"
+      el.innerHTML = this.muted ? iconLabel("volumeoff", offLabel) : iconLabel("volume", onLabel)
     })
   }
 

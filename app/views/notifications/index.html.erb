@@ -3,28 +3,6 @@
 <% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
 <%
-  # One emoji per notification type — a fast visual scent for each row.
-  type_badge = ->(n) {
-    case n.notification_type.to_sym
-    when :new_comment              then "💬"
-    when :comment_reply            then "↩️"
-    when :post_liked, :comment_liked then "❤️"
-    when :new_follower             then "👤"
-    when :direct_message           then "✉️"
-    when :prayer_joined            then "🙏"
-    when :prayer_answered          then "🌟"
-    when :mentioned, :everyone_mention then "📣"
-    when :post_reshared            then "🔁"
-    when :post_featured            then "⭐"
-    when :breath_from_followee     then "🌿"
-    when :connection_request, :connection_accepted then "🤝"
-    when :post_moderation_approved then "✅"
-    when :post_held_for_review, :post_blocked then "🛡️"
-    when :resource_approved, :resource_rejected then "📚"
-    else "✦"
-    end
-  }
-
   groups = @notifications.group_by do |n|
     if n.created_at >= Time.current.beginning_of_day       then "Today"
     elsif n.created_at >= 1.day.ago.beginning_of_day       then "Yesterday"
@@ -39,12 +17,12 @@
   <div class="fc-notifpage" data-controller="notifications-page">
     <header class="fc-notifpage-head">
       <div>
-        <span class="fc-page-kicker">✦ Notifications</span>
+        <span class="fc-page-kicker"><%= render_icon("bell", classes: "h-4 w-4") %> Notifications</span>
         <h1 class="fc-notifpage-title">Alerts</h1>
         <% if unread_count.positive? %>
           <p class="fc-notifpage-sub" data-notifications-page-target="sub"><%= pluralize(unread_count, "new update") %> waiting for you.</p>
         <% else %>
-          <p class="fc-notifpage-sub" data-notifications-page-target="sub">You're all caught up. 🕊️</p>
+          <p class="fc-notifpage-sub" data-notifications-page-target="sub">You're all caught up.</p>
         <% end %>
       </div>
       <% if unread_count.positive? %>
@@ -76,11 +54,11 @@
                   <% else %>
                     <span class="fc-avatar"><%= render_icon("sparkles", classes: "h-4 w-4") %></span>
                   <% end %>
-                  <span class="fc-notifrow-badge"><%= type_badge.call(notification) %></span>
+                  <span class="fc-notifrow-badge is-<%= notification.web_icon %>"><%= render_icon(notification.web_icon, classes: "h-3 w-3") %></span>
                 </span>
 
                 <span class="fc-notifrow-body">
-                  <span class="fc-notifrow-text"><%= notification.message %></span>
+                  <span class="fc-notifrow-text"><%= notification.web_message %></span>
                   <span class="fc-notifrow-time"><%= time_ago_in_words(notification.created_at) %> ago</span>
                 </span>
 
@@ -101,7 +79,7 @@
     <% else %>
       <div class="fc-empty">
         <div class="fc-empty-mark" aria-hidden="true">
-          <%= render_icon("sparkles", classes: "h-7 w-7") %>
+          <%= render_icon("bell", classes: "h-7 w-7") %>
         </div>
         <h2 class="fc-empty-title">Nothing here yet.</h2>
         <p class="fc-empty-text">When someone reacts, comments, follows, or prays with you, it lands here.</p>

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { iconLabel } from "../helpers/ui_icons"
 import { copyText } from "../copy_text"
 
 // Wires the two author-facing composer assistants: gentleness check and
@@ -119,9 +120,9 @@ export default class extends Controller {
   }
 
   renderGentleness({ tone, summary, nudge, suggestion }) {
-    const labels = { gentle: "🕊️ Reads gently", firm: "💬 Firm but ok", harsh: "⚠️ Could land hard" }
+    const labels = { gentle: ["dove", "Reads gently"], firm: ["chat", "Firm but ok"], harsh: ["alert", "Could land hard"] }
     let html = `<div class="fc-asst-result is-${tone}">`
-    html += `<p class="fc-asst-headline">${labels[tone] || tone}</p>`
+    html += `<p class="fc-asst-headline">${labels[tone] ? iconLabel(...labels[tone]) : this.escape(tone)}</p>`
     if (summary) html += `<p class="fc-asst-line">${this.escape(summary)}</p>`
     if (nudge)   html += `<p class="fc-asst-nudge">${this.escape(nudge)}</p>`
     if (suggestion) {
@@ -136,7 +137,7 @@ export default class extends Controller {
       this.show(`<div class="fc-asst-result is-empty"><p class="fc-asst-line">No fitting verse jumped out — try writing a bit more about what's on your heart.</p></div>`)
       return
     }
-    let html = `<div class="fc-asst-result is-scripture"><p class="fc-asst-headline">📖 Suggested scripture</p><ul class="fc-asst-verses">`
+    let html = `<div class="fc-asst-result is-scripture"><p class="fc-asst-headline">${iconLabel("bookopen", "Suggested scripture")}</p><ul class="fc-asst-verses">`
     for (const v of verses) {
       const text = (v.text || "").trim()
       const trans = v.translation || "KJV"
@@ -151,7 +152,7 @@ export default class extends Controller {
                   data-copy-text="${this.escape(clip)}"
                   title="Copy verse"
                   aria-label="Copy verse">
-            ⎘ Copy
+            ${iconLabel("copy", "Copy")}
           </button>
         </div>`
       if (text) {
@@ -173,10 +174,10 @@ export default class extends Controller {
     if (!text) return
     const ok = await copyText(text)
     btn.classList.toggle("is-copied", ok)
-    btn.innerHTML = ok ? "✓ Copied" : "✗ Couldn't copy"
+    btn.innerHTML = ok ? iconLabel("check", "Copied") : iconLabel("x", "Couldn't copy")
     setTimeout(() => {
       btn.classList.remove("is-copied")
-      btn.innerHTML = "⎘ Copy"
+      btn.innerHTML = iconLabel("copy", "Copy")
     }, 1400)
   }
 

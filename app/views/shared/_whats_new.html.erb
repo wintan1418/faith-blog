@@ -6,7 +6,7 @@
     <div class="wn-card">
       <div class="wn-top">
         <span class="wn-kicker" id="wn-heading"><%= release.kicker.presence || "What's new" %></span>
-        <button type="button" class="wn-close" data-action="whats-new#finish" aria-label="Close">×</button>
+        <button type="button" class="wn-close" data-action="whats-new#finish" aria-label="Close"><%= render_icon("x", classes: "h-4 w-4") %></button>
       </div>
 
       <div class="wn-viewport">
@@ -15,7 +15,7 @@
             <section class="wn-slide<%= ' is-active' if i.zero? %>" data-whats-new-target="slide" aria-hidden="<%= i.zero? ? 'false' : 'true' %>">
               <div class="wn-emoji-wrap" aria-hidden="true">
                 <span class="wn-spark is-1"></span><span class="wn-spark is-2"></span><span class="wn-spark is-3"></span>
-                <span class="wn-emoji"><%= slide.emoji %></span>
+                <span class="wn-emoji"><%= render_icon(emoji_icon_name(slide.emoji), classes: "h-12 w-12") %></span>
               </div>
               <h2 class="wn-title"><%= slide.title %></h2>
               <% if slide.text %><p class="wn-text"><%= slide.text %></p><% end %>
