@@ -1,0 +1,33 @@
+<% content_for(:page_title) { "Push test" } %>
+
+<div class="max-w-2xl space-y-6">
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h2 class="text-lg font-bold text-[var(--fc-ink)]">Push keys on the server</h2>
+    <ul class="mt-3 space-y-1 text-sm">
+      <li>iPhone (Apple): <strong><%= NativePushConfig.apple? ? "set" : "missing (APNS_KEY_ID, APNS_KEY, APNS_TEAM_ID)" %></strong></li>
+      <li>Android (Google): <strong><%= NativePushConfig.google? ? "set" : "missing (FCM_PROJECT_ID, FCM_SERVICE_ACCOUNT_JSON)" %></strong></li>
+    </ul>
+  </div>
+
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h2 class="text-lg font-bold text-[var(--fc-ink)]">Your phones</h2>
+    <% if @devices.any? %>
+      <ul class="mt-3 space-y-1 text-sm">
+        <% @devices.each do |device| %>
+          <li><%= device.platform == "apple" ? "iPhone" : "Android" %> · <%= device.name || "unnamed" %> · registered <%= time_ago_in_words(device.created_at) %> ago</li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="mt-3 text-sm text-[var(--fc-muted)]">None yet. Open the app, allow notifications when asked, and sign in.</p>
+    <% end %>
+
+    <%= button_to "Send me a test notification", admin_push_test_path, method: :post,
+                  class: "mt-5 rounded-lg bg-[var(--fc-accent)] px-4 py-2 text-sm font-bold text-white" %>
+
+    <% if @results.present? %>
+      <ul class="mt-4 space-y-1 rounded-lg bg-[var(--fc-surface-2)] p-3 text-sm" id="push-results">
+        <% @results.each do |line| %><li><%= line %></li><% end %>
+      </ul>
+    <% end %>
+  </div>
+</div>

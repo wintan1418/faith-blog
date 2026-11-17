@@ -65,7 +65,8 @@
       ["Broadcasts", admin_broadcasts_path, "send", request.path.include?("/admin/broadcasts")],
       ["Announcements", admin_announcements_path, "sparkles", request.path.include?("/admin/announcements")],
       ["Updates bots", admin_bots_path, "send", request.path.include?("/admin/bots")],
-      ["App versions", edit_admin_app_release_path, "sparkles", request.path.include?("/admin/app-versions")]
+      ["App versions", edit_admin_app_release_path, "sparkles", request.path.include?("/admin/app-versions")],
+      ["Push test", admin_push_test_path, "bell", request.path.include?("/admin/push-test")]
     ] %>
 
     <div class="fc-app fc-admin min-h-full">
