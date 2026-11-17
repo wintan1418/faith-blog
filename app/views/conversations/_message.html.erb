@@ -8,6 +8,9 @@
 <% deleted = message.deleted? %>
 <% removed = !deleted && message.removed? %>
 <% starts_group = message_starts_group?(message, previous) %>
+<%# Photos alone, or a verse alone, sit on the chat without a bubble around them. %>
+<% plain = !deleted && !removed && message.body.blank? && !message.reply_to && !message.forwarded? &&
+           !message.has_voice_note? && !message.has_documents? && (message.has_images? || message.has_scripture?) %>
 
 <%
   loaded_likes = message.likes.loaded? ? message.likes.to_a : message.likes.includes(:user).to_a
@@ -25,27 +28,22 @@
   <% end %>
 
   <div class="msg-line">
-    <div class="msg-gutter">
-      <% if starts_group %>
-        <%= render "conversations/avatar", user: message.sender, size: "h-10 w-10" %>
-      <% else %>
-        <span class="msg-gutter-time"><%= local_time_tag(message.created_at, "short", message.created_at.in_time_zone.strftime("%-l:%M")) %></span>
-      <% end %>
-    </div>
+    <% unless mine %>
+      <div class="msg-gutter">
+        <% if starts_group %><%= render "conversations/avatar", user: message.sender, size: "h-7 w-7" %><% end %>
+      </div>
+    <% end %>
 
     <div class="msg-content">
       <% if starts_group %>
-        <div class="msg-head">
-          <span class="msg-name"><%= message.sender.display_name %></span>
-          <span class="msg-time">· <%= local_time_tag(message.created_at, "time", message.created_at.in_time_zone.strftime("%-l:%M %p")) %></span>
-        </div>
+        <span class="sr-only"><%= mine ? "You" : message.sender.display_name %>:</span>
       <% end %>
 
-      <div class="msg-bubble" data-controller="message-menu" data-action="click->message-menu#toggle">
+      <div class="msg-bubble<%= ' is-plain' if plain %><%= ' has-voice' if !deleted && !removed && message.has_voice_note? %>" data-controller="message-menu" data-action="click->message-menu#toggle">
         <% if deleted %>
           <p class="msg-deleted">This message was deleted</p>
         <% elsif removed %>
-          <p class="msg-deleted msg-removed">🛡 This message was removed for breaking our community guidelines.</p>
+          <p class="msg-deleted msg-removed"><%= render_icon("shield", classes: "h-4 w-4") %> This message was removed for breaking our community guidelines.</p>
         <% else %>
           <% if message.forwarded? %>
             <p class="msg-forwarded"><%= render_icon("forward", classes: "h-3.5 w-3.5") %> Forwarded</p>
@@ -82,7 +80,7 @@
                 <% end %>
               </div>
               <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
-                      title="Message options" aria-label="Message options">&#8943;</button>
+                      title="Message options" aria-label="Message options"><%= render_icon("more", classes: "h-5 w-5") %></button>
             </div>
           <% end %>
 
@@ -94,7 +92,7 @@
                 <%= link_to message_file_download_path(message, doc), class: "msg-doc", rel: "noopener",
                       data: { turbo: false, legacy_href: rails_blob_path(doc, disposition: "attachment") },
                       title: "Open #{doc.filename}" do %>
-                  <span class="msg-doc-icon" aria-hidden="true"><%= document_icon(doc) %></span>
+                  <span class="msg-doc-icon is-<%= document_kind(doc) %>" aria-hidden="true"><%= render_icon("file", classes: "h-5 w-5") %></span>
                   <span class="msg-doc-text">
                     <span class="msg-doc-name"><%= doc.filename %></span>
                     <span class="msg-doc-meta"><%= document_meta(doc) %></span>
@@ -105,7 +103,7 @@
             </div>
             <%# Tapping the file opens it, so it gets the options button too. %>
             <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
-                    title="Message options" aria-label="Message options">&#8943;</button>
+                    title="Message options" aria-label="Message options"><%= render_icon("more", classes: "h-5 w-5") %></button>
             </div>
           <% end %>
 
@@ -113,12 +111,29 @@
             <%# The player takes every tap, so voice notes get their own options
                 button (react, reply, edit, delete) on touch screens. %>
             <div class="msg-voice-row">
-              <audio controls preload="metadata" class="msg-voice" src="<%= url_for(message.voice_note) %>"></audio>
+              <%# Play button and a waveform-style bar that fills as it plays (voice-player). %>
+              <div class="msg-voice-player" data-controller="voice-player">
+                <audio preload="metadata" class="msg-voice" src="<%= url_for(message.voice_note) %>" data-voice-player-target="audio"></audio>
+                <button type="button" class="msg-voice-play" data-voice-player-target="playBtn" data-action="voice-player#toggle"
+                        aria-label="Play voice note">
+                  <%= render_icon("play", classes: "msg-voice-icon is-play") %>
+                  <%= render_icon("pause", classes: "msg-voice-icon is-pause") %>
+                </button>
+                <span class="msg-wave" data-voice-player-target="progress" data-action="click->voice-player#seek" aria-hidden="true">
+                  <% bars = voice_wave_bars(message) %>
+                  <span class="msg-wave-bars"><% bars.each do |h| %><i style="height: <%= h %>px"></i><% end %></span>
+                  <span class="msg-wave-fill" data-voice-player-target="fill"><span class="msg-wave-bars"><% bars.each do |h| %><i style="height: <%= h %>px"></i><% end %></span></span>
+                </span>
+                <span class="msg-voice-time">
+                  <span class="msg-voice-current" data-voice-player-target="current">0:00</span>
+                  <span class="msg-voice-total" data-voice-player-target="total"></span>
+                </span>
+              </div>
               <%= render "conversations/media_download", message: message, attachment: message.voice_note,
                          label: "Download voice note", class_name: "msg-media-get" %>
               <% unless deleted || removed %>
                 <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
-                        title="Message options" aria-label="Message options">&#8943;</button>
+                        title="Message options" aria-label="Message options"><%= render_icon("more", classes: "h-5 w-5") %></button>
               <% end %>
             </div>
           <% end %>
@@ -129,16 +144,18 @@
 
           <% if !mine && MoneyTalk.mentions?(message.body) %>
             <p class="msg-money-tip" role="note">
-              🛡 <strong>Money mentioned.</strong> Only send money to people you know and trust.
+              <%= render_icon("shield", classes: "msg-money-tip-icon") %> <strong>Money mentioned.</strong> Only send money to people you know and trust.
               Never share your PIN, OTP, BVN or password, not even with Brethreign staff.
               Something feels off? Tap the message and report it.
             </p>
           <% end %>
 
-          <% if message.respond_to?(:edited?) && message.edited? %>
-            <span class="msg-edited">(edited)</span>
-          <% end %>
         <% end %>
+
+        <span class="msg-stamp">
+          <% if !deleted && !removed && message.respond_to?(:edited?) && message.edited? %><span class="msg-edited">Edited</span><% end %>
+          <%= local_time_tag(message.created_at, "short", message.created_at.in_time_zone.strftime("%-l:%M")) %>
+        </span>
 
         <% unless deleted || removed %>
           <div class="msg-actions" data-message-menu-target="actions"
