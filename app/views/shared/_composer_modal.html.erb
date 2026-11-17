@@ -4,6 +4,7 @@
 <% draft_count = current_user.posts.draft.count %>
 
 <dialog data-composer-modal-target="dialog"
+        data-controller="visible-area"
         data-action="mousedown->composer-modal#backdropClick"
         aria-labelledby="composer-dialog-title"
         class="fc-composer-dialog">

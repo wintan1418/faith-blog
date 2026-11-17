@@ -830,3 +830,34 @@ dialog.fc-composer-dialog .eg-cmp-cancel { display: none; }
   .eg-cmp-emoji .fc-emoji-popover { right: auto; }
   .eg-cmp-schedule-picker { padding-left: 0; }
 }
+
+/* Phones: the sheet is exactly the visible area (see visible_area_controller):
+   in the apps and with the keyboard up, Breathe stays on screen. */
+@media (max-width: 520px) {
+  dialog.fc-composer-dialog[open][style*="--visible-h"] {
+    position: fixed;
+    inset: auto 0 auto 0;
+    top: var(--visible-top, 0px);
+    height: var(--visible-h);
+    max-height: var(--visible-h);
+    margin: 0;
+  }
+  dialog.fc-composer-dialog[open][style*="--visible-h"] .fc-composer-panel {
+    height: 100%;
+    max-height: 100%;
+  }
+}
+
+/* Phones: pin Cancel / Save draft / Breathe to the bottom of the visible
+   screen. The iPhone app's web engine didn't keep the sticky row in view, so
+   it slid below the screen. The form leaves room for it at the end. */
+@media (max-width: 520px) {
+  dialog.fc-composer-dialog[open] .fc-composer-footer.eg-cmp-footer {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+  }
+  dialog.fc-composer-dialog[open] .fc-composer-form.eg-cmp { padding-bottom: 132px; }
+}
