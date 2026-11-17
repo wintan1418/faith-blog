@@ -146,6 +146,9 @@ html .eg-pills .eg-pill.is-active { background: var(--fc-fill); color: var(--fc-
 }
 .eg-search { position: relative; display: none; }
 @media (min-width: 1560px) { .eg-search { display: block; } }
+/* With the full search box the bar needs more room, or the pills slide under it. */
+@media (min-width: 1560px) { html nav.eg-topbar .eg-topbar-inner { max-width: 1400px; } }
+.eg-pills { flex: 0 0 auto; }
 .eg-search-ico {
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
   width: 20px; height: 20px; color: var(--fc-muted); pointer-events: none;
