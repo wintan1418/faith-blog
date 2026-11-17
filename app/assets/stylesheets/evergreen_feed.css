@@ -870,16 +870,16 @@ html .eg-golden .fc-golden-dot.is-active { background: var(--fc-gold-fill); }
 
 /* ── Feed extras: pinned label, banners ───────────────────────────────── */
 html .eg-feed .fc-pinned-strip {
-  margin: 0;
+  margin: 18px 0 0;
   padding: 0;
   border: 0;
   border-image: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 html .eg-feed .fc-pinned-label {
-  margin: 0 4px;
+  margin: 0 6px;
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: none;
   color: var(--fc-muted) !important;
