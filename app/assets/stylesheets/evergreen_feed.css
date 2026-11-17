@@ -317,8 +317,16 @@ html.theme-dark .eg-menu .fc-dropdown-danger { color: #ff8a80 !important; }
   html .eg-breathe.fc-compose-btn { display: none; }
   html .eg-menu.fc-dropdown-menu { position: fixed; top: 62px; right: 8px; max-height: calc(100vh - 150px); }
 }
+/* Small phones keep the wordmark: tighter buttons instead of a bare mark. */
 @media (max-width: 370px) {
-  .eg-brand-word { display: none; }
+  html nav.eg-topbar .eg-topbar-inner { padding: 0 8px 0 10px; gap: 4px; }
+  .eg-brand { gap: 6px; }
+  .eg-brand-word { font-size: 18px; }
+  .eg-brand-mark { width: 28px; height: 28px; }
+  .eg-brand-mark svg { width: 18px; height: 18px; }
+  .eg-actions-bar.fc-topbar-actions { gap: 4px; }
+  html .eg-round, html .eg-me { width: 36px; height: 36px; }
+  .eg-me-img { width: 32px; height: 32px; }
 }
 
 /* ── Phone bottom nav ─────────────────────────────────────────────────── */
