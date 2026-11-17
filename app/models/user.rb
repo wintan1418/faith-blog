@@ -132,6 +132,17 @@ class User < ApplicationRecord
     user
   end
 
+  # People this user has blocked, or who blocked them (a MessageBlock either
+  # way): their breaths, reposts and comments are hidden from each other.
+  def blocked_user_ids
+    @blocked_user_ids ||= MessageBlock.where(blocker_id: id).pluck(:blocked_id) |
+                          MessageBlock.where(blocked_id: id).pluck(:blocker_id)
+  end
+
+  def blocking?(other)
+    other && MessageBlock.exists?(blocker_id: id, blocked_id: other.id)
+  end
+
   def admin_or_moderator?
     super_admin? || admin? || moderator?
   end

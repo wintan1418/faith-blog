@@ -1,0 +1,19 @@
+<%# Block / Unblock a member (hides each other's breaths, comments and
+    messages). Local: user, classes (optional) %>
+<% if user_signed_in? && user != current_user %>
+  <% css = local_assigns.fetch(:classes, "fc-action text-[var(--fc-muted)] hover:text-red-600") %>
+  <% if current_user.blocking?(user) %>
+    <%= button_to message_block_path(user), method: :delete, class: css, form_class: "contents",
+        data: { turbo_frame: "_top" }, title: "Unblock #{user.display_name}" do %>
+      <%= render_icon("x", classes: "h-4 w-4") %>
+      <span class="fc-action-label">Unblock</span>
+    <% end %>
+  <% else %>
+    <%= button_to message_blocks_path(user_id: user.id), method: :post, class: css, form_class: "contents",
+        data: { turbo_frame: "_top", turbo_confirm: "Block #{user.display_name}? You won't see each other's breaths, comments or messages." },
+        title: "Block #{user.display_name}" do %>
+      <%= render_icon("x", classes: "h-4 w-4") %>
+      <span class="fc-action-label">Block <%= user.display_name %></span>
+    <% end %>
+  <% end %>
+<% end %>
