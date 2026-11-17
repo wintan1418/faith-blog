@@ -4,5 +4,5 @@
      data-onboarding-key-value="fc:<%= android_update_card_key %>">
   <span><strong>Update available.</strong> Brethreign <%= android_latest_version %> is out, and you have <%= android_app_version %>. Update for the newest features and fixes.</span>
   <%= link_to "Update", android_store_url, class: "fc-btn-primary fc-app-update__action" %>
-  <button type="button" class="fc-app-update__close" data-action="click->onboarding#dismiss" aria-label="Not now">×</button>
+  <button type="button" class="fc-app-update__close" data-action="click->onboarding#dismiss" aria-label="Not now"><%= render_icon("x", classes: "h-4 w-4") %></button>
 </div>

@@ -33,7 +33,7 @@ export default class extends Controller {
     if (this.hasSubTarget) {
       this.subTarget.textContent = count > 0
         ? `${count} new update${count === 1 ? "" : "s"} waiting for you.`
-        : "You're all caught up. 🕊️"
+        : "You're all caught up."
     }
     if (count === 0 && this.hasMarkAllTarget) this.markAllTarget.style.display = "none"
 

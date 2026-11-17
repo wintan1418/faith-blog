@@ -20,13 +20,13 @@
                 class="fc-btn fc-btn-primary"
                 data-pwa-target="enableBtn"
                 data-action="click->pwa#enablePush">
-          🔕 Turn on push
+          <%= render_icon("belloff", classes: "h-4 w-4") %><span>Turn on push</span>
         </button>
         <button type="button"
                 class="fc-btn hidden"
                 data-pwa-target="installBtn"
                 data-action="click->pwa#installApp">
-          📲 Install Brethreign as an app
+          <%= render_icon("download", classes: "h-4 w-4") %><span>Install Brethreign as an app</span>
         </button>
         <button type="button"
                 class="fc-btn"

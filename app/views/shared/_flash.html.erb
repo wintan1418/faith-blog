@@ -4,14 +4,14 @@
       <div class="fc-toast is-success" role="status" data-flash-target="message">
         <span class="fc-toast-dot" aria-hidden="true"></span>
         <span class="fc-toast-text"><%= notice %></span>
-        <button type="button" class="fc-toast-close" data-action="click->flash#dismiss" aria-label="Dismiss">×</button>
+        <button type="button" class="fc-toast-close" data-action="click->flash#dismiss" aria-label="Dismiss"><%= render_icon("x", classes: "h-4 w-4") %></button>
       </div>
     <% end %>
     <% if alert %>
       <div class="fc-toast is-error" role="alert" data-flash-target="message">
         <span class="fc-toast-dot" aria-hidden="true"></span>
         <span class="fc-toast-text"><%= alert %></span>
-        <button type="button" class="fc-toast-close" data-action="click->flash#dismiss" aria-label="Dismiss">×</button>
+        <button type="button" class="fc-toast-close" data-action="click->flash#dismiss" aria-label="Dismiss"><%= render_icon("x", classes: "h-4 w-4") %></button>
       </div>
     <% end %>
   </div>

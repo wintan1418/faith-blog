@@ -10,7 +10,7 @@
     <div class="bys-row">
       <% if nudge %>
         <div class="bys-card bys-card--nudge">
-          <div class="bys-nudge-icon" aria-hidden="true">⛪</div>
+          <div class="bys-nudge-icon" aria-hidden="true"><%= render_icon("church", classes: "h-6 w-6") %></div>
           <p class="bys-name">Help brethren find you</p>
           <p class="bys-reason">Add your assembly and what you do, and we'll suggest people from your church and your field.</p>
           <%= link_to "Add details", edit_settings_professional_path, class: "bys-connect" %>

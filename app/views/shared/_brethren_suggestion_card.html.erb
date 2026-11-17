@@ -3,7 +3,7 @@
 <div class="bys-card" id="<%= dom_id(person, :suggestion) %>" style="<%= AccentPalette.css_vars(person.accent_color) %>">
   <span class="bys-cover" aria-hidden="true"></span>
   <%= button_to suggestion_dismissals_path(user_id: person.id), method: :post, class: "bys-dismiss",
-                form: { class: "bys-dismiss-form" }, aria: { label: "Not interested in #{person.display_name}" } do %>×<% end %>
+                form: { class: "bys-dismiss-form" }, aria: { label: "Not interested in #{person.display_name}" } do %><%= render_icon("x", classes: "h-4 w-4") %><% end %>
   <%= link_to user_path(person.username), class: "bys-who" do %>
     <% if person.profile&.avatar&.attached? %>
       <%= image_tag avatar_src(person.profile, 160), class: "bys-avatar #{open_to_ring_class(person)}", alt: "" %>
@@ -26,8 +26,8 @@
             <% end %>
           <% end %>
         </span>
-      <% elsif (icon = { assembly: "⛪", organization: "💼", profession: "💼", skill: "✦", city: "📍", room: "💬" }[s.kind]) %>
-        <span class="bys-reason-icon" aria-hidden="true"><%= icon %></span>
+      <% elsif (icon = { assembly: "church", organization: "briefcase", profession: "briefcase", skill: "badgecheck", city: "mappin", room: "users" }[s.kind]) %>
+        <span class="bys-reason-icon" aria-hidden="true"><%= render_icon(icon, classes: "h-3.5 w-3.5") %></span>
       <% end %>
       <%# With faces showing, "2 mutual" says enough; the full reason stays as a tooltip. %>
       <span class="bys-reason-text" title="<%= s.reason %>"><%= s.mutuals.present? ? "#{s.reason[/\A\d+/]} mutual" : s.reason %></span>

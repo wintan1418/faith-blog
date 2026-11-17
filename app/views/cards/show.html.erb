@@ -52,10 +52,10 @@
     </div>
 
     <div class="card-actions" data-controller="card-share" data-card-share-url-value="<%= @card_url %>" data-card-share-title-value="<%= "#{name} on Brethreign" %>">
-      <button type="button" class="card-act card-act--primary" data-action="card-share#share"><span aria-hidden="true">↗</span>Share</button>
-      <%= link_to card_path(m.username, format: :vcf), class: "card-act", data: { turbo: false } do %><span aria-hidden="true">👤</span>Save contact<% end %>
-      <%= link_to "https://wa.me/?text=#{ERB::Util.url_encode("#{name} on Brethreign: #{@card_url}")}", class: "card-act", target: "_blank", rel: "noopener" do %><span aria-hidden="true">💬</span>WhatsApp<% end %>
-      <button type="button" class="card-act" data-action="card-share#copy"><span aria-hidden="true">🔗</span>Copy link</button>
+      <button type="button" class="card-act card-act--primary" data-action="card-share#share"><span aria-hidden="true"><%= render_icon("send", classes: "h-5 w-5") %></span>Share</button>
+      <%= link_to card_path(m.username, format: :vcf), class: "card-act", data: { turbo: false } do %><span aria-hidden="true"><%= render_icon("userplus", classes: "h-5 w-5") %></span>Save contact<% end %>
+      <%= link_to "https://wa.me/?text=#{ERB::Util.url_encode("#{name} on Brethreign: #{@card_url}")}", class: "card-act", target: "_blank", rel: "noopener" do %><span aria-hidden="true"><%= render_icon("chat", classes: "h-5 w-5") %></span>WhatsApp<% end %>
+      <button type="button" class="card-act" data-action="card-share#copy"><span aria-hidden="true"><%= render_icon("link", classes: "h-5 w-5") %></span>Copy link</button>
     </div>
     <p class="card-link"><%= @card_url.sub(%r{\Ahttps?://}, "") %></p>
 

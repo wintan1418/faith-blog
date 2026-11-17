@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { copyText } from "../copy_text"
+import { iconSvg, iconLabel } from "../helpers/ui_icons"
 
 // Bible drawer: browse books → chapters → verses, or run a natural-language
 // search and tap a result to open the chapter. KJV via /scripture/lookup and
@@ -237,7 +238,7 @@ export default class extends Controller {
                     data-action="click->bible-drawer#copyVerse"
                     data-copy-text="${this.escape(verseClip)}"
                     title="Copy verse"
-                    aria-label="Copy verse">⎘</button>
+                    aria-label="Copy verse">${iconSvg("copy", "h-4 w-4")}</button>
           </p>
         `
       }).join("")
@@ -260,13 +261,13 @@ export default class extends Controller {
                 data-action="click->bible-drawer#copyVerse"
                 data-copy-text="${this.escape(passageClip)}"
                 title="Copy passage">
-          ⎘ Copy passage
+          ${iconLabel("copy", "Copy passage")}
         </button>
         <button type="button"
                 class="fc-bible-share-btn"
                 data-action="click->bible-drawer#shareVerse"
                 data-share-text="${this.escape(passageClip)}">
-          ✦ Share as a breath
+          ${iconLabel("sparkles", "Share as a breath")}
         </button>
       </div>
       <div class="fc-bible-read-body">${bodyHtml}</div>
@@ -284,7 +285,7 @@ export default class extends Controller {
     const original = btn.dataset.originalHtml || (btn.dataset.originalHtml = btn.innerHTML)
     const ok = await copyText(text)
     btn.classList.toggle("is-copied", ok)
-    btn.innerHTML = ok ? (inline ? "✓" : "✓ Copied") : (inline ? "✗" : "✗ Couldn't copy")
+    btn.innerHTML = ok ? (inline ? iconSvg("check") : iconLabel("check", "Copied")) : (inline ? iconSvg("x") : iconLabel("x", "Couldn't copy"))
     setTimeout(() => {
       btn.classList.remove("is-copied")
       btn.innerHTML = original

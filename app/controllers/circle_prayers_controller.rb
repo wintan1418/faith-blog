@@ -8,7 +8,7 @@ class CirclePrayersController < ApplicationController
   def create
     prayer = @circle.prayers.build(prayer_params.merge(user: current_user))
     if prayer.save
-      redirect_to circle_path(@circle), notice: "Added to the prayer list. The circle has been told. 🙏"
+      redirect_to circle_path(@circle), notice: "Added to the prayer list. The circle has been told."
     else
       redirect_to circle_path(@circle), alert: prayer.errors.full_messages.to_sentence
     end
@@ -40,7 +40,7 @@ class CirclePrayersController < ApplicationController
     end
 
     @prayer.mark_answered!(by: current_user)
-    redirect_to circle_path(@circle), notice: "Marked answered — the circle rejoices with you. 🌟"
+    redirect_to circle_path(@circle), notice: "Marked answered — the circle rejoices with you."
   end
 
   private

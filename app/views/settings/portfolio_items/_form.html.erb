@@ -14,7 +14,7 @@
   <div class="grid gap-5 sm:grid-cols-2">
     <div>
       <%= f.label :category, "Kind of work", class: "label" %>
-      <%= f.select :category, PortfolioItem::CATEGORIES.map { |name, emoji| [ "#{emoji} #{name}", name ] }, { include_blank: "Choose…" }, class: "input" %>
+      <%= f.select :category, PortfolioItem::CATEGORIES.keys.map { |name| [ name, name ] }, { include_blank: "Choose…" }, class: "input" %>
     </div>
     <div>
       <%= f.label :contribution, "Your part", class: "label" %>
@@ -61,7 +61,7 @@
   <div class="pf-form-media">
     <p class="label">PDF (optional)</p>
     <% if item.persisted? && item.document.attached? %>
-      <p class="text-sm">📕 <%= item.document.filename %>
+      <p class="text-sm inline-flex items-center gap-1.5"><%= render_icon("filetext", classes: "h-4 w-4") %> <%= item.document.filename %>
         <label class="ml-3 text-sm"><%= check_box_tag "portfolio_item[remove_document]", "1", false %> Remove</label></p>
     <% end %>
     <%= f.file_field :document, accept: ".pdf,application/pdf", class: "input" %>

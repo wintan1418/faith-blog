@@ -32,7 +32,7 @@
             <% if item.cover %>
               <%= image_tag resized_image_src(item.cover, width: 640, height: 480, crop: "fill", gravity: "auto"), alt: "", loading: "lazy" %>
             <% else %>
-              <span class="pf-cover-blank" aria-hidden="true"><%= item.emoji %></span>
+              <span class="pf-cover-blank" aria-hidden="true"><%= render_icon(item.icon, classes: "h-9 w-9") %></span>
             <% end %>
             <% if item.images.attachments.size > 1 %><span class="pf-count"><%= item.images.attachments.size %> photos</span><% end %>
             <% if item.hidden? %><span class="pf-hidden">Hidden by moderation</span><% end %>
@@ -40,7 +40,7 @@
           <span class="pf-card-body">
             <span class="pf-title"><%= item.title %></span>
             <% if item.summary.present? %><span class="pf-summary"><%= item.summary %></span><% end %>
-            <span class="pf-meta"><%= [ (item.category.present? ? "#{item.emoji} #{item.category}" : nil), item.completed_on&.year ].compact.join(" · ") %></span>
+            <span class="pf-meta"><% if item.category.present? %><%= render_icon(item.icon, classes: "h-3.5 w-3.5") %> <% end %><%= [ item.category.presence, item.completed_on&.year ].compact.join(" · ") %></span>
           </span>
         <% end %>
       <% end %>

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { iconSvg, iconLabel } from "../helpers/ui_icons"
 
 // Mounted on <body> for signed-in users. Responsibilities:
 //   1. Register /service-worker.js so the app installs as a PWA.
@@ -99,8 +100,8 @@ export default class extends Controller {
   reflectPushState(state) {
     if (!this.hasEnableBtnTarget) return
     this.enableBtnTarget.dataset.pushState = state
-    const labels = { on: "Notifications on", off: "Turn on push", blocked: "Blocked in browser" }
-    this.enableBtnTarget.textContent = labels[state]
+    const labels = { on: ["bell", "Notifications on"], off: ["belloff", "Turn on push"], blocked: ["ban", "Blocked in browser"] }
+    this.enableBtnTarget.innerHTML = iconLabel(...labels[state])
   }
 
   headers() {

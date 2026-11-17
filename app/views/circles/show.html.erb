@@ -2,11 +2,11 @@
 
 <div class="mystic-shell circle-room">
   <div class="mystic-container max-w-5xl py-8">
-    <%= link_to "← All circles", circles_path, class: "circle-back" %>
+    <%= link_to circles_path, class: "circle-back" do %><%= render_icon("chevronleft", classes: "h-4 w-4") %> All circles<% end %>
 
     <header class="circle-head-panel">
       <div class="circle-head-main">
-        <h1 class="circle-room-title">🕯️ <%= @circle.name %></h1>
+        <h1 class="circle-room-title"><span class="eg-tile"><%= render_icon("flame", classes: "h-5 w-5") %></span><%= @circle.name %></h1>
         <% if @circle.description.present? %>
           <p class="circle-room-desc"><%= @circle.description %></p>
         <% end %>
@@ -64,8 +64,8 @@
                     <span class="circle-breath-name"><%= breath.user.display_name.presence || breath.user.username %></span>
                     <span class="circle-breath-time"><%= time_ago_in_words(breath.created_at) %> ago</span>
                     <% if breath.user_id == current_user.id || @circle.owned_by?(current_user) %>
-                      <%= button_to "×", circle_breath_path(@circle, breath), method: :delete, form_class: "inline ml-auto", class: "circle-x", aria: { label: "Remove breath" },
-                            data: { turbo_confirm: "Remove this breath?" } %>
+                      <%= button_to circle_breath_path(@circle, breath), method: :delete, form_class: "inline ml-auto", class: "circle-x", aria: { label: "Remove breath" },
+                            data: { turbo_confirm: "Remove this breath?" } do %><%= render_icon("x", classes: "h-4 w-4") %><% end %>
                     <% end %>
                   </header>
                   <div class="circle-breath-text"><%= simple_format(breath.body) %></div>
@@ -79,7 +79,7 @@
       </section>
 
       <aside class="circle-prayer-list">
-        <h2 class="circle-section-title">🙏 Prayer list</h2>
+        <h2 class="circle-section-title"><%= render_icon("pray", classes: "h-5 w-5") %> Prayer list</h2>
 
         <%= form_with url: circle_prayers_path(@circle), scope: :circle_prayer, class: "circle-prayer-form" do |f| %>
           <%= f.text_field :title, placeholder: "What shall we carry?", maxlength: 160, required: true, class: "circle-input" %>
@@ -94,8 +94,8 @@
                 <header class="circle-prayer-head">
                   <h3 class="circle-prayer-title"><%= prayer.title %></h3>
                   <% if prayer.user_id == current_user.id || @circle.owned_by?(current_user) %>
-                    <%= button_to "×", circle_prayer_path(@circle, prayer), method: :delete, form_class: "inline", class: "circle-x", aria: { label: "Remove prayer" },
-                          data: { turbo_confirm: "Remove this prayer from the list?" } %>
+                    <%= button_to circle_prayer_path(@circle, prayer), method: :delete, form_class: "inline", class: "circle-x", aria: { label: "Remove prayer" },
+                          data: { turbo_confirm: "Remove this prayer from the list?" } do %><%= render_icon("x", classes: "h-4 w-4") %><% end %>
                   <% end %>
                 </header>
                 <% if prayer.details.present? %>
@@ -106,11 +106,11 @@
                   <% prayed = prayer.prayed_by?(current_user) %>
                   <%= button_to amen_circle_prayer_path(@circle, prayer), method: :post, form_class: "inline",
                         class: "circle-amen#{' is-prayed' if prayed}" do %>
-                    🙏 <%= prayed ? "Prayed" : "I prayed" %><% if prayer.amens_count.positive? %> · <%= prayer.amens_count %><% end %>
+                    <%= render_icon("pray", classes: "h-4 w-4") %> <%= prayed ? "Prayed" : "I prayed" %><% if prayer.amens_count.positive? %> · <%= prayer.amens_count %><% end %>
                   <% end %>
                   <% if prayer.user_id == current_user.id || @circle.owned_by?(current_user) %>
-                    <%= button_to "🌟 Answered", answered_circle_prayer_path(@circle, prayer), method: :post, form_class: "inline", class: "circle-answered-btn",
-                          data: { turbo_confirm: "Mark “#{prayer.title}” answered? The circle will be told." } %>
+                    <%= button_to answered_circle_prayer_path(@circle, prayer), method: :post, form_class: "inline", class: "circle-answered-btn",
+                          data: { turbo_confirm: "Mark “#{prayer.title}” answered? The circle will be told." } do %><%= render_icon("answered", classes: "h-4 w-4") %> Answered<% end %>
                   <% end %>
                 </div>
               </article>
@@ -121,7 +121,7 @@
         <% end %>
 
         <% if @answered_prayers.any? %>
-          <h3 class="circle-answered-heading">🌟 Answered</h3>
+          <h3 class="circle-answered-heading"><%= render_icon("answered", classes: "h-4 w-4") %> Answered</h3>
           <ul class="circle-answered-list">
             <% @answered_prayers.each do |prayer| %>
               <li>

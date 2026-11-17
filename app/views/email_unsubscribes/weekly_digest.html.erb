@@ -2,15 +2,15 @@
 <div class="fc-offline">
   <div class="fc-offline-card">
     <% if @result == :ok %>
-      <div class="fc-offline-icon">📭</div>
+      <div class="fc-offline-icon"><%= render_icon("inbox", classes: "h-8 w-8") %></div>
       <h1>Unsubscribed.</h1>
       <p>We won't send <strong><%= @user.email %></strong> the weekly Brethreign digest anymore. You can re-enable email anytime in <a href="/settings/notifications/edit">notification settings</a>.</p>
     <% elsif @result == :missing %>
-      <div class="fc-offline-icon">🤔</div>
+      <div class="fc-offline-icon"><%= render_icon("usersearch", classes: "h-8 w-8") %></div>
       <h1>Account not found.</h1>
       <p>That link points to an account we can't find. If you still want to unsubscribe, log in and toggle email notifications off in settings.</p>
     <% else %>
-      <div class="fc-offline-icon">🔗</div>
+      <div class="fc-offline-icon"><%= render_icon("link", classes: "h-8 w-8") %></div>
       <h1>Link expired.</h1>
       <p>This unsubscribe link is invalid or expired. Open the most recent digest and try again, or sign in and adjust settings directly.</p>
     <% end %>
