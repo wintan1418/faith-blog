@@ -69,4 +69,28 @@ class NativeAppleSessionsTest < ActionDispatch::IntegrationTest
     get new_user_session_path
     assert_select "a.apple-auth-button", count: 0
   end
+
+  test "keeps Apple's refresh token, and deleting the account revokes it" do
+    with_apple_keys do
+      AppleSignInTokens.stub(:exchange, ->(code) { code == "one-time" ? "r.refresh" : nil }) do
+        post native_apple_sign_in_path, params: { identity_token: token, authorization_code: "one-time" }, as: :json
+      end
+    end
+    user = User.find_by(provider: "apple", uid: "001234.abc")
+    assert_equal "r.refresh", user.apple_refresh_token
+
+    assert_enqueued_with(job: AppleTokenRevokeJob, args: [ "r.refresh" ]) do
+      delete settings_account_path, params: { confirm_username: user.username }
+    end
+    assert_not User.exists?(user.id)
+  end
+
+  test "sign-in still works when Apple won't swap the code" do
+    with_apple_keys do
+      AppleSignInTokens.stub(:exchange, ->(_) { raise AppleSignInTokens::Error, "invalid_grant" }) do
+        post native_apple_sign_in_path, params: { identity_token: token, authorization_code: "bad" }, as: :json
+      end
+    end
+    assert_response :success
+  end
 end

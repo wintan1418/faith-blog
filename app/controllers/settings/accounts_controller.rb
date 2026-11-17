@@ -30,6 +30,8 @@ class Settings::AccountsController < ApplicationController
     end
 
     user = current_user
+    # Disconnect from their Apple ID too (Apple requires it for Sign in with Apple).
+    AppleTokenRevokeJob.perform_later(user.apple_refresh_token) if user.apple_refresh_token.present?
     user.destroy!
     sign_out(user)
     redirect_to root_path, status: :see_other,

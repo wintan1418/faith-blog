@@ -25,6 +25,7 @@ class Users::NativeAppleSessionsController < ApplicationController
       return refuse(I18n.t("devise.failure.#{user.inactive_message}", default: "This account can't sign in."), :forbidden)
     end
 
+    remember_apple_token(user)
     sign_in(user, event: :authentication)
     render json: { location: after_sign_in_path_for(user) }
   rescue AppleIdentityToken::Invalid, ActionController::ParameterMissing
@@ -38,6 +39,15 @@ class Users::NativeAppleSessionsController < ApplicationController
   def refuse(message, status)
     flash[:alert] = message
     render json: { location: new_user_session_path, error: message }, status: status
+  end
+
+  # Keep Apple's refresh token so deleting the account can revoke it. Never
+  # blocks sign-in: Apple being slow or saying no just skips it.
+  def remember_apple_token(user)
+    token = AppleSignInTokens.exchange(params[:authorization_code])
+    user.update_column(:apple_refresh_token, token) if token
+  rescue AppleSignInTokens::Error, Net::OpenTimeout, Net::ReadTimeout => e
+    Rails.logger.warn("Sign in with Apple token exchange failed: #{e.message}")
   end
 
   def verified?(claims)
