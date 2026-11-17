@@ -22,6 +22,9 @@ class ApnsKeyTest < ActiveSupport::TestCase
     assert_reads %("#{PEM.gsub("\n", "\\n")}"), "in quotes"
     assert_reads PEM.gsub("\n", "\r\n"), "with Windows line breaks"
     assert_reads Base64.strict_encode64(PEM), "base64-encoded"
+    body = PEM.lines[1..-2].join
+    assert_reads body, "without the BEGIN/END lines"
+    assert_reads "n" + body.gsub("\n", "\\n").chomp("\\n"), "without BEGIN/END, with a stray n (as found on the server)"
   end
 
   test "an empty or broken key isn't readable" do
