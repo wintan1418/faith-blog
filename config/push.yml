@@ -3,11 +3,11 @@
 # Each platform stays switched off until its variables are set; see NativePushConfig.
 shared:
   apple:
-    key_id: <%= ENV["APNS_KEY_ID"] %>
+    key_id: <%= ENV["APNS_KEY_ID"].to_s.strip.delete('"') %>
     # Contents of the AuthKey_XXXXXX.p8 file from developer.apple.com (Keys).
     encryption_key: <%= ApnsKey.pem.dump %>
-    team_id: <%= ENV["APNS_TEAM_ID"] %>
-    topic: <%= ENV.fetch("APNS_TOPIC", "com.brethreign.app") %>
+    team_id: <%= ENV["APNS_TEAM_ID"].to_s.strip.delete('"') %>
+    topic: <%= ENV.fetch("APNS_TOPIC", "com.brethreign.app").strip %>
     # Builds run from Xcode get development tokens; TestFlight/App Store get production ones.
     connect_to_development_server: <%= ENV["APNS_DEVELOPMENT"] == "1" %>
 
