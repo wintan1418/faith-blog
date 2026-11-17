@@ -1,12 +1,18 @@
 <% ref = message.scripture_ref %>
 <% verse = (ScriptureLookup.lookup(ref) rescue nil) %>
-<div class="dm-scripture-card">
+<%# A shared verse: gold band on top, the words in serif, the reference below. %>
+<figure class="dm-scripture-card">
   <div class="dm-scripture-head">
-    <%= render_icon("book_open", classes: "h-4 w-4") %>
-    <span class="dm-scripture-ref"><%= verse&.dig(:reference).presence || ref %></span>
+    <%= render_icon("book_open", classes: "h-3.5 w-3.5") %>
+    <span>Shared a verse</span>
   </div>
   <% if verse && verse[:text].present? %>
-    <p class="dm-scripture-text"><%= verse[:text] %></p>
-    <div class="dm-scripture-tr"><%= verse[:translation].presence || "KJV" %></div>
+    <blockquote class="dm-scripture-text"><%= verse[:text] %></blockquote>
   <% end %>
-</div>
+  <figcaption class="dm-scripture-foot">
+    <span class="dm-scripture-ref"><%= verse&.dig(:reference).presence || ref %></span>
+    <% if verse && verse[:text].present? %>
+      <span class="dm-scripture-tr"><%= verse[:translation].presence || "KJV" %></span>
+    <% end %>
+  </figcaption>
+</figure>

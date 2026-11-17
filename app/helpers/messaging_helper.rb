@@ -51,14 +51,41 @@ module MessagingHelper
     "#{ext} · #{number_to_human_size(attachment.byte_size)}"
   end
 
-  def document_icon(attachment)
+  # The coloured tile behind a document's file icon: "pdf", "doc", "sheet", "slides", "book" or "file".
+  def document_kind(attachment)
     case File.extname(attachment.filename.to_s).downcase
-    when ".pdf" then "📕"
-    when ".doc", ".docx", ".odt", ".rtf" then "📘"
-    when ".xls", ".xlsx", ".ods", ".csv" then "📗"
-    when ".ppt", ".pptx", ".odp" then "📙"
-    when ".epub" then "📚"
-    else "📄"
+    when ".pdf" then "pdf"
+    when ".doc", ".docx", ".odt", ".rtf" then "doc"
+    when ".xls", ".xlsx", ".ods", ".csv" then "sheet"
+    when ".ppt", ".pptx", ".odp" then "slides"
+    when ".epub" then "book"
+    else "file"
+    end
+  end
+
+  # Icon shown before an inbox row's preview for media-only messages (nil for text).
+  def conversation_preview_icon(message)
+    return unless message
+    return if message.respond_to?(:removed?) && message.removed?
+    return if message.body.present?
+
+    if message.respond_to?(:has_voice_note?) && message.has_voice_note? then "mic"
+    elsif message.respond_to?(:has_images?) && message.has_images? then "image"
+    elsif message.respond_to?(:has_documents?) && message.has_documents? then "file"
+    elsif message.respond_to?(:has_scripture?) && message.has_scripture? then "bookopen"
+    end
+  end
+
+  # Bar heights (px) for a voice note's waveform-style progress bar. It is a
+  # pattern, not the recording's real loudness: varied per message so notes
+  # don't all look identical, and the same every time the message is drawn.
+  VOICE_BARS = 28
+
+  def voice_wave_bars(message)
+    seed = message.id.to_i
+    Array.new(VOICE_BARS) do |i|
+      wobble = Math.sin((i + 1) * 0.9 + seed) * 0.5 + Math.sin((i + 1) * 0.37 + seed * 1.7) * 0.5
+      (6 + ((wobble + 1) / 2.0) * 18).round
     end
   end
 

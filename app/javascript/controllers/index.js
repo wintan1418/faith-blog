@@ -185,6 +185,9 @@ application.register("voice-recorder", VoiceRecorderController)
 import TypingController from "./typing_controller"
 application.register("typing", TypingController)
 
+import InboxTypingController from "./inbox_typing_controller"
+application.register("inbox-typing", InboxTypingController)
+
 import ListFilterController from "./list_filter_controller"
 application.register("list-filter", ListFilterController)
 
