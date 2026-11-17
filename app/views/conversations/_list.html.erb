@@ -1,29 +1,45 @@
-<%# Left pane on computers, the whole screen on phones (LinkedIn "Messaging"). %>
+<%# Left pane on computers, the whole screen on phones. %>
 <% filter = local_assigns.fetch(:filter, "all") %>
 <% active = local_assigns[:active] %>
+<%# "Active now": people you already chat with who are online and share their status. %>
+<% active_now = conversations.filter_map { |c| (u = c.other_participant_for(current_user)) && u.visible_online? ? [ u, c ] : nil }.uniq { |u, _| u.id }.first(8) %>
 
 <aside class="msg-list" aria-label="Conversations">
   <header class="msg-list-head">
-    <h1 class="msg-list-title">Messaging</h1>
-    <%= link_to new_conversation_path, class: "msg-icon-btn", title: "New message", aria: { label: "New message" } do %>
+    <h1 class="msg-list-title">Messages</h1>
+    <%= link_to new_conversation_path, class: "msg-new-btn", title: "New message", aria: { label: "New message" } do %>
       <%= render_icon("compose", classes: "h-5 w-5") %>
     <% end %>
   </header>
 
   <div class="msg-search-row">
     <%= form_with url: inbox_search_path, method: :get, class: "msg-search", role: "search" do %>
-      <%= render_icon("search", classes: "h-4 w-4") %>
+      <%= render_icon("search", classes: "h-5 w-5") %>
       <input type="search" name="q" placeholder="Search messages" aria-label="Search messages" value="<%= local_assigns[:query] %>">
     <% end %>
     <%# In the app the title row is hidden (the native bar shows "Messaging"), so New message sits here. %>
-    <%= link_to new_conversation_path, class: "msg-icon-btn msg-compose-inline", title: "New message", aria: { label: "New message" } do %>
+    <%= link_to new_conversation_path, class: "msg-new-btn msg-compose-inline", title: "New message", aria: { label: "New message" } do %>
       <%= render_icon("compose", classes: "h-5 w-5") %>
     <% end %>
   </div>
 
+  <% if active_now.any? %>
+    <section class="msg-active" aria-labelledby="msg_active_label">
+      <p class="msg-active-label" id="msg_active_label">Active now</p>
+      <div class="msg-active-row">
+        <% active_now.each do |person, chat| %>
+          <%= link_to conversation_path(chat), class: "msg-active-person", aria: { label: "#{person.display_name}, active now" } do %>
+            <%= render "conversations/avatar", user: person, size: "h-12 w-12", online: true %>
+            <span class="msg-active-name" aria-hidden="true"><%= person.display_name.split.first %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
   <nav class="msg-filters" aria-label="Filter conversations">
-    <%= link_to "All", conversations_path, class: "msg-filter#{' is-active' if filter == 'all'}" %>
-    <%= link_to conversations_path(filter: "unread"), class: "msg-filter#{' is-active' if filter == 'unread'}" do %>
+    <%= link_to "All", conversations_path, class: "msg-filter#{' is-active' if filter == 'all'}", aria: { current: (filter == "all" ? "page" : nil) } %>
+    <%= link_to conversations_path(filter: "unread"), class: "msg-filter#{' is-active' if filter == 'unread'}", aria: { current: (filter == "unread" ? "page" : nil) } do %>
       Unread<% if local_assigns[:unread_total].to_i.positive? %> <span class="msg-filter-count"><%= unread_total %></span><% end %>
     <% end %>
   </nav>
@@ -42,12 +58,13 @@
       <% end %>
     <% elsif filter == "unread" %>
       <div class="msg-empty" id="msg_rows_empty">
+        <span class="msg-empty-icon"><%= render_icon("checkcheck", classes: "h-7 w-7") %></span>
         <p class="msg-empty-title">You're all caught up</p>
         <p class="msg-empty-text">No unread messages.</p>
       </div>
     <% else %>
       <div class="msg-empty" id="msg_rows_empty">
-        <span class="msg-empty-icon"><%= render_icon("mail", classes: "h-7 w-7") %></span>
+        <span class="msg-empty-icon"><%= render_icon("chat", classes: "h-7 w-7") %></span>
         <p class="msg-empty-title">No messages yet</p>
         <p class="msg-empty-text">Reach out to a brother or sister: encourage them, pray with them, or just say hello.</p>
         <%= link_to "Write a message", new_conversation_path, class: "msg-btn msg-btn-primary" %>

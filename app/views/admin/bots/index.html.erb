@@ -20,7 +20,7 @@
         <p class="fc-cms-meta">
           <%= @live_counts[s.id].to_i %> live ·
           <%= s.last_fetched_at ? "read #{time_ago_in_words(s.last_fetched_at)} ago" : "not read yet" %>
-          <% if s.last_error.present? %> · <span class="text-red-500">⚠ <%= s.last_error %></span><% end %>
+          <% if s.last_error.present? %> · <span class="admin-inline-alert"><%= render_icon("alerttriangle", classes: "h-4 w-4") %> <%= s.last_error %></span><% end %>
         </p>
       </div>
       <div class="fc-cms-actions">

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { icon } from "../helpers/game_icons"
 
 // Gamified Bible quiz controller. State machine:
 //   modeSelect → loading → question (×N) → result
@@ -114,7 +115,7 @@ export default class extends Controller {
     const scoreEl = this.stageTarget.querySelector(".fc-quiz-hud-score")
     const streakEl = this.stageTarget.querySelector(".fc-quiz-hud-streak")
     if (scoreEl)  scoreEl.textContent  = this.score
-    if (streakEl) streakEl.textContent = `🔥 ${this.streak}`
+    if (streakEl) streakEl.innerHTML = `${icon("flame")}${this.streak}`
 
     // Show explanation + next button
     const expl = this.stageTarget.querySelector(".fc-quiz-explanation")
@@ -122,7 +123,7 @@ export default class extends Controller {
       expl.classList.remove("hidden")
       expl.innerHTML = `
         <p class="fc-quiz-verdict ${correct ? "is-right" : "is-miss"}">
-          ${correct ? "✓ Right." : "✗ The answer is " + this.escape(q.choices[q.correct_index]) + "."}
+          ${correct ? `${icon("check")} Right.` : `${icon("x")} The answer is ${this.escape(q.choices[q.correct_index])}.`}
         </p>
         ${q.reference ? `<p class="fc-quiz-ref">${this.escape(q.reference)}</p>` : ""}
         ${q.explanation ? `<p class="fc-quiz-note">${this.escape(q.explanation)}</p>` : ""}
@@ -136,7 +137,7 @@ export default class extends Controller {
   flashCombo(streak) {
     const burst = document.createElement("div")
     burst.className = "fc-quiz-combo"
-    burst.textContent = streak >= 5 ? `🔥 ${streak} ON FIRE` : `🔥 ${streak} in a row`
+    burst.innerHTML = `${icon("flame")}${streak >= 5 ? `${streak} on fire` : `${streak} in a row`}`
     this.stageTarget.appendChild(burst)
     setTimeout(() => burst.remove(), 1100)
   }
@@ -193,7 +194,7 @@ export default class extends Controller {
           </div>
           <div class="fc-quiz-hud-right">
             <span class="fc-quiz-hud-score">${this.score}</span>
-            <span class="fc-quiz-hud-streak">${this.streak ? `🔥 ${this.streak}` : "·"}</span>
+            <span class="fc-quiz-hud-streak" aria-label="Streak">${icon("flame")}${this.streak}</span>
           </div>
         </div>
         <div class="fc-quiz-bar"><span style="width: ${(n / total) * 100}%"></span></div>
@@ -215,12 +216,12 @@ export default class extends Controller {
           <button type="button"
                   class="fc-btn fc-btn-primary fc-quiz-next hidden"
                   data-action="click->quiz#next">
-            ${this.index + 1 === total ? "See result →" : "Next question →"}
+            ${this.index + 1 === total ? "See result" : "Next question"} ${icon("arrowright")}
           </button>
           ${q.id && this.flagUrlValue ? `
             <div class="fc-quiz-report" data-qid="${q.id}">
               <button type="button" class="fc-quiz-flag" data-action="click->quiz#openReport">
-                ⚑ Report this question
+                ${icon("flag")} Report this question
               </button>
             </div>` : ""}
         </div>
@@ -233,7 +234,8 @@ export default class extends Controller {
     const t = this.questions.length
     const secs = Math.round(durationMs / 1000)
     const pct = Math.round((s / t) * 100)
-    const medal = s === t ? "🏆" : pct >= 80 ? "🥇" : pct >= 60 ? "🥈" : pct >= 40 ? "🥉" : "🌱"
+    // Trophy for a perfect round, a medal for a good one, a sprout for a start.
+    const medal = s === t ? "trophy" : pct >= 40 ? "award" : "sprout"
     const verdict = s === t ? "Perfect round."
                    : pct >= 80 ? "Almost flawless."
                    : pct >= 60 ? "Solid run."
@@ -251,7 +253,7 @@ export default class extends Controller {
     this.stageTarget.classList.remove("is-correct", "is-wrong")
     this.stageTarget.innerHTML = `
       <div class="fc-quiz-screen fc-quiz-result">
-        <div class="fc-quiz-result-medal">${medal}</div>
+        <div class="fc-quiz-result-medal is-${medal}" aria-hidden="true">${icon(medal)}</div>
         <div class="fc-quiz-result-badge">${s}<span>/${t}</span></div>
         <h2 class="fc-quiz-headline">${this.escape(verdict)}</h2>
         <div class="fc-quiz-result-stats">
@@ -264,19 +266,19 @@ export default class extends Controller {
 
         <div class="fc-quiz-actions">
           <a class="fc-btn fc-btn-primary" href="${shareUrl}">
-            📣 Share to feed
+            ${icon("send")} Share to feed
           </a>
           <button type="button" class="fc-btn" data-action="click->quiz#copyShare" data-share="${this.escape(shareLine)}">
-            ⎘ Copy share line
+            ${icon("copy")} Copy share line
           </button>
           <button type="button" class="fc-btn" data-action="click->quiz#playAgain">
-            Play again
+            ${icon("rotateccw")} Play again
           </button>
           ${this.hasThemeGridTarget ? `
           <button type="button" class="fc-btn" data-action="click->quiz#changeMode">
             Change theme
           </button>` : ""}
-          <a href="/games" class="fc-btn">Leaderboard</a>
+          <a href="/games#leaderboard" class="fc-btn">${icon("trophy")} Leaderboard</a>
         </div>
       </div>
     `
@@ -327,7 +329,7 @@ export default class extends Controller {
     const box = event.currentTarget.closest(".fc-quiz-report")
     if (!box) return
     box.innerHTML = `
-      <button type="button" class="fc-quiz-flag" data-action="click->quiz#openReport">⚑ Report this question</button>
+      <button type="button" class="fc-quiz-flag" data-action="click->quiz#openReport">${icon("flag")} Report this question</button>
     `
   }
 
@@ -347,7 +349,7 @@ export default class extends Controller {
         body: JSON.stringify({ question_id: box.dataset.qid, reason: data.get("reason"), note: data.get("note") || "" })
       })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      box.innerHTML = `<p class="fc-quiz-report-done" role="status">✓ Thanks, question reported. We'll review it.</p>`
+      box.innerHTML = `<p class="fc-quiz-report-done" role="status">${icon("check")} Thanks, question reported. We'll review it.</p>`
     } catch {
       send.disabled = false
       error.textContent = "Couldn't send the report. Please try again."
@@ -366,7 +368,7 @@ export default class extends Controller {
     try {
       await navigator.clipboard.writeText(text)
       const original = btn.innerHTML
-      btn.innerHTML = "✓ Copied"
+      btn.innerHTML = `${icon("check")} Copied`
       setTimeout(() => { btn.innerHTML = original }, 1400)
     } catch {}
   }

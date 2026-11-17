@@ -63,7 +63,7 @@
       ["Reports", admin_reports_path, "shield", request.path.include?("/admin/reports")],
       ["Moderation", admin_moderation_reviews_path, "shieldcheck", request.path.include?("/admin/moderation_reviews")],
       ["Verses", admin_bible_verses_path, "bookopen", request.path.include?("/admin/bible_verses")],
-      ["Golden Breaths", admin_golden_breaths_path, "flame", request.path.include?("/admin/golden_breaths")],
+      ["Golden breaths", admin_golden_breaths_path, "flame", request.path.include?("/admin/golden_breaths")],
       ["Broadcasts", admin_broadcasts_path, "send", request.path.include?("/admin/broadcasts")],
       ["Announcements", admin_announcements_path, "megaphone", request.path.include?("/admin/announcements")],
       ["Updates bots", admin_bots_path, "newspaper", request.path.include?("/admin/bots")],
@@ -78,14 +78,14 @@
             <span class="fc-brand-mark"><%= render_icon("breathe", classes: "h-4 w-4") %></span>
             <span>
               <span class="block text-sm font-extrabold text-[var(--fc-ink)]">Brethreign</span>
-              <span class="block text-xs font-bold text-[var(--fc-muted)]">Admin Console</span>
+              <span class="block text-xs font-bold text-[var(--fc-muted)]">Admin console</span>
             </span>
           <% end %>
 
           <nav class="admin-side-nav" aria-label="Admin navigation">
             <% admin_nav_items.each do |label, path, icon, active| %>
               <%= link_to path, class: "admin-side-link #{'is-active' if active}" do %>
-                <span class="admin-side-icon"><%= render_icon(icon, classes: "h-4 w-4") %></span>
+                <span class="admin-side-icon"><%= render_icon(icon, classes: "h-5 w-5") %></span>
                 <span class="min-w-0 flex-1"><%= label %></span>
                 <% if label == "Reports" && pending_count.positive? %>
                   <span class="admin-count"><%= pending_count %></span>
@@ -98,8 +98,8 @@
 
           <div class="admin-sidebar-footer">
             <%= link_to feed_path, class: "admin-side-link" do %>
-              <span class="admin-side-icon"><%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") %></span>
-              <span>Back to Site</span>
+              <span class="admin-side-icon"><%= render_icon("chevronleft", classes: "h-5 w-5") %></span>
+              <span>Back to site</span>
             <% end %>
           </div>
         </aside>
@@ -107,20 +107,20 @@
         <div class="admin-main">
           <header class="admin-topbar">
             <div class="min-w-0">
-              <p class="fc-section-label mb-1">Admin Console</p>
-              <h1 class="truncate text-2xl font-extrabold text-[var(--fc-ink)]"><%= content_for(:page_title) || "Dashboard" %></h1>
+              <p class="fc-section-label mb-1">Admin console</p>
+              <h1 class="admin-page-title truncate text-[var(--fc-ink)]"><%= content_for(:page_title) || "Dashboard" %></h1>
             </div>
 
             <div class="flex shrink-0 items-center gap-2">
               <%= link_to feed_path, class: "admin-back-to-app", title: "Back to app", aria: { label: "Back to app" } do %>
-                <%= render_icon("arrow_right", classes: "h-4 w-4 rotate-180") %>
+                <%= render_icon("chevronleft", classes: "h-5 w-5") %>
                 <span class="admin-back-to-app-label">App</span>
               <% end %>
 
               <nav class="admin-mobile-nav" aria-label="Admin navigation">
                 <% admin_nav_items.each do |label, path, icon, active| %>
                   <%= link_to path, class: "admin-mobile-link #{'is-active' if active}", title: label, aria: { label: label } do %>
-                    <%= render_icon(icon, classes: "h-4 w-4") %>
+                    <%= render_icon(icon, classes: "h-5 w-5") %>
                   <% end %>
                 <% end %>
               </nav>
@@ -141,12 +141,12 @@
           <% if notice || alert %>
             <div class="admin-flashes">
               <% if notice %>
-                <div class="rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] px-4 py-3 text-sm font-semibold text-[var(--fc-soft)] shadow-sm">
+                <div class="admin-flash is-notice" role="status">
                   <%= notice %>
                 </div>
               <% end %>
               <% if alert %>
-                <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800 shadow-sm">
+                <div class="admin-flash is-alert" role="alert">
                   <%= alert %>
                 </div>
               <% end %>

@@ -1,6 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
-import { iconLabel } from "../helpers/ui_icons"
 import { copyText } from "../copy_text"
+
+// Small outline icons (same 24px grid and stroke as render_icon) — no emoji.
+const ICON_PATHS = {
+  book:   "M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z",
+  dove:   "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01",
+  firm:   "M21 11.5a8.4 8.4 0 0 1-9 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z",
+  alert:  "M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01",
+  copy:   "M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2",
+  check:  "M20 6 9 17l-5-5",
+  plus:   "M12 5v14M5 12h14",
+  x:      "M18 6 6 18M6 6l12 12"
+}
+const icon = (name, cls = "eg-asst-icon") =>
+  `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICON_PATHS[name]}"/></svg>`
 
 // Wires the two author-facing composer assistants: gentleness check and
 // scripture suggestion. Both POST the current draft to a JSON endpoint and
@@ -26,8 +39,13 @@ export default class extends Controller {
   }
 
   toggleAutoScripture(event) {
-    event.preventDefault()
-    this.liveActive = !this.liveActive
+    const box = event.currentTarget
+    if (box && box.type === "checkbox") {
+      this.liveActive = box.checked
+    } else {
+      event.preventDefault()
+      this.liveActive = !this.liveActive
+    }
     localStorage.setItem("fc:liveScripture", this.liveActive ? "1" : "0")
     this.updateAutoBtn()
     if (this.liveActive) this.maybeAutoSuggest()
@@ -37,6 +55,11 @@ export default class extends Controller {
     if (!this.hasScriptureAutoBtnTarget) return
     const btn = this.scriptureAutoBtnTarget
     btn.classList.toggle("is-on", this.liveActive)
+    // The composer uses a switch (checkbox); the edit page a toggle button.
+    if (btn.type === "checkbox") {
+      btn.checked = this.liveActive
+      return
+    }
     btn.setAttribute("aria-pressed", this.liveActive ? "true" : "false")
     const label = btn.querySelector(".fc-composer-asst-label")
     if (label) label.textContent = this.liveActive ? "Auto: on" : "Auto: off"
@@ -120,9 +143,13 @@ export default class extends Controller {
   }
 
   renderGentleness({ tone, summary, nudge, suggestion }) {
-    const labels = { gentle: ["dove", "Reads gently"], firm: ["chat", "Firm but ok"], harsh: ["alert", "Could land hard"] }
-    let html = `<div class="fc-asst-result is-${tone}">`
-    html += `<p class="fc-asst-headline">${labels[tone] ? iconLabel(...labels[tone]) : this.escape(tone)}</p>`
+    const labels = {
+      gentle: `${icon("dove")} Reads gently`,
+      firm:   `${icon("firm")} Firm but OK`,
+      harsh:  `${icon("alert")} Could land hard`
+    }
+    let html = `<div class="fc-asst-result is-${this.escape(tone)}">`
+    html += `<div class="eg-asst-head"><p class="fc-asst-headline">${labels[tone] || this.escape(tone)}</p>${this.dismissButton()}</div>`
     if (summary) html += `<p class="fc-asst-line">${this.escape(summary)}</p>`
     if (nudge)   html += `<p class="fc-asst-nudge">${this.escape(nudge)}</p>`
     if (suggestion) {
@@ -134,35 +161,35 @@ export default class extends Controller {
 
   renderScripture(verses) {
     if (!verses.length) {
-      this.show(`<div class="fc-asst-result is-empty"><p class="fc-asst-line">No fitting verse jumped out — try writing a bit more about what's on your heart.</p></div>`)
+      this.show(`<div class="fc-asst-result is-empty"><div class="eg-asst-head"><p class="fc-asst-line">No fitting verse jumped out — try writing a bit more about what's on your heart.</p>${this.dismissButton()}</div></div>`)
       return
     }
-    let html = `<div class="fc-asst-result is-scripture"><p class="fc-asst-headline">${iconLabel("bookopen", "Suggested scripture")}</p><ul class="fc-asst-verses">`
-    for (const v of verses) {
+    let html = `<div class="fc-asst-result is-scripture"><ul class="fc-asst-verses">`
+    verses.forEach((v, i) => {
       const text = (v.text || "").trim()
       const trans = v.translation || "KJV"
       const clip = text ? `"${text}"\n— ${v.reference} (${trans})` : `${v.reference} (${trans})`
       html += `<li class="fc-asst-verse">
-        <div class="fc-asst-verse-head">
-          <span class="fc-asst-verse-ref">${this.escape(v.reference)}</span>
-          <span class="fc-asst-verse-trans">${this.escape(trans)}</span>
-          <button type="button"
-                  class="fc-copy-btn ml-auto"
-                  data-action="click->composer-assistant#copyVerse"
-                  data-copy-text="${this.escape(clip)}"
-                  title="Copy verse"
-                  aria-label="Copy verse">
-            ${iconLabel("copy", "Copy")}
-          </button>
-        </div>`
-      if (text) {
-        html += `<blockquote class="fc-asst-verse-text">${this.escape(text)}</blockquote>`
-      }
-      if (v.reason) {
-        html += `<p class="fc-asst-verse-reason">${this.escape(v.reason)}</p>`
-      }
-      html += `</li>`
-    }
+        <figure class="eg-asst-verse">
+          ${icon("book", "eg-asst-verse-icon")}
+          <span class="eg-asst-verse-body">`
+      if (text) html += `<blockquote class="fc-asst-verse-text">${this.escape(text)}</blockquote>`
+      html += `<figcaption class="eg-asst-verse-ref">${this.escape(v.reference)} · ${this.escape(trans)} · Suggested</figcaption>`
+      if (v.reason) html += `<p class="fc-asst-verse-reason">${this.escape(v.reason)}</p>`
+      html += `<span class="eg-asst-verse-actions">
+              <button type="button" class="eg-asst-link"
+                      data-action="click->composer-assistant#insertVerse"
+                      data-copy-text="${this.escape(clip)}">${icon("plus")}<span>Add to breath</span></button>
+              <button type="button" class="fc-copy-btn eg-asst-link"
+                      data-action="click->composer-assistant#copyVerse"
+                      data-copy-text="${this.escape(clip)}"
+                      title="Copy verse">${icon("copy")}<span>Copy</span></button>
+            </span>
+          </span>
+          ${i === 0 ? this.dismissButton("Remove verse") : ""}
+        </figure>
+      </li>`
+    })
     html += `</ul></div>`
     this.show(html)
   }
@@ -174,15 +201,45 @@ export default class extends Controller {
     if (!text) return
     const ok = await copyText(text)
     btn.classList.toggle("is-copied", ok)
-    btn.innerHTML = ok ? iconLabel("check", "Copied") : iconLabel("x", "Couldn't copy")
+    btn.innerHTML = ok ? `${icon("check")}<span>Copied</span>` : `${icon("x")}<span>Couldn't copy</span>`
     setTimeout(() => {
       btn.classList.remove("is-copied")
-      btn.innerHTML = iconLabel("copy", "Copy")
+      btn.innerHTML = `${icon("copy")}<span>Copy</span>`
     }, 1400)
   }
 
+  // Put a suggested verse at the end of the breath.
+  insertVerse(event) {
+    event.preventDefault()
+    const text = event.currentTarget.dataset.copyText || ""
+    const el = this.element.querySelector("trix-editor")
+    if (!text) return
+    if (!el || !el.editor) {
+      const ta = this.element.querySelector("textarea")
+      if (!ta) return
+      ta.value = ta.value.trim() ? `${ta.value.trimEnd()}\n\n${text}` : text
+      ta.dispatchEvent(new Event("input", { bubbles: true }))
+      return this.dismiss()
+    }
+    const doc = el.editor.getDocument().toString().trim()
+    el.editor.setSelectedRange([ el.editor.getDocument().getLength() - 1, el.editor.getDocument().getLength() - 1 ])
+    el.editor.insertString((doc ? "\n\n" : "") + text)
+    this.dismiss()
+  }
+
+  dismiss(event) {
+    if (event) event.preventDefault()
+    if (!this.hasPanelTarget) return
+    this.panelTarget.classList.add("hidden")
+    this.panelContentTarget.innerHTML = ""
+  }
+
+  dismissButton(label = "Dismiss") {
+    return `<button type="button" class="eg-asst-dismiss" data-action="click->composer-assistant#dismiss" aria-label="${label}" title="${label}">${icon("x")}</button>`
+  }
+
   showError(msg) {
-    this.show(`<div class="fc-asst-result is-error"><p class="fc-asst-line">${this.escape(msg)}</p></div>`)
+    this.show(`<div class="fc-asst-result is-error"><div class="eg-asst-head"><p class="fc-asst-line">${this.escape(msg)}</p>${this.dismissButton()}</div></div>`)
   }
 
   show(html) {
@@ -212,17 +269,23 @@ export default class extends Controller {
     return resp.json()
   }
 
+  // Only the button's words change (a [data-label] span when there is one),
+  // so its icon stays put.
   busy(btn, label) {
     if (!btn) return
+    const words = btn.querySelector("[data-label]") || btn
     btn.disabled = true
-    btn.dataset.originalLabel = btn.dataset.originalLabel || btn.textContent.trim()
-    btn.textContent = label
+    btn.setAttribute("aria-busy", "true")
+    btn.dataset.originalLabel = btn.dataset.originalLabel || words.textContent.trim()
+    words.textContent = label
   }
 
   idle(btn) {
     if (!btn) return
+    const words = btn.querySelector("[data-label]") || btn
     btn.disabled = false
-    if (btn.dataset.originalLabel) btn.textContent = btn.dataset.originalLabel
+    btn.removeAttribute("aria-busy")
+    if (btn.dataset.originalLabel) words.textContent = btn.dataset.originalLabel
   }
 
   escape(s) {

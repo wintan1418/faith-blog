@@ -26,7 +26,7 @@ export default class extends Controller {
 
     // Let interactive descendants (links, buttons, media, the pill itself)
     // behave normally instead of toggling the menu.
-    if (event.target.closest("a, button, audio, input, textarea, label, .msg-actions, .msg-reactions, .message-actions, .message-reactions, .fc-reaction-picker")) {
+    if (event.target.closest("a, button, audio, input, textarea, label, .msg-voice-player, .msg-actions, .msg-reactions, .message-actions, .message-reactions, .fc-reaction-picker")) {
       return
     }
 

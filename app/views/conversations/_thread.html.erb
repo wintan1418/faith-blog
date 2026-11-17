@@ -1,6 +1,6 @@
 <% other_user = conversation.other_participant_for(current_user) %>
 
-<section class="msg-thread"
+<section class="msg-thread" aria-label="Chat with <%= other_user.display_name %>"
          data-controller="typing"
          data-typing-conversation-id-value="<%= conversation.id %>"
          data-typing-user-id-value="<%= current_user.id %>"
@@ -14,15 +14,20 @@
     <% end %>
 
     <%= link_to user_path(other_user.username), class: "msg-thread-who" do %>
-      <%= render "conversations/avatar", user: other_user, size: "h-10 w-10", online: other_user.visible_online? %>
-      <span class="min-w-0">
+      <%= render "conversations/avatar", user: other_user, size: "h-11 w-11", online: other_user.visible_online? %>
+      <span class="msg-thread-who-text">
         <span class="msg-thread-name"><%= other_user.display_name %></span>
         <% if (presence = other_user.presence_label) %>
           <span class="msg-thread-status<%= ' is-online' if other_user.visible_online? %>"><%= presence %></span>
         <% end %>
+        <%# Shown instead of the status while they type (typing controller sets .is-typing). %>
+        <span class="msg-thread-typing" aria-hidden="true">typing…</span>
       </span>
     <% end %>
 
+    <%= link_to user_path(other_user.username), class: "msg-icon-btn msg-thread-profile", title: "View profile", aria: { label: "View #{other_user.display_name}'s profile" } do %>
+      <%= render_icon("user", classes: "h-5 w-5") %>
+    <% end %>
     <div class="msg-thread-menu" data-controller="dropdown">
       <button type="button" class="msg-icon-btn" data-action="click->dropdown#toggle" title="More options" aria-label="More options">
         <%= render_icon("more", classes: "h-5 w-5") %>
@@ -64,9 +69,11 @@
 
   <%= render "conversations/read_receipt", conversation: conversation, viewer_id: current_user.id %>
 
-  <div class="typing-indicator msg-typing hidden" data-typing-target="indicator">
-    <span class="typing-dots"><span></span><span></span><span></span></span>
-    <span class="typing-text"></span>
+  <%# Their avatar beside a bubble of bouncing dots; the text is for screen readers. %>
+  <div class="typing-indicator msg-typing hidden" data-typing-target="indicator" role="status" aria-live="polite">
+    <%= render "conversations/avatar", user: other_user, size: "h-7 w-7" %>
+    <span class="typing-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+    <span class="typing-text sr-only"></span>
   </div>
 
   <% if conversation.blocked_for?(current_user) %>

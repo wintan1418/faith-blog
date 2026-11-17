@@ -88,4 +88,30 @@ class InboxLiveTest < ApplicationSystemTestCase
       assert_selector ".msg-row", count: 2
     end
   end
+
+  # Evergreen inbox: "the inbox comes alive". While the other person types,
+  # their row in the list says "typing…" and the open chat shows the dots.
+  test "typing shows in the inbox row and in the open chat" do
+    visit conversations_path
+    row = "##{ActionView::RecordIdentifier.dom_id(@chat, :inbox_row)}"
+    assert_selector "#{row} .msg-row-preview", text: "Hello brother"
+
+    # Keep saying "typing" until the page's subscription is live.
+    seen = 20.times.any? do
+      ConversationTypingChannel.broadcast_to(@chat, user_id: @friend.id, username: @friend.display_name, typing: true)
+      has_selector?("#{row}.is-typing .msg-row-typing", text: "typing…", wait: 0.4)
+    end
+    assert seen, "the row shows typing…"
+    assert_no_selector "#{row} .msg-row-preview", text: "Hello brother"
+
+    visit conversation_path(@chat)
+    seen = 20.times.any? do
+      ConversationTypingChannel.broadcast_to(@chat, user_id: @friend.id, username: @friend.display_name, typing: true)
+      has_selector?(".msg-thread.is-typing .typing-indicator .typing-dots", wait: 0.4)
+    end
+    assert seen, "the chat shows the typing dots"
+    assert_selector ".msg-thread-typing", text: "typing…"
+    # The composer stays on screen above everything at phone size.
+    assert_selector "#new_message .msg-compose-input", visible: true
+  end
 end

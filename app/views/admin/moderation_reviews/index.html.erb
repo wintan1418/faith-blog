@@ -1,11 +1,12 @@
-<% content_for(:page_title) { "Moderation Queue" } %>
+<% content_for(:page_title) { "Moderation queue" } %>
 
 <% if @worker_health %>
   <div class="mb-6 rounded-xl border p-4 <%= @worker_health[:ok] ? "border-emerald-300/60 bg-emerald-50/50 dark:bg-emerald-500/10" : "border-red-300/70 bg-red-50/60 dark:bg-red-500/10" %>">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <p class="text-sm font-extrabold text-[var(--fc-ink)]">
-          <%= @worker_health[:ok] ? "🟢 Background worker is running" : "🔴 Background worker appears DOWN" %>
+        <p class="admin-health-line <%= @worker_health[:ok] ? 'is-ok' : 'is-down' %>">
+          <%= render_icon(@worker_health[:ok] ? "checkcircle" : "alerttriangle", classes: "h-5 w-5") %>
+          <%= @worker_health[:ok] ? "Background worker is running" : "Background worker appears to be down" %>
         </p>
         <p class="mt-0.5 text-xs text-[var(--fc-muted)]">
           <% if @worker_health[:error] %>

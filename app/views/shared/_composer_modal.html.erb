@@ -1,16 +1,21 @@
 <% return unless user_signed_in? %>
 <% rooms = Room.public_rooms.ordered %>
 <% post = current_user.posts.build %>
+<% draft_count = current_user.posts.draft.count %>
 
 <dialog data-composer-modal-target="dialog"
         data-action="mousedown->composer-modal#backdropClick"
+        aria-labelledby="composer-dialog-title"
         class="fc-composer-dialog">
   <div class="fc-composer-panel">
-    <header class="fc-composer-bar">
-      <h2 class="fc-composer-bar-title">Take a breath</h2>
+    <header class="fc-composer-bar eg-cmp-bar">
+      <h2 class="fc-composer-bar-title eg-cmp-bar-title" id="composer-dialog-title">New breath</h2>
+      <%= link_to drafts_path, class: "eg-cmp-drafts-link" do %>
+        Drafts<% if draft_count.positive? %> <span class="eg-cmp-drafts-count">(<%= draft_count %>)</span><% end %>
+      <% end %>
       <button type="button"
               data-action="click->composer-modal#close"
-              class="fc-composer-icon-btn"
+              class="eg-cmp-close"
               title="Close"
               aria-label="Close">
         <%= render_icon("x", classes: "h-5 w-5") %>

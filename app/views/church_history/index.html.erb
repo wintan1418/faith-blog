@@ -1,15 +1,10 @@
 <% content_for(:title) { "Church History Arena · Brethreign" } %>
 
 <div class="fc-app">
-  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 900px;">
-    <main class="fc-main">
-      <header class="mb-5">
-        <%= link_to feed_path, class: "text-sm font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" do %>
-          ← Back to feed
-        <% end %>
-        <h1 class="mt-2 text-3xl font-extrabold text-[var(--fc-ink)]">⛪ Church History Arena</h1>
-        <p class="text-sm text-[var(--fc-muted)]">From the upper room to the modern moves of God — 60 of the church's witnesses, in their order.</p>
-      </header>
+  <div class="fc-shell fc-games-shell is-wide" style="grid-template-columns: minmax(0, 1fr);">
+    <main class="fc-main fc-games">
+      <%= game_header("church_history", title: "Church History Arena", back: :feed,
+                      intro: "From the upper room to the modern moves of God: 60 of the church's witnesses, in their order.") %>
 
       <section data-controller="history-arena"
                data-history-arena-figure-url-value="<%= church_history_figure_path('SLUG') %>"
@@ -77,7 +72,7 @@
               <button type="button"
                       class="fc-bible-drawer-close"
                       data-action="click->history-arena#closeFigure"
-                      aria-label="Close">×</button>
+                      aria-label="Close"><%= render_icon("x", classes: "h-5 w-5") %></button>
             </header>
             <div class="fc-figure-drawer-body" data-history-arena-target="drawerBody">
               <p class="fc-bible-drawer-loading">Pulling the story…</p>
@@ -87,7 +82,8 @@
 
         <footer class="fc-arena-footer">
           <%= link_to games_history_path, class: "fc-btn fc-btn-primary" do %>
-            ⚔️ Test me on church history
+            <%= render_icon("play", classes: "h-4 w-4 fc-icon-fill") %>
+            Test me on church history
           <% end %>
         </footer>
       </section>

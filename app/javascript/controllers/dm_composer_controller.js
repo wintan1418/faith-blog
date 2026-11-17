@@ -290,7 +290,7 @@ export default class extends Controller {
     }
     files.slice(0, 3).forEach(file => {
       const chip = Object.assign(document.createElement("div"), { className: "msg-doc-chip" })
-      const name = Object.assign(document.createElement("span"), { className: "msg-doc-chip-name", textContent: `📄 ${file.name}` })
+      const name = Object.assign(document.createElement("span"), { className: "msg-doc-chip-name", textContent: file.name })
       const size = Object.assign(document.createElement("span"), { className: "msg-doc-chip-size", textContent: this.humanSize(file.size) })
       chip.append(name, size)
       box.append(chip)
@@ -342,7 +342,7 @@ export default class extends Controller {
 
     this.recordBtnTarget.classList.add("is-recording")
     this.micHTML ??= this.recordBtnTarget.innerHTML
-    this.recordBtnTarget.textContent = "⏺"
+    this.recordBtnTarget.innerHTML = '<svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>'
     this.recordBtnTarget.title = "Stop recording"
 
     // A clear "Recording 0:07" bar with Stop / Cancel, instead of just a red icon.
@@ -383,7 +383,6 @@ export default class extends Controller {
     if (this.hasRecordingBarTarget) this.recordingBarTarget.classList.add("hidden")
     this.recordBtnTarget.classList.remove("is-recording")
     if (this.micHTML) this.recordBtnTarget.innerHTML = this.micHTML
-    else this.recordBtnTarget.textContent = "🎙️"
     this.recordBtnTarget.title = "Record voice note"
   }
 

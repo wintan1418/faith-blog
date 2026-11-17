@@ -1,290 +1,353 @@
-<%# Lean Twitter-style composer used inside the modal AND on /posts/new.
-    Locals: post, rooms %>
-<% mode = local_assigns.fetch(:mode, post.kind || "breath").to_s %>
+<%# The "New breath" composer, used inside the pop-up AND on /posts/new.
+    Locals: post, rooms. Evergreen layout: who/where, a four-way kind
+    switch (Breath / Prayer / Verse / Thread), a large quiet text area,
+    the writing helpers, option rows with switches, then a footer with the
+    attach tools and Save draft / Breathe. %>
+<% prayer_on = post.prayer_status_prayer_answered? ? "prayer_answered" : "prayer_pending" %>
+<% mode = local_assigns.fetch(:mode, nil).presence ||
+          (post.kind_thread? ? "thread" : (post.prayer? ? "prayer" : "breath")) %>
+<% mode = mode.to_s %>
+<% placeholders = {
+     "breath" => "What's on your heart? Breathe it out…",
+     "prayer" => "Share what you'd like the brethren to pray for…",
+     "verse"  => "Which verse is on your heart? Share it and what it speaks to you…",
+     "thread" => "Pose a question. Invite the community in."
+   } %>
+<% kinds = [
+     [ "breath", "Breath", "pen" ],
+     [ "prayer", "Prayer", "pray" ],
+     [ "verse",  "Verse",  "bookopen" ],
+     [ "thread", "Thread", "thread" ]
+   ] %>
 <%# page: true when the composer is the whole page (/posts/new, edit), not the
     pop-up. Publishing then replaces the composer in history, so Back doesn't
     reopen it after the breath is out. %>
 <%= form_with model: post,
-    html: { class: "fc-composer-form", multipart: true, data: {
+    html: { class: "fc-composer-form eg-cmp", multipart: true, data: {
       turbo_action: ("replace" if local_assigns[:page]),
       controller: "post-form composer-mode composer-assistant paste-images caret-clear",
       composer_mode_initial_value: mode,
       composer_assistant_gentleness_url_value: check_gentleness_posts_path,
       composer_assistant_scripture_url_value: suggest_scripture_posts_path
     } } do |f| %>
-  <% if post.errors.any? %>
-    <div class="fc-composer-errors">
-      <strong>Couldn't post:</strong>
-      <ul>
-        <% post.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <%# Game-result share card riding along (re-sanitized server-side on create). %>
-  <% if post.game_share.present? %>
-    <%= f.hidden_field :game_share, value: post.game_share.to_json %>
-    <% if (info = post.game_share_info) %>
-      <div class="fc-composer-gamecard-note">
-        <%= info[:emoji] %> Sharing your <strong><%= info[:name] %></strong> result —
-        <%= post.game_share["score"] %>/<%= post.game_share["total"] %> — as a card on this breath.
+  <%# One wrapper (display: contents) so the emoji picker and the voice
+      recorder reach both the writing area and their buttons in the footer. %>
+  <div class="eg-cmp-scope" data-controller="emoji-picker voice-recorder">
+  <div class="eg-cmp-body">
+    <% if post.errors.any? %>
+      <div class="fc-composer-errors eg-cmp-errors" role="alert">
+        <strong>Couldn't post:</strong>
+        <ul>
+          <% post.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
       </div>
     <% end %>
-  <% end %>
 
-  <div class="fc-composer-tabs" role="tablist" aria-label="What are you posting?">
-    <button type="button"
-            class="fc-composer-tab is-active"
-            data-mode="breath"
-            data-action="click->composer-mode#switch"
-            data-composer-mode-target="tab"
-            role="tab">
-      <%= render_icon("sparkles", classes: "h-4 w-4") %>
-      <span>Breathe</span>
-    </button>
-    <button type="button"
-            class="fc-composer-tab"
-            data-mode="thread"
-            data-action="click->composer-mode#switch"
-            data-composer-mode-target="tab"
-            role="tab">
-      <%= render_icon("message_circle", classes: "h-4 w-4") %>
-      <span>Start a thread</span>
-    </button>
-  </div>
-
-  <%= f.hidden_field :kind, value: mode, data: { composer_mode_target: "kindField" } %>
-  <% if post.quoted_post.present? %>
-    <%= f.hidden_field :quoted_post_id %>
-  <% end %>
-
-  <div class="fc-composer-head">
-    <% if current_user.profile&.avatar&.attached? %>
-      <%= image_tag avatar_src(current_user.profile), class: "fc-avatar object-cover" %>
-    <% else %>
-      <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
+    <%# Game-result share card riding along (re-sanitized server-side on create). %>
+    <% if post.game_share.present? %>
+      <%= f.hidden_field :game_share, value: post.game_share.to_json %>
+      <% if (info = post.game_share_info) %>
+        <div class="fc-composer-gamecard-note eg-cmp-note">
+          <%= render_icon("gamepad", classes: "eg-cmp-note-icon") %>
+          <span>Sharing your <strong><%= info[:name] %></strong> result —
+          <%= post.game_share["score"] %>/<%= post.game_share["total"] %> — as a card on this breath.</span>
+        </div>
+      <% end %>
     <% end %>
-    <div class="fc-composer-author">
-      <p class="fc-composer-name"><%= current_user.username %></p>
-      <p class="fc-composer-handle"
-         data-composer-mode-target="handle"
-         data-handle-breath="breathing into the community"
-         data-handle-thread="opening a thread for the community">breathing into the community</p>
-    </div>
-  </div>
 
-  <%= f.text_field :title,
-      class: "fc-composer-title",
-      placeholder: mode == "thread" ? "What do you want to discuss?" : "Add a title (optional)",
-      maxlength: 200,
-      required: mode == "thread",
-      data: {
-        composer_mode_target: "title",
-        title_breath: "Add a title (optional)",
-        title_thread: "What do you want to discuss?"
-      } %>
-
-  <div data-controller="emoji-picker">
-    <%= f.rich_text_area :content,
-        class: "fc-composer-body",
-        placeholder: "What's on your heart? Breathe it out...",
-        data: {
-          emoji_picker_target: "editor",
-          controller: "mentions",
-          composer_mode_target: "body",
-          body_breath: "What's on your heart? Breathe it out...",
-          body_thread: "Pose a question. Invite the community in."
-        } %>
-
-    <div class="fc-composer-toolbar">
-      <div class="fc-composer-tools">
-        <div class="fc-emoji-anchor">
-          <button type="button"
-                  data-emoji-picker-target="button"
-                  data-action="click->emoji-picker#toggle"
-                  class="fc-composer-icon-btn"
-                  title="Add emoji"
-                  aria-label="Add emoji">
-            <%= render_icon("smile", classes: "h-5 w-5") %>
-          </button>
-          <div data-emoji-picker-target="picker" class="fc-emoji-popover hidden">
-            <emoji-picker></emoji-picker>
-          </div>
-        </div>
-
-        <label class="fc-composer-icon-btn cursor-pointer" title="Add images" aria-label="Add images">
-          <%= render_icon("image", classes: "h-5 w-5") %>
-          <%= f.file_field :images,
-              multiple: true,
-              accept: "image/*",
-              class: "sr-only",
-              data: { action: "change->post-form#previewImages", paste_images_target: "input" } %>
-        </label>
-
-        <div class="fc-voice-recorder" data-controller="voice-recorder">
-          <button type="button"
-                  class="fc-composer-icon-btn"
-                  data-voice-recorder-target="trigger"
-                  data-action="click->voice-recorder#togglePanel"
-                  title="Record voice note"
-                  aria-label="Record voice note">
-            🎙️
-          </button>
-
-          <%# Hidden inputs that the recorder fills in. %>
-          <%= f.file_field :voice_note,
-              accept: "audio/*",
-              class: "sr-only",
-              data: { voice_recorder_target: "fileInput" } %>
-          <%= f.hidden_field :voice_duration_ms,
-              data: { voice_recorder_target: "durationInput" } %>
-
-          <div class="fc-voice-recorder-panel hidden" data-voice-recorder-target="panel">
-            <div class="fc-voice-recorder-row">
-              <button type="button"
-                      class="fc-voice-recorder-record"
-                      data-voice-recorder-target="recordBtn"
-                      data-action="click->voice-recorder#record"
-                      title="Start recording">●</button>
-              <button type="button"
-                      class="fc-voice-recorder-stop hidden"
-                      data-voice-recorder-target="stopBtn"
-                      data-action="click->voice-recorder#stop"
-                      title="Stop">■</button>
-              <span class="fc-voice-recorder-timer" data-voice-recorder-target="timer">0:00</span>
-              <span class="fc-voice-recorder-max">/ 1:30 max</span>
-            </div>
-
-            <div class="fc-voice-recorder-preview hidden" data-voice-recorder-target="preview">
-              <audio controls preload="metadata" data-voice-recorder-target="previewAudio"></audio>
-              <div class="fc-voice-recorder-actions">
-                <button type="button" class="fc-btn" data-action="click->voice-recorder#retry">Re-record</button>
-                <button type="button" class="fc-btn" data-action="click->voice-recorder#discard">Discard</button>
-              </div>
-            </div>
-          </div>
-
-          <%# Inline summary chip shown after a successful recording so the
-              user can see (and remove) the attached note without re-opening
-              the panel. %>
-          <div class="fc-voice-recorder-summary hidden" data-voice-recorder-target="summary">
-            🎙️ Voice note attached · <span data-voice-recorder-target="summaryDuration">0:00</span>
-            <button type="button" class="fc-voice-recorder-remove"
-                    data-voice-recorder-target="removeBtn"
-                    data-action="click->voice-recorder#remove"
-                    aria-label="Remove voice note">×</button>
-          </div>
-        </div>
-
-        <button type="button"
-                class="fc-composer-icon-btn"
-                title="Open Bible"
-                aria-label="Open Bible"
-                data-action="click->bible-drawer#open">
-          <%= render_icon("bookopen", classes: "h-5 w-5") %>
-        </button>
-
-        <button type="button"
-                class="fc-composer-asst-btn"
-                data-composer-assistant-target="gentlenessBtn"
-                data-action="click->composer-assistant#checkGentleness"
-                title="Run a quick tone check">
-          🕊️ <span>Check tone</span>
-        </button>
-        <button type="button"
-                class="fc-composer-asst-btn"
-                data-composer-assistant-target="scriptureBtn"
-                data-action="click->composer-assistant#suggestScripture"
-                title="Suggest a fitting scripture">
-          📖 <span>Suggest scripture</span>
-        </button>
-        <button type="button"
-                class="fc-composer-asst-btn fc-composer-asst-toggle"
-                data-composer-assistant-target="scriptureAutoBtn"
-                data-action="click->composer-assistant#toggleAutoScripture"
-                title="Suggest scripture automatically as you type"
-                aria-pressed="false">
-          ⚡ <span class="fc-composer-asst-label">Auto: off</span>
-        </button>
-      </div>
-
-      <div class="fc-composer-meta">
-        <label class="fc-composer-pill">
-          <span class="fc-composer-pill-label">Room</span>
+    <%# Who and where %>
+    <div class="eg-cmp-who">
+      <% if current_user.profile&.avatar&.attached? %>
+        <%= image_tag avatar_src(current_user.profile), class: "eg-cmp-avatar", alt: "" %>
+      <% else %>
+        <span class="eg-cmp-avatar" style="<%= avatar_tint_style(current_user.username) %>" aria-hidden="true"><%= current_user.username.first.upcase %></span>
+      <% end %>
+      <div class="eg-cmp-who-text">
+        <p class="eg-cmp-name"><%= current_user.display_name.presence || current_user.username %></p>
+        <label class="fc-composer-pill eg-cmp-room">
+          <span class="sr-only">Room</span>
+          <%= render_icon("users", classes: "eg-cmp-room-icon") %>
           <%= f.select :room_id,
-              rooms.map { |r| ["#{r.icon ? "#{r.icon} " : ""}#{r.name}", r.id] },
-              { include_blank: "None — just breathe" },
-              class: "fc-composer-pill-select" %>
+              rooms.map { |r| [r.name, r.id] },
+              { include_blank: "Everyone — no room" },
+              class: "fc-composer-pill-select eg-cmp-room-select" %>
+          <%= render_icon("chevrondown", classes: "eg-cmp-room-chev") %>
         </label>
-
-        <label class="fc-composer-toggle">
-          <%= f.check_box :anonymous, class: "fc-composer-checkbox" %>
-          <span>Anonymous</span>
-        </label>
-
-        <label class="fc-composer-toggle">
-          <%= f.check_box :prayer_status,
-              {
-                checked: post.prayer_status_prayer_pending? || post.prayer_status_prayer_answered?,
-                class: "fc-composer-checkbox"
-              },
-              "prayer_pending", "not_a_prayer" %>
-          <span>🙏 Prayer request</span>
-        </label>
-
-        <%# The picker shows the phone's own time; the hidden field sends it with its time zone. %>
-        <div class="fc-composer-schedule" data-controller="schedule-field" data-schedule-field-utc-value="<%= post.scheduled_for&.utc&.iso8601 %>">
-        <label class="fc-composer-pill" title="Pick a future date/time to auto-publish this breath">
-          <span class="fc-composer-pill-label">⏱️ Schedule</span>
-          <input type="datetime-local" class="fc-composer-pill-select" aria-label="Schedule for"
-                 data-schedule-field-target="local" data-action="change->schedule-field#sync input->schedule-field#sync">
-          <%= f.hidden_field :scheduled_for, value: post.scheduled_for&.utc&.iso8601, data: { schedule_field_target: "utc" } %>
-          <button type="button" class="fc-composer-pill-clear hidden" aria-label="Clear schedule"
-                  data-schedule-field-target="clear" data-action="schedule-field#clear">×</button>
-        </label>
-        <p class="fc-composer-schedule-note hidden" data-schedule-field-target="note" aria-live="polite"></p>
-        </div>
       </div>
     </div>
 
+    <%# What kind of post: Breath / Prayer / Verse / Thread %>
+    <div class="eg-cmp-kinds" role="radiogroup" aria-label="What are you posting?"
+         data-action="keydown->composer-mode#arrow">
+      <% kinds.each do |key, label, icon| %>
+        <button type="button"
+                class="eg-cmp-kind is-<%= key %><%= " is-active" if key == mode %>"
+                role="radio"
+                aria-checked="<%= key == mode %>"
+                tabindex="<%= key == mode ? 0 : -1 %>"
+                data-mode="<%= key %>"
+                data-action="click->composer-mode#switch"
+                data-composer-mode-target="tab">
+          <%= render_icon(icon, classes: "eg-cmp-kind-icon") %>
+          <span><%= label %></span>
+        </button>
+      <% end %>
+    </div>
 
-    <div class="fc-asst-panel hidden"
+    <%= f.hidden_field :kind, value: (mode == "thread" ? "thread" : "breath"), data: { composer_mode_target: "kindField" } %>
+    <%= f.hidden_field :prayer_status,
+        value: (mode == "prayer" ? prayer_on : "not_a_prayer"),
+        data: { composer_mode_target: "prayerField", prayer_on: prayer_on } %>
+    <% if post.quoted_post.present? %>
+      <%= f.hidden_field :quoted_post_id %>
+    <% end %>
+
+    <div class="eg-cmp-write">
+      <%= f.label :title, mode == "thread" ? "Thread question" : "Title (optional)", class: "sr-only",
+          data: { composer_mode_target: "titleLabel" } %>
+      <%= f.text_field :title,
+          class: "fc-composer-title eg-cmp-title",
+          placeholder: mode == "thread" ? "What do you want to discuss?" : "Add a title (optional)",
+          maxlength: 200,
+          required: mode == "thread",
+          data: {
+            composer_mode_target: "title",
+            title_breath: "Add a title (optional)",
+            title_prayer: "Add a title (optional)",
+            title_verse: "Add a title (optional)",
+            title_thread: "What do you want to discuss?"
+          } %>
+
+      <%= f.rich_text_area :content,
+          class: "fc-composer-body eg-cmp-text",
+          placeholder: placeholders[mode],
+          aria: { label: "What's on your heart" },
+          data: {
+            emoji_picker_target: "editor",
+            controller: "mentions",
+            composer_mode_target: "body",
+            body_breath: placeholders["breath"],
+            body_prayer: placeholders["prayer"],
+            body_verse: placeholders["verse"],
+            body_thread: placeholders["thread"]
+          } %>
+    </div>
+
+    <%# Suggested scripture and tone results land here. %>
+    <div class="fc-asst-panel eg-cmp-asst hidden"
          data-composer-assistant-target="panel"
          aria-live="polite">
       <div data-composer-assistant-target="panelContent"></div>
     </div>
+
+    <div class="eg-cmp-helpers">
+      <button type="button"
+              class="eg-cmp-helper"
+              data-composer-assistant-target="scriptureBtn"
+              data-action="click->composer-assistant#suggestScripture"
+              title="Suggest a fitting scripture">
+        <%= render_icon("sparkles", classes: "eg-cmp-helper-icon") %>
+        <span data-label>Suggest scripture</span>
+      </button>
+      <button type="button"
+              class="eg-cmp-helper"
+              data-composer-assistant-target="gentlenessBtn"
+              data-action="click->composer-assistant#checkGentleness"
+              title="Run a quick tone check">
+        <%= render_icon("tone", classes: "eg-cmp-helper-icon") %>
+        <span data-label>Check tone</span>
+      </button>
+    </div>
+
+    <div id="image-previews" class="fc-composer-previews eg-cmp-previews hidden" data-post-form-target="previews"></div>
+
+    <%# Voice note: the recorder panel, then a summary once a note is attached. %>
+    <div class="eg-cmp-voice-panel hidden" data-voice-recorder-target="panel">
+      <div class="eg-cmp-voice-row">
+        <button type="button"
+                class="eg-cmp-voice-btn is-record"
+                data-voice-recorder-target="recordBtn"
+                data-action="click->voice-recorder#record"
+                aria-label="Start recording"
+                title="Start recording"><%= render_icon("record", classes: "eg-cmp-voice-icon") %></button>
+        <button type="button"
+                class="eg-cmp-voice-btn is-stop hidden"
+                data-voice-recorder-target="stopBtn"
+                data-action="click->voice-recorder#stop"
+                aria-label="Stop recording"
+                title="Stop"><%= render_icon("stop", classes: "eg-cmp-voice-icon") %></button>
+        <span class="eg-cmp-voice-timer" data-voice-recorder-target="timer" aria-live="polite">0:00</span>
+        <span class="eg-cmp-voice-max">/ 1:30 max</span>
+        <button type="button" class="eg-cmp-voice-close" data-action="click->voice-recorder#closePanel" aria-label="Hide recorder">
+          <%= render_icon("x", classes: "h-5 w-5") %>
+        </button>
+      </div>
+
+      <div class="eg-cmp-voice-preview hidden" data-voice-recorder-target="preview">
+        <audio controls preload="metadata" data-voice-recorder-target="previewAudio"></audio>
+        <div class="eg-cmp-voice-actions">
+          <button type="button" class="eg-cmp-text-btn" data-action="click->voice-recorder#retry">Re-record</button>
+          <button type="button" class="eg-cmp-text-btn" data-action="click->voice-recorder#discard">Discard</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="eg-cmp-voice-summary hidden" data-voice-recorder-target="summary">
+      <%= render_icon("mic", classes: "eg-cmp-voice-summary-icon") %>
+      <span>Voice note attached · <span data-voice-recorder-target="summaryDuration">0:00</span></span>
+      <button type="button" class="eg-cmp-chip-remove"
+              data-voice-recorder-target="removeBtn"
+              data-action="click->voice-recorder#remove"
+              aria-label="Remove voice note"><%= render_icon("x", classes: "h-4 w-4") %></button>
+    </div>
+
+    <%# Hidden inputs that the recorder fills in. %>
+    <%= f.file_field :voice_note,
+        accept: "audio/*",
+        class: "sr-only",
+        tabindex: -1,
+        aria: { hidden: true },
+        data: { voice_recorder_target: "fileInput" } %>
+    <%= f.hidden_field :voice_duration_ms,
+        data: { voice_recorder_target: "durationInput" } %>
+
+    <% if post.quoted_post.present? %>
+      <div class="fc-composer-quote eg-cmp-quote">
+        <span class="fc-composer-quote-label">
+          <%= render_icon("repeat", classes: "h-3.5 w-3.5") %>
+          Quoting
+        </span>
+        <%= render "posts/embedded_quote", quoted: post.quoted_post, variant: :composer %>
+      </div>
+    <% end %>
+
+    <%# Options: each a row with a switch and a one-line hint. %>
+    <div class="eg-cmp-options">
+      <label class="eg-cmp-option">
+        <%= render_icon("eyeoff", classes: "eg-cmp-option-icon") %>
+        <span class="eg-cmp-option-text">
+          <span class="eg-cmp-option-label">Post anonymously</span>
+          <span class="eg-cmp-option-hint">Your name is hidden from the brethren</span>
+        </span>
+        <%= f.check_box :anonymous, class: "eg-cmp-switch", role: "switch" %>
+      </label>
+
+      <%# The picker shows the phone's own time; the hidden field sends it with its time zone. %>
+      <div class="eg-cmp-schedule" data-controller="schedule-field" data-schedule-field-utc-value="<%= post.scheduled_for&.utc&.iso8601 %>">
+        <label class="eg-cmp-option">
+          <%= render_icon("clock", classes: "eg-cmp-option-icon") %>
+          <span class="eg-cmp-option-text">
+            <span class="eg-cmp-option-label">Schedule</span>
+            <span class="eg-cmp-option-hint">Publish later at a time you pick</span>
+          </span>
+          <input type="checkbox" class="eg-cmp-switch" role="switch"
+                 data-schedule-field-target="toggle" data-action="change->schedule-field#toggle">
+        </label>
+        <div class="eg-cmp-schedule-picker hidden" data-schedule-field-target="picker">
+          <label class="fc-composer-pill eg-cmp-when" title="Pick a future date/time to auto-publish this breath">
+            <span class="eg-cmp-when-label">Publish on</span>
+            <input type="datetime-local" class="fc-composer-pill-select eg-cmp-when-input" aria-label="Schedule for"
+                   data-schedule-field-target="local" data-action="change->schedule-field#sync input->schedule-field#sync">
+            <%= f.hidden_field :scheduled_for, value: post.scheduled_for&.utc&.iso8601, data: { schedule_field_target: "utc" } %>
+            <button type="button" class="eg-cmp-chip-remove hidden" aria-label="Clear schedule"
+                    data-schedule-field-target="clear" data-action="schedule-field#clear"><%= render_icon("x", classes: "h-4 w-4") %></button>
+          </label>
+          <p class="eg-cmp-schedule-note hidden" data-schedule-field-target="note" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <label class="eg-cmp-option">
+        <%= render_icon("sparkles", classes: "eg-cmp-option-icon") %>
+        <span class="eg-cmp-option-text">
+          <span class="eg-cmp-option-label">Suggest verses as I write</span>
+          <span class="eg-cmp-option-hint">A fitting scripture appears once you've written a little</span>
+        </span>
+        <input type="checkbox" class="eg-cmp-switch" role="switch"
+               data-composer-assistant-target="scriptureAutoBtn"
+               data-action="change->composer-assistant#toggleAutoScripture">
+      </label>
+    </div>
   </div>
 
-  <div id="image-previews" class="fc-composer-previews hidden" data-post-form-target="previews"></div>
+  <div class="fc-composer-footer eg-cmp-footer" data-caret-clear-target="bar">
+    <div class="eg-cmp-tools">
+      <label class="eg-cmp-tool is-photo" title="Add photos">
+        <span class="sr-only">Add photos</span>
+        <%= render_icon("image", classes: "eg-cmp-tool-icon") %>
+        <%= f.file_field :images,
+            multiple: true,
+            accept: "image/*",
+            class: "sr-only",
+            data: { action: "change->post-form#previewImages", paste_images_target: "input" } %>
+      </label>
 
-  <% if post.quoted_post.present? %>
-    <div class="fc-composer-quote">
-      <span class="fc-composer-quote-label">
-        <%= render_icon("repeat", classes: "h-3.5 w-3.5") %>
-        Quoting
-      </span>
-      <%= render "posts/embedded_quote", quoted: post.quoted_post, variant: :composer %>
+      <button type="button"
+              class="eg-cmp-tool is-voice"
+              data-voice-recorder-target="trigger"
+              data-action="click->voice-recorder#togglePanel"
+              title="Record voice note"
+              aria-label="Record voice note">
+        <%= render_icon("mic", classes: "eg-cmp-tool-icon") %>
+      </button>
+
+      <button type="button"
+              class="eg-cmp-tool is-bible"
+              title="Open Bible"
+              aria-label="Open Bible"
+              data-action="click->bible-drawer#open">
+        <%= render_icon("bookopen", classes: "eg-cmp-tool-icon") %>
+      </button>
+
+      <div class="fc-emoji-anchor eg-cmp-emoji">
+        <button type="button"
+                data-emoji-picker-target="button"
+                data-action="click->emoji-picker#toggle"
+                class="eg-cmp-tool is-emoji"
+                title="Add emoji"
+                aria-label="Add emoji">
+          <%= render_icon("smile", classes: "eg-cmp-tool-icon") %>
+        </button>
+        <div data-emoji-picker-target="picker" class="fc-emoji-popover hidden">
+          <emoji-picker></emoji-picker>
+        </div>
+      </div>
+
+      <button type="button"
+              class="eg-cmp-tool is-format"
+              title="Text formatting"
+              aria-label="Text formatting"
+              aria-pressed="false"
+              data-composer-mode-target="formatBtn"
+              data-action="click->composer-mode#toggleFormatting">
+        <%= render_icon("type", classes: "eg-cmp-tool-icon") %>
+      </button>
     </div>
-  <% end %>
 
-  <div class="fc-composer-footer" data-caret-clear-target="bar">
-    <button type="button" class="fc-btn" data-action="click->composer-modal#close">Cancel</button>
-    <%# A draft is still unpublished: it keeps "Save draft" and its main button
-        publishes it. (It used to say "Update" and quietly stay a draft.) %>
-    <% editing_live = post.persisted? && !post.draft? %>
-    <% unless editing_live %>
-      <button type="submit" name="post[status]" value="draft" class="fc-btn">Save draft</button>
-    <% end %>
-    <button type="submit"
-            name="post[status]"
-            value="published"
-            class="fc-btn fc-btn-primary"
-            data-composer-mode-target="submit"
-            data-submit-breath="<%= editing_live ? "Update" : "Breathe" %>"
-            data-submit-thread="<%= editing_live ? "Update thread" : "Open the thread" %>">
-      <%= editing_live ? "Update" : "Breathe" %>
-    </button>
+    <div class="eg-cmp-actions">
+      <button type="button" class="eg-cmp-text-btn eg-cmp-cancel" data-action="click->composer-modal#close">Cancel</button>
+      <%# A draft is still unpublished: it keeps "Save draft" and its main button
+          publishes it. (It used to say "Update" and quietly stay a draft.) %>
+      <% editing_live = post.persisted? && !post.draft? %>
+      <% unless editing_live %>
+        <button type="submit" name="post[status]" value="draft" class="eg-cmp-text-btn eg-cmp-draft">Save draft</button>
+      <% end %>
+      <% breathe_label = editing_live ? "Update" : "Breathe" %>
+      <% thread_label = editing_live ? "Update thread" : "Open the thread" %>
+      <button type="submit"
+              name="post[status]"
+              value="published"
+              class="eg-cmp-breathe"
+              data-composer-mode-target="submit"
+              data-submit-breath="<%= breathe_label %>"
+              data-submit-prayer="<%= breathe_label %>"
+              data-submit-verse="<%= breathe_label %>"
+              data-submit-thread="<%= thread_label %>">
+        <%= render_icon("breathe", classes: "eg-cmp-breathe-icon") %>
+        <span data-label><%= mode == "thread" ? thread_label : breathe_label %></span>
+      </button>
+    </div>
+  </div>
   </div>
 <% end %>

@@ -53,6 +53,11 @@ class QuizThemeRoundTest < ApplicationSystemTestCase
       assert_no_selector ".fc-quiz-hud-progress", text: %r{Question #{i + 1} / 3}i if i < 2
     end
     assert_selector ".fc-quiz-result"
+    # Evergreen: the result medal and the action buttons are real icons, not emoji.
+    assert_selector ".fc-quiz-result-medal svg"
+    assert_selector ".fc-quiz-actions a.fc-btn-primary", text: "Share to feed"
+    assert_selector ".fc-quiz-actions a.fc-btn-primary svg"
+    assert_no_selector ".fc-quiz-result-medal", text: /[\u{1F300}-\u{1FAFF}]/
   end
 
   private

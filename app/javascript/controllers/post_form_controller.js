@@ -102,16 +102,19 @@ export default class extends Controller {
       const reader = new FileReader()
       reader.onload = (e) => {
         const div = document.createElement("div")
-        div.className = "relative group"
+        div.className = "eg-thumb"
 
         const img = document.createElement("img")
         img.src = e.target.result
-        img.className = "w-full h-24 object-cover rounded-lg"
+        img.alt = `Photo ${index + 1}`
+        img.className = "eg-thumb-img"
 
+        // Always visible (a hover-only button can't be reached on a phone).
         const removeBtn = document.createElement("button")
         removeBtn.type = "button"
-        removeBtn.className = "absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs"
-        removeBtn.innerHTML = "×"
+        removeBtn.className = "eg-thumb-remove"
+        removeBtn.setAttribute("aria-label", `Remove photo ${index + 1}`)
+        removeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>'
         removeBtn.onclick = () => {
           const [ removed ] = this.accumulator.splice(index, 1)
           if (removed) {
