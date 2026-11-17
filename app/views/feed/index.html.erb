@@ -6,7 +6,7 @@
       <div class="fc-section-label">Your Space</div>
       <nav class="space-y-1">
         <%= link_to feed_path, class: "fc-rail-link #{'is-active' if current_page?(feed_path)}" do %>
-          <%= render_icon("message_circle", classes: "h-4 w-4") %>
+          <%= render_icon("feed", classes: "h-4 w-4") %>
           Feed
         <% end %>
         <button type="button"
@@ -17,19 +17,19 @@
           Open Bible
         </button>
         <%= link_to games_path, class: "fc-rail-link" do %>
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          <%= render_icon("games", classes: "h-4 w-4") %>
           Games
         <% end %>
         <%= link_to church_history_path, class: "fc-rail-link" do %>
-          <%= render_icon("bookopen", classes: "h-4 w-4") %>
+          <%= render_icon("church", classes: "h-4 w-4") %>
           Church History
         <% end %>
         <%= link_to circles_path, class: "fc-rail-link" do %>
-          <%= render_icon("users", classes: "h-4 w-4") %>
+          <%= render_icon("pray", classes: "h-4 w-4") %>
           Prayer Circles
         <% end %>
         <%= link_to answered_prayers_path, class: "fc-rail-link" do %>
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          <%= render_icon("answered", classes: "h-4 w-4") %>
           Answered Prayers
         <% end %>
         <%= link_to bookmarks_path, class: "fc-rail-link" do %>
@@ -37,11 +37,11 @@
           Bookmarks
         <% end %>
         <%= link_to blog_path, class: "fc-rail-link" do %>
-          <%= render_icon("bookopen", classes: "h-4 w-4") %>
+          <%= render_icon("blog", classes: "h-4 w-4") %>
           Blog &amp; guides
         <% end %>
         <%= link_to user_path(current_user.username), class: "fc-rail-link" do %>
-          <%= render_icon("users", classes: "h-4 w-4") %>
+          <%= render_icon("user", classes: "h-4 w-4") %>
           Profile
         <% end %>
         <%= link_to my_connections_path, class: "fc-rail-link" do %>
@@ -49,12 +49,12 @@
           Connections
         <% end %>
         <%= link_to notifications_path, class: "fc-rail-link" do %>
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          <%= render_icon("bell", classes: "h-4 w-4") %>
           Notifications
         <% end %>
         <% if current_user_admin? %>
           <%= link_to admin_root_path, class: "fc-rail-link #{'is-active' if request.path.start_with?('/admin')}" do %>
-            <%= render_icon("sparkles", classes: "h-4 w-4") %>
+            <%= render_icon("settings", classes: "h-4 w-4") %>
             Admin
           <% end %>
         <% end %>
@@ -97,7 +97,7 @@
           %>
           <%= link_to room_path(room), class: "fc-rail-link" do %>
             <span class="grid h-5 w-5 place-items-center rounded text-[10px] room-tint-<%= tint %>">
-              <%= render_icon(room.icon || "sparkles", classes: "h-3.5 w-3.5") %>
+              <%= render_icon(room_icon_name(room), classes: "h-3.5 w-3.5") %>
             </span>
             <%= room.name %>
           <% end %>

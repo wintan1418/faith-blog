@@ -94,7 +94,7 @@
         <% end %>
         <%= render_rich_social_text(
               post.content,
-              class_name: "fc-breath-copy is-rich#{' is-untitled' unless post.display_title}",
+              class_name: "fc-breath-copy is-rich#{' is-untitled' unless post.display_title}#{' is-clamped' if likely_overflow}",
               data: { expand_text_target: "copy" }
             ) %>
         <% if likely_overflow %>

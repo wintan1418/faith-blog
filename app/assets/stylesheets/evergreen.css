@@ -1,0 +1,169 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   EVERGREEN — the Brethreign design language (November 2026)
+   Loaded last on every page (main app and admin), after brand_polish.css.
+
+   1. Warm linen page, white cards with a hairline edge (no heavy outlines).
+   2. Evergreen for actions, gold for prayer and scripture moments.
+   3. Playfair serif for dates, headings and scripture; Inter for the UI.
+   4. One bold outline icon set (see IconHelper): 2.25 stroke, filled when active.
+   5. Dark mode is deep neutral, not green-black.
+
+   Screen-specific rules live in evergreen_*.css next to this file.
+   Members who picked their own accent in Settings keep it: their choice is
+   set inline on <body> and wins over these tokens.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html.theme-light,
+html:not(.theme-dark),
+:root {
+  --fc-serif: "Playfair Display", "Fraunces", Georgia, "Times New Roman", serif;
+  --fc-display: "Playfair Display", Georgia, serif;
+  --fc-sans: "Inter", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --fc-bg:          #f5f1e8;
+  --fc-bg-2:        #efe9dc;
+  --fc-surface:     #ffffff;
+  --fc-surface-2:   #f8f5ee;
+  --fc-surface-3:   #f0ebe0;
+  --fc-surface-4:   #e3dccd;
+  --fc-card:        #ffffff;
+
+  --fc-ink:    #1c211e;
+  --fc-soft:   #333b37;
+  --fc-muted:  #5e6862;   /* 5.6:1 on white */
+  --fc-faint:  #646e68;
+
+  --fc-line:        #ece6da;
+  --fc-line-strong: #ddd5c4;
+
+  --fc-accent:      #0e5c43;  /* 7.6:1 on white */
+  --fc-accent-2:    #0e5c43;
+  --fc-accent-deep: #0a4532;
+  --fc-accent-soft: rgba(14, 92, 67, 0.09);
+  --fc-accent-glow: rgba(14, 92, 67, 0.22);
+
+  --fc-fill:        #0e5c43;
+  --fc-fill-hover:  #0a4532;
+  --fc-on-fill:     #ffffff;
+  --fc-on-accent:   #ffffff;
+
+  --fc-gold:        #8a5a0b;  /* text on white 6.1:1 */
+  --fc-gold-fill:   #b87a14;
+  --fc-on-gold:     #ffffff;
+  --fc-gold-soft:   #fbf3e2;
+  --fc-gold-line:   #e9d9b4;
+
+  --fc-radius:      20px;
+  --fc-radius-sm:   12px;
+
+  --bg-translucent: rgba(255, 255, 255, 0.92);
+  --sh-sm: 0 1px 2px rgba(40, 34, 14, 0.04);
+  --sh-md: 0 2px 8px rgba(40, 34, 14, 0.05);
+  --sh-lg: 0 18px 44px rgba(40, 34, 14, 0.12), 0 4px 10px rgba(40, 34, 14, 0.05);
+}
+
+html.theme-dark {
+  --fc-bg:          #0c1210;
+  --fc-bg-2:        #101815;
+  --fc-surface:     #151e1a;
+  --fc-surface-2:   #1b2621;
+  --fc-surface-3:   #222e29;
+  --fc-surface-4:   #2c3933;
+  --fc-card:        #151e1a;
+
+  --fc-ink:    #ecf1ee;
+  --fc-soft:   #cfd8d3;
+  --fc-muted:  #a3aea8;   /* 7.4:1 on surface */
+  --fc-faint:  #8c9892;
+
+  --fc-line:        rgba(255, 255, 255, 0.08);
+  --fc-line-strong: rgba(255, 255, 255, 0.14);
+
+  --fc-accent:      #4cc995;
+  --fc-accent-2:    #6fd6aa;
+  --fc-accent-deep: #3bb583;
+  --fc-accent-soft: rgba(76, 201, 149, 0.13);
+  --fc-accent-glow: rgba(76, 201, 149, 0.26);
+
+  --fc-fill:        #4cc995;  /* dark text on it: 9:1 */
+  --fc-fill-hover:  #6fd6aa;
+  --fc-on-fill:     #06231a;
+  --fc-on-accent:   #06231a;
+
+  --fc-gold:        #e9be68;
+  --fc-gold-fill:   #e9be68;
+  --fc-on-gold:     #2a1c02;
+  --fc-gold-soft:   rgba(233, 190, 104, 0.12);
+  --fc-gold-line:   rgba(233, 190, 104, 0.30);
+
+  --bg-translucent: rgba(21, 30, 26, 0.94);
+  --sh-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sh-md: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --sh-lg: 0 16px 40px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Page: a flat linen (or deep neutral) canvas, no glow ─────────────── */
+html.theme-light, html.theme-light body, html:not(.theme-dark), html:not(.theme-dark) body, body.theme-light,
+html.theme-dark, html.theme-dark body, body.theme-dark {
+  background: var(--fc-bg) !important;
+}
+body { font-family: var(--fc-sans); }
+
+/* Top and bottom bars: solid card colour with a hairline */
+html nav.fc-topbar, html .fc-bottom-nav {
+  background: var(--fc-surface) !important;
+  border-color: var(--fc-line) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* ── Cards: white, 20px corners, a hairline instead of an outline box ─── */
+:is(.fc-breath, .fc-side-card, .fc-card, .fc-panel, .fc-game-card, .fc-stats-strip .fc-stat, .fc-notif-card, .fc-empty) {
+  background: var(--fc-surface) !important;
+  border: 1px solid var(--fc-line) !important;
+  border-radius: var(--fc-radius) !important;
+  box-shadow: none !important;
+}
+:is(.fc-breath, .fc-side-card, .fc-card, .fc-game-card):hover {
+  border-color: var(--fc-line-strong) !important;
+}
+
+/* Section labels: sentence case, readable size, not tiny uppercase */
+:is(.fc-section-label, .fc-page-kicker) {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  color: var(--fc-muted) !important;
+}
+
+/* Headings in the brand serif */
+:is(h1, .fc-page-title, .fc-side-card h2, .fc-side-card h3) {
+  font-family: var(--fc-display);
+  letter-spacing: 0;
+}
+
+/* ── Icons: bold enough to read; inline icons follow the text colour ──── */
+.fc-rail-link svg, .admin-side-icon svg, .fc-topbar svg { stroke-width: 2.25; }
+.fc-rail-link svg { width: 1.25rem; height: 1.25rem; }
+.fc-rail-link { gap: 0.75rem; font-weight: 600; color: var(--fc-ink) !important; }
+.fc-rail-link.is-active { color: var(--fc-accent) !important; }
+
+/* ── Breaths: fade only the long ones (short breaths show every line) ── */
+.fc-breath-copy.is-rich:not(.is-clamped) {
+  max-height: none !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+.fc-breath-copy.is-rich:not(.is-clamped)::after { display: none !important; }
+
+/* ── Buttons: pill shape everywhere ───────────────────────────────────── */
+:is(.btn, .fc-btn, .msg-send, .auth-submit) { border-radius: 999px !important; }
+
+/* ── Badges: one red style for every count ────────────────────────────── */
+:is(.fc-count-badge, .fc-count-badge.is-mint) {
+  background: #d93025 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}

@@ -28,7 +28,7 @@
           <td class="px-6 py-4">
             <div class="flex min-w-0 items-center gap-3">
               <div class="grid h-10 w-10 flex-none place-items-center rounded-lg bg-gray-100 text-[var(--admin-accent)]">
-                <%= render_icon(room.icon.presence || "sparkles", classes: "h-5 w-5") %>
+                <%= render_icon(room_icon_name(room), classes: "h-5 w-5") %>
               </div>
               <div class="min-w-0">
                 <p class="font-semibold text-gray-900"><%= room.name %></p>

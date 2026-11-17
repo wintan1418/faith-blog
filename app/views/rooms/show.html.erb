@@ -6,7 +6,7 @@
       <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <div class="flex items-start gap-5">
           <div class="grid h-16 w-16 shrink-0 place-items-center rounded-3xl bg-white/75 text-faith-green shadow-sm">
-            <%= render_icon(@room.icon || "sparkles", classes: "w-8 h-8") %>
+            <%= render_icon(room_icon_name(@room), classes: "w-8 h-8") %>
           </div>
           <div class="min-w-0">
             <div class="mb-3 flex flex-wrap items-center gap-2">
@@ -60,7 +60,7 @@
         <% else %>
           <div class="mystic-panel p-10 text-center">
             <div class="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-white/75 text-faith-green">
-              <%= render_icon(@room.icon || "sparkles", classes: "w-7 h-7") %>
+              <%= render_icon(room_icon_name(@room), classes: "w-7 h-7") %>
             </div>
             <h2 class="text-xl font-bold text-faith-dark">No posts in this room yet</h2>
             <p class="mystic-copy mx-auto mt-2 max-w-md">Be the first to start a meaningful conversation in <%= @room.name %>.</p>
@@ -91,7 +91,7 @@
             <% Room.public_rooms.where.not(id: @room.id).ordered.limit(5).each do |room| %>
               <%= link_to room_path(room), class: "flex items-center gap-3 rounded-2xl p-2 transition hover:bg-white/70" do %>
                 <span class="grid h-10 w-10 place-items-center rounded-xl bg-white/80 text-faith-green">
-                  <%= render_icon(room.icon || "sparkles", classes: "w-5 h-5") %>
+                  <%= render_icon(room_icon_name(room), classes: "w-5 h-5") %>
                 </span>
                 <span class="min-w-0 flex-1">
                   <span class="block truncate text-sm font-bold text-faith-dark"><%= room.name %></span>
