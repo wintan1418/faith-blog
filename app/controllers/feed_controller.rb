@@ -83,6 +83,11 @@ class FeedController < ApplicationController
   # cards (author, photos, likes, tags…) for just that page's 20 items. Before, all
   # 60 posts + 60 reposts were loaded with everything attached on every request.
   def paged_feed(posts:, reshares: nil, keep_order: false)
+    # Nothing from people you've blocked (or who blocked you), nor their reposts.
+    if (blocked = current_user.blocked_user_ids).any?
+      posts = posts.where.not(user_id: blocked)
+      reshares = reshares.where.not(user_id: blocked).where.not(post_id: Post.where(user_id: blocked).select(:id)) if reshares
+    end
     entries = posts.limit(POSTS_BUFFER).pluck(:id, :published_at, :created_at)
                    .map { |id, published_at, created_at| [ :post, id, published_at || created_at ] }
     if reshares
@@ -107,7 +112,9 @@ class FeedController < ApplicationController
   end
 
   def feed_posts_scope
-    Post.published.includes(feed_post_includes)
+    scope = Post.published.includes(feed_post_includes)
+    blocked = current_user.blocked_user_ids
+    blocked.any? ? scope.where.not(user_id: blocked) : scope
   end
 
   def feed_post_includes
@@ -178,11 +185,16 @@ class FeedController < ApplicationController
           .limit(4).pluck(:id)
     end
     @trending_breaths = load_by_ids(Post.includes(:user, :room), trending_ids)
+    # The sidebar lists are shared by everyone (cached); drop blocked people per viewer.
+    if (blocked = current_user.blocked_user_ids).any?
+      @trending_breaths = @trending_breaths.reject { |post| blocked.include?(post.user_id) }
+      @open_prayer_requests = @open_prayer_requests.reject { |post| blocked.include?(post.user_id) }
+    end
 
     following_ids = current_user.following.pluck(:id) << current_user.id
     active_author_ids = Post.published
                             .where(published_at: 30.days.ago..)
-                            .where.not(user_id: following_ids)
+                            .where.not(user_id: following_ids + current_user.blocked_user_ids)
                             .group(:user_id)
                             .order(Arel.sql("COUNT(*) DESC"))
                             .limit(3)

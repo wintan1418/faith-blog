@@ -36,6 +36,7 @@
     <%# Save now sits on the card's action bar (one button, so saving updates in place). %>
     <% if user_signed_in? && post.user != current_user %>
       <%= render "reports/button", reportable: post, label: "Report" %>
+      <%= render "users/block_button", user: post.user unless post.anonymous? %>
     <% end %>
   </div>
 </div>

@@ -48,10 +48,12 @@ class Comment < ApplicationRecord
   # pending_review/blocked comments to the whole world.
   def self.visible_for(viewer)
     return moderation_visible unless viewer
-    return all if viewer.respond_to?(:moderator?) &&
-                  (viewer.moderator? || viewer.admin? || viewer.super_admin?)
 
-    moderation_visible.or(where(user_id: viewer.id))
+    moderator = viewer.respond_to?(:moderator?) && (viewer.moderator? || viewer.admin? || viewer.super_admin?)
+    scope = moderator ? all : moderation_visible.or(where(user_id: viewer.id))
+    # Comments from people you've blocked (or who blocked you) are hidden.
+    blocked = viewer.respond_to?(:blocked_user_ids) ? viewer.blocked_user_ids : []
+    blocked.any? ? scope.where.not(user_id: blocked) : scope
   end
 
   # Instance methods

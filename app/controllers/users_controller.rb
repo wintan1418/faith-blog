@@ -31,6 +31,9 @@ class UsersController < ApplicationController
 
   def show
     @profile_private = !profile_visible_to_viewer?(@user)
+    # Blocked either way: no breaths here (the page says so, with Unblock).
+    @blocked = user_signed_in? && current_user.blocked_user_ids.include?(@user.id)
+    @profile_private ||= @blocked
     @tab = PROFILE_TABS.include?(params[:tab]) ? params[:tab] : "breaths"
     @strength = ProfessionalStrength.new(@user) if @tab == "professional" && @user == current_user
 

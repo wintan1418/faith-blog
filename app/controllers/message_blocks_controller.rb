@@ -7,12 +7,13 @@ class MessageBlocksController < ApplicationController
 
   def create
     current_user.message_blocks.find_or_create_by!(blocked: @user)
-    redirect_back fallback_location: conversations_path, notice: "#{@user.display_name} can no longer message you."
+    redirect_back fallback_location: feed_path,
+                  notice: "You blocked #{@user.display_name}. You won't see each other's breaths, comments or messages."
   end
 
   def destroy
     current_user.message_blocks.find_by(blocked: @user)&.destroy
-    redirect_back fallback_location: conversations_path, notice: "#{@user.display_name} can message you again."
+    redirect_back fallback_location: feed_path, notice: "You unblocked #{@user.display_name}."
   end
 
   private

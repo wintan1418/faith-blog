@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# A block between two members (named from when it only stopped messages).
+# It stops messages and hides each other's breaths, reposts and comments
+# (User#blocked_user_ids).
 class MessageBlock < ApplicationRecord
   belongs_to :blocker, class_name: "User"
   belongs_to :blocked, class_name: "User"
