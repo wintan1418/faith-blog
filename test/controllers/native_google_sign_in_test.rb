@@ -86,8 +86,11 @@ class NativeGoogleSignInTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_user_session_path
   end
 
-  test "tokens from the iPhone app's Google client are accepted" do
-    assert_includes Users::NativeGoogleSessionsController.audiences,
-                    "465735091377-paqcrc2j9t30bm3m2j8fklqanqs1riek.apps.googleusercontent.com"
+  test "tokens from the iPhone app's Google client are accepted once it's configured" do
+    saved = ENV["GOOGLE_IOS_CLIENT_ID"]
+    ENV["GOOGLE_IOS_CLIENT_ID"] = "ios-client.apps.googleusercontent.com"
+    assert_includes Users::NativeGoogleSessionsController.audiences, "ios-client.apps.googleusercontent.com"
+  ensure
+    ENV["GOOGLE_IOS_CLIENT_ID"] = saved
   end
 end
