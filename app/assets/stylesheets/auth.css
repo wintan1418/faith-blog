@@ -241,6 +241,15 @@ html .auth .auth-divider span { background: none; padding: 0; }
 /* Keep the sign-in pages calm: no floating scripture text over the form. */
 body:has(.auth) .fc-rain { display: none; }
 
-/* Sign in with Apple (iPhone app): Apple's black button. */
-html .auth .apple-auth-button { background: #000; border-color: #000; color: #fff; margin-bottom: 0.7rem; }
-html .auth .apple-auth-button:hover { border-color: #000; }
+/* Sign in with Apple (iPhone app): Apple's black button. The shared
+   .google-auth-button styles use !important, so these must too. */
+html .auth .apple-auth-button,
+html .auth .apple-auth-button:hover,
+html .auth .apple-auth-button:active {
+  background: #000 !important;
+  border-color: #000 !important;
+  color: #fff !important;
+}
+html .auth .apple-auth-button { margin-bottom: 0.7rem; }
+html .auth .apple-auth-button::before,
+html .auth .apple-auth-button::after { display: none !important; }
