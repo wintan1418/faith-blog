@@ -8,7 +8,7 @@
     <span class="office-badge is-<%= status %>"><%= status == "draft" ? "Draft" : status.capitalize %></span>
     <% if card["updated_at"].present? %><span class="office-badge is-updated">Updated</span><% end %>
     <% if card["room_name"].present? %><span class="office-badge"><%= card["room_name"] %></span><% end %>
-    <% if card["prayer"] %><span class="office-badge">🙏 Prayer request</span><% end %>
+    <% if card["prayer"] %><span class="office-badge admin-icon-badge"><%= render_icon("pray", classes: "h-3.5 w-3.5") %> Prayer request</span><% end %>
   </header>
 
   <% if image_message %>

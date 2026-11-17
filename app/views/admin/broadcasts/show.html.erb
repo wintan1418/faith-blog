@@ -34,7 +34,7 @@
         form_class: "inline",
         class: "fc-btn fc-btn-primary",
         data: { turbo_confirm: "Send this broadcast to every user with email notifications on (#{number_with_delimiter(Broadcast.eligible_user_count)} people)? This can't be undone." } do %>
-      📨 Send to all users now
+      <%= render_icon("send", classes: "h-4 w-4") %> Send to all users now
     <% end %>
     <%= link_to "Edit", edit_admin_broadcast_path(@broadcast), class: "fc-btn" %>
     <%= button_to "Delete draft",
