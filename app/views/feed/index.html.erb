@@ -1,89 +1,91 @@
 <% content_for(:title) { "Feed - Brethreign" } %>
+<%
+  # Verse of the day for the Today strip: one of the admin's Living Scriptures,
+  # the same one all day, changing each morning.
+  verses = @daily_verses.presence || [
+    OpenStruct.new(text: "He gives strength to the weary, and increases the power of the weak.", reference: "Isaiah 40:29")
+  ]
+  verse = verses[Date.current.yday % verses.size]
+  verse_chapter = verse.reference.to_s.sub(/:[\d\-–, ]+\z/, "").strip
+  streak = current_user.current_breath_streak.to_i
+  breathed_today = current_user.posts.published.where(created_at: Time.current.all_day).exists?
+%>
 
-<div class="fc-app">
+<div class="fc-app eg-feed">
   <div class="fc-shell" data-controller="discover">
-    <aside class="fc-sidebar">
-      <div class="fc-section-label">Your Space</div>
-      <nav class="space-y-1">
-        <%= link_to feed_path, class: "fc-rail-link #{'is-active' if current_page?(feed_path)}" do %>
-          <%= render_icon("feed", classes: "h-4 w-4") %>
+    <aside class="fc-sidebar eg-left" aria-label="Your space">
+      <%= render "feed/walk", plan: @user_reading_plan %>
+
+      <nav class="eg-card eg-shortcuts" aria-label="Shortcuts">
+        <%= link_to feed_path, class: "fc-rail-link eg-shortcut #{'is-active' if current_page?(feed_path)}" do %>
+          <%= render_icon("feed", classes: "eg-ico is-green") %>
           Feed
         <% end %>
         <button type="button"
-                class="fc-rail-link w-full text-left"
+                class="fc-rail-link eg-shortcut"
                 data-tour-anchor="bible"
                 data-action="click->bible-drawer#open">
-          <%= render_icon("bookopen", classes: "h-4 w-4") %>
+          <%= render_icon("bookopen", classes: "eg-ico is-green") %>
           Open Bible
         </button>
-        <%= link_to games_path, class: "fc-rail-link" do %>
-          <%= render_icon("games", classes: "h-4 w-4") %>
-          Games
-        <% end %>
-        <%= link_to church_history_path, class: "fc-rail-link" do %>
-          <%= render_icon("church", classes: "h-4 w-4") %>
-          Church History
-        <% end %>
-        <%= link_to circles_path, class: "fc-rail-link" do %>
-          <%= render_icon("pray", classes: "h-4 w-4") %>
+        <%= link_to circles_path, class: "fc-rail-link eg-shortcut" do %>
+          <%= render_icon("pray", classes: "eg-ico is-gold") %>
           Prayer Circles
         <% end %>
-        <%= link_to answered_prayers_path, class: "fc-rail-link" do %>
-          <%= render_icon("answered", classes: "h-4 w-4") %>
+        <%= link_to answered_prayers_path, class: "fc-rail-link eg-shortcut" do %>
+          <%= render_icon("answered", classes: "eg-ico is-green") %>
           Answered Prayers
         <% end %>
-        <%= link_to bookmarks_path, class: "fc-rail-link" do %>
-          <%= render_icon("bookmark", classes: "h-4 w-4") %>
+        <%= link_to bookmarks_path, class: "fc-rail-link eg-shortcut" do %>
+          <%= render_icon("bookmark", classes: "eg-ico is-blue") %>
           Bookmarks
         <% end %>
-        <%= link_to blog_path, class: "fc-rail-link" do %>
-          <%= render_icon("blog", classes: "h-4 w-4") %>
-          Blog &amp; guides
-        <% end %>
-        <%= link_to user_path(current_user.username), class: "fc-rail-link" do %>
-          <%= render_icon("user", classes: "h-4 w-4") %>
-          Profile
-        <% end %>
-        <%= link_to my_connections_path, class: "fc-rail-link" do %>
-          <%= render_icon("users", classes: "h-4 w-4") %>
-          Connections
-        <% end %>
-        <%= link_to notifications_path, class: "fc-rail-link" do %>
-          <%= render_icon("bell", classes: "h-4 w-4") %>
-          Notifications
-        <% end %>
-        <% if current_user_admin? %>
-          <%= link_to admin_root_path, class: "fc-rail-link #{'is-active' if request.path.start_with?('/admin')}" do %>
-            <%= render_icon("settings", classes: "h-4 w-4") %>
-            Admin
+
+        <details class="eg-more">
+          <summary class="fc-rail-link eg-shortcut eg-more-toggle">
+            <%= render_icon("chevrondown", classes: "eg-ico eg-more-chevron") %>
+            <span class="eg-more-closed">See more</span>
+            <span class="eg-more-open">See less</span>
+          </summary>
+          <%= link_to games_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("games", classes: "eg-ico is-violet") %>
+            Games
           <% end %>
-        <% end %>
+          <%= link_to church_history_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("church", classes: "eg-ico is-violet") %>
+            Church History
+          <% end %>
+          <%= link_to blog_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("blog", classes: "eg-ico is-blue") %>
+            Blog &amp; guides
+          <% end %>
+          <%= link_to user_path(current_user.username), class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("user", classes: "eg-ico is-green") %>
+            Profile
+          <% end %>
+          <%= link_to my_connections_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("users", classes: "eg-ico is-green") %>
+            Connections
+          <% end %>
+          <%= link_to notifications_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("bell", classes: "eg-ico is-gold") %>
+            Notifications
+          <% end %>
+          <% if current_user_admin? %>
+            <%= link_to admin_root_path, class: "fc-rail-link eg-shortcut #{'is-active' if request.path.start_with?('/admin')}" do %>
+              <%= render_icon("settings", classes: "eg-ico") %>
+              Admin
+            <% end %>
+          <% end %>
+        </details>
       </nav>
 
-      <div class="fc-rail-games-card" data-tour-anchor="discover">
-        <div class="fc-rail-games-head">
-          <span class="fc-rail-games-kicker">🎯 Play</span>
-          <%= link_to "Leaderboard →", games_path, class: "fc-rail-games-link" %>
+      <section class="eg-card eg-rooms" data-tour-anchor="rooms" aria-labelledby="eg-rooms-title">
+        <div class="eg-card-head">
+          <h2 class="eg-card-title" id="eg-rooms-title">Rooms</h2>
+          <%= link_to "See all", rooms_path, class: "eg-card-link" %>
         </div>
-        <div class="fc-rail-games-list">
-          <%= link_to games_quiz_path, class: "fc-rail-games-item" do %>
-            <span class="fc-rail-games-icon">📖</span>
-            <span class="fc-rail-games-label">Bible Quiz</span>
-          <% end %>
-          <%= link_to games_chess_path, class: "fc-rail-games-item" do %>
-            <span class="fc-rail-games-icon">♚</span>
-            <span class="fc-rail-games-label">Chess Puzzle</span>
-          <% end %>
-          <%= link_to games_history_path, class: "fc-rail-games-item" do %>
-            <span class="fc-rail-games-icon">⛪</span>
-            <span class="fc-rail-games-label">Church History</span>
-          <% end %>
-        </div>
-      </div>
-
-      <div class="fc-section-label">Your Rooms</div>
-      <nav class="space-y-1" data-tour-anchor="rooms">
-        <% Room.public_rooms.ordered.limit(6).each do |room| %>
+        <% Room.public_rooms.ordered.limit(5).each do |room| %>
           <%
             tint = case room.slug.to_s
                    when /prayer/  then "prayer"
@@ -95,93 +97,109 @@
                    else "prayer"
                    end
           %>
-          <%= link_to room_path(room), class: "fc-rail-link" do %>
-            <span class="grid h-5 w-5 place-items-center rounded text-[10px] room-tint-<%= tint %>">
-              <%= render_icon(room_icon_name(room), classes: "h-3.5 w-3.5") %>
+          <%= link_to room_path(room), class: "fc-rail-link eg-shortcut eg-room-link" do %>
+            <span class="eg-room-tile room-tint-<%= tint %>">
+              <%= render_icon(room_icon_name(room), classes: "h-4 w-4") %>
             </span>
-            <%= room.name %>
+            <span class="eg-room-name"><%= room.name %></span>
           <% end %>
         <% end %>
-        <%= link_to "Browse all rooms ->", rooms_path, class: "mt-3 block px-3 text-sm font-semibold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
-      </nav>
+      </section>
+
+      <% latest_articles = BlogArticle.all.sort_by { |a| [ -a.date.jd, a.order ] }.first(3) %>
+      <% if latest_articles.any? %>
+        <section class="eg-blog fc-blog-card" aria-labelledby="eg-blog-title">
+          <div class="eg-card-head">
+            <h2 class="eg-mini-title" id="eg-blog-title">From the blog</h2>
+            <%= link_to "All guides", blog_path, class: "eg-card-link" %>
+          </div>
+          <% latest_articles.each do |article| %>
+            <%= link_to blog_article_path(article.slug), class: "eg-blog-item" do %>
+              <span class="eg-blog-title"><%= article.title %></span>
+              <span class="eg-blog-meta"><%= article.category %> · <%= article.minutes %> min read</span>
+            <% end %>
+          <% end %>
+        </section>
+      <% end %>
     </aside>
 
-    <main class="fc-main">
-      <%# Masthead: today's date in the reader's own time zone (the server runs
-          on UTC, so the server's date can be a day off late at night). %>
-      <header class="fc-masthead">
-        <div class="min-w-0">
-          <h1 class="fc-masthead-date">
+    <main class="fc-main eg-main">
+      <%# Today: the reader's own date (the server runs on UTC, so its date can
+          be a day off late at night), the breath streak, the verse of the day
+          and who is online right now. %>
+      <section class="eg-today" aria-label="Today">
+        <svg class="eg-today-waves" viewBox="0 0 320 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M0 70c40-50 80-50 120 0s80 50 120 0 60-40 80-20M0 100c40-50 80-50 120 0s80 50 120 0 60-40 80-20"/></svg>
+        <div class="eg-today-top">
+          <h1 class="eg-today-date">
             <time datetime="<%= Time.current.utc.iso8601 %>" data-controller="local-time" data-local-time-format-value="today"><%= Date.current.strftime("%A, %-d %B") %></time>
           </h1>
+          <% if streak.positive? %>
+            <span class="eg-today-streak" title="Breath streak: days in a row you've breathed">
+              <%= render_icon("flame", classes: "eg-flame") %>
+              <%= streak %>-day streak
+            </span>
+          <% end %>
         </div>
-        <% if current_user.current_breath_streak.to_i.positive? %>
-          <span class="fc-masthead-streak" title="Breath streak — days in a row you've breathed">
-            🔥 <%= current_user.current_breath_streak %><small><%= current_user.current_breath_streak == 1 ? "day" : "days" %></small>
-          </span>
-        <% end %>
-      </header>
-
-      <%= render "presence/strip", online: OnlinePresence.new(current_user) %>
+        <blockquote class="eg-today-verse">&ldquo;<%= verse.text %>&rdquo;</blockquote>
+        <div class="eg-today-foot">
+          <% if verse.reference.present? %>
+            <span class="eg-today-ref"><%= verse.reference %></span>
+          <% end %>
+          <div class="eg-today-online">
+            <%= render "presence/strip", online: OnlinePresence.new(current_user) %>
+          </div>
+          <% if verse_chapter.present? %>
+            <button type="button"
+                    class="eg-today-read"
+                    data-reference="<%= verse_chapter %>"
+                    data-action="click->bible-drawer#open click->bible-drawer#openChapter">
+              Read chapter
+              <%= render_icon("chevronright", classes: "h-4 w-4") %>
+            </button>
+          <% end %>
+        </div>
+      </section>
 
       <%= render "feed/birthdays", birthdays: @birthdays_today %>
 
-      <div class="fc-panel fc-composer">
-        <div class="fc-composer-row">
+      <%# The Daily Breath question is the composer's prompt. %>
+      <div class="fc-panel fc-composer eg-composer">
+        <div class="eg-composer-row">
           <% if current_user.profile&.avatar&.attached? %>
-            <%= image_tag avatar_src(current_user.profile), class: "fc-avatar object-cover" %>
+            <%= image_tag avatar_src(current_user.profile), class: "eg-avatar object-cover", alt: "" %>
           <% else %>
-            <span class="fc-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
+            <span class="eg-avatar" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
           <% end %>
           <button type="button"
-                  class="fc-composer-input flex items-center text-[var(--fc-muted)]"
+                  class="eg-composer-input"
                   data-tour-anchor="composer"
                   data-action="click->composer-modal#open">
-            <%# Phones hide the Breathe button beside this box, so the box shows a pen. %>
-            <span class="fc-composer-input-pen" aria-hidden="true"><%= render_icon("pencil", classes: "h-4 w-4") %></span>
-            <%# On phones the Daily Breath card folds into this box: its question becomes the prompt. %>
-            <span class="fc-composer-input-text fc-composer-default">What's on your heart?<span class="fc-composer-input-more"> Take a breath...</span></span>
-            <span class="fc-composer-input-text fc-composer-daily">What breath do you have today?</span>
-          </button>
-          <button type="button"
-                  class="fc-btn fc-btn-primary fc-composer-go"
-                  data-action="click->composer-modal#open">
-            Breathe
+            <span class="fc-composer-daily">What breath do you have today?</span>
+            <span class="eg-composer-photo" aria-hidden="true"><%= render_icon("image", classes: "h-5 w-5") %></span>
           </button>
         </div>
-        <% if current_user.posts.published.where(created_at: Time.current.all_day).exists? %>
-          <p class="fc-composer-done">✓ You breathed today</p>
-        <% end %>
-        <div class="fc-composer-chips">
-          <button type="button" class="fc-composer-chip is-prayer" data-tour-anchor="prayer" data-tour-rank="1"
+        <div class="eg-chips">
+          <button type="button" class="eg-chip is-prayer" data-tour-anchor="prayer" data-tour-rank="1"
                   data-action="click->composer-modal#openWith"
-                  data-composer-modal-prefill-param="🙏 Brethren, please pray with me — ">🙏 Prayer request</button>
-          <button type="button" class="fc-composer-chip is-verse"
+                  data-composer-modal-prefill-param="Brethren, please pray with me: ">
+            <%= render_icon("pray", classes: "h-5 w-5") %> Prayer
+          </button>
+          <button type="button" class="eg-chip is-verse"
                   data-action="click->composer-modal#openWith"
-                  data-composer-modal-prefill-param="📖 A verse on my heart today: ">📖 Share a verse</button>
-          <button type="button" class="fc-composer-chip is-voice" data-action="click->composer-modal#open">🎙️ Voice note</button>
-          <button type="button" class="fc-composer-chip is-read" data-tour-anchor="bible" data-tour-rank="1" data-action="click->bible-drawer#open">✨ Read first</button>
+                  data-composer-modal-prefill-param="A verse on my heart today: ">
+            <%= render_icon("bookopen", classes: "h-5 w-5") %> Verse
+          </button>
+          <button type="button" class="eg-chip is-photo" data-action="click->composer-modal#open">
+            <%= render_icon("image", classes: "h-5 w-5") %> Photo
+          </button>
+          <button type="button" class="eg-chip is-voice" data-action="click->composer-modal#open">
+            <%= render_icon("mic", classes: "h-5 w-5") %> Voice
+          </button>
+          <% if breathed_today %>
+            <p class="fc-composer-done"><%= render_icon("answered", classes: "h-4 w-4") %> You breathed today</p>
+          <% end %>
         </div>
       </div>
-
-      <%# The Daily Breath prompt — one question a day the whole community
-          answers. Turns readers into writers. %>
-      <% breathed_today = current_user.posts.published.where(created_at: Time.current.all_day).exists? %>
-      <section class="fc-daily-prompt<%= ' is-done' if breathed_today %>">
-        <div class="fc-daily-prompt-body">
-          <p class="fc-daily-prompt-kicker">🌅 Daily breath</p>
-          <h2 class="fc-daily-prompt-q">What breath do you have today?</h2>
-        </div>
-        <% if breathed_today %>
-          <span class="fc-daily-prompt-done">✓ You breathed today</span>
-        <% else %>
-          <button type="button"
-                  class="fc-btn fc-btn-primary fc-daily-prompt-cta"
-                  data-action="click->composer-modal#open">
-            Breathe it out
-          </button>
-        <% end %>
-      </section>
 
       <%# Getting started: first steps that tick themselves, until done or hidden. %>
       <% if @onboarding || @onboarding_celebrate %>
@@ -196,7 +214,7 @@
       <% join_key = "join-#{joiners.map(&:id).max}" %>
       <% if joiners.any? && !current_user.card_dismissed?(join_key) %>
         <% people = joiners.map(&:user).uniq.first(5) %>
-        <div class="fc-join-card mb-3"
+        <div class="fc-join-card"
              data-controller="auto-dismiss"
              data-auto-dismiss-after-ms-value="30000"
              data-auto-dismiss-persist-key-value="<%= join_key %>"
@@ -242,7 +260,7 @@
                   data-action="click->onboarding#dismiss"
                   aria-label="Dismiss">×</button>
           <% if @release_announcement.kicker.present? %>
-            <p class="fc-release-banner-kicker">✦ <%= @release_announcement.kicker %></p>
+            <p class="fc-release-banner-kicker"><%= render_icon("sparkles", classes: "h-4 w-4") %> <%= @release_announcement.kicker %></p>
           <% end %>
           <h2 class="fc-release-banner-title"><%= @release_announcement.title %></h2>
           <% if @release_announcement.body.present? %>
@@ -261,18 +279,8 @@
           just this region — no full page reload. target: "_top" keeps every
           link inside the cards navigating normally; only the tab links opt
           into the frame. %>
-      <%# Phones hide the sidebar, so its shortcuts sit here as a swipeable row. %>
-      <nav class="fc-feed-shortcuts" aria-label="Shortcuts">
-        <%= link_to "🙏 Prayer Circles", circles_path, class: "fc-feed-shortcut" %>
-        <%= link_to "🌟 Answered Prayers", answered_prayers_path, class: "fc-feed-shortcut" %>
-        <%= link_to "📰 Blog & guides", blog_path, class: "fc-feed-shortcut" %>
-        <%= link_to "🎯 Games", games_path, class: "fc-feed-shortcut" %>
-        <%= link_to "⛪ Church History", church_history_path, class: "fc-feed-shortcut" %>
-        <%= link_to "🔖 Bookmarks", bookmarks_path, class: "fc-feed-shortcut" %>
-      </nav>
-
       <%= turbo_frame_tag "feed_stream", target: "_top" do %>
-      <div class="fc-tabs" data-controller="feed-tabs">
+      <div class="fc-tabs eg-tabs" data-controller="feed-tabs" role="tablist" aria-label="Feed">
         <%= link_to "Recent", feed_path,
               class: "fc-tab #{current_page?(feed_path) ? 'is-active' : ''}",
               data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
@@ -289,7 +297,7 @@
               class: "fc-tab #{@updates_tab ? 'is-active' : ''}",
               data: { turbo_frame: "feed_stream", turbo_action: "advance", action: "click->feed-tabs#move" } %>
         <button type="button" class="fc-discover-trigger" data-tour-anchor="discover" data-action="click->discover#open" aria-label="Open discover panel">
-          <%= render_icon("sparkles", classes: "h-4 w-4") %>
+          <%= render_icon("grid", classes: "h-4 w-4") %>
           <span>Discover</span>
         </button>
       </div>
@@ -308,14 +316,14 @@
           <span data-new-posts-pill-target="label">new breaths</span>
         </button>
 
-        <div class="mt-4 space-y-3">
+        <div class="eg-stream">
           <% if @updates_tab %>
             <%= render "bot_items/stream" %>
           <% else %>
           <% if @pinned_posts.present? %>
             <div class="fc-pinned-strip">
-              <p class="fc-pinned-label">📌 Pinned for the community</p>
-              <div class="space-y-3">
+              <p class="fc-pinned-label"><%= render_icon("pin", classes: "h-4 w-4") %> Pinned for the community</p>
+              <div class="eg-stream">
                 <% @pinned_posts.each do |pinned| %>
                   <div class="fc-pinned-card">
                     <%= render "posts/card", post: pinned %>
@@ -326,7 +334,7 @@
           <% end %>
 
           <% if @items.any? %>
-            <div id="feed_list" class="space-y-3">
+            <div id="feed_list" class="eg-stream">
               <% @items.each_with_index do |item, index| %>
                 <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
                 <% if index == 3 && @suggestions %>
@@ -351,14 +359,14 @@
             <% else %>
               <div class="fc-caught-up" role="status">
                 <span class="fc-caught-up-line" aria-hidden="true"></span>
-                <span class="fc-caught-up-text">✦ You're all caught up</span>
+                <span class="fc-caught-up-text"><%= render_icon("answered", classes: "h-4 w-4") %> You're all caught up</span>
                 <span class="fc-caught-up-line" aria-hidden="true"></span>
               </div>
             <% end %>
           <% else %>
             <div class="fc-empty">
               <div class="fc-empty-mark" aria-hidden="true">
-                <%= render_icon("message_circle", classes: "h-7 w-7") %>
+                <%= render_icon("chat", classes: "h-7 w-7") %>
               </div>
               <h2 class="fc-empty-title">Quiet here for now.</h2>
               <p class="fc-empty-text">Be the first to take a breath — share a verse, a prayer, or what's on your heart.</p>
@@ -371,7 +379,7 @@
                 <button type="button"
                         class="fc-btn"
                         data-action="click->bible-drawer#open">
-                  📖 Open Bible
+                  <%= render_icon("bookopen", classes: "h-4 w-4") %> Open Bible
                 </button>
               </div>
             </div>
@@ -382,101 +390,155 @@
       <% end %>
     </main>
 
-    <aside class="fc-aside space-y-3" data-discover-target="panel">
+    <aside class="fc-aside eg-right" data-discover-target="panel" aria-label="Discover">
       <header class="fc-discover-head">
         <span>Discover</span>
         <button type="button" class="fc-discover-close" data-action="click->discover#close" aria-label="Close">×</button>
       </header>
 
-      <nav class="fc-discover-quicklinks" aria-label="Quick links">
-        <button type="button"
-                class="fc-discover-quicklink is-bible"
-                title="Open Bible"
-                aria-label="Open Bible"
-                data-action="click->bible-drawer#open click->discover#close">
-          <%= render_icon("bookopen", classes: "h-5 w-5") %>
+      <%# Phones have no left column: its shortcuts and walk live in this sheet. %>
+      <nav class="eg-card eg-quicklinks" aria-label="Quick links">
+        <button type="button" class="eg-quicklink" data-action="click->bible-drawer#open click->discover#close">
+          <%= render_icon("bookopen", classes: "eg-ico is-green") %> Open Bible
         </button>
-        <%= link_to people_path, class: "fc-discover-quicklink", title: "People", aria: { label: "People" } do %>
-          <%= render_icon("users", classes: "h-5 w-5") %>
+        <%= link_to circles_path, class: "eg-quicklink" do %>
+          <%= render_icon("pray", classes: "eg-ico is-gold") %> Prayer Circles
         <% end %>
-        <%= link_to bookmarks_path, class: "fc-discover-quicklink", title: "Bookmarks", aria: { label: "Bookmarks" } do %>
-          <%= render_icon("bookmark", classes: "h-5 w-5") %>
+        <%= link_to answered_prayers_path, class: "eg-quicklink" do %>
+          <%= render_icon("answered", classes: "eg-ico is-green") %> Answered Prayers
         <% end %>
-        <%= link_to search_path, class: "fc-discover-quicklink", title: "Search", aria: { label: "Search" } do %>
-          <%= render_icon("search", classes: "h-5 w-5") %>
+        <%= link_to bookmarks_path, class: "eg-quicklink" do %>
+          <%= render_icon("bookmark", classes: "eg-ico is-blue") %> Bookmarks
         <% end %>
-        <%= link_to church_history_path, class: "fc-discover-quicklink", title: "Church History", aria: { label: "Church History" } do %>
-          <span class="fc-discover-quicklink-emoji">⛪</span>
+        <%= link_to people_path, class: "eg-quicklink" do %>
+          <%= render_icon("users", classes: "eg-ico is-green") %> People
         <% end %>
-        <%= link_to games_path, class: "fc-discover-quicklink", title: "Games", aria: { label: "Games" } do %>
-          <span class="fc-discover-quicklink-emoji">🎯</span>
+        <%= link_to search_path, class: "eg-quicklink" do %>
+          <%= render_icon("search", classes: "eg-ico") %> Search
         <% end %>
-        <%= link_to blog_path, class: "fc-discover-quicklink", title: "Blog & guides", aria: { label: "Blog and guides" } do %>
-          <span class="fc-discover-quicklink-emoji">📰</span>
+        <%= link_to games_path, class: "eg-quicklink" do %>
+          <%= render_icon("games", classes: "eg-ico is-violet") %> Games
         <% end %>
-        <%= link_to circles_path, class: "fc-discover-quicklink", title: "Prayer Circles", aria: { label: "Prayer Circles" } do %>
-          <span class="fc-discover-quicklink-emoji">🙏</span>
+        <%= link_to church_history_path, class: "eg-quicklink" do %>
+          <%= render_icon("church", classes: "eg-ico is-violet") %> Church History
         <% end %>
-        <%= link_to answered_prayers_path, class: "fc-discover-quicklink", title: "Answered Prayers", aria: { label: "Answered Prayers" } do %>
-          <span class="fc-discover-quicklink-emoji">🌟</span>
+        <%= link_to blog_path, class: "eg-quicklink" do %>
+          <%= render_icon("blog", classes: "eg-ico is-blue") %> Blog &amp; guides
         <% end %>
       </nav>
-      <%
-        verses = @daily_verses.presence || [
-          OpenStruct.new(
-            text: "He gives strength to the weary, and increases the power of the weak.",
-            reference: "Isaiah 40:29"
-          )
-        ]
-      %>
-      <div class="fc-side-card fc-living-card"
-           data-controller="golden-carousel"
-           data-golden-carousel-interval-value="9000">
-        <header class="fc-living-head">
-          <p class="fc-living-kicker">Living Scriptures</p>
-          <% if verses.size > 1 %>
-            <div class="fc-golden-controls">
-              <button type="button" class="fc-living-arrow" data-action="click->golden-carousel#prev" aria-label="Previous">‹</button>
-              <button type="button" class="fc-living-arrow" data-action="click->golden-carousel#next" aria-label="Next">›</button>
-            </div>
-          <% end %>
-        </header>
+      <%= render "feed/walk", plan: @user_reading_plan, extra_class: "eg-phone-only" %>
 
-        <div class="fc-golden-track" data-golden-carousel-target="track">
-          <% verses.each_with_index do |verse, i| %>
-            <article class="fc-golden-slide<%= ' is-active' if i.zero? %>" data-golden-carousel-target="slide">
-              <p class="fc-living-quote">"<%= verse.text %>"</p>
-              <% if verse.reference.present? %>
-                <p class="fc-living-ref"><%= verse.reference %></p>
-              <% end %>
-            </article>
+      <section class="fc-side-card eg-card eg-pray-card" data-tour-anchor="prayer" aria-labelledby="eg-pray-title">
+        <div class="eg-card-head">
+          <h2 class="eg-card-title" id="eg-pray-title">Pray for the brethren</h2>
+          <% if @open_prayer_requests_count.to_i.positive? %>
+            <span class="eg-count"><%= @open_prayer_requests_count %></span>
           <% end %>
         </div>
-
-        <% if verses.size > 1 %>
-          <div class="fc-golden-dots fc-living-dots" role="tablist" aria-label="Living Scriptures">
-            <% verses.each_with_index do |_, i| %>
-              <button type="button"
-                      class="fc-golden-dot<%= ' is-active' if i.zero? %>"
-                      data-action="click->golden-carousel#goto"
-                      data-index="<%= i %>"
-                      data-golden-carousel-target="dot"
-                      aria-label="Slide <%= i + 1 %>"></button>
-            <% end %>
+        <% if @open_prayer_requests.any? %>
+          <% @open_prayer_requests.each do |post| %>
+            <div class="eg-pray-row">
+              <span class="eg-avatar eg-avatar-sm" style="<%= avatar_tint_style(post.anonymous? ? "anon-#{post.id}" : post.user.username) %>">
+                <%= post.anonymous? ? render_icon("users", classes: "h-4 w-4") : post.user.username.first.upcase %>
+              </span>
+              <span class="eg-pray-text">
+                <%= link_to truncate(post.title, length: 42), post_path(post), class: "eg-pray-title" %>
+                <span class="eg-pray-meta"><%= post.anonymous? ? "Anonymous" : post.user.username %> · <%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
+              </span>
+              <% if current_user.has_liked?(post) %>
+                <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
+                    method: :delete,
+                    form_class: "eg-pray-form",
+                    class: "eg-pray-btn is-praying",
+                    title: "You're praying. Tap to undo",
+                    aria: { label: "Praying for: #{post.title}. Tap to undo" },
+                    data: { turbo_frame: "_top" } do %>
+                  <%= render_icon("pray", classes: "h-5 w-5") %>
+                <% end %>
+              <% else %>
+                <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_type: :praying),
+                    form_class: "eg-pray-form",
+                    class: "eg-pray-btn",
+                    title: "Pray",
+                    aria: { label: "Pray for: #{post.title}" },
+                    data: { turbo_frame: "_top" } do %>
+                  <%= render_icon("pray", classes: "h-5 w-5") %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+          <div class="eg-card-links">
+            <%= link_to "See all requests", (@prayer_room ? room_path(@prayer_room) : rooms_path), class: "eg-card-link" %>
+            <%= link_to "Answered wall", answered_prayers_path, class: "eg-card-link is-gold" %>
           </div>
+        <% else %>
+          <p class="eg-muted">No prayer requests yet.</p>
+          <button type="button" data-action="click->composer-modal#open" class="eg-card-link">Start one</button>
         <% end %>
-      </div>
+      </section>
+
+      <section class="fc-side-card eg-card eg-games-card" aria-labelledby="eg-games-title">
+        <div class="eg-card-head">
+          <h2 class="eg-card-title" id="eg-games-title">Play today</h2>
+          <%= link_to "Leaderboard", games_path, class: "eg-card-link" %>
+        </div>
+        <%= link_to games_chess_path, class: "eg-game-row" do %>
+          <span class="eg-tile is-green"><%= render_icon("chess", classes: "h-5 w-5") %></span>
+          <span class="eg-game-text"><strong>Chess puzzle</strong><small>Today's puzzle</small></span>
+        <% end %>
+        <%= link_to games_quiz_path, class: "eg-game-row" do %>
+          <span class="eg-tile is-gold"><%= render_icon("quiz", classes: "h-5 w-5") %></span>
+          <span class="eg-game-text"><strong>Bible quiz</strong><small>Test what you know</small></span>
+        <% end %>
+        <%= link_to games_history_path, class: "eg-game-row" do %>
+          <span class="eg-tile is-violet"><%= render_icon("church", classes: "h-5 w-5") %></span>
+          <span class="eg-game-text"><strong>Church history</strong><small>Walk through the centuries</small></span>
+        <% end %>
+      </section>
+
+      <% if @who_to_brethren.any? %>
+        <section class="fc-side-card eg-card" aria-labelledby="eg-people-title">
+          <div class="eg-card-head">
+            <h2 class="eg-card-title" id="eg-people-title">Brethren you may know</h2>
+            <%= link_to "See all", people_path, class: "eg-card-link" %>
+          </div>
+          <% @who_to_brethren.each do |user| %>
+            <div class="eg-person">
+              <%= link_to user_path(user.username), class: "eg-person-avatar", aria: { label: user.username } do %>
+                <% if user.profile&.avatar&.attached? %>
+                  <%= image_tag avatar_src(user.profile), class: "eg-avatar object-cover", alt: "" %>
+                <% else %>
+                  <span class="eg-avatar" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
+                <% end %>
+              <% end %>
+              <span class="eg-person-text">
+                <%= link_to user.username, user_path(user.username), class: "eg-person-name" %>
+                <% bio = user.profile&.bio.to_s.strip %>
+                <span class="eg-person-sub"><%= bio.present? ? truncate(bio, length: 32) : "recent breath author" %></span>
+              </span>
+              <%= button_to follow_user_path(user.username),
+                  method: :post,
+                  form_class: "eg-person-form",
+                  class: "eg-btn eg-btn-outline",
+                  data: { turbo: false } do %>
+                Follow
+              <% end %>
+            </div>
+          <% end %>
+        </section>
+      <% end %>
 
       <% if @daily_breaths.any? %>
-        <div class="fc-side-card fc-golden-card"
-             data-controller="golden-carousel"
-             data-golden-carousel-interval-value="7000">
-          <header class="fc-golden-head">
-            <p class="fc-golden-kicker">Golden Breaths</p>
+        <section class="fc-side-card eg-card fc-golden-card eg-golden"
+                 data-controller="golden-carousel"
+                 data-golden-carousel-interval-value="7000"
+                 aria-labelledby="eg-golden-title">
+          <header class="eg-card-head">
+            <h2 class="eg-card-title" id="eg-golden-title">Golden breaths</h2>
             <% if @daily_breaths.size > 1 %>
-              <div class="fc-golden-controls">
-                <button type="button" class="fc-golden-arrow" data-action="click->golden-carousel#prev" aria-label="Previous">‹</button>
-                <button type="button" class="fc-golden-arrow" data-action="click->golden-carousel#next" aria-label="Next">›</button>
+              <div class="eg-golden-controls">
+                <button type="button" class="eg-round-btn" data-action="click->golden-carousel#prev" aria-label="Previous"><%= render_icon("chevronleft", classes: "h-4 w-4") %></button>
+                <button type="button" class="eg-round-btn" data-action="click->golden-carousel#next" aria-label="Next"><%= render_icon("chevronright", classes: "h-4 w-4") %></button>
               </div>
             <% end %>
           </header>
@@ -484,15 +546,15 @@
           <div class="fc-golden-track" data-golden-carousel-target="track">
             <% @daily_breaths.each_with_index do |breath, i| %>
               <article class="fc-golden-slide<%= ' is-active' if i.zero? %>" data-golden-carousel-target="slide">
-                <p class="fc-golden-quote">"<%= breath.text %>"</p>
-                <div class="fc-golden-foot">
+                <p class="eg-golden-quote">&ldquo;<%= breath.text %>&rdquo;</p>
+                <p class="eg-golden-foot">
                   <% if breath.author_name.present? %>
-                    <span class="fc-golden-author">— <%= breath.author_name %></span>
+                    <span class="eg-golden-author"><%= breath.author_name %></span>
                   <% end %>
                   <% if breath.reference.present? %>
-                    <span class="fc-golden-ref"><%= breath.reference %></span>
+                    <span class="eg-golden-ref"><%= breath.reference %></span>
                   <% end %>
-                </div>
+                </p>
               </article>
             <% end %>
           </div>
@@ -509,166 +571,7 @@
               <% end %>
             </div>
           <% end %>
-        </div>
-      <% end %>
-
-      <% if @user_reading_plan %>
-        <div class="fc-side-card fc-plan-side">
-          <p class="fc-plan-side-kicker">📖 <%= @user_reading_plan.plan&.title %></p>
-          <p class="fc-plan-side-day">Day <%= @user_reading_plan.current_day %> of <%= @user_reading_plan.days_total %></p>
-          <p class="fc-plan-side-ref"><%= @user_reading_plan.today_reading&.dig(:reference) %></p>
-          <div class="fc-plan-progress">
-            <div class="fc-plan-progress-bar" style="width: <%= @user_reading_plan.progress_percent %>%"></div>
-          </div>
-          <% if @user_reading_plan.can_check_in_today? %>
-            <%= button_to "Mark today done", check_in_reading_plan_path(@user_reading_plan.plan_slug), method: :post, form_class: "inline mt-3", class: "fc-btn fc-btn-primary w-full" %>
-          <% else %>
-            <p class="mt-3 text-xs font-bold text-[var(--fc-accent-2)]">✓ Done for today</p>
-          <% end %>
-          <%= link_to "Open plan →", reading_plan_path(@user_reading_plan.plan_slug), class: "mt-2 inline-block text-xs font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
-        </div>
-      <% else %>
-        <div class="fc-side-card">
-          <p class="text-xs font-extrabold uppercase tracking-wider text-[var(--fc-muted)]">📖 Reading plan</p>
-          <p class="mt-2 text-sm text-[var(--fc-soft)]">Pick a slow rhythm in scripture — psalms, John, or Proverbs.</p>
-          <%= link_to "Browse plans", reading_plans_path, class: "mt-3 inline-block text-sm font-bold text-[var(--fc-accent-2)] hover:text-[var(--fc-ink)]" %>
-        </div>
-      <% end %>
-
-      <% latest_articles = BlogArticle.all.sort_by { |a| [ -a.date.jd, a.order ] }.first(3) %>
-      <% if latest_articles.any? %>
-        <div class="fc-side-card fc-blog-card">
-          <div class="mb-2 flex items-center justify-between">
-            <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">📰 From the blog</h3>
-            <%= link_to "All guides →", blog_path, class: "text-sm font-bold text-[var(--fc-accent-2)] hover:text-[var(--fc-ink)]" %>
-          </div>
-          <ul class="space-y-2">
-            <% latest_articles.each do |article| %>
-              <li>
-                <%= link_to blog_article_path(article.slug), class: "group block" do %>
-                  <span class="block text-sm font-bold leading-snug text-[var(--fc-ink)] group-hover:text-[var(--fc-accent-2)]"><%= article.title %></span>
-                  <span class="block text-xs text-[var(--fc-muted)]"><%= article.category %> · <%= article.minutes %> min read</span>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
-
-      <div class="fc-side-card" data-tour-anchor="prayer">
-        <div class="mb-3 flex items-center justify-between">
-          <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Open prayer requests</h3>
-          <span class="text-sm text-[var(--fc-muted)]"><%= @open_prayer_requests_count %></span>
-        </div>
-        <% if @open_prayer_requests.any? %>
-          <div class="space-y-3">
-            <% @open_prayer_requests.each do |post| %>
-            <div class="flex items-center gap-3">
-              <span class="fc-avatar" style="<%= avatar_tint_style(post.anonymous? ? "anon-#{post.id}" : post.user.username) %>">
-                <%= post.anonymous? ? render_icon("users", classes: "h-4 w-4") : post.user.username.first.upcase %>
-              </span>
-              <span class="min-w-0 flex-1">
-                <%= link_to post_path(post), class: "block truncate text-sm font-bold text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" do %>
-                  <%= truncate(post.title, length: 42) %>
-                <% end %>
-                <span class="block truncate text-xs text-[var(--fc-muted)]">
-                  <%= post.anonymous? ? "Anonymous" : post.user.username %> · <%= time_ago_in_words(post.published_at || post.created_at) %> ago
-                </span>
-              </span>
-              <% if current_user.has_liked?(post) %>
-                <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
-                    method: :delete,
-                    class: "fc-btn text-[var(--fc-accent)]",
-                    data: { turbo_frame: "_top" } do %>
-                  Praying
-                <% end %>
-              <% else %>
-                <%= button_to likes_path(likeable_type: "Post", likeable_id: post.id, reaction_type: :praying),
-                    class: "fc-btn",
-                    data: { turbo_frame: "_top" } do %>
-                  Pray
-                <% end %>
-              <% end %>
-            </div>
-            <% end %>
-          </div>
-          <div class="mt-4 flex items-center gap-4">
-            <%= link_to "View prayer room", (@prayer_room ? room_path(@prayer_room) : rooms_path), class: "text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]" %>
-            <%= link_to "🌟 Answered wall", answered_prayers_path, class: "text-sm font-bold text-[#b45309] hover:text-[var(--fc-ink)]" %>
-          </div>
-        <% else %>
-          <div class="rounded-md border border-[var(--fc-line)] bg-[var(--fc-surface-2)] p-4">
-            <p class="text-sm font-semibold text-[var(--fc-soft)]">No prayer requests yet.</p>
-            <button type="button"
-                    data-action="click->composer-modal#open"
-                    class="mt-3 inline-block text-sm font-bold text-[var(--fc-accent)] hover:text-[var(--fc-ink)]">
-              Start one
-            </button>
-          </div>
-        <% end %>
-      </div>
-
-      <% if @trending_breaths.any? %>
-        <div class="fc-side-card">
-          <div class="mb-3 flex items-center justify-between">
-            <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Trending breaths</h3>
-            <%= link_to "More", feed_trending_path, class: "text-xs font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
-          </div>
-          <div class="space-y-3">
-            <% @trending_breaths.each_with_index do |post, idx| %>
-              <%= link_to post_path(post), class: "flex items-start gap-3 hover:bg-[var(--fc-surface-2)] -mx-2 px-2 py-1.5 rounded-md transition-colors" do %>
-                <span class="fc-trend-rank is-<%= idx + 1 %> mt-0.5"><%= idx + 1 %></span>
-                <span class="min-w-0 flex-1">
-                  <span class="block truncate text-sm font-bold text-[var(--fc-ink)]">
-                    <%= truncate(post.title, length: 48) %>
-                  </span>
-                  <span class="block truncate text-xs text-[var(--fc-muted)]">
-                    <%= post.anonymous? ? "Anonymous" : post.user.username %>
-                    · <%= post.likes_count + post.comments_count %> reactions
-                  </span>
-                </span>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-
-      <% if @who_to_brethren.any? %>
-        <div class="fc-side-card">
-          <div class="mb-3 flex items-center justify-between">
-            <h3 class="text-sm font-extrabold text-[var(--fc-ink)]">Who to brethren</h3>
-            <%= link_to "See all", people_path, class: "text-xs font-bold text-[var(--fc-muted)] hover:text-[var(--fc-ink)]" %>
-          </div>
-          <div class="space-y-3">
-            <% @who_to_brethren.each do |user| %>
-              <div class="flex items-center gap-3">
-                <% if user.profile&.avatar&.attached? %>
-                  <%= link_to user_path(user.username) do %>
-                    <%= image_tag avatar_src(user.profile), class: "fc-avatar object-cover", alt: user.username %>
-                  <% end %>
-                <% else %>
-                  <%= link_to user.username.first.upcase, user_path(user.username), class: "fc-avatar" %>
-                <% end %>
-                <span class="min-w-0 flex-1">
-                  <%= link_to user.username, user_path(user.username), class: "block truncate text-sm font-bold text-[var(--fc-ink)] hover:text-[var(--fc-accent)]" %>
-                  <% bio = user.profile&.bio.to_s.strip %>
-                  <% if bio.present? %>
-                    <span class="block truncate text-xs text-[var(--fc-muted)]"><%= truncate(bio, length: 32) %></span>
-                  <% else %>
-                    <span class="block truncate text-xs text-[var(--fc-muted)]">recent breath author</span>
-                  <% end %>
-                </span>
-                <%= button_to follow_user_path(user.username),
-                    method: :post,
-                    form_class: "inline",
-                    class: "fc-btn fc-btn-primary",
-                    data: { turbo: false } do %>
-                  Follow
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
+        </section>
       <% end %>
     </aside>
   </div>

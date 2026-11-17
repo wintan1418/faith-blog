@@ -7,10 +7,22 @@
     </div>
   </article>
 <% else %>
-<article class="fc-breath<%= ' fc-card-held-author' if post.held_for_review? %><%= ' is-prayer' if post.prayer_status_prayer_pending? %><%= ' is-answered' if post.prayer_status_prayer_answered? %>" id="<%= dom_id(post) %>">
+<%
+  praying_request = post.prayer_status_prayer_pending?
+  answered        = post.prayer_status_prayer_answered?
+  posted_at       = post.published_at || post.created_at
+  verified        = !post.anonymous? && post.user.respond_to?(:verified_at) && post.user.verified_at.present?
+%>
+<article class="fc-breath eg-post<%= ' fc-card-held-author' if post.held_for_review? %><%= ' is-prayer' if praying_request %><%= ' is-answered' if answered %><%= ' is-pinned' if post.featured? %>" id="<%= dom_id(post) %>">
+  <% if praying_request || answered %>
+    <div class="eg-post-band">
+      <%= render_icon(answered ? "answered" : "pray", classes: "eg-i18") %>
+      <span class="eg-post-band-label"><%= answered ? "Answered prayer" : "Prayer request" %></span>
+    </div>
+  <% end %>
   <% if reshared_by %>
     <div class="fc-breath-attribution">
-      <%= render_icon("repeat", classes: "h-3.5 w-3.5") %>
+      <%= render_icon("repost", classes: "h-4 w-4") %>
       <%= link_to reshared_by.username, user_path(reshared_by.username), class: "fc-breath-attribution-name" %>
       <span>reshared</span>
     </div>
@@ -22,178 +34,178 @@
     </div>
   <% end %>
 
-  <div class="fc-breath-grid">
+  <header class="fc-breath-head eg-post-head">
     <div class="fc-breath-avatar">
       <% if post.anonymous? %>
-        <span class="fc-avatar"><%= render_icon("users", classes: "h-4 w-4") %></span>
+        <span class="eg-avatar"><%= render_icon("users", classes: "h-5 w-5") %></span>
       <% elsif post.user.profile&.avatar&.attached? %>
-        <%= link_to user_path(post.user.username) do %>
-          <%= image_tag avatar_src(post.user.profile), class: "fc-avatar object-cover", alt: post.user.username %>
+        <%= link_to user_path(post.user.username), tabindex: -1, aria: { hidden: true } do %>
+          <%= image_tag avatar_src(post.user.profile), class: "eg-avatar object-cover", alt: "" %>
         <% end %>
       <% else %>
-        <%= link_to user_path(post.user.username), class: "fc-avatar", style: avatar_tint_style(post.user.username) do %>
+        <%= link_to user_path(post.user.username), class: "eg-avatar", style: avatar_tint_style(post.user.username), tabindex: -1, aria: { hidden: true } do %>
           <%= post.user.username.first.upcase %>
         <% end %>
       <% end %>
     </div>
 
-    <div class="fc-breath-main">
-      <header class="fc-breath-head">
-        <div class="fc-breath-head-author">
-          <% if post.anonymous? %>
-            <span class="fc-breath-name">Anonymous</span>
-          <% else %>
-            <%= link_to post.user.username, user_path(post.user.username), class: "fc-breath-name" %>
-            <span class="fc-breath-handle">@<%= post.user.username %></span>
+    <div class="fc-breath-head-author eg-post-who">
+      <span class="eg-post-name-row">
+        <% if post.anonymous? %>
+          <span class="fc-breath-name">Anonymous</span>
+        <% else %>
+          <%= link_to post.user.display_name, user_path(post.user.username), class: "fc-breath-name" %>
+          <% if verified %>
+            <span class="eg-verified" role="img" aria-label="Verified"><%= render_icon("badgecheck", classes: "h-4 w-4") %></span>
           <% end %>
-          <span class="fc-breath-dot">·</span>
-          <span class="fc-breath-time" title="<%= (post.published_at || post.created_at).strftime("%A, %b %-d %Y · %-l:%M %p") %>"><%= time_ago_in_words(post.published_at || post.created_at) %> ago</span>
-        </div>
-        <%= render "posts/overflow_menu", post: post %>
-      </header>
-
-      <%
-        has_meta = post.room || post.featured? || post.threaded? ||
-                   post.prayer_status_prayer_pending? || post.prayer_status_prayer_answered?
-      %>
-      <% if has_meta %>
-        <div class="fc-breath-meta">
-          <% if post.room %>
-            <%= link_to post.room.name, room_path(post.room), class: "fc-badge" %>
-          <% end %>
-          <% if post.featured? %>
-            <span class="fc-featured-tag">★ Featured</span>
-          <% end %>
-          <% if post.threaded? %>
-            <span class="fc-thread-chip" title="Open thread">
-              <%= render_icon("message_circle", classes: "h-3.5 w-3.5") %>
-              <span>Thread</span>
-            </span>
-          <% end %>
-          <% if post.prayer_status_prayer_pending? %>
-            <span class="fc-prayer-chip" title="Prayer request">
-              🙏 <span>Prayer</span>
-            </span>
-          <% elsif post.prayer_status_prayer_answered? %>
-            <span class="fc-prayer-chip is-answered" title="Answered">
-              🌟 <span>Answered</span>
-            </span>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%
-        plain_text   = post.content.to_plain_text.to_s
-        # Rich cards show ~6 lines behind a fade curtain (max-height 9.5em),
-        # so the "…more" affordance kicks in around ~280 chars.
-        likely_overflow = plain_text.length > 280 || plain_text.lines.size > 6
-      %>
-      <div class="fc-breath-body" data-controller="expand-text scripture">
-        <% if post.display_title %>
-          <%= link_to post.display_title, post_path(post), class: "fc-breath-title hover:text-[var(--fc-accent)]" %>
+          <span class="fc-breath-handle">@<%= post.user.username %></span>
         <% end %>
-        <%= render_rich_social_text(
-              post.content,
-              class_name: "fc-breath-copy is-rich#{' is-untitled' unless post.display_title}#{' is-clamped' if likely_overflow}",
-              data: { expand_text_target: "copy" }
-            ) %>
-        <% if likely_overflow %>
-          <button type="button"
-                  class="fc-breath-readmore"
-                  data-expand-text-target="toggle"
-                  data-action="click->expand-text#expand">…more</button>
+        <% if post.featured? %>
+          <span class="eg-pin-mini" title="Pinned"><%= render_icon("pin", classes: "eg-flag-ico") %><span class="eg-sr">Pinned</span></span>
+        <% end %>
+      </span>
+      <span class="eg-post-sub">
+        <% if post.room %>
+          <%= link_to post.room.name, room_path(post.room), class: "eg-post-room eg-sub-item" %>
+        <% end %>
+        <span class="fc-breath-time eg-sub-item" title="<%= posted_at.strftime("%A, %b %-d %Y · %-l:%M %p") %>"><%= time_ago_in_words(posted_at) %> ago</span>
+        <% if post.featured? %>
+          <span class="eg-post-flag is-pinned eg-sub-item"><%= render_icon("pin", classes: "eg-flag-ico") %>Pinned</span>
+        <% end %>
+        <% if post.threaded? %>
+          <span class="eg-post-flag eg-sub-item" title="Open thread"><%= render_icon("thread", classes: "eg-flag-ico") %>Thread</span>
+        <% end %>
+      </span>
+    </div>
+
+    <div class="eg-post-tools">
+      <%# Save stays one tap away on the card (it was only on the post page once). %>
+      <%= render "posts/bookmark_button", post: post %>
+      <%= render "posts/overflow_menu", post: post %>
+    </div>
+  </header>
+
+  <%
+    plain_text   = post.content.to_plain_text.to_s
+    # Rich cards show ~6 lines behind a fade curtain (max-height 9.5em),
+    # so the "…more" affordance kicks in around ~280 chars.
+    likely_overflow = plain_text.length > 280 || plain_text.lines.size > 6
+  %>
+  <div class="fc-breath-body eg-post-body" data-controller="expand-text scripture">
+    <% if post.display_title %>
+      <%= link_to post.display_title, post_path(post), class: "fc-breath-title" %>
+    <% end %>
+    <%= render_rich_social_text(
+          post.content,
+          class_name: "fc-breath-copy is-rich#{' is-untitled' unless post.display_title}#{' is-clamped' if likely_overflow}",
+          data: { expand_text_target: "copy" }
+        ) %>
+    <% if likely_overflow %>
+      <button type="button"
+              class="fc-breath-readmore"
+              data-expand-text-target="toggle"
+              data-action="click->expand-text#expand">…more</button>
+    <% end %>
+  </div>
+
+  <div class="eg-post-extras">
+    <% if post.game_share.present? %>
+      <%= render "posts/game_share_card", post: post %>
+    <% end %>
+
+    <% if post.has_voice_note? %>
+      <%= render "posts/voice_note", post: post %>
+    <% end %>
+
+    <% if post.quote_repost? %>
+      <%= render "posts/embedded_quote", quoted: post.quoted_post %>
+    <% end %>
+
+    <% if post.has_images? %>
+      <%
+        imgs = post.images.first(4)
+        grid_class = "fc-breath-media-grid is-#{imgs.size}"
+      %>
+      <div class="<%= grid_class %>" data-controller="lightbox">
+        <% imgs.each do |img| %>
+          <%= image_tag photo_src(img), class: "fc-breath-media-image", alt: post.title, loading: "lazy" %>
         <% end %>
       </div>
+    <% end %>
 
-      <% if post.game_share.present? %>
-        <%= render "posts/game_share_card", post: post %>
-      <% end %>
-
-      <% if post.has_voice_note? %>
-        <%= render "posts/voice_note", post: post %>
-      <% end %>
-
-      <% if post.quote_repost? %>
-        <%= render "posts/embedded_quote", quoted: post.quoted_post %>
-      <% end %>
-
-      <% if post.has_images? %>
-        <%
-          imgs = post.images.first(4)
-          grid_class = "fc-breath-media-grid is-#{imgs.size}"
-        %>
-        <div class="<%= grid_class %>" data-controller="lightbox">
-          <% imgs.each do |img| %>
-            <%= image_tag photo_src(img), class: "fc-breath-media-image", alt: post.title, loading: "lazy" %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <% if post.tags.any? %>
-        <div class="fc-breath-tags">
-          <% post.tags.to_a.first(4).each do |tag| %>
-            <%= link_to "##{tag.name}", search_path(q: tag.name), class: "fc-breath-tag" %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <%= render "posts/reaction_summary", post: post %>
-
-      <footer class="fc-breath-actions">
-        <%= render "posts/reactions", post: post %>
-
-        <button type="button"
-                class="fc-breath-action<%= ' is-thread' if post.threaded? %>"
-                data-controller="thread-toggle"
-                data-thread-toggle-url-value="<%= inline_thread_post_path(post) %>"
-                data-thread-toggle-frame-value="<%= dom_id(post, :thread) %>"
-                data-action="click->thread-toggle#toggle"
-                aria-label="Comment"
-                title="Comment">
-          <%= render_icon("message_circle", classes: "h-5 w-5") %>
-          <span class="fc-action-label">Comment</span>
-        </button>
-
-        <%= render "reshares/button", post: post %>
-        <%= render "posts/share_button", post: post %>
-        <%# Save for later, right on the card (it was only on the post page). %>
-        <%= render "posts/bookmark_button", post: post %>
-
-        <% if post.prayer_status_prayer_pending? && user_signed_in? %>
-          <% mine = post.user_id == current_user.id %>
-          <% joined = !mine && joined_prayer_chain?(post) %>
-          <% if mine %>
-            <%= button_to mark_prayer_answered_post_path(post),
-                method: :post,
-                form_class: "inline fc-prayer-action-form",
-                class: "fc-breath-action is-prayer-action",
-                data: { turbo_confirm: "Mark this prayer answered? Everyone in the chain will be notified." } do %>
-              <span class="fc-prayer-emoji" aria-hidden="true">🌟</span>
-              <span class="fc-action-label">Mark answered</span>
-            <% end %>
-          <% elsif joined %>
-            <%= button_to leave_prayer_chain_post_path(post),
-                method: :delete,
-                form_class: "inline fc-prayer-action-form",
-                class: "fc-breath-action is-prayer-action is-joined",
-                title: "Leave the prayer chain" do %>
-              <span class="fc-prayer-emoji" aria-hidden="true">🙏</span>
-              <span class="fc-action-label">Praying<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
-            <% end %>
-          <% else %>
-            <%= button_to join_prayer_chain_post_path(post),
-                method: :post,
-                form_class: "inline fc-prayer-action-form",
-                class: "fc-breath-action is-prayer-action" do %>
-              <span class="fc-prayer-emoji" aria-hidden="true">🙏</span>
-              <span class="fc-action-label">Join chain<% if post.intercessions_count.to_i.positive? %> · <%= post.intercessions_count %><% end %></span>
-            <% end %>
-          <% end %>
+    <% if post.tags.any? %>
+      <div class="fc-breath-tags">
+        <% post.tags.to_a.first(4).each do |tag| %>
+          <%= link_to "##{tag.name}", search_path(q: tag.name), class: "fc-breath-tag" %>
         <% end %>
-      </footer>
-
-      <%= turbo_frame_tag dom_id(post, :thread), class: "fc-breath-thread" %>
-    </div>
+      </div>
+    <% end %>
   </div>
+
+  <% if praying_request && user_signed_in? %>
+    <%# The big prayer button: join the prayer chain (the author marks it answered). %>
+    <% mine = post.user_id == current_user.id %>
+    <% joined = !mine && joined_prayer_chain?(post) %>
+    <div class="eg-pray-bar">
+      <% if mine %>
+        <%= button_to mark_prayer_answered_post_path(post),
+            method: :post,
+            form_class: "fc-prayer-action-form",
+            class: "eg-pray-big is-answer",
+            data: { turbo_confirm: "Mark this prayer answered? Everyone in the chain will be notified." } do %>
+          <%= render_icon("answered", classes: "h-5 w-5") %>
+          <span>Mark answered</span>
+        <% end %>
+      <% elsif joined %>
+        <%= button_to leave_prayer_chain_post_path(post),
+            method: :delete,
+            form_class: "fc-prayer-action-form",
+            class: "eg-pray-big is-joined",
+            title: "Leave the prayer chain" do %>
+          <%= render_icon("answered", classes: "h-5 w-5") %>
+          <span>Praying</span>
+        <% end %>
+      <% else %>
+        <%= button_to join_prayer_chain_post_path(post),
+            method: :post,
+            form_class: "fc-prayer-action-form",
+            class: "eg-pray-big",
+            title: "Join the prayer chain" do %>
+          <%= render_icon("pray", classes: "h-5 w-5") %>
+          <span>I'm praying</span>
+        <% end %>
+      <% end %>
+      <span class="eg-pray-count">
+        <% if post.intercessions_count.to_i.positive? %>
+          <strong><%= post.intercessions_count %></strong> praying
+        <% else %>
+          Be the first to pray
+        <% end %>
+      </span>
+    </div>
+  <% end %>
+
+  <%= render "posts/reaction_summary", post: post %>
+
+  <footer class="fc-breath-actions eg-actions">
+    <%= render "posts/reactions", post: post %>
+
+    <button type="button"
+            class="fc-breath-action<%= ' is-thread' if post.threaded? %>"
+            data-controller="thread-toggle"
+            data-thread-toggle-url-value="<%= inline_thread_post_path(post) %>"
+            data-thread-toggle-frame-value="<%= dom_id(post, :thread) %>"
+            data-action="click->thread-toggle#toggle"
+            aria-label="Comment"
+            title="Comment">
+      <%= render_icon("comment", classes: "eg-i22") %>
+      <span class="fc-action-label">Comment</span>
+    </button>
+
+    <%= render "reshares/button", post: post %>
+    <%= render "posts/share_button", post: post %>
+  </footer>
+
+  <%= turbo_frame_tag dom_id(post, :thread), class: "fc-breath-thread" %>
 </article>
 <% end %>

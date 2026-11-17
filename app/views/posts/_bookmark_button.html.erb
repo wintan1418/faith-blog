@@ -1,19 +1,19 @@
 <span id="<%= dom_id(post, :bookmark) %>">
   <% if user_signed_in? %>
     <% if bookmarked_post?(post) %>
-      <%= button_to post_bookmark_path(post), method: :delete, class: "fc-action text-[var(--fc-gold)]", title: "Remove bookmark", data: { turbo_frame: "_top" } do %>
-        <%= render_icon("bookmark", classes: "h-4 w-4") %>
+      <%= button_to post_bookmark_path(post), method: :delete, class: "fc-action eg-save is-saved", title: "Remove bookmark", aria: { label: "Remove bookmark" }, data: { turbo_frame: "_top" } do %>
+        <%= render_icon("bookmark", classes: "eg-i20") %>
         <span class="fc-action-label">Saved</span>
       <% end %>
     <% else %>
-      <%= button_to post_bookmark_path(post), class: "fc-action", title: "Save post", data: { turbo_frame: "_top" } do %>
-        <%= render_icon("bookmark", classes: "h-4 w-4") %>
+      <%= button_to post_bookmark_path(post), class: "fc-action eg-save", title: "Save post", aria: { label: "Save post" }, data: { turbo_frame: "_top" } do %>
+        <%= render_icon("bookmark", classes: "eg-i20") %>
         <span class="fc-action-label">Save</span>
       <% end %>
     <% end %>
   <% else %>
-    <%= link_to new_user_session_path, class: "fc-action", title: "Save post" do %>
-      <%= render_icon("bookmark", classes: "h-4 w-4") %>
+    <%= link_to new_user_session_path, class: "fc-action eg-save", title: "Save post", aria: { label: "Save post" } do %>
+      <%= render_icon("bookmark", classes: "eg-i20") %>
       <span class="fc-action-label">Save</span>
     <% end %>
   <% end %>

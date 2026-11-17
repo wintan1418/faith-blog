@@ -40,8 +40,10 @@ class FeedActionsTest < ActionDispatch::IntegrationTest
       assert_select "form[action=?]", post_bookmark_path(@post), false
     end
 
-    # Save is one tap away on the card itself.
-    assert_select ".fc-breath-actions form[action=?]", post_bookmark_path(@post), 1
+    # Save is one tap away on the card itself, beside the ⋯ in the header,
+    # so the action bar keeps four equal buttons.
+    assert_select ".fc-breath-head .eg-post-tools form[action=?]", post_bookmark_path(@post), 1
+    assert_select ".fc-breath-actions form[action=?]", post_bookmark_path(@post), 0
   end
 
   test "feed shows the reaction summary strip and a single React button" do
@@ -55,6 +57,29 @@ class FeedActionsTest < ActionDispatch::IntegrationTest
     # Comment / repost / share / save are present as their own labelled segments.
     assert_select ".fc-breath-actions .fc-repost"
     assert_select ".fc-breath-actions .fc-share .fc-action-label", text: "Share"
+  end
+
+  test "the action bar is four equal buttons with icons, no emoji" do
+    sign_in @reader
+    get feed_path
+
+    bar = css_select("##{ActionView::RecordIdentifier.dom_id(@post)} .fc-breath-actions").first
+    assert bar, "action bar missing"
+    labels = bar.css(".fc-react-label, .fc-action-label").map { |e| e.text.strip }
+    assert_equal %w[Like Comment Repost Share], labels
+    assert_equal 4, bar.css(".fc-breath-action > svg").size
+    assert_no_match(/\p{Extended_Pictographic}/, bar.text)
+  end
+
+  test "the like button keeps the heart icon after reacting and the summary shows a coloured dot" do
+    sign_in @reader
+    @reader.likes.create!(likeable: @post, reaction_emoji: "🙏", reaction_type: :amen)
+    get feed_path
+
+    reactions_id = ActionView::RecordIdentifier.dom_id(@post, :reactions)
+    assert_select "##{reactions_id} .fc-react-btn.is-mine[data-reaction=?] svg", "🙏"
+    summary_id = ActionView::RecordIdentifier.dom_id(@post, :reaction_summary)
+    assert_select "##{summary_id} .eg-react-dot.is-pray svg"
   end
 
   test "reacting updates both the React button and the summary strip" do

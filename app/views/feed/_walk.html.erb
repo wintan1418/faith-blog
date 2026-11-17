@@ -1,0 +1,62 @@
+<%# "Your walk": who you are and where you are today. Only real numbers:
+    the breath streak, the reading plan you're on and the prayers you joined
+    this week. Locals: plan (UserReadingPlan or nil), extra_class %>
+<%
+  streak = current_user.current_breath_streak.to_i
+  week = 1.week.ago..
+  # Prayer chains joined plus "Praying" taps on requests, this week.
+  prayed_this_week = current_user.prayer_intercessions.where(created_at: week).count +
+                     current_user.likes.where(reaction_type: :praying, created_at: week).count
+%>
+<section class="eg-card eg-walk <%= local_assigns[:extra_class] %>" aria-label="Your walk">
+  <%= link_to user_path(current_user.username), class: "eg-walk-me" do %>
+    <% if current_user.profile&.avatar&.attached? %>
+      <%= image_tag avatar_src(current_user.profile), class: "eg-avatar eg-avatar-lg object-cover", alt: "" %>
+    <% else %>
+      <span class="eg-avatar eg-avatar-lg" style="<%= avatar_tint_style(current_user.username) %>"><%= current_user.username.first.upcase %></span>
+    <% end %>
+    <span class="eg-walk-names">
+      <span class="eg-walk-name"><%= current_user.display_name %></span>
+      <span class="eg-walk-handle">@<%= current_user.username %></span>
+    </span>
+  <% end %>
+
+  <h2 class="eg-card-title">Your walk</h2>
+
+  <div class="eg-walk-row">
+    <span class="eg-tile is-gold"><%= render_icon("flame", classes: "h-5 w-5") %></span>
+    <span class="eg-walk-label">Breath streak</span>
+    <strong class="eg-walk-value"><%= streak.positive? ? pluralize(streak, "day") : "Start" %></strong>
+  </div>
+
+  <% if plan %>
+    <%= link_to reading_plan_path(plan.plan_slug), class: "eg-walk-row" do %>
+      <span class="eg-tile is-green"><%= render_icon("calendar", classes: "h-5 w-5") %></span>
+      <span class="eg-walk-label"><%= plan.plan&.title.presence || "Reading plan" %></span>
+      <strong class="eg-walk-value">Day <%= plan.current_day %>/<%= plan.days_total %></strong>
+    <% end %>
+    <div class="eg-walk-plan">
+      <div class="fc-plan-progress"><div class="fc-plan-progress-bar" style="width: <%= plan.progress_percent %>%"></div></div>
+      <% if (ref = plan.today_reading&.dig(:reference)).present? %>
+        <p class="eg-walk-ref">Today: <%= ref %></p>
+      <% end %>
+      <% if plan.can_check_in_today? %>
+        <%= button_to "Mark today done", check_in_reading_plan_path(plan.plan_slug), method: :post, form_class: "eg-walk-form", class: "eg-btn eg-btn-soft" %>
+      <% else %>
+        <p class="eg-walk-done"><%= render_icon("answered", classes: "h-4 w-4") %> Done for today</p>
+      <% end %>
+    </div>
+  <% else %>
+    <%= link_to reading_plans_path, class: "eg-walk-row" do %>
+      <span class="eg-tile is-green"><%= render_icon("calendar", classes: "h-5 w-5") %></span>
+      <span class="eg-walk-label">Reading plan</span>
+      <strong class="eg-walk-value is-link">Start</strong>
+    <% end %>
+  <% end %>
+
+  <div class="eg-walk-row">
+    <span class="eg-tile is-violet"><%= render_icon("pray", classes: "h-5 w-5") %></span>
+    <span class="eg-walk-label">Prayed this week</span>
+    <strong class="eg-walk-value"><%= prayed_this_week %></strong>
+  </div>
+</section>

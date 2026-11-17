@@ -1,7 +1,7 @@
 <%# Brethren celebrating today. "Say happy birthday" opens a chat with a greeting ready to send. %>
 <% if birthdays.present? %>
   <section class="fc-birthdays" aria-label="Birthdays today">
-    <div class="fc-birthdays-icon" aria-hidden="true">🎂</div>
+    <div class="fc-birthdays-icon" aria-hidden="true"><%= render_icon("cake", classes: "h-6 w-6") %></div>
     <div class="fc-birthdays-main">
       <% first = birthdays.first %>
       <p class="fc-birthdays-title">

@@ -99,7 +99,7 @@ export default class extends Controller {
   reflectPushState(state) {
     if (!this.hasEnableBtnTarget) return
     this.enableBtnTarget.dataset.pushState = state
-    const labels = { on: "🔔 Notifications on", off: "🔕 Turn on push", blocked: "🚫 Blocked in browser" }
+    const labels = { on: "Notifications on", off: "Turn on push", blocked: "Blocked in browser" }
     this.enableBtnTarget.textContent = labels[state]
   }
 
