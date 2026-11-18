@@ -247,3 +247,6 @@ html.theme-dark .fc-bot-avatar.is-courses { background: rgba(180, 140, 255, 0.14
 .give-link { color: var(--fc-accent); font-weight: 700; }
 .give-amount input[type="number"] { border: 0 !important; background: transparent !important; box-shadow: none !important; padding-left: 0 !important; -moz-appearance: textfield; appearance: textfield; }
 .give-amount input[type="number"]::-webkit-inner-spin-button, .give-amount input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.give-promise { margin: 0 0 18px; padding: 16px 18px; border-radius: 14px; background: var(--fc-surface); border: 1px solid var(--fc-line); }
+.give-promise h3 { display: flex; gap: 8px; align-items: center; margin: 0 0 6px; font-size: 15px; font-weight: 700; color: var(--fc-accent); }
+.give-promise p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--fc-soft); }
