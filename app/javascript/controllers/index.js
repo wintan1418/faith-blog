@@ -65,7 +65,9 @@ import EmojiReactionsController from "./emoji_reactions_controller"
 application.register("emoji-reactions", EmojiReactionsController)
 
 import ExpandTextController from "./expand_text_controller"
+import GivingController from "./giving_controller"
 application.register("expand-text", ExpandTextController)
+application.register("giving", GivingController)
 
 import FeedTabsController from "./feed_tabs_controller"
 application.register("feed-tabs", FeedTabsController)

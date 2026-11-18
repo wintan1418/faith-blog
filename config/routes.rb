@@ -16,6 +16,10 @@ Rails.application.routes.draw do
 
   # Static pages
   get "about", to: "pages#about"
+  get "give", to: "giving#show", as: :give
+  post "give", to: "giving#create"
+  get "give/thanks", to: "giving#thanks", as: :give_thanks
+  post "give/webhook", to: "giving#webhook", as: :give_webhook
   get "guidelines", to: "pages#guidelines"
   get "contact", to: "pages#contact"
   get "privacy", to: "pages#privacy"
