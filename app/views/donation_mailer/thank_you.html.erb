@@ -1,0 +1,12 @@
+<p><%= @first_name.present? ? "Dear #{@first_name}," : "Dear friend," %></p>
+<p>Thank you. Your <%= @donation.monthly? ? "monthly gift" : "gift" %> of <strong><%= @donation.display_amount %></strong> to Brethreign has been received.</p>
+<p>It goes straight into keeping Brethreign safe, free and growing: servers, moderation, building the apps, and paying the developers, moderators and media team who have served as volunteers until now.</p>
+<p>We'll send you a short update on what your gift made possible.</p>
+<table style="width:100%; border-collapse:collapse; background:#f5f1e8; border-radius:10px; margin:16px 0; font-size:14px;">
+  <tr><td style="padding:10px 14px; color:#5e6862;">Amount</td><td style="padding:10px 14px; text-align:right;"><strong><%= @donation.display_amount %></strong><%= " every month" if @donation.monthly? %></td></tr>
+  <tr><td style="padding:10px 14px; color:#5e6862;">Date</td><td style="padding:10px 14px; text-align:right;"><%= @donation.paid_at&.strftime("%-d %B %Y") %></td></tr>
+  <tr><td style="padding:10px 14px; color:#5e6862;">Reference</td><td style="padding:10px 14px; text-align:right;"><%= @donation.reference %></td></tr>
+</table>
+<p style="color:#5e6862; font-size:13px;">Paid securely through Paystack.</p>
+<p style="font-style:italic; color:#333b37;">"Each of you should give what you have decided in your heart to give... for God loves a cheerful giver." 2 Corinthians 9:7</p>
+<p>With gratitude,<br>The Brethreign team</p>

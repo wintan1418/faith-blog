@@ -5,6 +5,7 @@ require "minitest/mock"
 
 class GivingTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
+  include ActionMailer::TestHelper
 
   setup do
     seen = { tour_completed_at: Time.current, welcomed_at: Time.current }
@@ -103,5 +104,25 @@ class GivingTest < ActionDispatch::IntegrationTest
     sig = OpenSSL::HMAC.hexdigest("SHA512", "sk_test_x", body)
     post give_webhook_path, params: body, headers: { "CONTENT_TYPE" => "application/json", "x-paystack-signature" => sig }
     assert_not d.reload.paid?
+  end
+
+  test "a confirmed gift sends one thank-you email with a receipt" do
+    d = Donation.create!(amount: 5000, currency: "NGN", email: "grace@example.com", name: "Grace Ade")
+    assert_enqueued_emails 1 do
+      d.mark_paid!
+      d.mark_paid!
+    end
+    mail = DonationMailer.thank_you(d.reload)
+    assert_equal [ "grace@example.com" ], mail.to
+    assert_match "Dear Grace", mail.text_part.body.to_s
+    assert_match "₦5,000", mail.text_part.body.to_s
+    assert_match d.reference, mail.text_part.body.to_s
+  end
+
+  test "the page says gifts pay the volunteers and promises an update" do
+    sign_in @admin
+    get give_path
+    assert_match "serve as volunteers today", response.body
+    assert_match "hear back from us", response.body
   end
 end

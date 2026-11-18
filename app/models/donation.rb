@@ -44,7 +44,11 @@ class Donation < ApplicationRecord
 
   # Marks it paid once (the redirect back and the webhook may both arrive).
   def mark_paid!
-    with_lock { update!(status: "paid", paid_at: Time.current) unless paid? }
+    newly_paid = with_lock do
+      next false if paid?
+      update!(status: "paid", paid_at: Time.current)
+    end
+    DonationMailer.thank_you(self).deliver_later if newly_paid
   end
 
   private

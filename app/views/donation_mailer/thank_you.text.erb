@@ -1,0 +1,18 @@
+<%= @first_name.present? ? "Dear #{@first_name}," : "Dear friend," %>
+
+Thank you. Your <%= @donation.monthly? ? "monthly gift" : "gift" %> of <%= @donation.display_amount %> to Brethreign has been received.
+
+It goes straight into keeping Brethreign safe, free and growing: servers, moderation, building the apps, and paying the developers, moderators and media team who have served as volunteers until now.
+
+We'll send you a short update on what your gift made possible.
+
+Receipt
+Amount: <%= @donation.display_amount %><%= " every month" if @donation.monthly? %>
+Date: <%= @donation.paid_at&.strftime("%-d %B %Y") %>
+Reference: <%= @donation.reference %>
+Paid securely through Paystack.
+
+"Each of you should give what you have decided in your heart to give... for God loves a cheerful giver." 2 Corinthians 9:7
+
+With gratitude,
+The Brethreign team
