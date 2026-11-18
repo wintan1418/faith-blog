@@ -17,11 +17,12 @@ class InboxDeletedMemberTest < ActionDispatch::IntegrationTest
     ConversationParticipant.where(user: @gone).delete_all # as after the account is deleted
   end
 
-  test "the inbox still opens and leaves the deleted member's chat out" do
+  test "the inbox still opens and shows the chat as Deleted account" do
     sign_in @me
     get conversations_path
     assert_response :success
     assert_match "inbox_friend2", response.body
+    assert_select ".msg-row-name.is-deleted", text: "Deleted account"
   end
 
   test "opening that chat explains the member deleted their account" do

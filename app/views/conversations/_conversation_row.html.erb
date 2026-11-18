@@ -3,8 +3,7 @@
 <%# viewer: whose inbox this row is for (passed when the row is broadcast). %>
 <% viewer = local_assigns[:viewer] || current_user %>
 <% other_user = conversation.other_participant_for(viewer) %>
-<%# The other person deleted their account: leave the chat out of the list. %>
-<% return if other_user.nil? %>
+<%# The other person deleted their account: the chat stays, as "Deleted account". %>
 <%# The list passes these in batch; fall back to per-row queries elsewhere. %>
 <% latest_message = local_assigns.key?(:latest) ? local_assigns[:latest] : conversation.messages.visible.order(created_at: :desc).first %>
 <% unread_count = local_assigns.key?(:unread) ? local_assigns[:unread].to_i : conversation.unread_count_for(viewer) %>
@@ -15,10 +14,14 @@
       class: "msg-row#{' is-active' if active}#{' is-unread' if unread_count.positive?}",
       aria: { current: (active ? "page" : nil) },
       data: { controller: "inbox-typing", inbox_typing_conversation_id_value: conversation.id, inbox_typing_user_id_value: viewer.id } do %>
-  <%= render "conversations/avatar", user: other_user, size: "h-12 w-12", online: other_user.visible_online? %>
+  <% if other_user %>
+    <%= render "conversations/avatar", user: other_user, size: "h-12 w-12", online: other_user.visible_online? %>
+  <% else %>
+    <span class="msg-avatar msg-avatar-deleted h-12 w-12" aria-hidden="true"><%= render_icon("user", classes: "h-6 w-6") %></span>
+  <% end %>
   <span class="msg-row-main">
     <span class="msg-row-top">
-      <span class="msg-row-name"><%= other_user.display_name %></span>
+      <span class="msg-row-name<%= ' is-deleted' unless other_user %>"><%= other_user&.display_name || "Deleted account" %></span>
       <% shown_at = latest_message&.created_at || conversation.created_at %>
       <span class="msg-row-time"><%= local_time_tag(shown_at, "inbox", inbox_time(shown_at)) %></span>
     </span>
