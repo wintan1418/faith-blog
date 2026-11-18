@@ -26,6 +26,7 @@
       <div class="msg-rows">
         <% @results.each do |message| %>
           <% other = message.conversation.other_participant_for(current_user) %>
+          <% next unless other %>
           <%= link_to conversation_path(message.conversation, anchor: dom_id(message)), class: "msg-row" do %>
             <%= render "conversations/avatar", user: other, size: "h-12 w-12" %>
             <span class="msg-row-main">
