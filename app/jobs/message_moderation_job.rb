@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
-# AI review of a direct message, seconds after it's sent. Brethreign fights
-# sexual content, occult practice and fraud hardest, so those are removed at once
-# (for both people) and sent to the moderators' queue; anything else unsafe is
-# flagged for a moderator. The recipient is notified only after the check, so a
-# removed message never pops up on their phone.
+# Private messages are private. The AI reads a message's words only when they
+# come from someone the recipient isn't connected with, and only their first
+# few messages (where scams and grooming start). Photos are always checked for
+# nudity. Reported messages go to the moderators as before.
+#
+# Only the narrow list in Ai::Moderation::Leniency is removed automatically
+# (sexual content, child safety, credible threats, clear scams); anything else
+# the AI doubts is delivered and flagged for a moderator.
 class MessageModerationJob < ApplicationJob
   queue_as :default
   discard_on ActiveJob::DeserializationError
 
-  REMOVE_CATEGORIES = %w[explicit_adult sexual_exploitation occult harassment hate].freeze
-  # Money talk is often innocent: a suspected scam stays up for a moderator to judge,
-  # and is removed straight away only when the AI is sure (severity high / block).
+  STRANGER_MESSAGES_CHECKED = 5 # a stranger's first messages in a chat
 
   def perform(message)
     return if message.deleted? || message.moderated_at.present?
@@ -39,7 +40,7 @@ class MessageModerationJob < ApplicationJob
   private
 
   def review(message)
-    text = if message.body.present?
+    text = if message.body.present? && words_checked?(message)
       Ai::Moderation::Reviewer.call(content: content_for(message), kind: "message", author_context: context_for(message))
     end
     pictures = (ImageModeration.review(message.images.attachments, kind: "message") if message.has_images?)
@@ -65,17 +66,18 @@ class MessageModerationJob < ApplicationJob
       "connected_to_recipient=#{message.conversation.participants_connected?}"
   end
 
+  # Between connected brethren, and after a stranger's first few messages, the
+  # words aren't read at all.
+  def words_checked?(message)
+    return false if message.conversation.participants_connected?
+    message.conversation.messages.where(sender_id: message.sender_id).where(id: ..message.id).count <= STRANGER_MESSAGES_CHECKED
+  end
+
   def decide(result)
-    return :allow if result.safe && result.severity.in?(%w[none low])
+    return :remove if Ai::Moderation::Leniency.remove?(result)
+    return :flag if Ai::Moderation::Leniency.flag?(result)
 
-    categories = Array(result.categories).map(&:to_s)
-    return :remove if result.recommended_action == "block"
-    return :remove if result.severity == "high"
-    return :remove if result.severity == "medium" && (categories & REMOVE_CATEGORIES).any?
-    # Insults aimed at someone are removed even when the AI calls them mild.
-    return :remove if (categories & %w[harassment hate]).any?
-
-    :flag
+    :allow
   end
 
   def record(message, result, status)

@@ -49,10 +49,10 @@ module Ai
         end
       end
 
-      test "medium-severity harassment gets :hold" do
+      test "medium-severity harassment stays up and is flagged for a moderator" do
         with_stub_env do
           verdict = PostGatekeeper.call(post: build_post("You are stupid and worthless and nobody likes you."))
-          assert verdict.hold?, "expected :hold, got #{verdict.decision}"
+          assert verdict.flag?, "expected :flag, got #{verdict.decision}"
         end
       end
 

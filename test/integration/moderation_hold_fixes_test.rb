@@ -52,7 +52,7 @@ class ModerationHoldFixesTest < ActionDispatch::IntegrationTest
     assert created.feed_visible?, "a fresh breath must be on the feed right away"
   end
 
-  test "the gate retro-holds a live post when the AI flags it" do
+  test "a live post the AI doubts stays up and goes to a moderator" do
     post_record = Post.create!(user: @author, room: @room, title: "Live breath", content: "Body",
                                status: :published, moderation_status: :approved)
 
@@ -62,8 +62,8 @@ class ModerationHoldFixesTest < ActionDispatch::IntegrationTest
       end
     end
 
-    assert post_record.reload.moderation_pending_review?, "flagged live post must be pulled for review"
-    assert_equal "pending", post_record.ai_moderation_review.status
+    assert post_record.reload.moderation_approved?, "a doubt alone never takes a breath down"
+    assert_equal "flagged", post_record.ai_moderation_review.status
   end
 
   test "the gate never re-litigates a settled review" do
@@ -80,7 +80,7 @@ class ModerationHoldFixesTest < ActionDispatch::IntegrationTest
     assert post_record.reload.moderation_approved?
   end
 
-  test "a held decision writes a pending review that shows on the admin queue" do
+  test "a flagged breath shows on the admin queue" do
     post_record = held_post!
 
     Ai::Moderation::Reviewer.stub :call, result_with(action: "require_review", severity: "medium") do
@@ -89,9 +89,8 @@ class ModerationHoldFixesTest < ActionDispatch::IntegrationTest
       end
     end
 
-    assert post_record.reload.moderation_pending_review?, "post should stay held"
     review = AiModerationReview.find_by(reviewable: post_record)
-    assert_equal "pending", review.status, "held post's review must land in the default admin queue"
+    assert_equal "flagged", review.status, "a flagged breath must land in the default admin queue"
 
     sign_in @admin
     get admin_moderation_reviews_path
