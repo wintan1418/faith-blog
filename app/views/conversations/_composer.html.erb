@@ -3,8 +3,8 @@
               id: "new_message",
               html: { multipart: true, data: {
                 controller: "dm-composer paste-images",
-                action: "submit->dm-composer#onSubmit",
-                dm_composer_gentleness_url_value: check_gentleness_posts_path
+                action: "submit->dm-composer#onSubmit"
+                # No automatic tone check in chats: private messages send as written.
               } } do |f| %>
 
   <% if message.errors.any? %>

@@ -813,3 +813,15 @@ body.hotwire-native .msg-search-row { padding-top: 12px; }
   .msg-page--index .msg-list { overflow: visible; }
   .msg-page--index .msg-rows { overflow: visible; }
 }
+
+/* Privacy promise under the search box. */
+.msg-privacy-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 2px 16px 10px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--fc-muted);
+}
+.msg-privacy-icon { flex: none; width: 14px; height: 14px; margin-top: 2px; color: var(--fc-accent); }

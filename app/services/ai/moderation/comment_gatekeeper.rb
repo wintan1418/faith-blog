@@ -55,16 +55,11 @@ module Ai
         parts.join(" ")
       end
 
+      # Same rule as posts (Leniency): only the narrow list is held back; anything
+      # else the AI doubts is posted and sent to a moderator.
       def decide(result)
-        action   = result.recommended_action.to_s
-        severity = result.severity.to_s
-        cats     = Array(result.categories).map(&:to_s)
-
-        return [ :block, "explicit_category" ]   if severity == "high" && (HARD_BLOCK_CATEGORIES & cats).any?
-        return [ :block, "policy_block" ]        if action == "block"
-        return [ :hold,  "hide_pending_review" ] if action == "hide_pending_review"
-        return [ :hold,  "require_review" ]      if action == "require_review"
-        return [ :hold,  "suggest_edit" ]        if action == "suggest_edit" && severity != "low"
+        return [ :block, "explicit_category" ] if Leniency.remove?(result)
+        return [ :flag, "for_moderator" ] if Leniency.flag?(result)
 
         [ :allow, "ok" ]
       end

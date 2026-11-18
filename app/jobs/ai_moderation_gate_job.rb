@@ -36,7 +36,7 @@ class AiModerationGateJob < ApplicationJob
     post.apply_moderation_decision!(verdict.decision, reason: verdict.reason)
     Ai::Moderation::RiskScorer.call(user: post.user) if post.user
 
-    notify_author(post, verdict) unless verdict.allow?
+    notify_author(post, verdict) if verdict.block? # a flag alone never bothers the author
   end
 
   private

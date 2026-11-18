@@ -49,10 +49,19 @@ class ModerationTest < ActiveSupport::TestCase
     assert_includes review.categories, "scam"
   end
 
-  test "occult offers are removed too" do
+  test "occult talk from a stranger is delivered and flagged for a moderator, not removed" do
     message = @conversation.messages.create!(sender: @sender, body: "I know a native doctor for money ritual")
 
-    assert message.reload.removed?
+    assert_not message.reload.removed?
+    assert AiModerationReview.find_by(reviewable: message)&.flagged?
+  end
+
+  test "between connected brethren the words aren't read" do
+    ConnectionRequest.new(sender: @sender, receiver: @recipient, status: :accepted).save!(validate: false)
+    assert @conversation.participants_connected?
+    message = @conversation.messages.create!(sender: @sender, body: "Hello, please send me your bank details and OTP")
+    assert_not message.reload.removed?
+    assert_nil AiModerationReview.find_by(reviewable: message)
   end
 
   test "a normal message goes through and notifies the recipient" do

@@ -12,7 +12,7 @@ class DmKindnessNudgeTest < ActionDispatch::IntegrationTest
     @conversation = Conversation.find_or_create_between!(@sender, @recipient)
   end
 
-  test "the composer renders the nudge UI and wires the tone check on submit" do
+  test "chats send as written: no automatic tone check" do
     sign_in @sender
     get conversation_path(@conversation)
 
@@ -21,6 +21,6 @@ class DmKindnessNudgeTest < ActionDispatch::IntegrationTest
     assert_select ".dm-nudge-soften"
     assert_select ".dm-nudge-send"
     assert_select "form#new_message[data-action*=?]", "dm-composer#onSubmit"
-    assert_select "form#new_message[data-dm-composer-gentleness-url-value=?]", check_gentleness_posts_path
+    assert_select "form#new_message[data-dm-composer-gentleness-url-value]", false
   end
 end

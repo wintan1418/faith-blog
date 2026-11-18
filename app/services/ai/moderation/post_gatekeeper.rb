@@ -16,6 +16,7 @@ module Ai
         def block? = decision == :block
         def hold?  = decision == :hold
         def allow? = decision == :allow
+        def flag?  = decision == :flag # stays visible; a moderator takes a look
 
         # Persist the AiModerationReview record now that the post has been saved.
         # No-op when fail-open returned no result (network/parse error).
@@ -25,13 +26,13 @@ module Ai
           return nil unless result
 
           status = if hold? then :pending
-          elsif block? then :flagged
+          elsif block? || flag? then :flagged
           end
           AiModerationReview.from_result(reviewable: post, user: post.user, result: result, status: status)
         end
       end
 
-      # Hard-block the moment the LLM names any of these categories with severity=high.
+      # Kept for reference by older code; auto-removal now follows Leniency.
       HARD_BLOCK_CATEGORIES = %w[
         explicit_adult
         sexual_exploitation
@@ -91,18 +92,11 @@ module Ai
         parts.join(" ")
       end
 
+      # Publish first; the AI takes down only the narrow list in Leniency and
+      # sends everything else it doubts to a moderator, still visible.
       def decide(result)
-        action = result.recommended_action.to_s
-        severity = result.severity.to_s
-        cats = Array(result.categories).map(&:to_s)
-
-        return [ :block, "explicit_category" ] if severity == "high" && (HARD_BLOCK_CATEGORIES & cats).any?
-        return [ :block, "policy_block" ]      if action == "block"
-        return [ :hold,  "hide_pending_review" ] if action == "hide_pending_review"
-        return [ :hold,  "require_review" ]     if action == "require_review"
-        # suggest_edit only warrants a human when the severity is real —
-        # "none"/"low" suggestions should never keep a breath off the feed.
-        return [ :hold,  "suggest_edit" ]       if action == "suggest_edit" && %w[medium high].include?(severity)
+        return [ :block, "explicit_category" ] if Leniency.remove?(result)
+        return [ :flag, "for_moderator" ] if Leniency.flag?(result)
 
         [ :allow, "ok" ]
       end

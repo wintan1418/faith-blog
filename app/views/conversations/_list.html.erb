@@ -23,6 +23,11 @@
     <% end %>
   </div>
 
+  <p class="msg-privacy-note">
+    <%= render_icon("lock", classes: "msg-privacy-icon") %>
+    Your chats are private. Messages between connected brethren aren't read by anyone; we only check photos and a stranger's first messages, and anything you report.
+  </p>
+
   <% if active_now.any? %>
     <section class="msg-active" aria-labelledby="msg_active_label">
       <p class="msg-active-label" id="msg_active_label">Active now</p>

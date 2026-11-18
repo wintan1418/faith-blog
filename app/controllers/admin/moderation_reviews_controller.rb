@@ -144,6 +144,7 @@ class Admin::ModerationReviewsController < ApplicationController
     when "approve", "dismiss"
       @review.dismissed!
       release_post_if_post!(decision)
+      release_comment_if_comment!
       restore_message_if_message!
     when "hide", "warn", "restrict", "suspend"
       @review.actioned!
@@ -151,6 +152,13 @@ class Admin::ModerationReviewsController < ApplicationController
       remove_message_if_message!
       apply_user_action!(decision)
     end
+  end
+
+  # A comment the moderator cleared shows again (it used to stay hidden).
+  def release_comment_if_comment!
+    comment = @review.reviewable
+    return unless comment.is_a?(Comment) && !comment.moderation_approved?
+    comment.update_columns(moderation_status: Comment.moderation_statuses[:approved], moderation_blocked_reason: nil)
   end
 
   # When the moderator approves/dismisses a Post review, flip the post back to
