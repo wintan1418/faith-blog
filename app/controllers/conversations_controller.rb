@@ -112,7 +112,8 @@ class ConversationsController < ApplicationController
   end
 
   def thread_scope
-    @conversation.messages.visible.includes({ sender: { profile: { avatar_attachment: :blob } } }, { likes: :user }, { reply_to: :sender })
+    @conversation.messages.visible.includes({ sender: { profile: { avatar_attachment: :blob } } }, { likes: :user }, { reply_to: :sender },
+                                            { images_attachments: :blob }, { voice_note_attachment: :blob }, { documents_attachments: :blob })
   end
 
   # Latest message and unread count for every row in one go (was 3 queries per row).
@@ -121,6 +122,7 @@ class ConversationsController < ApplicationController
     @latest_by_conversation = Message.visible.where(conversation_id: ids)
                                      .select("DISTINCT ON (messages.conversation_id) messages.*")
                                      .order("messages.conversation_id, messages.created_at DESC")
+                                     .preload(:images_attachments, :voice_note_attachment, :documents_attachments)
                                      .index_by(&:conversation_id)
     @unread_by_conversation = Message.visible.where(conversation_id: ids).where.not(sender_id: current_user.id)
                                      .joins("INNER JOIN conversation_participants cp ON cp.conversation_id = messages.conversation_id")

@@ -140,8 +140,18 @@ class User < ApplicationRecord
                           MessageBlock.where(blocked_id: id).pluck(:blocker_id)
   end
 
+  # One query per request for "have I blocked them?" (the feed asks once per post).
   def blocking?(other)
-    other && MessageBlock.exists?(blocker_id: id, blocked_id: other.id)
+    other.present? && blocking_ids.include?(other.id)
+  end
+
+  def blocking_ids
+    @blocking_ids ||= MessageBlock.where(blocker_id: id).pluck(:blocked_id).to_set
+  end
+
+  def reload(*)
+    @blocking_ids = @blocked_user_ids = nil
+    super
   end
 
   def admin_or_moderator?
@@ -199,6 +209,10 @@ class User < ApplicationRecord
   end
 
   def has_liked?(likeable)
+    # Feed cards preload their likes; use them instead of a query per card.
+    if likeable.respond_to?(:likes) && likeable.likes.loaded?
+      return likeable.likes.any? { |like| like.user_id == id }
+    end
     likes.exists?(likeable: likeable)
   end
 
