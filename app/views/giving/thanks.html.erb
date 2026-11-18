@@ -1,0 +1,22 @@
+<% content_for(:title) { "Thank you - Brethreign" } %>
+<% content_for(:app_title) { "Give" } %>
+<div class="give-page">
+  <div class="give-card give-thanks">
+    <% if @donation.paid? %>
+      <span class="give-thanks-icon"><%= render_icon("check", classes: "h-7 w-7") %></span>
+      <h1 class="give-title">Thank you<%= ", #{@donation.name.split.first}" if @donation.name.present? && !@donation.anonymous %></h1>
+      <p class="give-lede">Your <%= @donation.monthly? ? "monthly gift" : "gift" %> of <strong><%= @donation.display_amount %></strong> was received. A receipt is on its way to <%= @donation.email %>.</p>
+      <p class="give-lede">"The generous will themselves be blessed." Proverbs 22:9</p>
+    <% elsif @donation.status == "failed" %>
+      <h1 class="give-title">The payment didn't go through</h1>
+      <p class="give-lede">Nothing was charged. You can try again whenever you're ready.</p>
+    <% else %>
+      <h1 class="give-title">Confirming your gift…</h1>
+      <p class="give-lede">Paystack is still confirming the payment. Refresh this page in a minute.</p>
+    <% end %>
+    <div class="give-thanks-actions">
+      <%= link_to "Back to Brethreign", root_path, class: "give-submit" %>
+      <% unless @donation.paid? %><%= link_to "Try again", give_path, class: "give-link" %><% end %>
+    </div>
+  </div>
+</div>

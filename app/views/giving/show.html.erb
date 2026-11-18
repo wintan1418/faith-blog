@@ -1,0 +1,83 @@
+<% content_for(:title) { "Give - Brethreign" } %>
+<% content_for(:app_title) { "Give" } %>
+<% open = Donation.payments_open? %>
+<% cur = @donation.currency %>
+
+<div class="give-page" data-controller="giving" data-giving-currencies-value="<%= Donation::CURRENCIES.to_json %>">
+  <% unless Donation.public? %>
+    <p class="give-preview"><%= render_icon("shield", classes: "h-4 w-4") %> Preview: only admins can see this page. Payments open when the Paystack keys are added.</p>
+  <% end %>
+
+  <header class="give-hero">
+    <span class="give-kicker"><%= render_icon("handheart", classes: "h-4 w-4") %> Support Brethreign</span>
+    <h1 class="give-title">Keep this a safe home for believers</h1>
+    <p class="give-lede">Brethreign has no ads and never sells your data. Your gift keeps it that way, and keeps it free for every brother and sister who needs a place to pray, share and be encouraged.</p>
+  </header>
+
+  <div class="give-grid">
+    <%= form_with model: @donation, url: give_path, method: :post, class: "give-card", data: { turbo: false } do |f| %>
+      <% if @donation.errors.any? %>
+        <div class="give-errors" role="alert"><%= @donation.errors.full_messages.to_sentence %></div>
+      <% end %>
+
+      <fieldset class="give-toggle" aria-label="How often">
+        <% { "one_time" => "Give once", "monthly" => "Monthly" }.each do |value, label| %>
+          <label class="give-toggle-opt">
+            <%= f.radio_button :frequency, value, data: { action: "giving#update" } %><span><%= label %></span>
+          </label>
+        <% end %>
+      </fieldset>
+
+      <div class="give-row">
+        <span class="give-label">Amount</span>
+        <fieldset class="give-currency" aria-label="Currency">
+          <% Donation::CURRENCIES.each_key do |code| %>
+            <label class="give-currency-opt">
+              <%= f.radio_button :currency, code, data: { action: "giving#switchCurrency" } %><span><%= code %></span>
+            </label>
+          <% end %>
+        </fieldset>
+      </div>
+
+      <div class="give-chips" data-giving-target="chips">
+        <% Donation::CURRENCIES[cur][:presets].each_with_index do |amt, i| %>
+          <button type="button" class="give-chip<%= ' is-on' if i == 1 %>" data-action="giving#pick" data-amount="<%= amt %>">
+            <%= Donation::CURRENCIES[cur][:symbol] %><%= number_with_delimiter(amt) %>
+          </button>
+        <% end %>
+      </div>
+
+      <label class="give-amount">
+        <span class="give-amount-symbol" data-giving-target="symbol"><%= Donation::CURRENCIES[cur][:symbol] %></span>
+        <%= f.number_field :amount, value: (@donation.amount_minor ? @donation.amount : Donation::CURRENCIES[cur][:presets][1]),
+              min: Donation::CURRENCIES[cur][:min], step: "any", inputmode: "decimal", required: true,
+              aria: { label: "Amount" }, data: { giving_target: "amount", action: "input->giving#typed" } %>
+      </label>
+      <p class="give-hint" data-giving-target="hint">Minimum <%= Donation::CURRENCIES[cur][:symbol] %><%= number_with_delimiter(Donation::CURRENCIES[cur][:min]) %></p>
+
+      <div class="give-fields">
+        <label class="give-field"><span>Your name</span><%= f.text_field :name, autocomplete: "name", placeholder: "Optional" %></label>
+        <label class="give-field"><span>Email for your receipt</span><%= f.email_field :email, autocomplete: "email", required: true %></label>
+        <label class="give-field"><span>A note to the team</span><%= f.text_area :message, rows: 2, maxlength: 500, placeholder: "Optional" %></label>
+        <label class="give-check"><%= f.check_box :anonymous %><span>Give anonymously</span></label>
+      </div>
+
+      <button type="submit" class="give-submit" <%= "disabled" unless open %> data-giving-target="submit">
+        <%= render_icon("heart", classes: "h-5 w-5") %>
+        <span data-giving-target="submitLabel"><%= open ? "Give #{Donation::CURRENCIES[cur][:symbol]}#{number_with_delimiter(Donation::CURRENCIES[cur][:presets][1])}" : "Giving opens soon" %></span>
+      </button>
+      <p class="give-secure"><%= render_icon("shield", classes: "h-4 w-4") %> Payments are processed securely by Paystack. We never see your card.</p>
+    <% end %>
+
+    <aside class="give-where">
+      <h2 class="give-where-title">Where your gift goes</h2>
+      <ul class="give-list">
+        <li><span class="give-list-icon"><%= render_icon("globe", classes: "h-5 w-5") %></span><span><strong>Servers and speed.</strong> Hosting, storage for photos and voice notes, and keeping Brethreign fast across Africa and beyond.</span></li>
+        <li><span class="give-list-icon"><%= render_icon("shield", classes: "h-5 w-5") %></span><span><strong>A safe community.</strong> Moderation that protects members from scams, abuse and explicit content.</span></li>
+        <li><span class="give-list-icon"><%= render_icon("sparkles", classes: "h-5 w-5") %></span><span><strong>New features.</strong> The iPhone and Android apps, prayer circles, Bible tools and the faith-and-work network.</span></li>
+        <li><span class="give-list-icon"><%= render_icon("users", classes: "h-5 w-5") %></span><span><strong>Free for everyone.</strong> No ads, no paywall, no selling your data. Ever.</span></li>
+      </ul>
+      <blockquote class="give-verse">"Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver."<cite>2 Corinthians 9:7</cite></blockquote>
+    </aside>
+  </div>
+</div>

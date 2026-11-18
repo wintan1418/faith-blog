@@ -190,3 +190,60 @@ html.theme-dark .fc-bot-avatar.is-courses { background: rgba(180, 140, 255, 0.14
   background: var(--fc-accent-soft) !important;
   color: var(--fc-accent) !important;
 }
+
+/* ===== /give: donation page ===== */
+.give-page { max-width: 1040px; margin: 0 auto; padding: 28px 16px 64px; font-family: var(--fc-sans); color: var(--fc-ink); }
+.give-preview { display: flex; gap: 8px; align-items: center; margin: 0 0 18px; padding: 10px 14px; border-radius: 12px; background: var(--fc-gold-soft); border: 1px solid var(--fc-gold-line); color: var(--fc-gold); font-size: 14px; font-weight: 600; }
+.give-hero { text-align: center; max-width: 680px; margin: 8px auto 28px; }
+.give-kicker { display: inline-flex; gap: 6px; align-items: center; padding: 6px 12px; border-radius: 999px; background: var(--fc-accent-soft); color: var(--fc-accent); font-size: 13px; font-weight: 700; letter-spacing: .02em; }
+.give-title { font-family: var(--fc-display); font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 14px 0 12px; color: var(--fc-ink); }
+.give-lede { color: var(--fc-muted); font-size: 17px; line-height: 1.6; margin: 0 0 10px; }
+.give-grid { display: grid; gap: 22px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .give-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: start; } }
+.give-card { background: var(--fc-surface); border: 1px solid var(--fc-line); border-radius: 22px; padding: 22px; box-shadow: 0 10px 30px rgba(28, 33, 30, .06); }
+.give-errors { margin-bottom: 14px; padding: 10px 12px; border-radius: 10px; background: #fdecea; color: #8a1c13; font-size: 14px; }
+.give-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin: 0 0 18px; border: 0; border-radius: 14px; background: var(--fc-surface-3); }
+.give-toggle-opt, .give-currency-opt { position: relative; cursor: pointer; }
+.give-toggle-opt input, .give-currency-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.give-toggle-opt span { display: block; text-align: center; padding: 11px 8px; border-radius: 11px; font-weight: 700; color: var(--fc-muted); transition: background .15s, color .15s; }
+.give-toggle-opt input:checked + span { background: var(--fc-surface); color: var(--fc-accent); box-shadow: 0 1px 4px rgba(28, 33, 30, .12); }
+.give-toggle-opt input:focus-visible + span, .give-currency-opt input:focus-visible + span { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
+.give-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.give-label { font-weight: 700; font-size: 15px; }
+.give-currency { display: flex; gap: 4px; border: 0; margin: 0; padding: 3px; border-radius: 10px; background: var(--fc-surface-3); }
+.give-currency-opt span { display: block; padding: 5px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--fc-muted); }
+.give-currency-opt input:checked + span { background: var(--fc-surface); color: var(--fc-ink); }
+.give-chips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+@media (max-width: 420px) { .give-chips { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.give-chip { min-height: 48px; border-radius: 12px; border: 1.5px solid var(--fc-line-strong); background: var(--fc-surface); font-weight: 700; font-size: 16px; color: var(--fc-ink); cursor: pointer; transition: border-color .15s, background .15s; }
+.give-chip:hover { border-color: var(--fc-accent); }
+.give-chip.is-on { border-color: var(--fc-accent); background: var(--fc-accent-soft); color: var(--fc-accent); }
+.give-amount { display: flex; align-items: center; gap: 6px; border: 1.5px solid var(--fc-line-strong); border-radius: 14px; padding: 0 14px; background: var(--fc-surface-2); }
+.give-amount:focus-within { border-color: var(--fc-accent); }
+.give-amount-symbol { font-family: var(--fc-display); font-size: 26px; color: var(--fc-muted); }
+.give-amount input { flex: 1; min-width: 0; border: 0; background: transparent; font-size: 28px; font-weight: 700; padding: 12px 0; color: var(--fc-ink); outline: none; box-shadow: none; }
+.give-hint { margin: 6px 2px 18px; font-size: 13px; color: var(--fc-muted); }
+.give-fields { display: grid; gap: 12px; margin-bottom: 18px; }
+.give-field { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: var(--fc-soft); }
+.give-field input, .give-field textarea { width: 100%; border: 1px solid var(--fc-line-strong); border-radius: 12px; padding: 11px 12px; font-size: 16px; background: var(--fc-surface); color: var(--fc-ink); }
+.give-field input:focus, .give-field textarea:focus { border-color: var(--fc-accent); outline: none; box-shadow: 0 0 0 3px var(--fc-accent-soft); }
+.give-check { display: flex; gap: 10px; align-items: center; font-size: 15px; color: var(--fc-soft); cursor: pointer; }
+.give-check input { width: 18px; height: 18px; accent-color: var(--fc-accent); }
+.give-submit { display: flex; width: 100%; justify-content: center; align-items: center; gap: 8px; min-height: 54px; border: 0; border-radius: 14px; background: var(--fc-fill); color: var(--fc-on-fill); font-size: 17px; font-weight: 700; cursor: pointer; text-decoration: none; transition: background .15s; }
+.give-submit:hover { background: var(--fc-fill-hover); }
+.give-submit:disabled { background: var(--fc-surface-4); color: var(--fc-muted); cursor: not-allowed; }
+.give-secure { display: flex; gap: 6px; align-items: center; justify-content: center; margin: 12px 0 0; font-size: 13px; color: var(--fc-muted); }
+.give-where { background: var(--fc-surface-2); border: 1px solid var(--fc-line); border-radius: 22px; padding: 22px; }
+.give-where-title { font-family: var(--fc-display); font-size: 24px; margin: 0 0 16px; }
+.give-list { list-style: none; margin: 0 0 20px; padding: 0; display: grid; gap: 16px; }
+.give-list li { display: flex; gap: 12px; align-items: flex-start; color: var(--fc-soft); line-height: 1.5; font-size: 15px; }
+.give-list strong { color: var(--fc-ink); }
+.give-list-icon { flex: none; display: inline-flex; width: 38px; height: 38px; align-items: center; justify-content: center; border-radius: 12px; background: var(--fc-accent-soft); color: var(--fc-accent); }
+.give-verse { margin: 0; padding: 16px 18px; border-left: 3px solid var(--fc-gold-fill); background: var(--fc-gold-soft); border-radius: 0 14px 14px 0; font-family: var(--fc-serif); font-style: italic; color: var(--fc-soft); line-height: 1.6; }
+.give-verse cite { display: block; margin-top: 8px; font-family: var(--fc-sans); font-style: normal; font-size: 13px; font-weight: 700; color: var(--fc-gold); }
+.give-thanks { max-width: 560px; margin: 24px auto; text-align: center; }
+.give-thanks-icon { display: inline-flex; width: 60px; height: 60px; align-items: center; justify-content: center; border-radius: 50%; background: var(--fc-accent-soft); color: var(--fc-accent); }
+.give-thanks-actions { display: grid; gap: 10px; margin-top: 20px; }
+.give-link { color: var(--fc-accent); font-weight: 700; }
+.give-amount input[type="number"] { border: 0 !important; background: transparent !important; box-shadow: none !important; padding-left: 0 !important; -moz-appearance: textfield; appearance: textfield; }
+.give-amount input[type="number"]::-webkit-inner-spin-button, .give-amount input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }

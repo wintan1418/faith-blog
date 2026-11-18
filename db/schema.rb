@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_162938) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -407,6 +407,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_162938) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["last_message_at"], name: "index_conversations_on_last_message_at"
+  end
+
+  create_table "donations", force: :cascade do |t|
+    t.bigint "user_id"
+    t.integer "amount_minor", null: false
+    t.string "currency", limit: 3, default: "NGN", null: false
+    t.string "frequency", limit: 16, default: "one_time", null: false
+    t.string "status", limit: 16, default: "pending", null: false
+    t.string "reference", null: false
+    t.string "email", null: false
+    t.string "name"
+    t.boolean "anonymous", default: false, null: false
+    t.text "message"
+    t.string "paystack_plan_code"
+    t.datetime "paid_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reference"], name: "index_donations_on_reference", unique: true
+    t.index ["status", "paid_at"], name: "index_donations_on_status_and_paid_at"
+    t.index ["user_id"], name: "index_donations_on_user_id"
   end
 
   create_table "educations", force: :cascade do |t|
@@ -1034,6 +1054,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_162938) do
   add_foreign_key "connection_requests", "users", column: "sender_id"
   add_foreign_key "conversation_participants", "conversations"
   add_foreign_key "conversation_participants", "users"
+  add_foreign_key "donations", "users", on_delete: :nullify
   add_foreign_key "educations", "users"
   add_foreign_key "experiences", "users"
   add_foreign_key "follows", "users", column: "follower_id"
