@@ -114,4 +114,33 @@ class InboxLiveTest < ApplicationSystemTestCase
     # The composer stays on screen above everything at phone size.
     assert_selector "#new_message .msg-compose-input", visible: true
   end
+
+  # Trello: a message that arrived while the app was in the background (live
+  # connection dropped) was missing from Recent chats until a manual refresh.
+  test "a chat missed while the app was in the background appears when the inbox comes back" do
+    visit conversations_path
+    assert_text "inbox_friend"
+    newcomer = create_member("inbox_newcomer", welcomed_at: Time.current, tour_completed_at: Time.current)
+    chat = Conversation.find_or_create_between!(@me, newcomer)
+    # As if the broadcast never reached this phone: no live update.
+    Message.skip_callback(:commit, :after, :broadcast_inbox_rows) rescue nil
+    begin
+      Message.create!(conversation: chat, sender: newcomer, body: "Are you coming on Sunday?")
+    ensure
+      Message.set_callback(:commit, :after, :broadcast_inbox_rows, on: :create) rescue nil
+    end
+    assert_no_text "inbox_newcomer", wait: 1
+
+    # The app goes to the background and comes back.
+    page.execute_script(<<~JS)
+      Object.defineProperty(document, "hidden", { configurable: true, get: () => true })
+      document.dispatchEvent(new Event("visibilitychange"))
+    JS
+    sleep 2.2
+    page.execute_script(<<~JS)
+      Object.defineProperty(document, "hidden", { configurable: true, get: () => false })
+      document.dispatchEvent(new Event("visibilitychange"))
+    JS
+    assert_selector "#msg_rows", text: "inbox_newcomer", wait: 6
+  end
 end
