@@ -40,7 +40,7 @@ class Conversation < ApplicationRecord
   def other_participant_for(user)
     # Use the participants already loaded with the list (one query for all rows), if any.
     participants = conversation_participants.loaded? ? conversation_participants : conversation_participants.includes(:user)
-    participants.map(&:user).detect { |participant| participant.id != user.id }
+    participants.map(&:user).compact.detect { |participant| participant.id != user.id }
   end
 
   # Whether the two people in this chat are accepted connections.

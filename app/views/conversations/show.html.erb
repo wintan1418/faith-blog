@@ -1,7 +1,7 @@
 <% other_user = @conversation.other_participant_for(current_user) %>
 <%# Always fetch fresh: going back to the list should show the latest messages, not a saved copy. %>
 <% content_for(:head) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
-<% content_for(:title) { "#{other_user.display_name} - Brethreign" } %>
+<% content_for(:title) { "#{other_user&.display_name || 'Deleted account'} - Brethreign" } %>
 <%# The conversation header already shows who it is; the app's top bar just says Messaging. %>
 <% content_for(:app_title) { "Messaging" } %>
 

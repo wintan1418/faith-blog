@@ -1,4 +1,13 @@
 <% other_user = conversation.other_participant_for(current_user) %>
+<% if other_user.nil? %>
+  <section class="msg-thread">
+    <div class="msg-empty">
+      <p class="msg-empty-title">This member deleted their account</p>
+      <p class="msg-empty-text">The conversation is no longer available.</p>
+      <%= link_to "Back to messages", conversations_path, class: "msg-btn msg-btn-primary" %>
+    </div>
+  </section>
+<% else %>
 
 <section class="msg-thread" aria-label="Chat with <%= other_user.display_name %>"
          data-controller="typing"
@@ -82,3 +91,4 @@
     <%= render "conversations/composer", conversation: conversation, message: message %>
   <% end %>
 </section>
+<% end %>

@@ -3,6 +3,8 @@
 <%# viewer: whose inbox this row is for (passed when the row is broadcast). %>
 <% viewer = local_assigns[:viewer] || current_user %>
 <% other_user = conversation.other_participant_for(viewer) %>
+<%# The other person deleted their account: leave the chat out of the list. %>
+<% return if other_user.nil? %>
 <%# The list passes these in batch; fall back to per-row queries elsewhere. %>
 <% latest_message = local_assigns.key?(:latest) ? local_assigns[:latest] : conversation.messages.visible.order(created_at: :desc).first %>
 <% unread_count = local_assigns.key?(:unread) ? local_assigns[:unread].to_i : conversation.unread_count_for(viewer) %>
