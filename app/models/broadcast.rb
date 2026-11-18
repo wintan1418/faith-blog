@@ -20,7 +20,7 @@ class Broadcast < ApplicationRecord
   # confirmation step ("send to 1,234 users?"). Lives in a method instead
   # of a column so it stays accurate as users sign up / opt out.
   def self.eligible_user_count
-    User.where(active: true)
+    User.active
         .where(email_notifications_enabled: true)
         .where.not(email: [ nil, "" ])
         .count

@@ -825,3 +825,7 @@ body.hotwire-native .msg-search-row { padding-top: 12px; }
   color: var(--fc-muted);
 }
 .msg-privacy-icon { flex: none; width: 14px; height: 14px; margin-top: 2px; color: var(--fc-accent); }
+
+/* A chat whose other person deleted their account. */
+.msg-avatar-deleted { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--fc-surface-3); color: var(--fc-muted); flex: none; }
+.msg-row-name.is-deleted { color: var(--fc-muted); font-style: italic; }

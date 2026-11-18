@@ -1,0 +1,5 @@
+<p>Something on Brethreign needs attention.</p>
+<p><strong><%= @title %></strong></p>
+<% if @count > 1 %><p>It happened <%= @count %> times in the last 15 minutes.</p><% end %>
+<pre style="white-space: pre-wrap; font-size: 13px; background: #f5f1e8; padding: 12px; border-radius: 8px;"><%= @detail %></pre>
+<p style="color: #5e6862; font-size: 13px;">You will get at most one email about this problem every 15 minutes.</p>

@@ -111,7 +111,8 @@ class User < ApplicationRecord
   after_create_commit :accept_pending_invitations
 
   # Scopes
-  scope :active, -> { where(active: true) }
+  # Members (the site health check's account never appears in member lists).
+  scope :active, -> { where(active: true).where.not(email: SiteHealthCheck::EMAIL) }
   scope :verified, -> { where.not(verified_at: nil) }
 
   # Instance methods
@@ -163,6 +164,9 @@ class User < ApplicationRecord
                       .where(reviewed_at: 90.days.ago..)
                       .none?
   end
+
+  # The account the site health check signs in as (SiteHealthCheck).
+  def site_monitor? = email == SiteHealthCheck::EMAIL
 
   def active_for_authentication?
     super && active?
@@ -399,12 +403,14 @@ class User < ApplicationRecord
   end
 
   def send_welcome_note
+    return if site_monitor?
     WelcomeNoteJob.perform_later(self)
   rescue StandardError => e
     Rails.logger.warn("[User##{id}] welcome note failed: #{e.class}: #{e.message}")
   end
 
   def announce_join
+    return if site_monitor?
     Announcement.create(
       kind: :new_member,
       user: self,
