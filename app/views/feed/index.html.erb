@@ -9,7 +9,9 @@
     OpenStruct.new(text: "He gives strength to the weary, and increases the power of the weak.", reference: "Isaiah 40:29")
   ]
   verse = verses[Date.current.yday % verses.size]
-  verse_chapter = verse.reference.to_s.sub(/:[\d\-–, ]+\z/, "").strip
+  verse_text = BibleVerse.clean_text(verse.text)
+  verse_reference = BibleVerse.clean_reference(verse.reference)
+  verse_chapter = BibleVerse.chapter_of(verse.reference)
   streak = current_user.current_breath_streak.to_i
   breathed_today = current_user.posts.published.where(created_at: Time.current.all_day).exists?
 %>
@@ -143,10 +145,10 @@
             </span>
           <% end %>
         </div>
-        <blockquote class="eg-today-verse">&ldquo;<%= verse.text %>&rdquo;</blockquote>
+        <blockquote class="eg-today-verse">&ldquo;<%= verse_text %>&rdquo;</blockquote>
         <div class="eg-today-foot">
-          <% if verse.reference.present? %>
-            <span class="eg-today-ref"><%= verse.reference %></span>
+          <% if verse_reference.present? %>
+            <span class="eg-today-ref"><%= verse_reference %></span>
           <% end %>
           <div class="eg-today-online">
             <%= render "presence/strip", online: OnlinePresence.new(current_user) %>
