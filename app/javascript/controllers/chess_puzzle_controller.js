@@ -117,11 +117,13 @@ export default class extends Controller {
   }
 
   startLadder() {
+    this.practice = false
     this.stage = 1
     this.loadStage()
   }
 
   nextStage() {
+    if (this.practice) return this.startLadder()
     if (this.mode !== "ladder" || !this.complete || this.failed) return this.startLadder()
     if (this.stage >= STAGES) return this.startLadder()
     this.stage += 1
@@ -239,7 +241,10 @@ export default class extends Controller {
     }
     if (run !== this.run) return
 
-    if (this.mode === "ladder") {
+    if (this.practice) {
+      this.flash("hint", "That was the line. Tap Restart to try it again, or Climb again for a new climb.")
+      this.setNextButton(true, "Climb again")
+    } else if (this.mode === "ladder") {
       this.failed = true
       const reached = this.stage - 1
       if (reached > 0) this.saveBest(reached)
@@ -252,15 +257,19 @@ export default class extends Controller {
   }
 
   reset() {
-    if (this.mode === "ladder" && this.failed) {
-      this.flash("hint", "This climb is over. Tap “Climb again” to start a new one.")
-      return
-    }
+    // After a lost climb, Restart replays the same puzzle as practice: it
+    // doesn't count, and "Climb again" still starts a new climb.
+    const practice = this.practice || (this.mode === "ladder" && this.failed)
     // Restart puts the pieces back but keeps the tries you've used.
     const left = this.complete ? undefined : this.triesLeft
     try {
       this.start()
+      this.practice = practice
       if (left !== undefined) { this.triesLeft = left; this.renderTries() }
+      if (practice) {
+        this.setNextButton(true, "Climb again")
+        this.setStatus(`Practice round: this one doesn't count. ${this.colorName(this.solverColor)} to move.`)
+      }
     } catch (err) {
       console.error("[chess-puzzle] could not reset:", err)
       this.showLoadError(err)
@@ -468,6 +477,12 @@ export default class extends Controller {
   finish() {
     this.complete = true
     this.clearSelection()
+
+    if (this.practice) {
+      this.flash("good", "Solved! Practice rounds don't count, so climb again to go for a new best.")
+      this.setNextButton(true, "Climb again")
+      return
+    }
 
     if (this.mode === "ladder") {
       this.saveBest(this.stage)
