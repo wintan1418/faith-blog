@@ -35,7 +35,7 @@ class BrethrenSuggestions
     add_rooms
 
     ids = (@scores.keys - excluded_ids).sort_by { |id| -@scores[id] }.first(limit)
-    users = User.active.where(id: ids).includes(profile: { avatar_attachment: :blob }).index_by(&:id)
+    users = User.active.where(id: ids).includes(:experiences, profile: { avatar_attachment: :blob }).index_by(&:id)
     faces = User.where(id: ids.flat_map { |id| @mutual_ids[id].to_a.first(3) }.uniq)
                 .includes(profile: { avatar_attachment: :blob }).index_by(&:id)
     ids.filter_map do |id|
