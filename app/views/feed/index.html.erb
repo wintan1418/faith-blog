@@ -1,4 +1,6 @@
 <% content_for(:title) { "Feed - Brethreign" } %>
+<%# In the iPhone/Android apps the top bar shows this: the brand, not "Feed". %>
+<% content_for(:app_title) { "Brethreign" } %>
 <%
   # Verse of the day for the Today strip: one of the admin's Living Scriptures,
   # the same one all day, changing each morning.
