@@ -46,7 +46,7 @@
 
   <%# New messages move their chat to the top of this list live (Message#broadcast_inbox_rows). %>
   <%= turbo_stream_from current_user, :inbox %>
-  <div class="msg-rows" id="msg_rows">
+  <div class="msg-rows" id="msg_rows" data-controller="inbox-refresh">
     <% if conversations.any? %>
       <% conversations.each do |conversation| %>
         <% if defined?(@latest_by_conversation) && @latest_by_conversation %>

@@ -88,6 +88,9 @@ application.register("hello", HelloController)
 import HistoryArenaController from "./history_arena_controller"
 application.register("history-arena", HistoryArenaController)
 
+import InboxRefreshController from "./inbox_refresh_controller"
+application.register("inbox-refresh", InboxRefreshController)
+
 import InboxTypingController from "./inbox_typing_controller"
 application.register("inbox-typing", InboxTypingController)
 
