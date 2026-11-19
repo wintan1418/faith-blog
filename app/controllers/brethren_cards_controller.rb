@@ -15,7 +15,7 @@ class BrethrenCardsController < ApplicationController
 
   def ensure_connected_or_owner
     return if @user == current_user
-    return if current_user.connected_with?(@user)
+    return if current_user.connected_with?(@user) && !MessageBlock.between?(current_user, @user)
 
     redirect_to user_path(@user.username),
                 alert: "You need to connect with #{@user.display_name} first to view their Brethren Card."

@@ -9,10 +9,15 @@ class AiModerationGateJob < ApplicationJob
 
   discard_on ActiveJob::DeserializationError
 
-  def perform(post_id)
+  # recheck: the author edited a breath that was already reviewed. The new
+  # words/photos get the same look, but a recheck only ever tightens (holds or
+  # blocks); it never releases a breath a moderator or earlier review stopped.
+  def perform(post_id, recheck: false)
     post = Post.find_by(id: post_id)
     return unless post
     return unless post.published?
+    return perform_recheck(post) if recheck
+
     # Act only while the post awaits its FIRST decision: no review row yet, or
     # still held with the review pending. Any settled review (cleared/flagged/
     # actioned/dismissed) means the AI or a moderator already decided — never
@@ -40,6 +45,23 @@ class AiModerationGateJob < ApplicationJob
   end
 
   private
+
+  def perform_recheck(post)
+    verdict = Ai::Moderation::PostGatekeeper.call(post: post)
+    return unless verdict.block? || verdict.hold? || verdict.flag?
+
+    begin
+      verdict.persist_review!(post)
+    rescue StandardError => e
+      Rails.logger.error("[AiModerationGateJob] recheck persist_review failed for post #{post.id}: #{e.class}: #{e.message}")
+    end
+    return unless verdict.block? || verdict.hold?
+    return if post.moderation_blocked? # already as strict as it gets
+
+    post.apply_moderation_decision!(verdict.decision, reason: verdict.reason)
+    Ai::Moderation::RiskScorer.call(user: post.user) if post.user
+    notify_author(post, verdict) if verdict.block?
+  end
 
   def notify_author(post, verdict)
     Notification.create(

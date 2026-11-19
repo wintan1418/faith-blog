@@ -2,6 +2,7 @@
 
 class BibleController < ApplicationController
   before_action :authenticate_user!
+  member_rate_limit to: 120, within: 1.hour, only: :search, name: "bible-search", json: true
 
   def search
     query = params[:query].to_s.strip

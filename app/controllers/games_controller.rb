@@ -2,6 +2,11 @@
 
 class GamesController < ApplicationController
   before_action :authenticate_user!
+  # Every "generate" asks the AI for a fresh round; all of them share one budget.
+  GENERATE_ACTIONS = %i[quiz_generate history_generate character_match_generate reference_scramble_generate
+                        verse_memory_generate pic_word_generate].freeze
+  member_rate_limit to: 60, within: 1.hour, only: GENERATE_ACTIONS, name: "ai-generate", json: true,
+                    message: "That's a lot of new rounds in an hour. Take a breather and try again soon."
 
   def index
     @window = params[:window].to_s.presence || "week"

@@ -2,6 +2,7 @@
 
 class LikesController < ApplicationController
   before_action :authenticate_user!
+  member_rate_limit to: 60, within: 1.minute, only: %i[create destroy], name: "reactions"
   before_action :set_likeable
 
   def create
@@ -78,6 +79,7 @@ class LikesController < ApplicationController
   def create_notification
     return unless @likeable.is_a?(Post) || @likeable.is_a?(Comment) # bots and chats don't get notified
     return if @likeable.user == current_user
+    return if MessageBlock.between?(current_user, @likeable.user) # (Notification also refuses it)
 
     notification_type = @likeable.is_a?(Post) ? :post_liked : :comment_liked
 

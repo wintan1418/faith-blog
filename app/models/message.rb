@@ -109,6 +109,9 @@ class Message < ApplicationRecord
   after_create_commit :broadcast_inbox_rows
   # AI review first; it notifies the recipient once the message is cleared.
   after_create_commit :moderate
+  # Edited words or swapped photos/files get the same look again (no new alert).
+  before_update :note_edit_for_moderation
+  after_update_commit :remoderate_after_edit
 
   # The message just before this one in its thread (for grouping and day dividers).
   def previous_in_thread
@@ -180,7 +183,39 @@ class Message < ApplicationRecord
     deleted_at.present?
   end
 
+  # Deleting a message takes its photos, voice note and files down from the
+  # file store too, except files still used elsewhere (a forwarded copy).
+  def purge_files!
+    attachments = ActiveStorage::Attachment.where(record: self, name: %w[images voice_note documents]).includes(:blob).to_a
+    attachments.each do |attachment|
+      shared = ActiveStorage::Attachment.where(blob_id: attachment.blob_id).where.not(id: attachment.id).exists?
+      shared ? attachment.delete : attachment.purge_later
+    end
+    reload
+  end
+
   private
+
+  def note_edit_for_moderation
+    @edited_for_moderation = will_save_change_to_body? ||
+                             (attachment_changes.keys & %w[images voice_note documents]).any?
+  end
+
+  def remoderate_after_edit
+    edited = @edited_for_moderation
+    @edited_for_moderation = false
+    return unless edited && !deleted? && !removed?
+    return if body.blank? && !has_images?
+
+    update_columns(moderated_at: nil)
+    if Ai::Moderation::Client.stub?
+      MessageModerationJob.perform_now(self, notify: false)
+    else
+      MessageModerationJob.perform_later(self, notify: false)
+    end
+  rescue StandardError => e
+    Rails.logger.warn("[Message##{id}] re-moderation after edit failed: #{e.class}: #{e.message}")
+  end
 
   # A body isn't required when the message already carries something to say:
   # an image, a voice note, or a shared verse.

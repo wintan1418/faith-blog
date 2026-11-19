@@ -2,10 +2,13 @@
 
 class CommentsController < ApplicationController
   before_action :authenticate_user!
+  member_rate_limit to: 10, within: 1.minute, only: %i[create reply], name: "comment-burst"
+  member_rate_limit to: 120, within: 1.hour, only: %i[create reply], name: "comment-hourly"
   before_action :set_post
   before_action :set_comment, only: [ :update, :destroy, :reply ]
   before_action :authorize_comment!, only: [ :update, :destroy ]
   before_action :enforce_comment_rate_limit!, only: [ :create, :reply ]
+  before_action :refuse_if_blocked!, only: [ :create, :reply ]
 
   def create
     return redirect_to(@post, alert: "Comments are disabled for this post.") unless @post.allow_comments?
@@ -94,8 +97,12 @@ class CommentsController < ApplicationController
   end
 
   def update
-    if @comment.update(comment_params)
+    @comment.assign_attributes(comment_params)
+    recheck_edited_comment(@comment) if @comment.rich_text_content&.changed?
+
+    if @comment.save
       @comment.mark_as_edited!
+      @edit_verdict.persist_review!(@comment) if @edit_verdict && !@edit_verdict.allow?
       # Mentions are processed in after_save callback, no need to call again
       respond_to do |format|
         if from_inline_thread?
@@ -154,6 +161,23 @@ class CommentsController < ApplicationController
     @comment = @post.comments.find(params[:id])
   end
 
+  # No commenting on the breath of someone you've blocked (or who blocked you),
+  # nor replying to their comment.
+  def refuse_if_blocked!
+    people = [ @post.user_id, @comment&.user_id ].compact.uniq - [ current_user.id ]
+    return unless people.any? { |id| MessageBlock.between?(current_user, id) }
+
+    message = "You can't comment here."
+    respond_to do |format|
+      format.html { redirect_to @post, alert: message }
+      format.turbo_stream do
+        flash.now[:alert] = message
+        render turbo_stream: turbo_stream.update("flash_messages", partial: "shared/flash"), status: :forbidden
+      end
+      format.any { head :forbidden }
+    end
+  end
+
   def comment_params
     params.require(:comment).permit(:content)
   end
@@ -166,6 +190,20 @@ class CommentsController < ApplicationController
       comment.moderation_status = :pending_review
     else
       comment.moderation_status = :approved
+    end
+  end
+
+  # An edit gets the same look as a new comment. It can hold or block the
+  # comment, but never releases one that's already held or blocked.
+  def recheck_edited_comment(comment)
+    verdict = @edit_verdict = Ai::Moderation::CommentGatekeeper.call(comment: comment)
+    return unless comment.moderation_approved?
+
+    if verdict.block?
+      comment.moderation_status = :blocked
+      comment.moderation_blocked_reason = verdict.reason
+    elsif verdict.hold?
+      comment.moderation_status = :pending_review
     end
   end
 

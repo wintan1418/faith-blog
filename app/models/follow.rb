@@ -8,6 +8,7 @@ class Follow < ApplicationRecord
   # Validations
   validates :follower_id, uniqueness: { scope: :following_id, message: "is already following this user" }
   validate :cannot_follow_self
+  validate :not_blocked
 
   # Callbacks
   after_create :create_notification
@@ -16,6 +17,10 @@ class Follow < ApplicationRecord
 
   def cannot_follow_self
     errors.add(:follower_id, "cannot follow yourself") if follower_id == following_id
+  end
+
+  def not_blocked
+    errors.add(:base, "You can't follow this member.") if MessageBlock.between?(follower_id, following_id)
   end
 
   def create_notification

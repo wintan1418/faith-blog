@@ -113,7 +113,7 @@
             <div class="msg-voice-row">
               <%# Play button and a waveform-style bar that fills as it plays (voice-player). %>
               <div class="msg-voice-player" data-controller="voice-player">
-                <audio preload="metadata" class="msg-voice" src="<%= url_for(message.voice_note) %>" data-voice-player-target="audio"></audio>
+                <audio preload="metadata" class="msg-voice" src="<%= message_file_inline_path(message, message.voice_note) %>" data-voice-player-target="audio"></audio>
                 <button type="button" class="msg-voice-play" data-voice-player-target="playBtn" data-action="voice-player#toggle"
                         aria-label="Play voice note">
                   <%= render_icon("play", classes: "msg-voice-icon is-play") %>
@@ -176,7 +176,7 @@
               <%= render_icon("forward", classes: "h-4 w-4") %>
             <% end %>
             <% share_images = message.has_images? ? message.images.map { |img| photo_src(img, width: 1080) } : [] %>
-            <% share_docs = message.has_documents? ? message.documents.map { |d| { url: rails_blob_path(d, disposition: "attachment"), name: d.filename.to_s, type: d.content_type } } : [] %>
+            <% share_docs = message.has_documents? ? message.documents.map { |d| { url: message_file_download_path(message, d), name: d.filename.to_s, type: d.content_type } } : [] %>
             <% if message.body.present? || message.has_scripture? || share_images.any? || share_docs.any? %>
               <button type="button" class="msg-action" title="Share" aria-label="Share outside Brethreign"
                       data-controller="message-share"

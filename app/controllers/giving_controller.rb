@@ -5,6 +5,7 @@
 class GivingController < ApplicationController
   skip_forgery_protection only: :webhook
   before_action :ensure_visible, only: %i[show create]
+  member_rate_limit to: 10, within: 10.minutes, only: :create, name: "give", per: :ip
 
   def show
     @donation = Donation.new(currency: params[:currency].presence_in(Donation::CURRENCIES.keys) || "NGN",

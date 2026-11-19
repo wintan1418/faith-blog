@@ -14,7 +14,7 @@ class DmPushNotificationTest < ActionDispatch::IntegrationTest
                               password: "password123", password_confirmation: "password123")
     @conversation = Conversation.find_or_create_between!(@sender, @recipient)
     @sub = @recipient.push_subscriptions.create!(
-      endpoint: "https://push.example.com/abc123",
+      endpoint: "https://fcm.googleapis.com/fcm/send/abc123",
       p256dh_key: "test-p256dh",
       auth_key: "test-auth"
     )

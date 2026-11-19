@@ -2,6 +2,7 @@
 
 class InvitationsController < ApplicationController
   before_action :authenticate_user!
+  member_rate_limit to: 30, within: 1.hour, only: %i[create resend], name: "invites"
 
   def index
     @invitation = current_user.sent_invitations.build
@@ -16,6 +17,8 @@ class InvitationsController < ApplicationController
       @invitations = current_user.sent_invitations.includes(:invited_user).recent
       @invitation.errors.add(:email, "has already accepted your invitation")
       render :index, status: :unprocessable_entity
+    elsif @invitation.persisted? && @invitation.recently_sent?
+      redirect_to invitations_path, alert: "You already invited #{@invitation.email} today. You can send it again tomorrow."
     elsif @invitation.save
       @invitation.deliver!
       redirect_to invitations_path, notice: "Invitation sent to #{@invitation.email}."
@@ -29,6 +32,10 @@ class InvitationsController < ApplicationController
     invitation = current_user.sent_invitations.find(params[:id])
     if invitation.accepted?
       redirect_to invitations_path, alert: "That invitation has already been accepted."
+      return
+    end
+    if invitation.recently_sent?
+      redirect_to invitations_path, alert: "That invitation went out recently. You can resend it once a day."
       return
     end
 

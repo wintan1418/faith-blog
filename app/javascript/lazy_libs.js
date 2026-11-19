@@ -20,3 +20,12 @@ function preload() {
 }
 
 document.addEventListener("turbo:load", preload)
+
+// Breaths and comments take photos only: any other file dropped or pasted into
+// the editor is refused before it uploads (the server refuses it too).
+const EDITOR_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+const EDITOR_MAX_BYTES = 10 * 1024 * 1024
+document.addEventListener("trix-file-accept", (event) => {
+  const file = event.file
+  if (!file || !EDITOR_IMAGE_TYPES.includes(file.type) || file.size > EDITOR_MAX_BYTES) event.preventDefault()
+})
