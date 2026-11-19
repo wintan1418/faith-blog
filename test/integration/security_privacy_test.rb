@@ -15,7 +15,8 @@ class SecurityPrivacyTest < ActionDispatch::IntegrationTest
   end
 
   def breath(user: @author, **attrs)
-    Post.create!({ user: user, room: @room, content: "A breath #{SecureRandom.hex(3)}", status: :published }.merge(attrs))
+    @breath_count = @breath_count.to_i + 1 # plain words only: random hex can trip the language filter
+    Post.create!({ user: user, room: @room, content: "A quiet breath number #{@breath_count}", status: :published }.merge(attrs))
   end
 
   # ── 1. Drafts / scheduled breaths ──
