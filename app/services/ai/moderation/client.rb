@@ -22,8 +22,10 @@ module Ai
 
       # max_tokens: the reply's length limit; nil keeps the provider default
       # (600, enough for a verdict). Longer replies (quiz batches) pass more.
-      def self.call(system:, user:, images: [], max_tokens: nil)
-        new.call(system: system, user: user, images: images, max_tokens: max_tokens)
+      # timeout: seconds to wait for the reply (nil = the provider default of 12,
+      # right for a quick verdict; long readings such as a LinkedIn PDF pass more).
+      def self.call(system:, user:, images: [], max_tokens: nil, timeout: nil)
+        new(timeout: timeout).call(system: system, user: user, images: images, max_tokens: max_tokens)
       end
 
       def self.stub?
@@ -54,13 +56,13 @@ module Ai
         ENV[env_key].to_s.strip.length.positive?
       end
 
-      def initialize(provider: nil)
+      def initialize(provider: nil, timeout: nil)
         name = provider || self.class.resolve_provider_name
         config = PROVIDERS.fetch(name) { raise ConfigError, "unknown provider: #{name}" }
         api_key = config[:env_key] ? ENV[config[:env_key]] : nil
 
         @provider_name = name
-        @impl = config[:klass].new(api_key: api_key)
+        @impl = config[:klass].new(api_key: api_key, timeout: timeout || Providers::Base::DEFAULT_TIMEOUT)
       end
 
       def call(system:, user:, images: [], max_tokens: nil)

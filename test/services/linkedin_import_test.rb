@@ -96,11 +96,82 @@ class LinkedinImportTest < ActiveSupport::TestCase
     end
   end
 
-  test "a PDF reply that isn't JSON gives a friendly error" do
-    Ai::Moderation::Client.stub(:stub?, false) do
-      error = assert_raises(LinkedinImport::Error) { FakePdf.new("x" * 100, "Sorry, I can't").call }
-      assert_match(/data export ZIP/, error.message)
+  # LinkedIn's "Save to PDF" after the sidebar and main column are unmixed.
+  PDF_TEXT = <<~TEXT
+    Contact
+    www.linkedin.com/in/adaokafor (LinkedIn)
+    ada@example.com
+    Top Skills
+    UX Design
+    Figma
+    User Research
+    Languages
+    English (Native or Bilingual)
+    Yoruba (Native or Bilingual)
+    Certifications
+    Google UX Design Certificate
+    Ada Okafor
+    Product Designer at Lumen Fintech
+    Lagos, Lagos State, Nigeria
+    Summary
+    I design money tools that people in Lagos actually use.
+    Experience
+    Lumen Fintech
+    3 years 2 months
+    Senior Product Designer
+    March 2024 - Present (1 year 9 months)
+    Lagos, Nigeria
+    Leads the design of the savings app.
+    Product Designer
+    March 2022 - March 2024 (2 years 1 month)
+    Lagos, Nigeria
+    Hope Studio
+    UI Designer
+    January 2020 - February 2022 (2 years 2 months)
+    Remote
+    Page 1 of 2
+    Education
+    University of Lagos
+    Bachelor of Science - BSc, Computer Science · (2012 - 2016)
+    Page 2 of 2
+  TEXT
+
+  test "without AI, the PDF is read by LinkedIn's layout" do
+    draft = Ai::Moderation::Client.stub(:stub?, true) { FakePdf.new(PDF_TEXT, nil).call }
+    assert_equal "Product Designer at Lumen Fintech", draft.headline
+    assert_match "Lagos", draft.location
+    assert_match "money tools", draft.summary
+    roles = draft.positions.map { |p| [ p["title"], p["organization"], p["start_on"].to_s, p["current"] ] }
+    assert_equal [ "Senior Product Designer", "Lumen Fintech", "2024-03-01", true ], roles[0]
+    assert_equal [ "Product Designer", "Lumen Fintech", "2022-03-01", false ], roles[1]
+    assert_equal [ "UI Designer", "Hope Studio", "2020-01-01", false ], roles[2]
+    assert_equal "University of Lagos", draft.educations.first["school"]
+    assert_equal [ 2012, 2016 ], [ draft.educations.first["start_year"], draft.educations.first["end_year"] ]
+    assert_equal [ "UX Design", "Figma", "User Research" ], draft.skills
+    assert_equal %w[English Yoruba], draft.languages.map { |l| l["name"] }
+    assert_equal [ "Google UX Design Certificate" ], draft.certifications.map { |c| c["name"] }
+  end
+
+  test "when the AI is slow or unreachable, the layout reader takes over" do
+    slow = Class.new(FakePdf) { def ask_ai(_text) = raise(Ai::Moderation::Client::ApiError, "openai unreachable: Net::ReadTimeout") }
+    draft = Ai::Moderation::Client.stub(:stub?, false) { slow.new(PDF_TEXT, nil).call }
+    assert_equal 3, draft.positions.size
+    assert_equal "Product Designer at Lumen Fintech", draft.headline
+  end
+
+  test "a PDF reply that isn't JSON falls back to the layout reader" do
+    draft = Ai::Moderation::Client.stub(:stub?, false) { FakePdf.new(PDF_TEXT, "Sorry, I can't").call }
+    assert_equal "University of Lagos", draft.educations.first["school"]
+  end
+
+  test "the import asks the AI with a long wait and room for a whole profile" do
+    seen = nil
+    fake = ->(**kw) { seen = kw; { "content" => [ { "type" => "text", "text" => "{}" } ] } }
+    Ai::Moderation::Client.stub(:call, fake) do
+      LinkedinImport::PdfReader.new("unused.pdf").send(:ask_ai, "text")
     end
+    assert_operator seen[:timeout], :>=, 30
+    assert_operator seen[:max_tokens], :>=, 3000
   end
 
   test "the PDF's sidebar and main column are read one after the other" do

@@ -209,6 +209,8 @@ module LinkedinImport
 
   # ── The profile PDF ──────────────────────────────────────────────
   class PdfReader
+    AI_TIMEOUT = 45
+    AI_MAX_TOKENS = 4000
     SYSTEM_PROMPT = <<~PROMPT.freeze
       You turn the text of a LinkedIn profile PDF ("Save to PDF") into JSON.
       Use ONLY what the text says. Never invent or guess roles, dates, schools or skills.
@@ -233,9 +235,9 @@ module LinkedinImport
     def call
       text = extract_text
       raise Error, "We couldn't read any text in that PDF. Try LinkedIn's “Save to PDF” again, or use the data export." if text.length < 40
-      raise Error, "Reading PDFs isn't switched on here yet. Please use the LinkedIn data export ZIP instead." if Ai::Moderation::Client.stub?
-
-      data = parse(ask_ai(text))
+      # The AI sorts the text best; if it is off, slow or answers badly, the
+      # rule-based reader of LinkedIn's PDF layout (PdfRules) does the job.
+      data = (from_ai(text) unless Ai::Moderation::Client.stub?) || PdfRules.new(text).call
       build(data)
     end
 
@@ -275,20 +277,26 @@ module LinkedinImport
       raise Error, "We couldn't open that PDF (#{e.class.name.demodulize})."
     end
 
-    # Network seam — tests replace this.
+    # The AI's sorting of the text, or nil when it isn't usable.
+    def from_ai(text)
+      data = parse(ask_ai(text))
+      data.is_a?(Hash) ? data : nil
+    rescue Ai::Moderation::Client::Error, Timeout::Error, SocketError, JSON::ParserError => e
+      Rails.logger.warn("[LinkedinImport] AI: #{e.class}: #{e.message.to_s.first(200)} (using the layout reader)")
+      nil
+    end
+
+    # Network seam — tests replace this. A whole profile is a long reply, so it
+    # gets more time and room than a moderation verdict.
     def ask_ai(text)
-      Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: "LinkedIn profile text:\n\n#{text}")
-    rescue Ai::Moderation::Client::Error, Timeout::Error, SocketError => e
-      Rails.logger.warn("[LinkedinImport] AI: #{e.class}: #{e.message}")
-      raise Error, "Reading the PDF didn't work just now. Please try again in a minute, or use the data export ZIP."
+      Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: "LinkedIn profile text:\n\n#{text}",
+                                  max_tokens: AI_MAX_TOKENS, timeout: AI_TIMEOUT)
     end
 
     def parse(raw)
       text = raw.is_a?(Hash) ? Array(raw["content"]).find { |c| c["type"] == "text" }&.dig("text").to_s : raw.to_s
       text = text.sub(/\A```(?:json)?\s*/i, "").sub(/```\s*\z/, "").strip
       JSON.parse(text)
-    rescue JSON::ParserError
-      raise Error, "Reading the PDF didn't work just now. Please try again, or use the data export ZIP."
     end
 
     def build(data)
