@@ -19,7 +19,7 @@
             <p class="text-xs text-gray-500"><%= time_ago_in_words(post.created_at) %> ago</p>
           </td>
           <td class="px-6 py-4 text-sm text-gray-700"><%= post.room&.name || "No room" %></td>
-          <td class="px-6 py-4 text-sm text-gray-700"><% if post.anonymous? %>Anonymous <span class="text-xs text-gray-500">(real author: <%= post.user&.username %>)</span> <span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-800" title="Shown to staff only for moderation. Members see this breath as Anonymous.">Posted anonymously · staff-only</span><% else %><%= post.user.username %><% end %></td>
+          <td class="px-6 py-4 text-sm text-gray-700"><% if post.anonymous? %>Anonymous<% if current_user.can_unmask_anonymous? %> <span class="text-xs text-gray-500">(real author: <%= post.user&.username %>)</span> <span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-800" title="Only the super admin can see this. Everyone else sees Anonymous.">Super admin only</span><% end %><% else %><%= post.user.username %><% end %></td>
           <td class="px-6 py-4">
             <span class="badge badge-secondary"><%= post.status.humanize %></span>
             <% if post.featured? %><span class="badge badge-faith ml-1">Featured</span><% end %>

@@ -253,6 +253,9 @@ class User < ApplicationRecord
                       .none?
   end
 
+  # Only the super admin may see who wrote an anonymous post.
+  def can_unmask_anonymous? = super_admin?
+
   # The account the site health check signs in as (SiteHealthCheck).
   def site_monitor? = email == SiteHealthCheck::EMAIL
 
