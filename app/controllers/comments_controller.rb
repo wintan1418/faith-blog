@@ -138,6 +138,9 @@ class CommentsController < ApplicationController
 
   def set_post
     @post = Post.friendly.find(params[:post_id])
+    # Drafts / scheduled / held breaths can't be commented on (or probed) by
+    # anyone who can't see them.
+    raise ActiveRecord::RecordNotFound unless @post.visible_to?(current_user)
   end
 
   # Mirror the breath rate limit: a freshly-created, flagged account can post

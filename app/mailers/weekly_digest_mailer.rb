@@ -62,7 +62,7 @@ class WeeklyDigestMailer < ApplicationMailer
   def answered_in_circle_for(user)
     circle_ids = user.following.pluck(:id) + [ user.id ]
     Post.where(user_id: circle_ids, prayer_answered_at: @range)
-        .where(status: :published)
+        .where(status: :published, anonymous: false)
         .order(prayer_answered_at: :desc)
         .limit(3)
         .includes(:user)

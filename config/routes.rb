@@ -4,7 +4,8 @@ Rails.application.routes.draw do
     omniauth_callbacks: "users/omniauth_callbacks",
     registrations: "users/registrations",
     sessions: "users/sessions",
-    passwords: "users/passwords"
+    passwords: "users/passwords",
+    unlocks: "users/unlocks"
   }
 
   # Root path
@@ -42,7 +43,10 @@ Rails.application.routes.draw do
 
   # Prayer Circles — private groups with a quiet stream + shared prayer list.
   # The join route must precede resources so "join" is never read as a slug.
-  get "circles/join/:code", to: "circles#join", as: :join_circle
+  # The invite link shows a confirm page; joining is a POST (a GET must never
+  # change state — link previews and prefetchers follow links).
+  get "circles/join/:code", to: "circles#join_confirm", as: :join_circle
+  post "circles/join/:code", to: "circles#join"
   resources :circles, param: :slug, only: [ :index, :show, :create, :destroy ] do
     member do
       delete :leave

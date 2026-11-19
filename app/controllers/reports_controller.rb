@@ -25,9 +25,9 @@ class ReportsController < ApplicationController
 
     case reportable_type
     when "Post"
-      Post.find(reportable_id)
+      Post.find(reportable_id).tap { |post| raise ActiveRecord::RecordNotFound unless post.readable_by?(current_user) }
     when "Comment"
-      Comment.find(reportable_id)
+      Comment.find(reportable_id).tap { |comment| raise ActiveRecord::RecordNotFound unless comment.post.nil? || comment.post.readable_by?(current_user) }
     when "Resource"
       Resource.find(reportable_id)
     when "Message"

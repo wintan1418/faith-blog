@@ -22,7 +22,7 @@ class AuthPagesTest < ActionDispatch::IntegrationTest
     assert_select "input#user_password_confirmation", count: 0
 
     assert_difference -> { User.count }, 1 do
-      post user_registration_path, params: { user: { username: "new_breather", email: "new_breather@example.com", password: @password } }
+      post user_registration_path, params: { user: { username: "new_breather", email: "new_breather@example.com", password: @password } }.merge(human_signup_fields)
     end
   end
 

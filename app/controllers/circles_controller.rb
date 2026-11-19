@@ -32,6 +32,14 @@ class CirclesController < ApplicationController
     end
   end
 
+  def join_confirm
+    @circle = Circle.find_by(invite_code: params[:code])
+    return redirect_to(circles_path, alert: "That invite link is no longer valid.") if @circle.nil?
+    return redirect_to(circle_path(@circle)) if @circle.member?(current_user)
+
+    @code = params[:code]
+  end
+
   def join
     circle = Circle.find_by(invite_code: params[:code])
     if circle.nil?

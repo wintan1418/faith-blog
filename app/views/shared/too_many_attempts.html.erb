@@ -1,0 +1,4 @@
+<% content_for(:title) { "Please wait - Brethreign" } %>
+<%= render layout: "devise/shared/auth_shell", locals: { title: "Please wait a moment", subtitle: AuthRateLimiting::TOO_MANY_MESSAGE } do %>
+  <p class="auth-switch"><%= link_to "Back to sign in", new_user_session_path %></p>
+<% end %>

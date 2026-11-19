@@ -17,8 +17,8 @@
       <div class="auth-input-wrap">
         <%= render_icon("lock", classes: "auth-input-icon") %>
         <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "auth-input",
-                             placeholder: "At least #{@minimum_password_length || 8} characters", required: true,
-                             minlength: @minimum_password_length || 8,
+                             placeholder: "At least #{@minimum_password_length || 10} characters", required: true,
+                             minlength: @minimum_password_length || 10,
                              data: { password_field_target: "input", action: "input->password-field#measure" } %>
         <button type="button" class="auth-eye" data-action="password-field#toggle" data-password-field-target="toggle"
                 aria-label="Show password" aria-pressed="false">Show</button>

@@ -4,6 +4,9 @@
 # app catches that link, shows Apple's sheet, and posts the identity token here
 # from inside the web view (so the session cookie lands where the app needs it).
 class Users::NativeAppleSessionsController < ApplicationController
+  rate_limit to: 20, within: 5.minutes, only: :create, store: AuthThrottleStore.store,
+             with: -> { refuse(AuthRateLimiting::TOO_MANY_MESSAGE, :too_many_requests) }
+
   # An app version that can't sign in with Apple just lands back on sign-in.
   def start
     redirect_to new_user_session_path,

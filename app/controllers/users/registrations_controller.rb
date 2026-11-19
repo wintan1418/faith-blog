@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class Users::RegistrationsController < Devise::RegistrationsController
+  include AuthRateLimiting
+
+  BOT_REJECTION_MESSAGE = "We couldn't create your account just now. Please try again."
+
+  # A church or family can share one network, so the per-IP limit is roomy.
+  throttle_auth only: :create, per_ip: 10, per_email: 5, within: 1.hour
+  before_action :reject_bots!, only: :create
   before_action :store_invite_token, only: [ :new, :create ]
   before_action :configure_sign_up_params, only: [ :create ]
   before_action :configure_account_update_params, only: [ :update ]
@@ -43,6 +50,18 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   private
+
+  # Honeypot, minimum fill time and (when configured) Turnstile — see
+  # SignupGuard. A rejected request just sees the form again.
+  def reject_bots!
+    reason = SignupGuard.bot_reason(params, remote_ip: request.remote_ip)
+    return unless reason
+
+    SignupGuard.record_block!(reason, where: "sign-up", remote_ip: request.remote_ip, email: params.dig(:user, :email))
+    build_resource(params.fetch(:user, {}).permit(:username, :email))
+    resource.errors.add(:base, BOT_REJECTION_MESSAGE)
+    render :new, status: :unprocessable_entity
+  end
 
   def store_invite_token
     session[:invitation_token] = params[:invite] if params[:invite].present?

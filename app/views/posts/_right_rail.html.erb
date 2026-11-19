@@ -20,7 +20,7 @@
         <span>Followers</span>
       </div>
       <div>
-        <p><%= post.user.posts.published.count %></p>
+        <p><%= post.user.posts.published.named.count %></p>
         <span>Breaths</span>
       </div>
     </div>
@@ -41,7 +41,7 @@
 </div>
 
 <%
-  more_from_author = post.user.posts.published
+  more_from_author = post.user.posts.published.named
                           .where.not(id: post.id)
                           .recent
                           .limit(3)

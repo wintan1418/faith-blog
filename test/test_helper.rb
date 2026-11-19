@@ -19,9 +19,19 @@ module ActiveSupport
     def create_member(username, **attrs)
       User.create!(username: username, email: "#{username}@example.com", password: SecureRandom.base58(24), **attrs)
     end
+
+    # Rate-limit / bot counters live in an in-memory store under test; start
+    # every test with a clean slate so suites don't trip each other's limits.
+    setup { AuthThrottleStore.clear! }
   end
 end
 
 class ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
+
+  # The hidden fields a real sign-up form carries (SignupGuard): an empty
+  # honeypot and a "form shown" stamp from long enough ago to be human.
+  def human_signup_fields(shown_at: 10.seconds.ago)
+    { SignupGuard::TOKEN_PARAM => SignupGuard.form_token(issued_at: shown_at), SignupGuard::HONEYPOT_PARAM => "" }
+  end
 end

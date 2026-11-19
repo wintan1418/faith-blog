@@ -4,6 +4,10 @@ class Admin::UsersController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
   before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin ]
+  # Role changes and deleting accounts are for super admins only; and nobody
+  # can act on themselves or on someone of equal or higher rank.
+  before_action :require_super_admin!, only: [ :destroy, :make_moderator, :make_admin ]
+  before_action :require_outranks_target!, only: [ :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin ]
 
   FILTERS = {
     "all" => "All", "online" => "Online now", "active" => "Active in 7 days", "new" => "Joined this week",
@@ -84,7 +88,21 @@ class Admin::UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
+  # Only a super admin may change someone's email (it's how accounts are recovered).
   def user_params
-    params.require(:user).permit(:username, :email)
+    permitted = current_user.super_admin? ? [ :username, :email ] : [ :username ]
+    params.require(:user).permit(*permitted)
+  end
+
+  def require_super_admin!
+    return if current_user.super_admin?
+
+    redirect_to admin_users_path, alert: "Only a super admin can do that."
+  end
+
+  def require_outranks_target!
+    return if current_user.outranks?(@user)
+
+    redirect_to admin_users_path, alert: "You can't change an account of equal or higher rank."
   end
 end

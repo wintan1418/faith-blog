@@ -42,7 +42,7 @@ class AdTrackingTest < ActionDispatch::IntegrationTest
 
   test "a new account is reported as a sign-up once" do
     configure!
-    post user_registration_path, params: { user: { username: "ads_newbie", email: "ads-newbie@example.com", password: SecureRandom.base58(16) } }
+    post user_registration_path, params: { user: { username: "ads_newbie", email: "ads-newbie@example.com", password: SecureRandom.base58(16) } }.merge(human_signup_fields)
     follow_redirect!
     assert_select "[data-ad-consent-signup-value='true']"
 

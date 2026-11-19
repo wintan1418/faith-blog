@@ -140,6 +140,7 @@
             <td class="px-5 py-4 text-sm">
               <% if review.user %>
                 <p class="font-semibold text-[var(--fc-ink)]"><%= review.user.username %></p>
+                <% if review.reviewable.try(:anonymous?) %><span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-800" title="Shown to staff only for moderation. Members see this breath as Anonymous.">Posted anonymously · staff-only</span><% end %>
                 <p class="text-xs text-[var(--fc-muted)]">risk: <%= review.user.risk_profile&.risk_level || "clear" %></p>
               <% else %>
                 <span class="text-[var(--fc-muted)]">—</span>

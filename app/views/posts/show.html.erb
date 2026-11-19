@@ -1,13 +1,17 @@
-<% page_title = @post.display_title || truncate(@post.content.to_plain_text.to_s.strip, length: 60, separator: " ") %>
+<%# Link previews / meta tags only ever describe a breath the whole world may
+    read. A held, draft or scheduled breath gets a generic card so its words
+    (and photos) can't leak through a share preview or a cached crawl. %>
+<% public_breath = @post.visible_to?(nil) %>
+<% page_title = public_breath ? (@post.display_title || truncate(@post.content.to_plain_text.to_s.strip, length: 60, separator: " ")) : "A breath on Brethreign" %>
 <% content_for(:title) { "#{page_title} - Brethreign" } %>
-<% post_excerpt = truncate(@post.content.to_plain_text.to_s.strip, length: 200, separator: " ") %>
+<% post_excerpt = public_breath ? truncate(@post.content.to_plain_text.to_s.strip, length: 200, separator: " ") : "A Christian community for sharing faith, prayer and encouragement." %>
 <% content_for(:meta_description) { post_excerpt } %>
 <% content_for(:og_title) { page_title } %>
 <% content_for(:og_description) { post_excerpt } %>
 <% content_for(:og_url) { post_url(@post) } %>
 <% content_for(:og_type) { "article" } %>
 <% content_for(:canonical) { post_url(@post) } %>
-<% if @post.visible_to?(nil) && @post.published? %>
+<% if public_breath %>
   <% content_for(:structured_data) do %>
     <script type="application/ld+json"><%= raw({
       "@context" => "https://schema.org", "@type" => "DiscussionForumPosting",
@@ -22,9 +26,9 @@
     }.to_json) %></script>
   <% end %>
 <% end %>
-<% if @post.has_images? %>
+<% if public_breath && @post.has_images? %>
   <% content_for(:og_image) { url_for(@post.images.first) } %>
-<% else %>
+<% elsif public_breath && !@post.anonymous? %>
   <% content_for(:og_accent) { @post.user&.accent_color } %>
 <% end %>
 
@@ -80,17 +84,20 @@
             </div>
           <% end %>
 
-          <% if @post.linked_posts.any? || @post.linking_posts.any? %>
+          <%# Only breaths this reader may see — a draft linking here must not leak. %>
+          <% visible_linked  = @post.linked_posts.select { |p| p.visible_to?(current_user) } %>
+          <% visible_linking = @post.linking_posts.select { |p| p.visible_to?(current_user) } %>
+          <% if visible_linked.any? || visible_linking.any? %>
             <div class="post-linked">
-              <% if @post.linked_posts.any? %>
+              <% if visible_linked.any? %>
                 <p class="post-section-label">Related</p>
-                <% @post.linked_posts.each do |linked| %>
+                <% visible_linked.each do |linked| %>
                   <%= render "posts/linked_card", linked: linked %>
                 <% end %>
               <% end %>
-              <% if @post.linking_posts.any? %>
+              <% if visible_linking.any? %>
                 <p class="post-section-label">Linked here</p>
-                <% @post.linking_posts.each do |linking| %>
+                <% visible_linking.each do |linking| %>
                   <%= render "posts/linked_card", linked: linking %>
                 <% end %>
               <% end %>

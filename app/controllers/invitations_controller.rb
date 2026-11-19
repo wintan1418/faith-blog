@@ -19,6 +19,11 @@ class InvitationsController < ApplicationController
       render :index, status: :unprocessable_entity
     elsif @invitation.persisted? && @invitation.recently_sent?
       redirect_to invitations_path, alert: "You already invited #{@invitation.email} today. You can send it again tomorrow."
+    # Same answer whether or not the address already has an account, so the
+    # invite form can't be used to check who's a member. (No email is sent
+    # to existing members.)
+    elsif !current_user.email.casecmp?(@invitation.email) && User.exists?(email: @invitation.email)
+      redirect_to invitations_path, notice: "Invitation sent to #{@invitation.email}."
     elsif @invitation.save
       @invitation.deliver!
       redirect_to invitations_path, notice: "Invitation sent to #{@invitation.email}."
@@ -75,7 +80,8 @@ class InvitationsController < ApplicationController
     already_invited = current_user.sent_invitations.where(email: valid_format).pluck(:email)
     to_send         = valid_format - already_users - already_invited
 
-    sent_count = 0
+    # Existing members are skipped silently and reported like a sent invite.
+    sent_count = already_users.size
     to_send.each do |email|
       invitation = current_user.sent_invitations.build(email: email, message: note.presence)
       if invitation.save
@@ -86,7 +92,6 @@ class InvitationsController < ApplicationController
 
     parts = []
     parts << "Sent #{view_context.pluralize(sent_count, "invitation")}." if sent_count.positive?
-    parts << "Skipped #{already_users.size} already on the platform." if already_users.any?
     parts << "Skipped #{already_invited.size} already invited by you." if already_invited.any?
     parts << "Skipped #{invalid_emails.size} invalid (#{invalid_emails.first(3).join(", ")}#{"…" if invalid_emails.size > 3})." if invalid_emails.any?
 

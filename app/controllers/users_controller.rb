@@ -10,12 +10,7 @@ class UsersController < ApplicationController
     users = User.active.includes(:profile).order(created_at: :desc)
 
     if @query.present?
-      users = users
-        .left_joins(:profile)
-        .where(
-          "users.username ILIKE :query OR users.email ILIKE :query OR profiles.bio ILIKE :query OR profiles.location ILIKE :query OR profiles.faith_background ILIKE :query",
-          query: "%#{@query}%"
-        )
+      users = users.member_search(@query)
     end
 
     users = users.where.not(id: current_user.id) if user_signed_in?
@@ -44,7 +39,7 @@ class UsersController < ApplicationController
       return
     end
 
-    posts    = @user.posts.published.for_cards.recent.limit(60)
+    posts    = profile_posts_scope.for_cards.recent.limit(60)
     reshares = Reshare.where(user: @user).includes(:user, post: Post::CARD_INCLUDES)
                       .order(created_at: :desc).limit(60)
     @items = FeedItem.merge(posts: posts, reshares: reshares)
@@ -54,7 +49,7 @@ class UsersController < ApplicationController
 
   def posts
     @profile_private = !profile_visible_to_viewer?(@user)
-    scope = @profile_private ? @user.posts.none : @user.posts.published
+    scope = @profile_private ? @user.posts.none : profile_posts_scope
     @pagy, @posts = pagy(scope.for_cards.recent)
     @tab = "breaths"
     @items = @posts.map { |post| FeedItem.from_post(post) }
@@ -150,6 +145,13 @@ class UsersController < ApplicationController
 
   # A private profile (public_profile = false) hides its posts from everyone
   # except the owner and admins/moderators.
+  # Anonymous breaths never appear on (or count toward) their author's
+  # profile — that would unmask them. The author still sees their own.
+  def profile_posts_scope
+    scope = @user.posts.published
+    user_signed_in? && current_user == @user ? scope : scope.where(anonymous: false)
+  end
+
   def profile_visible_to_viewer?(user)
     return true if user.profile&.public_profile? != false
     return false unless user_signed_in?

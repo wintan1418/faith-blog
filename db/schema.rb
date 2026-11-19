@@ -1023,6 +1023,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_200100) do
     t.datetime "onboarding_completed_at"
     t.datetime "tour_completed_at"
     t.string "apple_refresh_token"
+    t.integer "failed_attempts", default: 0, null: false
+    t.string "unlock_token"
+    t.datetime "locked_at"
+    t.datetime "password_chosen_at"
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
@@ -1031,6 +1035,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_200100) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
+    t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
     t.index ["username"], name: "index_users_on_username_trgm", opclass: :gin_trgm_ops, using: :gin
   end

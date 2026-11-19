@@ -50,7 +50,7 @@
               <% end %>
 
               <div class="fc-people-meta">
-                <span><%= pluralize(user.posts.published.count, "breath") %></span>
+                <span><%= pluralize(user.posts.published.named.count, "breath") %></span>
                 <span class="fc-people-dot">·</span>
                 <span><%= pluralize(user.followers_count, "follower") %></span>
                 <% if user.profile&.location.present? %>

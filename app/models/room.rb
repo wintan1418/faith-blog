@@ -21,6 +21,14 @@ class Room < ApplicationRecord
   scope :public_rooms, -> { where(is_public: true) }
   scope :ordered, -> { order(position: :asc) }
 
+  # Private rooms (is_public = false) are for their members and staff only.
+  def accessible_by?(user)
+    return true if is_public?
+    return false unless user
+
+    user.admin_or_moderator? || room_memberships.exists?(user: user)
+  end
+
   # Counter cache updates
   def update_posts_count
     update_column(:posts_count, posts.published.count)

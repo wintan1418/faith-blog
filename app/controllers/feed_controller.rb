@@ -39,7 +39,9 @@ class FeedController < ApplicationController
   def following
     followed_user_ids = current_user.following.pluck(:id)
 
-    posts    = Post.published.where(user_id: followed_user_ids).recent
+    # Anonymous breaths stay out of Following — showing one here would tell
+    # you it came from someone you follow.
+    posts    = Post.published.named.where(user_id: followed_user_ids).recent
     reshares = Reshare.where(user_id: followed_user_ids).order(created_at: :desc)
     @items = paged_feed(posts: posts, reshares: reshares)
     respond_to_feed
@@ -106,7 +108,7 @@ class FeedController < ApplicationController
       if kind == :post
         cards[id] && FeedItem.from_post(cards[id])
       else
-        reshared[id]&.post && FeedItem.from_reshare(reshared[id])
+        reshared[id]&.post&.readable_by?(current_user) && FeedItem.from_reshare(reshared[id])
       end
     end
   end

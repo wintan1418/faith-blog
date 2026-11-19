@@ -1,0 +1,21 @@
+<% content_for(:title) { "Join #{@circle.name} - Prayer Circle" } %>
+
+<div class="mystic-shell circle-room">
+  <div class="mystic-container max-w-xl py-12">
+    <div class="mystic-panel-strong p-6 text-center">
+      <span class="eg-tile mx-auto"><%= render_icon("flame", classes: "h-5 w-5") %></span>
+      <h1 class="circle-room-title mt-3 justify-center">Join “<%= @circle.name %>”?</h1>
+      <% if @circle.description.present? %>
+        <p class="circle-room-desc mt-2"><%= @circle.description %></p>
+      <% end %>
+      <p class="mystic-copy mt-2 text-sm">
+        You were invited to this prayer circle (<%= pluralize(@circle.members_count, "member") %>).
+        Members see each other's breaths and prayers in the circle.
+      </p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <%= button_to "Join the circle", join_circle_path(code: @code), method: :post, class: "fc-btn fc-btn-primary", form: { data: { turbo: false } } %>
+        <%= link_to "Not now", circles_path, class: "fc-btn" %>
+      </div>
+    </div>
+  </div>
+</div>

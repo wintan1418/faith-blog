@@ -42,12 +42,20 @@ class PrayerCirclesTest < ActionDispatch::IntegrationTest
     circle = create_circle
     sign_in @friend
 
+    # Opening the link only shows a confirm page; it doesn't join.
     get join_circle_path(code: circle.invite_code)
+    assert_response :success
+    assert_select "form[action='#{join_circle_path(code: circle.invite_code)}'][method='post']"
+    assert_not circle.reload.member?(@friend)
+
+    post join_circle_path(code: circle.invite_code)
     assert_redirected_to circle_path(circle)
     assert circle.reload.member?(@friend)
     assert_equal 2, circle.members_count
 
     get join_circle_path(code: "not-a-real-code")
+    assert_redirected_to circles_path
+    post join_circle_path(code: "not-a-real-code")
     assert_redirected_to circles_path
   end
 
@@ -118,7 +126,7 @@ class PrayerCirclesTest < ActionDispatch::IntegrationTest
     assert_not_equal old_code, circle.reload.invite_code
 
     sign_in @friend
-    get join_circle_path(code: old_code)
+    post join_circle_path(code: old_code)
     assert_redirected_to circles_path
     assert_not circle.reload.member?(@friend)
   end

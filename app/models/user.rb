@@ -4,7 +4,7 @@ class User < ApplicationRecord
   # Devise modules
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :trackable, :omniauthable,
+         :trackable, :omniauthable, :lockable,
          omniauth_providers: [ :google_oauth2 ]
 
   # Enums
@@ -115,22 +115,95 @@ class User < ApplicationRecord
   scope :active, -> { where(active: true).where.not(email: SiteHealthCheck::EMAIL) }
   scope :verified, -> { where.not(verified_at: nil) }
 
+  # Member search. Usernames are public handles, so they always match; bio,
+  # location and faith background only match on public profiles (a private
+  # profile's details must not be discoverable by probing search). Email is
+  # never searchable — that would be an address-confirmation oracle.
+  def self.member_search(query)
+    pattern = "%#{sanitize_sql_like(query.to_s)}%"
+    left_joins(:profile).where(
+      "users.username ILIKE :q OR (COALESCE(profiles.public_profile, TRUE) AND " \
+      "(profiles.bio ILIKE :q OR profiles.location ILIKE :q OR profiles.faith_background ILIKE :q))",
+      q: pattern
+    )
+  end
+
   # Instance methods
   def display_name
     username
   end
 
+  OAUTH_PROVIDER_NAMES = { "google_oauth2" => "Google", "apple" => "Apple" }.freeze
+
+  # Set when the app (not the member) assigns a random password — OAuth
+  # sign-ups and account linking — so password_chosen_at stays NULL.
+  attr_accessor :password_generated
+
+  before_save :track_password_chosen, if: :will_save_change_to_encrypted_password?
+
+  # The member knows a password they picked themselves (and so can be asked
+  # for it before changing email / password).
+  def password_known? = password_chosen_at.present?
+
+  def oauth_provider_name = OAUTH_PROVIDER_NAMES.fetch(provider.to_s, provider.to_s.titleize)
+
   # Also used for Sign in with Apple (provider "apple").
+  #
+  # Emails on password sign-ups are never confirmed, so anyone could have
+  # registered someone else's address first ("pre-account hijack"). When a
+  # Google / Apple sign-in — which proves the person owns the address — links
+  # to an existing password account for the first time, the old password is
+  # replaced with a random one (which also signs out every other session) and
+  # the member is emailed how to set a new one. Whoever registered the address
+  # earlier can no longer get in. Linking only happens on a verified email.
   def self.from_google(auth)
     email = auth.info.email.to_s.downcase
-    user = find_by(provider: auth.provider, uid: auth.uid) || find_by(email: email)
+    user = find_by(provider: auth.provider, uid: auth.uid)
+    return user if user
 
-    user ||= new(email: email, username: unique_username_from(auth), password: Devise.friendly_token.first(32))
+    user = find_by(email: email)
+    return create_from_oauth!(auth, email) unless user
+
+    unless oauth_email_verified?(auth)
+      user = new(email: email)
+      user.errors.add(:email, "isn't verified with #{OAUTH_PROVIDER_NAMES.fetch(auth.provider.to_s, 'your provider')}, so it can't be linked to an existing account")
+      raise ActiveRecord::RecordInvalid, user
+    end
+
+    first_link = user.provider.blank?
     user.provider = auth.provider
     user.uid = auth.uid
-    user.password = Devise.friendly_token.first(32) if user.encrypted_password.blank?
+    if first_link || user.encrypted_password.blank?
+      user.password = Devise.friendly_token.first(32)
+      user.password_generated = true
+      user.skip_password_change_notification!
+      user.failed_attempts = 0
+      user.locked_at = nil
+      user.unlock_token = nil
+    end
+    user.save!
+    AccountSecurityMailer.with(user: user, provider: auth.provider.to_s).linked_to_provider.deliver_later if first_link
+    user
+  end
+
+  def self.create_from_oauth!(auth, email)
+    user = new(email: email, username: unique_username_from(auth), password: Devise.friendly_token.first(32),
+               provider: auth.provider, uid: auth.uid)
+    user.password_generated = true
     user.save!
     user
+  end
+
+  # Native Google / Apple callers verify email_verified before calling us (and
+  # build an auth hash with no extra). The web Google callback carries Google's
+  # own flag in extra.raw_info / extra.id_info.
+  def self.oauth_email_verified?(auth)
+    extra = auth.respond_to?(:extra) ? auth.extra : nil
+    return true if extra.blank?
+
+    flag = extra.dig("raw_info", "email_verified")
+    flag = extra.dig("id_info", "email_verified") if flag.nil?
+    flag.nil? || [ true, "true" ].include?(flag)
   end
 
   # People this user has blocked, or who blocked them (a MessageBlock either
@@ -156,6 +229,11 @@ class User < ApplicationRecord
 
   def admin_or_moderator?
     super_admin? || admin? || moderator?
+  end
+
+  # Strictly higher role than `other` (and never yourself).
+  def outranks?(other)
+    other.present? && other != self && self.class.roles.fetch(role) > self.class.roles.fetch(other.role)
   end
 
   # Trust threshold for skipping the AI moderation gate on new breaths.
@@ -349,6 +427,17 @@ class User < ApplicationRecord
 
   def username_is_clean
     errors.add(:username, "isn't allowed. Please choose another") if CleanLanguage.offensive?(username.to_s.tr("_", " "))
+  end
+
+  validate :email_not_disposable, on: :create
+
+  def email_not_disposable
+    errors.add(:email, "from a throwaway email service can't be used. Please use your personal email") if DisposableEmail.disposable?(email)
+  end
+
+  def track_password_chosen
+    self.password_chosen_at = password_generated ? nil : Time.current
+    self.password_generated = false
   end
 
   # Cards this person closed, remembered across devices ("join-12", "release-3", "onboard-feed").
