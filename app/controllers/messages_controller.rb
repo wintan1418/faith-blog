@@ -2,6 +2,10 @@
 
 class MessagesController < ApplicationController
   before_action :authenticate_user!
+  member_rate_limit to: 30, within: 1.minute, only: :create, name: "dm-burst",
+                    message: "You're sending messages very fast. Wait a moment and try again."
+  member_rate_limit to: 600, within: 1.hour, only: :create, name: "dm-hourly",
+                    message: "You've sent a lot of messages this hour. Please try again later."
   before_action :set_conversation
   before_action :set_message,    only: [ :update, :destroy, :pick_forward, :forward ]
   before_action :authorize_own!, only: [ :update, :destroy ]
@@ -55,6 +59,7 @@ class MessagesController < ApplicationController
 
   def destroy
     @message.update(deleted_at: Time.current, body: "[deleted]")
+    @message.purge_files! # a deleted photo or file shouldn't live on at its old link
     respond_to do |format|
       format.html { redirect_to conversation_path(@conversation) }
       format.turbo_stream {

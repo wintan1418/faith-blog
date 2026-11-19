@@ -14,7 +14,8 @@ class MessageModerationJob < ApplicationJob
 
   STRANGER_MESSAGES_CHECKED = 5 # a stranger's first messages in a chat
 
-  def perform(message)
+  # notify: false when re-checking an edit (the recipient was told already).
+  def perform(message, notify: true)
     return if message.deleted? || message.moderated_at.present?
 
     result = review(message)
@@ -27,14 +28,14 @@ class MessageModerationJob < ApplicationJob
       message.remove_for_moderation!
     when :flag
       record(message, result, :flagged)
-      message.notify_recipient
+      message.notify_recipient if notify
     else
-      message.notify_recipient
+      message.notify_recipient if notify
     end
   rescue StandardError => e
     # Fail open: a moderation outage must never swallow people's messages.
     Rails.logger.warn("[MessageModerationJob] fail-open for message #{message&.id}: #{e.class}: #{e.message}")
-    message&.notify_recipient unless message&.removed?
+    message&.notify_recipient if notify && !message&.removed?
   end
 
   private

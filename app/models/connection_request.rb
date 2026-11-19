@@ -1,12 +1,17 @@
 class ConnectionRequest < ApplicationRecord
   belongs_to :sender, class_name: "User"
   belongs_to :receiver, class_name: "User"
+  has_many :notifications, as: :notifiable, dependent: :delete_all
 
   enum :status, { pending: 0, accepted: 1, declined: 2 }
 
   validates :sender_id, uniqueness: { scope: :receiver_id, message: "has already sent a request to this user" }
   validate :cannot_request_self
   validate :sender_has_complete_card
+  validate :not_blocked
+
+  # After a decline the sender can ask again, but only once in this long.
+  REREQUEST_AFTER = 30.days
 
   scope :incoming, ->(user) { where(receiver: user) }
   scope :outgoing, ->(user) { where(sender: user) }
@@ -23,6 +28,11 @@ class ConnectionRequest < ApplicationRecord
     where(sender: user1, receiver: user2)
       .or(where(sender: user2, receiver: user1))
       .first
+  end
+
+  # A declined request can be sent again once REREQUEST_AFTER has passed.
+  def rerequest_allowed?
+    declined? && updated_at <= REREQUEST_AFTER.ago
   end
 
   def self.connected?(user1, user2)
@@ -53,6 +63,10 @@ class ConnectionRequest < ApplicationRecord
   rescue StandardError => e
     # A live update must never undo an accept/decline.
     Rails.logger.warn("[ConnectionRequest] broadcast failed: #{e.class}: #{e.message}")
+  end
+
+  def not_blocked
+    errors.add(:base, "You can't connect with this member.") if MessageBlock.between?(sender_id, receiver_id)
   end
 
   def cannot_request_self

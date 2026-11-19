@@ -8,7 +8,8 @@ class MessageBlocksController < ApplicationController
   def create
     current_user.message_blocks.find_or_create_by!(blocked: @user)
     redirect_back fallback_location: feed_path,
-                  notice: "You blocked #{@user.display_name}. You won't see each other's breaths, comments or messages."
+                  notice: "You blocked #{@user.display_name}. You won't see each other's breaths, comments or messages, " \
+                          "and they can't follow, connect with or notify you."
   end
 
   def destroy

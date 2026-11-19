@@ -5,6 +5,7 @@ module Settings
   # what we found, tick what to add. The file itself is never kept.
   class LinkedinImportsController < ApplicationController
     before_action :authenticate_user!
+    member_rate_limit to: 10, within: 1.hour, only: :create, name: "linkedin-import"
 
     def new; end
 

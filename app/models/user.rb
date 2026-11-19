@@ -186,10 +186,13 @@ class User < ApplicationRecord
     active? ? super : :inactive
   end
 
+  # The new Follow, or nil when it couldn't be made (yourself, already
+  # following, or a block between you).
   def follow(user)
     return if self == user || following?(user)
 
-    active_follows.create(following: user)
+    follow = active_follows.create(following: user)
+    follow if follow.persisted?
   end
 
   def unfollow(user)

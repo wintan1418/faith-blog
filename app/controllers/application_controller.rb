@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::Base
   include Pagy::Backend
+  include FriendlyRateLimits
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :touch_last_seen,                 if: :user_signed_in?

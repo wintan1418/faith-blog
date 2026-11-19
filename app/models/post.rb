@@ -151,6 +151,10 @@ class Post < ApplicationRecord
   after_save :process_mentions_after_save
   after_commit :enqueue_ai_moderation_review, on: :create, if: -> { published? && moderation_approved? }
   after_update_commit :enqueue_ai_moderation_review_on_publish
+  # Moderation looks at what was published; an edit to the words or photos of a
+  # live breath gets looked at again (see AiModerationGateJob recheck).
+  before_update :note_edit_for_moderation
+  after_update_commit :recheck_moderation_after_edit
   after_commit :fanout_to_followers, on: :create, if: -> { published? && moderation_approved? }
   after_update_commit :fanout_to_followers_on_publish
   after_commit :bump_author_streak, on: :create, if: -> { published? && moderation_approved? }
@@ -395,6 +399,21 @@ class Post < ApplicationRecord
     # Fail open: with no row the sweep re-enqueues the normal gate job —
     # the post just costs one AI call instead of zero.
     Rails.logger.error("[TrustGate] review row failed for post #{id}: #{e.class}: #{e.message}")
+  end
+
+  def note_edit_for_moderation
+    @edited_for_moderation = will_save_change_to_title? ||
+                             attachment_changes.key?("images") || attachment_changes.key?("voice_note") ||
+                             rich_text_content&.changed?
+  end
+
+  def recheck_moderation_after_edit
+    edited = @edited_for_moderation
+    @edited_for_moderation = false
+    return unless edited && published?
+    return if saved_change_to_status? # just published: the first review covers it
+
+    AiModerationGateJob.perform_later(id, recheck: true)
   end
 
   def enqueue_ai_moderation_review_on_publish

@@ -12,6 +12,9 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
+    # Request counters for `rate_limit` (a memory store in tests) start fresh.
+    setup { RateLimitStore.store.clear }
+
     # A throwaway member for a test. The password is random on every run.
     def create_member(username, **attrs)
       User.create!(username: username, email: "#{username}@example.com", password: SecureRandom.base58(24), **attrs)

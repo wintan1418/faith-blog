@@ -1,5 +1,7 @@
 class ConnectionRequestsController < ApplicationController
   before_action :authenticate_user!
+  member_rate_limit to: 30, within: 1.hour, only: :create, name: "connect-hourly"
+  member_rate_limit to: 100, within: 1.day, only: :create, name: "connect-daily"
   before_action :set_connection_request, only: [ :accept, :decline ]
 
   def index
@@ -15,6 +17,10 @@ class ConnectionRequestsController < ApplicationController
 
   def create
     @receiver = User.find(params[:receiver_id])
+
+    if MessageBlock.between?(current_user, @receiver)
+      return refuse_request("You can't send a connection request to this member.")
+    end
 
     # Check if current user's brethren card is complete
     unless current_user.brethren_card&.complete?
@@ -57,8 +63,12 @@ class ConnectionRequestsController < ApplicationController
             render :create
           end
         end
+      elsif existing.sender_id == current_user.id && !existing.rerequest_allowed?
+        # Asking again straight after a "no" is pressure: once a month at most.
+        return refuse_request("#{@receiver.display_name} hasn't accepted your earlier request. " \
+                              "You can ask again after #{(existing.updated_at + ConnectionRequest::REREQUEST_AFTER).to_date.to_fs(:long)}.")
       else
-        # If declined, allow to request again
+        # Declined over a month ago: allow one more request.
         existing.update(status: :pending, sender: current_user, receiver: @receiver)
         respond_to do |format|
           format.html do
@@ -154,6 +164,17 @@ class ConnectionRequestsController < ApplicationController
   end
 
   private
+
+  def refuse_request(message)
+    @connection_request = nil # nothing was sent
+    respond_to do |format|
+      format.html { redirect_back fallback_location: user_path(@receiver.username), alert: message }
+      format.turbo_stream do
+        flash.now[:alert] = message
+        render :create, status: :unprocessable_entity
+      end
+    end
+  end
 
   def set_connection_request
     @connection_request = ConnectionRequest.find(params[:id])

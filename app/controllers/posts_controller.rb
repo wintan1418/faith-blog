@@ -7,6 +7,9 @@ class PostsController < ApplicationController
   before_action :authorize_post!, only: [ :edit, :update, :destroy ]
   before_action :authorize_feature!, only: [ :feature, :unfeature ]
   before_action :enforce_rate_limit!, only: [ :create ]
+  # AI helpers cost money per call.
+  member_rate_limit to: 40, within: 1.hour, only: :check_gentleness, name: "gentleness", json: true
+  member_rate_limit to: 40, within: 1.hour, only: :suggest_scripture, name: "suggest-scripture", json: true
 
   def index
     # There's no posts list page; the feed is where breaths are read.

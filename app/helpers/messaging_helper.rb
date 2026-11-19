@@ -110,4 +110,11 @@ module MessagingHelper
   def message_file_download_path(message, attachment)
     conversation_message_file_path(message.conversation_id, message, attachment.id, filename: attachment.filename.to_s)
   end
+
+  # The same file, shown or played in place (voice notes) rather than saved.
+  # Only the chat's members can open it, and it stops working once deleted.
+  def message_file_inline_path(message, attachment)
+    conversation_message_file_path(message.conversation_id, message, attachment.id,
+                                   filename: attachment.filename.to_s, inline: 1)
+  end
 end

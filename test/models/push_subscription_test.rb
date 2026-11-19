@@ -19,14 +19,14 @@ class PushSubscriptionTest < ActiveSupport::TestCase
   end
 
   test "endpoint must be unique" do
-    PushSubscription.create!(user: @user, endpoint: "https://push.example/abc", p256dh_key: "a", auth_key: "b")
-    dupe = PushSubscription.new(user: @user, endpoint: "https://push.example/abc", p256dh_key: "x", auth_key: "y")
+    PushSubscription.create!(user: @user, endpoint: "https://fcm.googleapis.com/fcm/send/abc", p256dh_key: "a", auth_key: "b")
+    dupe = PushSubscription.new(user: @user, endpoint: "https://fcm.googleapis.com/fcm/send/abc", p256dh_key: "x", auth_key: "y")
     refute dupe.valid?
     assert_includes dupe.errors[:endpoint], "has already been taken"
   end
 
   test "destroyed when its user is destroyed" do
-    PushSubscription.create!(user: @user, endpoint: "https://push.example/zzz", p256dh_key: "a", auth_key: "b")
+    PushSubscription.create!(user: @user, endpoint: "https://fcm.googleapis.com/fcm/send/zzz", p256dh_key: "a", auth_key: "b")
     assert_difference -> { PushSubscription.count }, -1 do
       @user.destroy
     end

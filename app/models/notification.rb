@@ -42,6 +42,16 @@ class Notification < ApplicationRecord
 
   # Validations
   validates :notification_type, presence: true
+  validate :not_between_blocked_members, on: :create
+
+  # Alerts one member causes another (likes, comments, mentions, follows,
+  # requests…). None of these are created between people where either has
+  # blocked the other. Moderation and system alerts aren't affected.
+  SOCIAL_TYPES = %w[
+    new_comment comment_reply new_follower mentioned post_liked comment_liked connection_request
+    connection_accepted post_reshared direct_message breath_from_followee everyone_mention prayer_joined
+    prayer_answered thread_new_voice circle_breath circle_prayer circle_prayer_answered birthday skill_endorsed
+  ].freeze
 
   after_create_commit :deliver_email_notification
   after_create_commit :deliver_push_notification
@@ -278,4 +288,11 @@ class Notification < ApplicationRecord
 
   # Also called when a waiting chat notification is refreshed by a newer message.
   public :deliver_push_notification
+
+  def not_between_blocked_members
+    return if actor_id.blank? || user_id.blank? || actor_id == user_id
+    return unless SOCIAL_TYPES.include?(notification_type.to_s)
+
+    errors.add(:base, "blocked") if MessageBlock.between?(user_id, actor_id)
+  end
 end

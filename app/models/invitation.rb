@@ -25,6 +25,13 @@ class Invitation < ApplicationRecord
     accepted_at.present?
   end
 
+  # One email per invitation per day, however often "Resend" is pressed.
+  RESEND_AFTER = 24.hours
+
+  def recently_sent?
+    last_sent_at.present? && last_sent_at > RESEND_AFTER.ago
+  end
+
   def deliver!
     InvitationMailer.with(invitation: self).invite.deliver_later
     update!(last_sent_at: Time.current)

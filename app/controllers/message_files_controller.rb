@@ -21,8 +21,17 @@ class MessageFilesController < ApplicationController
     raise ActiveRecord::RecordNotFound if message.removed?
 
     attachment = ActiveStorage::Attachment.where(record: message, name: ATTACHMENT_NAMES).find(params[:id])
-    # The size up front lets phones show download progress.
-    response.headers["Content-Length"] = attachment.blob.byte_size.to_s
-    send_blob_stream attachment.blob, disposition: :attachment
+    blob = attachment.blob
+    # ?inline=1 plays a voice note in the chat (or shows a file) instead of
+    # saving it. Players ask for byte ranges to seek, so answer those.
+    disposition = params[:inline].present? ? :inline : :attachment
+    response.headers["Cache-Control"] = "private, max-age=300"
+    if request.headers["Range"].present?
+      send_blob_byte_range_data blob, request.headers["Range"], disposition: disposition
+    else
+      # The size up front lets phones show download progress.
+      response.headers["Content-Length"] = blob.byte_size.to_s
+      send_blob_stream blob, disposition: disposition
+    end
   end
 end
