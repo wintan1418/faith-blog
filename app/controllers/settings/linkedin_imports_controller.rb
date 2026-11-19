@@ -14,6 +14,7 @@ module Settings
       @have = existing_keys
       render :review
     rescue LinkedinImport::Error => e
+      FeatureFailure.record(:linkedin_import, e.message) unless e.member_fault?
       flash.now[:alert] = e.message
       render :new, status: :unprocessable_entity
     end
