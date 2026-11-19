@@ -5,7 +5,7 @@
 # players are served instantly from the pool. Safe when the AI isn't
 # configured — BibleQuizTopUpJob logs and skips.
 class BibleQuizWarmPoolJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
 
   def perform
     return 0 if Ai::Moderation::Client.stub?

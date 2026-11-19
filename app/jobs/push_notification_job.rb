@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PushNotificationJob < ApplicationJob
-  queue_as :default
+  queue_as :realtime
   discard_on ActiveJob::DeserializationError
 
   def perform(notification)

@@ -78,4 +78,36 @@ class BrethrenSuggestionsTest < ActiveSupport::TestCase
       dismissed.destroy!
     end
   end
+
+  test "each source reads at most SOURCE_CAP candidates, newest members first" do
+    church = Array.new(4) { |i| make_user("member#{i}", assembly: "RCCG Jubilee Parish") }
+    original = BrethrenSuggestions::SOURCE_CAP
+    silence_warnings { BrethrenSuggestions.const_set(:SOURCE_CAP, 2) }
+
+    names = suggested(@me).map { |s| s.user.username }
+    assert_equal church.last(2).map(&:username).sort, names.sort
+  ensure
+    silence_warnings { BrethrenSuggestions.const_set(:SOURCE_CAP, original) } if original
+  end
+
+  test "suggestions are cached per member; connecting clears it, dismissals apply at once" do
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    a = make_user("church_a", assembly: "RCCG Jubilee Parish")
+    b = make_user("church_b", assembly: "RCCG Jubilee Parish")
+    assert_equal %w[church_a church_b], suggested(@me).map { |s| s.user.username }.sort
+
+    late = make_user("church_late", assembly: "RCCG Jubilee Parish")
+    refute_includes suggested(@me).map(&:user), late, "served from cache"
+
+    @me.suggestion_dismissals.create!(dismissed_user: a)
+    refute_includes suggested(@me).map(&:user), a, "dismissal applies without waiting for the cache"
+
+    connect(@me, b)
+    names = suggested(@me).map { |s| s.user.username }
+    assert_includes names, "church_late", "a new connection clears the cache"
+    refute_includes names, "church_b"
+  ensure
+    Rails.cache = original_cache
+  end
 end

@@ -23,6 +23,8 @@ class ConnectionRequest < ApplicationRecord
   # request accepted from the sender's profile (or another device) stops
   # showing as pending without a refresh.
   after_commit :broadcast_request_lists
+  # Connecting, asking or withdrawing changes both people's "brethren you may know".
+  after_commit -> { BrethrenSuggestions.expire(sender_id, receiver_id) }
 
   def self.between(user1, user2)
     where(sender: user1, receiver: user2)

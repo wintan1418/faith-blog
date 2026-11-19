@@ -4,7 +4,7 @@
 # is enqueued separately so a slow / bouncing single recipient can't
 # block the rest of the run, and so retries happen at the per-user level.
 class BroadcastFanoutJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
   discard_on ActiveJob::DeserializationError
 
   def perform(broadcast)

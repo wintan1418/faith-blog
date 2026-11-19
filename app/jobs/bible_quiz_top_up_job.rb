@@ -4,7 +4,7 @@
 # players never wait on the AI. Enqueued by GamesController#quiz_generate
 # when a filter runs thin, and by BibleQuizWarmPoolJob on a schedule.
 class BibleQuizTopUpJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
 
   # Each generator call yields ~5 questions.
   DEFAULT_BATCHES = 4

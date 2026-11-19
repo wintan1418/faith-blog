@@ -16,6 +16,9 @@ module FaithBlog
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # deliver_later goes to its own queue (config/queue.yml).
+    config.action_mailer.deliver_later_queue_name = "mailers"
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

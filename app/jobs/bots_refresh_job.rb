@@ -3,7 +3,7 @@
 # Every hour: each Updates bot reads its sources and posts what it chose.
 # One bot failing never stops the others.
 class BotsRefreshJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
 
   def perform(bot = nil, force: false)
     keys = bot ? [ bot ] : Bots::Catalog.keys

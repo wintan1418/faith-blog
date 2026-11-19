@@ -212,9 +212,11 @@ class User < ApplicationRecord
   end
 
   def has_liked?(likeable)
-    # Feed cards preload their likes; use them instead of a query per card.
-    if likeable.respond_to?(:likes) && likeable.likes.loaded?
-      return likeable.likes.any? { |like| like.user_id == id }
+    # Feed cards preload the viewer's own like (Post#viewer_like, keyed on
+    # Current.user); use it instead of a query per card.
+    if Current.user&.id == id && likeable.class.reflect_on_association(:viewer_like) &&
+       likeable.association(:viewer_like).loaded?
+      return likeable.viewer_like.present?
     end
     likes.exists?(likeable: likeable)
   end
@@ -299,13 +301,23 @@ class User < ApplicationRecord
     @unread_notifications_count ||= notifications.activity.unread.count
   end
 
+  UNREAD_CONVERSATIONS_CAP = 100
+
+  # Conversations with a message newer than my last read — counted the same
+  # way as the inbox (not archived, deleted messages ignored) and capped:
+  # badges show "99+" past 99, so there's no need to count further.
   def unread_conversations_count
-    @unread_conversations_count ||= conversation_participants
-      .joins("INNER JOIN messages ON messages.conversation_id = conversation_participants.conversation_id")
-      .where.not(messages: { sender_id: id })
-      .where("conversation_participants.last_read_at IS NULL OR messages.created_at > conversation_participants.last_read_at")
-      .distinct
-      .count(:conversation_id)
+    @unread_conversations_count ||= begin
+      unread = conversation_participants.active
+        .joins("INNER JOIN messages ON messages.conversation_id = conversation_participants.conversation_id")
+        .where(messages: { deleted_at: nil })
+        .where.not(messages: { sender_id: id })
+        .where("conversation_participants.last_read_at IS NULL OR messages.created_at > conversation_participants.last_read_at")
+        .distinct
+        .select("conversation_participants.conversation_id")
+        .limit(UNREAD_CONVERSATIONS_CAP)
+      ConversationParticipant.from(unread, :unread).count
+    end
   end
 
   def connected_with?(user)

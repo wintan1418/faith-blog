@@ -4,8 +4,7 @@
     summary row above, and on data-reaction). Count lives in the meta row above.
     Local: post %>
 <%
-  loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
-  user_like    = user_signed_in? ? loaded_likes.find { |l| l.user_id == current_user.id } : nil
+  user_like = my_reaction_to(post)
 %>
 <div class="fc-reactions" id="<%= dom_id(post, :reactions) %>" data-controller="emoji-reactions"
      data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"

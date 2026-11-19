@@ -3,13 +3,9 @@
     Hidden entirely when a breath has no engagement yet. Re-rendered by the
     like turbo-stream. Local: post %>
 <%
-  loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
-  reacted      = loaded_likes.reject { |l| l.reaction_emoji.to_s.empty? }
-  top_emojis   = reacted.group_by(&:reaction_emoji)
-                        .sort_by { |_, g| -g.size }
-                        .first(3)
-                        .map(&:first)
-  total        = reacted.size
+  counts       = reaction_counts_for(post)
+  top_emojis   = counts.first(3).map(&:first)
+  total        = counts.sum(&:last)
   comments     = post.comments_count.to_i
   reposts      = post.reshares_count.to_i
   has_any      = total.positive? || comments.positive? || reposts.positive?

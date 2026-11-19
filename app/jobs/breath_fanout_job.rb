@@ -2,7 +2,9 @@
 
 # Notifies every follower of the post author when they publish a "breath".
 class BreathFanoutJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
+
+  BATCH_SIZE = 1000
 
   def perform(post_id)
     post = Post.find_by(id: post_id)
@@ -13,18 +15,21 @@ class BreathFanoutJob < ApplicationJob
     follower_ids = author.followers.pluck(:id)
     return if follower_ids.empty?
 
-    rows = follower_ids.map do |follower_id|
-      {
-        user_id:           follower_id,
-        actor_id:          author.id,
-        notifiable_type:   "Post",
-        notifiable_id:     post.id,
-        notification_type: Notification.notification_types[:breath_from_followee],
-        created_at:        Time.current,
-        updated_at:        Time.current
-      }
+    now = Time.current
+    type = Notification.notification_types[:breath_from_followee]
+    # One INSERT per 1000 followers instead of one giant statement.
+    follower_ids.each_slice(BATCH_SIZE) do |ids|
+      Notification.insert_all(ids.map do |follower_id|
+        {
+          user_id:           follower_id,
+          actor_id:          author.id,
+          notifiable_type:   "Post",
+          notifiable_id:     post.id,
+          notification_type: type,
+          created_at:        now,
+          updated_at:        now
+        }
+      end)
     end
-
-    Notification.insert_all(rows) if rows.any?
   end
 end

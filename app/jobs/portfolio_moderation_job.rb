@@ -5,7 +5,7 @@
 # owner is told why, and it goes to the moderators' queue. Fails open, like
 # the other moderation jobs. A hidden piece that passes after an edit shows again.
 class PortfolioModerationJob < ApplicationJob
-  queue_as :default
+  queue_as :moderation
   discard_on ActiveJob::DeserializationError
 
   HIDE_CATEGORIES = %w[explicit_adult sexual_exploitation occult harassment hate scam fraud].freeze

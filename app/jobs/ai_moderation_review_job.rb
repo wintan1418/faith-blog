@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AiModerationReviewJob < ApplicationJob
-  queue_as :default
+  queue_as :moderation
 
   retry_on Ai::Moderation::Client::ApiError, wait: :polynomially_longer, attempts: 3
   retry_on Ai::Moderation::Reviewer::ParseError, wait: 30.seconds, attempts: 2

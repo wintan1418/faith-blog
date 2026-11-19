@@ -4,7 +4,7 @@
 # occult, gory or a scam, it's taken down, the person is told why, and it goes
 # to the moderators' queue.
 class AvatarModerationJob < ApplicationJob
-  queue_as :default
+  queue_as :moderation
   discard_on ActiveJob::DeserializationError
 
   def perform(profile)

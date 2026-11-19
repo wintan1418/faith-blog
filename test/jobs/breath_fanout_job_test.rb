@@ -61,4 +61,25 @@ class BreathFanoutJobTest < ActiveJob::TestCase
     assert_nothing_raised { perform_enqueued_jobs(only: BreathFanoutJob) }
     assert_equal 0, Notification.where(notifiable: post).count
   end
+
+  test "fanout inserts in batches and still reaches every follower once" do
+    author = make_user
+    followers = Array.new(5) { make_user }
+    followers.each { |f| f.follow(author) }
+    post = Post.create!(user: author, room: make_room, title: "A breath worth sharing", content: "Body of the test.", status: :published)
+
+    inserts = 0
+    counter = ->(*, payload) { inserts += 1 if payload[:sql] =~ /\AINSERT INTO "notifications"/ }
+    original = BreathFanoutJob::BATCH_SIZE
+    silence_warnings { BreathFanoutJob.const_set(:BATCH_SIZE, 2) }
+    ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+      BreathFanoutJob.perform_now(post.id)
+    end
+
+    assert_equal 3, inserts # 2 + 2 + 1
+    user_ids = Notification.where(notification_type: :breath_from_followee, notifiable: post).pluck(:user_id)
+    assert_equal followers.map(&:id).sort, user_ids.sort
+  ensure
+    silence_warnings { BreathFanoutJob.const_set(:BATCH_SIZE, original) } if original
+  end
 end

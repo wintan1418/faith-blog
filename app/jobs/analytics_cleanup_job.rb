@@ -2,7 +2,7 @@
 
 # Keeps site analytics to the last 13 months.
 class AnalyticsCleanupJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
 
   KEEP = 13.months
 

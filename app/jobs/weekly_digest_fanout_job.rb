@@ -5,7 +5,7 @@
 # Solid Queue job so a slow / failing send for one address can't block
 # the rest of the batch.
 class WeeklyDigestFanoutJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
 
   def perform
     User.where(active: true)
