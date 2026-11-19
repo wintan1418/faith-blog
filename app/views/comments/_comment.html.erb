@@ -18,6 +18,10 @@
 <% else %>
 <%
   can_manage = user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?)
+  # The author of an anonymous post stays anonymous in its comments too
+  # (they still see their own name; staff see it for moderation).
+  masked = post.anonymous? && comment.user_id == post.user_id &&
+           !(user_signed_in? && (current_user.id == comment.user_id || current_user.admin_or_moderator?))
   replies = is_reply ? [] : comment.thread_replies.active.visible_for(current_user).includes(:user, likes: :user).oldest_first.to_a
   shown_replies = 2
   folded = [ replies.size - shown_replies, 0 ].max
@@ -26,11 +30,17 @@
      id="<%= dom_id(comment) %>"
      data-controller="reply-toggle comment-edit<%= ' cm-thread' unless is_reply %>">
   <div class="cm-row">
-    <%= link_to user_path(comment.user.username), class: "cm-avatar", aria: { label: comment.user.display_name } do %>
-      <% if comment.user.profile&.avatar&.attached? %>
-        <%= image_tag avatar_src(comment.user.profile), class: "fc-avatar object-cover", alt: "" %>
-      <% else %>
-        <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
+    <% if masked %>
+      <span class="cm-avatar" aria-label="Anonymous author">
+        <span class="fc-avatar" style="<%= avatar_tint_style("anon-#{post.id}") %>"><%= render_icon("users", classes: "h-4 w-4") %></span>
+      </span>
+    <% else %>
+      <%= link_to user_path(comment.user.username), class: "cm-avatar", aria: { label: comment.user.display_name } do %>
+        <% if comment.user.profile&.avatar&.attached? %>
+          <%= image_tag avatar_src(comment.user.profile), class: "fc-avatar object-cover", alt: "" %>
+        <% else %>
+          <span class="fc-avatar" style="<%= avatar_tint_style(comment.user.username) %>"><%= comment.user.username.first.upcase %></span>
+        <% end %>
       <% end %>
     <% end %>
 
@@ -45,7 +55,11 @@
       <div class="cm-bubble">
         <div class="cm-head">
           <div class="cm-who">
-            <%= link_to comment.user.username, user_path(comment.user.username), class: "cm-name" %>
+            <% if masked %>
+              <span class="cm-name">Anonymous</span>
+            <% else %>
+              <%= link_to comment.user.username, user_path(comment.user.username), class: "cm-name" %>
+            <% end %>
             <% if comment.user_id == post.user_id %><span class="cm-badge">Author</span><% end %>
             <time class="cm-time" datetime="<%= comment.created_at.iso8601 %>" title="<%= l(comment.created_at, format: :long) %>">
               <%= time_ago_short(comment.created_at) %><%= " · edited" if comment.edited? %>
@@ -135,8 +149,8 @@
               <%= f.text_area :content,
                   class: "fc-inline-reply-input",
                   rows: 2,
-                  placeholder: "Reply to #{comment.user.username}…",
-                  value: (prefill = is_reply && comment.user != current_user ? "@#{comment.user.username} " : ""),
+                  placeholder: "Reply to #{masked ? 'Anonymous' : comment.user.username}…",
+                  value: (prefill = is_reply && !masked && comment.user != current_user ? "@#{comment.user.username} " : ""),
                   autocomplete: "off",
                   autocapitalize: "sentences",
                   spellcheck: true,
