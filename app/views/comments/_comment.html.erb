@@ -19,9 +19,9 @@
 <%
   can_manage = user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?)
   # The author of an anonymous post stays anonymous in its comments too
-  # (they still see their own name; staff see it for moderation).
+  # (they still see their own name; only the super admin sees it otherwise).
   masked = post.anonymous? && comment.user_id == post.user_id &&
-           !(user_signed_in? && (current_user.id == comment.user_id || current_user.admin_or_moderator?))
+           !(user_signed_in? && (current_user.id == comment.user_id || current_user.can_unmask_anonymous?))
   replies = is_reply ? [] : comment.thread_replies.active.visible_for(current_user).includes(:user, likes: :user).oldest_first.to_a
   shown_replies = 2
   folded = [ replies.size - shown_replies, 0 ].max
