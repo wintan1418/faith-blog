@@ -12,7 +12,7 @@ require "minitest/mock"
 class ChessOtherMatesTest < ApplicationSystemTestCase
   include Warden::Test::Helpers
 
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 900 ]
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 900 ], options: { name: :phone_chess_mates }
 
   # Two rooks against a lone king on g8: White mates in 2. Lichess lists
   # Rb7 then Ra8#; Ra7 then Rb8# mates just as surely.

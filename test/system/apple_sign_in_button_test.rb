@@ -6,7 +6,7 @@ require "application_system_test_case"
 # box: the light theme painted every sign-in button white over Apple's black
 # while the text turned white. Apple's button must be black with white text.
 class AppleSignInButtonTest < ApplicationSystemTestCase
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 390, 844 ] do |options|
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 390, 844 ], options: { name: :ios_apple_sign_in } do |options|
     options.add_argument("--user-agent=Brethreign/1.0.9; NativeShare; NativeDownloads; NativeAppleSignIn; Hotwire Native iOS; Turbo Native iOS")
   end
 

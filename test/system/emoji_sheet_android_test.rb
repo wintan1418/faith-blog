@@ -16,7 +16,7 @@ class EmojiSheetAndroidTest < ApplicationSystemTestCase
                    "Mozilla/5.0 (Linux; Android 16; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) " \
                    "Version/4.0 Chrome/133.0.0.0 Mobile Safari/537.36"
 
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 820 ] do |options|
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 820 ], options: { name: :android_emoji_sheet } do |options|
     options.add_argument("--user-agent=#{APP_USER_AGENT}")
     options.add_emulation(device_metrics: { width: 412, height: 820, pixelRatio: 2.625, touch: true })
   end

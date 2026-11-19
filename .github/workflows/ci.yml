@@ -7,11 +7,11 @@ on:
 
 jobs:
   scan_ruby:
-    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04, which has no prebuilt Ruby 3.4.3 yet
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -22,11 +22,14 @@ jobs:
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
 
+      - name: Scan gems for known security advisories
+        run: bundle exec bundle-audit check --update
+
   lint:
-    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04, which has no prebuilt Ruby 3.4.3 yet
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -38,7 +41,7 @@ jobs:
         run: bin/rubocop -f github
 
   test:
-    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04, which has no prebuilt Ruby 3.4.3 yet
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
 
     services:
       postgres:
@@ -50,18 +53,12 @@ jobs:
           - 5432:5432
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
-      # redis:
-      #   image: redis
-      #   ports:
-      #     - 6379:6379
-      #   options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
-
     steps:
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev node-gyp pkg-config python-is-python3 google-chrome-stable
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev libvips-dev node-gyp pkg-config python-is-python3
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -73,11 +70,42 @@ jobs:
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
-          # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test test:system
+        run: bin/rails db:test:prepare test
+
+  system_test:
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev libvips-dev node-gyp pkg-config python-is-python3 google-chrome-stable
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run system tests
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+        run: bin/rails db:test:prepare test:system
 
       - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: screenshots

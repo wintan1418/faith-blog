@@ -30,7 +30,9 @@ export default class extends Controller {
   }
 
   reveal() {
-    if (!this.hasBarTarget || getComputedStyle(this.barTarget).position !== "sticky") return
+    // The bar is sticky, or (phones, since the app pinned Breathe on screen)
+    // fixed to the bottom; either way it covers the end of the form.
+    if (!this.hasBarTarget || ![ "sticky", "fixed" ].includes(getComputedStyle(this.barTarget).position)) return
     const caret = this.caretRect()
     if (!caret) return
 

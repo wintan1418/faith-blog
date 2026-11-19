@@ -15,7 +15,7 @@ class InboxLiveTest < ApplicationSystemTestCase
                    "Mozilla/5.0 (Linux; Android 16; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) " \
                    "Version/4.0 Chrome/133.0.0.0 Mobile Safari/537.36"
 
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 900 ] do |options|
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 900 ], options: { name: :android_inbox_live } do |options|
     options.add_argument("--user-agent=#{APP_USER_AGENT}")
   end
 
@@ -57,20 +57,29 @@ class InboxLiveTest < ApplicationSystemTestCase
     assert_selector "#messages", text: LONG_TEXT, wait: 1.5
   end
 
-  test "a message already read as harsh still pauses for the kindness nudge" do
+  # Moderation: protect people without policing them (082df2b) — chats no
+  # longer run an automatic tone check, so even words the checker would call
+  # harsh send as written, with no kindness nudge in the way.
+  test "chats send as written: no tone check, no kindness nudge" do
     visit conversation_path(@chat)
-    fake_tone_check(<<~JS.squish)
-      Promise.resolve(new Response(JSON.stringify({ ok: true, tone: "harsh", confidence: 0.9,
-        nudge: "This could wound.", suggestion: "" }), { headers: { "Content-Type": "application/json" } }))
+    page.execute_script(<<~JS)
+      window.__toneChecks = 0
+      const realFetch = window.fetch
+      window.fetch = (url, opts) => {
+        if (String(url).includes("check_gentleness")) {
+          window.__toneChecks++
+          return Promise.resolve(new Response(JSON.stringify({ ok: true, tone: "harsh", confidence: 0.9,
+            nudge: "This could wound.", suggestion: "" }), { headers: { "Content-Type": "application/json" } }))
+        }
+        return realFetch(url, opts)
+      }
     JS
     find("#new_message textarea").fill_in(with: LONG_TEXT)
-    sleep 1.6 # past the typing pause that triggers the reading
     find("#new_message [data-dm-composer-target='sendBtn']").click
 
-    assert_selector ".dm-nudge", text: "This could wound."
-    assert_no_selector "#messages", text: LONG_TEXT
-    click_on "Send anyway"
     assert_selector "#messages", text: LONG_TEXT
+    assert_no_selector ".dm-nudge", visible: true
+    assert_equal 0, page.evaluate_script("window.__toneChecks"), "no tone check is made in chats"
   end
 
   test "a new message moves its chat to the top of the open inbox without a refresh" do

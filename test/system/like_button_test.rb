@@ -40,6 +40,14 @@ class LikeButtonTest < ApplicationSystemTestCase
   test "holding the button opens the picker without reacting" do
     visit feed_path
     button = find("##{reactions_id} .fc-react-btn")
+    # The hold starts on pointerdown, so the controller must be listening
+    # before we press (a click works either way, a hold doesn't).
+    assert page.evaluate_async_script(<<~JS, reactions_id), "the reactions controller never connected"
+      const [ id, done ] = arguments
+      const ready = () => window.Stimulus?.getControllerForElementAndIdentifier(document.getElementById(id), "emoji-reactions")
+      const wait = (n) => ready() ? done(true) : n ? setTimeout(() => wait(n - 1), 50) : done(false)
+      wait(100)
+    JS
 
     page.driver.browser.action.click_and_hold(button.native).pause(duration: 0.7).release.perform
     assert_selector "##{reactions_id} .fc-reaction-picker:not(.hidden)"
