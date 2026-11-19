@@ -5,7 +5,10 @@
 # retro-holding or blocking only when the AI flags something. The feed must
 # never depend on this job having run.
 class AiModerationGateJob < ApplicationJob
-  queue_as :default
+  queue_as :moderation
+  # The create hook and the backlog sweep can both enqueue the same post;
+  # never classify one post twice at the same time.
+  limits_concurrency to: 1, key: ->(post_id) { post_id }, duration: 5.minutes
 
   discard_on ActiveJob::DeserializationError
 

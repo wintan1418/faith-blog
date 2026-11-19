@@ -12,6 +12,7 @@ class Follow < ApplicationRecord
 
   # Callbacks
   after_create :create_notification
+  after_commit -> { BrethrenSuggestions.expire(follower_id, following_id) }
 
   private
 

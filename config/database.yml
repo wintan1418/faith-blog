@@ -17,8 +17,10 @@ default: &default
   encoding: unicode
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
-  # Increased pool size for handling 100s of concurrent users
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 25 } %>
+  # One connection per Puma thread (or job thread) plus headroom for the
+  # Action Cable worker pool and the Solid Cable listener, which share this
+  # pool. Connections open lazily, so the headroom costs nothing when idle.
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 3).to_i + 5 %>
   # Connection timeout for busy servers
   timeout: 5000
   # Prepared statements improve performance

@@ -30,7 +30,7 @@ class PostsController < ApplicationController
       return redirect_to new_user_session_path, alert: "Please sign in to view this breath."
     end
 
-    @post.increment_views! unless current_user == @post.user
+    @post.record_view!(viewer_key) unless current_user == @post.user
     @comments = @post.comments.root_comments.active.visible_for(current_user)
                      .includes(:user, :replies, likes: :user).oldest_first
     @new_comment = Comment.new
@@ -273,7 +273,12 @@ class PostsController < ApplicationController
     render json: { ok: true, verses: verses }
   end
 
+
   private
+
+  def viewer_key
+    current_user ? "u#{current_user.id}" : "ip#{Digest::SHA256.hexdigest(request.remote_ip.to_s).first(16)}"
+  end
 
   # Pulls draft text from JSON or form params for the composer assistants.
   # Strips HTML so a Trix-rendered body comes through as plain words.

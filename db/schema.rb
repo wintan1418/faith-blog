@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_19_200100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "action_push_native_devices", force: :cascade do |t|
     t.string "name"
@@ -72,6 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.datetime "time"
     t.index ["name", "time"], name: "index_ahoy_events_on_name_and_time"
     t.index ["properties"], name: "index_ahoy_events_on_properties", opclass: :jsonb_path_ops, using: :gin
+    t.index ["time"], name: "index_ahoy_events_on_time"
     t.index ["user_id"], name: "index_ahoy_events_on_user_id"
     t.index ["visit_id"], name: "index_ahoy_events_on_visit_id"
   end
@@ -542,9 +544,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["mentionable_type", "mentionable_id"], name: "index_mentions_on_mentionable"
-    t.index ["mentionable_type", "mentionable_id"], name: "index_mentions_on_mentionable_type_and_mentionable_id"
     t.index ["mentioned_by_type", "mentioned_by_id"], name: "index_mentions_on_mentioned_by"
-    t.index ["mentioned_by_type", "mentioned_by_id"], name: "index_mentions_on_mentioned_by_type_and_mentioned_by_id"
     t.index ["user_id", "mentionable_type", "mentionable_id"], name: "index_mentions_on_user_and_mentionable"
     t.index ["user_id"], name: "index_mentions_on_user_id"
   end
@@ -598,7 +598,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.index ["created_at"], name: "index_moderation_logs_on_created_at"
     t.index ["moderator_id"], name: "index_moderation_logs_on_moderator_id"
     t.index ["target_type", "target_id"], name: "index_moderation_logs_on_target"
-    t.index ["target_type", "target_id"], name: "index_moderation_logs_on_target_type_and_target_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -614,6 +613,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["notification_type"], name: "index_notifications_on_notification_type"
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
+    t.index ["user_id", "created_at"], name: "index_notifications_unread_by_user", order: { created_at: :desc }, where: "(read_at IS NULL)"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
@@ -712,20 +712,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.integer "voice_duration_ms"
     t.bigint "quoted_post_id"
     t.jsonb "game_share"
+    t.tsvector "searchable"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
     t.index ["moderation_status"], name: "index_posts_on_moderation_status"
     t.index ["prayer_status"], name: "index_posts_on_prayer_status"
     t.index ["published_at"], name: "index_posts_on_published_at"
+    t.index ["published_at"], name: "index_posts_published_feed", order: :desc, where: "((status = 1) AND (moderation_status = 0))"
     t.index ["quoted_post_id"], name: "index_posts_on_quoted_post_id"
     t.index ["room_id", "status", "published_at"], name: "index_posts_on_room_id_and_status_and_published_at"
     t.index ["room_id"], name: "index_posts_on_room_id"
     t.index ["scheduled_for"], name: "index_posts_on_scheduled_for", where: "(scheduled_for IS NOT NULL)"
+    t.index ["searchable"], name: "index_posts_on_searchable", using: :gin
     t.index ["slug"], name: "index_posts_on_slug", unique: true
     t.index ["status"], name: "index_posts_on_status"
+    t.index ["user_id", "published_at"], name: "index_posts_published_by_user", order: { published_at: :desc }, where: "((status = 1) AND (moderation_status = 0))"
     t.index ["user_id", "status"], name: "index_posts_on_user_id_and_status"
     t.index ["user_id"], name: "index_posts_on_user_id"
-    t.index ["views_count"], name: "index_posts_on_views_count"
   end
 
   create_table "prayer_intercessions", force: :cascade do |t|
@@ -765,6 +768,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.index ["birth_month", "birth_day"], name: "index_profiles_on_birth_month_and_birth_day"
     t.index ["city_key"], name: "index_profiles_on_city_key"
     t.index ["industry"], name: "index_profiles_on_industry"
+    t.index ["skills"], name: "index_profiles_on_skills", using: :gin
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 
@@ -805,7 +809,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "thought"
+    t.index ["created_at"], name: "index_reshares_on_created_at"
     t.index ["post_id"], name: "index_reshares_on_post_id"
+    t.index ["user_id", "created_at"], name: "index_reshares_on_user_id_and_created_at"
     t.index ["user_id", "post_id"], name: "index_reshares_on_user_id_and_post_id", unique: true
     t.index ["user_id"], name: "index_reshares_on_user_id"
   end
@@ -1026,6 +1032,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_18_182046) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
     t.index ["username"], name: "index_users_on_username", unique: true
+    t.index ["username"], name: "index_users_on_username_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

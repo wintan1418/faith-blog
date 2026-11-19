@@ -2,7 +2,7 @@
 
 # Alerts (and a push) for members on an older Android app: "Brethreign 1.0.8 is out".
 class AppUpdateReminderJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
 
   def perform(release_id)
     release = AppRelease.find_by(id: release_id)

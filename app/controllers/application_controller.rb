@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   include Pagy::Backend
   include FriendlyRateLimits
 
+  before_action :set_current_viewer
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :touch_last_seen,                 if: :user_signed_in?
   before_action :require_supported_app_version
@@ -71,6 +72,10 @@ class ApplicationController < ActionController::Base
 
   # Refresh user's last_seen_at on each authenticated request, but
   # throttle to once a minute so we don't write on every page hit.
+  def set_current_viewer
+    Current.user = current_user
+  end
+
   def touch_last_seen
     return unless current_user
 

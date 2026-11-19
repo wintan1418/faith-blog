@@ -1,15 +1,50 @@
+# Named queues so a slow job can't hold up a fast one: a weekly digest
+# fan-out or an AI call no longer sits in front of a chat push.
+#
+#   realtime   — pushes, chat message moderation, Turbo broadcasts
+#   moderation — AI moderation of posts, comments, profiles, portfolios
+#   default    — everything small (badges, welcome notes, scheduled posts, Office)
+#   mailers    — ActionMailer deliver_later (config.action_mailer.deliver_later_queue_name)
+#   bulk       — fan-outs (digest, broadcasts, breaths), bots, quiz pool, cleanup
+#
+# Every job's queue must be listed below (test/jobs/job_queues_test.rb checks).
+# Sized for one shared server: 9 threads over 5 worker processes.
 default: &default
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+  workers:
+    - queues: [ realtime ]
+      threads: 3
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: 0.1
+    - queues: [ moderation ]
+      threads: 2
+      processes: 1
+      polling_interval: 0.5
+    - queues: [ default ]
+      threads: 2
+      processes: 1
+      polling_interval: 0.2
+    - queues: [ mailers ]
+      threads: 1
+      processes: 1
+      polling_interval: 1
+    - queues: [ bulk ]
+      threads: 1
+      processes: 1
+      polling_interval: 1
+
+# One light worker on a laptop.
+development:
   dispatchers:
     - polling_interval: 1
       batch_size: 500
   workers:
     - queues: "*"
       threads: 3
-      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      processes: 1
       polling_interval: 0.1
-
-development:
-  <<: *default
 
 test:
   <<: *default

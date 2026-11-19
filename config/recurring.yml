@@ -12,7 +12,6 @@
 production:
   site_health_check:
     class: SiteHealthCheckJob
-    queue: default
     schedule: every 10 minutes
 
   clear_solid_queue_finished_jobs:
@@ -21,35 +20,28 @@ production:
 
   analytics_cleanup:
     class: AnalyticsCleanupJob
-    queue: default
     schedule: every Sunday at 3am Africa/Lagos
 
   birthday_notifications:
     class: BirthdayNotificationsJob
-    queue: default
     schedule: every day at 7am Africa/Lagos
 
   weekly_digest:
     class: WeeklyDigestFanoutJob
-    queue: default
     schedule: every Sunday at 8am
 
   scheduled_post_publisher:
     class: ScheduledPostPublisherJob
-    queue: default
     schedule: every 5 minutes
 
   updates_bots:
     class: BotsRefreshJob
-    queue: default
     schedule: every hour at minute 7
 
   moderation_backlog_sweep:
     class: ModerationBacklogSweepJob
-    queue: default
     schedule: every 5 minutes
 
   bible_quiz_warm_pool:
     class: BibleQuizWarmPoolJob
-    queue: default
     schedule: every 6 hours

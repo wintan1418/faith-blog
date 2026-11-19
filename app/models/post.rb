@@ -72,6 +72,18 @@ class Post < ApplicationRecord
   belongs_to :room, counter_cache: :posts_count, optional: true
   has_many :comments, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
+  # Per-emoji counts for the card's reaction summary: rows of
+  # (likeable_id, reaction_emoji, tally). Preloaded by CARD_INCLUDES in one
+  # GROUP BY for every card on the page. Legacy likes with no emoji don't show.
+  has_many :reaction_tallies, -> {
+    where.not(reaction_emoji: [ nil, "" ])
+      .group(:likeable_type, :likeable_id, :reaction_emoji)
+      .select(:likeable_type, :likeable_id, :reaction_emoji, "COUNT(*) AS tally", "MIN(likes.id) AS first_like_id")
+      .unscope(:order)
+  }, as: :likeable, class_name: "Like"
+  # The signed-in viewer's reaction (Current.user). One query per page when
+  # preloaded; nil when nobody is signed in.
+  has_one :viewer_like, -> { where(user_id: Current.user&.id) }, as: :likeable, class_name: "Like"
   has_many :bookmarks, dependent: :destroy
   has_many :reshares, dependent: :destroy
   has_many :reshared_by_users, through: :reshares, source: :user
@@ -107,15 +119,29 @@ class Post < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
   validate :max_images_count
 
-  # Search
+  # Search. `searchable` is a stored tsvector of the title + plain-text body
+  # (GIN-indexed), refreshed by #refresh_search_vector whenever either changes.
+  # Kept out of SELECT * so feed queries don't carry it around.
+  self.ignored_columns += [ "searchable" ]
+  SEARCH_VECTOR_SQL = "searchable = to_tsvector('english', coalesce(?, '') || ' ' || coalesce(?, ''))"
+
   pg_search_scope :search,
                   against: [ :title ],
-                  associated_against: {
-                    rich_text_content: [ :body ]
-                  },
                   using: {
-                    tsearch: { prefix: true, dictionary: "english" }
+                    tsearch: { prefix: true, dictionary: "english", tsvector_column: "searchable" }
                   }
+
+  after_save :refresh_search_vector, if: :search_text_changed?
+
+  def search_text_changed?
+    return true if saved_change_to_id? || saved_change_to_title?
+
+    association(:rich_text_content).loaded? && rich_text_content&.saved_change_to_body?
+  end
+
+  def refresh_search_vector
+    self.class.where(id: id).update_all([ SEARCH_VECTOR_SQL, title, content&.to_plain_text.to_s ])
+  end
 
   # Everything `posts/_card` touches, so a page of cards is a fixed number of
   # queries instead of ~10 per post (author + avatar blob, images, voice note,
@@ -124,7 +150,7 @@ class Post < ApplicationRecord
     :room, :tags, :rich_text_content, :ai_moderation_review, :voice_note_attachment,
     { images_attachments: :blob },
     { user: { profile: { avatar_attachment: :blob } } },
-    { likes: :user },
+    :viewer_like, :reaction_tallies,
     { quoted_post: :user }
   ].freeze
   scope :for_cards, -> { includes(*CARD_INCLUDES) }
@@ -177,6 +203,19 @@ class Post < ApplicationRecord
 
   def increment_views!
     increment!(:views_count)
+  end
+
+  VIEW_WINDOW = 1.hour
+
+  # Counts a view at most once per viewer per hour, so refreshes and
+  # back-and-forth don't rewrite the post row on every page load.
+  # `viewer_key` is a user id or a hashed IP. Returns true when counted.
+  def record_view!(viewer_key)
+    key = "post_view/#{id}/#{viewer_key}"
+    return false unless Rails.cache.write(key, true, expires_in: VIEW_WINDOW, unless_exist: true)
+
+    increment_views!
+    true
   end
 
   def author_name

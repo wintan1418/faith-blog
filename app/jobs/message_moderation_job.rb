@@ -9,7 +9,7 @@
 # (sexual content, child safety, credible threats, clear scams); anything else
 # the AI doubts is delivered and flagged for a moderator.
 class MessageModerationJob < ApplicationJob
-  queue_as :default
+  queue_as :realtime
   discard_on ActiveJob::DeserializationError
 
   STRANGER_MESSAGES_CHECKED = 5 # a stranger's first messages in a chat

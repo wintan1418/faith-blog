@@ -1,11 +1,9 @@
 <%
-  loaded_likes = (post.likes.loaded? ? post.likes : post.likes.includes(:user)).to_a
-                   .reject { |l| l.reaction_emoji.to_s.empty? }
-  user_like    = user_signed_in? ? current_user.likes.find_by(likeable: post) : nil
-  emoji_groups = loaded_likes
-                   .group_by(&:reaction_emoji)
-                   .sort_by { |_, likes| -likes.size }
-                   .first(4)
+  counts        = reaction_counts_for(post)
+  total         = counts.sum(&:last)
+  user_like     = my_reaction_to(post)
+  emoji_groups  = counts.first(4)
+  first_reactors = reactors_by_emoji(post, emoji_groups.map(&:first))
 %>
 <%# Its own id (not :reactions, which is the feed card's version): after a
     reaction the server replaces this whole bar, so a breath's page keeps its
@@ -14,9 +12,9 @@
   <div class="post-reactions-left fc-reactions" data-controller="emoji-reactions"
        data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Post", likeable_id: post.id) %>"
        data-emoji-reactions-token-value="<%= form_authenticity_token %>">
-    <% emoji_groups.each do |emoji, group| %>
+    <% emoji_groups.each do |emoji, count| %>
       <% mine = user_like&.display_emoji == emoji %>
-      <% tip = reactor_names_label(group) %>
+      <% tip = reactor_names_label(first_reactors[emoji], total: count) %>
       <% if mine %>
         <%= button_to unlike_path(likeable_type: "Post", likeable_id: post.id),
             method: :delete,
@@ -24,7 +22,7 @@
             class: "fc-reaction-pill is-mine",
             title: "Remove your reaction" do %>
           <span class="fc-reaction-emoji"><%= emoji %></span>
-          <span class="fc-reaction-count"><%= group.size %></span>
+          <span class="fc-reaction-count"><%= count %></span>
           <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
         <% end %>
       <% else %>
@@ -32,7 +30,7 @@
             form_class: "inline",
             class: "fc-reaction-pill" do %>
           <span class="fc-reaction-emoji"><%= emoji %></span>
-          <span class="fc-reaction-count"><%= group.size %></span>
+          <span class="fc-reaction-count"><%= count %></span>
           <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
         <% end %>
       <% end %>
@@ -62,12 +60,12 @@
       <%= link_to "React", new_user_session_path, class: "fc-reaction-add" %>
     <% end %>
 
-    <% if loaded_likes.any? %>
+    <% if total.positive? %>
       <button type="button" class="fc-reaction-viewers"
               data-action="reactors-modal#open"
               data-reactors-modal-url-param="<%= reactions_post_path(post) %>"
               title="See who reacted">
-        <%= pluralize(loaded_likes.size, "reaction") %>
+        <%= pluralize(total, "reaction") %>
       </button>
     <% end %>
 

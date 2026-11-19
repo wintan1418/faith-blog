@@ -13,6 +13,7 @@ class Experience < ApplicationRecord
 
   # A first role sets up the professional profile: tick it on an open feed.
   after_commit -> { OnboardingChecklist.broadcast_refresh(user) }, on: %i[create destroy]
+  after_commit -> { BrethrenSuggestions.expire(user_id) }
 
   validates :title, :organization, presence: true, length: { maximum: 100 }
   validates :start_on, presence: true

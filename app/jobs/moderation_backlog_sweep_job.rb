@@ -14,7 +14,7 @@
 # unavailable AI provider releases rather than holds), so re-running it can
 # only move posts forward.
 class ModerationBacklogSweepJob < ApplicationJob
-  queue_as :default
+  queue_as :moderation
 
   GRACE  = 10.minutes
   WINDOW = 7.days # don't trawl all of history for unclassified legacy posts

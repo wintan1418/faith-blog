@@ -132,6 +132,9 @@ class Profile < ApplicationRecord
   # The headline (professional profile) and photo are getting-started steps.
   before_save { @onboarding_changed = will_save_change_to_headline? || attachment_changes.key?("avatar") }
   after_commit -> { OnboardingChecklist.broadcast_refresh(user) }, if: -> { @onboarding_changed }
+  # A new church, city or skills changes who "brethren you may know" finds.
+  after_commit -> { BrethrenSuggestions.expire(user_id) },
+               if: -> { (previous_changes.keys & %w[assembly_key city_key skills]).any? }
 
   def moderate_avatar
     @avatar_changed = false

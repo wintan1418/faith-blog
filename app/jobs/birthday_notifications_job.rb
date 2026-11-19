@@ -2,7 +2,7 @@
 
 # Every morning: tell each person's brethren (accepted connections) whose birthday it is.
 class BirthdayNotificationsJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk
 
   def perform(date = Profile.today_for_birthdays)
     Profile.birthday_on(date).where(show_birthday: true).includes(:user).find_each do |profile|
