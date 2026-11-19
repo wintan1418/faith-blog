@@ -7,7 +7,7 @@ on:
 
 jobs:
   scan_ruby:
-    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04, which has no prebuilt Ruby 3.4.3 yet
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
 
     steps:
       - name: Checkout code
@@ -26,7 +26,7 @@ jobs:
         run: bundle exec bundle-audit check --update
 
   lint:
-    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04, which has no prebuilt Ruby 3.4.3 yet
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -41,7 +41,7 @@ jobs:
         run: bin/rubocop -f github
 
   test:
-    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04, which has no prebuilt Ruby 3.4.3 yet
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
 
     services:
       postgres:
@@ -73,7 +73,7 @@ jobs:
         run: bin/rails db:test:prepare test
 
   system_test:
-    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04, which has no prebuilt Ruby 3.4.3 yet
+    runs-on: ubuntu-24.04 # ubuntu-latest moved to 26.04; keep the runner Ruby builds are known to exist for
 
     services:
       postgres:
