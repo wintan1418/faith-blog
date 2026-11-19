@@ -9,7 +9,11 @@ class SignupAndAccountSafetyTest < ApplicationSystemTestCase
   include Warden::Test::Helpers
 
   setup { ENV["AI_MODERATION_STUB"] = "1" }
-  teardown { Warden.test_reset! }
+  teardown do
+    Warden.test_reset!
+    # The browser is shared with every desktop test: put its size back.
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
 
   [ [ 390, 844 ], [ 1400, 1000 ] ].each do |width, height|
     test "a person can sign up through the real form at #{width}px" do
