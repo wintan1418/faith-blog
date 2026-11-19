@@ -17,7 +17,7 @@ class NativeComposerTypingTest < ApplicationSystemTestCase
                    "Version/4.0 Chrome/133.0.0.0 Mobile Safari/537.36"
 
   # 412 wide like a Pixel; 470 tall is what's left above the keyboard.
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 470 ] do |options|
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 470 ], options: { name: :android_composer_typing } do |options|
     options.add_argument("--user-agent=#{APP_USER_AGENT}")
     options.add_emulation(device_metrics: { width: 412, height: 470, pixelRatio: 2.625, touch: true })
   end
@@ -48,19 +48,23 @@ class NativeComposerTypingTest < ApplicationSystemTestCase
       editor.send_keys(:enter) unless i == 11
     end
 
+    # The editor scrolls the caret into view after each keystroke; let it settle.
     gap = nil
-    10.times do
-      gap = page.evaluate_script(<<~JS)
-        (() => {
-          const editor = document.querySelector("dialog.fc-composer-dialog trix-editor")
-          const [ position ] = editor.editor.getSelectedRange()
-          const caret = editor.editor.getClientRectAtPosition(position)
-          const bar = document.querySelector("dialog.fc-composer-dialog .fc-composer-footer")
-          return bar.getBoundingClientRect().top - caret.bottom
-        })()
-      JS
-      break if gap >= 0
-      sleep 0.1
+    begin
+      page.document.synchronize do
+        gap = page.evaluate_script(<<~JS)
+          (() => {
+            const editor = document.querySelector("dialog.fc-composer-dialog trix-editor")
+            const [ position ] = editor.editor.getSelectedRange()
+            const caret = editor.editor.getClientRectAtPosition(position)
+            const bar = document.querySelector("dialog.fc-composer-dialog .fc-composer-footer")
+            return bar.getBoundingClientRect().top - caret.bottom
+          })()
+        JS
+        raise Capybara::ExpectationNotMet, "caret behind the bar" unless gap >= 0
+      end
+    rescue Capybara::ExpectationNotMet
+      # fall through to the assertion below, which reports how far behind it is
     end
 
     assert_operator gap, :>=, 0, "the caret is #{-gap.to_i}px behind the Cancel / Breathe bar"

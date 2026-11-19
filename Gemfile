@@ -23,7 +23,7 @@ gem "jbuilder"
 # gem "bcrypt", "~> 3.1.7"
 
 # Authentication
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0", ">= 5.0.4"
 gem "omniauth-google-oauth2", "~> 1.2"
 gem "omniauth-rails_csrf_protection", "~> 1.0"
 
@@ -80,6 +80,9 @@ group :development, :test do
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
+
+  # Checks Gemfile.lock against known security advisories [https://github.com/rubysec/bundler-audit]
+  gem "bundler-audit", require: false
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false

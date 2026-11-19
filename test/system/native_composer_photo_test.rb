@@ -14,7 +14,7 @@ class NativeComposerPhotoTest < ApplicationSystemTestCase
                    "Mozilla/5.0 (Linux; Android 16; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) " \
                    "Version/4.0 Chrome/133.0.0.0 Mobile Safari/537.36"
 
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 900 ] do |options|
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 412, 900 ], options: { name: :android_composer_photo } do |options|
     options.add_argument("--user-agent=#{APP_USER_AGENT}")
     options.add_emulation(device_metrics: { width: 412, height: 900, pixelRatio: 2, touch: true })
   end
@@ -48,8 +48,10 @@ class NativeComposerPhotoTest < ApplicationSystemTestCase
     end
     image = Post.order(:created_at).last.images.first
     assert image, "the photo was attached"
-    image.analyze unless image.analyzed?
-    assert_operator [ image.metadata["width"], image.metadata["height"] ].max, :<=, 2560
+    image.blob.analyze unless image.blob.analyzed? && image.blob.metadata["width"]
+    width, height = image.blob.metadata.values_at("width", "height")
+    assert width && height, "the photo's size couldn't be read (is libvips installed?): #{image.blob.metadata.inspect}"
+    assert_operator [ width, height ].max, :<=, 2560
   end
 
   test "when the post can't be sent, it says so and keeps the words" do
