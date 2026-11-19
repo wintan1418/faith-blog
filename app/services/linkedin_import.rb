@@ -13,7 +13,15 @@ require "csv"
 # Both give a Draft. Nothing is saved here: the member reviews the draft and
 # picks what to add. The uploaded file is never stored.
 module LinkedinImport
-  class Error < StandardError; end
+  class Error < StandardError
+    def member_fault? = false
+  end
+
+  # The member picked no file, too big a file or the wrong kind: not our fault,
+  # so it never counts towards a "keeps failing" alert.
+  class MemberError < Error
+    def member_fault? = true
+  end
 
   MAX_UPLOAD = 30.megabytes
   MAX_CSV_ENTRY = 3.megabytes
@@ -30,14 +38,14 @@ module LinkedinImport
 
   # upload: an ActionDispatch::Http::UploadedFile (or anything with #path/#size).
   def self.read(upload)
-    raise Error, "Choose your LinkedIn PDF or data export ZIP first." if upload.blank?
-    raise Error, "That file is too big. The limit is #{MAX_UPLOAD / 1.megabyte} MB." if upload.size.to_i > MAX_UPLOAD
+    raise MemberError, "Choose your LinkedIn PDF or data export ZIP first." if upload.blank?
+    raise MemberError, "That file is too big. The limit is #{MAX_UPLOAD / 1.megabyte} MB." if upload.size.to_i > MAX_UPLOAD
 
     head = File.binread(upload.path, 4).to_s
     draft =
       if head.start_with?("%PDF") then PdfReader.new(upload.path).call
       elsif head.start_with?("PK") then ExportReader.new(upload.path).call
-      else raise Error, "That isn't a LinkedIn PDF or ZIP. Use “Save to PDF” on your LinkedIn profile, or your data export."
+      else raise MemberError, "That isn't a LinkedIn PDF or ZIP. Use “Save to PDF” on your LinkedIn profile, or your data export."
       end
     raise Error, "We couldn't find any profile details in that file." if draft.empty?
 
