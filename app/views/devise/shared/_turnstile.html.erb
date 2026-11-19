@@ -1,0 +1,5 @@
+<%# Cloudflare Turnstile — only when TURNSTILE_SITE_KEY / TURNSTILE_SECRET_KEY are set. %>
+<% if SignupGuard.turnstile_enabled? %>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <div class="cf-turnstile auth-field" data-sitekey="<%= SignupGuard.turnstile_site_key %>" data-theme="auto" data-size="flexible"></div>
+<% end %>

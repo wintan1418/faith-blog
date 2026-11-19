@@ -1,0 +1,12 @@
+Hi <%= @user.username %>,
+
+Someone (we hope you!) just signed in to Brethreign with <%= @provider_name %> using <%= @user.email %>. That sign-in is now linked to your Brethreign account.
+
+To keep your account safe, the password that was on this account has been switched off and every other device was signed out. From now on you can sign in with <%= @provider_name %>.
+
+Want to sign in with a password as well? Set a new one here:
+<%= @reset_url %>
+
+If this wasn't you, reset your password using the link above and reply to this email so we can help.
+
+— Brethreign

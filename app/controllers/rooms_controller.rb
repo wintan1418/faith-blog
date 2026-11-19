@@ -37,7 +37,10 @@ class RoomsController < ApplicationController
 
   private
 
+  # A private room 404s for anyone who isn't a member or staff — including
+  # "join", so it can't be entered by guessing its slug.
   def set_room
     @room = Room.friendly.find(params[:id])
+    raise ActiveRecord::RecordNotFound unless @room.accessible_by?(current_user)
   end
 end

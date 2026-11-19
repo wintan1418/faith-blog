@@ -84,6 +84,21 @@
             </div>
           </div>
 
+          <div class="border-t border-faith-green/10 pt-5">
+            <% if current_user.password_known? %>
+              <%= f.label :current_password, "Current Password", class: "label" %>
+              <%= f.password_field :current_password, class: "input", autocomplete: "current-password", value: nil,
+                                   aria: { describedby: "current-password-hint" } %>
+              <p id="current-password-hint" class="mt-1 text-sm text-faith-muted">Needed to change your email or password.</p>
+            <% else %>
+              <p class="text-sm text-faith-muted">
+                You sign in with <%= current_user.oauth_provider_name %>. To change your email or set a password,
+                sign in again with <%= current_user.oauth_provider_name %> first (changes are allowed for 15 minutes after signing in),
+                or <%= link_to "email yourself a link to set a password", new_user_password_path, class: "underline" %>.
+              </p>
+            <% end %>
+          </div>
+
           <%= f.submit "Save Changes", class: "btn btn-primary" %>
         <% end %>
       </div>

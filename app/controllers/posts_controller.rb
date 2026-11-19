@@ -101,6 +101,8 @@ class PostsController < ApplicationController
   def create
     @post = current_user.posts.build(post_params)
     sanitize_quoted_post!(@post)
+    # Can't breathe into a private room you're not in.
+    @post.room = nil if @post.room && !@post.room.accessible_by?(current_user)
 
     # The composer carries the game card through a hidden JSON field;
     # re-sanitize here — never trust the round trip.
@@ -289,7 +291,16 @@ class PostsController < ApplicationController
   end
 
   def set_post
-    @post = Post.friendly.find(params[:id])
+    @post = find_post_for_set
+    return if performed?
+
+    # Unpublished (draft / scheduled / archived) breaths 404 for everyone but
+    # their author and staff — signed in or not.
+    raise ActiveRecord::RecordNotFound, "Post not found" unless @post.readable_by?(current_user)
+  end
+
+  def find_post_for_set
+    Post.friendly.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     # Old notification emails carry post URLs baked at send time; once the
     # breath is deleted those links are dead forever. Give signed-in readers

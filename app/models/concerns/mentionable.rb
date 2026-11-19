@@ -72,7 +72,6 @@ module Mentionable
 
       existing_notification = Notification.where(
         user: user,
-        actor: mentioned_by_user,
         notifiable: self,
         notification_type: :mentioned
       ).where("created_at > ?", 1.hour.ago).first
@@ -100,7 +99,6 @@ module Mentionable
     return unless room
 
     cooldown = Notification.where(
-      actor: actor,
       notification_type: :everyone_mention,
       notifiable: self
     ).where("created_at > ?", 24.hours.ago).exists?
@@ -139,10 +137,12 @@ module Mentionable
   def create_everyone_notifications(user_ids, actor, scope: "room")
     return if user_ids.blank?
 
+    # insert_all skips Notification callbacks, so hide an anonymous author here.
+    actor_id = Notification.anonymous_actor_id_for(self, actor.id)
     rows = user_ids.map do |uid|
       {
         user_id:           uid,
-        actor_id:          actor.id,
+        actor_id:          actor_id,
         notifiable_type:   self.class.name,
         notifiable_id:     id,
         notification_type: Notification.notification_types[:everyone_mention],
@@ -152,31 +152,5 @@ module Mentionable
     end
 
     Notification.insert_all(rows)
-  end
-
-  # Get content with mentions as links (for ActionText, returns HTML)
-  def content_with_mentions
-    raw = if respond_to?(:content) && content.present?
-            content.to_s
-    else
-            content.to_s
-    end
-
-    raw.gsub(/@([a-zA-Z0-9_-]{2,30})/) do |match|
-      handle = $1.downcase
-      case handle
-      when "everyone"
-        %(<span class="mention-broadcast" data-scope="room">@everyone</span>)
-      when "all"
-        %(<span class="mention-broadcast mention-broadcast-platform" data-scope="platform">@all</span>)
-      else
-        user = User.find_by("LOWER(username) = ?", handle)
-        if user
-          %(<a href="/u/#{user.username}" class="mention-link">@#{user.username}</a>)
-        else
-          match
-        end
-      end
-    end.html_safe
   end
 end

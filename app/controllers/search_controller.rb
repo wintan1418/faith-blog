@@ -7,17 +7,10 @@ class SearchController < ApplicationController
 
     case params[:type]
     when "users"
-      @pagy, @results = pagy(
-        User
-          .active
-          .includes(:profile)
-          .left_joins(:profile)
-          .where(
-            "users.username ILIKE :query OR profiles.bio ILIKE :query OR profiles.location ILIKE :query OR profiles.faith_background ILIKE :query",
-            query: "%#{@query}%"
-          )
-          .order(:username)
-      )
+      # Member search is for members only — no anonymous profile probing.
+      return authenticate_user! unless user_signed_in?
+
+      @pagy, @results = pagy(User.active.includes(:profile).member_search(@query).order(:username))
       @result_type = :users
     when "resources"
       @pagy, @results = pagy(Resource.approved.search(@query).includes(:resource_category, :user))

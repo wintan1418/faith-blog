@@ -114,6 +114,8 @@ class Comment < ApplicationRecord
   end
 
   def visible_to?(viewer)
+    # A comment is never more visible than the breath it sits on.
+    return false if post && !post.visible_to?(viewer)
     return true unless held_for_review?
     return false unless viewer
     return true if viewer == user

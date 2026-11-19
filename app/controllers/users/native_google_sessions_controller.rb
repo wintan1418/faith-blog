@@ -5,6 +5,9 @@
 # and posts the resulting ID token here (from inside the web view, so the
 # session cookie lands where the app needs it).
 class Users::NativeGoogleSessionsController < ApplicationController
+  rate_limit to: 20, within: 5.minutes, only: :create, store: AuthThrottleStore.store,
+             with: -> { refuse(AuthRateLimiting::TOO_MANY_MESSAGE, :too_many_requests) }
+
   # The app's "Continue with Google" button points here. New app versions catch
   # this link and show the native picker; an older version that doesn't just
   # lands back on the sign-in page.

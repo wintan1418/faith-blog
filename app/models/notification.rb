@@ -53,6 +53,8 @@ class Notification < ApplicationRecord
     prayer_answered thread_new_voice circle_breath circle_prayer circle_prayer_answered birthday skill_endorsed
   ].freeze
 
+  before_create :conceal_anonymous_author
+
   after_create_commit :deliver_email_notification
   after_create_commit :deliver_push_notification
 
@@ -256,7 +258,29 @@ class Notification < ApplicationRecord
     user.notifications.unread.update_all(read_at: Time.current)
   end
 
+  # The actor id to store for a notification about `post`: nil when the
+  # actor is the hidden author of an anonymous breath, else unchanged.
+  def self.anonymous_actor_id_for(post, actor_id)
+    return actor_id unless post.is_a?(Post) && post.anonymous?
+
+    actor_id == post.user_id ? nil : actor_id
+  end
+
   private
+
+  # Anonymous breaths must never unmask their author. Any notification about
+  # an anonymous breath whose actor *is* that author (mentions, @everyone,
+  # prayer answered, a quote, their own comment on it…) is stored with no
+  # actor, so every copy — in-app, email, push — reads "Someone".
+  # (Bulk insert_all paths call Notification.anonymous_actor_id_for directly.)
+  def conceal_anonymous_author
+    return if actor_id.nil?
+
+    post = underlying_post
+    self.actor = nil if post&.anonymous? && post.user_id == actor_id
+  rescue StandardError
+    nil
+  end
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?

@@ -1,0 +1,8 @@
+<%# Invisible to people (and to screen readers): bots fill every field and
+    post instantly. See SignupGuard. %>
+<div class="auth-hp" aria-hidden="true" style="position:absolute !important;left:-10000px !important;top:auto;width:1px;height:1px;overflow:hidden;">
+  <label for="hp_website">Leave this field empty</label>
+  <input type="text" name="<%= SignupGuard::HONEYPOT_PARAM %>" id="hp_website" value="" tabindex="-1" autocomplete="off">
+</div>
+<%= hidden_field_tag SignupGuard::TOKEN_PARAM, SignupGuard.form_token, id: nil %>
+<%= render "devise/shared/turnstile" %>

@@ -1,0 +1,6 @@
+<p>Hi <%= @user.username %>,</p>
+<p>Someone (we hope you!) just signed in to Brethreign with <strong><%= @provider_name %></strong> using <%= @user.email %>. That sign-in is now linked to your Brethreign account.</p>
+<p>To keep your account safe, the password that was on this account has been switched off and every other device was signed out. From now on you can sign in with <%= @provider_name %>.</p>
+<p>Want to sign in with a password as well? <%= link_to "Set a new password", @reset_url %>.</p>
+<p>If this wasn't you, reset your password using the link above and reply to this email so we can help.</p>
+<p>— Brethreign</p>

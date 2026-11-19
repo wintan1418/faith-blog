@@ -60,16 +60,20 @@
           </td>
           <td class="px-6 py-4 text-right">
             <div class="flex justify-end gap-2">
-              <% if user.active? %>
-                <%= button_to "Suspend", suspend_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm text-red-600" %>
-              <% else %>
-                <%= button_to "Activate", activate_admin_user_path(user), method: :post, class: "btn btn-primary btn-sm" %>
-              <% end %>
-              <% unless user.moderator? || user.admin? || user.super_admin? %>
-                <%= button_to "Moderator", make_moderator_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm" %>
-              <% end %>
-              <% unless user.admin? || user.super_admin? %>
-                <%= button_to "Admin", make_admin_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm" %>
+              <% if current_user.outranks?(user) %>
+                <% if user.active? %>
+                  <%= button_to "Suspend", suspend_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm text-red-600" %>
+                <% else %>
+                  <%= button_to "Activate", activate_admin_user_path(user), method: :post, class: "btn btn-primary btn-sm" %>
+                <% end %>
+                <% if current_user.super_admin? %>
+                  <% unless user.moderator? || user.admin? || user.super_admin? %>
+                    <%= button_to "Moderator", make_moderator_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm" %>
+                  <% end %>
+                  <% unless user.admin? || user.super_admin? %>
+                    <%= button_to "Admin", make_admin_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm" %>
+                  <% end %>
+                <% end %>
               <% end %>
             </div>
           </td>

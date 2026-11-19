@@ -13,5 +13,6 @@ class Rooms::PostsController < ApplicationController
 
   def set_room
     @room = Room.friendly.find(params[:room_id])
+    raise ActiveRecord::RecordNotFound unless @room.accessible_by?(current_user)
   end
 end

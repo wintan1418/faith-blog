@@ -165,6 +165,9 @@ class Post < ApplicationRecord
   # them via direct links (see Post#visible_to?).
   scope :published, -> { published_status.moderation_visible }
   scope :drafts, -> { where(status: :draft) }
+  # Breaths that carry their author's name (anonymous ones never count toward
+  # or appear on the author's public profile).
+  scope :named, -> { where(anonymous: false) }
   scope :featured, -> { where(featured: true) }
   scope :recent, -> { order(published_at: :desc) }
   scope :popular, -> { order(views_count: :desc) }
@@ -334,7 +337,26 @@ class Post < ApplicationRecord
   end
 
   def visible_to?(viewer)
+    return false unless readable_by?(viewer)
     return true unless held_for_review?
+
+    author_or_staff?(viewer)
+  end
+
+  # Live = published status with a publish time that has arrived. Drafts,
+  # scheduled breaths and archived ones are not live.
+  def live?
+    published? && (published_at.nil? || published_at <= Time.current)
+  end
+
+  # Drafts / scheduled / archived breaths exist only for their author and
+  # staff. Everyone else (signed-out included) must get a 404 — never a page
+  # that confirms the breath exists.
+  def readable_by?(viewer)
+    live? || author_or_staff?(viewer)
+  end
+
+  def author_or_staff?(viewer)
     return false unless viewer
 
     viewer == user ||

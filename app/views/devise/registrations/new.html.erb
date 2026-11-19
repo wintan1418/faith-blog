@@ -39,16 +39,18 @@
       <div class="auth-input-wrap">
         <%= render_icon("lock", classes: "auth-input-icon") %>
         <%= f.password_field :password, autocomplete: "new-password", class: "auth-input",
-                             placeholder: "At least 8 characters", required: true, minlength: 8,
+                             placeholder: "At least 10 characters", required: true, minlength: 10,
                              data: { password_field_target: "input", action: "input->password-field#measure" } %>
         <button type="button" class="auth-eye" data-action="password-field#toggle" data-password-field-target="toggle"
                 aria-label="Show password" aria-pressed="false">Show</button>
       </div>
       <div class="auth-strength" data-password-field-target="meter" data-level="0" aria-live="polite">
         <span></span><span></span><span></span><span></span>
-        <em data-password-field-target="label">Use 8 or more characters</em>
+        <em data-password-field-target="label">Use 10 or more characters</em>
       </div>
     </div>
+
+    <%= render "devise/shared/bot_guard" %>
 
     <%= f.submit "Create account", class: "auth-submit", data: { turbo_submits_with: "Creating your account…" } %>
 

@@ -124,7 +124,7 @@
               <small>Following</small>
             <% end %>
             <div class="profile-stat">
-              <span data-profile-hero-target="count" data-count="<%= @user.posts.published.count %>"><%= @user.posts.published.count %></span>
+              <% visible_breath_count = (user_signed_in? && current_user == @user ? @user.posts.published : @user.posts.published.named).count %><span data-profile-hero-target="count" data-count="<%= visible_breath_count %>"><%= visible_breath_count %></span>
               <small>Breaths</small>
             </div>
             <% if @user.current_breath_streak.to_i.positive? %>

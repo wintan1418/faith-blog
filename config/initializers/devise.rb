@@ -17,7 +17,27 @@ Devise.setup do |config|
   # active user effectively never gets signed out.
   config.remember_for = 6.months
   config.extend_remember_period = true
-  config.password_length = 8..128
+  # New passwords only — Devise validates length when a password is set, so
+  # existing (shorter) passwords keep working until they're changed.
+  config.password_length = 10..128
+
+  # Never reveal whether an email has an account (sign-in, password reset,
+  # unlock all answer the same way either way).
+  config.paranoid = true
+
+  # :lockable — after 10 wrong passwords in a row the account locks; an
+  # unlock link is emailed and it also unlocks by itself after an hour.
+  config.lock_strategy = :failed_attempts
+  config.unlock_keys = [ :email ]
+  config.unlock_strategy = :both
+  config.maximum_attempts = 10
+  config.unlock_in = 1.hour
+  config.last_attempt_warning = true
+
+  # Tell the OLD address when the email changes, and the member when their
+  # password changes — so a hijacked session can't quietly take the account.
+  config.send_email_changed_notification = true
+  config.send_password_change_notification = true
   config.email_regexp = /\A[^@\s]+@[^@\s]+\z/
   config.reset_password_within = 6.hours
   config.sign_out_via = :delete
