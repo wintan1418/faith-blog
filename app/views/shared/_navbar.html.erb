@@ -18,7 +18,7 @@
 
     <div class="eg-pills" role="navigation" aria-label="Main">
       <% feed_active = user_signed_in? ? request.path.start_with?("/feed") : current_page?(root_path) %>
-      <%= link_to (user_signed_in? ? feed_path : root_path), class: "eg-pill #{'is-active' if feed_active}", title: "Feed", aria: { current: (feed_active ? "page" : nil) } do %>
+      <%= link_to (user_signed_in? ? feed_path : guest_feed_path), class: "eg-pill #{'is-active' if feed_active}", title: "Feed", aria: { current: (feed_active ? "page" : nil) } do %>
         <%= render_icon("feed", classes: "eg-pill-ico") %><span class="eg-pill-label">Feed</span>
       <% end %>
       <% rooms_active = request.path.start_with?("/rooms") %>
@@ -237,7 +237,7 @@
       <span>Profile</span>
     <% end %>
   <% else %>
-    <%= link_to root_path, class: "fc-bottom-nav-item #{'is-active' if current_page?(root_path)}" do %>
+    <%= link_to guest_feed_path, class: "fc-bottom-nav-item #{'is-active' if current_page?(root_path)}" do %>
       <%= render_icon("feed", classes: "eg-bottom-ico") %>
       <span>Feed</span>
     <% end %>

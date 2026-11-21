@@ -224,6 +224,8 @@ html .eg-breathe {
   box-shadow: none;
 }
 html .eg-breathe:hover { background: var(--fc-fill-hover); color: var(--fc-on-fill); }
+/* Link colour rules (html.theme-light a) outrank the pill; keep its text on-fill. */
+html a.eg-breathe.eg-breathe, html a.eg-breathe.eg-breathe:hover { color: var(--fc-on-fill); }
 .eg-breathe-ico { width: 22px; height: 22px; }
 .eg-join { padding: 0 20px; }
 .eg-signin { font-weight: 700; color: var(--fc-ink); padding: 0 10px; min-height: 44px; display: inline-flex; align-items: center; }

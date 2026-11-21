@@ -7,7 +7,7 @@
     <aside class="home-public-rail home-public-rail-left" aria-label="Community rooms">
       <div class="home-rail-section-label">Your Space</div>
       <nav class="home-rail-nav" aria-label="Explore">
-        <%= link_to root_path, class: "is-active" do %>
+        <%= link_to guest_feed_path, class: "is-active" do %>
           <%= render_icon("message_circle", classes: "h-4 w-4") %>
           Feed
         <% end %>
@@ -59,7 +59,7 @@
 
       <section class="home-feed-control-row">
         <div class="home-public-tabs" role="list" aria-label="Feed filters">
-          <%= link_to "Recent", root_path, class: "is-active" %>
+          <%= link_to "Recent", guest_feed_path, class: "is-active" %>
           <%= link_to "Trending", rooms_path %>
           <%= link_to "Following", new_user_session_path %>
         </div>
