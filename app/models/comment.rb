@@ -2,6 +2,7 @@
 
 class Comment < ApplicationRecord
   include Mentionable
+  include GifAttachable
 
   # Rich text content
   has_rich_text :content
@@ -25,7 +26,8 @@ class Comment < ApplicationRecord
   enum :moderation_status, { approved: 0, pending_review: 1, blocked: 2 }, prefix: :moderation
 
   # Validations
-  validates :content, presence: true
+  # A GIF on its own is a whole comment.
+  validates :content, presence: true, unless: :has_gif?
   validate :parent_comment_belongs_to_same_post
   validate :language_is_clean
 

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CommentsController < ApplicationController
+  include GifParams
+
   before_action :authenticate_user!
   member_rate_limit to: 10, within: 1.minute, only: %i[create reply], name: "comment-burst"
   member_rate_limit to: 120, within: 1.hour, only: %i[create reply], name: "comment-hourly"
@@ -13,7 +15,7 @@ class CommentsController < ApplicationController
   def create
     return redirect_to(@post, alert: "Comments are disabled for this post.") unless @post.allow_comments?
 
-    @comment = @post.comments.build(comment_params)
+    @comment = @post.comments.build(comment_params.merge(gif_params(:comment)))
     @comment.user = current_user
 
     verdict = Ai::Moderation::CommentGatekeeper.call(comment: @comment)
@@ -55,7 +57,7 @@ class CommentsController < ApplicationController
   def reply
     return redirect_to(@post, alert: "Comments are disabled for this post.") unless @post.allow_comments?
 
-    @reply = @post.comments.build(comment_params)
+    @reply = @post.comments.build(comment_params.merge(gif_params(:comment)))
     @reply.user = current_user
     # Like LinkedIn: one level of replies. Answering a reply joins the same
     # chain and @mentions the person, so the thread never runs off a phone.

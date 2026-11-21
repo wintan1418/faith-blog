@@ -78,6 +78,9 @@ application.register("flash", FlashController)
 import ForwardPickerController from "./forward_picker_controller"
 application.register("forward-picker", ForwardPickerController)
 
+import GifPickerController from "./gif_picker_controller"
+application.register("gif-picker", GifPickerController)
+
 import FrameRefreshController from "./frame_refresh_controller"
 application.register("frame-refresh", FrameRefreshController)
 

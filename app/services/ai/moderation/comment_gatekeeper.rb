@@ -19,6 +19,10 @@ module Ai
       end
 
       def call
+        # Nothing to read (a GIF on its own, held to Klipy's strictest rating).
+        return Verdict.new(decision: :allow, reason: "no_text", severity: "none", categories: [],
+                           recommended_action: "allow", result: nil) if extract_content.blank?
+
         result = Reviewer.call(
           content: extract_content,
           kind: "comment",

@@ -122,6 +122,7 @@
                 title="Add emoji" aria-label="Add emoji">
           <%= render_icon("smile", classes: "h-5 w-5") %>
         </button>
+        <%= render "gifs/picker", scope: "message", button_class: "msg-tool msg-tool--gif", anchor_class: "gif-anchor--static" %>
         <button type="button" class="msg-tool msg-tool--verse" data-action="click->dm-composer#toggleVersePanel"
                 title="Share a verse" aria-label="Share a verse">
           <%= render_icon("book_open", classes: "h-5 w-5") %>

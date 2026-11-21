@@ -69,7 +69,8 @@ module MessagingHelper
     return if message.respond_to?(:removed?) && message.removed?
     return if message.body.present?
 
-    if message.respond_to?(:has_voice_note?) && message.has_voice_note? then "mic"
+    if message.respond_to?(:has_gif?) && message.has_gif? then "image"
+    elsif message.respond_to?(:has_voice_note?) && message.has_voice_note? then "mic"
     elsif message.respond_to?(:has_images?) && message.has_images? then "image"
     elsif message.respond_to?(:has_documents?) && message.has_documents? then "file"
     elsif message.respond_to?(:has_scripture?) && message.has_scripture? then "bookopen"
@@ -95,6 +96,7 @@ module MessagingHelper
     text =
       if message.respond_to?(:removed?) && message.removed? then "Message removed"
       elsif message.body.present? then message.body.squish
+      elsif message.respond_to?(:has_gif?) && message.has_gif? then "Sent a GIF"
       elsif message.respond_to?(:has_voice_note?) && message.has_voice_note? then "Sent a voice note"
       elsif message.respond_to?(:has_images?) && message.has_images? then "Sent a photo"
       elsif message.respond_to?(:has_documents?) && message.has_documents? then "Sent a document"

@@ -1,0 +1,22 @@
+<%#
+  The GIF button and its picker. Renders nothing unless Klipy is set up.
+  Picking a GIF fills hidden fields on the surrounding form and sends it.
+  Locals:
+    scope        — the form's param scope: "message" or "comment"
+    button_class — classes for the button, to match the tools beside it
+    anchor_class — extra classes for the wrapper (optional)
+%>
+<% if gifs_enabled? %>
+  <div class="gif-anchor <%= local_assigns[:anchor_class] %>"
+        data-controller="gif-picker"
+        data-gif-picker-scope-value="<%= scope %>"
+        data-gif-picker-search-url-value="<%= gifs_path %>"
+        data-gif-picker-trending-url-value="<%= trending_gifs_path %>">
+    <button type="button" class="gif-tool <%= local_assigns[:button_class] %>"
+            data-gif-picker-target="button" data-action="click->gif-picker#toggle"
+            title="Send a GIF" aria-label="Send a GIF" aria-haspopup="dialog" aria-expanded="false">
+      <span class="gif-tool-label" aria-hidden="true">GIF</span>
+    </button>
+    <div class="gif-popover hidden" data-gif-picker-target="popover" role="dialog" aria-label="Choose a GIF"></div>
+  </div>
+<% end %>

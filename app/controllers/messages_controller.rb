@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MessagesController < ApplicationController
+  include GifParams
+
   before_action :authenticate_user!
   member_rate_limit to: 30, within: 1.minute, only: :create, name: "dm-burst",
                     message: "You're sending messages very fast. Wait a moment and try again."
@@ -11,7 +13,7 @@ class MessagesController < ApplicationController
   before_action :authorize_own!, only: [ :update, :destroy ]
 
   def create
-    @message = @conversation.messages.build(message_params)
+    @message = @conversation.messages.build(message_params.merge(gif_params(:message)))
     @message.sender = current_user
 
     if @message.save

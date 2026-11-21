@@ -56,6 +56,7 @@ class MessageModerationJob < ApplicationJob
     lines = earlier.compact_blank.map { |b| "(earlier) #{b}" }
     lines << "(new) #{message.body}"
     lines << "(new) [shared verse: #{message.scripture_ref}]" if message.scripture_ref.present?
+    lines << "(new) [GIF: #{message.gif_title}]" if message.try(:has_gif?) && message.gif_title.present?
     lines.join("\n")
   end
 

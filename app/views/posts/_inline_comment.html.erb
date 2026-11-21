@@ -38,6 +38,7 @@
       <div class="fc-inline-comment-text" data-comment-edit-target="display" data-controller="scripture">
         <%= render_social_text(comment.content, class_name: "fc-social-text") %>
       </div>
+      <%= render "gifs/attached", record: comment %>
 
       <% if user_signed_in? && (comment.user == current_user || current_user.admin_or_moderator?) %>
         <% edit_plain = comment.content.to_plain_text %>
@@ -134,6 +135,7 @@
                       <emoji-picker></emoji-picker>
                     </div>
                   </div>
+                  <%= render "gifs/picker", scope: "comment", button_class: "fc-composer-icon-btn" %>
                   <button type="button"
                           class="fc-composer-icon-btn"
                           title="Open Bible"

@@ -143,6 +143,7 @@
                                   title="Add emoji">
                             <%= render_icon("smile", classes: "h-4 w-4") %>
                           </button>
+                          <%= render "gifs/picker", scope: "comment", button_class: "composer-tool" %>
                           <div class="composer-spacer"></div>
                           <button type="button"
                                   data-action="click->composer#collapse"
