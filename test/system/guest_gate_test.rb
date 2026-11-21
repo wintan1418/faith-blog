@@ -28,7 +28,8 @@ class GuestGateSystemTest < ApplicationSystemTestCase
 
     find(".home-feed-actions a", match: :first).click # like
     within("dialog.guest-gate[open]") { click_link "Sign in" }
-    assert_current_path new_user_session_path
+    # The like was on the feed, so sign-in will bring them back to it.
+    assert_current_path new_user_session_path(return_to: "/?browse=1")
   end
 
   test "Look around first and the legal links stay open" do

@@ -107,7 +107,9 @@ export default class extends Controller {
     if (!link) return here
     try {
       const url = new URL(link.href, window.location.href)
-      return url.origin === window.location.origin ? url.pathname + url.search : here
+      // Like / save / comment buttons for guests point at sign-up: return to this page instead.
+      if (url.origin !== window.location.origin || /^\/(users|auth)(\/|$)/.test(url.pathname)) return here
+      return url.pathname + url.search
     } catch (e) { return here }
   }
 
