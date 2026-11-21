@@ -299,7 +299,10 @@ class Notification < ApplicationRecord
     return "#{name} sent you #{waiting} messages" if waiting > 1
 
     preview = notifiable.try(:body).to_s.squish
-    preview.present? && preview != "[deleted]" ? "#{name}: #{preview.truncate(120)}" : "#{name} sent you a message"
+    return "#{name}: #{preview.truncate(120)}" if preview.present? && preview != "[deleted]"
+    return "#{name} sent you a GIF" if notifiable.try(:has_gif?) && !notifiable.try(:deleted?)
+
+    "#{name} sent you a message"
   end
 
   def deliver_push_notification

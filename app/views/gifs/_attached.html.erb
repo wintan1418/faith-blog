@@ -1,0 +1,8 @@
+<%# A comment's GIF, loaded straight from Klipy's CDN at a modest size. %>
+<% if record.has_gif? && !record.deleted? %>
+  <% gif_w, gif_h = gif_display_size(record, max: 220) %>
+  <div class="cm-gif-wrap">
+    <img src="<%= record.gif_url %>" class="cm-gif" width="<%= gif_w %>" height="<%= gif_h %>"
+         loading="lazy" decoding="async" alt="<%= record.gif_alt %>" style="aspect-ratio: <%= gif_w %> / <%= gif_h %>">
+  </div>
+<% end %>

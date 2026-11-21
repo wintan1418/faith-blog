@@ -102,6 +102,10 @@ Rails.application.routes.draw do
   # Mentions autocomplete
   get "mentions", to: "users#mentions"
 
+  # GIF picker (Klipy, called from the server so the key stays private).
+  get "gifs", to: "gifs#index", as: :gifs, defaults: { format: :json }
+  get "gifs/trending", to: "gifs#trending", as: :trending_gifs, defaults: { format: :json }
+
   # User profiles
   # Skill endorsements (from connections) and the digital business card.
   post "u/:username/endorse", to: "endorsements#create", as: :endorse_skill

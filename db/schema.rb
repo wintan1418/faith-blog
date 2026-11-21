@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_200100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -368,6 +368,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_200100) do
     t.datetime "updated_at", null: false
     t.integer "moderation_status", default: 0, null: false
     t.string "moderation_blocked_reason", limit: 280
+    t.string "gif_url"
+    t.integer "gif_width"
+    t.integer "gif_height"
+    t.string "gif_title"
     t.index ["deleted_at"], name: "index_comments_on_deleted_at"
     t.index ["flagged"], name: "index_comments_on_flagged"
     t.index ["moderation_status"], name: "index_comments_on_moderation_status"
@@ -575,6 +579,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_200100) do
     t.bigint "reply_to_id"
     t.boolean "forwarded", default: false, null: false
     t.boolean "quiet", default: false, null: false
+    t.string "gif_url"
+    t.integer "gif_width"
+    t.integer "gif_height"
+    t.string "gif_title"
     t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["deleted_at"], name: "index_messages_on_deleted_at"

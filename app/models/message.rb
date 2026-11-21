@@ -2,6 +2,7 @@
 
 class Message < ApplicationRecord
   include AttachmentValidatable
+  include GifAttachable
 
   MAX_IMAGES = 4
   IMAGE_MAX_BYTES = 10.megabytes
@@ -73,6 +74,7 @@ class Message < ApplicationRecord
     return "This message was deleted" if deleted?
     return "This message was removed" if removed?
     return body.to_s.squish.truncate(length) if body.present?
+    return "GIF" if has_gif?
     return "📷 Photo" if has_images?
     return "🎤 Voice note" if has_voice_note?
     return "📄 #{documents.first.filename}".truncate(length) if has_documents?
@@ -93,7 +95,8 @@ class Message < ApplicationRecord
   # uploaded again: the copy points at the same stored files. Every rule a new
   # message follows (membership, blocks, clean language) still applies.
   def forward_to(conversation, by:)
-    copy = conversation.messages.build(sender: by, body: body, scripture_ref: scripture_ref, forwarded: true)
+    copy = conversation.messages.build(sender: by, body: body, scripture_ref: scripture_ref, forwarded: true,
+                                       gif_url: gif_url, gif_width: gif_width, gif_height: gif_height, gif_title: gif_title)
     copy.images.attach(images.blobs) if has_images?
     copy.voice_note.attach(voice_note.blob) if has_voice_note?
     copy.documents.attach(documents.blobs) if has_documents?
@@ -168,7 +171,7 @@ class Message < ApplicationRecord
 
   def moderate
     if body.blank? && !has_images?
-      notify_recipient # voice note only: nothing to read or look at
+      notify_recipient # voice note or Klipy GIF only (rated for all ages): nothing to read or look at
     elsif Ai::Moderation::Client.stub?
       MessageModerationJob.perform_now(self) # offline/test moderation decides right away
     else
@@ -218,9 +221,9 @@ class Message < ApplicationRecord
   end
 
   # A body isn't required when the message already carries something to say:
-  # an image, a voice note, or a shared verse.
+  # an image, a voice note, a shared verse, or a GIF.
   def body_optional?
-    has_attachments? || scripture_ref.present?
+    has_attachments? || scripture_ref.present? || has_gif?
   end
 
   # Accept free-form input like "read John 3:16 today" and keep just the

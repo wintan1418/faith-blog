@@ -6,6 +6,9 @@ export const loadEditor = once(() => import("trix").then(() => import("@rails/ac
 export const loadEmojiPicker = once(() => import("emoji-picker-element"))
 export const loadTribute = once(() => import("tributejs").then((m) => m.default))
 export const loadChess = once(() => import("chess.js").then((m) => m.Chess))
+// The GIF picker panel. Unlike the others it may be retried after a failed load (flaky phone data).
+let gifPanel
+export const loadGifPanel = () => (gifPanel ||= import("./helpers/gif_panel").catch((error) => { gifPanel = null; throw error }))
 
 const whenIdle = (fn) => (window.requestIdleCallback ? window.requestIdleCallback(fn, { timeout: 2500 }) : setTimeout(fn, 1200))
 

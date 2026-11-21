@@ -10,7 +10,7 @@
 <% starts_group = message_starts_group?(message, previous) %>
 <%# Photos alone, or a verse alone, sit on the chat without a bubble around them. %>
 <% plain = !deleted && !removed && message.body.blank? && !message.reply_to && !message.forwarded? &&
-           !message.has_voice_note? && !message.has_documents? && (message.has_images? || message.has_scripture?) %>
+           !message.has_voice_note? && !message.has_documents? && (message.has_images? || message.has_scripture? || message.has_gif?) %>
 
 <%
   loaded_likes = message.likes.loaded? ? message.likes.to_a : message.likes.includes(:user).to_a
@@ -60,6 +60,15 @@
 
           <% if message.has_scripture? %>
             <%= render "conversations/scripture_card", message: message %>
+          <% end %>
+
+          <% if message.has_gif? %>
+            <% gif_w, gif_h = gif_display_size(message, max: 240) %>
+            <%# Loaded straight from Klipy's CDN; the size keeps its shape while it loads. %>
+            <div class="msg-gif-wrap">
+              <img src="<%= message.gif_url %>" class="msg-gif" width="<%= gif_w %>" height="<%= gif_h %>"
+                   loading="lazy" decoding="async" alt="<%= message.gif_alt %>" style="aspect-ratio: <%= gif_w %> / <%= gif_h %>">
+            </div>
           <% end %>
 
           <% if message.has_images? %>
