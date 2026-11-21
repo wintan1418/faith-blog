@@ -8,6 +8,8 @@ export default class extends Controller {
 
   connect() {
     if (!this.urlValue) return
+    // Signed-out web visitors see the first page only (guest_gate_controller.js).
+    if (document.body.matches("[data-controller~='guest-gate']")) return
     this.io = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) this.load()
     }, { rootMargin: "300px 0px" })

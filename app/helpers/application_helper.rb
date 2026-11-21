@@ -19,6 +19,12 @@ module ApplicationHelper
     hotwire_native_app? ? root_path : root_path(browse: 1)
   end
 
+  # Signed-out web visitors can read the page they landed on, but clicking
+  # further asks them to join (guest_gate_controller.js). Never in the apps.
+  def guest_gate?
+    !user_signed_in? && !hotwire_native_app?
+  end
+
   def page_title(title = nil)
     base_title = "Brethreign"
     title.present? ? "#{title} - #{base_title}" : base_title

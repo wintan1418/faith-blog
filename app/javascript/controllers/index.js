@@ -84,6 +84,9 @@ application.register("frame-refresh", FrameRefreshController)
 import GoldenCarouselController from "./golden_carousel_controller"
 application.register("golden-carousel", GoldenCarouselController)
 
+import GuestGateController from "./guest_gate_controller"
+application.register("guest-gate", GuestGateController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
