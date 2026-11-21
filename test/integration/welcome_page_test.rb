@@ -125,4 +125,10 @@ class WelcomePageTest < ActionDispatch::IntegrationTest
   ensure
     old.each { |k, v| ENV[k] = v }
   end
+
+  test "a request for JSON at / still gets the welcome page instead of a crash" do
+    get root_path, headers: { "Accept" => "application/json" }
+    assert_response :success
+    assert_equal "text/html", response.media_type
+  end
 end
