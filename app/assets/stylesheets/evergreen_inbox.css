@@ -767,9 +767,10 @@ html body .msg-page .msg-send.hidden { opacity: 0.4; pointer-events: none; }
   html .msg-page .msg-compose-input,
   html .msg-page .msg-compose-input:focus { min-height: 44px; padding: 11px 0; }
   .msg-compose-tools { height: 44px; }
-  .msg-tool { width: 40px; height: 44px; }
-  /* Phones have an emoji keyboard; keep the pill roomy for typing. */
-  .msg-tool--emoji { display: none; }
+  .msg-tool { width: 36px; height: 44px; }
+  /* The emoji picker opens full width just above the message box, so each emoji can be seen landing. */
+  .msg-emoji-popover { left: 0; right: 0; bottom: calc(100% + 6px); }
+  .msg-emoji-popover emoji-picker { width: 100%; height: min(320px, 42vh); }
 
   /* 28 bars × 2px with 1px gaps: room for play, time, download and ⋯ on a phone. */
   .msg-wave, .msg-wave-bars { width: 83px; }
@@ -779,6 +780,11 @@ html body .msg-page .msg-send.hidden { opacity: 0.4; pointer-events: none; }
   .msg-voice-play { width: 36px; height: 36px; }
 
   .msg-new { border-radius: 0; box-shadow: none; }
+}
+@media (max-width: 380px) {
+  /* Small phones: three tools still leave room for "Write a message…" on one line. */
+  .msg-tool { width: 30px; }
+  .msg-compose-field { padding-left: 12px; }
 }
 
 /* Site-wide text colours (p, time) reach into bubbles; my bubbles keep their on-fill text. */
