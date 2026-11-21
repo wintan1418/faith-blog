@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./messaging.css";
 @import "./auth.css";
+@import "./welcome.css";
 @import "./comments.css";
 @import "./whats_new.css";
 @import "./updates.css";

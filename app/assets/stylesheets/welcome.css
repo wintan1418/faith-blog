@@ -1,0 +1,164 @@
+/* ==========================================
+   Welcome page: "/" for signed-out web visitors.
+   Phones: stacked, small mark on top. Computers: the mark large on the
+   left, headline and actions on the right. Evergreen tokens throughout,
+   so light and dark come for free. The Google button and divider come
+   from auth.css (the actions sit inside an .auth wrapper).
+   ========================================== */
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  color: var(--fc-ink);
+  background: var(--fc-bg);
+  overflow-x: clip;
+}
+body:has(.welcome) .fc-rain { display: none; }
+
+.welcome-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  gap: 2.25rem;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 2rem;
+}
+
+/* ── The mark ── */
+.welcome-brand { display: flex; align-items: center; gap: 0.7rem; }
+.welcome-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--fc-fill);
+  color: var(--fc-on-fill);
+}
+.welcome-mark svg { width: 62%; height: 62%; }
+.welcome-word {
+  font-family: var(--fc-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+/* ── Headline and actions ── */
+.welcome-main { min-width: 0; max-width: 460px; }
+.welcome-title {
+  font-family: var(--fc-display);
+  font-size: clamp(2.3rem, 9vw, 4.1rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--fc-ink);
+  overflow-wrap: break-word;
+}
+.welcome-sub { margin-top: 1rem; font-size: 1.15rem; line-height: 1.5; color: var(--fc-muted); }
+
+html .welcome .welcome-actions {
+  display: block;
+  min-height: 0;
+  max-width: 360px;
+  margin-top: 2.25rem;
+  background: none;
+}
+.welcome-h2 { margin-bottom: 1rem; font-size: 1.45rem; font-weight: 800; color: var(--fc-ink); }
+.welcome-h3 { margin: 2.5rem 0 0.9rem; font-size: 1.05rem; font-weight: 800; color: var(--fc-ink); }
+
+/* One pill shape for every button here, the Google one too. */
+html .welcome .auth .google-auth-button,
+.welcome-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  height: 48px;
+  padding: 0 1.25rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, filter 0.15s;
+}
+html .welcome .auth .auth-divider { margin: 0.85rem 0; }
+html .welcome .welcome-btn-primary {
+  border: 0;
+  background: var(--fc-fill);
+  color: var(--fc-on-fill);
+}
+html .welcome .welcome-btn-primary:hover { background: var(--fc-fill-hover); }
+html .welcome .welcome-btn-outline {
+  border: 1.5px solid var(--fc-line-strong);
+  background: transparent;
+  color: var(--fc-accent);
+}
+html .welcome .welcome-btn-outline:hover { background: var(--fc-accent-soft); }
+.welcome-btn:focus-visible,
+.welcome-browse:focus-visible,
+.welcome-footer a:focus-visible { outline: 3px solid var(--fc-accent-glow); outline-offset: 2px; }
+
+.welcome-legal { margin-top: 0.6rem; font-size: 0.76rem; line-height: 1.5; color: var(--fc-muted); }
+.welcome-legal a { color: var(--fc-accent); text-decoration: none; }
+.welcome-legal a:hover { text-decoration: underline; }
+
+/* Low-key: a plain text link, not a button. */
+html .welcome .welcome-browse {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 1.25rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--fc-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--fc-line-strong);
+}
+html .welcome .welcome-browse:hover { color: var(--fc-accent); text-decoration-color: currentColor; }
+
+/* ── Footer row ── */
+.welcome-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem 1.25rem;
+  padding: 1rem 1.25rem 1.5rem;
+  font-size: 0.82rem;
+  color: var(--fc-muted);
+}
+.welcome-footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 1.25rem; }
+html .welcome .welcome-footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--fc-muted);
+  text-decoration: none;
+}
+html .welcome .welcome-footer a:hover { color: var(--fc-ink); text-decoration: underline; }
+
+/* ── Computers: big mark left, actions right ── */
+@media (min-width: 960px) {
+  .welcome-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 3rem;
+    padding: 3rem 2.5rem;
+  }
+  .welcome-brand { flex-direction: column; justify-content: center; gap: 1.5rem; }
+  .welcome-mark {
+    width: clamp(260px, 28vw, 360px);
+    height: clamp(260px, 28vw, 360px);
+    box-shadow: 0 30px 70px -30px var(--fc-accent-glow);
+  }
+  .welcome-word { font-size: 2.6rem; }
+  .welcome-main { max-width: 520px; }
+}

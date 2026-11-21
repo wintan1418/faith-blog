@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 class HomeController < ApplicationController
+  # Signed-out web visitors get a welcome page at "/" (brand, Join, Sign in).
+  # The public feed is still one tap away at "/?browse=1" ("Look around first"),
+  # and the apps keep opening "/" straight into it.
   def index
     if user_signed_in?
       redirect_to feed_path
+    elsif !hotwire_native_app? && params[:browse].blank?
+      render :welcome
     else
       @rooms = Room.public_rooms.ordered.limit(8)
       @featured_rooms = @rooms.first(4)

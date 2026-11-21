@@ -199,7 +199,8 @@
          data-rain-items-value="<%= BackgroundRain.items.to_json %>"></div>
 
     <div class="min-h-full fc-page" data-controller="<%= ["reactors-modal", ("composer-modal notifications-modal bible-drawer notification-sound" if user_signed_in?)].compact.join(" ") %>">
-      <%= render "shared/navbar" %>
+      <%# The signed-out welcome page stands on its own, without the top and bottom bars. %>
+      <%= render "shared/navbar" unless content_for?(:bare_page) %>
 
       <div id="flash_messages"><%= render "shared/flash" %></div>
       <%= render "shared/app_update_banner" if outdated_android_app? %>

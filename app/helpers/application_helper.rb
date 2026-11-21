@@ -13,6 +13,12 @@ module ApplicationHelper
 
   include Pagy::Frontend
 
+  # The public feed for signed-out visitors. On the web "/" is the welcome page,
+  # so the feed lives at "/?browse=1"; the apps still open "/" straight into it.
+  def guest_feed_path
+    hotwire_native_app? ? root_path : root_path(browse: 1)
+  end
+
   def page_title(title = nil)
     base_title = "Brethreign"
     title.present? ? "#{title} - #{base_title}" : base_title

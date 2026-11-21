@@ -3,6 +3,7 @@
     versions without native Google sign-in get no button at all. %>
 <% native_google = hotwire_native_app? && native_google_sign_in_supported? %>
 <% native_apple = hotwire_native_app? && native_apple_sign_in_supported? %>
+<% divider = local_assigns.fetch(:divider, "or continue with email") %>
 <% show_google = ENV["GOOGLE_CLIENT_ID"].present? && (native_google || (!hotwire_native_app? && ENV["GOOGLE_CLIENT_SECRET"].present?)) %>
 <% if native_apple %>
   <%# Apple asks for its button first and as prominent as the others. %>
@@ -13,7 +14,7 @@
     <span>Continue with Apple</span>
   <% end %>
   <% unless show_google %>
-    <div class="auth-divider"><span>or continue with email</span></div>
+    <div class="auth-divider"><span><%= divider %></span></div>
   <% end %>
 <% end %>
 <% if show_google %>
@@ -35,6 +36,6 @@
   <% end %>
 
   <div class="auth-divider">
-    <span>or continue with email</span>
+    <span><%= divider %></span>
   </div>
 <% end %>

@@ -1,0 +1,49 @@
+<%# The front door for signed-out web visitors at "/".
+    Computers: the mark large on the left, headline and actions on the right.
+    Phones: stacked, mark on top. The public feed is behind "Look around first". %>
+<% content_for(:title) { "Brethreign · Christian community for prayer, scripture and fellowship" } %>
+<% content_for(:meta_description) { "Brethreign is a social space with faith at its centre and room for everyone. Share what is on your heart, ask big questions and have sane, respectful conversations about life, work, relationships and belief. Free on the web and Android." } %>
+<% content_for(:og_description) { "Faith at the centre, everyone welcome. Sane, kind conversations about everything. Free on the web and Android." } %>
+<% content_for(:bare_page) { "1" } %>
+<% wave = "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3" %>
+
+<div class="welcome">
+  <div class="welcome-grid">
+    <div class="welcome-brand" aria-hidden="true">
+      <span class="welcome-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="<%= wave %>"/></svg>
+      </span>
+      <span class="welcome-word">Brethreign</span>
+    </div>
+
+    <section class="welcome-main" aria-labelledby="welcome-title">
+      <h1 id="welcome-title" class="welcome-title">Faith at the centre. Everyone welcome.</h1>
+      <p class="welcome-sub">Sane, kind conversations about everything.</p>
+
+      <div class="auth welcome-actions">
+        <h2 class="welcome-h2">Join today</h2>
+        <%= render "devise/shared/google_sign_in", divider: "or" %>
+        <%= link_to "Create account", new_user_registration_path, class: "welcome-btn welcome-btn-primary" %>
+        <p class="welcome-legal">
+          By joining you agree to our <%= link_to "Terms", terms_path %>
+          and <%= link_to "Privacy Policy", privacy_path %>.
+        </p>
+
+        <h3 class="welcome-h3">Already have an account?</h3>
+        <%= link_to "Sign in", new_user_session_path, class: "welcome-btn welcome-btn-outline" %>
+
+        <%= link_to "Look around first", root_path(browse: 1), class: "welcome-browse" %>
+      </div>
+    </section>
+  </div>
+
+  <footer class="welcome-footer" aria-label="About Brethreign">
+    <nav>
+      <%= link_to "About", about_path %>
+      <%= link_to "Privacy", privacy_path %>
+      <%= link_to "Terms", terms_path %>
+      <%= link_to "Child safety", child_safety_path %>
+    </nav>
+    <span>&copy; <%= Date.current.year %> Brethreign</span>
+  </footer>
+</div>
