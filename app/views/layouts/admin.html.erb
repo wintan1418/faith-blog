@@ -66,6 +66,7 @@
       ["Announcements", admin_announcements_path, "megaphone", request.path.include?("/admin/announcements")],
       ["Updates bots", admin_bots_path, "newspaper", request.path.include?("/admin/bots")],
       ["App versions", edit_admin_app_release_path, "smartphone", request.path.include?("/admin/app-versions")],
+      ["App waitlist", admin_app_waitlist_entries_path, "bell", request.path.include?("/admin/app-waitlist")],
       ["Push test", admin_push_test_path, "bell", request.path.include?("/admin/push-test")],
       ["Giving page (preview)", give_path, "handheart", false]
     ] %>

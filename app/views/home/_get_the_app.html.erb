@@ -1,0 +1,26 @@
+<%# "Get the app": both stores are coming soon, so the badges are not links.
+    Drawn in brand style (not the stores' official artwork). The waitlist form
+    posts to /waitlist; the whole block is open to the guest gate. %>
+<section id="get-the-app" class="welcome-app" aria-labelledby="get-app-title" data-guest-gate-allow>
+  <h2 id="get-app-title" class="welcome-h3 welcome-app-title">Get the app</h2>
+  <p class="welcome-app-sub">Brethreign for iPhone and Android is on its way.</p>
+
+  <ul class="app-badges" role="list">
+    <li class="app-badge">
+      <svg class="app-badge-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M15.6 2.2c.1 1.2-.4 2.4-1.1 3.2-.8.9-1.9 1.5-3 1.4-.1-1.2.4-2.3 1.1-3.1.8-.9 2-1.5 3-1.5zM12.1 8.1c.9 0 2-.8 3.4-.8 1.3 0 2.7.6 3.6 1.9-3.1 1.8-2.6 6.2.5 7.4-.5 1.3-1.1 2.5-1.9 3.6-.8 1.1-1.7 2.2-3 2.2-1.2 0-1.6-.8-3-.8-1.5 0-1.9.8-3.1.8-1.3 0-2.2-1.2-3-2.3C4 17.9 3 14.9 3.6 12.2c.5-2.4 2.3-4 4.4-4.1 1.4 0 2.9.9 4.1.9z"/>
+      </svg>
+      <span class="app-badge-text"><small>For iPhone</small><span>App Store</span></span>
+      <span class="app-badge-soon">Coming soon</span>
+    </li>
+    <li class="app-badge">
+      <svg class="app-badge-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M6.2 3.3c-.6-.4-1.4.1-1.4.8v15.8c0 .7.8 1.2 1.4.8l13.4-7.9c.6-.4.6-1.3 0-1.6L6.2 3.3z"/>
+      </svg>
+      <span class="app-badge-text"><small>For Android</small><span>Google Play</span></span>
+      <span class="app-badge-soon">Coming soon</span>
+    </li>
+  </ul>
+
+  <%= render "app_waitlist_entries/form" %>
+</section>

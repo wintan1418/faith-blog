@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -150,6 +150,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["platform"], name: "index_app_releases_on_platform", unique: true
+  end
+
+  create_table "app_waitlist_entries", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "platform", default: "both", null: false
+    t.string "source"
+    t.string "ip_hash"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((email)::text)", name: "index_app_waitlist_entries_on_lower_email", unique: true
+    t.index ["created_at"], name: "index_app_waitlist_entries_on_created_at"
   end
 
   create_table "bible_quiz_questions", force: :cascade do |t|

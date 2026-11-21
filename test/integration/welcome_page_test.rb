@@ -34,6 +34,46 @@ class WelcomePageTest < ActionDispatch::IntegrationTest
     assert_select "meta[property='og:image']"
   end
 
+  test "the welcome page tells the new dawn story" do
+    get root_path
+
+    assert_select ".welcome-brand figure.dawn-wrap" do
+      assert_select ".dawn[role=img][aria-label=?]",
+                    "The old Brethreign logo sets like the moon as the new logo rises like the sun. New look coming soon."
+      assert_select ".dawn-moon svg path" # the current mark, as the moon
+      assert_select ".dawn-sun svg.dawn-mark path", count: 3 # the new B: two rings and the B
+      assert_select ".dawn-sun svg.dawn-mark path[fill-opacity='.2']"
+      assert_select ".dawn-sun svg.dawn-mark path[fill-opacity='.6']"
+      assert_select "figcaption .dawn-eyebrow", text: "Unveiling soon"
+      assert_select "figcaption", text: /A new dawn for Brethreign\. Our new look is almost here\./
+    end
+    assert_select ".welcome-word", text: "Brethreign"
+  end
+
+  test "the welcome page has Get the app: coming-soon badges and the waitlist form" do
+    get root_path
+
+    assert_select "section#get-the-app[data-guest-gate-allow]" do
+      assert_select "h2", text: "Get the app"
+      assert_select ".app-badge", count: 2
+      assert_select ".app-badge", text: /App Store/
+      assert_select ".app-badge", text: /Google Play/
+      assert_select ".app-badge .app-badge-soon", text: "Coming soon", count: 2
+      assert_select ".app-badge a", false # not links yet
+      assert_select "form[action=?][method=post]", waitlist_path do
+        assert_select "label[for=waitlist_email]"
+        assert_select "input#waitlist_email[type=email][autocomplete=email]"
+        assert_select "fieldset legend"
+        assert_select "input[type=radio][name='app_waitlist_entry[platform]']", count: 3
+        assert_select "input#waitlist_platform_both[checked]"
+        assert_select "input[name=?][value='']", SignupGuard::HONEYPOT_PARAM.to_s
+        assert_select "input[type=hidden][name=?]", SignupGuard::TOKEN_PARAM.to_s
+        assert_select "button[type=submit]", text: "Notify me"
+      end
+      assert_select ".waitlist-note", text: "We'll only email you when the app is ready. No spam."
+    end
+  end
+
   test "the welcome page reuses the Google button when Google sign-in is set up" do
     with_env("GOOGLE_CLIENT_ID" => "id", "GOOGLE_CLIENT_SECRET" => "secret") do
       get root_path

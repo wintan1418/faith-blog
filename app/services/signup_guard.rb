@@ -25,14 +25,16 @@ module SignupGuard
   end
 
   # Returns nil when the request looks human, else a short reason (for logs).
-  def bot_reason(params, remote_ip:)
+  # turnstile: false for light forms that don't show the widget (the app
+  # waitlist); they lean on the honeypot, fill time and a rate limit.
+  def bot_reason(params, remote_ip:, turnstile: true)
     return "honeypot" if params[HONEYPOT_PARAM].present?
 
     issued = verifier.verified(params[TOKEN_PARAM].to_s, purpose: :signup_form)
     return "missing_or_expired_token" unless issued.is_a?(Integer)
     return "too_fast" if Time.current.to_i - issued < MIN_FILL_TIME.to_i
 
-    return "turnstile" if turnstile_enabled? && !turnstile_passed?(params["cf-turnstile-response"], remote_ip)
+    return "turnstile" if turnstile && turnstile_enabled? && !turnstile_passed?(params["cf-turnstile-response"], remote_ip)
 
     nil
   end

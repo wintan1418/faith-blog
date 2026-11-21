@@ -25,28 +25,224 @@ body:has(.welcome) .fc-rain { display: none; }
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
-  padding: 2.5rem 1.25rem 2rem;
+  padding: 1.25rem 1rem 2rem;
 }
 
-/* ── The mark ── */
-.welcome-brand { display: flex; align-items: center; gap: 0.7rem; }
-.welcome-mark {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--fc-fill);
-  color: var(--fc-on-fill);
-}
-.welcome-mark svg { width: 62%; height: 62%; }
+/* ── The brand: "A new dawn" scene + wordmark ── */
+.welcome-brand { display: flex; flex-direction: column; align-items: stretch; gap: 0.6rem; min-width: 0; }
+/* On phones the caption already names Brethreign; the wordmark shows on computers. */
 .welcome-word {
+  display: none;
   font-family: var(--fc-display);
-  font-size: 1.65rem;
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.01em;
+}
+
+/* ── New dawn: the old mark sets like the moon, the new B rises like the sun ──
+   The resting styles below are the FINAL scene (day broken, sun up, moon gone).
+   Each animation runs once from its night keyframe towards that rest, with
+   fill-mode backwards so the first paint is already the full night scene and
+   nothing waits on JavaScript. Only transform and opacity move.
+   Timeline: 0-0.5s night · moon sets 0.5-4.5s · sky warms 0.8-5s ·
+   sun rises 2.6-6s · heartbeat from 6.2s, every 1.1s.
+   Positions are custom properties so the phone banner can re-place things. */
+.dawn-wrap {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  --dawn-night: #060d1c;
+  --horizon: 74%;
+  --moon-x: 30%;
+  --moon-top: 11%;
+  --moon-size: 17%;
+  --sun-x: 50%;
+  --sun-y: 47%;
+  --sun-size: 44%;
+}
+.dawn {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 188px;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 22px;
+  background: var(--dawn-night);
+  box-shadow: 0 0 0 1px rgba(60, 219, 157, 0.14), 0 24px 60px -32px rgba(7, 18, 13, 0.75);
+}
+.dawn > span, .dawn-stars i { position: absolute; display: block; }
+.dawn-sky { inset: 0; }
+.dawn-sky-night {
+  background: linear-gradient(180deg, #050a18 0%, #0a1630 55%, #13234a 100%);
+}
+/* Dawn: navy → deep green above, a gold and mint glow on the horizon. */
+.dawn-sky-dawn {
+  background:
+    radial-gradient(ellipse 70% 42% at var(--sun-x) var(--horizon), rgba(240, 205, 120, 0.85) 0%, rgba(212, 175, 89, 0.45) 30%, rgba(212, 175, 89, 0) 70%),
+    radial-gradient(ellipse 95% 60% at var(--sun-x) var(--horizon), rgba(60, 219, 157, 0.38) 0%, rgba(60, 219, 157, 0) 70%),
+    linear-gradient(180deg, #08162a 0%, #0a2a26 32%, #0d4a37 58%, #1f7a58 76%, #0d6a4b 100%);
+  animation: dawn-warm 4.2s ease-in-out 0.8s both;
+}
+.dawn-stars { inset: 0; opacity: 0.12; animation: dawn-stars 4s ease-in 0.6s both; }
+.dawn-stars i {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #f5f1e6;
+  opacity: 0.7;
+}
+.dawn-stars i.is-big { width: 3px; height: 3px; opacity: 0.95; box-shadow: 0 0 6px rgba(245, 241, 230, 0.7); }
+
+/* The moon: the current logo, pale glow. Its path layer is the whole scene,
+   so translateY(%) is a fraction of the scene's height. */
+.dawn-moon-path {
+  inset: 0;
+  opacity: 0;
+  transform: translateY(72%);
+  animation: dawn-moonset 4s cubic-bezier(0.4, 0.1, 0.6, 0.95) 0.5s both;
+}
+.dawn-moon {
+  position: absolute;
+  left: var(--moon-x);
+  top: var(--moon-top);
+  height: var(--moon-size);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #0d6a4b;
+  color: #ffffff;
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 4px rgba(245, 241, 230, 0.08), 0 0 28px 6px rgba(245, 241, 230, 0.22);
+}
+.dawn-moon svg { width: 62%; height: 62%; }
+
+/* The sun: the new B mark with its rings, a warm glow and a heartbeat. */
+.dawn-sun-path { inset: 0; animation: dawn-sunrise 3.4s cubic-bezier(0.22, 0.7, 0.3, 1) 2.6s both; }
+.dawn-sun {
+  position: absolute;
+  left: var(--sun-x);
+  top: var(--sun-y);
+  height: var(--sun-size);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+.dawn-glow, .dawn-ripple, .dawn-beat { position: absolute; display: block; }
+.dawn-glow {
+  inset: -45%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 225, 160, 0.55) 0%, rgba(212, 175, 89, 0.28) 32%, rgba(60, 219, 157, 0.1) 52%, rgba(60, 219, 157, 0) 70%);
+}
+.dawn-ripple {
+  inset: 4%;
+  border-radius: 50%;
+  border: 2px solid rgba(60, 219, 157, 0.55);
+  opacity: 0;
+}
+.dawn-beat { inset: 0; display: grid; place-items: center; }
+.dawn-mark { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(60, 219, 157, 0.45)); }
+
+/* The land the moon sinks behind and the sun rises from. */
+.dawn-ground {
+  left: -15%;
+  right: -15%;
+  top: var(--horizon);
+  bottom: 0;
+  z-index: 1;
+  border-radius: 50% 50% 0 0 / 22px 22px 0 0;
+  background: linear-gradient(180deg, #0b2219 0%, #07120d 55%);
+  box-shadow: 0 -1px 0 rgba(240, 205, 120, 0.55), 0 -10px 24px -8px rgba(240, 205, 120, 0.35);
+}
+
+/* Heartbeat: lub-dub (1 → 1.12 → 1 → 1.07 → 1), then rest. */
+.dawn-beat { animation: dawn-heartbeat 1.1s ease-in-out 6.2s infinite; }
+.dawn-ripple { animation: dawn-ripple 1.1s ease-out 6.2s infinite; }
+
+@keyframes dawn-warm    { from { opacity: 0; } }
+@keyframes dawn-stars   { from { opacity: 1; } }
+@keyframes dawn-moonset {
+  0%   { opacity: 1; transform: translateY(0); }
+  60%  { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(72%); }
+}
+@keyframes dawn-sunrise {
+  0%   { opacity: 0; transform: translateY(58%); }
+  25%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes dawn-heartbeat {
+  0%, 56%, 100% { transform: scale(1); }
+  12% { transform: scale(1.12); }
+  26% { transform: scale(1); }
+  40% { transform: scale(1.07); }
+}
+@keyframes dawn-ripple {
+  0%   { opacity: 0; transform: scale(0.85); }
+  12%  { opacity: 0.6; }
+  70%, 100% { opacity: 0; transform: scale(1.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dawn, .dawn * { animation: none !important; }
+}
+
+/* Caption: over the left of the phone banner, under the scene's horizon on computers. */
+.dawn-caption {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 54%;
+  padding: 0 0 0 1.1rem;
+  color: #f5f1e6;
+  pointer-events: none;
+}
+.dawn-eyebrow {
+  align-self: flex-start;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(212, 175, 89, 0.18);
+  border: 1px solid rgba(212, 175, 89, 0.5);
+  color: #f0d88f;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.dawn-line {
+  font-family: var(--fc-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-shadow: 0 1px 12px rgba(7, 18, 13, 0.8);
+}
+/* Phones: the moon and sun live on the right, the words on the left. */
+@media (max-width: 959.98px) {
+  .dawn-wrap {
+    --horizon: 76%;
+    --moon-x: 66%;
+    --moon-top: 12%;
+    --moon-size: 21%;
+    --sun-x: 78%;
+    --sun-y: 46%;
+    --sun-size: 52%;
+  }
+  /* A soft shade behind the words so they read at every moment of the story. */
+  .dawn-caption {
+    border-radius: 22px 0 0 22px;
+    background: linear-gradient(90deg, rgba(5, 12, 16, 0.62) 0%, rgba(5, 12, 16, 0.3) 70%, rgba(5, 12, 16, 0) 100%);
+  }
+}
+@media (max-width: 380px) {
+  .dawn-line { font-size: 0.95rem; }
+  .dawn-caption { width: 58%; padding-left: 0.95rem; }
 }
 
 /* ── Headline and actions ── */
@@ -124,6 +320,146 @@ html .welcome .welcome-browse {
 }
 html .welcome .welcome-browse:hover { color: var(--fc-accent); text-decoration-color: currentColor; }
 
+/* ── Get the app: coming-soon badges + waitlist ── */
+.welcome-app {
+  max-width: 400px;
+  margin-top: 2rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--fc-line);
+}
+html .welcome .welcome-app-title { margin: 0 0 0.3rem; }
+.welcome-app-sub { font-size: 0.92rem; line-height: 1.5; color: var(--fc-muted); }
+
+.app-badges {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+/* Our own badge, in brand colours: near-black, cream type, a gold hairline. */
+html .welcome .app-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  min-height: 54px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 14px;
+  background: #07120d;
+  color: #f5f1e6;
+  border: 1px solid rgba(212, 175, 89, 0.45);
+  cursor: default;
+}
+html.theme-dark .welcome .app-badge { border-color: rgba(212, 175, 89, 0.55); background: #030805; }
+html .welcome .app-badge-glyph { flex: none; width: 24px; height: 24px; color: #f5f1e6; }
+.app-badge-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.1; }
+html .welcome .app-badge-text small { font-size: 0.66rem; font-weight: 600; color: rgba(245, 241, 230, 0.75); }
+html .welcome .app-badge-text span {
+  color: #f5f1e6; font-size: 1rem; font-weight: 800; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html .welcome .app-badge-soon {
+  position: absolute;
+  top: -0.55rem;
+  right: 0.55rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: #3cdb9d;
+  color: #07120d;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px -2px rgba(7, 18, 13, 0.4);
+}
+
+/* The waitlist form */
+.waitlist { margin-top: 1.25rem; }
+.waitlist-form { display: flex; flex-direction: column; gap: 0.9rem; }
+.waitlist-label { display: block; margin-bottom: 0.4rem; font-size: 0.88rem; font-weight: 700; color: var(--fc-ink); }
+html .welcome .waitlist-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 1rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--fc-line-strong);
+  background: var(--fc-surface, transparent);
+  color: var(--fc-ink);
+  font-size: 1rem;
+}
+html .welcome .waitlist-input::placeholder { color: var(--fc-faint, var(--fc-muted)); }
+html .welcome .waitlist-input:focus { outline: 3px solid var(--fc-accent-glow); outline-offset: 1px; border-color: var(--fc-accent); }
+/* The site-wide input theme uses !important, so the error state has to as well. */
+html .welcome .waitlist-input[aria-invalid="true"] { border-color: #d64545 !important; box-shadow: 0 0 0 1px #d64545; }
+
+.waitlist-platforms { margin: 0; padding: 0; border: 0; min-width: 0; }
+.waitlist-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.waitlist-pill { position: relative; display: inline-flex; }
+/* The real radio stays in the page (keyboard arrows, screen readers), just unseen. */
+.waitlist-pill input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.waitlist-pill span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--fc-line-strong);
+  color: var(--fc-ink);
+  font-size: 0.92rem;
+  font-weight: 700;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.waitlist-pill:hover span { border-color: var(--fc-accent); }
+.waitlist-pill input:checked + span { background: var(--fc-accent-soft); border-color: var(--fc-accent); color: var(--fc-accent); }
+.waitlist-pill input:focus-visible + span { outline: 3px solid var(--fc-accent-glow); outline-offset: 2px; }
+
+.waitlist-error {
+  margin: 0;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(214, 69, 69, 0.1);
+  color: #b42318;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+html.theme-dark .waitlist-error { color: #ff9b91; background: rgba(255, 120, 110, 0.12); }
+.waitlist-submit:focus-visible { outline: 3px solid var(--fc-accent-glow); outline-offset: 2px; }
+.waitlist-note { margin: -0.3rem 0 0; font-size: 0.76rem; line-height: 1.5; color: var(--fc-muted); }
+.waitlist-hp { position: absolute !important; left: -10000px !important; width: 1px; height: 1px; overflow: hidden; }
+
+.waitlist-thanks {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--fc-accent);
+  background: var(--fc-accent-soft);
+}
+.waitlist-thanks-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--fc-fill);
+  color: var(--fc-on-fill);
+}
+.waitlist-thanks-icon svg { width: 60%; height: 60%; }
+.waitlist-thanks-title { font-weight: 800; color: var(--fc-ink); }
+.waitlist-thanks-text { margin-top: 0.2rem; font-size: 0.92rem; line-height: 1.5; color: var(--fc-muted); overflow-wrap: anywhere; }
+.waitlist-thanks-text strong { color: var(--fc-ink); }
+
 /* ── Footer row ── */
 .welcome-footer {
   display: flex;
@@ -153,12 +489,23 @@ html .welcome .welcome-footer a:hover { color: var(--fc-ink); text-decoration: u
     gap: 3rem;
     padding: 3rem 2.5rem;
   }
-  .welcome-brand { flex-direction: column; justify-content: center; gap: 1.5rem; }
-  .welcome-mark {
-    width: clamp(260px, 28vw, 360px);
-    height: clamp(260px, 28vw, 360px);
-    box-shadow: 0 30px 70px -30px var(--fc-accent-glow);
+  /* The scene stays in view while the right column (with Get the app) scrolls. */
+  .welcome-brand { align-items: center; align-self: start; position: sticky; top: 3rem; gap: 1.4rem; }
+  .welcome-word { display: block; }
+  .dawn-wrap { --sun-size: 40%; }
+  .welcome-brand .dawn-wrap { width: min(100%, 440px); }
+  .dawn { height: auto; aspect-ratio: 1 / 1.04; border-radius: 32px; }
+  .dawn-caption {
+    top: auto;
+    width: auto;
+    right: 0;
+    height: 26%;
+    padding: 0 1.5rem;
+    align-items: center;
+    text-align: center;
   }
+  .dawn-eyebrow { align-self: center; font-size: 0.7rem; }
+  .dawn-line { font-size: 1.12rem; }
   .welcome-word { font-size: 2.6rem; }
   .welcome-main { max-width: 520px; }
 }

@@ -43,6 +43,22 @@ class GuestGateSystemTest < ApplicationSystemTestCase
     assert_current_path privacy_path
   end
 
+  test "the app waitlist on the welcome page submits without the gate" do
+    visit root_path
+    # A form shown long enough ago to look human (SignupGuard's minimum fill time).
+    page.execute_script("document.querySelector('#get-the-app input[name=form_token]').value = arguments[0]",
+                        SignupGuard.form_token(issued_at: 10.seconds.ago))
+    within("#get-the-app") do
+      fill_in "Email for the launch news", with: "gate.waitlist@example.com"
+      choose "Android", allow_label_click: true
+      click_button "Notify me"
+      assert_text "You're on the list."
+    end
+    assert_no_selector "dialog.guest-gate[open]"
+    assert_current_path root_path
+    assert_equal "android", AppWaitlistEntry.find_by(email: "gate.waitlist@example.com")&.platform
+  end
+
   test "members are never gated" do
     login_as create_member("gate_sys_member", welcomed_at: Time.current, seen_release_id: Announcement.maximum(:id).to_i,
                                                tour_completed_at: Time.current, onboarding_dismissed_at: Time.current), scope: :user
