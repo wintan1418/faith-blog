@@ -32,7 +32,7 @@
         <h3 class="welcome-h3">Already have an account?</h3>
         <%= link_to "Sign in", new_user_session_path, class: "welcome-btn welcome-btn-outline" %>
 
-        <%= link_to "Look around first", root_path(browse: 1), class: "welcome-browse" %>
+        <%= link_to "Look around first", root_path(browse: 1), class: "welcome-browse", data: { guest_gate_allow: true } %>
       </div>
     </section>
   </div>

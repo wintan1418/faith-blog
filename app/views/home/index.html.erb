@@ -129,6 +129,17 @@
               </footer>
             </article>
           <% end %>
+          <% if guest_gate? %>
+            <%# The public feed stops here: no more pages for guests. %>
+            <section class="guest-more" aria-label="Join to see more">
+              <h2>Join to see more</h2>
+              <p>There's plenty more to read. Create a free account to keep scrolling.</p>
+              <div class="guest-more-actions">
+                <%= link_to "Create account", new_user_registration_path, class: "guest-gate-btn guest-gate-btn-primary" %>
+                <%= link_to "Sign in", new_user_session_path, class: "guest-gate-btn guest-gate-btn-outline" %>
+              </div>
+            </section>
+          <% end %>
         <% else %>
           <div class="home-empty-feed">
             <span><%= render_icon("sparkles", classes: "h-5 w-5") %></span>

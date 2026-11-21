@@ -1,6 +1,6 @@
 <%# Ads measurement + cookie choice. Scripts are only added after consent (see ad_consent_controller.js). %>
 <% signup = session.delete(:ad_signup) %>
-<div data-controller="ad-consent"
+<div data-controller="ad-consent" data-guest-gate-allow
      data-ad-consent-pixel-value="<%= meta_pixel_id %>"
      data-ad-consent-gtag-value="<%= google_tag_id %>"
      data-ad-consent-conversion-value="<%= google_ads_signup %>"

@@ -194,7 +194,7 @@
           </div>
         </div>
       <% else %>
-        <button type="button" class="eg-round" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle">
+        <button type="button" class="eg-round" title="Toggle dark mode" aria-label="Toggle dark mode" data-controller="theme" data-action="theme#toggle" data-guest-gate-allow>
           <span data-theme-target="lightIcon"><%= render_icon("moon", classes: "eg-round-ico") %></span>
           <span data-theme-target="darkIcon" class="hidden"><%= render_icon("sun", classes: "eg-round-ico") %></span>
         </button>

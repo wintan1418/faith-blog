@@ -106,7 +106,7 @@
   </head>
 
   <body class="h-full bg-stone-50 font-sans antialiased theme-light<%= ' hotwire-native' if hotwire_native_app? %>"
-        data-controller="<%= 'pwa' if user_signed_in? && !hotwire_native_app? %>"
+        data-controller="<%= 'pwa' if user_signed_in? && !hotwire_native_app? %><%= 'guest-gate' if guest_gate? %>"
         data-native-signed-in="<%= user_signed_in? %>"
         data-native-admin="<%= user_signed_in? && current_user_admin? %>"
         <% if hotwire_native_app? && user_signed_in? %>
@@ -202,7 +202,7 @@
       <%# The signed-out welcome page stands on its own, without the top and bottom bars. %>
       <%= render "shared/navbar" unless content_for?(:bare_page) %>
 
-      <div id="flash_messages"><%= render "shared/flash" %></div>
+      <div id="flash_messages" data-guest-gate-allow><%= render "shared/flash" %></div>
       <%= render "shared/app_update_banner" if outdated_android_app? %>
 
       <main>
@@ -212,6 +212,7 @@
       <%= render "shared/whats_new", release: Announcement.unseen_release_for(current_user) if user_signed_in? %>
 
       <%= render "shared/reactors_modal" %>
+      <%= render "shared/guest_gate" if guest_gate? %>
 
       <% if user_signed_in? %>
         <%= render "shared/composer_modal" %>

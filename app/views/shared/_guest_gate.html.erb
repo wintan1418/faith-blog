@@ -1,0 +1,21 @@
+<%# "Join to continue": opened by guest_gate_controller.js when a signed-out web
+    visitor clicks further than the page they landed on. %>
+<% wave = "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3" %>
+<dialog class="guest-gate" aria-labelledby="guest-gate-title" aria-describedby="guest-gate-text"
+        data-guest-gate-target="dialog" data-guest-gate-allow
+        data-action="click->guest-gate#backdrop close->guest-gate#closed">
+  <div class="guest-gate-card">
+    <button type="button" class="guest-gate-close" aria-label="Close" data-action="guest-gate#close">
+      <%= render_icon("x", classes: "h-5 w-5") %>
+    </button>
+    <span class="guest-gate-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="<%= wave %>"/></svg>
+    </span>
+    <h2 id="guest-gate-title" class="guest-gate-title">Join Brethreign to keep reading</h2>
+    <p id="guest-gate-text" class="guest-gate-text">Open breaths, meet people, pray together and join the conversation. It's free.</p>
+    <div class="guest-gate-actions">
+      <%= link_to "Create account", new_user_registration_path, class: "guest-gate-btn guest-gate-btn-primary", data: { turbo_frame: "_top" } %>
+      <%= link_to "Sign in", new_user_session_path, class: "guest-gate-btn guest-gate-btn-outline", data: { turbo_frame: "_top" } %>
+    </div>
+  </div>
+</dialog>
