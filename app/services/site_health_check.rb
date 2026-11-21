@@ -22,6 +22,7 @@ class SiteHealthCheck
     failures = pages(user).filter_map do |name, path|
       status = session.get(path)
       problem = if status >= 500 then "returned #{status}"
+      elsif status == 404 then "was not found (404), so the check list may be out of date"
       elsif status.between?(300, 399) && session.response.location.to_s.include?("/users/sign_in") then "signed the reader out"
       end
       Failure.new(name, path, problem) if problem
@@ -38,9 +39,9 @@ class SiteHealthCheck
   def pages(user)
     list = {
       "Feed" => "/feed", "Following" => "/feed/following", "Trending" => "/feed/trending", "Updates" => "/feed/updates",
-      "Inbox" => "/inbox", "New message" => "/conversations/new", "Notifications" => "/notifications",
+      "Inbox" => "/inbox", "New message" => "/inbox/new", "Notifications" => "/notifications",
       "Games" => "/games", "Rooms" => "/rooms", "Prayer circles" => "/circles", "New breath" => "/posts/new",
-      "Own profile" => "/u/#{user.username}", "Settings" => "/settings/accounts/edit"
+      "Own profile" => "/u/#{user.username}", "Settings" => "/settings/account/edit"
     }
     if (post = Post.published.where(moderation_status: :approved).order(published_at: :desc).first)
       list["Newest breath"] = "/posts/#{post.to_param}"

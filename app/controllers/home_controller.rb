@@ -8,7 +8,8 @@ class HomeController < ApplicationController
     if user_signed_in?
       redirect_to feed_path
     elsif !hotwire_native_app? && params[:browse].blank?
-      render :welcome
+      # Always the web page: bots and link checkers sometimes ask "/" for JSON.
+      render :welcome, formats: :html, content_type: "text/html"
     else
       @rooms = Room.public_rooms.ordered.limit(8)
       @featured_rooms = @rooms.first(4)
