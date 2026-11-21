@@ -1,0 +1,48 @@
+<%# "Notify me when the app is out". Replaced by the thank-you (Turbo) on success.
+    locals: entry (AppWaitlistEntry), error (string or nil), form_token (keep the
+    original "form shown at" stamp after an error; see SignupGuard). %>
+<% entry = local_assigns[:entry] || AppWaitlistEntry.new %>
+<% error = local_assigns[:error] %>
+<% choices = [ [ "ios", "iPhone" ], [ "android", "Android" ], [ "both", "Both" ] ] %>
+<% selected = AppWaitlistEntry::PLATFORMS.include?(entry.platform) ? entry.platform : "both" %>
+
+<div id="app_waitlist" class="waitlist" data-guest-gate-allow>
+  <%= form_with url: waitlist_path, scope: :app_waitlist_entry, class: "waitlist-form", html: { novalidate: true } do |f| %>
+    <div>
+      <%= f.label :email, "Email for the launch news", class: "waitlist-label", for: "waitlist_email" %>
+      <%= f.email_field :email, id: "waitlist_email", value: entry.email, class: "waitlist-input",
+                        placeholder: "you@example.com", autocomplete: "email", autocapitalize: "none", spellcheck: false,
+                        required: true, maxlength: 254,
+                        "aria-invalid": (error ? "true" : nil),
+                        "aria-describedby": [ ("waitlist_error" if error), "waitlist_note" ].compact.join(" ") %>
+    </div>
+
+    <fieldset class="waitlist-platforms">
+      <legend class="waitlist-label">Tell me when it's on</legend>
+      <div class="waitlist-pills">
+        <% choices.each do |value, label| %>
+          <label class="waitlist-pill">
+            <%= f.radio_button :platform, value, checked: selected == value, id: "waitlist_platform_#{value}" %>
+            <span><%= label %></span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <% if error %>
+      <p id="waitlist_error" class="waitlist-error" role="alert"><%= error %></p>
+    <% end %>
+
+    <%= f.hidden_field :source, value: "welcome", id: nil %>
+    <%# Bot guard (SignupGuard): a field people never see, and when the form was shown. %>
+    <div class="waitlist-hp" aria-hidden="true">
+      <label for="waitlist_hp">Leave this field empty</label>
+      <input type="text" name="<%= SignupGuard::HONEYPOT_PARAM %>" id="waitlist_hp" value="" tabindex="-1" autocomplete="off">
+    </div>
+    <%= hidden_field_tag SignupGuard::TOKEN_PARAM, local_assigns[:form_token].presence || SignupGuard.form_token, id: nil %>
+
+    <%= f.button "Notify me", type: "submit", class: "welcome-btn welcome-btn-primary waitlist-submit",
+                              data: { turbo_submits_with: "Adding you…" } %>
+    <p id="waitlist_note" class="waitlist-note">We'll only email you when the app is ready. No spam.</p>
+  <% end %>
+</div>

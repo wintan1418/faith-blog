@@ -7,7 +7,7 @@ import { Controller } from "@hotwired/stimulus"
 //
 // One capture-phase listener instead of editing every link. What stays open:
 // sign up / sign in / password pages, Google sign-in, the legal pages, the
-// welcome page "/", other websites, same-page #anchors, and anything inside an
+// welcome page "/" and its app waitlist, other websites, same-page #anchors, and anything inside an
 // element marked data-guest-gate-allow (the dialog itself, cookie choice,
 // flash messages, theme toggle). The server still requires sign-in for every
 // action that needs it; this is the friendly front for that.
@@ -16,7 +16,8 @@ const OPEN_PATHS = [
   /^\/users\/(sign_in|sign_up|password|confirmation|unlock|auth)(\/|$)/, // Devise + Google
   /^\/users\/?$/,                                                       // sign-up form submit
   /^\/auth\//,                                                          // app sign-in hand-offs
-  /^\/(privacy|terms|child-safety|about|guidelines|contact)\/?$/
+  /^\/(privacy|terms|child-safety|about|guidelines|contact)\/?$/,
+  /^\/waitlist\/?$/                                                      // "Get the app" on the welcome page
 ]
 
 const ENTRY_PATHS = /^\/users\/(sign_in|sign_up)\/?$/

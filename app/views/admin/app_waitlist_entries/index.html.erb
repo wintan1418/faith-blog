@@ -1,0 +1,59 @@
+<% content_for(:page_title) { "App waitlist" } %>
+<% names = { "ios" => "iPhone", "android" => "Android", "both" => "Both" } %>
+
+<div class="space-y-6">
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-bold text-[var(--fc-ink)]">Waiting for the app</h2>
+        <p class="mt-1 text-sm text-[var(--fc-muted)]">People who asked, on the welcome page, for an email when the iPhone or Android app is out. Nothing is emailed yet. These are personal email addresses: keep the CSV private.</p>
+      </div>
+      <%= link_to "Download CSV", admin_app_waitlist_entries_path(format: :csv), class: "fc-btn fc-btn-primary", data: { turbo: false } %>
+    </div>
+
+    <dl class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div class="rounded-lg bg-[var(--fc-surface-2)] p-3">
+        <dt class="text-xs font-bold uppercase tracking-wide text-[var(--fc-muted)]">Total</dt>
+        <dd class="mt-1 text-2xl font-bold text-[var(--fc-ink)]" data-waitlist-count="total"><%= @total %></dd>
+      </div>
+      <% @counts.each do |platform, count| %>
+        <div class="rounded-lg bg-[var(--fc-surface-2)] p-3">
+          <dt class="text-xs font-bold uppercase tracking-wide text-[var(--fc-muted)]"><%= names[platform] %></dt>
+          <dd class="mt-1 text-2xl font-bold text-[var(--fc-ink)]" data-waitlist-count="<%= platform %>"><%= count %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <% if @entries.any? %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-[var(--fc-muted)]">
+              <th class="py-1 pr-4">Email</th>
+              <th class="py-1 pr-4">Platform</th>
+              <th class="py-1 pr-4">From</th>
+              <th class="py-1 text-right">Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @entries.each do |entry| %>
+              <tr class="border-t border-[var(--fc-line)]">
+                <td class="py-2 pr-4 font-semibold text-[var(--fc-ink)] break-all"><%= entry.email %></td>
+                <td class="py-2 pr-4"><%= names.fetch(entry.platform, entry.platform) %></td>
+                <td class="py-2 pr-4 text-[var(--fc-muted)]"><%= entry.source.presence || "—" %></td>
+                <td class="py-2 text-right text-[var(--fc-muted)] whitespace-nowrap" title="<%= entry.created_at.iso8601 %>"><%= time_ago_in_words(entry.created_at) %> ago</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <% if @pagy.pages > 1 %>
+        <div class="mt-6"><%== pagy_nav(@pagy) %></div>
+      <% end %>
+    <% else %>
+      <p class="text-sm text-[var(--fc-muted)]">No one yet. The form is under “Get the app” on the welcome page.</p>
+    <% end %>
+  </div>
+</div>

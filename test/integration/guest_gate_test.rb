@@ -41,6 +41,7 @@ class GuestGateTest < ActionDispatch::IntegrationTest
   test "the parts that must keep working are marked open" do
     get root_path
     assert_select "a.welcome-browse[data-guest-gate-allow]", text: "Look around first"
+    assert_select "[data-guest-gate-allow] form[action=?]", waitlist_path
 
     get root_path(browse: 1)
     assert_select "#flash_messages[data-guest-gate-allow]"

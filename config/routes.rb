@@ -275,9 +275,13 @@ Rails.application.routes.draw do
   end
   resources :message_blocks, only: [ :create, :destroy ], param: :user_id
 
+  # "Get the app" waitlist on the welcome page (open to signed-out visitors).
+  post "waitlist", to: "app_waitlist_entries#create", as: :waitlist
+
   # Admin namespace
   namespace :admin do
     root to: "dashboard#index"
+    resources :app_waitlist_entries, only: :index, path: "app-waitlist"
     get "online", to: "online#index", as: :online
     get "bots", to: "bots#index", as: :bots
     resource :push_test, only: [ :show, :create ], path: "push-test"

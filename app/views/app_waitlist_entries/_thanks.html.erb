@@ -1,0 +1,10 @@
+<%# Shown in place of the waitlist form once someone is on the list. %>
+<div id="app_waitlist" class="waitlist waitlist-thanks" role="status" data-guest-gate-allow>
+  <span class="waitlist-thanks-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+  </span>
+  <div>
+    <p class="waitlist-thanks-title">You're on the list.</p>
+    <p class="waitlist-thanks-text">We'll email <strong><%= entry.email %></strong> when Brethreign is on <%= entry.platform_name %>.</p>
+  </div>
+</div>
