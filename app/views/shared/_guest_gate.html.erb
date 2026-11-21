@@ -14,8 +14,8 @@
     <h2 id="guest-gate-title" class="guest-gate-title">Join Brethreign to keep reading</h2>
     <p id="guest-gate-text" class="guest-gate-text">Open breaths, meet people, pray together and join the conversation. It's free.</p>
     <div class="guest-gate-actions">
-      <%= link_to "Create account", new_user_registration_path, class: "guest-gate-btn guest-gate-btn-primary", data: { turbo_frame: "_top" } %>
-      <%= link_to "Sign in", new_user_session_path, class: "guest-gate-btn guest-gate-btn-outline", data: { turbo_frame: "_top" } %>
+      <%= link_to "Create account", new_user_registration_path, class: "guest-gate-btn guest-gate-btn-primary", data: { turbo_frame: "_top", guest_gate_auth: true } %>
+      <%= link_to "Sign in", new_user_session_path, class: "guest-gate-btn guest-gate-btn-outline", data: { turbo_frame: "_top", guest_gate_auth: true } %>
     </div>
   </div>
 </dialog>

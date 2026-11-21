@@ -2,6 +2,7 @@
 
 class Users::SessionsController < Devise::SessionsController
   include AuthRateLimiting
+  include GuestReturnTo
 
   # Lockable locks an account after 10 wrong passwords; this stops one IP
   # spraying many accounts and slows guessing at a single one.

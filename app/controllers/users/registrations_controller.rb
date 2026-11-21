@@ -2,6 +2,7 @@
 
 class Users::RegistrationsController < Devise::RegistrationsController
   include AuthRateLimiting
+  include GuestReturnTo
 
   BOT_REJECTION_MESSAGE = "We couldn't create your account just now. Please try again."
 
@@ -42,7 +43,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def after_sign_up_path_for(resource)
-    feed_path
+    stored = stored_location_for(resource)
+    return feed_path if hotwire_native_app?
+
+    stored || feed_path
   end
 
   def after_inactive_sign_up_path_for(resource)

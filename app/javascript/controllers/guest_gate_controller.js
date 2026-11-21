@@ -95,7 +95,30 @@ export default class extends Controller {
   open(from) {
     if (!this.hasDialogTarget) return
     this.returnFocus = from instanceof HTMLElement ? from : document.activeElement
+    this.pointAuthLinksAt(this.destination(from))
     if (!this.dialogTarget.open) this.dialogTarget.showModal()
+  }
+
+  // Where the visitor was heading: the tapped link's page on this site, or else
+  // the page they're on (a like or comment button). The server only keeps safe paths.
+  destination(from) {
+    const here = window.location.pathname + window.location.search
+    const link = from instanceof Element ? from.closest("a[href]") : null
+    if (!link) return here
+    try {
+      const url = new URL(link.href, window.location.href)
+      // Like / save / comment buttons for guests point at sign-up: return to this page instead.
+      if (url.origin !== window.location.origin || /^\/(users|auth)(\/|$)/.test(url.pathname)) return here
+      return url.pathname + url.search
+    } catch (e) { return here }
+  }
+
+  pointAuthLinksAt(path) {
+    this.dialogTarget.querySelectorAll("a[data-guest-gate-auth]").forEach((a) => {
+      const url = new URL(a.getAttribute("href"), window.location.href)
+      url.searchParams.set("return_to", path)
+      a.setAttribute("href", url.pathname + url.search)
+    })
   }
 
   close(event) {
