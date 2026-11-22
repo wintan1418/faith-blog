@@ -8,7 +8,7 @@ class AiModerationGateJobTest < ActiveSupport::TestCase
   setup { ENV["AI_MODERATION_STUB"] = "1" }
 
   def make_user
-    suffix = SecureRandom.hex(3)
+    suffix = SecureRandom.random_number(10**8).to_s.rjust(8, "0") # digits only: hex can spell blocked words
     User.create!(
       username: "u_#{suffix}",
       email: "u_#{suffix}@example.com",
