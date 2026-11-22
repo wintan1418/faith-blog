@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1046,6 +1046,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.string "unlock_token"
     t.datetime "locked_at"
     t.datetime "password_chosen_at"
+    t.datetime "feed_seen_at"
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true

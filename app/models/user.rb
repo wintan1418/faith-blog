@@ -208,6 +208,17 @@ class User < ApplicationRecord
 
   # People this user has blocked, or who blocked them (a MessageBlock either
   # way): their breaths, reposts and comments are hidden from each other.
+  FEED_SEEN_THROTTLE = 1.minute
+
+  # Remember that they looked at the top of the feed (drives the New posts
+  # pill and the "New" dots). At most one write a minute, and never backwards.
+  def mark_feed_seen!(at = Time.current)
+    return false if feed_seen_at && feed_seen_at > at - FEED_SEEN_THROTTLE
+
+    update_column(:feed_seen_at, at)
+    true
+  end
+
   def blocked_user_ids
     @blocked_user_ids ||= MessageBlock.where(blocker_id: id).pluck(:blocked_id) |
                           MessageBlock.where(blocked_id: id).pluck(:blocker_id)

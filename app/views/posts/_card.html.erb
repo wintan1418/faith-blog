@@ -69,6 +69,9 @@
           <%= link_to post.room.name, room_path(post.room), class: "eg-post-room eg-sub-item" %>
         <% end %>
         <span class="fc-breath-time eg-sub-item" title="<%= posted_at.strftime("%A, %b %-d %Y · %-l:%M %p") %>"><%= time_ago_in_words(posted_at) %> ago</span>
+        <% if local_assigns[:fresh] %>
+          <span class="fc-new-dot" title="Posted since your last visit"><span aria-hidden="true"></span>New</span>
+        <% end %>
         <% if post.featured? %>
           <span class="eg-post-flag is-pinned eg-sub-item"><%= render_icon("pin", classes: "eg-flag-ico") %>Pinned</span>
         <% end %>

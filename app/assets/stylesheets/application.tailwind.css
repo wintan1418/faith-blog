@@ -18031,6 +18031,65 @@ html.theme-dark .fc-composer-input {
   animation: fc-pill-drop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
+.fc-new-posts-pill .fc-pill-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+/* Light theme: a deep accent with white text and a white ring, so the pill
+   stands out over the green verse banner and white cards alike. */
+html:not(.theme-dark) .fc-new-posts-pill {
+  background: color-mix(in srgb, var(--fc-accent) 72%, #0b1f17);
+  color: #fff;
+  box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+html.theme-dark .fc-new-posts-pill {
+  box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(0, 0, 0, 0.35);
+}
+.fc-pill-arrow { font-size: 0.95rem; line-height: 1; }
+.fc-pill-faces { display: inline-flex; }
+.fc-pill-face {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid color-mix(in srgb, var(--fc-accent) 70%, white);
+  background: var(--fc-avatar-bg, #d9e7df);
+  color: var(--fc-avatar-fg, #06231a);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.fc-pill-face + .fc-pill-face { margin-left: -8px; }
+.fc-pill-label { white-space: nowrap; }
+/* In the apps the web top bar is hidden (the native bar sits above the web
+   view), so the pill sits just under the top of the web view. */
+body.hotwire-native .fc-new-posts-pill {
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+}
+@media (max-width: 640px) {
+  .fc-new-posts-pill { top: 70px; padding: 0.45rem 0.9rem; }
+}
+
+/* "New" since your last visit, next to the time on a feed card. */
+.fc-new-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.45rem;
+  white-space: nowrap;
+  color: var(--fc-accent);
+  font-weight: 700;
+}
+.fc-new-dot > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--fc-accent);
+}
+
 @keyframes fc-pill-drop {
   from { transform: translateY(-8px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }

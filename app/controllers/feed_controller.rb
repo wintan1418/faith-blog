@@ -3,10 +3,15 @@
 class FeedController < ApplicationController
   before_action :authenticate_user!
   # Infinite scroll (?page=N) only appends cards; it never shows the sidebar or onboarding.
-  before_action :load_sidebar_context, unless: :next_page?
-  before_action :load_onboarding_progress, unless: :next_page?
+  before_action :load_sidebar_context, unless: :next_page?, except: :new_posts
+  before_action :load_onboarding_progress, unless: :next_page?, except: :new_posts
+  # The pill's background check isn't a page view.
+  skip_after_action :track_page_view, only: :new_posts
+  helper_method :feed_next_page_url, :feed_fresh?, :feed_as_of, :time_param_value
 
-  POSTS_BUFFER    = 60
+  # How many recent posts/reposts the feed looks at (ids and times only). Wide
+  # enough that a burst from one author can be spread out among other members.
+  POSTS_BUFFER    = 200
   RESHARES_BUFFER = 60
   PER_PAGE        = 20
   # Community-wide sidebar bits are the same for everyone: refresh every few minutes.
@@ -19,8 +24,36 @@ class FeedController < ApplicationController
 
     posts    = Post.published.where.not(id: @pinned_posts.map(&:id)).recent
     reshares = Reshare.order(created_at: :desc)
-    @items = paged_feed(posts: posts, reshares: reshares)
+    # Posts newer than the last visit come first and get a small "New" dot.
+    @feed_fresh_after = snapshot? ? param_time(:seen) : current_user.feed_seen_at
+    @items = paged_feed(posts: posts, reshares: reshares, fresh_after: @feed_fresh_after)
+    # They've now seen the top of the feed (written at most once a minute).
+    current_user.mark_feed_seen!(feed_as_of) unless params[:page].to_i > 1
     respond_to_feed
+  end
+
+  # The "New posts" pill: how many feed posts arrived after `since` (the time
+  # the page on screen was built) that this member hasn't seen, plus up to
+  # three of their authors' faces. Same rules as the feed: published and
+  # approved only, nobody blocked, and anonymous posts are counted but never
+  # show their author. The page asks on load, when the app comes back to the
+  # front, and when a live "post arrived" marker comes in.
+  def new_posts
+    since = [ param_time(:since), current_user.feed_seen_at ].compact.max
+    if since
+      scope = Post.published.where("posts.published_at > ?", since).where.not(user_id: current_user.id)
+      blocked = current_user.blocked_user_ids
+      scope = scope.where.not(user_id: blocked) if blocked.any?
+      @new_posts_count = scope.count
+      author_ids = scope.named.reorder(published_at: :desc).limit(30).pluck(:user_id).uniq.first(3)
+      authors = User.includes(profile: { avatar_attachment: :blob }).where(id: author_ids).index_by(&:id)
+      @new_posts_authors = author_ids.filter_map { |id| authors[id] }
+    else
+      @new_posts_count = 0
+      @new_posts_authors = []
+    end
+    render partial: "feed/new_posts_pill", formats: [ :html ],
+           locals: { count: @new_posts_count, authors: @new_posts_authors }
   end
 
   def threads
@@ -84,33 +117,77 @@ class FeedController < ApplicationController
   # Speed: work out the page from ids and times only (tiny queries), then load full
   # cards (author, photos, likes, tags…) for just that page's 20 items. Before, all
   # 60 posts + 60 reposts were loaded with everything attached on every request.
-  def paged_feed(posts:, reshares: nil, keep_order: false)
+  #
+  # Every page of one visit is cut from the same snapshot: only posts up to
+  # `as_of` (the time page one was built), mixed with the same seed. So paging
+  # never repeats or skips a card even while new posts arrive; those wait for
+  # the New posts pill. FeedMix spreads out runs from one author.
+  def paged_feed(posts:, reshares: nil, keep_order: false, fresh_after: nil)
     # Nothing from people you've blocked (or who blocked you), nor their reposts.
     if (blocked = current_user.blocked_user_ids).any?
       posts = posts.where.not(user_id: blocked)
       reshares = reshares.where.not(user_id: blocked).where.not(post_id: Post.where(user_id: blocked).select(:id)) if reshares
     end
-    entries = posts.limit(POSTS_BUFFER).pluck(:id, :published_at, :created_at)
-                   .map { |id, published_at, created_at| [ :post, id, published_at || created_at ] }
+    posts = posts.where(published_at: ..feed_as_of)
+    entries = posts.limit(POSTS_BUFFER).pluck(:id, :published_at, :created_at, :user_id)
+                   .map { |id, published_at, created_at, user_id| { kind: :post, id: id, at: published_at || created_at, author_id: user_id } }
     if reshares
-      entries += reshares.limit(RESHARES_BUFFER).pluck(:id, :created_at).map { |id, at| [ :reshare, id, at ] }
+      # A repost is grouped with the author of the post it shares: that's whose words fill the card.
+      entries += reshares.where(created_at: ..feed_as_of).joins(:post).limit(RESHARES_BUFFER)
+                         .pluck("reshares.id", "reshares.created_at", "posts.user_id")
+                         .map { |id, at, user_id| { kind: :reshare, id: id, at: at, author_id: user_id } }
     end
-    entries = entries.sort_by { |_kind, _id, at| -at.to_i } unless keep_order
+    entries = FeedMix.call(entries, seed: "#{current_user.id}:#{feed_as_of.to_date}",
+                                    fresh_after: fresh_after, keep_order: keep_order)
 
     @pagy, page = pagy_array(entries, items: PER_PAGE)
 
-    post_ids    = page.filter_map { |kind, id, _| id if kind == :post }
-    reshare_ids = page.filter_map { |kind, id, _| id if kind == :reshare }
+    post_ids    = page.filter_map { |e| e[:id] if e[:kind] == :post }
+    reshare_ids = page.filter_map { |e| e[:id] if e[:kind] == :reshare }
     cards     = Post.includes(feed_post_includes).where(id: post_ids).index_by(&:id)
     reshared  = Reshare.includes(:user, post: feed_post_includes).where(id: reshare_ids).index_by(&:id)
 
-    page.filter_map do |kind, id, _|
-      if kind == :post
-        cards[id] && FeedItem.from_post(cards[id])
+    page.filter_map do |e|
+      if e[:kind] == :post
+        cards[e[:id]] && FeedItem.from_post(cards[e[:id]])
       else
-        reshared[id]&.post&.readable_by?(current_user) && FeedItem.from_reshare(reshared[id])
+        reshared[e[:id]]&.post&.readable_by?(current_user) && FeedItem.from_reshare(reshared[e[:id]])
       end
     end
+  end
+
+  # The moment this visit's feed was cut. Times travel in URLs as whole
+  # microseconds (the database's precision), so page two cuts at exactly the
+  # same instant as page one.
+  def feed_as_of
+    @feed_as_of ||= begin
+      now = Time.zone.at(Rational(time_param_value(Time.current), 1_000_000))
+      at = param_time(:as_of)
+      at && at <= now ? at : now
+    end
+  end
+
+  def time_param_value(time)
+    (time.to_r * 1_000_000).to_i
+  end
+
+  # A later page of a visit that started earlier (infinite scroll carries the snapshot).
+  def snapshot?
+    params[:page].to_i > 1 && params[:as_of].present?
+  end
+
+  def param_time(key)
+    value = params[key].to_i
+    Time.zone.at(Rational(value, 1_000_000)) if value.positive?
+  end
+
+  # Posted since the member's last visit (not by them): gets a small "New" dot.
+  def feed_fresh?(item)
+    @feed_fresh_after.present? && item.timestamp > @feed_fresh_after && item.post.user_id != current_user.id
+  end
+
+  def feed_next_page_url
+    url_for(page: @pagy.next, as_of: time_param_value(feed_as_of), seen: @feed_fresh_after && time_param_value(@feed_fresh_after))
   end
 
   def feed_posts_scope
