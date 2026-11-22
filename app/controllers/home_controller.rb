@@ -13,7 +13,11 @@ class HomeController < ApplicationController
     else
       @rooms = Room.public_rooms.ordered.limit(8)
       @featured_rooms = @rooms.first(4)
-      @posts = Post.published.includes(:user, :room, :tags).recent.limit(8)
+      # Same author mix as the signed-in feed, so one busy author can't fill the guest view.
+      recent = Post.published.recent.limit(200).pluck(:id, :published_at, :user_id)
+      entries = recent.map { |id, at, uid| { kind: :post, id: id, at: at, author_id: uid } }
+      ids = FeedMix.call(entries, seed: "guest:#{Date.current}").first(8).map { |e| e[:id] }
+      @posts = Post.where(id: ids).includes(:user, :room, :tags).index_by(&:id).values_at(*ids).compact
       @prayer_posts = Post.published
                           .where(room_id: Room.prayers.public_rooms.select(:id))
                           .includes(:user, :room)

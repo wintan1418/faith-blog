@@ -131,4 +131,18 @@ class WelcomePageTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "text/html", response.media_type
   end
+
+  test "the guest feed mixes authors instead of one long run" do
+    mk = ->(n) { User.create!(username: "mix#{n}", email: "mix#{n}@example.com", password: SecureRandom.base58(16)) }
+    busy = mk.call(1)
+    others = [ mk.call(2), mk.call(3) ]
+    6.times { |i| Post.create!(user: busy, title: "Busy #{i}", content: "Busy post #{i}", status: :published, published_at: i.minutes.ago) }
+    others.each_with_index { |u, i| Post.create!(user: u, title: "Other #{i}", content: "Other post #{i}", status: :published, published_at: (10 + i).minutes.ago) }
+    get root_path(browse: 1)
+    assert_response :success
+    order = response.body.scan(/(Busy|Other) post \d/).flatten
+    assert order.size >= 6, "expected the posts on the page, got #{order.inspect}"
+    runs = order.chunk_while { |a, b| a == b }.map(&:size)
+    assert runs.max <= 2, "longest run was #{runs.max}: #{order.inspect}"
+  end
 end
