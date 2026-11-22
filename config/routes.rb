@@ -33,6 +33,7 @@ Rails.application.routes.draw do
   get "feed/following", to: "feed#following"
   get "feed/threads",   to: "feed#threads"
   get "feed/updates",   to: "feed#updates"
+  get "feed/new_posts", to: "feed#new_posts", as: :feed_new_posts
 
   # Who's online: heartbeat from the signed-in layout, and the feed's "Online now" row.
   post "presence/ping", to: "presence#ping", as: :presence_ping

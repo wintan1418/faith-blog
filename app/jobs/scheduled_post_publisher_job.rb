@@ -40,8 +40,8 @@ class ScheduledPostPublisherJob < ApplicationJob
 
     return unless verdict.allow?
 
-    BreathFanoutJob.perform_later(post.id)
-    post.user&.bump_breath_streak!
+    # Followers' notifications, the streak, and the live "New posts" pill.
+    post.deliver_after_moderation_release!
   end
 
   def notify_author(post, verdict)

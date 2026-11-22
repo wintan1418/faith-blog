@@ -191,11 +191,13 @@ class Post < ApplicationRecord
 
   # Live "new breaths" pill on the public feed. Drops a hidden marker into
   # #feed_incoming for anyone subscribed; a Stimulus controller counts the
-  # markers and shows the pill. Fires on initial publish and on moderator
-  # release.
-  after_commit :broadcast_to_public_feed, on: :create, if: :feed_visible?
-  after_update_commit :broadcast_to_public_feed,
-                      if: -> { saved_change_to_moderation_status? && feed_visible? }
+  # markers and shows the pill. Fires on initial publish, on moderator
+  # release, and when a draft or scheduled post goes live. (The scheduled
+  # publisher writes with update_columns, so it calls
+  # deliver_after_moderation_release! itself.)
+  # One registration on purpose: Rails keeps only the last after_*_commit
+  # for a given method name, so a separate on-create one was silently dropped.
+  after_commit :broadcast_to_public_feed, on: %i[create update], if: :went_live_on_feed?
 
   after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
 
@@ -485,6 +487,12 @@ class Post < ApplicationRecord
 
   def fanout_to_followers
     BreathFanoutJob.perform_later(id)
+  end
+
+  def went_live_on_feed?
+    return false unless feed_visible?
+
+    previously_new_record? || saved_change_to_moderation_status? || saved_change_to_status?
   end
 
   def broadcast_to_public_feed

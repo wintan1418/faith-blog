@@ -1,0 +1,18 @@
+<%# The inside of the "New posts" pill (feed/new_posts). count: 0 keeps it hidden. %>
+<span class="fc-pill-inner" data-new-posts-count="<%= count %>">
+  <% if count.positive? %>
+    <span class="fc-pill-arrow" aria-hidden="true">&uarr;</span>
+    <% if authors.any? %>
+      <span class="fc-pill-faces" aria-hidden="true">
+        <% authors.each do |author| %>
+          <% if author.profile&.avatar&.attached? %>
+            <%= image_tag avatar_src(author.profile, 48), class: "fc-pill-face", alt: "" %>
+          <% else %>
+            <span class="fc-pill-face is-initial" style="<%= avatar_tint_style(author.username) %>"><%= author.username.first.upcase %></span>
+          <% end %>
+        <% end %>
+      </span>
+    <% end %>
+    <span class="fc-pill-label"><%= count == 1 ? "1 new post" : "#{count > 99 ? '99+' : count} new posts" %></span>
+  <% end %>
+</span>

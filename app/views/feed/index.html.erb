@@ -307,7 +307,10 @@
         </button>
       </div>
 
-      <div data-controller="new-posts-pill">
+      <div data-controller="new-posts-pill"
+           data-new-posts-pill-url-value="<%= feed_new_posts_path %>"
+           data-new-posts-pill-since-value="<%= time_param_value(feed_as_of) %>"
+           data-new-posts-pill-feed-url-value="<%= feed_path %>">
         <%= turbo_stream_from "feed:public" %>
         <div id="feed_incoming" hidden data-new-posts-pill-target="bucket"></div>
 
@@ -315,11 +318,7 @@
                 class="fc-new-posts-pill hidden"
                 data-new-posts-pill-target="pill"
                 data-action="click->new-posts-pill#flush"
-                aria-live="polite">
-          <%= render_icon("sparkles", classes: "h-3.5 w-3.5") %>
-          <span data-new-posts-pill-target="count">0</span>
-          <span data-new-posts-pill-target="label">new breaths</span>
-        </button>
+                aria-live="polite"></button>
 
         <div class="eg-stream">
           <% if @updates_tab %>
@@ -341,7 +340,7 @@
           <% if @items.any? %>
             <div id="feed_list" class="eg-stream">
               <% @items.each_with_index do |item, index| %>
-                <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+                <%= render "posts/card", post: item.post, reshared_by: item.reshared_by, fresh: feed_fresh?(item) %>
                 <% if index == 3 && @suggestions %>
                   <%= render "shared/brethren_suggestions", suggestions: @suggestions, nudge: @suggestion_nudge %>
                 <% end %>
@@ -351,7 +350,7 @@
             <% if @pagy.next %>
               <div id="feed_more"
                    data-controller="infinite-scroll"
-                   data-infinite-scroll-url-value="<%= url_for(page: @pagy.next) %>">
+                   data-infinite-scroll-url-value="<%= feed_next_page_url %>">
                 <div class="fc-skel-card">
                   <div class="fc-skel fc-skel-avatar"></div>
                   <div>

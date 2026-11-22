@@ -1,6 +1,6 @@
 <%= turbo_stream.append "feed_list" do %>
   <% @items.each do |item| %>
-    <%= render "posts/card", post: item.post, reshared_by: item.reshared_by %>
+    <%= render "posts/card", post: item.post, reshared_by: item.reshared_by, fresh: feed_fresh?(item) %>
   <% end %>
 <% end %>
 
@@ -8,7 +8,7 @@
   <%= turbo_stream.replace "feed_more" do %>
     <div id="feed_more"
          data-controller="infinite-scroll"
-         data-infinite-scroll-url-value="<%= url_for(page: @pagy.next) %>">
+         data-infinite-scroll-url-value="<%= feed_next_page_url %>">
       <div class="fc-skel-card">
         <div class="fc-skel fc-skel-avatar"></div>
         <div>
