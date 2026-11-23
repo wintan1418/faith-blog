@@ -135,7 +135,7 @@ class BreathersAroundSafetyTest < ActionDispatch::IntegrationTest
     get around_path
     assert_select ".ba-section--same_city .ba-section-title", text: "In and around Akure"
     # (The one member in Owo is alone there, so only the region shows.)
-    assert_equal [ "Ondo State · Within 50 km", "near Akure" ], chips.uniq.sort
+    assert_equal [ "Ondo State", "near Akure" ], chips.uniq.sort
     get feed_path
     assert_select ".ba-feed-title", text: "3 breathers live in and around Akure"
     assert_not_includes response.body.gsub(/Iju, Ondo, Nigeria/, ""), "Iju · "
@@ -147,7 +147,7 @@ class BreathersAroundSafetyTest < ActionDispatch::IntegrationTest
 
     get around_path
     assert_equal [ "lonely" ], names_on_page
-    assert_equal [ "Kwara State · Same country" ], chips
+    assert_equal [ "Kwara State" ], chips
     assert_not_includes response.body, "Faraway"
     assert_not(map_dots.any? { |d| d["name"] == "Faraway" })
 
@@ -164,7 +164,7 @@ class BreathersAroundSafetyTest < ActionDispatch::IntegrationTest
     get around_path
     assert_select ".ba-section--same_city", count: 0
     assert_select ".ba-section--near .ba-person-name", count: 2
-    assert_equal [ "Ondo State · Within 50 km" ], chips.uniq
+    assert_equal [ "Ondo State" ], chips.uniq
     mine = map_dots.find { |d| d["mine"] }
     assert_equal 0, mine["count"], "your own dot doesn't say 2 live there"
     assert_equal 1, map_dots.size
@@ -191,7 +191,15 @@ class BreathersAroundSafetyTest < ActionDispatch::IntegrationTest
     assert_equal [ "Ondo State" ], names
     assert_equal 3, map_dots.find { |d| d["name"] == "Ondo State" }["count"]
     refute(map_dots.any? { |d| %w[Ondo Owo].include?(d["name"]) })
-    assert_equal [ "Ondo State · Within 50 km" ], chips.uniq.reject { |c| c.include?("Same country") }
+    assert_equal [ "Ondo State" ], chips.uniq
+  end
+
+  test "a lone member in a big city whose region shares its name shows the region, not the city" do
+    placed("lone_lagos", cities(:lagos))
+
+    get around_path
+    assert_equal [ "Lagos region" ], chips
+    refute(map_dots.any? { |d| d["name"] == "Lagos" })
   end
 
   # 3. No online dot ---------------------------------------------------------------------

@@ -13,7 +13,7 @@
     <%= render "around/city_picker", profile: @profile, field_id: "around_city", label: "Where do you live?" %>
     <% if (next_change = @profile.city_id && @profile.next_city_change_at) %>
       <p class="ba-city-limit" role="note">
-        You've changed your city <%= CityChange::CHANGES_ALLOWED %> times this month.
+        You've changed your city <%= CityChange::CHANGES_ALLOWED %> times in the last <%= CityChange::WINDOW.in_days.to_i %> days.
         You can change it again on <%= next_change.to_date.to_fs(:long) %>.
       </p>
     <% end %>

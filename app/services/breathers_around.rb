@@ -33,7 +33,11 @@ class BreathersAround
   Place = Struct.new(:city, :grouped, keyword_init: true) do
     def name = grouped ? "near #{city.name}" : city.name
     # The wider area used when a place has too few members to name it.
-    def region = city.admin1_name.presence || city.country_name
+    # ("Lagos region", not "Lagos", where the region shares the big city's name.)
+    def region
+      name = city.admin1_name.presence or return city.country_name
+      name.casecmp?(city.name) || name.casecmp?(city.ascii_name) ? "#{name} region" : name
+    end
   end
 
   # folded: their place has too few members to name, so only the region shows.
@@ -167,7 +171,8 @@ class BreathersAround
     in_place = rows.select { |_, city_id| places[city_id]&.city&.id == mine.city.id }
     if in_place.size >= MIN_PER_PLACE
       ids = in_place.map(&:first)
-      where = "in #{'and around ' if mine.grouped}#{mine.city.name}"
+      around = mine.grouped || in_place.any? { |_, city_id| places[city_id].grouped }
+      where = "in #{'and around ' if around}#{mine.city.name}"
     else
       ids = rows.select { |_, city_id| (p = places[city_id]) && city.distance_km_to(p.city) <= NEAR_KM }.map(&:first)
       where = "within #{NEAR_KM} km of you"

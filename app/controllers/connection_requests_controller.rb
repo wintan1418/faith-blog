@@ -41,7 +41,7 @@ class ConnectionRequestsController < ApplicationController
     existing = ConnectionRequest.between(current_user, @receiver)
     if via_around? && !existing&.accepted? && (until_at = around_hellos_full_until)
       return refuse_request("You've said hello to #{ConnectionRequest::AROUND_HELLOS_PER_DAY} new people from Breathers around you today. " \
-                            "You can say hello to more in #{helpers.distance_of_time_in_words(Time.current, until_at)}. " \
+                            "You can say hello to more in #{helpers.pluralize(((until_at - Time.current) / 1.hour).ceil.clamp(1, 24), 'hour')}. " \
                             "You can still message your connections any time.")
     end
     if existing

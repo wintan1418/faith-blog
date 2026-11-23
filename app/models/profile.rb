@@ -198,7 +198,7 @@ class Profile < ApplicationRecord
     next_at = next_city_change_at
     return unless next_at
 
-    errors.add(:base, "You've changed your city #{CityChange::CHANGES_ALLOWED} times this month. " \
+    errors.add(:base, "You've changed your city #{CityChange::CHANGES_ALLOWED} times in the last #{CityChange::WINDOW.in_days.to_i} days. " \
                       "You can change it again on #{next_at.to_date.to_fs(:long)}.")
     throw :abort
   end

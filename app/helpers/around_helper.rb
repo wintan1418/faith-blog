@@ -31,10 +31,11 @@ module AroundHelper
   end
 
   # The chip that says where and how far: "Same city", "near Akure", "Owo · ~40 km",
-  # "Ondo State · Within 50 km" (too few in their town to name it), "Lagos · Same country".
+  # "Ondo State" (too few in their town to name it), "Lagos · Same country".
   def around_distance_chip(person)
     return "Same city" if person.same_city
-    return person.where if person.bucket == :same_city
+    # Folded into the wider area: just the region (the section already says how far).
+    return person.where if person.bucket == :same_city || person.folded
 
     "#{person.where} · #{person.distance_label}"
   end
