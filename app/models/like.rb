@@ -8,6 +8,8 @@ class Like < ApplicationRecord
   belongs_to :user
   belongs_to :likeable, polymorphic: true, counter_cache: :likes_count
   after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
+  after_create_commit -> { Seeds.reaction_created(self) }
+  after_destroy_commit -> { Seeds.revoke_source(self) }
 
   validates :user_id, uniqueness: { scope: [ :likeable_type, :likeable_id ], message: "has already reacted to this" }
 

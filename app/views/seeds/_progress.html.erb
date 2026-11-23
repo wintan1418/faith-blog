@@ -1,0 +1,16 @@
+<%# Progress to the next rank (shown to the member themself). Locals: user %>
+<% rank = user.seeds_rank %>
+<% nxt = rank.next %>
+<div class="seed-progress-block">
+  <div class="seed-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<%= rank.progress(user.seeds_total) %>"
+       aria-label="<%= nxt ? "Progress to #{nxt.name}" : "Top rank" %>">
+    <span class="seed-progress-fill seed-rank--<%= rank.key %>" style="width: <%= rank.progress(user.seeds_total) %>%"></span>
+  </div>
+  <p class="seed-progress-label">
+    <% if nxt %>
+      <strong><%= seeds_count(rank.seeds_to_next(user.seeds_total)) %></strong> to <%= nxt.name %>
+    <% else %>
+      Top rank reached
+    <% end %>
+  </p>
+</div>

@@ -177,6 +177,9 @@ application.register("rain", RainController)
 import RainToggleController from "./rain_toggle_controller"
 application.register("rain-toggle", RainToggleController)
 
+import RankUpController from "./rank_up_controller"
+application.register("rank-up", RankUpController)
+
 import ReactionsController from "./reactions_controller"
 application.register("reactions", ReactionsController)
 

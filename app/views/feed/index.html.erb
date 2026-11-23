@@ -56,6 +56,10 @@
             <%= render_icon("games", classes: "eg-ico is-violet") %>
             Games
           <% end %>
+          <%= link_to leaderboard_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("sprout", classes: "eg-ico is-green") %>
+            Leaderboard
+          <% end %>
           <%= link_to church_history_path, class: "fc-rail-link eg-shortcut" do %>
             <%= render_icon("church", classes: "eg-ico is-violet") %>
             Church History
@@ -423,6 +427,9 @@
         <%= link_to games_path, class: "eg-quicklink" do %>
           <%= render_icon("games", classes: "eg-ico is-violet") %> Games
         <% end %>
+        <%= link_to leaderboard_path, class: "eg-quicklink" do %>
+          <%= render_icon("sprout", classes: "eg-ico is-green") %> Leaderboard
+        <% end %>
         <%= link_to church_history_path, class: "eg-quicklink" do %>
           <%= render_icon("church", classes: "eg-ico is-violet") %> Church History
         <% end %>
@@ -480,6 +487,8 @@
           <button type="button" data-action="click->composer-modal#open" class="eg-card-link">Start one</button>
         <% end %>
       </section>
+
+      <%= render "feed/top_encouragers" %>
 
       <section class="fc-side-card eg-card eg-games-card" aria-labelledby="eg-games-title">
         <div class="eg-card-head">

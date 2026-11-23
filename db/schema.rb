@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -906,6 +906,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
     t.index ["slug"], name: "index_rooms_on_slug", unique: true
   end
 
+  create_table "seed_events", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "kind", null: false
+    t.integer "points", null: false
+    t.string "source_type", null: false
+    t.bigint "source_id", null: false
+    t.bigint "post_id"
+    t.bigint "comment_id"
+    t.bigint "actor_id"
+    t.bigint "room_id"
+    t.boolean "anonymous", default: false, null: false
+    t.date "created_on", null: false
+    t.datetime "created_at", null: false
+    t.index ["comment_id"], name: "index_seed_events_on_comment_id"
+    t.index ["created_on", "user_id"], name: "index_seed_events_on_created_on_and_user_id"
+    t.index ["post_id"], name: "index_seed_events_on_post_id"
+    t.index ["room_id", "created_on"], name: "index_seed_events_on_room_id_and_created_on"
+    t.index ["source_type", "source_id"], name: "index_seed_events_on_source_type_and_source_id"
+    t.index ["user_id", "kind", "created_on"], name: "index_seed_events_on_user_id_and_kind_and_created_on"
+    t.index ["user_id", "kind", "source_type", "source_id"], name: "index_seed_events_uniqueness", unique: true
+  end
+
+  create_table "seed_rank_ups", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "rank_index", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "rank_index"], name: "index_seed_rank_ups_on_user_id_and_rank_index", unique: true
+  end
+
   create_table "skill_endorsements", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "endorser_id", null: false
@@ -1047,6 +1077,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
     t.datetime "locked_at"
     t.datetime "password_chosen_at"
     t.datetime "feed_seen_at"
+    t.integer "seeds_total", default: 0, null: false
+    t.integer "seeds_rank_reached", default: 0, null: false
+    t.integer "seeds_rank_seen", default: 0, null: false
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
@@ -1055,6 +1088,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["role"], name: "index_users_on_role"
+    t.index ["seeds_total"], name: "index_users_on_seeds_total"
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
     t.index ["username"], name: "index_users_on_username_trgm", opclass: :gin_trgm_ops, using: :gin
@@ -1129,6 +1163,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_090000) do
   add_foreign_key "resources", "users", column: "approved_by_id"
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
+  add_foreign_key "seed_events", "users", on_delete: :cascade
+  add_foreign_key "seed_rank_ups", "users", on_delete: :cascade
   add_foreign_key "skill_endorsements", "users"
   add_foreign_key "skill_endorsements", "users", column: "endorser_id"
   add_foreign_key "suggestion_dismissals", "users"

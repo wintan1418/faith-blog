@@ -73,6 +73,7 @@ class UserBadge < ApplicationRecord
       next unless badge[:earned].call(user)
 
       awarded = create!(user: user, slug: slug, awarded_at: Time.current)
+      Seeds.badge_awarded(awarded)
       Notification.create(
         user: user,
         actor: user,

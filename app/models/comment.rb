@@ -35,6 +35,9 @@ class Comment < ApplicationRecord
   before_validation :unwrap_leaked_trix_html
   after_save :process_mentions_after_save
   after_commit :enqueue_ai_moderation_review, on: :create, if: :moderation_approved?
+  after_create_commit :award_seeds
+  after_update_commit :resync_seeds_after_moderation, if: :saved_change_to_moderation_status?
+  after_destroy_commit :revoke_seeds_after_destroy
 
   # Scopes
   scope :root_comments, -> { where(parent_comment_id: nil) }
@@ -74,6 +77,7 @@ class Comment < ApplicationRecord
       end
     end
     content.update(body: "[This comment has been deleted]") if content.present?
+    Seeds.revoke_comment(self)
   end
 
   def deleted?
@@ -160,6 +164,20 @@ class Comment < ApplicationRecord
 
   def enqueue_ai_moderation_review
     AiModerationReviewJob.perform_later(self)
+  end
+
+  def award_seeds
+    Seeds.comment_created(self)
+  end
+
+  # Held or blocked after the fact: its seeds go. Approved again: they come back.
+  def resync_seeds_after_moderation
+    moderation_approved? ? Seeds.comment_created(self) : Seeds.revoke_comment(self)
+  end
+
+  # A breath taking its comments with it settles seeds itself (Seeds.revoke_post).
+  def revoke_seeds_after_destroy
+    Seeds.revoke_comment(id) unless destroyed_by_association
   end
 
   private

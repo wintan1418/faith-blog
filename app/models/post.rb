@@ -200,6 +200,7 @@ class Post < ApplicationRecord
   after_commit :broadcast_to_public_feed, on: %i[create update], if: :went_live_on_feed?
 
   after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
+  after_destroy_commit :revoke_seeds_after_destroy
 
   # Instance methods
   def engagement_score
@@ -321,6 +322,7 @@ class Post < ApplicationRecord
       updated_at: Time.current
     )
     self.moderation_status = target # keep the in-memory record consistent
+    Seeds.revoke_post(self) unless target == "approved" # held or blocked breaths earn nothing
 
     deliver_after_moderation_release! if feed_visible?
     true
@@ -512,7 +514,13 @@ class Post < ApplicationRecord
   end
 
   def bump_author_streak
-    user&.bump_breath_streak!
+    bumped = user&.bump_breath_streak!
+    Seeds.breath_published(self, streak_bumped: bumped.present?)
+  end
+
+  # Deleted: the author loses the seeds this breath earned them.
+  def revoke_seeds_after_destroy
+    Seeds.revoke_post(id, author_id: user_id)
   end
 
   def bump_author_streak_on_publish

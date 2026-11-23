@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   before_action :touch_last_seen,                 if: :user_signed_in?
   before_action :require_supported_app_version
   after_action :track_page_view
+  after_action :deliver_seeds_toast, if: :user_signed_in?
 
   helper_method :current_user_admin?, :current_user_moderator?, :current_user_super_admin?
 
@@ -103,6 +104,24 @@ class ApplicationController < ActionController::Base
     return unless helpers.android_update_required?
 
     render "app_updates/required", layout: false
+  end
+
+  # "+5 seeds": seeds the viewer earned in this request (Seeds records them in
+  # Current). A Turbo Stream response gets the toast (and any rank-up
+  # celebration) appended; a redirect carries it to the next page in the flash.
+  def deliver_seeds_toast
+    points = Current.seeds_earned.to_i
+    return unless points.positive?
+
+    if response.media_type == "text/vnd.turbo-stream.html" && response.successful?
+      fresh = User.find(current_user.id)
+      response.body = response.body.to_s +
+        view_context.render(partial: "seeds/toast_stream", formats: [ :html ], locals: { points: points, user: fresh })
+    elsif response.redirect?
+      flash[:seeds] = points
+    end
+  rescue StandardError => e
+    Rails.logger.warn("[Seeds] toast failed: #{e.class}: #{e.message}")
   end
 
   # One "$view" per page someone opens, for Admin → Dashboard. Skips admin pages,

@@ -1,0 +1,72 @@
+<% content_for(:title) { "Leaderboard · Brethreign" } %>
+
+<div class="seed-page">
+  <header class="seed-page-head">
+    <span class="seed-kicker"><%= render_icon("sprout", classes: "h-4 w-4") %> Seeds</span>
+    <h1 class="seed-page-title">Leaderboard</h1>
+    <p class="seed-page-copy">Seeds grow from comments, prayers, reactions and breaths that build the brethren up.</p>
+    <%= link_to seeds_guide_path, class: "seed-link" do %>
+      <%= render_icon("lightbulb", classes: "h-4 w-4") %> How to earn seeds
+    <% end %>
+  </header>
+
+  <nav class="seed-tabs" aria-label="Leaderboard period">
+    <% { "week" => "This week", "all" => "All time", "room" => "By room" }.each do |key, label| %>
+      <%= link_to label, leaderboard_path(tab: key), class: "seed-tab #{'is-active' if @tab == key}", aria: { current: (@tab == key ? "page" : nil) } %>
+    <% end %>
+  </nav>
+
+  <% if @tab == "room" && @rooms.any? %>
+    <nav class="seed-room-picker" aria-label="Room">
+      <% @rooms.each do |room| %>
+        <%= link_to room.name, leaderboard_path(tab: "room", room: room.slug), class: "seed-room-chip #{'is-active' if room == @room}", aria: { current: (room == @room ? "true" : nil) } %>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% if @mine %>
+    <section class="seed-mine" aria-label="Your place">
+      <div class="seed-mine-top">
+        <span class="seed-pos"><%= @mine.position ? "##{@mine.position}" : "–" %></span>
+        <%= render "seeds/avatar", user: current_user %>
+        <span class="seed-row-who">
+          <span class="seed-row-name">You</span>
+          <%= seed_rank_chip(current_user) %>
+        </span>
+        <span class="seed-row-seeds"><%= seeds_count(@mine.seeds) %></span>
+      </div>
+      <% if @mine.position.nil? %>
+        <p class="seed-mine-note">
+          <% if Seeds::LEADERBOARD_EXCLUDE_STAFF && Seeds::STAFF_ROLES.include?(current_user.role) %>
+            Staff stay off the public board, but your seeds still count for you.
+          <% elsif @tab == "room" %>
+            Join the conversation in <%= @room&.name || "this room" %> to appear here.
+          <% else %>
+            Comment, pray and breathe to appear on the board.
+          <% end %>
+        </p>
+      <% end %>
+      <%= render "seeds/progress", user: current_user %>
+    </section>
+  <% end %>
+
+  <% if @rows.any? %>
+    <ol class="seed-board">
+      <% @rows.each do |row| %>
+        <li class="seed-row<%= ' is-me' if row.user == current_user %><%= " is-top-#{row.position}" if row.position <= 3 %>">
+          <span class="seed-pos"><%= row.position %></span>
+          <%= link_to user_path(row.user.username), class: "seed-row-link" do %>
+            <%= render "seeds/avatar", user: row.user %>
+            <span class="seed-row-who">
+              <span class="seed-row-name"><%= row.user.display_name.presence || row.user.username %></span>
+              <%= seed_rank_chip(row.user) %>
+            </span>
+          <% end %>
+          <span class="seed-row-seeds"><%= seeds_count(row.seeds) %></span>
+        </li>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="seed-empty">No seeds here yet<%= " this week" if @tab == "week" %>. Be the first to encourage someone.</p>
+  <% end %>
+</div>

@@ -1,0 +1,6 @@
+<%# A member's photo or initial, for seed boards. Locals: user %>
+<% if user.profile&.avatar&.attached? %>
+  <%= image_tag avatar_src(user.profile), class: "seed-avatar object-cover", alt: "" %>
+<% else %>
+  <span class="seed-avatar" style="<%= avatar_tint_style(user.username) %>" aria-hidden="true"><%= user.username.first.upcase %></span>
+<% end %>

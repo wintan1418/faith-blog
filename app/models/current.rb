@@ -5,4 +5,6 @@
 # of cards can preload "my reaction" in one query.
 class Current < ActiveSupport::CurrentAttributes
   attribute :user
+  # Seeds the viewer earned during this request (the "+5 seeds" toast).
+  attribute :seeds_earned, default: 0
 end

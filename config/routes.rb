@@ -401,6 +401,11 @@ Rails.application.routes.draw do
   get ".well-known/apple-app-site-association", to: "well_known#apple_app_site_association", defaults: { format: :json }
   get "apple-app-site-association", to: "well_known#apple_app_site_association", defaults: { format: :json }
   post "whats_new/:id/seen", to: "whats_new#seen", as: :seen_whats_new
+
+  # Seeds: engagement points and ranks.
+  get  "leaderboard", to: "leaderboard#index", as: :leaderboard
+  get  "seeds", to: "seeds#show", as: :seeds_guide
+  post "seeds/rank_seen", to: "seeds#rank_seen", as: :seeds_rank_seen
   post "dismissals", to: "dismissals#create", as: :dismissals
   # First-run onboarding: hide or bring back the getting-started list; finish or retake the tour.
   scope "onboarding", controller: "onboarding", as: "onboarding" do

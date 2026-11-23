@@ -159,6 +159,7 @@ class Admin::ModerationReviewsController < ApplicationController
     comment = @review.reviewable
     return unless comment.is_a?(Comment) && !comment.moderation_approved?
     comment.update_columns(moderation_status: Comment.moderation_statuses[:approved], moderation_blocked_reason: nil)
+    Seeds.comment_created(comment)
   end
 
   # When the moderator approves/dismisses a Post review, flip the post back to
@@ -176,7 +177,8 @@ class Admin::ModerationReviewsController < ApplicationController
 
     post.update_columns(moderation_status: Post.moderation_statuses[:approved], moderation_blocked_reason: nil)
     BreathFanoutJob.perform_later(post.id) if post.published?
-    post.user&.bump_breath_streak!
+    bumped = post.user&.bump_breath_streak!
+    Seeds.breath_published(post, streak_bumped: bumped.present?)
 
     Notification.create(
       user: post.user,
@@ -209,6 +211,7 @@ class Admin::ModerationReviewsController < ApplicationController
     return if post.moderation_blocked?
 
     post.update_columns(moderation_status: Post.moderation_statuses[:blocked])
+    Seeds.revoke_post(post)
   rescue StandardError => e
     Rails.logger.warn("[ModerationDecide block] #{e.class}: #{e.message}")
   end

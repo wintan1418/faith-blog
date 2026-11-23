@@ -1,0 +1,29 @@
+<%# Seeds: this week's top five encouragers (staff and anonymous-breath seeds left out). %>
+<% rows = Seeds::Leaderboard.new(period: "week").top(5) %>
+<section class="fc-side-card eg-card seed-side-card" aria-labelledby="seed-side-title">
+  <div class="eg-card-head">
+    <h2 class="eg-card-title" id="seed-side-title">Top Encouragers this week</h2>
+    <%= link_to "See all", leaderboard_path, class: "eg-card-link" %>
+  </div>
+  <% if rows.any? %>
+    <ol class="seed-side-list">
+      <% rows.each do |row| %>
+        <li class="seed-side-row">
+          <%= link_to user_path(row.user.username), class: "seed-side-link" do %>
+            <%= render "seeds/avatar", user: row.user %>
+            <span class="seed-row-who">
+              <span class="seed-row-name"><%= row.user.display_name.presence || row.user.username %></span>
+              <%= seed_rank_chip(row.user) %>
+            </span>
+          <% end %>
+          <span class="seed-side-seeds">+<%= number_with_delimiter(row.seeds) %></span>
+        </li>
+      <% end %>
+    </ol>
+  <% else %>
+    <p class="eg-muted">A new week. Encourage someone and lead the way.</p>
+  <% end %>
+  <%= link_to seeds_guide_path, class: "seed-link seed-side-how" do %>
+    <%= render_icon("sprout", classes: "h-4 w-4") %> How to earn seeds
+  <% end %>
+</section>
