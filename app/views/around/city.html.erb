@@ -1,0 +1,21 @@
+<% content_for(:title) { "Your city - Brethreign" } %>
+<% content_for(:app_title) { "Your city" } %>
+<div class="ba-page ba-city-page">
+  <%= form_with url: around_path, method: :patch, scope: :profile, id: "ba-city-form", class: "ba-city-form" do %>
+    <header class="ba-city-head">
+      <%= link_to (@profile.city ? around_path(look: 1) : feed_path), class: "ba-round", aria: { label: "Back" } do %>
+        <%= render_icon("chevronleft", classes: "h-5 w-5") %>
+      <% end %>
+      <h1 class="ba-city-title">Your city</h1>
+      <button type="submit" class="ba-pill is-primary">Save</button>
+    </header>
+
+    <%= render "around/city_picker", profile: @profile, field_id: "around_city", label: "Where do you live?" %>
+
+    <hr class="ba-rule">
+
+    <%= render "around/privacy_fields", profile: @profile, scope: "profile" %>
+
+    <button type="submit" class="ba-big-btn ba-city-save">Save</button>
+  <% end %>
+</div>

@@ -52,6 +52,10 @@
             <span class="eg-more-closed">See more</span>
             <span class="eg-more-open">See less</span>
           </summary>
+          <%= link_to around_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("mappin", classes: "eg-ico is-green") %>
+            Breathers around you
+          <% end %>
           <%= link_to games_path, class: "fc-rail-link eg-shortcut" do %>
             <%= render_icon("games", classes: "eg-ico is-violet") %>
             Games
@@ -216,6 +220,8 @@
         <%= turbo_stream_from current_user, :onboarding if @onboarding %>
         <%= render "feed/onboarding_frame", checklist: @onboarding, celebrate: @onboarding_celebrate, prayer_room: @prayer_room %>
       <% end %>
+
+      <%= render "around/feed_card", card: @around_card if @around_card %>
 
       <%# New brethren: one card, not one per person. Closing it hides this group;
           the next person to join brings it back. %>
@@ -420,6 +426,9 @@
         <% end %>
         <%= link_to people_path, class: "eg-quicklink" do %>
           <%= render_icon("users", classes: "eg-ico is-green") %> People
+        <% end %>
+        <%= link_to around_path, class: "eg-quicklink" do %>
+          <%= render_icon("mappin", classes: "eg-ico is-green") %> Breathers around you
         <% end %>
         <%= link_to search_path, class: "eg-quicklink" do %>
           <%= render_icon("search", classes: "eg-ico") %> Search

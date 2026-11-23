@@ -1,0 +1,57 @@
+<%# One person in Breathers around you. Locals: person, my_city, rooms (names
+    of rooms you share), connection (ConnectionRequest between you, or nil). %>
+<% user = person.user %>
+<% open_to = visible_open_to(user) %>
+<% name = user.display_name %>
+<% headline = user.professional_headline.presence || user.profile&.industry.presence %>
+<article class="ba-person" id="<%= dom_id(user, :around) %>">
+  <div class="ba-person-main">
+    <%= link_to user_path(user.username), class: "ba-ava-wrap", tabindex: -1, aria: { hidden: true } do %>
+      <% if user.profile&.avatar&.attached? %>
+        <%= image_tag avatar_src(user.profile, 120), class: "ba-ava", alt: "", loading: "lazy" %>
+      <% else %>
+        <span class="ba-ava ba-ava--initial" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
+      <% end %>
+      <% if user.visible_online? %><span class="ba-online" title="Online now"></span><% end %>
+    <% end %>
+    <div class="ba-person-text">
+      <%= link_to name, user_path(user.username), class: "ba-person-name" %>
+      <% if headline %><span class="ba-person-headline"><%= headline %></span><% end %>
+      <div class="ba-chips">
+        <span class="ba-chip <%= person.bucket == :same_city ? 'is-mint' : 'is-plain' %>"><%= around_distance_chip(person) %></span>
+        <% if open_to.include?("mentoring") %><span class="ba-chip is-gold">Open to mentoring</span><% end %>
+        <% (open_to - [ "mentoring" ]).first(1).each do |key| %>
+          <span class="ba-chip is-plain"><%= Profile::OPEN_TO[key][:badge] %></span>
+        <% end %>
+        <% if rooms.any? %>
+          <span class="ba-chip is-blue"><%= rooms.size == 1 ? "Both in #{rooms.first}".truncate(28) : "#{rooms.size} rooms in common" %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="ba-person-action bys-action" id="<%= dom_id(user, :suggestion_action) %>">
+    <% if connection&.accepted? %>
+      <% mode = "message" %>
+    <% elsif connection&.pending? && connection.sender_id == current_user.id %>
+      <span class="ba-pill is-outline is-muted" aria-disabled="true">Requested</span>
+    <% elsif connection&.pending? %>
+      <%= button_to "Accept", accept_connection_request_path(connection), method: :post, class: "ba-pill is-primary" %>
+    <% else %>
+      <% mode = current_user.brethren_card&.complete? ? "request" : "card" %>
+    <% end %>
+    <% if mode %>
+      <button type="button" class="ba-pill <%= mode == 'message' ? 'is-outline' : 'is-primary' %>"
+              data-action="around-hello#open"
+              data-around-hello-person-param="<%= {
+                id: user.id, name: name, headline: headline, initial: user.username.first.upcase,
+                avatar: (avatar_src(user.profile, 160) if user.profile&.avatar&.attached?),
+                tint: avatar_tint_style(user.username),
+                chips: [ around_distance_chip(person), (rooms.size > 1 ? "#{rooms.size} rooms in common" : ("Both in #{rooms.first}" if rooms.any?)) ].compact,
+                lines: around_hello_lines(person, my_city, rooms), mode: mode,
+                request_url: connection_requests_path(receiver_id: user.id)
+              }.to_json %>">
+        <%= mode == "message" ? "Message" : "Say hello" %>
+      </button>
+    <% end %>
+  </div>
+</article>

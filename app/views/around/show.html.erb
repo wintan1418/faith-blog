@@ -1,0 +1,100 @@
+<% content_for(:title) { "Breathers around you - Brethreign" } %>
+<% content_for(:app_title) { "Around you" } %>
+<% city = @profile.city %>
+<% visible = @profile.show_in_nearby? && !@profile.city_shown_to_only_me? %>
+<% total = @sections.sum { |s| s.people.size } %>
+
+<div class="ba-page" data-controller="around-hello">
+  <div class="ba-layout">
+    <div class="ba-list-col">
+      <header class="ba-head">
+        <div class="ba-head-text">
+          <h1 class="ba-title">Breathers around you</h1>
+          <%= link_to city_around_path, class: "ba-head-city" do %>
+            <%= render_icon("mappin", classes: "ba-head-pin") %>
+            <span class="ba-head-place"><%= around_city_line(city) %></span>
+            <span class="ba-head-change">Change</span>
+          <% end %>
+        </div>
+        <% if visible %>
+          <%= link_to city_around_path(anchor: "ba-visibility"), class: "ba-status is-on", title: "Who can see me" do %>
+            <%= render_icon("shieldcheck", classes: "h-4 w-4") %><span class="ba-status-text">You're visible</span>
+          <% end %>
+        <% else %>
+          <%= link_to city_around_path(anchor: "ba-visibility"), class: "ba-status", title: "You're hidden. Who can see me" do %>
+            <%= render_icon("shield", classes: "h-4 w-4") %><span class="ba-status-text">You're hidden</span>
+          <% end %>
+        <% end %>
+      </header>
+
+      <% unless visible %>
+        <%= form_with url: around_path, method: :patch, scope: :profile, class: "ba-hidden-note" do %>
+          <%= hidden_field_tag "profile[show_in_nearby]", "1" %>
+          <% if @profile.city_shown_to_only_me? %><%= hidden_field_tag "profile[city_visibility]", "everyone" %><% end %>
+          <p>You can look around, but nobody nearby can see you yet.</p>
+          <button type="submit" class="ba-pill is-primary">Show me</button>
+        <% end %>
+      <% end %>
+
+      <%# Phones: the map sits at the top; desktops: on the right. %>
+      <%= render "around/map", city: city, dots: @dots, extra: "ba-map--top" %>
+
+      <nav class="ba-filters" aria-label="Filters">
+        <% pill = ->(label, path, active) { link_to label, path, class: "ba-pill #{'is-active' if active}", aria: { current: (active ? "true" : nil) }, data: { turbo_action: "replace" } } %>
+        <%= pill.call(@filters.values.any? ? "Everyone" : "Everyone · #{total}", around_path, @filters.values.none?) %>
+        <%= pill.call("Open to mentoring", around_path(filter: "mentoring"), @filters[:mentoring]) %>
+        <% (@industries | [ @filters[:industry] ].compact).each do |industry| %>
+          <%= pill.call(industry, around_path(industry: industry), @filters[:industry] == industry) %>
+        <% end %>
+        <% if @in_rooms %>
+          <%= pill.call("My rooms", around_path(filter: "rooms"), @filters[:my_rooms]) %>
+        <% end %>
+      </nav>
+
+      <% if total.zero? %>
+        <section class="ba-empty">
+          <span class="ba-empty-ico" aria-hidden="true"><%= render_icon("mappin", classes: "h-6 w-6") %></span>
+          <h2 class="ba-empty-title">
+            <%= @filters.values.any? ? "No one matches that yet" : "You're the first breather around #{city.name}" %>
+          </h2>
+          <p class="ba-empty-copy">
+            Only members who turn on “Show me to breathers near me” appear here.
+            Invite brethren from your church and city, and they'll show up as they join in.
+          </p>
+          <div class="ba-empty-actions">
+            <%= link_to "Invite brethren", invitations_path, class: "ba-pill is-primary" %>
+            <% if @filters.values.any? %><%= link_to "See everyone", around_path, class: "ba-pill" %><% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <% @sections.each do |section| %>
+        <% next if section.people.empty? %>
+        <section class="ba-section ba-section--<%= section.key %>" aria-labelledby="ba-<%= section.key %>">
+          <div class="ba-section-head">
+            <h2 class="ba-section-title" id="ba-<%= section.key %>"><%= section.title %></h2>
+            <span class="ba-section-count"><%= pluralize(section.people.size, "breather") %></span>
+          </div>
+          <div class="ba-people">
+            <% section.people.each do |person| %>
+              <%= render "around/person", person: person, my_city: city,
+                         rooms: @shared_rooms[person.user.id].to_a, connection: @connections[person.user.id] %>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <p class="ba-credit">
+        City data © <a href="https://www.geonames.org/" rel="noopener" target="_blank">GeoNames</a>
+        (<a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener license" target="_blank">CC BY 4.0</a>) ·
+        Map © <a href="https://www.openstreetmap.org/copyright" rel="noopener" target="_blank">OpenStreetMap</a> contributors
+      </p>
+    </div>
+
+    <aside class="ba-map-col" aria-label="Map">
+      <%= render "around/map", city: city, dots: @dots, extra: "ba-map--side" %>
+    </aside>
+  </div>
+
+  <%= render "around/hello_sheet" %>
+</div>

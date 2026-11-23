@@ -21,8 +21,8 @@
     <% if profile&.assembly.present? %>
       <div><dt>Church</dt><dd><%= profile.assembly %></dd></div>
     <% end %>
-    <% if profile&.location.present? %>
-      <div><dt>Lives in</dt><dd><%= profile.location %></dd></div>
+    <% if (shown_location = visible_location(profile)) %>
+      <div><dt>Lives in</dt><dd><%= shown_location %></dd></div>
     <% end %>
     <% if (headline = user.professional_headline) %>
       <div><dt>Work</dt><dd><%= headline %></dd></div>

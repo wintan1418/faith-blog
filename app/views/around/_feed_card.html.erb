@@ -1,0 +1,42 @@
+<%# Feed: "7 breathers live in Houston" with a few faces, or, without a city,
+    a gentle nudge to add one. Closing it hides it until the count changes.
+    Locals: card. %>
+<% if card[:kind] == :add_city %>
+  <section class="ba-feed-add" data-controller="onboarding" data-onboarding-key-value="fc:<%= card[:key] %>" aria-label="Add your city">
+    <span class="ba-feed-add-ico" aria-hidden="true"><%= render_icon("mappin", classes: "h-5 w-5") %></span>
+    <div class="ba-feed-add-text">
+      <p class="ba-feed-add-title">Add your city to find breathers around you</p>
+      <p class="ba-feed-add-sub">We keep your city only, never where you are.</p>
+    </div>
+    <%= link_to "Add", city_around_path, class: "ba-feed-add-link" %>
+    <button type="button" class="ba-feed-add-x" data-action="click->onboarding#dismiss" aria-label="Hide this card"><%= render_icon("x", classes: "h-4 w-4") %></button>
+  </section>
+<% else %>
+  <% preview = card[:preview] %>
+  <% others = preview.count - preview.users.size %>
+  <section class="ba-feed-card" data-controller="onboarding" data-onboarding-key-value="fc:<%= card[:key] %>" aria-label="Breathers around you">
+    <span class="ba-feed-rings" aria-hidden="true"></span>
+    <p class="ba-feed-kicker"><%= render_icon("mappin", classes: "h-3.5 w-3.5") %> Breathers around you</p>
+    <h2 class="ba-feed-title"><%= preview.count %> <%= preview.count == 1 ? "breather lives" : "breathers live" %> in <%= card[:city].name %></h2>
+    <div class="ba-feed-people">
+      <span class="ba-feed-faces">
+        <% preview.users.each do |person| %>
+          <% if person.profile&.avatar&.attached? %>
+            <%= image_tag avatar_src(person.profile, 80), class: "ba-feed-face", alt: "" %>
+          <% else %>
+            <span class="ba-feed-face" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+          <% end %>
+        <% end %>
+        <% if others.positive? %><span class="ba-feed-face is-more">+<%= others %></span><% end %>
+      </span>
+      <p class="ba-feed-names">
+        <%= preview.users.map(&:display_name).to_sentence(last_word_connector: others.positive? ? ", " : " and ", two_words_connector: others.positive? ? ", " : " and ") %><%= " and #{pluralize(others, 'other')}" if others.positive? %>.
+        <% if preview.mentoring.positive? %><%= preview.mentoring == 1 ? "1 is" : "#{preview.mentoring} are" %> open to mentoring.<% end %>
+      </p>
+    </div>
+    <div class="ba-feed-actions">
+      <%= link_to "See who's around", around_path, class: "ba-feed-go" %>
+      <button type="button" class="ba-feed-x" data-action="click->onboarding#dismiss" aria-label="Hide this card"><%= render_icon("x", classes: "h-4 w-4") %></button>
+    </div>
+  </section>
+<% end %>

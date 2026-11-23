@@ -7,6 +7,7 @@ class Profile < ApplicationRecord
 
   # Associations
   belongs_to :user
+  belongs_to :city, optional: true
   has_one_attached :avatar
 
   # Validations
@@ -112,6 +113,58 @@ class Profile < ApplicationRecord
     errors.add(:birth_year, "can't be in the future") if birth_year.present? && birth_year > Date.current.year
   end
 
+  # "Breathers around you": a member's city (never their coordinates), whether
+  # they appear there (off until they choose it) and who may see the city.
+  enum :city_visibility, { everyone: 0, connections: 1, only_me: 2 }, prefix: :city_shown_to
+  ADULT_AGE = 18
+  validate :old_enough_to_show_nearby, if: -> { show_in_nearby? && will_save_change_to_show_in_nearby? }
+  before_save :sync_city_and_location
+
+  # Could be under 18. Judged on the latest possible birthday in their birth year,
+  # so someone born in 2008 without a day counts as 17 until the end of 2026.
+  def minor?(today = Date.current)
+    return false if birth_year.blank?
+
+    birthday = birth_month && birth_day ? Date.new(birth_year, birth_month, birth_day) : Date.new(birth_year, 12, 31)
+    birthday.advance(years: ADULT_AGE) > today
+  end
+
+  # SQL twin of minor? (profiles.birth_year etc.), for leaving under-18s out of lists.
+  def self.adults_or_unknown
+    where("profiles.birth_year IS NULL OR (CASE WHEN profiles.birth_month IS NULL OR profiles.birth_day IS NULL " \
+          "THEN make_date(profiles.birth_year, 12, 31) " \
+          "ELSE make_date(profiles.birth_year, profiles.birth_month, profiles.birth_day) END " \
+          "+ INTERVAL '#{ADULT_AGE} years') <= CURRENT_DATE")
+  end
+
+  # May this viewer see where the member lives? (They always see their own.)
+  def city_visible_to?(viewer)
+    return false if location.blank?
+    return true if viewer && viewer.id == user_id
+    return true if city_shown_to_everyone?
+    return false unless city_shown_to_connections? && viewer
+
+    viewer.connected_with?(user)
+  end
+
+  def nearby_ready? = show_in_nearby? && city_id.present?
+
+  def old_enough_to_show_nearby
+    errors.add(:show_in_nearby, "is for members 18 and over") if minor?
+  end
+
+  # The city and the location text stay in step: picking a city writes
+  # "Akure, Ondo, Nigeria"; typing a location looks for the city it names.
+  def sync_city_and_location
+    if will_save_change_to_city_id? && city
+      self.location = city.label
+    elsif will_save_change_to_location?
+      found = City.best_match(location)
+      self.city = found
+      self.location = found.label if found
+    end
+  end
+
   # Public church / assembly (the Brethren Card one stays private), plus match keys.
   validates :assembly, length: { maximum: 120 }
   before_save do
@@ -134,7 +187,7 @@ class Profile < ApplicationRecord
   after_commit -> { OnboardingChecklist.broadcast_refresh(user) }, if: -> { @onboarding_changed }
   # A new church, city or skills changes who "brethren you may know" finds.
   after_commit -> { BrethrenSuggestions.expire(user_id) },
-               if: -> { (previous_changes.keys & %w[assembly_key city_key skills]).any? }
+               if: -> { (previous_changes.keys & %w[assembly_key city_key city_id show_in_nearby city_visibility skills]).any? }
 
   def moderate_avatar
     @avatar_changed = false

@@ -46,9 +46,9 @@
 
               <div class="fc-people-meta">
                 <span><%= pluralize(person.followers_count, "follower") %></span>
-                <% if person.profile&.location.present? %>
+                <% if (shown_location = visible_location(person.profile)) %>
                   <span class="fc-people-dot">·</span>
-                  <span><%= person.profile.location %></span>
+                  <span><%= shown_location %></span>
                 <% end %>
               </div>
             </div>

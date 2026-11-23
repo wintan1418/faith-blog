@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="bcard-foot">
-        <span><%= [ profile&.assembly, profile&.location.to_s.split(",").first.presence ].compact_blank.join(" · ") %></span>
+        <span><%= [ profile&.assembly, visible_location(profile).to_s.split(",").first.presence ].compact_blank.join(" · ") %></span>
         <span>/in/<%= m.username %></span>
       </div>
     </section>

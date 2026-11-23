@@ -1,0 +1,43 @@
+<% content_for(:title) { "Find breathers around you - Brethreign" } %>
+<% content_for(:app_title) { "Around you" } %>
+<% city = @profile.city %>
+<div class="ba-optin">
+  <div class="ba-radar" aria-hidden="true">
+    <span class="ba-radar-ring is-1"></span>
+    <span class="ba-radar-ring is-2"></span>
+    <span class="ba-radar-ring is-3"></span>
+    <span class="ba-radar-dot is-a"></span><span class="ba-radar-dot is-b"></span>
+    <span class="ba-radar-dot is-c"></span><span class="ba-radar-dot is-d"></span>
+    <span class="ba-radar-ping"></span>
+    <span class="ba-radar-core"><%= render_icon("breathe", classes: "h-7 w-7") %></span>
+  </div>
+
+  <section class="ba-optin-sheet" aria-labelledby="ba-optin-title">
+    <span class="ba-sheet-grip" aria-hidden="true"></span>
+    <div>
+      <p class="ba-kicker">New</p>
+      <h1 class="ba-optin-title" id="ba-optin-title">Find breathers around you</h1>
+    </div>
+    <p class="ba-optin-copy">
+      <% if @count_near.positive? %>
+        <%= pluralize(@count_near, "breather") %> <%= @count_near == 1 ? "lives" : "live" %> within 50 km of <%= city.name %>.
+      <% else %>
+        Be one of the first breathers around <%= city.name %>.
+      <% end %>
+      Meet people who share your faith and your city, for friendship, mentoring and work.
+    </p>
+    <ul class="ba-bullets">
+      <li><%= render_icon("mappin", classes: "h-5 w-5") %> Only your city is shared, never where you are</li>
+      <li><%= render_icon("shield", classes: "h-5 w-5") %> Blocked people and under-18s never see you</li>
+      <li><%= render_icon("settings", classes: "h-5 w-5") %> Turn it off any time in Settings</li>
+    </ul>
+    <%= form_with url: around_path, method: :patch, scope: :profile, class: "ba-optin-actions" do %>
+      <%= hidden_field_tag "profile[show_in_nearby]", "1" %>
+      <% if @profile.city_shown_to_only_me? %><%= hidden_field_tag "profile[city_visibility]", "everyone" %><% end %>
+      <button type="submit" class="ba-big-btn">Show me to breathers near me</button>
+    <% end %>
+    <%= button_to "Just look around for now", around_path, method: :patch, params: { look_around: "1" },
+                  class: "ba-quiet-btn", form_class: "ba-optin-actions" %>
+    <p class="ba-optin-fine">Living somewhere else? <%= link_to "Change city (#{city.name})", city_around_path %></p>
+  </section>
+</div>

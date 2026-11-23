@@ -1,0 +1,17 @@
+<%# City-level map: one dot per CITY with how many breathers live there, never
+    a dot per person. Locals: city (the viewer's), dots, extra (class). %>
+<section class="ba-map <%= extra %>" aria-label="Map of breathers by city"
+         data-controller="around-map"
+         data-around-map-dots-value="<%= dots.map { |d| d.to_h }.to_json %>">
+  <div class="ba-map-canvas" data-around-map-target="canvas"></div>
+  <div class="ba-map-chips" role="group" aria-label="Map area">
+    <button type="button" class="ba-map-chip is-active" aria-pressed="true" data-around-map-target="chip" data-scope="near" data-action="around-map#setArea">Near me</button>
+    <button type="button" class="ba-map-chip" aria-pressed="false" data-around-map-target="chip" data-scope="country" data-action="around-map#setArea"><%= around_country_short(city) %></button>
+    <button type="button" class="ba-map-chip" aria-pressed="false" data-around-map-target="chip" data-scope="world" data-action="around-map#setArea">World</button>
+  </div>
+  <p class="ba-map-status" aria-live="polite" data-around-map-target="status"></p>
+  <div class="ba-map-foot">
+    <span>Each dot is a city, never a person</span>
+    <span>© <a href="https://www.openstreetmap.org/copyright" rel="noopener" target="_blank">OpenStreetMap</a> · <a href="https://www.geonames.org/" rel="noopener" target="_blank">GeoNames</a></span>
+  </div>
+</section>

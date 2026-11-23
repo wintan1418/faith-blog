@@ -81,11 +81,19 @@
             <p class="profile-bio"><%= @user.profile.bio %></p>
           <% end %>
 
+          <% if user_signed_in? && @user == current_user && @user.profile.city_id.blank? && !@user.profile.minor? %>
+            <%= link_to around_path, class: "ba-profile-prompt" do %>
+              <%= render_icon("mappin", classes: "h-4 w-4") %>
+              <span>Add your city to find breathers around you</span>
+              <%= render_icon("chevronright", classes: "h-4 w-4") %>
+            <% end %>
+          <% end %>
+
           <div class="mt-5 flex flex-wrap gap-3">
-            <% if @user.profile.location.present? %>
+            <% if (shown_location = visible_location(@user.profile)) %>
               <span class="profile-meta">
                 <%= render_icon("globe", classes: "w-4 h-4") %>
-                <%= @user.profile.location %>
+                <%= shown_location %>
               </span>
             <% end %>
             <% if @user.profile.faith_background.present? %>

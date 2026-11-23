@@ -1,0 +1,29 @@
+<%# City picker: type-ahead over real cities, keyboard friendly, with "Use my
+    location" where the browser can share it (hidden in the iPhone/Android apps,
+    which don't ask for location). Locals: profile, scope ("profile"), label, field_id. %>
+<% scope = local_assigns.fetch(:scope, "profile") %>
+<% field_id = local_assigns.fetch(:field_id, "city_picker_input") %>
+<div class="cp" data-controller="city-picker"
+     data-city-picker-url-value="<%= cities_path %>"
+     data-city-picker-nearest-url-value="<%= nearest_city_path %>"
+     data-city-picker-country-value="<%= city_picker_country_hint %>">
+  <label for="<%= field_id %>" class="ba-label"><%= local_assigns.fetch(:label, "Your city") %></label>
+  <div class="cp-field">
+    <%= render_icon("search", classes: "cp-ico") %>
+    <input type="text" id="<%= field_id %>" name="<%= scope %>[location]" value="<%= profile.location %>"
+           class="cp-input" placeholder="Start typing your city" maxlength="100"
+           autocomplete="off" autocapitalize="words" spellcheck="false"
+           role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="<%= field_id %>_list"
+           data-city-picker-target="input"
+           data-action="input->city-picker#search keydown->city-picker#keydown blur->city-picker#blur">
+    <input type="hidden" name="<%= scope %>[city_id]" value="<%= profile.city_id %>" data-city-picker-target="id">
+    <ul id="<%= field_id %>_list" class="cp-list" role="listbox" aria-label="Matching cities" hidden data-city-picker-target="list"></ul>
+  </div>
+  <% unless hotwire_native_app? %>
+    <button type="button" class="cp-locate" hidden data-city-picker-target="locate" data-action="city-picker#locate">
+      <%= render_icon("target", classes: "h-5 w-5") %> Use my location
+    </button>
+  <% end %>
+  <p class="cp-status" aria-live="polite" data-city-picker-target="status"></p>
+  <p class="cp-hint">We only keep your city. <% unless hotwire_native_app? %>Your exact location is used once to find it, then forgotten.<% end %></p>
+</div>

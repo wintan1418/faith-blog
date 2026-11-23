@@ -1,0 +1,42 @@
+<%# The opt-in switch, who can see my city, and the privacy promise.
+    Locals: profile, scope ("profile"). %>
+<% scope = local_assigns.fetch(:scope, "profile") %>
+<div class="ba-privacy">
+  <p class="ba-label">Breathers around you</p>
+  <% if profile.minor? %>
+    <div class="ba-switch-card">
+      <div class="ba-switch-text">
+        <strong>Breathers around you is for members 18 and over</strong>
+        <small>We don't show where younger brethren live.</small>
+      </div>
+    </div>
+  <% else %>
+    <label class="ba-switch-card" for="<%= scope %>_show_in_nearby">
+      <span class="ba-switch-text">
+        <strong>Show me to breathers near me</strong>
+        <small>People in your area can find you and say hello. Off until you turn it on.</small>
+      </span>
+      <span class="ba-switch">
+        <input type="hidden" name="<%= scope %>[show_in_nearby]" value="0">
+        <input type="checkbox" role="switch" id="<%= scope %>_show_in_nearby" name="<%= scope %>[show_in_nearby]" value="1"
+               <%= "checked" if profile.show_in_nearby? %>>
+        <span class="ba-switch-knob" aria-hidden="true"></span>
+      </span>
+    </label>
+  <% end %>
+
+  <fieldset class="ba-radio-card" id="ba-visibility">
+    <legend>Who can see my city</legend>
+    <% AroundHelper::CITY_VISIBILITY_CHOICES.each do |value, title| %>
+      <label class="ba-radio">
+        <input type="radio" name="<%= scope %>[city_visibility]" value="<%= value %>" <%= "checked" if profile.city_visibility == value %>>
+        <%= title %>
+      </label>
+    <% end %>
+  </fieldset>
+
+  <div class="ba-gold-note">
+    <%= render_icon("shield", classes: "h-5 w-5") %>
+    <p>Distances are always rounded, like “~40 km”. Blocked people and anyone under 18 never see you here.</p>
+  </div>
+</div>

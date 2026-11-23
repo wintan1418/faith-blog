@@ -1,0 +1,9 @@
+<% content_for(:title) { "Breathers around you - Brethreign" } %>
+<div class="ba-page">
+  <section class="ba-empty ba-empty--page">
+    <span class="ba-empty-ico" aria-hidden="true"><%= render_icon("shield", classes: "h-6 w-6") %></span>
+    <h1 class="ba-empty-title">Breathers around you is for members 18 and over</h1>
+    <p class="ba-empty-copy">To keep younger brethren safe, we don't show where they live or let them browse who lives nearby.</p>
+    <%= link_to "Back to the feed", feed_path, class: "ba-pill is-primary" %>
+  </section>
+</div>

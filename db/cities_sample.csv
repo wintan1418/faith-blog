@@ -1,0 +1,46 @@
+geonames_id,name,ascii_name,admin1_code,admin1_name,country_code,country_name,lat,lng,population,alternates
+2350841,Akure,Akure,48,Ondo State,NG,Nigeria,7.25256,5.19312,730000,Akuce|Akure
+2326171,Ondo,Ondo,48,Ondo State,NG,Nigeria,7.09316,4.83528,375000,Ondo
+2332459,Lagos,Lagos,05,Lagos,NG,Nigeria,6.45407,3.39467,15388000,Eko|Lacupolis|Lagas|Lagos|Lagos shaary|Lagosa|Lagosas|Lagoso|Laguosos|Laqos|Logos
+2344082,Ebute Ikorodu,Ebute Ikorodu,05,Lagos,NG,Nigeria,6.60086,3.48818,535619,Awja-Ikoradu|Ebute Ikorodu|Ebute-Egga|Ikorodu
+2352947,Abeokuta,Abeokuta,16,Ogun State,NG,Nigeria,7.15571,3.34509,735000,Abeokuta
+2338900,Ile-Ife,Ile-Ife,42,Osun State,NG,Nigeria,7.4824,4.56032,560000,Ife|Ile-Ife
+2352379,Ado-Ekiti,Ado-Ekiti,54,Ekiti State,NG,Nigeria,7.62329,5.22087,435000,Ado|Ado-Ehkiti|Ado-Ekiti
+2325314,Owo,Owo,48,Ondo State,NG,Nigeria,7.1962,5.58681,276574,Ovo|Owo
+2339354,Ibadan,Ibadan,32,Oyo State,NG,Nigeria,7.37756,3.90591,3649000,Ibadan|Ibadan shaary|Ibadana|Ibadanas|Ibadano|Impantan
+2338313,Ikeja,Ikeja,05,Lagos,NG,Nigeria,6.59651,3.34205,313196,Ikedzha|Ikeja
+2352778,Abuja,Abuja,11,FCT,NG,Nigeria,9.05785,7.49508,2690000,Abodza|Abouja|Abuca|Abudz|Abudza|Abudzha|Abugia|Abugo|Abuja|Abuya|Abuzha|Ampouza
+2324774,Port Harcourt,Port Harcourt,50,Rivers State,NG,Nigeria,4.77742,7.0134,2120000,Port Harcourt|Port Harkortas|Port Harkurt|Port Kharkurt|Port Xarcourt|Port-Kharkort|Ugwu Ocha
+6167865,Toronto,Toronto,08,Ontario,CA,Canada,43.65333,-79.38389,2794356,Taronta|Torontas|Toronto|Torontu|Torontum
+6075357,Mississauga,Mississauga,08,Ontario,CA,Canada,43.5789,-79.6583,717961,Misisaga|Misisoga|Misisogo|Missisoga|Mississauga|Mississoga
+5913490,Calgary,Calgary,01,Alberta,CA,Canada,51.05011,-114.08529,1306784,Calgaria|Calgary|Kalgari|Kalgario|Kalgaris|Kalgary|Kalnkari|Kalqari|Kelgery
+2643743,London,London,ENG,England,GB,United Kingdom,51.50853,-0.12574,8961989,ILondon|Lakana|Landan|Landen|Ljondan|Llundain|Lodoni|Londain|Londan|Londar|Londe|Londen|Londin|Londinium|Londino
+6058560,London,London,08,Ontario,CA,Canada,42.98339,-81.23304,422324,Landona|London|Londonas|Londono
+2306104,Accra,Accra,01,Greater Accra,GH,Ghana,5.55602,-0.1969,1963264,Aakra|Accra|Acra|Akara|Akkr|Akkra|Akkrae|Akra|Akrao|Nkran
+184745,Nairobi,Nairobi,05,Nairobi County,KE,Kenya,-1.28333,36.81667,4397073,Nai-lok-pi|Nairoba|Nairobi|Nairobia|Nairobis|Nairoby|Nairompi|Nairovi|Najrobi|Najrobi osh|Najrobio|Najrobo|Nayiiroobii|Nayrobi|Nayroobi
+4699066,Houston,Houston,TX,Texas,US,United States,29.76328,-95.36327,2314157,Chiouston|Hiu-su-tun|Hiustonas|Hjuston|Hjustona|Houston|Houston City|Hustonia|Hustono|Hyuston|Kh'juston|Khjustn|Khjustan|Khjuston
+4180439,Atlanta,Atlanta,GA,Georgia,US,United States,33.749,-84.38798,510823,Atlant|Atlanta|Atlantae|Atlanto|Atlonta|Canebrake|Marthasdale|Marthasville|Standing Peachtree|Terminus|White Hall|Whitehall
+5368361,Los Angeles,Los Angeles,CA,California,US,United States,34.05223,-118.24368,3820914,Angelopolis|Ciudad De los Angelos|Cuidad De Los Angelos|El Pueblo del Rio de Nuestra Senora|La Reina de Los Angeles de Porciuncula|Lok-chham-ki|Los And'eles|Los Andzelas|Los Andzeles|Los Andzheles|Los Andzhelis|Los Angeles|Los Anjeles|Los Antzeles|Los Anxheles
+2267226,Lagos,Lagos,09,Faro,PT,Portugal,37.10202,-8.67422,33494,Lacobriga|Lagos|Lagosh
+5907364,Brampton,Brampton,08,Ontario,CA,Canada,43.68341,-79.76633,656480,Brampton|Bramptonas|Bramptono|Bramptun
+2298890,Kumasi,Kumasi,02,Ashanti,GH,Ghana,6.68848,-1.62443,2544530,Coomassie|Kumase|Kumasi|Kumasi shaary|Kumasis|Kumaso|Kumassi|Kumasy
+4164138,Miami,Miami,FL,Florida,US,United States,25.77427,-80.19366,487014,Maiami|Majami|Majamis|Mayami|Miami|Miamia|Miamo
+5809844,Seattle,Seattle,WA,Washington,US,United States,47.60621,-122.33207,780995,Seatl|Seatlo|Seattle|Seattlum|Siatl|Siatul|Siehtl|Sietl|Sietla|Sietlas|Sijetl|Siyaatil
+4684888,Dallas,Dallas,TX,Texas,US,United States,32.78306,-96.80667,1326087,Dalas|Dalasa|Dalasas|Dalaso|Dallas|Dallas shaary|Dallasium|Ntalas
+5419384,Denver,Denver,CO,Colorado,US,United States,39.73915,-104.9847,729019,Dehnver|Denber|Denvr|Denver|Denver County|Denvera|Denveres|Denveris|Denverium|Denvero|Denwer|Mile-High City|Ntenver|Queen City of the Plains|Saint Charles
+4644585,Nashville,Nashville,TN,Tennessee,US,United States,36.16589,-86.78444,689447,French Lick|Nachville|Nasburgum|Nashboro|Nashborough|Nashfile|Nashvil|Nashvill|Nashville|Nashville-Davidson|Nashwil|Nasvelis|Nasvil|Nasvila|Nasvilo
+4167147,Orlando,Orlando,FL,Florida,US,United States,28.53834,-81.37924,334854,Orlandas|Orlando|Orlanto
+4726206,San Antonio,San Antonio,TX,Texas,US,United States,29.42412,-98.49363,1526656,San Antonijus|San Antonio|San Antonio de Bejar|San Antoniyo|San-Antonia|San-Antonio|Sanantonio|Sanctus Antonius
+4930956,Boston,Boston,MA,Massachusetts,US,United States,42.35843,-71.05977,653833,Baston|Bostan|Boston|Bostona|Bostonas|Bostone|Bostonia|Bostono|Bostons|Bostun|Mushauwomuk|Old Boston|Po-su-tun|Pokekona|Shawmut
+5308655,Phoenix,Phoenix,AZ,Arizona,US,United States,33.44838,-112.07404,1650070,East Phoenix|Feniks|Fenikso|Finiks|Finiksa|Finiksas|Finiksos|Foinix|Hellings Mill|Hoozdoh|Mill City|Peniki|Phenix|Phoeniks|Phoenix
+5391959,San Francisco,San Francisco,CA,California,US,United States,37.77493,-122.41942,827526,Franciscopolis|Frisco|Kapalakiko|Khiu-kim-san|Lungsod ng San Francisco|New Albion|San Francisco|San Franciscu|San Francisko|San Fransisco|San Fransiskas|San Fransisko|San Frantzisko|San Phransisko|San-Francisko
+5746545,Portland,Portland,OR,Oregon,US,United States,45.52345,-122.67621,652503,Bridgetown|P-town|Portland|Portland i Oregon|Portlandas|Portlandia|Portlando|Portlant|Portlend|Portlenda|Puddletown|Rip City|River City|Stumptown|The City of Roses
+5128581,New York City,New York City,NY,New York,US,United States,40.71427,-74.00597,8804190,Aebura|Bandar Raya New York|Big Apple|Cathair Nua-Eabhrac|City of New York|Eabhraig Nuadh|Efrog Newydd|Evrek Nowydh|Ga-no-no|Kanono|Kota New York|Lungsod ng New York|N'ju-Jork|Nea Yorke|Nei Yarrick Schtadt
+2335204,Kano,Kano,29,Kano State,NG,Nigeria,12.00012,8.51672,4910000,Byen Kano|Cano|Kanas|Kano
+4734825,Sugar Land,Sugar Land,TX,Texas,US,United States,29.61968,-95.63495,88156,Shugar Land|Shugar-Lend|Sugar Land
+4736476,The Woodlands,The Woodlands,TX,Texas,US,United States,30.15799,-95.48938,93847,Te-Vudlends|The Woodlands|Vudlands|Woodlands|Ze-Vudlends
+4702732,Katy,Katy,TX,Texas,US,United States,29.78579,-95.8244,16158,Katy|Kehci|Kehti|Kejti
+4671654,Austin,Austin,TX,Texas,US,United States,30.26715,-97.74306,974447,Austin|Austino|Austinopolis|Montopolis|Oscin|Ostin|Ostina|Ostinas|Ostins|Waterloo
+4718097,Pearland,Pearland,TX,Texas,US,United States,29.56357,-95.28605,108821,Pehrlend|Perland
+4328010,Houma,Houma,LA,Louisiana,US,United States,29.59577,-90.71953,34287,Khouma
+2646517,Hounslow,Hounslow,ENG,England,GB,United Kingdom,51.46839,-0.36092,66292,Hounslow|Hounslow keruelet|London Borough of Hounslow

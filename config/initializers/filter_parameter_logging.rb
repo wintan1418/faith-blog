@@ -6,5 +6,7 @@
 Rails.application.config.filter_parameters += [
   :passw, :email, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn, :cvv, :cvc,
   # Private words members write (breaths, comments, DMs, reports) and OAuth codes.
-  :body, :content, :message, :details, :code, :authorization_code, :current_password
+  :body, :content, :message, :details, :code, :authorization_code, :current_password,
+  # "Use my location": the browser's position is used once and never kept, not even in logs.
+  /\Alat\z/, /\Alng\z/
 ]

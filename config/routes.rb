@@ -217,6 +217,14 @@ Rails.application.routes.draw do
   get "blog/:slug/cover", to: "blog#cover", constraints: { slug: /[a-z0-9-]+/ } if Rails.env.development?
 
   get "people", to: "users#index", as: :people
+  # "Breathers around you": members nearby who chose to be found (city level only).
+  get "around", to: "around#show", as: :around
+  patch "around", to: "around#update"
+  get "around/city", to: "around#city", as: :city_around
+  post "around/hello", to: "around#hello", as: :around_hello
+  # City picker type-ahead and "Use my location" (POST, so the position never sits in a URL).
+  get "cities", to: "cities#index", as: :cities, defaults: { format: :json }
+  post "cities/nearest", to: "cities#nearest", as: :nearest_city, defaults: { format: :json }
   get "people/suggested", to: "users#suggested", as: :suggested_people
 
   # Settings
