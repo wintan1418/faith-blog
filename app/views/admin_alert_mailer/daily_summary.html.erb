@@ -1,0 +1,20 @@
+<p style="font-size: 13px; color: #5e6862; margin: 0;">Brethreign · <%= @date.strftime("%A %-d %B %Y") %></p>
+<h2 style="font-size: 18px; margin: 6px 0 14px;">Yesterday on Brethreign</h2>
+<table style="border-collapse: collapse; font-size: 14px;">
+  <tr><td style="padding: 4px 16px 4px 0;">New members</td><td><strong><%= @stats[:new_members] %></strong></td></tr>
+  <tr><td style="padding: 4px 16px 4px 0;">Breaths published</td><td><strong><%= @stats[:breaths] %></strong></td></tr>
+  <tr><td style="padding: 4px 16px 4px 0;">Comments</td><td><strong><%= @stats[:comments] %></strong></td></tr>
+  <tr><td style="padding: 4px 16px 4px 0;">Messages</td><td><strong><%= @stats[:messages] %></strong></td></tr>
+</table>
+<h3 style="font-size: 15px; margin: 18px 0 6px;">Bots stopped by the sign-up guard: <%= @bots[:total] %></h3>
+<% if @bots[:total].positive? %>
+  <ul style="font-size: 14px; margin: 0; padding-left: 18px;">
+    <% @bots[:reasons].each do |reason, n| %><li><%= reason.humanize %>: <%= n %></li><% end %>
+    <% @bots[:places].each do |place, n| %><li>On <%= place %>: <%= n %></li><% end %>
+  </ul>
+  <% if @bots[:latest].present? %><p style="font-size: 13px; color: #5e6862;">Latest: <%= @bots[:latest] %></p><% end %>
+  <p style="font-size: 13px;">Nothing to do unless real people say they can't join.</p>
+<% else %>
+  <p style="font-size: 13px;">No bots tried to sign up.</p>
+<% end %>
+<p style="color: #5e6862; font-size: 13px; margin-top: 18px;">You only get instant emails when something is broken: a page crashing, the site check failing, or a feature that keeps failing for members.</p>

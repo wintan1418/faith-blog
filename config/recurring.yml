@@ -22,6 +22,10 @@ production:
     class: AnalyticsCleanupJob
     schedule: every Sunday at 3am Africa/Lagos
 
+  daily_summary:
+    class: DailySummaryJob
+    schedule: every day at 7am Africa/Lagos
+
   birthday_notifications:
     class: BirthdayNotificationsJob
     schedule: every day at 7am Africa/Lagos

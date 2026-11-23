@@ -8,14 +8,14 @@ require "net/http"
 #     to fill the form; a bot posts instantly (or without loading the form),
 #   * Cloudflare Turnstile, when TURNSTILE_SITE_KEY + TURNSTILE_SECRET_KEY
 #     are set (invisible/managed challenge, verified server-side).
-# Blocked attempts are counted; more than ALERT_THRESHOLD in an hour raises an
-# admin alert so an attack is visible.
+# Blocked attempts are counted per day for the admins' morning summary
+# (DailySummaryJob); they never send an email on their own.
 module SignupGuard
   HONEYPOT_PARAM = :hp_website
   TOKEN_PARAM    = :form_token
   MIN_FILL_TIME  = 3.seconds
   TOKEN_TTL      = 1.day
-  ALERT_THRESHOLD = 5
+  REASONS = %w[honeypot missing_or_expired_token too_fast turnstile].freeze
   TURNSTILE_VERIFY_URL = URI("https://challenges.cloudflare.com/turnstile/v0/siteverify")
 
   module_function
@@ -59,19 +59,31 @@ module SignupGuard
     true
   end
 
+  # Bots are counted for the morning summary (DailySummaryJob), not emailed one by one.
   def record_block!(reason, where:, remote_ip:, email:)
-    Rails.logger.warn("[SignupGuard] blocked #{where} (#{reason}) ip=#{remote_ip} email_domain=#{email.to_s.split('@', 2)[1]}")
-    key = "signup_guard:blocked:#{Time.current.strftime('%Y%m%d%H')}"
-    count = AuthThrottleStore.store.increment(key, 1, expires_in: 2.hours) || 1
-    return unless count > ALERT_THRESHOLD
+    domain = email.to_s.split("@", 2)[1]
+    Rails.logger.warn("[SignupGuard] blocked #{where} (#{reason}) ip=#{remote_ip} email_domain=#{domain}")
+    store = AuthThrottleStore.store
+    day = "signup_guard:day:#{Date.current.iso8601}"
+    [ "total", "reason:#{reason}", "where:#{where}" ].each do |part|
+      store.increment("#{day}:#{part}", 1, expires_in: 3.days) || store.write("#{day}:#{part}", 1, expires_in: 3.days)
+    end
+    store.write("#{day}:latest", "#{where}, #{reason}, IP #{remote_ip}, #{domain}", expires_in: 3.days)
+  rescue StandardError => e
+    Rails.logger.warn("[SignupGuard] couldn't count the block: #{e.class}: #{e.message}")
+  end
 
-    ErrorAlert.notify(
-      key: "signup_guard:bot_signups",
-      title: "Bot sign-ups being blocked (#{count} this hour)",
-      detail: "#{count} sign-up / password-reset attempts were blocked as bots this hour. " \
-              "Latest: #{where}, reason #{reason}, IP #{remote_ip}, email domain #{email.to_s.split('@', 2)[1]}. " \
-              "Nothing to do unless real people report they can't join."
-    )
+  # What the bot guard stopped on one day: { total:, reasons: {..}, places: {..}, latest: }.
+  def blocked_on(date)
+    store = AuthThrottleStore.store
+    day = "signup_guard:day:#{date.iso8601}"
+    read = ->(part) { store.read("#{day}:#{part}").to_i }
+    {
+      total: read.call("total"),
+      reasons: REASONS.index_with { |r| read.call("reason:#{r}") }.select { |_, n| n.positive? },
+      places: [ "sign-up", "password reset", "app waitlist" ].index_with { |w| read.call("where:#{w}") }.select { |_, n| n.positive? },
+      latest: store.read("#{day}:latest")
+    }
   end
 
   def verifier
