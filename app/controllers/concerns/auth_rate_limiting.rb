@@ -20,7 +20,7 @@ module AuthRateLimiting
   private
 
   def auth_rate_limit_email
-    email = params.dig(:user, :email).to_s.strip.downcase
+    email = nested_param(:user, :email).to_s.strip.downcase
     email.presence || "ip:#{request.remote_ip}"
   end
 

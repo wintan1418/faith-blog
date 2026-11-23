@@ -320,7 +320,6 @@ Rails.application.routes.draw do
         post :retire_question
       end
     end
-    resources :moderation_logs, only: [ :index, :show ]
     resources :bible_verses do
       member { post :toggle }
     end

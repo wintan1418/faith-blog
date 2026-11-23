@@ -34,6 +34,6 @@ class Admin::AnnouncementsController < ApplicationController
   end
 
   def announcement_params
-    params.require(:announcement).permit(:kind, :title, :kicker, :body, :published_at, :expires_at)
+    params.expect(announcement: [ :kind, :title, :kicker, :body, :published_at, :expires_at ])
   end
 end

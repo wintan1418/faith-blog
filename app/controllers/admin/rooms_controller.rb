@@ -48,6 +48,6 @@ class Admin::RoomsController < ApplicationController
   end
 
   def room_params
-    params.require(:room).permit(:name, :description, :room_type, :icon, :color, :rules, :is_public, :position)
+    params.expect(room: [ :name, :description, :room_type, :icon, :color, :rules, :is_public, :position ])
   end
 end

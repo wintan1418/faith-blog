@@ -50,6 +50,6 @@ class Admin::BibleVersesController < ApplicationController
   end
 
   def verse_params
-    params.require(:bible_verse).permit(:text, :reference, :active, :position)
+    params.expect(bible_verse: [ :text, :reference, :active, :position ])
   end
 end

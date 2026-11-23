@@ -3,10 +3,9 @@
 class Rooms::PostsController < ApplicationController
   before_action :set_room
 
+  # There is no separate list page (it answered 406): the room page is the list.
   def index
-    @pagy, @posts = pagy(
-      @room.posts.published.includes(:user, :tags).recent
-    )
+    redirect_to room_path(@room), status: :moved_permanently
   end
 
   private

@@ -21,8 +21,8 @@ module Users
       return if SignupGuard.turnstile_passed?(params["cf-turnstile-response"], request.remote_ip)
 
       SignupGuard.record_block!("turnstile", where: "password reset", remote_ip: request.remote_ip,
-                                             email: params.dig(:user, :email))
-      self.resource = resource_class.new(email: params.dig(:user, :email))
+                                             email: nested_param(:user, :email))
+      self.resource = resource_class.new(email: nested_param(:user, :email))
       resource.errors.add(:base, "Please complete the check below and try again.")
       render :new, status: :unprocessable_entity
     end

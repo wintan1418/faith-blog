@@ -74,6 +74,6 @@ class Admin::BroadcastsController < ApplicationController
   end
 
   def broadcast_params
-    params.require(:broadcast).permit(:subject, :preheader, :body)
+    params.expect(broadcast: [ :subject, :preheader, :body ])
   end
 end

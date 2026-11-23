@@ -1,0 +1,25 @@
+<% content_for(:title) { "Unlock your account - Brethreign" } %>
+
+<%= render layout: "devise/shared/auth_shell", locals: { title: "Unlock your account", subtitle: "Enter your email and we'll send you a link to unlock it." } do %>
+  <%= form_for(resource, as: resource_name, url: unlock_path(resource_name), html: { method: :post, class: "auth-form" }) do |f| %>
+    <% if resource.errors.any? %>
+      <div class="auth-errors" role="alert">
+        <% resource.errors.full_messages.each do |message| %>
+          <p><%= message %></p>
+        <% end %>
+      </div>
+    <% end %>
+    <div class="auth-field">
+      <%= f.label :email, "Email", class: "auth-label" %>
+      <div class="auth-input-wrap">
+        <%= render_icon("mail", classes: "auth-input-icon") %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", inputmode: "email", class: "auth-input",
+                          placeholder: "you@example.com", required: true %>
+      </div>
+    </div>
+
+    <%= f.submit "Send unlock link", class: "auth-submit", data: { turbo_submits_with: "Sending…" } %>
+  <% end %>
+
+  <p class="auth-switch">Remembered it? <%= link_to "Back to sign in", new_session_path(resource_name) %></p>
+<% end %>

@@ -5,7 +5,7 @@ class CircleBreathsController < ApplicationController
   before_action :set_circle_and_require_membership!
 
   def create
-    breath = @circle.breaths.build(user: current_user, body: params.dig(:circle_breath, :body))
+    breath = @circle.breaths.build(user: current_user, body: nested_param(:circle_breath, :body))
     if breath.save
       redirect_to circle_path(@circle), notice: "Breathed."
     else

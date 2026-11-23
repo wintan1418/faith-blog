@@ -60,7 +60,7 @@ class GivingController < ApplicationController
   end
 
   def donation_params
-    params.require(:donation).permit(:amount, :currency, :frequency, :email, :name, :anonymous, :message)
+    params.expect(donation: [ :amount, :currency, :frequency, :email, :name, :anonymous, :message ])
   end
 
   def confirm(donation)

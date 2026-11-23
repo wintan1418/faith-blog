@@ -28,17 +28,21 @@ class Admin::UsersController < ApplicationController
     @pagy, @users = pagy(scope.order(created_at: :desc), items: 25)
   end
 
+  # There is no member page or edit form in admin (these answered 406 from the
+  # dashboard's member links): the list, filtered to them, has every action.
   def show
+    redirect_to admin_users_path(q: @user.username)
   end
 
   def edit
+    redirect_to admin_users_path(q: @user.username)
   end
 
   def update
     if @user.update(user_params)
       redirect_to admin_user_path(@user), notice: "User updated successfully."
     else
-      render :edit, status: :unprocessable_entity
+      redirect_to admin_users_path(q: @user.username_was), alert: @user.errors.full_messages.to_sentence
     end
   end
 
@@ -91,7 +95,7 @@ class Admin::UsersController < ApplicationController
   # Only a super admin may change someone's email (it's how accounts are recovered).
   def user_params
     permitted = current_user.super_admin? ? [ :username, :email ] : [ :username ]
-    params.require(:user).permit(*permitted)
+    params.expect(user: [ *permitted ])
   end
 
   def require_super_admin!

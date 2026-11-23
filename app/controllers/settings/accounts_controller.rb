@@ -17,7 +17,7 @@ class Settings::AccountsController < ApplicationController
     attrs = account_params
     if sensitive_change?(attrs)
       if current_user.password_known?
-        saved = current_user.update_with_password(attrs.merge(current_password: params.dig(:user, :current_password).to_s))
+        saved = current_user.update_with_password(attrs.merge(current_password: nested_param(:user, :current_password).to_s))
       elsif recently_signed_in?
         saved = current_user.update(attrs)
       else
@@ -63,7 +63,7 @@ class Settings::AccountsController < ApplicationController
   private
 
   def account_params
-    params.require(:user).permit(:email, :username, :password, :password_confirmation)
+    params.expect(user: [ :email, :username, :password, :password_confirmation ])
   end
 
   def sensitive_change?(attrs)

@@ -250,6 +250,8 @@ class Message < ApplicationRecord
   end
 
   def reply_to_same_conversation
+    # A reply to a message that's gone (or never was) failed the foreign key: a 500.
+    return errors.add(:reply_to, "is no longer available") if reply_to_id.present? && reply_to.nil?
     return if reply_to.nil? || reply_to.conversation_id == conversation_id
 
     errors.add(:reply_to, "must be a message in this chat")

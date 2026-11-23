@@ -63,7 +63,7 @@ class ResourceItemsController < ApplicationController
   end
 
   def resource_params
-    params.require(:resource).permit(:title, :description, :resource_type, :url, :resource_category_id, :file)
+    params.expect(resource: [ :title, :description, :resource_type, :url, :resource_category_id, :file ])
   end
 
   # Until it's approved, a resource is only seen by whoever shared it and the moderators.

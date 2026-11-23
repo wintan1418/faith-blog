@@ -41,7 +41,7 @@ module Settings
     end
 
     def certification_params
-      params.require(:certification).permit(:name, :issuer, :issued_month, :expires_month, :credential_url)
+      params.expect(certification: [ :name, :issuer, :issued_month, :expires_month, :credential_url ])
     end
   end
 end

@@ -7,7 +7,7 @@ module Settings
     before_action :authenticate_user!
 
     def create
-      language = current_user.languages.new(params.require(:user_language).permit(:name, :proficiency))
+      language = current_user.languages.new(params.expect(user_language: [ :name, :proficiency ]))
       if language.save
         redirect_to edit_settings_professional_path(anchor: "languages"), notice: "#{language.name} added."
       else

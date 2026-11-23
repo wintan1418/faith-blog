@@ -90,6 +90,6 @@ class CirclesController < ApplicationController
   end
 
   def circle_params
-    params.require(:circle).permit(:name, :description)
+    params.expect(circle: [ :name, :description ])
   end
 end

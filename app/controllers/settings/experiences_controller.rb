@@ -40,8 +40,8 @@ module Settings
     end
 
     def experience_params
-      params.require(:experience).permit(:title, :organization, :employment_type, :location,
-                                         :start_month, :end_month, :current, :description)
+      params.expect(experience: [ :title, :organization, :employment_type, :location,
+                                  :start_month, :end_month, :current, :description ])
     end
   end
 end

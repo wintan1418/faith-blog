@@ -48,6 +48,6 @@ class Admin::PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :status, :featured, :room_id)
+    params.expect(post: [ :title, :status, :featured, :room_id ])
   end
 end

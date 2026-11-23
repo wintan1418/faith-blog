@@ -39,9 +39,10 @@ class Post < ApplicationRecord
   end
 
   # Enums
-  enum :status, { draft: 0, published: 1, archived: 2, scheduled: 3 }
-  enum :kind,   { breath: 0, thread: 1 }, prefix: :kind
-  enum :prayer_status, { not_a_prayer: 0, prayer_pending: 1, prayer_answered: 2 }, prefix: :prayer_status
+  # validate: an unknown value from a form is a validation error (422), not an ArgumentError (500).
+  enum :status, { draft: 0, published: 1, archived: 2, scheduled: 3 }, validate: true
+  enum :kind,   { breath: 0, thread: 1 }, prefix: :kind, validate: true
+  enum :prayer_status, { not_a_prayer: 0, prayer_pending: 1, prayer_answered: 2 }, prefix: :prayer_status, validate: true
   enum :moderation_status, { approved: 0, pending_review: 1, blocked: 2 }, prefix: :moderation
 
   has_many :prayer_intercessions, dependent: :destroy
