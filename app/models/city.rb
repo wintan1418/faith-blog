@@ -72,6 +72,10 @@ class City < ApplicationRecord
     name, qualifier = split_query(text)
     return Match.new(status: :blank, candidates: []) if name.blank?
     return Match.new(status: :vague, candidates: []) if VAGUE.include?(name)
+    # "Nigeria", "USA 🇺🇸": a country is not a city (it once matched Aba and Worcester).
+    return Match.new(status: :country_only, candidates: []) if country_name?(name)
+    # "Ekiti, Nigeria": a state with no city of that name (it once matched Ado-Ekiti).
+    return Match.new(status: :region_only, candidates: []) if region_name?(name) && !city_name?(name)
 
     exact = narrowed_by(where("cities.search_tokens LIKE ?", "%|#{sanitize_sql_like(name)}|%"), qualifier)
               .order(population: :desc).limit(5).to_a
@@ -88,6 +92,21 @@ class City < ApplicationRecord
     end
 
     Match.new(status: :matched, city: top, candidates: exact)
+  end
+
+  def self.country_name?(name)
+    COUNTRY_ALIASES.key?(name) || where("LOWER(cities.country_name) = ?", name).exists?
+  end
+
+  def self.region_name?(name)
+    short = name.sub(REGION_SUFFIX, "").strip
+    where("LOWER(cities.admin1_name) IN (:names)", names: [ name, short, "#{short} state" ].uniq).exists?
+  end
+
+  def self.city_name?(name)
+    # "New York" is a state and the start of "New York City", so it stays a city.
+    where("LOWER(cities.ascii_name) = :n OR LOWER(cities.name) = :n OR LOWER(cities.ascii_name) LIKE :p",
+          n: name, p: "#{sanitize_sql_like(name)} %").exists?
   end
 
   def self.best_match(text)
