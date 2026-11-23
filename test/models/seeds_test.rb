@@ -28,10 +28,10 @@ class SeedsTest < ActiveSupport::TestCase
 
   # ── Earning rules ─────────────────────────────────────────────
 
-  test "publishing a breath pays 10, the first 3 a day" do
-    4.times { breath }
-    assert_equal 3, kinds(@author)["breath"]
-    assert_equal 30, total(@author)
+  test "publishing a breath pays 10, the first 10 a day" do
+    11.times { breath }
+    assert_equal 10, kinds(@author)["breath"]
+    assert_equal 100, total(@author)
   end
 
   test "a held or draft breath pays nothing until it goes live" do
@@ -40,6 +40,28 @@ class SeedsTest < ActiveSupport::TestCase
 
     post.update!(status: :published)
     assert_equal 10, total(@author)
+  end
+
+  test "a GIF comment counts like words do" do
+    post = breath
+    comment = Comment.new(user: @reader, post: post, gif_url: "https://static.klipy.com/x.gif", gif_title: "Amen")
+    comment.content = ""
+    comment.save!(validate: false)
+    Seeds.comment_created(comment.reload)
+    assert_equal 1, kinds(@reader)["comment"]
+  end
+
+  test "on your own breath, a reply to someone counts; talking to yourself does not" do
+    post = breath
+    lonely = Comment.create!(user: @author, post: post, content: "Adding a little more context for everyone here")
+    Seeds.comment_created(lonely)
+    assert_nil kinds(@author)["comment"]
+
+    Comment.create!(user: @reader, post: post, content: "This really helped me today, thank you so much")
+    reply = Comment.create!(user: @author, post: post, content: "So glad it helped, thank you for sharing that")
+    Seeds.comment_created(reply)
+    assert_equal 1, kinds(@author)["comment"]
+    assert_equal 0, SeedEvent.where(user: @author, kind: "comment_received", actor_id: @author.id).count
   end
 
   test "commenting on someone else's breath pays 5 and the author 2" do
@@ -124,9 +146,9 @@ class SeedsTest < ActiveSupport::TestCase
     assert_equal 1, kinds(@author)["streak_30"]
 
     @author.update_columns(current_breath_streak: 99, streak_updated_on: Date.yesterday)
-    breath # the 4th breath today earns no breath seeds, but the streak still pays
+    breath # the 4th breath today still pays (cap is 10), and the streak pays too
     assert_equal 1, kinds(@author)["streak_100"]
-    assert_equal 3, kinds(@author)["breath"]
+    assert_equal 4, kinds(@author)["breath"]
   end
 
   test "earning a badge pays 25" do

@@ -41,7 +41,7 @@ class SeedsBackfillTest < ActiveSupport::TestCase
     added = Seeds::Backfill.new(io: nil).run
     assert added.positive?
 
-    assert_equal 3, SeedEvent.where(user: @author, kind: "breath").count # 5 breaths in one day, cap 3
+    assert_equal 5, SeedEvent.where(user: @author, kind: "breath").count # 5 breaths in one day, under the cap of 10
     assert_equal 20, SeedEvent.where(user: @reader, kind: "comment").count # 25 comments in one day, cap 20
     assert_equal 5, SeedEvent.where(user: @author, kind: "comment_received").count # once per commenter per breath
     assert_equal 1, SeedEvent.where(user: @reader, kind: "streak_7").count
