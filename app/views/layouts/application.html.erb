@@ -203,6 +203,10 @@
       <%= render "shared/navbar" unless content_for?(:bare_page) %>
 
       <div id="flash_messages" data-guest-gate-allow><%= render "shared/flash" %></div>
+      <%# Seeds: "+5 seeds" toasts and the rank-up celebration land here. %>
+      <div id="seed_toasts" class="seed-toasts">
+        <%= render "seeds/rank_up_modal", user: current_user if user_signed_in? && current_user.rank_up_pending? %>
+      </div>
       <%= render "shared/app_update_banner" if outdated_android_app? %>
 
       <main>

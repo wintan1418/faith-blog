@@ -32,7 +32,8 @@ class Notification < ApplicationRecord
     birthday:               26,
     content_removed:        27,
     skill_endorsed:         28,
-    app_update:             29
+    app_update:             29,
+    rank_up:                30
   }
 
   # Associations
@@ -92,7 +93,8 @@ class Notification < ApplicationRecord
     post_blocked: "shield", post_held_for_review: "shield", post_moderation_approved: "checkcircle",
     thread_new_voice: "comment", badge_earned: "trophy", circle_breath: "users",
     circle_prayer: "pray", circle_prayer_answered: "answered", birthday: "cake",
-    content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone"
+    content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone",
+    rank_up: "sprout"
   }.freeze
 
   def web_icon
@@ -145,6 +147,9 @@ class Notification < ApplicationRecord
     when :badge_earned
       badge = notifiable.respond_to?(:info) ? notifiable.info : nil
       badge ? "You earned the #{badge[:name]} badge#{e.(" #{badge[:emoji]}")}" : "You earned a new badge#{e.(" ✦")}"
+    when :rank_up
+      rank = notifiable.respond_to?(:rank) ? notifiable.rank : nil
+      rank ? "You're now #{rank.a_name}#{e.(" #{rank.emoji}")}. Keep encouraging the brethren." : "You reached a new rank#{e.(" 🌱")}"
     when :prayer_joined
       "#{actor&.display_name || 'Someone'} joined your prayer chain"
     when :prayer_answered
@@ -189,7 +194,7 @@ class Notification < ApplicationRecord
       else
         Rails.application.routes.url_helpers.notifications_path
       end
-    when :badge_earned
+    when :badge_earned, :rank_up
       Rails.application.routes.url_helpers.user_path(user.username)
     when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked, :thread_new_voice
       post = underlying_post
@@ -284,7 +289,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
-    return if birthday? || skill_endorsed? || app_update? # a push and the alert are enough; no emails for these
+    return if birthday? || skill_endorsed? || app_update? || rank_up? # a push and the alert are enough; no emails for these
     return if notifiable.is_a?(Message) && notifiable.quiet? # e.g. the welcome note, which has its own email
 
     NotificationMailer.with(notification: self).community_notification.deliver_later

@@ -1,3 +1,6 @@
+<% if flash[:seeds].to_i.positive? %>
+  <%= render "seeds/toast", points: flash[:seeds].to_i %>
+<% end %>
 <% if notice || alert %>
   <div class="fc-toast-stack" data-controller="flash">
     <% if notice %>

@@ -1,0 +1,231 @@
+/* ==========================================
+   Seeds: rank chips, the "+5 seeds" toast, the rank-up celebration,
+   the leaderboard and the "Top Encouragers" card.
+   Colours come from --fc-* tokens, so light and dark both work.
+   ========================================== */
+
+.seed-rank--seedling { --rank: #4f7d2f; }
+.seed-rank--sprout   { --rank: #1f7f52; }
+.seed-rank--sapling  { --rank: #0c7266; }
+.seed-rank--branch   { --rank: #3f6b22; }
+.seed-rank--fruitful { --rank: #7a3d91; }
+.seed-rank--oak      { --rank: #8a5a1f; }
+.seed-rank--cedar    { --rank: #7a5c12; }
+html.theme-dark .seed-rank--seedling { --rank: #a5d983; }
+html.theme-dark .seed-rank--sprout   { --rank: #6fd9a6; }
+html.theme-dark .seed-rank--sapling  { --rank: #5fd6c3; }
+html.theme-dark .seed-rank--branch   { --rank: #b4dd8a; }
+html.theme-dark .seed-rank--fruitful { --rank: #d1a8ea; }
+html.theme-dark .seed-rank--oak      { --rank: #e7b878; }
+html.theme-dark .seed-rank--cedar    { --rank: #e3c470; }
+
+/* ── Rank chip ─────────────────────────────────────────────── */
+.seed-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  padding: 0.1rem 0.5rem 0.1rem 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--rank, var(--fc-accent)) 13%, transparent);
+  color: var(--rank, var(--fc-accent));
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.seed-rank-ico { width: 0.85rem; height: 0.85rem; flex: none; }
+.seed-rank-name { overflow: hidden; text-overflow: ellipsis; }
+.seed-rank.is-compact { padding: 0.15rem; }
+.seed-rank.is-compact .seed-rank-ico { width: 0.75rem; height: 0.75rem; }
+.cm-rank { margin-left: 0.15rem; opacity: 0.9; }
+.seed-rank-link { text-decoration: none; display: inline-flex; }
+.seed-rank--profile { font-size: 0.8rem; padding: 0.2rem 0.65rem 0.2rem 0.45rem; }
+.seed-rank--profile .seed-rank-ico { width: 1rem; height: 1rem; }
+
+/* ── Toast ─────────────────────────────────────────────────── */
+.seed-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  z-index: 95;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.95rem 0.5rem 0.6rem;
+  border-radius: 999px;
+  background: var(--fc-surface, #fff);
+  color: var(--fc-ink, #111);
+  border: 1px solid color-mix(in oklch, var(--fc-accent, #0b7a54) 35%, transparent);
+  box-shadow: 0 12px 32px -10px rgba(0, 0, 0, 0.35);
+  font-weight: 800;
+  font-size: 0.9rem;
+  transform: translateX(-50%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  animation: seed-pop 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.3);
+  pointer-events: none;
+}
+@media (min-width: 1024px) { .seed-toast { bottom: 2rem; } }
+.seed-toast.opacity-0 { opacity: 0; transform: translate(-50%, 8px); }
+.seed-toast-ico {
+  display: grid; place-items: center;
+  width: 1.6rem; height: 1.6rem; border-radius: 999px;
+  background: var(--fc-accent-soft, rgba(14, 138, 95, 0.1));
+  color: var(--fc-accent, #0b7a54);
+}
+.seed-toast-text { color: var(--fc-accent, #0b7a54); }
+@keyframes seed-pop {
+  from { opacity: 0; transform: translate(-50%, 14px) scale(0.9); }
+  to   { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+/* ── Progress ──────────────────────────────────────────────── */
+.seed-progress {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--fc-ink, #111) 9%, transparent);
+  overflow: hidden;
+}
+.seed-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--fc-accent, #0b7a54), var(--rank, var(--fc-accent, #0b7a54)));
+  transition: width 0.6s ease;
+}
+.seed-progress-label { margin-top: 0.35rem; font-size: 0.8rem; color: var(--fc-muted, #5a6b62); }
+.seed-progress-label strong { color: var(--fc-ink, #111); }
+
+/* ── Rank-up celebration (borrows the What's new dialog) ───── */
+.seed-rankup-body { padding: 1.25rem 1.5rem 0.25rem; text-align: center; }
+.seed-rankup-icon { position: relative; color: var(--rank, var(--fc-accent)); }
+.seed-rankup .seed-progress { margin: 1rem 0 0; text-align: left; }
+.seed-rankup .wn-actions a.wn-back { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+
+/* ── Pages: leaderboard + how to earn ──────────────────────── */
+.seed-page {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 6rem;
+  color: var(--fc-ink, #111);
+}
+.seed-page-head { margin-bottom: 1rem; }
+.seed-kicker {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.2rem 0.65rem; border-radius: 999px;
+  background: var(--fc-accent-soft, rgba(14, 138, 95, 0.1)); color: var(--fc-accent, #0b7a54);
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.seed-page-title {
+  margin-top: 0.6rem;
+  font-family: var(--fc-serif, Georgia, serif);
+  font-size: clamp(1.7rem, 6vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--fc-ink, #111);
+}
+.seed-page-copy { margin-top: 0.4rem; color: var(--fc-muted, #5a6b62); }
+.seed-link {
+  display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.6rem;
+  color: var(--fc-accent, #0b7a54); font-weight: 700; font-size: 0.9rem; text-decoration: none;
+}
+.seed-link:hover { text-decoration: underline; }
+.seed-page-foot { margin-top: 1.25rem; text-align: center; }
+
+.seed-tabs {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;
+  padding: 0.25rem; border-radius: 999px;
+  background: color-mix(in oklch, var(--fc-ink, #111) 6%, transparent);
+}
+.seed-tab {
+  padding: 0.5rem 0.25rem; border-radius: 999px; text-align: center;
+  font-weight: 700; font-size: 0.88rem; color: var(--fc-muted, #5a6b62); text-decoration: none;
+  white-space: nowrap;
+}
+.seed-tab.is-active { background: var(--fc-surface, #fff); color: var(--fc-ink, #111); box-shadow: var(--sh-sm, 0 1px 2px rgba(0,0,0,.08)); }
+
+.seed-room-picker { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+.seed-room-chip {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 0.3rem 0.75rem; border-radius: 999px; border: 1px solid var(--fc-line-strong, rgba(0,0,0,.18));
+  font-size: 0.82rem; font-weight: 600; color: var(--fc-soft, #2c3b33); text-decoration: none;
+}
+.seed-room-chip.is-active { background: var(--fc-fill, #0d855b); border-color: transparent; color: var(--fc-on-fill, #fff); }
+
+.seed-mine, .seed-card {
+  margin-top: 1rem; padding: 0.9rem 1rem; border-radius: 18px;
+  background: var(--fc-surface, #fff); border: 1px solid var(--fc-line, rgba(0,0,0,.1));
+  box-shadow: var(--sh-sm, none);
+}
+.seed-mine { border-color: color-mix(in oklch, var(--fc-accent, #0b7a54) 35%, transparent); }
+.seed-mine-top { display: flex; align-items: center; gap: 0.6rem; min-width: 0; margin-bottom: 0.7rem; }
+.seed-mine-note { margin: -0.2rem 0 0.6rem; font-size: 0.82rem; color: var(--fc-muted, #5a6b62); }
+
+.seed-board { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.seed-row {
+  display: flex; align-items: center; gap: 0.6rem; min-width: 0;
+  padding: 0.6rem 0.75rem; border-radius: 16px;
+  background: var(--fc-surface, #fff); border: 1px solid var(--fc-line, rgba(0,0,0,.1));
+}
+.seed-row.is-me { border-color: color-mix(in oklch, var(--fc-accent, #0b7a54) 45%, transparent); }
+.seed-pos {
+  flex: none; width: 2rem; text-align: center;
+  font-weight: 800; font-size: 0.95rem; color: var(--fc-muted, #5a6b62);
+}
+.seed-row.is-top-1 .seed-pos, .seed-row.is-top-2 .seed-pos, .seed-row.is-top-3 .seed-pos { color: var(--fc-gold, #84651c); }
+.seed-row-link, .seed-side-link {
+  display: flex; align-items: center; gap: 0.6rem; flex: 1; min-width: 0; text-decoration: none; color: inherit;
+}
+.seed-avatar {
+  flex: none; display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 999px;
+  background: var(--fc-avatar-bg, var(--fc-accent-soft)); color: var(--fc-avatar-fg, var(--fc-ink));
+  font-weight: 800; font-size: 0.9rem;
+}
+.seed-row-who { display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; min-width: 0; flex: 1; }
+.seed-row-name {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-weight: 700; color: var(--fc-ink, #111);
+}
+.seed-row-seeds { flex: none; font-weight: 800; font-size: 0.88rem; color: var(--fc-accent, #0b7a54); white-space: nowrap; }
+.seed-empty { margin-top: 1.25rem; text-align: center; color: var(--fc-muted, #5a6b62); }
+
+.seed-card-title { font-weight: 800; font-size: 1.05rem; color: var(--fc-ink, #111); margin-bottom: 0.5rem; }
+.seed-rules { display: flex; flex-direction: column; }
+.seed-rule {
+  display: flex; align-items: center; gap: 0.7rem; padding: 0.6rem 0;
+  border-top: 1px solid var(--fc-line, rgba(0,0,0,.1));
+}
+.seed-rule:first-child { border-top: 0; }
+.seed-rule-ico {
+  flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 999px;
+  background: var(--fc-accent-soft, rgba(14,138,95,.1)); color: var(--fc-accent, #0b7a54);
+}
+.seed-rule-text { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.seed-rule-text strong { font-weight: 700; color: var(--fc-ink, #111); }
+.seed-rule-text small { font-size: 0.8rem; color: var(--fc-muted, #5a6b62); }
+.seed-rule-pts { flex: none; font-weight: 800; color: var(--fc-accent, #0b7a54); font-size: 0.85rem; text-align: right; }
+.seed-fine { margin-top: 0.6rem; font-size: 0.8rem; color: var(--fc-muted, #5a6b62); }
+.seed-ranks { display: flex; flex-direction: column; gap: 0.35rem; }
+.seed-rank-line {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  padding: 0.4rem 0.5rem; border-radius: 12px;
+}
+.seed-rank-line.is-current { background: var(--fc-accent-soft, rgba(14,138,95,.1)); }
+.seed-rank-at { font-size: 0.85rem; font-weight: 600; color: var(--fc-muted, #5a6b62); }
+
+/* ── Profile ──────────────────────────────────────────────── */
+.seed-profile-progress { margin-top: 1rem; max-width: 420px; }
+.seed-profile-progress .seed-link { margin-top: 0.25rem; font-size: 0.82rem; }
+.profile-stat-seeds span { display: inline-flex; align-items: center; gap: 0.25rem; }
+.profile-stat-seeds span svg { color: var(--fc-accent, #0b7a54); }
+
+/* ── Feed card ────────────────────────────────────────────── */
+.seed-side-list { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 0.6rem; }
+.seed-side-row { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+.seed-side-row .seed-avatar { width: 36px; height: 36px; font-size: 0.8rem; }
+.seed-side-seeds { flex: none; font-weight: 800; font-size: 0.82rem; color: var(--fc-accent, #0b7a54); }
+.seed-side-how { font-size: 0.82rem; }

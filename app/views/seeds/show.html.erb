@@ -1,0 +1,54 @@
+<% content_for(:title) { "How to earn seeds · Brethreign" } %>
+
+<div class="seed-page">
+  <header class="seed-page-head">
+    <span class="seed-kicker"><%= render_icon("sprout", classes: "h-4 w-4") %> Seeds</span>
+    <h1 class="seed-page-title">How to earn seeds</h1>
+    <p class="seed-page-copy">“Let us consider one another to provoke unto love and to good works.” Hebrews 10:24. Seeds are a small thank-you for building the brethren up.</p>
+  </header>
+
+  <section class="seed-card" aria-labelledby="seed-ways">
+    <h2 class="seed-card-title" id="seed-ways">Ways to earn</h2>
+    <ul class="seed-rules">
+      <% notes = {
+           "comment" => "At least #{Seeds::MIN_COMMENT_CHARS} characters. Up to #{@rules["comment"][:daily_cap]} a day.",
+           "intercession" => "Up to #{@rules["intercession"][:daily_cap]} a day.",
+           "breath" => "Your first #{@rules["breath"][:daily_cap]} breaths each day.",
+           "comment_received" => "Once per person, per breath.",
+           "reaction_received" => "Up to #{@rules["reaction_received"][:daily_cap]} a day.",
+           "badge" => "Each milestone badge."
+         } %>
+      <% [ %w[comment comment], %w[intercession pray], %w[breath leaf], %w[comment_received reply], %w[reaction_received heart], %w[badge trophy] ].each do |kind, icon| %>
+        <% rule = @rules[kind] %>
+        <li class="seed-rule">
+          <span class="seed-rule-ico"><%= render_icon(icon, classes: "h-4 w-4") %></span>
+          <span class="seed-rule-text">
+            <strong><%= rule[:label] %></strong>
+            <small><%= notes[kind] %></small>
+          </span>
+          <span class="seed-rule-pts">+<%= rule[:points] %></span>
+        </li>
+      <% end %>
+      <li class="seed-rule">
+        <span class="seed-rule-ico"><%= render_icon("flame", classes: "h-4 w-4") %></span>
+        <span class="seed-rule-text"><strong>Breath streaks</strong><small>Day 7, day 30 and day 100 of a streak.</small></span>
+        <span class="seed-rule-pts">+<%= @rules["streak_7"][:points] %> / +<%= @rules["streak_30"][:points] %> / +<%= @rules["streak_100"][:points] %></span>
+      </li>
+    </ul>
+    <p class="seed-fine">Nothing is earned from your own breaths or from people who have blocked you. Seeds from a breath or comment go away if it is deleted or held by moderation.</p>
+  </section>
+
+  <section class="seed-card" aria-labelledby="seed-ranks">
+    <h2 class="seed-card-title" id="seed-ranks">Ranks</h2>
+    <ol class="seed-ranks">
+      <% @ranks.each do |rank| %>
+        <li class="seed-rank-line<%= ' is-current' if user_signed_in? && current_user.seeds_rank == rank %>">
+          <%= seed_rank_chip(rank) %>
+          <span class="seed-rank-at"><%= rank.threshold.zero? ? "Start" : seeds_count(rank.threshold) %></span>
+        </li>
+      <% end %>
+    </ol>
+  </section>
+
+  <p class="seed-page-foot"><%= link_to "See the leaderboard", leaderboard_path, class: "fc-btn fc-btn-primary" %></p>
+</div>

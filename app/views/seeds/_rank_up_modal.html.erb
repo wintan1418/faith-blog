@@ -1,0 +1,32 @@
+<%# The once-per-rank celebration. Marked seen as soon as it opens. Locals: user %>
+<% rank = Seeds::Rank.at(user.seeds_rank_reached) %>
+<% nxt = rank.next %>
+<dialog class="wn seed-rankup" data-controller="rank-up" data-turbo-temporary
+        data-rank-up-seen-url-value="<%= seeds_rank_seen_path %>" aria-labelledby="seed-rankup-title">
+  <div class="wn-card seed-rankup-card seed-rank--<%= rank.key %>">
+    <div class="wn-top">
+      <span class="wn-kicker">New rank</span>
+      <button type="button" class="wn-close" data-action="rank-up#close" aria-label="Close"><%= render_icon("x", classes: "h-4 w-4") %></button>
+    </div>
+    <div class="seed-rankup-body">
+      <div class="wn-emoji-wrap" aria-hidden="true">
+        <span class="wn-spark is-1"></span><span class="wn-spark is-2"></span><span class="wn-spark is-3"></span>
+        <span class="seed-rankup-icon"><%= render_icon(rank.icon, classes: "h-12 w-12") %></span>
+      </div>
+      <h2 class="wn-title" id="seed-rankup-title">You're now <%= rank.a_name %> <%= rank.emoji %></h2>
+      <p class="wn-text">Every comment, prayer and breath helps the brethren grow. Thank you for building them up.</p>
+      <% if nxt %>
+        <div class="seed-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<%= rank.progress(user.seeds_total) %>" aria-label="Progress to <%= nxt.name %>">
+          <span class="seed-progress-fill" style="width: <%= rank.progress(user.seeds_total) %>%"></span>
+        </div>
+        <p class="seed-progress-label"><%= seeds_count(rank.seeds_to_next(user.seeds_total)) %> to <%= nxt.name %></p>
+      <% else %>
+        <p class="seed-progress-label">The highest rank. Thank you, faithful one.</p>
+      <% end %>
+    </div>
+    <div class="wn-actions">
+      <%= link_to "Leaderboard", leaderboard_path, class: "wn-back", data: { action: "rank-up#close" } %>
+      <button type="button" class="wn-next" data-action="rank-up#close">Keep going</button>
+    </div>
+  </div>
+</dialog>

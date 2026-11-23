@@ -40,6 +40,8 @@ class User < ApplicationRecord
   validates :accent_color, inclusion: { in: ->(_) { AccentPalette.slugs } }, allow_blank: true
   has_many :game_attempts, dependent: :destroy
   has_many :user_badges, dependent: :destroy
+  has_many :seed_events, dependent: :delete_all
+  has_many :seed_rank_ups, dependent: :destroy
   has_many :user_seen_quiz_questions, dependent: :delete_all
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
@@ -358,6 +360,7 @@ class User < ApplicationRecord
 
   # Update breath streak after a published post lands.
   # Today already counted? Skip. Yesterday? Increment. Older? Reset to 1.
+  # Truthy only when this call moved the streak (Seeds pays streak bonuses then).
   def bump_breath_streak!
     today = Date.current
     return if streak_updated_on == today
@@ -374,6 +377,18 @@ class User < ApplicationRecord
       longest_breath_streak: new_longest,
       streak_updated_on: today
     )
+  end
+
+  # Seeds: the member's rank comes from their total.
+  def seeds_rank = Seeds::Rank.for(seeds_total)
+
+  def seeds_this_week
+    seed_events.since(Date.current.beginning_of_week).sum(:points)
+  end
+
+  # A rank reached whose celebration hasn't been shown yet.
+  def rank_up_pending?
+    seeds_rank_reached.to_i > seeds_rank_seen.to_i
   end
 
   def streak_label

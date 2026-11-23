@@ -1,0 +1,5 @@
+<%# "+5 seeds" after an action that earned some. Locals: points %>
+<div class="seed-toast" role="status" data-controller="flash" data-turbo-temporary>
+  <span class="seed-toast-ico" aria-hidden="true"><%= render_icon("sprout", classes: "h-4 w-4") %></span>
+  <span class="seed-toast-text">+<%= seeds_count(points) %></span>
+</div>

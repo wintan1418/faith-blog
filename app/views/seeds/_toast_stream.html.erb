@@ -1,0 +1,5 @@
+<%# Appended to a Turbo Stream response that earned the viewer seeds. Locals: points, user %>
+<turbo-stream action="append" target="seed_toasts"><template><%= render "seeds/toast", points: points %></template></turbo-stream>
+<% if user.rank_up_pending? %>
+  <turbo-stream action="append" target="seed_toasts"><template><%= render "seeds/rank_up_modal", user: user %></template></turbo-stream>
+<% end %>
