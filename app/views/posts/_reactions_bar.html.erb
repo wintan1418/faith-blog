@@ -73,21 +73,35 @@
     <%= render "posts/share_button", post: post %>
   </div>
 
+  <%# Save, then a ⋯ More menu for the rarer actions (pin, report, block), so
+      the second row is always the same four: Repost · Share · Save · More. %>
   <div class="post-reactions-right">
-    <% if user_signed_in? %>
-      <%= render "posts/bookmark_button", post: post %>
-      <% if current_user.admin_or_moderator? %>
-        <% if post.featured? %>
-          <%= button_to "Unfeature", unfeature_post_path(post), form_class: "inline", class: "fc-btn" %>
-        <% else %>
-          <%= button_to "★ Feature", feature_post_path(post), form_class: "inline", class: "fc-btn" %>
-        <% end %>
-      <% end %>
-      <% if post.user != current_user %>
-        <%= render "reports/button", reportable: post, label: "Report" %>
-      <% end %>
-    <% else %>
-      <%= render "posts/bookmark_button", post: post %>
+    <%= render "posts/bookmark_button", post: post %>
+    <% if user_signed_in? && (current_user.admin_or_moderator? || post.user != current_user) %>
+      <div class="fc-breath-more post-bar-more" data-controller="dropdown">
+        <button type="button" class="fc-action post-bar-more-trigger" data-action="click->dropdown#toggle"
+                aria-label="More actions" aria-haspopup="menu" title="More">
+          <%= render_icon("more", classes: "eg-i20") %>
+          <span class="fc-action-label">More</span>
+        </button>
+        <div data-dropdown-target="menu" class="fc-breath-menu post-bar-menu hidden" role="menu">
+          <% if current_user.admin_or_moderator? %>
+            <% if post.featured? %>
+              <%= button_to unfeature_post_path(post), form_class: "contents", class: "fc-action w-full", role: "menuitem" do %>
+                <%= render_icon("pin", classes: "h-4 w-4") %><span class="fc-action-label">Unpin breath</span>
+              <% end %>
+            <% else %>
+              <%= button_to feature_post_path(post), form_class: "contents", class: "fc-action w-full", role: "menuitem" do %>
+                <%= render_icon("pin", classes: "h-4 w-4") %><span class="fc-action-label">Pin for everyone</span>
+              <% end %>
+            <% end %>
+          <% end %>
+          <% if post.user != current_user %>
+            <%= render "reports/button", reportable: post, label: "Report", classes: "fc-action w-full" %>
+            <%= render "users/block_button", user: post.user, classes: "fc-action w-full" unless post.anonymous? %>
+          <% end %>
+        </div>
+      </div>
     <% end %>
   </div>
 </div>
