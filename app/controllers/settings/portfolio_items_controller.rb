@@ -30,12 +30,12 @@ module Settings
       # New photos are added to the ones kept (like editing a breath), so the
       # count and type checks still run on the whole set.
       added = Array(attrs.delete(:images)).compact_blank
-      removed = Array(params.dig(:portfolio_item, :remove_image_ids)).map(&:to_i)
+      removed = Array(nested_param(:portfolio_item, :remove_image_ids)).map(&:to_i)
       if added.any? || removed.any?
         kept = @item.images.attachments.reject { |a| removed.include?(a.id) }.map { |a| a.blob.signed_id }
         attrs[:images] = kept + added
       end
-      drop_document = params.dig(:portfolio_item, :remove_document) == "1" && attrs[:document].blank?
+      drop_document = nested_param(:portfolio_item, :remove_document) == "1" && attrs[:document].blank?
 
       if @item.update(attrs)
         @item.document.purge_later if drop_document
@@ -62,8 +62,8 @@ module Settings
     end
 
     def item_params
-      params.require(:portfolio_item).permit(:title, :summary, :description, :category, :contribution, :link_url, :skills_list,
-                                             :completed_month, :document, images: [])
+      params.expect(portfolio_item: [ :title, :summary, :description, :category, :contribution, :link_url, :skills_list,
+                                      :completed_month, :document, images: [] ])
     end
   end
 end

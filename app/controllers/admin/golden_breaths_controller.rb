@@ -49,6 +49,6 @@ class Admin::GoldenBreathsController < ApplicationController
   end
 
   def breath_params
-    params.require(:golden_breath).permit(:text, :author_name, :reference, :source_url, :active, :position)
+    params.expect(golden_breath: [ :text, :author_name, :reference, :source_url, :active, :position ])
   end
 end

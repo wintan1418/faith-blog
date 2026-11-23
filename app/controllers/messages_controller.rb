@@ -43,7 +43,8 @@ class MessagesController < ApplicationController
   end
 
   def update
-    if @message.update(message_params.merge(edited_at: Time.current))
+    # Editing changes the words only, never the files or what it replies to.
+    if @message.update(params.expect(message: [ :body ]).merge(edited_at: Time.current))
       respond_to do |format|
         format.html { redirect_to conversation_path(@conversation) }
         format.turbo_stream {
@@ -124,6 +125,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:body, :voice_note, :scripture_ref, :reply_to_id, images: [], documents: [])
+    params.expect(message: [ :body, :voice_note, :scripture_ref, :reply_to_id, images: [], documents: [] ])
   end
 end

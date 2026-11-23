@@ -20395,16 +20395,18 @@ html.theme-dark .aw-chip { color: #fbbf24; }
 
 .circle-columns {
   display: grid;
-  grid-template-columns: 1fr 330px;
+  /* minmax(0, …): a plain 1fr grew to the inputs' natural width and pushed
+     the page sideways on phones. */
+  grid-template-columns: minmax(0, 1fr) 330px;
   gap: 1.2rem;
   margin-top: 1.2rem;
   align-items: start;
 }
 
-@media (max-width: 860px) { .circle-columns { grid-template-columns: 1fr; } }
+@media (max-width: 860px) { .circle-columns { grid-template-columns: minmax(0, 1fr); } }
 
 .circle-breathe-form { display: flex; gap: 0.6rem; align-items: flex-end; }
-.circle-breathe-input { flex: 1; resize: vertical; }
+.circle-breathe-input { flex: 1; min-width: 0; resize: vertical; }
 
 .circle-breaths { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.7rem; }
 
@@ -20463,6 +20465,7 @@ html.theme-dark .aw-chip { color: #fbbf24; }
 @media (max-width: 860px) { .circle-prayer-list { position: static; } }
 
 .circle-prayer-form { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.8rem; }
+.circle-prayer-form .circle-input { width: 100%; min-width: 0; }
 
 .circle-prayers { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.7rem; }
 

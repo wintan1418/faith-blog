@@ -6,9 +6,9 @@ class PushSubscriptionsController < ApplicationController
   # POST /push_subscriptions
   # Body: { endpoint, keys: { p256dh, auth } }
   def create
-    endpoint = params.dig(:subscription, :endpoint) || params[:endpoint]
-    p256dh   = params.dig(:subscription, :keys, :p256dh) || params.dig(:keys, :p256dh)
-    auth     = params.dig(:subscription, :keys, :auth)   || params.dig(:keys, :auth)
+    endpoint = nested_param(:subscription, :endpoint) || params[:endpoint]
+    p256dh   = nested_param(:subscription, :keys, :p256dh) || nested_param(:keys, :p256dh)
+    auth     = nested_param(:subscription, :keys, :auth)   || nested_param(:keys, :auth)
 
     if endpoint.blank? || p256dh.blank? || auth.blank?
       render json: { ok: false, error: "Missing subscription fields." }, status: :unprocessable_entity
@@ -43,7 +43,7 @@ class PushSubscriptionsController < ApplicationController
   # DELETE /push_subscriptions
   # Body: { endpoint }
   def destroy
-    endpoint = params[:endpoint] || params.dig(:subscription, :endpoint)
+    endpoint = params[:endpoint] || nested_param(:subscription, :endpoint)
     current_user.push_subscriptions.where(endpoint: endpoint).destroy_all
     render json: { ok: true }
   end

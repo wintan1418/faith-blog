@@ -55,6 +55,6 @@ class CirclePrayersController < ApplicationController
   end
 
   def prayer_params
-    params.require(:circle_prayer).permit(:title, :details)
+    params.expect(circle_prayer: [ :title, :details ])
   end
 end

@@ -40,7 +40,7 @@ module Settings
     end
 
     def education_params
-      params.require(:education).permit(:school, :qualification, :field_of_study, :start_year, :end_year, :description)
+      params.expect(education: [ :school, :qualification, :field_of_study, :start_year, :end_year, :description ])
     end
   end
 end

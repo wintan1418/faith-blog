@@ -22,13 +22,7 @@ module Settings
     end
 
     def brethren_card_params
-      params.require(:brethren_card).permit(
-        :church_or_assembly,
-        :bio,
-        :occupation,
-        :whatsapp_number,
-        :email
-      )
+      params.expect(brethren_card: [ :church_or_assembly, :bio, :occupation, :whatsapp_number, :email ])
     end
   end
 end

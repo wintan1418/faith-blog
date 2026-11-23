@@ -42,6 +42,6 @@ class Admin::AppReleasesController < ApplicationController
   end
 
   def release_params
-    params.require(:app_release).permit(:latest_version, :minimum_version)
+    params.expect(app_release: [ :latest_version, :minimum_version ])
   end
 end

@@ -31,7 +31,7 @@ class AppWaitlistEntriesController < ApplicationController
   private
 
   def entry_params
-    params.fetch(:app_waitlist_entry, {}).permit(:email, :platform, :source)
+    optional_params(:app_waitlist_entry).permit(:email, :platform, :source)
   end
 
   # Honeypot + "form shown at" stamp, shared with sign-up (SignupGuard).

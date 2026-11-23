@@ -106,7 +106,7 @@ class PostsController < ApplicationController
 
     # The composer carries the game card through a hidden JSON field;
     # re-sanitize here — never trust the round trip.
-    if params.dig(:post, :game_share).present?
+    if nested_param(:post, :game_share).present?
       @post.game_share = Post.sanitize_game_share(params[:post][:game_share])
     end
 
@@ -138,7 +138,7 @@ class PostsController < ApplicationController
   def update
     attrs = post_params
     uploaded    = Array(attrs[:images]).reject(&:blank?)
-    removed_ids = Array(params.dig(:post, :remove_image_ids)).reject(&:blank?).map(&:to_i)
+    removed_ids = Array(nested_param(:post, :remove_image_ids)).reject(&:blank?).map(&:to_i)
 
     # Editing must APPEND images, not replace the set. Assigning
     # kept-signed-ids + new uploads in one go keeps every model validation
@@ -286,7 +286,7 @@ class PostsController < ApplicationController
   # Strips HTML so a Trix-rendered body comes through as plain words.
   def composer_text
     raw = params[:content].to_s
-    raw = params.dig(:post, :content).to_s if raw.blank?
+    raw = nested_param(:post, :content).to_s if raw.blank?
     ActionController::Base.helpers.strip_tags(raw).to_s.squish
   end
 
@@ -312,7 +312,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, :voice_note, :voice_duration_ms, :quoted_post_id, images: [])
+    params.expect(post: [ :title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, :voice_note, :voice_duration_ms, :quoted_post_id, images: [] ])
   end
 
   # Resolve ?quote=ID for the new-post flow. Only accept posts the viewer is

@@ -7,7 +7,7 @@ module Settings
     before_action :authenticate_user!
 
     def update
-      on = ActiveModel::Type::Boolean.new.cast(params[:on])
+      on = ActiveModel::Type::Boolean.new.cast(params[:on]) == true
       current_user.update!(background_rain: on)
 
       respond_to do |format|

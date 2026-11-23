@@ -2,7 +2,11 @@
 
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def google_oauth2
-    @user = User.from_google(request.env["omniauth.auth"])
+    # Opened directly (no Google answer attached), there is no one to sign in.
+    auth = request.env["omniauth.auth"]
+    return failure if auth.blank?
+
+    @user = User.from_google(auth)
 
     if @user.persisted?
       session[:ad_signup] = true if @user.previously_new_record? # a new account, for ads measurement

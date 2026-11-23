@@ -16,7 +16,7 @@ class Admin::Office::ConversationsController < Admin::Office::BaseController
   # Starts a thread, optionally with its first message (the empty-state composer).
   def create
     @conversation = conversations.create!
-    content = params.dig(:message, :content).to_s.strip
+    content = nested_param(:message, :content).to_s.strip
     if content.present?
       @conversation.messages.create!(role: :user, content: content)
       @conversation.title_from!(content)
@@ -27,7 +27,7 @@ class Admin::Office::ConversationsController < Admin::Office::BaseController
   end
 
   def update
-    @conversation.update(title: params.dig(:conversation, :title).to_s.strip.presence || OfficeConversation::DEFAULT_TITLE)
+    @conversation.update(title: nested_param(:conversation, :title).to_s.strip.presence || OfficeConversation::DEFAULT_TITLE)
     redirect_to admin_office_conversation_path(@conversation)
   end
 

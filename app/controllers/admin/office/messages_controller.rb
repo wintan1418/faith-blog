@@ -6,7 +6,7 @@ class Admin::Office::MessagesController < Admin::Office::BaseController
   before_action :set_conversation
 
   def create
-    content = params.dig(:message, :content).to_s.strip
+    content = nested_param(:message, :content).to_s.strip
     if content.blank?
       head :unprocessable_entity and return
     end

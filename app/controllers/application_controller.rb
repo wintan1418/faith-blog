@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   include FriendlyRateLimits
 
   before_action :set_current_viewer
+  before_action :reject_malformed_devise_params, if: :devise_controller?
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :touch_last_seen,                 if: :user_signed_in?
   before_action :require_supported_app_version
@@ -27,7 +28,42 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # A page that only has an HTML (or turbo-stream) view, asked for in another
+  # format (bots, link checkers and API clients send Accept: application/json),
+  # raised MissingTemplate: a 500. Answer 406 Not Acceptable instead. A missing
+  # HTML view is a real bug, so that still raises.
+  rescue_from ActionView::MissingTemplate do |error|
+    raise error if request.format.html? || request.format.turbo_stream?
+
+    head :not_acceptable
+  end
+
+  # A tampered or truncated signed id (an upload's blob id, say) is a bad
+  # request, not a server error.
+  rescue_from ActiveSupport::MessageVerifier::InvalidSignature do
+    head :unprocessable_entity
+  end
+
   protected
+
+  # Devise reads params[:user] as a hash; user=some-string crashed inside it.
+  def reject_malformed_devise_params
+    value = params[resource_name]
+    head :bad_request if value.present? && !value.is_a?(ActionController::Parameters)
+  end
+
+  # nested_param(:post, :content), but nil (not a TypeError, a 500) when a
+  # bot or stale form sends post=some-string instead of the nested fields.
+  def nested_param(*keys)
+    keys.reduce(params) { |node, key| node.is_a?(ActionController::Parameters) ? node[key] : nil }
+  end
+
+  # optional_params(:user) for optional nested fields, but empty when the
+  # value isn't a hash (calling permit on a string was a 500).
+  def optional_params(key)
+    value = params[key]
+    value.is_a?(ActionController::Parameters) ? value : ActionController::Parameters.new
+  end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [ :username ])

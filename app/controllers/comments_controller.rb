@@ -184,7 +184,7 @@ class CommentsController < ApplicationController
   end
 
   def comment_params
-    params.require(:comment).permit(:content)
+    params.expect(comment: [ :content ])
   end
 
   def apply_verdict_to_comment(comment, verdict)

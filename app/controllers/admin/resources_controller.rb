@@ -81,6 +81,6 @@ class Admin::ResourcesController < ApplicationController
   end
 
   def resource_params
-    params.require(:resource).permit(:title, :description, :resource_type, :url, :resource_category_id, :featured)
+    params.expect(resource: [ :title, :description, :resource_type, :url, :resource_category_id, :featured ])
   end
 end

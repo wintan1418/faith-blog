@@ -32,6 +32,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Devise's own DELETE /users removed the account at once: no typed-username
+  # check and no Sign in with Apple revoke. Accounts are deleted only from
+  # Settings → Account, which does both.
+  def destroy
+    redirect_to delete_settings_account_path, status: :see_other
+  end
+
   protected
 
   def configure_sign_up_params
@@ -61,8 +68,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
     reason = SignupGuard.bot_reason(params, remote_ip: request.remote_ip)
     return unless reason
 
-    SignupGuard.record_block!(reason, where: "sign-up", remote_ip: request.remote_ip, email: params.dig(:user, :email))
-    build_resource(params.fetch(:user, {}).permit(:username, :email))
+    SignupGuard.record_block!(reason, where: "sign-up", remote_ip: request.remote_ip, email: nested_param(:user, :email))
+    build_resource(optional_params(:user).permit(:username, :email))
     resource.errors.add(:base, BOT_REJECTION_MESSAGE)
     render :new, status: :unprocessable_entity
   end
