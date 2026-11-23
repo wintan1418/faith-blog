@@ -297,6 +297,9 @@ class Message < ApplicationRecord
       # Never let a live-update failure break sending.
       Rails.logger.error("[Message##{id}] inbox broadcast to user #{participant.user_id} failed: #{e.class}: #{e.message}")
     end
+    conversation.conversation_participants.includes(:user).find_each do |participant|
+      participant.user&.broadcast_unread_counts unless participant.user_id == sender_id
+    end
   end
 
   def broadcast_to_participants

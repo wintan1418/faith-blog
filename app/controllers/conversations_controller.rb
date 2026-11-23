@@ -23,6 +23,10 @@ class ConversationsController < ApplicationController
   def show
     load_sidebar
     load_thread
+    # Turbo prefetches a link when the pointer rests on it; only a real visit
+    # counts as reading the chat.
+    return if request.headers["X-Sec-Purpose"] == "prefetch"
+
     @conversation.mark_read_for!(current_user)
     clear_message_notifications
   end

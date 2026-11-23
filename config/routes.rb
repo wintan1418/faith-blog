@@ -258,6 +258,7 @@ Rails.application.routes.draw do
   get "my-connections", to: "connection_requests#connections", as: :my_connections
 
   get "inbox/search", to: "conversations#search", as: :inbox_search
+  get "unread_counts", to: "unread_counts#show", as: :unread_counts
   resources :conversations, path: "inbox", only: [ :index, :show, :new, :create ] do
     member do
       post :archive

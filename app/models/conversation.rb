@@ -56,6 +56,7 @@ class Conversation < ApplicationRecord
   def mark_read_for!(user)
     participant_for(user)&.mark_read!
     broadcast_read_receipts
+    user.broadcast_unread_counts
   end
 
   def unread_for?(user)

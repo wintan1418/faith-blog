@@ -99,8 +99,7 @@ module Ai
       end
 
       def call
-        raw = Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: user_prompt)
-        payload = extract_payload(raw)
+        payload = fetch_payload
         questions = Array(payload["questions"]).first(5).filter_map { |q| build_question(q) }
         raise ParseError, "no valid questions" if questions.empty?
 
@@ -150,6 +149,20 @@ module Ai
 
           Generate 5 questions. Seed: #{SecureRandom.hex(4)}
         PROMPT
+      end
+
+      # A round is five questions with explanations: the default 600-token reply
+      # cut it off mid-JSON (Nov 2026). Ask for room, and try once more if the
+      # reply still comes back broken.
+      REPLY_TOKENS = 2500
+
+      def fetch_payload(attempts: 2)
+        raw = Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: user_prompt, max_tokens: REPLY_TOKENS)
+        extract_payload(raw)
+      rescue ParseError
+        attempts -= 1
+        retry if attempts.positive?
+        raise
       end
 
       def extract_payload(raw)

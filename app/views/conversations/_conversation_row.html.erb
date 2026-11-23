@@ -13,7 +13,7 @@
 <%= link_to conversation_path(conversation), id: dom_id(conversation, :inbox_row),
       class: "msg-row#{' is-active' if active}#{' is-unread' if unread_count.positive?}",
       aria: { current: (active ? "page" : nil) },
-      data: { controller: "inbox-typing", inbox_typing_conversation_id_value: conversation.id, inbox_typing_user_id_value: viewer.id } do %>
+      data: { turbo_prefetch: false, controller: "inbox-typing", inbox_typing_conversation_id_value: conversation.id, inbox_typing_user_id_value: viewer.id } do %>
   <% if other_user %>
     <%= render "conversations/avatar", user: other_user, size: "h-12 w-12", online: other_user.visible_online? %>
   <% else %>
