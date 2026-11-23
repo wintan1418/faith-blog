@@ -118,6 +118,7 @@ class Profile < ApplicationRecord
   enum :city_visibility, { everyone: 0, connections: 1, only_me: 2 }, prefix: :city_shown_to
   ADULT_AGE = 18
   validate :old_enough_to_show_nearby, if: -> { show_in_nearby? && will_save_change_to_show_in_nearby? }
+  validate :city_before_showing_nearby
   before_save :sync_city_and_location
 
   # Could be under 18. Judged on the latest possible birthday in their birth year,
@@ -151,6 +152,14 @@ class Profile < ApplicationRecord
 
   def old_enough_to_show_nearby
     errors.add(:show_in_nearby, "is for members 18 and over") if minor?
+  end
+
+  # Turning "Show me" on without a city made members invisible without saying why.
+  # Checked only when it is being switched on, so other profile edits still save.
+  def city_before_showing_nearby
+    return unless show_in_nearby? && will_save_change_to_show_in_nearby? && city_id.blank?
+
+    errors.add(:base, "Pick your city first so breathers near you can find you.")
   end
 
   # The city and the location text stay in step: picking a city writes

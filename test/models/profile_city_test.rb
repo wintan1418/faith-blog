@@ -36,8 +36,20 @@ class ProfileCityTest < ActiveSupport::TestCase
     refute @profile.update(show_in_nearby: true)
     assert_includes @profile.errors[:show_in_nearby].join, "18"
 
-    @profile.update!(birth_year: year - 30, show_in_nearby: true)
+    @profile.update!(birth_year: year - 30, city: cities(:akure), show_in_nearby: true)
     assert @profile.show_in_nearby?
+  end
+
+  test "Show me needs a city first, without blocking other profile edits" do
+    @profile.update!(birth_year: Date.current.year - 30)
+    refute @profile.update(show_in_nearby: true)
+    assert_includes @profile.errors.full_messages.join, "Pick your city first"
+
+    @profile.update_columns(show_in_nearby: true) # an older record switched on with no city
+    assert @profile.reload.update(bio: "Still saves")
+
+    assert @profile.update(city: cities(:ondo))
+    assert @profile.nearby_ready?
   end
 
   test "minor? and its SQL twin agree on the edges" do
