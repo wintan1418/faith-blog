@@ -1,0 +1,7 @@
+<%# Live unread counts (locals: messages, notifications). Replaced over the
+    [user, :badges] stream; the live-badges controller copies the numbers into
+    the navbar badges and the attributes the apps read for their tab badges. %>
+<div id="unread_counts" hidden data-controller="live-badges"
+     data-live-badges-messages-value="<%= messages.to_i %>"
+     data-live-badges-notifications-value="<%= notifications.to_i %>"
+     data-live-badges-url-value="<%= unread_counts_path %>"></div>

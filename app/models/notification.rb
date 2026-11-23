@@ -58,6 +58,7 @@ class Notification < ApplicationRecord
 
   after_create_commit :deliver_email_notification
   after_create_commit :deliver_push_notification
+  after_create_commit -> { user&.broadcast_unread_counts }
 
   # Scopes
   scope :unread, -> { where(read_at: nil) }

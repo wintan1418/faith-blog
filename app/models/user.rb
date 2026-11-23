@@ -427,6 +427,18 @@ class User < ApplicationRecord
     end
   end
 
+  # Push fresh unread counts to this member's open pages (navbar badges and the
+  # count the apps read for their tab badges), so they change without a refresh.
+  def broadcast_unread_counts
+    fresh = User.find(id) # the counts above are memoized per instance
+    Turbo::StreamsChannel.broadcast_replace_to(
+      [ self, :badges ], target: "unread_counts", partial: "shared/unread_counts",
+      locals: { messages: fresh.unread_conversations_count, notifications: fresh.unread_notifications_count }
+    )
+  rescue StandardError => e
+    Rails.logger.warn("[User##{id}] unread count broadcast failed: #{e.class}: #{e.message}")
+  end
+
   def connected_with?(user)
     ConnectionRequest.connected?(self, user)
   end

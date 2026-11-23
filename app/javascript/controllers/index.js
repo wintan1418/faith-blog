@@ -65,9 +65,7 @@ import EmojiReactionsController from "./emoji_reactions_controller"
 application.register("emoji-reactions", EmojiReactionsController)
 
 import ExpandTextController from "./expand_text_controller"
-import GivingController from "./giving_controller"
 application.register("expand-text", ExpandTextController)
-application.register("giving", GivingController)
 
 import FeedTabsController from "./feed_tabs_controller"
 application.register("feed-tabs", FeedTabsController)
@@ -78,11 +76,14 @@ application.register("flash", FlashController)
 import ForwardPickerController from "./forward_picker_controller"
 application.register("forward-picker", ForwardPickerController)
 
+import FrameRefreshController from "./frame_refresh_controller"
+application.register("frame-refresh", FrameRefreshController)
+
 import GifPickerController from "./gif_picker_controller"
 application.register("gif-picker", GifPickerController)
 
-import FrameRefreshController from "./frame_refresh_controller"
-application.register("frame-refresh", FrameRefreshController)
+import GivingController from "./giving_controller"
+application.register("giving", GivingController)
 
 import GoldenCarouselController from "./golden_carousel_controller"
 application.register("golden-carousel", GoldenCarouselController)
@@ -113,6 +114,9 @@ application.register("lightbox", LightboxController)
 
 import ListFilterController from "./list_filter_controller"
 application.register("list-filter", ListFilterController)
+
+import LiveBadgesController from "./live_badges_controller"
+application.register("live-badges", LiveBadgesController)
 
 import LocalTimeController from "./local_time_controller"
 application.register("local-time", LocalTimeController)

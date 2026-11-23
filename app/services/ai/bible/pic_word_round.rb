@@ -77,8 +77,7 @@ module Ai
       end
 
       def call
-        raw = Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: user_prompt)
-        payload = extract_payload(raw)
+        payload = fetch_payload
 
         puzzles = Array(payload["puzzles"]).first(5).filter_map do |p|
           emoji  = p["emoji"].to_s.strip
@@ -115,6 +114,20 @@ module Ai
           Difficulty mix: 2 easy, 2 medium, 1 genuinely tricky.
           Generate one round of 5 puzzles. Seed: #{SecureRandom.hex(4)}
         PROMPT
+      end
+
+      # A round is five questions with explanations: the default 600-token reply
+      # cut it off mid-JSON (Nov 2026). Ask for room, and try once more if the
+      # reply still comes back broken.
+      REPLY_TOKENS = 2500
+
+      def fetch_payload(attempts: 2)
+        raw = Ai::Moderation::Client.call(system: SYSTEM_PROMPT, user: user_prompt, max_tokens: REPLY_TOKENS)
+        extract_payload(raw)
+      rescue Error
+        attempts -= 1
+        retry if attempts.positive?
+        raise
       end
 
       def extract_payload(raw)

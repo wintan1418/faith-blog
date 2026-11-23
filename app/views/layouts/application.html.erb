@@ -225,5 +225,9 @@
       <% end %>
     </div>
     <%= render "shared/ad_tracking" if ad_tracking_enabled? %>
+    <% if user_signed_in? %>
+      <%= turbo_stream_from current_user, :badges %>
+      <%= render "shared/unread_counts", messages: current_user.unread_conversations_count, notifications: current_user.unread_notifications_count %>
+    <% end %>
   </body>
 </html>
