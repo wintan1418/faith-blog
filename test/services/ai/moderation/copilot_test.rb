@@ -14,15 +14,15 @@ module Ai
 
       def make_user
         User.create!(
-          username: "u_#{SecureRandom.hex(3)}",
-          email: "u_#{SecureRandom.hex(3)}@example.com",
+          username: "u_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}",
+          email: "u_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}@example.com",
           password: "password123",
           password_confirmation: "password123"
         )
       end
 
       def make_room
-        Room.create!(name: "Room #{SecureRandom.hex(3)}", description: "x")
+        Room.create!(name: "Room #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", description: "x")
       end
 
       def make_review

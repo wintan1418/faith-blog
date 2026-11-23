@@ -7,7 +7,7 @@ class BreathFanoutJobTest < ActiveJob::TestCase
     ENV["AI_MODERATION_STUB"] = "1"
   end
 
-  def make_user(suffix = SecureRandom.hex(3))
+  def make_user(suffix = SecureRandom.random_number(10**6).to_s.rjust(6, "0"))
     User.create!(
       username: "u_#{suffix}",
       email: "u_#{suffix}@example.com",
@@ -17,7 +17,7 @@ class BreathFanoutJobTest < ActiveJob::TestCase
   end
 
   def make_room
-    Room.create!(name: "Room #{SecureRandom.hex(3)}", description: "x")
+    Room.create!(name: "Room #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", description: "x")
   end
 
   test "publishing a post enqueues the fanout job" do

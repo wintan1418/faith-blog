@@ -14,7 +14,7 @@ class SeedsTest < ActiveSupport::TestCase
   end
 
   def breath(user = @author, **attrs)
-    Post.create!({ user: user, room: @room, title: "A breath #{SecureRandom.hex(3)}", content: "Body of the breath",
+    Post.create!({ user: user, room: @room, title: "A breath #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", content: "Body of the breath",
                    status: :published, moderation_status: :approved, published_at: Time.current }.merge(attrs))
   end
 

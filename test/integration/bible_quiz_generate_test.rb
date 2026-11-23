@@ -21,7 +21,7 @@ class BibleQuizGenerateTest < ActionDispatch::IntegrationTest
   def make_questions(count, theme:, difficulty:)
     Array.new(count) do |i|
       BibleQuizQuestion.create!(
-        kind: "which_book", prompt: "#{theme} #{difficulty} question #{i} #{SecureRandom.hex(3)}?",
+        kind: "which_book", prompt: "#{theme} #{difficulty} question #{i} #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}?",
         choices: %w[Romans Acts John Jude], correct_index: 0,
         reference: "Romans 1:1", explanation: "KJV", theme: theme, difficulty: difficulty
       )
@@ -118,7 +118,7 @@ class BibleQuizGenerateTest < ActionDispatch::IntegrationTest
       asked << theme
       Array.new(5) do |i|
         Ai::Bible::QuizGenerator::Question.new(
-          kind: "what_does", prompt: "Cross question #{i} #{SecureRandom.hex(3)}?",
+          kind: "what_does", prompt: "Cross question #{i} #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}?",
           choices: %w[Atonement Exile Famine Jubilee], correct_index: 0,
           reference: "Romans 3:25", explanation: "KJV", theme: theme, difficulty: difficulty || "medium"
         )
@@ -151,7 +151,7 @@ class BibleQuizGenerateTest < ActionDispatch::IntegrationTest
       calls += 1
       Array.new(5) do |i|
         Ai::Bible::QuizGenerator::Question.new(
-          kind: "which_book", prompt: "Fresh question #{i} #{SecureRandom.hex(3)}?",
+          kind: "which_book", prompt: "Fresh question #{i} #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}?",
           choices: %w[Romans Acts John Jude], correct_index: 0,
           reference: "Romans 1:1", explanation: "KJV", theme: "faith", difficulty: "easy"
         )

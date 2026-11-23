@@ -7,7 +7,7 @@ class LinkedinImportFlowTest < ActionDispatch::IntegrationTest
   setup do
     @me = create_member("li_flow")
     sign_in @me
-    @zip = Rails.root.join("tmp", "li-flow-#{SecureRandom.hex(3)}.zip").to_s
+    @zip = Rails.root.join("tmp", "li-flow-#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}.zip").to_s
     Zip::File.open(@zip, create: true) do |zip|
       LinkedinImportTest::EXPORT.each { |name, body| zip.get_output_stream(name) { |io| io.write(body) } }
     end

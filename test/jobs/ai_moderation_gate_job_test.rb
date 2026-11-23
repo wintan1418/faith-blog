@@ -20,7 +20,7 @@ class AiModerationGateJobTest < ActiveSupport::TestCase
   def pending_post(user, title: "A gentle breath", body: "Grace and peace to you.")
     Post.create!(
       user: user,
-      room: Room.create!(name: "Room #{SecureRandom.hex(3)}", description: "x"),
+      room: Room.create!(name: "Room #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", description: "x"),
       title: title,
       content: body,
       status: :published,

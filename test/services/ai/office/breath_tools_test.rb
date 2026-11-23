@@ -13,7 +13,7 @@ class Ai::Office::BreathToolsTest < ActiveSupport::TestCase
   setup do
     ENV["OFFICE_STUB"] = "1"
     Stub.reset!
-    @admin = create_member("office_admin_#{SecureRandom.hex(3)}", role: :admin)
+    @admin = create_member("office_admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
     @conversation = @admin.office_conversations.create!
     @conversation.messages.create!(role: :user, content: "Let's make a breath and a flyer")
   end
@@ -24,7 +24,7 @@ class Ai::Office::BreathToolsTest < ActiveSupport::TestCase
   end
 
   def tool_call(name, input)
-    Reply.new(text: "", tool_calls: [ { "id" => "call_#{SecureRandom.hex(3)}", "name" => name, "input" => input } ], model: "stub")
+    Reply.new(text: "", tool_calls: [ { "id" => "call_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", "name" => name, "input" => input } ], model: "stub")
   end
 
   # Runs one tool through the runner, as the model would, and returns its message.

@@ -4,7 +4,7 @@ require "test_helper"
 
 class OfficeConversationTest < ActiveSupport::TestCase
   setup do
-    @admin = create_member("office_model_#{SecureRandom.hex(3)}", role: :admin)
+    @admin = create_member("office_model_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
     @conversation = @admin.office_conversations.create!
   end
 

@@ -340,7 +340,7 @@ class AbuseSafetyTest < ActionDispatch::IntegrationTest
   # --- L6: resources -------------------------------------------------------------------
 
   test "unapproved resources are hidden by slug, and editing an approved one sends it back for approval" do
-    category = ResourceCategory.create!(name: "Study #{SecureRandom.hex(3)}")
+    category = ResourceCategory.create!(name: "Study #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}")
     resource = Resource.create!(user: @me, resource_category: category, title: "Pending guide", resource_type: :link, url: "https://example.com/a")
 
     get resources_item_path(resource)

@@ -8,21 +8,21 @@ class Admin::ModerationReviewsControllerTest < ActionDispatch::IntegrationTest
     ENV["ANTHROPIC_API_KEY"] = nil
 
     @admin = User.create!(
-      username: "admin_#{SecureRandom.hex(3)}",
-      email: "admin_#{SecureRandom.hex(3)}@example.com",
+      username: "admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}",
+      email: "admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}@example.com",
       password: "password123",
       password_confirmation: "password123",
       role: :admin
     )
 
     @author = User.create!(
-      username: "author_#{SecureRandom.hex(3)}",
-      email: "author_#{SecureRandom.hex(3)}@example.com",
+      username: "author_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}",
+      email: "author_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}@example.com",
       password: "password123",
       password_confirmation: "password123"
     )
 
-    @room = Room.create!(name: "Room #{SecureRandom.hex(3)}", description: "x")
+    @room = Room.create!(name: "Room #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", description: "x")
     @post = Post.create!(user: @author, room: @room, title: "Title", content: "Body", status: :published)
 
     flagged = Ai::Moderation::Result.new(
@@ -75,8 +75,8 @@ class Admin::ModerationReviewsControllerTest < ActionDispatch::IntegrationTest
 
   test "suspend against a staff member's content actions the review but never the account" do
     staff = User.create!(
-      username: "staff_#{SecureRandom.hex(3)}",
-      email: "staff_#{SecureRandom.hex(3)}@example.com",
+      username: "staff_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}",
+      email: "staff_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}@example.com",
       password: "password123",
       password_confirmation: "password123",
       role: :super_admin

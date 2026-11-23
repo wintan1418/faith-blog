@@ -8,7 +8,7 @@ class ModerationBacklogSweepJobTest < ActiveSupport::TestCase
   setup { ENV["AI_MODERATION_STUB"] = "1" }
 
   def make_user
-    suffix = SecureRandom.hex(3)
+    suffix = SecureRandom.random_number(10**8).to_s # digits only: hex once spelled a blocked word
     User.create!(
       username: "u_#{suffix}",
       email: "u_#{suffix}@example.com",
@@ -20,7 +20,7 @@ class ModerationBacklogSweepJobTest < ActiveSupport::TestCase
   def pending_post(user, created_at:)
     post = Post.create!(
       user: user,
-      room: Room.create!(name: "Room #{SecureRandom.hex(3)}", description: "x"),
+      room: Room.create!(name: "Room #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", description: "x"),
       title: "A gentle breath",
       content: "Grace and peace to you.",
       status: :published,
