@@ -9,8 +9,8 @@
 # comment, a reaction or a page.
 module Seeds
   RULES = {
-    "breath"            => { points: 10,  daily_cap: 3,  label: "Publish a breath" },
-    "comment"           => { points: 5,   daily_cap: 20, label: "Comment on someone's breath" },
+    "breath"            => { points: 10,  daily_cap: 10, label: "Publish a breath" },
+    "comment"           => { points: 5,   daily_cap: 20, label: "Comment on a breath, or reply on yours" },
     "comment_received"  => { points: 2,   daily_cap: nil, label: "Someone comments on your breath" },
     "reaction_received" => { points: 1,   daily_cap: 50, label: "Someone reacts to your breath or comment" },
     "intercession"      => { points: 3,   daily_cap: 10, label: "Join someone's prayer chain" },
@@ -70,16 +70,19 @@ module Seeds
       next unless comment&.user_id && comment.moderation_approved? && !comment.deleted?
 
       post = comment.post
-      next unless post&.user_id && post.user_id != comment.user_id
-      next if MessageBlock.between?(comment.user_id, post.user_id)
+      next unless post&.user_id
+      own = post.user_id == comment.user_id
+      next if !own && MessageBlock.between?(comment.user_id, post.user_id)
 
       at ||= comment.created_at || Time.current
       context = { post: post, comment_id: comment.id, actor_id: comment.user_id, at: at, notify: notify }
 
+      # On your own breath it only counts as a reply to someone who commented first.
       paid = nil
-      if comment.content.to_plain_text.to_s.squish.length >= MIN_COMMENT_CHARS
+      if substantial_comment?(comment) && (!own || replying_on_own_breath?(post, comment))
         paid = award(user_id: comment.user_id, kind: "comment", source: comment, **context)
       end
+      next paid if own
 
       already = SeedEvent.exists?(user_id: post.user_id, kind: "comment_received",
                                   post_id: post.id, actor_id: comment.user_id)
@@ -89,6 +92,19 @@ module Seeds
       end
       paid
     end
+  end
+
+  # Real words (20+ characters), or a GIF, picture or voice note.
+  def substantial_comment?(comment)
+    return true if comment.content.to_plain_text.to_s.squish.length >= MIN_COMMENT_CHARS
+    return true if comment.respond_to?(:has_gif?) && comment.has_gif?
+
+    comment.content&.body&.attachments.present?
+  end
+
+  def replying_on_own_breath?(post, comment)
+    post.comments.where.not(user_id: comment.user_id)
+        .where(created_at: ...(comment.created_at || Time.current)).exists?
   end
 
   # +1 to whoever wrote the breath or comment someone else reacted to.
