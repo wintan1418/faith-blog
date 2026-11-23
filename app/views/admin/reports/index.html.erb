@@ -29,7 +29,7 @@
               <p class="font-semibold text-gray-900">Quiz question #<%= report.reportable_id %></p>
               <p class="text-sm text-gray-700"><%= truncate(report.reportable.prompt, length: 90) %></p>
             <% else %>
-              <p class="font-semibold text-gray-900"><%= report.reportable_type %> #<%= report.reportable_id %></p>
+              <p class="font-semibold text-gray-900"><%= report.reportable_type %> #<%= report.reportable_id %><%= " (@#{report.reportable.username})" if report.reportable.is_a?(User) %></p>
             <% end %>
             <p class="text-xs text-gray-500"><%= time_ago_in_words(report.created_at) %> ago</p>
           </td>

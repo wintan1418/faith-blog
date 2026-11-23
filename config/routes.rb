@@ -292,6 +292,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index"
     resources :app_waitlist_entries, only: :index, path: "app-waitlist"
+    resources :city_changes, only: :index, path: "city-changes"
     get "online", to: "online#index", as: :online
     get "bots", to: "bots#index", as: :bots
     resource :push_test, only: [ :show, :create ], path: "push-test"

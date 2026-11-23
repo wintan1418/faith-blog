@@ -1,7 +1,6 @@
 <% content_for(:title) { "Breathers around you - Brethreign" } %>
 <% content_for(:app_title) { "Around you" } %>
 <% city = @profile.city %>
-<% visible = @profile.show_in_nearby? && !@profile.city_shown_to_only_me? %>
 <% total = @sections.sum { |s| s.people.size } %>
 
 <div class="ba-page" data-controller="around-hello">
@@ -16,25 +15,15 @@
             <span class="ba-head-change">Change</span>
           <% end %>
         </div>
-        <% if visible %>
-          <%= link_to city_around_path(anchor: "ba-visibility"), class: "ba-status is-on", title: "Who can see me" do %>
-            <%= render_icon("shieldcheck", classes: "h-4 w-4") %><span class="ba-status-text">You're visible</span>
-          <% end %>
-        <% else %>
-          <%= link_to city_around_path(anchor: "ba-visibility"), class: "ba-status", title: "You're hidden. Who can see me" do %>
-            <%= render_icon("shield", classes: "h-4 w-4") %><span class="ba-status-text">You're hidden</span>
-          <% end %>
+        <%= link_to city_around_path(anchor: "ba-visibility"), class: "ba-status is-on", title: "Who can see me" do %>
+          <%= render_icon("shieldcheck", classes: "h-4 w-4") %><span class="ba-status-text">You're visible</span>
+        <% end %>
+        <%# One tap to disappear (seeing requires showing, so this also closes the list). %>
+        <%= button_to around_path, method: :patch, params: { profile: { show_in_nearby: "0" } },
+                      class: "ba-hide-me", form_class: "ba-hide-me-form", title: "Hide me from Breathers around you" do %>
+          <%= render_icon("eyeoff", classes: "h-4 w-4") %><span>Hide me</span>
         <% end %>
       </header>
-
-      <% unless visible %>
-        <%= form_with url: around_path, method: :patch, scope: :profile, class: "ba-hidden-note" do %>
-          <%= hidden_field_tag "profile[show_in_nearby]", "1" %>
-          <% if @profile.city_shown_to_only_me? %><%= hidden_field_tag "profile[city_visibility]", "everyone" %><% end %>
-          <p>You can look around, but nobody nearby can see you yet.</p>
-          <button type="submit" class="ba-pill is-primary">Show me</button>
-        <% end %>
-      <% end %>
 
       <%# Phones: the map sits at the top; desktops: on the right. %>
       <%= render "around/map", city: city, dots: @dots, extra: "ba-map--top" %>
@@ -55,7 +44,7 @@
         <section class="ba-empty">
           <span class="ba-empty-ico" aria-hidden="true"><%= render_icon("mappin", classes: "h-6 w-6") %></span>
           <h2 class="ba-empty-title">
-            <%= @filters.values.any? ? "No one matches that yet" : "You're the first breather around #{city.name}" %>
+            <%= @filters.values.any? ? "No one matches that yet" : "You're the first breather around #{@around.my_place.city.name}" %>
           </h2>
           <p class="ba-empty-copy">
             Only members who turn on “Show me to breathers near me” appear here.

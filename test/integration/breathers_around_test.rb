@@ -16,31 +16,35 @@ class BreathersAroundTest < ActionDispatch::IntegrationTest
   def map_dots = JSON.parse(css_select("[data-around-map-dots-value]").first["data-around-map-dots-value"])
 
   setup do
-    @me = placed("viewer", cities(:akure))
+    # Breathers around you opens after an account's first week.
+    @me = placed("viewer", cities(:akure)).tap { |u| u.update_columns(created_at: 30.days.ago) }
     sign_in @me
   end
 
   test "lists people by same city, within 50 km, then the same country, with bucketed distances" do
-    placed("same_city", cities(:akure))
-    placed("in_owo", cities(:owo))
-    placed("in_lagos", cities(:lagos))
+    # Three in each place, so each can be named (BreathersAround::MIN_PER_PLACE).
+    3.times do |i|
+      placed("same_city#{i}", cities(:akure))
+      placed("in_owo#{i}", cities(:owo))
+      placed("in_lagos#{i}", cities(:lagos))
+    end
     placed("in_toronto", cities(:toronto))
 
     get around_path
     assert_response :success
-    assert_select ".ba-section--same_city .ba-person-name", text: "same_city"
-    assert_select ".ba-section--near .ba-person-name", text: "in_owo"
-    assert_select ".ba-section--country .ba-person-name", text: "in_lagos"
+    assert_select ".ba-section--same_city .ba-person-name", text: "same_city0"
+    assert_select ".ba-section--near .ba-person-name", text: "in_owo0"
+    assert_select ".ba-section--country .ba-person-name", text: "in_lagos0"
     refute_includes names_on_page, "in_toronto"
 
-    distances = css_select(".ba-person .ba-chips .ba-chip:first-child").map { |d| d.text.strip }
+    distances = css_select(".ba-person .ba-chips .ba-chip:first-child").map { |d| d.text.strip }.uniq
     assert_equal [ "Same city", "Owo · ~40 km", "Lagos · Same country" ], distances
     # Never more precise than a city: no exact kilometres (Owo is ~44 km away).
     refute_match(/\b4[1-9] km\b/, response.body)
   end
 
   test "opted-out, blocked (either way), under-18, deactivated and hidden members never appear" do
-    placed("visible", cities(:akure))
+    3.times { |i| placed("visible#{i}", cities(:akure)) }
     placed("opted_out", cities(:akure)).profile.update!(show_in_nearby: false)
     MessageBlock.create!(blocker: @me, blocked: placed("i_blocked", cities(:akure)))
     MessageBlock.create!(blocker: placed("blocked_me", cities(:akure)), blocked: @me)
@@ -50,11 +54,11 @@ class BreathersAroundTest < ActionDispatch::IntegrationTest
     placed("friends_only", cities(:akure), city_visibility: :connections)
 
     get around_path
-    assert_equal [ "visible" ], names_on_page
+    assert_equal %w[visible2 visible1 visible0], names_on_page
 
     # Counts and map dots (worldwide, one per city) follow the same rules.
-    assert_select ".ba-section-count", text: "1 breather"
-    assert_equal [ 1 ], map_dots.map { |d| d["count"] }
+    assert_select ".ba-section-count", text: "3 breathers"
+    assert_equal [ 3 ], map_dots.map { |d| d["count"] }
     assert_equal [ "name", "lat", "lng", "count", "mine", "near", "country", "distance" ].sort, map_dots.first.keys.sort
   end
 
@@ -77,15 +81,17 @@ class BreathersAroundTest < ActionDispatch::IntegrationTest
     assert_equal "Say hello", button.text.strip
     person = JSON.parse(button["data-around-hello-person-param"])
     assert_equal "request", person["mode"]
-    assert_equal connection_requests_path(receiver_id: other.id), person["request_url"]
+    assert_equal connection_requests_path(receiver_id: other.id, via: "around"), person["request_url"]
     assert_equal 3, person["lines"].size
 
     # The note rides along with the connection request.
-    post connection_requests_path(receiver_id: other.id, message: person["lines"].first), as: :turbo_stream
-    assert_equal person["lines"].first, ConnectionRequest.find_by(sender: @me, receiver: other).message
+    post person["request_url"], params: { message: person["lines"].first }, as: :turbo_stream
+    request = ConnectionRequest.find_by(sender: @me, receiver: other)
+    assert_equal person["lines"].first, request.message
+    assert request.via_around?
   end
 
-  test "first visit asks you to opt in; you can just look around, hidden, or turn it on" do
+  test "until you show yourself you only get the opt-in screen: seeing requires showing" do
     @me.profile.update!(show_in_nearby: false)
     placed("neighbour", cities(:akure))
     placed("near_owo", cities(:owo))
@@ -93,21 +99,19 @@ class BreathersAroundTest < ActionDispatch::IntegrationTest
     get around_path
     assert_select ".ba-optin-copy", text: /2 breathers live within 50 km of Akure/
     assert_select ".ba-optin-sheet button", text: "Show me to breathers near me"
+    assert_select "button", text: /Just look around/, count: 0
     assert_empty names_on_page
 
+    # The old "just look around" door is closed.
     patch around_path, params: { look_around: "1" }
-    follow_redirect!
-    assert_equal [ "neighbour", "near_owo" ], names_on_page
-    assert_select ".ba-hidden-note"
-    refute @me.profile.reload.show_in_nearby?, "looking around never opts you in"
-
-    get around_path
-    assert_select ".ba-optin-sheet", count: 0
+    get around_path(look: 1)
+    assert_select ".ba-optin-sheet"
+    assert_empty names_on_page
 
     patch around_path, params: { profile: { show_in_nearby: "1" } }
     assert @me.profile.reload.show_in_nearby?
     follow_redirect!
-    assert_select ".ba-hidden-note", count: 0
+    assert_equal %w[near_owo neighbour], names_on_page.sort
   end
 
   test "without a city the page sends you to pick one, and picking one stores only the city" do
@@ -173,10 +177,10 @@ class BreathersAroundTest < ActionDispatch::IntegrationTest
   end
 
   test "city type-ahead and nearest city; the position is used once and never kept" do
-    placed("neighbour", cities(:akure))
+    3.times { |i| placed("neighbour#{i}", cities(:akure)) }
     get cities_path(q: "aku")
     assert_equal "Akure, Ondo, Nigeria", response.parsed_body.first["label"]
-    assert_equal 1, response.parsed_body.first["breathers"]
+    assert_equal 3, response.parsed_body.first["breathers"]
 
     before = @me.profile.reload.attributes
     post nearest_city_path, params: { lat: "7.20", lng: "5.59" }
@@ -215,11 +219,10 @@ class BreathersAroundTest < ActionDispatch::IntegrationTest
   end
 
   test "feed card: how many live in your city, or a nudge to add one" do
-    placed("neighbour", cities(:akure))
-    placed("neighbour2", cities(:akure))
+    3.times { |i| placed("neighbour#{i}", cities(:akure)) }
     get feed_path
-    assert_select ".ba-feed-title", text: "2 breathers live in Akure"
-    assert_select ".ba-feed-face", count: 2
+    assert_select ".ba-feed-title", text: "3 breathers live in Akure"
+    assert_select ".ba-feed-face", count: 3
 
     @me.profile.update!(city: cities(:toronto))
     get feed_path

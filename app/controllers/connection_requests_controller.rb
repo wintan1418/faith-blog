@@ -39,6 +39,11 @@ class ConnectionRequestsController < ApplicationController
 
     # Check if connection request already exists
     existing = ConnectionRequest.between(current_user, @receiver)
+    if via_around? && !existing&.accepted? && (until_at = around_hellos_full_until)
+      return refuse_request("You've said hello to #{ConnectionRequest::AROUND_HELLOS_PER_DAY} new people from Breathers around you today. " \
+                            "You can say hello to more in #{helpers.distance_of_time_in_words(Time.current, until_at)}. " \
+                            "You can still message your connections any time.")
+    end
     if existing
       @connection_request = existing
       if existing.accepted?
@@ -87,7 +92,8 @@ class ConnectionRequestsController < ApplicationController
     @connection_request = ConnectionRequest.new(
       sender: current_user,
       receiver: @receiver,
-      message: params[:message]
+      message: params[:message],
+      via_around: via_around?
     )
 
     if @connection_request.save
@@ -164,6 +170,19 @@ class ConnectionRequestsController < ApplicationController
   end
 
   private
+
+  # Sent from the Say hello sheet on Breathers around you.
+  def via_around? = params[:via] == "around"
+
+  # Strangers greeted from Breathers around you: AROUND_HELLOS_PER_DAY in any 24
+  # hours. Returns when the next one is allowed, or nil if one is allowed now.
+  def around_hellos_full_until
+    times = ConnectionRequest.where(sender_id: current_user.id, via_around: true, created_at: 24.hours.ago..)
+                             .order(:created_at).pluck(:created_at)
+    return if times.size < ConnectionRequest::AROUND_HELLOS_PER_DAY
+
+    times[times.size - ConnectionRequest::AROUND_HELLOS_PER_DAY] + 24.hours
+  end
 
   def refuse_request(message)
     @connection_request = nil # nothing was sent

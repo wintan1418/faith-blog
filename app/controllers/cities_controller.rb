@@ -9,9 +9,10 @@ class CitiesController < ApplicationController
 
   def index
     cities = City.search(params[:q].to_s.first(80), country: params[:country].presence || request.headers["CF-IPCountry"]).to_a
-    # "· 7 breathers": only people this member could find there anyway.
-    around = BreathersAround.new(current_user)
-    counts = around.allowed? ? around.visible_profiles.where(city_id: cities.map(&:id)).group(:city_id).count : {}
+    # "· 7 breathers": only near the member's own city, only where enough live to
+    # name the place, and only people they could find there anyway (so the picker
+    # can't be used to survey towns far away). See BreathersAround#picker_counts.
+    counts = BreathersAround.new(current_user).picker_counts(cities)
     render json: cities.map { |c| c.as_json.merge(breathers: counts[c.id].to_i) }
   end
 

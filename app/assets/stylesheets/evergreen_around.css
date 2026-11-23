@@ -78,8 +78,6 @@ html.theme-dark {
   background: var(--ba-mint); color: var(--ba-on-mint); font: 800 1rem/1 var(--fc-sans);
   box-shadow: 0 10px 30px color-mix(in srgb, var(--ba-mint) 28%, transparent);
 }
-.ba-quiet-btn { width: 100%; min-height: 2.75rem; border: 0; border-radius: 999px; background: transparent; color: var(--fc-muted); font: 700 0.9rem/1 var(--fc-sans); cursor: pointer; }
-.ba-quiet-btn:hover { color: var(--fc-ink); }
 
 /* ── Page layout: list, and the map (top on phones, right on desktops) ─── */
 .ba-layout { display: grid; gap: 1rem; }
@@ -112,11 +110,6 @@ html.theme-dark {
 }
 .ba-status.is-on { border-color: transparent; background: var(--ba-mint-soft); color: var(--ba-mint-text); }
 @media (max-width: 639px) { .ba-status-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } .ba-status { padding: 0; } }
-.ba-hidden-note {
-  display: flex; align-items: center; gap: 0.75rem; margin: 0; padding: 0.65rem 0.65rem 0.65rem 0.9rem; border-radius: 16px;
-  background: var(--ba-gold-soft); border: 1px solid var(--ba-gold-line);
-}
-.ba-hidden-note p { flex: 1; margin: 0; font: 500 0.82rem/1.4 var(--fc-sans); color: var(--fc-soft); }
 
 /* Map card */
 .ba-map {
@@ -187,7 +180,6 @@ html.theme-dark .ba-map-canvas .leaflet-tile-pane { filter: invert(1) hue-rotate
 .ba-person-main { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 0.75rem; }
 .ba-ava-wrap { position: relative; flex: none; display: block; }
 .ba-ava { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 999px; object-fit: cover; font: 800 1.1rem var(--fc-sans); }
-.ba-online { position: absolute; right: -2px; bottom: -2px; width: 14px; height: 14px; border-radius: 999px; background: #3cdb9d; border: 3px solid var(--ba-card); box-sizing: border-box; }
 .ba-person-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; }
 .ba-person-name { font: 700 0.95rem/1.25 var(--fc-sans); color: var(--fc-ink); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ba-person-name:hover { text-decoration: underline; }
@@ -418,3 +410,35 @@ html .cp-field input.cp-input, html .cp-field input.cp-input:focus {
 .ba-feed-card .ba-feed-kicker { color: #7ef0c2 !important; }
 .ba-feed-card .ba-feed-names { color: #d6e6dd !important; }
 .am-label.is-hidden { visibility: hidden; }
+
+/* Safety: Hide me, the person menu (Report / Block), the city-change limit */
+.ba-hide-me-form { margin: 0; flex: none; }
+.ba-hide-me {
+  display: inline-flex; align-items: center; gap: 0.35rem; height: 2.4rem; padding: 0 0.8rem; border-radius: 999px;
+  border: 1px solid var(--ba-card-line); background: var(--ba-card); color: var(--fc-soft);
+  font: 700 0.75rem/1 var(--fc-sans); cursor: pointer; white-space: nowrap;
+}
+.ba-hide-me:hover { border-color: var(--ba-mint-line); color: var(--fc-ink); }
+.ba-more { position: relative; flex: none; align-self: flex-start; }
+.ba-more-btn {
+  display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 999px; cursor: pointer;
+  color: var(--fc-muted); list-style: none;
+}
+.ba-more-btn::-webkit-details-marker { display: none; }
+.ba-more-btn:hover, .ba-more[open] .ba-more-btn { background: var(--ba-card-line); color: var(--fc-ink); }
+.ba-more-menu {
+  position: absolute; right: 0; top: calc(100% + 0.25rem); z-index: 20; display: grid; min-width: 11rem; max-width: 70vw;
+  padding: 0.3rem; border-radius: 14px; background: var(--ba-card); border: 1px solid var(--ba-card-line);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.18);
+}
+.ba-more-menu form { margin: 0; display: contents; }
+.ba-more-item {
+  display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.55rem 0.7rem; border: 0; border-radius: 10px;
+  background: transparent; color: var(--fc-soft); font: 600 0.82rem/1.2 var(--fc-sans); text-align: left; cursor: pointer;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ba-more-item:hover { background: var(--ba-card-line); color: #dc2626; }
+.ba-city-limit {
+  margin: 0.75rem 0 0; padding: 0.65rem 0.9rem; border-radius: 14px; background: var(--ba-gold-soft);
+  border: 1px solid var(--ba-gold-line); font: 500 0.82rem/1.4 var(--fc-sans); color: var(--fc-soft);
+}

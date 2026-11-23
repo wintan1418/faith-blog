@@ -12,7 +12,6 @@
       <% else %>
         <span class="ba-ava ba-ava--initial" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
       <% end %>
-      <% if user.visible_online? %><span class="ba-online" title="Online now"></span><% end %>
     <% end %>
     <div class="ba-person-text">
       <%= link_to name, user_path(user.username), class: "ba-person-name" %>
@@ -28,6 +27,14 @@
         <% end %>
       </div>
     </div>
+    <details class="ba-more">
+      <summary class="ba-more-btn" aria-label="More for <%= name %>"><%= render_icon("morehorizontal", classes: "h-4 w-4") %></summary>
+      <div class="ba-more-menu">
+        <%= render "reports/button", reportable: user, label: "Report", classes: "ba-more-item",
+                   reason: "Reported from Breathers around you." %>
+        <%= render "users/block_button", user: user, classes: "ba-more-item" %>
+      </div>
+    </details>
   </div>
   <div class="ba-person-action bys-action" id="<%= dom_id(user, :suggestion_action) %>">
     <% if connection&.accepted? %>
@@ -48,7 +55,7 @@
                 tint: avatar_tint_style(user.username),
                 chips: [ around_distance_chip(person), (rooms.size > 1 ? "#{rooms.size} rooms in common" : ("Both in #{rooms.first}" if rooms.any?)) ].compact,
                 lines: around_hello_lines(person, my_city, rooms), mode: mode,
-                request_url: connection_requests_path(receiver_id: user.id)
+                request_url: connection_requests_path(receiver_id: user.id, via: "around")
               }.to_json %>">
         <%= mode == "message" ? "Message" : "Say hello" %>
       </button>

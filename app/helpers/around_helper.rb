@@ -30,18 +30,23 @@ module AroundHelper
     request.headers["CF-IPCountry"].to_s.upcase[/\A[A-Z]{2}\z/]
   end
 
-  # The chip that says how far: "Same city", "Owo · ~40 km", "Lagos · Same country".
+  # The chip that says where and how far: "Same city", "near Akure", "Owo · ~40 km",
+  # "Ondo State · Within 50 km" (too few in their town to name it), "Lagos · Same country".
   def around_distance_chip(person)
-    return "Same city" if person.bucket == :same_city
+    return "Same city" if person.same_city
+    return person.where if person.bucket == :same_city
 
-    "#{person.city&.name} · #{person.distance_label}"
+    "#{person.where} · #{person.distance_label}"
   end
+
+  # The viewer's city as Breathers around you names it (a small town → its big city).
+  def around_place_name(city) = @around&.my_place&.city&.name || city.name
 
   # Three ways to start, for the Say hello sheet.
   def around_hello_lines(person, my_city, rooms)
     first = person.user.display_name
-    where = person.city&.name
-    opener = person.bucket == :same_city ? "Hi #{first}! I saw you're in #{where} too." : "Hi #{first}! I saw you're close by in #{where}."
+    where = person.area
+    opener = person.bucket == :same_city ? "Hi #{first}! I saw you're around #{where} too." : "Hi #{first}! I saw you're close by, around #{where}."
     third = if (industry = person.user.profile&.industry.presence) && industry == current_user.profile&.industry
               "Hi! We're both in #{industry}. Fancy a chat sometime?"
     elsif visible_open_to(person.user).include?("mentoring")
@@ -49,8 +54,8 @@ module AroundHelper
     elsif rooms.present?
               "Hi! We're both in #{rooms.first}. Great to find you nearby."
     else
-              "Hi! Great to find a brother or sister nearby. How long have you been in #{where}?"
+              "Hi! Great to find a brother or sister nearby. How long have you been around #{where}?"
     end
-    [ "#{opener} Would love to connect.", "Hello! Do you know a good fellowship around #{my_city.name}?", third ]
+    [ "#{opener} Would love to connect.", "Hello! Do you know a good fellowship around #{around_place_name(my_city)}?", third ]
   end
 end
