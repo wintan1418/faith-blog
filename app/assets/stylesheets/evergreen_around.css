@@ -380,6 +380,8 @@ html.theme-light .ba-feed-card, html:not(.theme-dark) .ba-feed-card { background
 .ba-feed-actions { display: flex; gap: 0.5rem; }
 .ba-feed-go { flex: 1; display: grid; place-items: center; height: 2.75rem; border-radius: 999px; background: #3cdb9d; color: #062016; font: 800 0.9rem var(--fc-sans); text-decoration: none; }
 .ba-feed-go:hover { background: #57e6ae; color: #062016; }
+/* The dark theme colours every link (html.theme-dark a); keep this button's dark text. */
+html a.ba-feed-go, html a.ba-feed-go:visited { color: #062016; }
 .ba-feed-x { flex: none; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 999px; border: 1px solid #2a6a50; background: rgba(11, 21, 17, 0.4); color: #c8dbd1; cursor: pointer; }
 
 .ba-feed-add {
