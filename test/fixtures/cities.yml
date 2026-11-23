@@ -1,0 +1,9 @@
+# Real GeoNames rows (db/cities_sample.csv, CC BY 4.0), labelled by name:
+# cities(:akure), cities(:ondo), cities(:owo), cities(:lagos), cities(:toronto)...
+<% GeonamesImport.sample_rows.each do |row| %>
+<% label = row[:ascii_name].downcase.gsub(/[^a-z0-9]+/, "_") %>
+<%= row[:geonames_id] == 6058560 ? "london_ontario" : (row[:geonames_id] == 2267226 ? "lagos_portugal" : label) %>:
+<% row.each do |key, value| %>
+  <%= key %>: <%= value.to_json %>
+<% end %>
+<% end %>

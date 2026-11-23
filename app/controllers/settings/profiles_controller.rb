@@ -21,6 +21,9 @@ class Settings::ProfilesController < ApplicationController
 
   def profile_params
     params.expect(profile: [ :bio, :location, :faith_background, :website, :public_profile, :avatar,
-                             :birth_month, :birth_day, :birth_year, :show_birthday ])
+                             :birth_month, :birth_day, :birth_year, :show_birthday,
+                             :city_id, :show_in_nearby, :city_visibility ]).tap do |p|
+      p.delete(:city_visibility) unless Profile.city_visibilities.key?(p[:city_visibility].to_s)
+    end
   end
 end

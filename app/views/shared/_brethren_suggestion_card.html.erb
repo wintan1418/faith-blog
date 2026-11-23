@@ -26,7 +26,7 @@
             <% end %>
           <% end %>
         </span>
-      <% elsif (icon = { assembly: "church", organization: "briefcase", profession: "briefcase", skill: "badgecheck", city: "mappin", room: "users" }[s.kind]) %>
+      <% elsif (icon = { assembly: "church", organization: "briefcase", profession: "briefcase", skill: "badgecheck", city: "mappin", nearby: "mappin", room: "users" }[s.kind]) %>
         <span class="bys-reason-icon" aria-hidden="true"><%= render_icon(icon, classes: "h-3.5 w-3.5") %></span>
       <% end %>
       <%# With faces showing, "2 mutual" says enough; the full reason stays as a tooltip. %>

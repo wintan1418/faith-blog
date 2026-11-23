@@ -5,12 +5,12 @@
 # Scores everyone the viewer isn't already connected to by what they share,
 # strongest first, and keeps the best reason to show on the card:
 #   same assembly · mutual brethren · same organisation · same profession ·
-#   shared skills · same city · same rooms
+#   shared skills · same city · nearby (Breathers around you) · same rooms
 # Only public information is used (the private Brethren Card is never read).
 class BrethrenSuggestions
   Suggestion = Struct.new(:user, :score, :reason, :kind, :mutuals, keyword_init: true)
 
-  WEIGHTS = { assembly: 40, organization: 25, profession: 15, mutual: 10, city: 8, room: 3, skill: 4 }.freeze
+  WEIGHTS = { assembly: 40, organization: 25, profession: 15, mutual: 10, city: 8, nearby: 5, room: 3, skill: 4 }.freeze
   CAPS = { mutual: 50, room: 12, skill: 12 }.freeze
   # Each source (same assembly, city, skills, work, rooms, mutuals) reads at
   # most this many candidates, newest members first, so a big church or city
@@ -44,7 +44,8 @@ class BrethrenSuggestions
 
     ranked = Rails.cache.fetch(self.class.cache_key(@user.id), expires_in: CACHE_TTL) { rank }
     excluded = excluded_ids.to_set
-    picks = ranked.reject { |c| excluded.include?(c[:id]) }.first(limit)
+    ranked = ranked.reject { |c| excluded.include?(c[:id]) }
+    picks = still_placed(ranked.first(limit * 2)).first(limit)
     ids = picks.map { |c| c[:id] }
 
     users = User.active.where(id: ids).includes(:experiences, profile: { avatar_attachment: :blob }).index_by(&:id)
@@ -67,6 +68,7 @@ class BrethrenSuggestions
     add_work
     add_skills
     add_city
+    add_nearby
     add_rooms
 
     ids = (@scores.keys - excluded_ids).sort_by { |id| -@scores[id] }.first(CACHED_CANDIDATES)
@@ -139,12 +141,48 @@ class BrethrenSuggestions
     end
   end
 
+  # Same city, by the picked city or the typed one, among members who show
+  # their city to everyone (a city kept for connections or private isn't used).
   def add_city
     key = profile&.city_key
-    return if key.blank? || VAGUE_CITIES.include?(key)
+    return if (key.blank? || VAGUE_CITIES.include?(key)) && profile&.city_id.blank?
 
-    city = profile.location.to_s.split(",").first.to_s.strip
-    bump(capped(Profile.where(city_key: key)).pluck(:user_id).index_with(1), :city) { "Also in #{city}" }
+    same = Profile.where(city_key: key.presence || "-")
+    same = same.or(Profile.where(city_id: profile.city_id)) if profile.city_id
+    city = profile.city&.name || profile.location.to_s.split(",").first.to_s.strip
+    ids = capped(same.where(city_visibility: :everyone).adults_or_unknown).pluck(:user_id)
+    bump(ids.index_with(1), :city) { "Also in #{city}" }
+  end
+
+  # Brethren within 50 km (another city) who turned on Breathers around you.
+  def add_nearby
+    return unless profile&.city && !profile.minor?
+
+    city = profile.city
+    near = Profile.joins(:city).where(show_in_nearby: true, city_visibility: :everyone).adults_or_unknown
+                  .where.not(city_id: city.id)
+                  .where("#{City::DISTANCE_SQL} <= :km", lat: city.lat, lng: city.lng, km: BreathersAround::NEAR_KM)
+    capped(near).pluck(:user_id, "cities.name").each do |id, name|
+      bump({ id => 1 }, :nearby) { "Near you, in #{name}" }
+    end
+  end
+
+  # Cached reasons about where someone lives are re-checked on every read, so a
+  # member who hides their city or turns Breathers around you off drops out at once.
+  def still_placed(picks)
+    placed = picks.select { |c| %i[city nearby].include?(c[:kind]) }.map { |c| c[:id] }
+    return picks if placed.empty?
+
+    ok = Profile.where(user_id: placed, city_visibility: :everyone)
+    nearby_ok = ok.where(show_in_nearby: true).pluck(:user_id).to_set
+    ok = ok.pluck(:user_id).to_set
+    picks.select do |c|
+      case c[:kind]
+      when :city then ok.include?(c[:id])
+      when :nearby then nearby_ok.include?(c[:id])
+      else true
+      end
+    end
   end
 
   def add_rooms

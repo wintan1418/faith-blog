@@ -51,9 +51,10 @@
             <p class="mt-1 text-xs text-faith-muted"><%= @profile.bio&.length || 0 %>/500 characters</p>
           </div>
 
-          <div>
-            <%= f.label :location, class: "label" %>
-            <%= f.text_field :location, class: "input", placeholder: "City, Country" %>
+          <%# City: a real place (for Breathers around you), kept in step with the location text. %>
+          <div class="ba-settings-block">
+            <%= render "around/city_picker", profile: @profile, field_id: "profile_location", label: "Where do you live?" %>
+            <%= render "around/privacy_fields", profile: @profile, scope: "profile" %>
           </div>
 
           <div>

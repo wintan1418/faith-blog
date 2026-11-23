@@ -243,3 +243,12 @@ application.register("voice-recorder", VoiceRecorderController)
 
 import WhatsNewController from "./whats_new_controller"
 application.register("whats-new", WhatsNewController)
+
+import CityPickerController from "./city_picker_controller"
+application.register("city-picker", CityPickerController)
+
+import AroundMapController from "./around_map_controller"
+application.register("around-map", AroundMapController)
+
+import AroundHelloController from "./around_hello_controller"
+application.register("around-hello", AroundHelloController)

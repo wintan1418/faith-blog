@@ -1165,3 +1165,7 @@ puts "\n✨ Your Faith Community is ready to grow!"
 
 puts "\n📖 Seeding church history figures…"
 load Rails.root.join("db/seeds/church_history_figures.rb")
+
+# A few real cities (GeoNames sample) so the city picker and Breathers around you
+# work locally without the full download (bin/rails cities:import loads them all).
+GeonamesImport.load_sample! if City.none? && !Rails.env.production?

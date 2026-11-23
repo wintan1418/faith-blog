@@ -53,9 +53,9 @@
                 <span><%= pluralize(user.posts.published.named.count, "breath") %></span>
                 <span class="fc-people-dot">·</span>
                 <span><%= pluralize(user.followers_count, "follower") %></span>
-                <% if user.profile&.location.present? %>
+                <% if (shown_location = visible_location(user.profile)) %>
                   <span class="fc-people-dot">·</span>
-                  <span><%= user.profile.location %></span>
+                  <span><%= shown_location %></span>
                 <% end %>
               </div>
             </div>

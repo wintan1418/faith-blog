@@ -18,7 +18,10 @@ class FeedController < ApplicationController
   SIDEBAR_TTL     = 5.minutes
 
   def index
-    load_suggestions unless next_page?
+    unless next_page?
+      load_suggestions
+      load_around_card
+    end
     # Pinned breaths (admin-featured) lead the feed — a community noticeboard.
     @pinned_posts = feed_posts_scope.where(featured: true).recent.limit(2).to_a
 
@@ -224,6 +227,25 @@ class FeedController < ApplicationController
   rescue StandardError => e
     Rails.logger.warn("[feed] suggestions failed: #{e.class}: #{e.message}")
     @suggestions = []
+  end
+
+  # "N breathers live in Akure" (or "Add your city"), until closed.
+  def load_around_card
+    profile = current_user.profile
+    return if profile.nil? || profile.minor?
+
+    if profile.city_id.blank?
+      @around_card = { kind: :add_city, key: "around-add-city" }
+    else
+      preview = BreathersAround.new(current_user).city_preview
+      if preview.count.positive?
+        @around_card = { kind: :count, preview: preview, city: profile.city, key: "around-#{profile.city_id}-#{preview.count}" }
+      end
+    end
+    @around_card = nil if @around_card && current_user.card_dismissed?(@around_card[:key])
+  rescue StandardError => e
+    Rails.logger.warn("[feed] around card failed: #{e.class}: #{e.message}")
+    @around_card = nil
   end
 
   def next_page?

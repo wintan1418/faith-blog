@@ -125,7 +125,7 @@ class User < ApplicationRecord
     pattern = "%#{sanitize_sql_like(query.to_s)}%"
     left_joins(:profile).where(
       "users.username ILIKE :q OR (COALESCE(profiles.public_profile, TRUE) AND " \
-      "(profiles.bio ILIKE :q OR profiles.location ILIKE :q OR profiles.faith_background ILIKE :q))",
+      "(profiles.bio ILIKE :q OR (profiles.location ILIKE :q AND profiles.city_visibility = 0) OR profiles.faith_background ILIKE :q))",
       q: pattern
     )
   end

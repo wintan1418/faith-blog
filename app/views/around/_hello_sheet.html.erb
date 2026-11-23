@@ -1,0 +1,38 @@
+<%# "Say hello": a sheet with the person, three ways to start, and your note.
+    Not connected yet → a connection request carrying the note; connected → a
+    message in your conversation. Filled in by the around-hello controller. %>
+<dialog class="ba-sheet" data-around-hello-target="dialog" aria-labelledby="ba-sheet-name"
+        data-action="click->around-hello#backdrop keydown.esc->around-hello#close">
+  <div class="ba-sheet-body">
+    <span class="ba-sheet-grip" aria-hidden="true"></span>
+    <button type="button" class="ba-sheet-close" data-action="around-hello#close" aria-label="Close"><%= render_icon("x", classes: "h-4 w-4") %></button>
+    <div class="ba-sheet-who">
+      <span class="ba-sheet-ava" data-around-hello-target="avatar"></span>
+      <div class="ba-sheet-who-text">
+        <h2 class="ba-sheet-name" id="ba-sheet-name" data-around-hello-target="name"></h2>
+        <p class="ba-sheet-headline" data-around-hello-target="headline"></p>
+        <div class="ba-chips" data-around-hello-target="chips"></div>
+      </div>
+    </div>
+
+    <div class="ba-sheet-compose" data-around-hello-target="compose">
+      <p class="ba-label" id="ba-sheet-start">Start with</p>
+      <div class="ba-lines" role="radiogroup" aria-labelledby="ba-sheet-start" data-around-hello-target="lines"></div>
+
+      <form class="ba-sheet-form" method="post" data-around-hello-target="form" data-action="turbo:submit-end->around-hello#sent">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        <input type="hidden" name="recipient_id" data-around-hello-target="recipient">
+        <label for="ba-sheet-note" class="sr-only">Your message</label>
+        <input id="ba-sheet-note" type="text" class="ba-sheet-input" maxlength="300" required autocomplete="off"
+               data-around-hello-target="input">
+        <button type="submit" class="ba-send" aria-label="Send"><%= render_icon("send", classes: "h-5 w-5") %></button>
+      </form>
+      <p class="ba-sheet-note" data-around-hello-target="note"></p>
+    </div>
+
+    <div class="ba-sheet-card" data-around-hello-target="card" hidden>
+      <p>Complete your Brethren Card to say hello. It's what brethren see when you connect.</p>
+      <%= link_to "Complete my card", edit_settings_brethren_card_path, class: "ba-pill is-primary" %>
+    </div>
+  </div>
+</dialog>

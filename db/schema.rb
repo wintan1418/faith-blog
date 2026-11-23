@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_23_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_180100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -363,6 +363,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_100000) do
     t.index ["invite_code"], name: "index_circles_on_invite_code", unique: true
     t.index ["owner_id"], name: "index_circles_on_owner_id"
     t.index ["slug"], name: "index_circles_on_slug", unique: true
+  end
+
+  create_table "cities", force: :cascade do |t|
+    t.integer "geonames_id", null: false
+    t.string "name", null: false
+    t.string "ascii_name", null: false
+    t.string "admin1_code", limit: 20
+    t.string "admin1_name"
+    t.string "country_code", limit: 2, null: false
+    t.string "country_name", null: false
+    t.float "lat", null: false
+    t.float "lng", null: false
+    t.bigint "population", default: 0, null: false
+    t.string "search_key", null: false
+    t.text "search_tokens", default: "", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["country_code", "population"], name: "index_cities_on_country_code_and_population"
+    t.index ["geonames_id"], name: "index_cities_on_geonames_id", unique: true
+    t.index ["lat", "lng"], name: "index_cities_on_lat_and_lng"
+    t.index ["search_key"], name: "index_cities_on_search_key", opclass: :text_pattern_ops
+    t.index ["search_tokens"], name: "index_cities_on_search_tokens", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "comments", force: :cascade do |t|
@@ -783,10 +805,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_100000) do
     t.string "open_to", default: [], null: false, array: true
     t.integer "open_to_visibility", default: 0, null: false
     t.string "card_style", limit: 20, default: "mint", null: false
+    t.bigint "city_id"
+    t.boolean "show_in_nearby", default: false, null: false
+    t.integer "city_visibility", default: 0, null: false
     t.index ["assembly_key"], name: "index_profiles_on_assembly_key"
     t.index ["birth_month", "birth_day"], name: "index_profiles_on_birth_month_and_birth_day"
+    t.index ["city_id"], name: "index_profiles_on_city_id"
     t.index ["city_key"], name: "index_profiles_on_city_key"
     t.index ["industry"], name: "index_profiles_on_industry"
+    t.index ["show_in_nearby"], name: "index_profiles_on_show_in_nearby", where: "show_in_nearby"
     t.index ["skills"], name: "index_profiles_on_skills", using: :gin
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
@@ -1152,6 +1179,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_100000) do
   add_foreign_key "posts", "users"
   add_foreign_key "prayer_intercessions", "posts"
   add_foreign_key "prayer_intercessions", "users"
+  add_foreign_key "profiles", "cities", on_delete: :nullify
   add_foreign_key "profiles", "users"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "reports", "users", column: "reporter_id"
