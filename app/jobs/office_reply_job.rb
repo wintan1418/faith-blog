@@ -7,7 +7,7 @@
 class OfficeReplyJob < ApplicationJob
   queue_as :default
   # One reply at a time per conversation; replies can run a minute (flyers).
-  limits_concurrency to: 1, key: ->(conversation_id) { conversation_id }, duration: 5.minutes
+  limits_concurrency to: 1, key: ->(conversation_id, *) { conversation_id }, duration: 5.minutes
 
   def perform(conversation_id)
     conversation = OfficeConversation.find_by(id: conversation_id)

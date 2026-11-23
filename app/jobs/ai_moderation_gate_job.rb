@@ -8,7 +8,9 @@ class AiModerationGateJob < ApplicationJob
   queue_as :moderation
   # The create hook and the backlog sweep can both enqueue the same post;
   # never classify one post twice at the same time.
-  limits_concurrency to: 1, key: ->(post_id) { post_id }, duration: 5.minutes
+  # The key gets every job argument, including `recheck: true` from edits, so
+  # accept and ignore the rest (taking only post_id crashed every post edit).
+  limits_concurrency to: 1, key: ->(post_id, *) { post_id }, duration: 5.minutes
 
   discard_on ActiveJob::DeserializationError
 
