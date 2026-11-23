@@ -7,13 +7,13 @@ class PortfolioTest < ActionDispatch::IntegrationTest
   PNG = Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")
 
   def png(name = "shot.png")
-    path = Rails.root.join("tmp", "#{SecureRandom.hex(3)}-#{name}")
+    path = Rails.root.join("tmp", "#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}-#{name}")
     File.binwrite(path, PNG)
     Rack::Test::UploadedFile.new(path, "image/png")
   end
 
   def pdf
-    path = Rails.root.join("tmp", "case-#{SecureRandom.hex(3)}.pdf")
+    path = Rails.root.join("tmp", "case-#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}.pdf")
     File.binwrite(path, "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF")
     Rack::Test::UploadedFile.new(path, "application/pdf")
   end

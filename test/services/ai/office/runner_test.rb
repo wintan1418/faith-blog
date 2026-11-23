@@ -11,7 +11,7 @@ class Ai::Office::RunnerTest < ActiveSupport::TestCase
   setup do
     ENV["OFFICE_STUB"] = "1"
     Stub.reset!
-    @admin = create_member("office_admin_#{SecureRandom.hex(3)}", role: :admin)
+    @admin = create_member("office_admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
     @conversation = @admin.office_conversations.create!
   end
 
@@ -25,7 +25,7 @@ class Ai::Office::RunnerTest < ActiveSupport::TestCase
     @conversation.messages.create!(role: :user, content: text)
   end
 
-  def tool_call(name, input, id: "call_#{SecureRandom.hex(3)}")
+  def tool_call(name, input, id: "call_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}")
     Reply.new(text: "", tool_calls: [ { "id" => id, "name" => name, "input" => input } ], model: "stub")
   end
 

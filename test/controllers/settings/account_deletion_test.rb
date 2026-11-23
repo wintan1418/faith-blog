@@ -5,8 +5,8 @@ require "test_helper"
 class Settings::AccountDeletionTest < ActionDispatch::IntegrationTest
   setup do
     @user = User.create!(
-      username: "leaving_#{SecureRandom.hex(3)}",
-      email: "leaving_#{SecureRandom.hex(3)}@example.com",
+      username: "leaving_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}",
+      email: "leaving_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}@example.com",
       password: "password123",
       password_confirmation: "password123"
     )

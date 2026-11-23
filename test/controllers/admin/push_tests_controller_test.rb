@@ -9,7 +9,7 @@ class Admin::PushTestsControllerTest < ActionDispatch::IntegrationTest
   APPLE_ENV = { "APNS_KEY_ID" => "KEY123", "APNS_KEY" => "-----BEGIN PRIVATE KEY-----", "APNS_TEAM_ID" => "TEAM123" }.freeze
 
   setup do
-    @admin = create_member("push_admin_#{SecureRandom.hex(3)}", role: :admin)
+    @admin = create_member("push_admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
     sign_in @admin
   end
 

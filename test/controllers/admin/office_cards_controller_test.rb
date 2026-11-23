@@ -8,7 +8,7 @@ class Admin::OfficeCardsControllerTest < ActionDispatch::IntegrationTest
 
   setup do
     ENV["OFFICE_STUB"] = "1"
-    @admin = create_member("office_admin_#{SecureRandom.hex(3)}", role: :admin)
+    @admin = create_member("office_admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
     @conversation = @admin.office_conversations.create!(title: "Imported notes")
     sign_in @admin
   end
@@ -173,7 +173,7 @@ class Admin::OfficeCardsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "another admin can't use the pickers or attach to my cards" do
-    other = create_member("other_admin_#{SecureRandom.hex(3)}", role: :admin)
+    other = create_member("other_admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
     @conversation = other.office_conversations.create!
     breath = breath_card
     flyer = flyer_card

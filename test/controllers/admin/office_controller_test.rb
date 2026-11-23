@@ -5,8 +5,8 @@ require "test_helper"
 class Admin::OfficeControllerTest < ActionDispatch::IntegrationTest
   setup do
     ENV["OFFICE_STUB"] = "1"
-    @admin = create_member("office_admin_#{SecureRandom.hex(3)}", role: :admin)
-    @member = create_member("office_member_#{SecureRandom.hex(3)}")
+    @admin = create_member("office_admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
+    @member = create_member("office_member_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}")
   end
 
   teardown { ENV.delete("OFFICE_STUB") }
@@ -86,7 +86,7 @@ class Admin::OfficeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "an admin can't post into another admin's conversation" do
-    other = create_member("other_admin_#{SecureRandom.hex(3)}", role: :admin)
+    other = create_member("other_admin_#{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", role: :admin)
     conversation = conversation_for(other)
     sign_in @admin
     post admin_office_conversation_messages_path(conversation), params: { message: { content: "Hi" } }

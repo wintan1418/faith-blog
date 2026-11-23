@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "minitest/mock"
 require_relative "../support/sweep_world"
 
 # Every GET route in the app, opened by a signed-out visitor, a normal member
@@ -69,11 +70,19 @@ class RouteSweepTest < ActionDispatch::IntegrationTest
     crashes
   end
 
+  # A puzzle for the chess pages, so the sweep never waits on lichess.org
+  # (a slow reply there once failed CI with a 502 from /games/chess/practice).
+  LICHESS_PUZZLE = { id: "sweep1", rating: 1500, plays: 1, themes: %w[mateIn1], solution: %w[e2e4],
+                     fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", last_move: nil,
+                     link: "https://lichess.org/training/sweep1", side_to_move: "white" }.freeze
+
   def check(label, user)
     sign_in user if user
-    crashes = sweep("#{label} html")
-    crashes += sweep("#{label} json", headers: { "Accept" => "application/json" })
-    crashes += sweep("#{label} turbo", headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" })
+    crashes = Lichess::DailyPuzzle.stub(:request_puzzle, LICHESS_PUZZLE) do
+      sweep("#{label} html") +
+        sweep("#{label} json", headers: { "Accept" => "application/json" }) +
+        sweep("#{label} turbo", headers: { "Accept" => "text/vnd.turbo-stream.html, text/html" })
+    end
     assert_empty crashes, crashes.join("\n")
   end
 

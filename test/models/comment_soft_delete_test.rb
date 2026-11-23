@@ -6,7 +6,7 @@ class CommentSoftDeleteTest < ActiveSupport::TestCase
   setup { ENV["AI_MODERATION_STUB"] = "1" }
 
   def make_user
-    suffix = SecureRandom.hex(3)
+    suffix = SecureRandom.random_number(10**6).to_s.rjust(6, "0")
     User.create!(
       username: "u_#{suffix}",
       email: "u_#{suffix}@example.com",
@@ -18,7 +18,7 @@ class CommentSoftDeleteTest < ActiveSupport::TestCase
   def make_post(user)
     Post.create!(
       user: user,
-      room: Room.create!(name: "Room #{SecureRandom.hex(3)}", description: "x"),
+      room: Room.create!(name: "Room #{SecureRandom.random_number(10**6).to_s.rjust(6, "0")}", description: "x"),
       title: "A breath worth sharing",
       content: "Body.",
       status: :published
