@@ -237,9 +237,15 @@ class FeedController < ApplicationController
     if profile.city_id.blank?
       @around_card = { kind: :add_city, key: "around-add-city" }
     else
-      preview = BreathersAround.new(current_user).city_preview
+      around = BreathersAround.new(current_user)
+      preview = around.city_preview
       if preview.count.positive?
-        @around_card = { kind: :count, preview: preview, city: profile.city, key: "around-#{profile.city_id}-#{preview.count}" }
+        # Faces only for members who can see (shown themselves, account a week old).
+        locked_note = if !around.account_old_enough? then "You can see who they are after your first week on Brethreign."
+        elsif !around.showing? then "Turn on Show me to see who they are. Seeing who's around means being seen too."
+        end
+        @around_card = { kind: :count, preview: preview, city: profile.city, locked_note: locked_note,
+                         key: "around-#{profile.city_id}-#{preview.count}" }
       end
     end
     @around_card = nil if @around_card && current_user.card_dismissed?(@around_card[:key])

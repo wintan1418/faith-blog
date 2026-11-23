@@ -17,23 +17,27 @@
   <section class="ba-feed-card" data-controller="onboarding" data-onboarding-key-value="fc:<%= card[:key] %>" aria-label="Breathers around you">
     <span class="ba-feed-rings" aria-hidden="true"></span>
     <p class="ba-feed-kicker"><%= render_icon("mappin", classes: "h-3.5 w-3.5") %> Breathers around you</p>
-    <h2 class="ba-feed-title"><%= preview.count %> <%= preview.count == 1 ? "breather lives" : "breathers live" %> in <%= card[:city].name %></h2>
-    <div class="ba-feed-people">
-      <span class="ba-feed-faces">
-        <% preview.users.each do |person| %>
-          <% if person.profile&.avatar&.attached? %>
-            <%= image_tag avatar_src(person.profile, 80), class: "ba-feed-face", alt: "" %>
-          <% else %>
-            <span class="ba-feed-face" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+    <h2 class="ba-feed-title"><%= preview.count %> <%= preview.count == 1 ? "breather lives" : "breathers live" %> <%= preview.where %></h2>
+    <% if preview.users.empty? %>
+      <p class="ba-feed-names"><%= card[:locked_note] %></p>
+    <% else %>
+      <div class="ba-feed-people">
+        <span class="ba-feed-faces">
+          <% preview.users.each do |person| %>
+            <% if person.profile&.avatar&.attached? %>
+              <%= image_tag avatar_src(person.profile, 80), class: "ba-feed-face", alt: "" %>
+            <% else %>
+              <span class="ba-feed-face" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+            <% end %>
           <% end %>
-        <% end %>
-        <% if others.positive? %><span class="ba-feed-face is-more">+<%= others %></span><% end %>
-      </span>
-      <p class="ba-feed-names">
-        <%= preview.users.map(&:display_name).to_sentence(last_word_connector: others.positive? ? ", " : " and ", two_words_connector: others.positive? ? ", " : " and ") %><%= " and #{pluralize(others, 'other')}" if others.positive? %>.
-        <% if preview.mentoring.positive? %><%= preview.mentoring == 1 ? "1 is" : "#{preview.mentoring} are" %> open to mentoring.<% end %>
-      </p>
-    </div>
+          <% if others.positive? %><span class="ba-feed-face is-more">+<%= others %></span><% end %>
+        </span>
+        <p class="ba-feed-names">
+          <%= preview.users.map(&:display_name).to_sentence(last_word_connector: others.positive? ? ", " : " and ", two_words_connector: others.positive? ? ", " : " and ") %><%= " and #{pluralize(others, 'other')}" if others.positive? %>.
+          <% if preview.mentoring.positive? %><%= preview.mentoring == 1 ? "1 is" : "#{preview.mentoring} are" %> open to mentoring.<% end %>
+        </p>
+      </div>
+    <% end %>
     <div class="ba-feed-actions">
       <%= link_to "See who's around", around_path, class: "ba-feed-go" %>
       <button type="button" class="ba-feed-x" data-action="click->onboarding#dismiss" aria-label="Hide this card"><%= render_icon("x", classes: "h-4 w-4") %></button>

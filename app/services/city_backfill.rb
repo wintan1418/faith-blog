@@ -15,6 +15,7 @@ class CityBackfill
   def call
     results = Profile.where(city_id: nil).where.not(location: [ nil, "" ]).order(:id).map do |profile|
       match = City.match(profile.location)
+      profile.skip_city_change_limit = true
       profile.update(city: match.city) if @apply && match.matched?
       Result.new(profile_id: profile.id, location: profile.location_before_last_save || profile.location,
                  status: match.status, city: match.city, candidates: match.candidates)

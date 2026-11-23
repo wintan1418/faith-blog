@@ -120,6 +120,11 @@ class Profile < ApplicationRecord
   validate :old_enough_to_show_nearby, if: -> { show_in_nearby? && will_save_change_to_show_in_nearby? }
   validate :city_before_showing_nearby
   before_save :sync_city_and_location
+  # Runs after sync_city_and_location, which can change the city from typed text.
+  before_save :limit_city_changes, if: :will_save_change_to_city_id?
+  after_save :record_city_change, if: :saved_change_to_city_id?
+  # Set by tidy-up jobs (the city backfill) that aren't the member moving.
+  attr_accessor :skip_city_change_limit
 
   # Could be under 18. Judged on the latest possible birthday in their birth year,
   # so someone born in 2008 without a day counts as 17 until the end of 2026.
@@ -172,6 +177,36 @@ class Profile < ApplicationRecord
       self.city = found
       self.location = found.label if found
     end
+  end
+
+  # A member may change their city CityChange::CHANGES_ALLOWED times in
+  # CityChange::WINDOW, so nobody can hop between towns to see who lives there.
+  # A first city and clearing it don't count; clearing then picking another does.
+  def counted_city_change?(from_id, to_id)
+    return false if to_id.blank?
+
+    from_id.present? || CityChange.where(user_id: user_id).where.not(to_city_id: nil).exists?
+  end
+
+  # When the member may change city again (nil: now).
+  def next_city_change_at = CityChange.next_change_at(user_id)
+
+  def limit_city_changes
+    @city_change_counted = persisted? && counted_city_change?(city_id_in_database, city_id)
+    return if !@city_change_counted || skip_city_change_limit
+
+    next_at = next_city_change_at
+    return unless next_at
+
+    errors.add(:base, "You've changed your city #{CityChange::CHANGES_ALLOWED} times in the last #{CityChange::WINDOW.in_days.to_i} days. " \
+                      "You can change it again on #{next_at.to_date.to_fs(:long)}.")
+    throw :abort
+  end
+
+  def record_city_change
+    from_id, to_id = saved_change_to_city_id
+    CityChange.create!(user_id: user_id, from_city_id: from_id, to_city_id: to_id,
+                       counted: @city_change_counted && !skip_city_change_limit)
   end
 
   # Public church / assembly (the Brethren Card one stays private), plus match keys.

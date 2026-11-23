@@ -59,6 +59,8 @@ class User < ApplicationRecord
   has_many :sent_broadcasts, class_name: "Broadcast", foreign_key: :sender_id, dependent: :nullify
   has_many :office_conversations, dependent: :destroy
   has_many :reports, foreign_key: :reporter_id, dependent: :destroy
+  has_many :reports_about, class_name: "Report", as: :reportable, dependent: :destroy
+  has_many :city_changes, dependent: :delete_all
   has_many :moderation_logs, foreign_key: :moderator_id, dependent: :nullify
   has_one  :risk_profile, class_name: "UserRiskProfile", dependent: :destroy
   has_many :ai_moderation_reviews, dependent: :nullify

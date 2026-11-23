@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_23_180100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_090100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -387,6 +387,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_180100) do
     t.index ["search_tokens"], name: "index_cities_on_search_tokens", opclass: :gin_trgm_ops, using: :gin
   end
 
+  create_table "city_changes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "from_city_id"
+    t.bigint "to_city_id"
+    t.boolean "counted", default: false, null: false
+    t.datetime "created_at", null: false
+    t.index ["created_at"], name: "index_city_changes_on_created_at"
+    t.index ["user_id", "created_at"], name: "index_city_changes_on_user_id_and_created_at"
+  end
+
   create_table "comments", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "post_id", null: false
@@ -421,7 +431,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_180100) do
     t.text "message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "via_around", default: false, null: false
     t.index ["receiver_id"], name: "index_connection_requests_on_receiver_id"
+    t.index ["sender_id", "created_at"], name: "index_connection_requests_via_around", where: "via_around"
     t.index ["sender_id", "receiver_id"], name: "index_connection_requests_on_sender_id_and_receiver_id", unique: true
     t.index ["sender_id"], name: "index_connection_requests_on_sender_id"
     t.index ["status"], name: "index_connection_requests_on_status"
@@ -1140,6 +1152,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_180100) do
   add_foreign_key "circle_prayers", "circles"
   add_foreign_key "circle_prayers", "users"
   add_foreign_key "circles", "users", column: "owner_id"
+  add_foreign_key "city_changes", "cities", column: "from_city_id", on_delete: :nullify
+  add_foreign_key "city_changes", "cities", column: "to_city_id", on_delete: :nullify
+  add_foreign_key "city_changes", "users", on_delete: :cascade
   add_foreign_key "comments", "comments", column: "parent_comment_id"
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users"

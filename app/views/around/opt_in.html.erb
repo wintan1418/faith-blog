@@ -20,7 +20,7 @@
     </div>
     <p class="ba-optin-copy">
       <% if @count_near.positive? %>
-        <%= pluralize(@count_near, "breather") %> <%= @count_near == 1 ? "lives" : "live" %> within 50 km of <%= city.name %>.
+        <%= pluralize(@count_near, "breather") %> <%= @count_near == 1 ? "lives" : "live" %> within <%= BreathersAround::NEAR_KM %> km of <%= city.name %>.
       <% else %>
         Be one of the first breathers around <%= city.name %>.
       <% end %>
@@ -36,8 +36,7 @@
       <% if @profile.city_shown_to_only_me? %><%= hidden_field_tag "profile[city_visibility]", "everyone" %><% end %>
       <button type="submit" class="ba-big-btn">Show me to breathers near me</button>
     <% end %>
-    <%= button_to "Just look around for now", around_path, method: :patch, params: { look_around: "1" },
-                  class: "ba-quiet-btn", form_class: "ba-optin-actions" %>
+    <p class="ba-optin-fine">To see who's around, you show up here too. That's how everyone knows who can see them.</p>
     <p class="ba-optin-fine">Living somewhere else? <%= link_to "Change city (#{city.name})", city_around_path %></p>
   </section>
 </div>

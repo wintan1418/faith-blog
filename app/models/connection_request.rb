@@ -1,4 +1,6 @@
 class ConnectionRequest < ApplicationRecord
+  # "Say hello" from Breathers around you to people you're not connected with.
+  AROUND_HELLOS_PER_DAY = 10
   belongs_to :sender, class_name: "User"
   belongs_to :receiver, class_name: "User"
   has_many :notifications, as: :notifiable, dependent: :delete_all

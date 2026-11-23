@@ -1,0 +1,14 @@
+<% content_for(:title) { "Breathers around you - Brethreign" } %>
+<% content_for(:app_title) { "Around you" } %>
+<% ready_on = (current_user.created_at + BreathersAround::MIN_ACCOUNT_AGE).to_date %>
+<div class="ba-page">
+  <section class="ba-empty ba-empty--page">
+    <span class="ba-empty-ico" aria-hidden="true"><%= render_icon("mappin", classes: "h-6 w-6") %></span>
+    <h1 class="ba-empty-title">Breathers around you opens after your first week</h1>
+    <p class="ba-empty-copy">
+      To keep everyone safe, new accounts can find breathers nearby after a week on Brethreign.
+      It opens for you on <%= ready_on.to_fs(:long) %>. Until then, say hello in the rooms and get to know the family.
+    </p>
+    <%= link_to "Back to the feed", feed_path, class: "ba-pill is-primary" %>
+  </section>
+</div>

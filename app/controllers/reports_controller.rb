@@ -30,6 +30,9 @@ class ReportsController < ApplicationController
       Comment.find(reportable_id).tap { |comment| raise ActiveRecord::RecordNotFound unless comment.post.nil? || comment.post.readable_by?(current_user) }
     when "Resource"
       Resource.find(reportable_id)
+    when "User"
+      # A member (from Breathers around you); never yourself.
+      User.active.where.not(id: current_user.id).find(reportable_id)
     when "Message"
       conversation = current_user.conversations.joins(:messages).where(messages: { id: reportable_id }).first!
       conversation.messages.find(reportable_id)

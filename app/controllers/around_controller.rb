@@ -3,20 +3,21 @@
 # "Breathers around you" (/around): members near you who chose to be found.
 # See BreathersAround for the privacy rules.
 class AroundController < ApplicationController
-  OPT_IN_SEEN = "around-optin"
-
   before_action :authenticate_user!
   before_action :load_profile
   member_rate_limit to: 30, within: 1.hour, only: :hello, name: "around-hello",
                     message: "You've said hello to a lot of people this hour. Please try again later."
+  # Strangers get a connection request instead (ConnectionRequestsController),
+  # capped at ConnectionRequest::AROUND_HELLOS_PER_DAY.
 
   def show
     @around = BreathersAround.new(current_user)
     return render(:too_young) unless @around.allowed?
     return redirect_to(city_around_path) unless @profile.city
+    return render(:too_new) unless @around.account_old_enough?
 
-    # First visit: the opt-in screen, until they choose (or just look around).
-    if !@profile.show_in_nearby? && !current_user.card_dismissed?(OPT_IN_SEEN) && params[:look].blank?
+    # Seeing requires showing: until they're findable themselves, the opt-in screen.
+    unless @around.showing?
       @count_near = @around.count_near
       return render(:opt_in)
     end
@@ -37,10 +38,6 @@ class AroundController < ApplicationController
   def city; end
 
   def update
-    # Seen the first-visit screen: they chose to look around, or turned themselves on.
-    current_user.dismiss_card!(OPT_IN_SEEN) if params[:look_around] == "1" || around_params[:show_in_nearby] == "1"
-    return redirect_to(around_path(look: 1)) if params[:look_around] == "1"
-
     if @profile.update(around_params)
       redirect_to around_path, notice: update_notice
     else
@@ -80,7 +77,9 @@ class AroundController < ApplicationController
   def update_notice
     return "Saved." unless @profile.saved_change_to_show_in_nearby?
 
-    @profile.show_in_nearby? ? "You're now visible to breathers near #{@profile.city&.name || 'you'}." : "You're hidden from Breathers around you."
+    return "You're now visible to breathers near #{@profile.city&.name || 'you'}." if @profile.show_in_nearby?
+
+    "You're hidden from Breathers around you. Turn Show me back on any time to see who's around."
   end
 
   # One filter at a time (the pills): mentoring, an industry, or my rooms.

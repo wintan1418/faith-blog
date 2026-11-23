@@ -15,4 +15,20 @@ namespace :cities do
   task backfill: :environment do
     CityBackfill.new(apply: ENV["APPLY"] == "1").call
   end
+
+  desc "Members with 3+ city changes in the last 30 days (possible town scanning)"
+  task movers: :environment do
+    counts = CityChange.frequent_movers
+    if counts.empty?
+      puts "Nobody has changed city #{CityChange::WATCH_AT}+ times in the last #{CityChange::WINDOW.in_days.to_i} days."
+      next
+    end
+
+    users = User.where(id: counts.keys).index_by(&:id)
+    counts.each do |user_id, n|
+      changes = CityChange.recent.where(user_id: user_id).includes(:to_city).order(:created_at)
+      trail = changes.map { |c| c.to_city&.name || "(cleared)" }.join(" -> ")
+      puts format("%-24s %2d changes  %s", "@#{users[user_id]&.username || user_id}", n, trail)
+    end
+  end
 end

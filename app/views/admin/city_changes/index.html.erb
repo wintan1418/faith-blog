@@ -1,0 +1,60 @@
+<% content_for(:page_title) { "City changes" } %>
+<% place = ->(c) { c ? c.label : "—" } %>
+
+<div class="space-y-6">
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h2 class="text-lg font-bold text-[var(--fc-ink)]">Members who keep moving</h2>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">
+      <%= CityChange::WATCH_AT %> or more city changes in the last <%= CityChange::WINDOW.in_days.to_i %> days.
+      Members can only make <%= CityChange::CHANGES_ALLOWED %> real changes a month, so this usually means
+      clearing and re-picking a city to look around other towns in Breathers around you.
+    </p>
+    <% if @movers.any? %>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-sm" id="city-movers">
+          <thead><tr class="text-left text-[var(--fc-muted)]"><th class="py-1 pr-4">Member</th><th class="py-1 text-right">Changes</th></tr></thead>
+          <tbody>
+            <% @movers.each do |user, n| %>
+              <tr class="border-t border-[var(--fc-line)]">
+                <td class="py-2 pr-4 font-semibold"><%= link_to "@#{user.username}", admin_user_path(user), class: "text-[var(--fc-ink)]" %></td>
+                <td class="py-2 text-right"><%= n %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="mt-4 text-sm text-[var(--fc-muted)]">Nobody right now.</p>
+    <% end %>
+  </div>
+
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h2 class="text-lg font-bold text-[var(--fc-ink)]">Latest changes</h2>
+    <% if @changes.any? %>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-[var(--fc-muted)]">
+              <th class="py-1 pr-4">Member</th><th class="py-1 pr-4">From</th><th class="py-1 pr-4">To</th>
+              <th class="py-1 pr-4">Counted</th><th class="py-1 text-right">When</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @changes.each do |change| %>
+              <tr class="border-t border-[var(--fc-line)]">
+                <td class="py-2 pr-4 font-semibold"><%= link_to "@#{change.user.username}", admin_user_path(change.user), class: "text-[var(--fc-ink)]" %></td>
+                <td class="py-2 pr-4"><%= place.call(change.from_city) %></td>
+                <td class="py-2 pr-4"><%= place.call(change.to_city) %></td>
+                <td class="py-2 pr-4"><%= change.counted? ? "Yes" : "No" %></td>
+                <td class="py-2 text-right text-[var(--fc-muted)] whitespace-nowrap" title="<%= change.created_at.iso8601 %>"><%= time_ago_in_words(change.created_at) %> ago</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    <% else %>
+      <p class="mt-4 text-sm text-[var(--fc-muted)]">No city changes yet.</p>
+    <% end %>
+  </div>
+</div>
