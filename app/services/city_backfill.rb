@@ -32,6 +32,7 @@ class CityBackfill
       when :matched then "→ #{r.city.label} (##{r.city.geonames_id})"
       when :ambiguous then "?? could be #{r.candidates.first(3).map(&:label).join(' / ')}"
       when :region_only then "-- a state/region, no city named"
+      when :country_only then "-- a country, no city named"
       when :vague then "-- not a place"
       else "-- no city found"
       end

@@ -39,6 +39,17 @@ class CityTest < ActiveSupport::TestCase
     assert_equal cities(:london), City.match("London").city
   end
 
+  test "a country or a state on its own never becomes a city" do
+    assert_equal :country_only, City.match("Nigeria").status
+    assert_equal :country_only, City.match("Nigeria ").status
+    assert_equal :country_only, City.match("USA 🇺🇸").status
+    assert_equal :country_only, City.match("England").status
+    assert_equal :region_only, City.match("Ekiti, Nigeria").status
+    assert_equal :region_only, City.match("Ondo State, Nigeria").status
+    assert_equal cities(:ondo), City.match("Ondo, Nigeria").city
+    assert_equal cities(:lagos), City.match("Lagos, Nigeria").city
+  end
+
   test "two places of a similar size are a guess, not a match" do
     City.create!(geonames_id: 1, name: "Springfield", country_code: "US", country_name: "United States", admin1_code: "IL", admin1_name: "Illinois", lat: 39.8, lng: -89.6, population: 114_000)
     City.create!(geonames_id: 2, name: "Springfield", country_code: "US", country_name: "United States", admin1_code: "MO", admin1_name: "Missouri", lat: 37.2, lng: -93.3, population: 169_000)
