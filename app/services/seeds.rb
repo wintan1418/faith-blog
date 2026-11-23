@@ -29,6 +29,8 @@ module Seeds
   # public boards so the community sees itself, not the staff.
   LEADERBOARD_EXCLUDE_STAFF = true
   STAFF_ROLES = %w[admin super_admin].freeze
+  # Shown in a pinned "Founder" card above the board instead: visible, unranked.
+  FOUNDER_ROLES = %w[super_admin].freeze
 
   module_function
 

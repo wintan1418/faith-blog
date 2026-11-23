@@ -15,6 +15,7 @@ class LeaderboardController < ApplicationController
     end
     board = Seeds::Leaderboard.new(period: @tab, room: @room)
     @rows = board.top(TOP)
+    @founders = board.founders
     @mine = board.position_of(current_user)
   end
 end

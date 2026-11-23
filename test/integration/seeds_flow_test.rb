@@ -124,6 +124,29 @@ class SeedsFlowTest < ActionDispatch::IntegrationTest
     assert_select ".seed-mine", text: /500 seeds/
   end
 
+  test "the founder gets a pinned, unranked card above the board" do
+    founder = create_member("flow_founder", role: :super_admin)
+    give(founder, 900)
+    give(@author, 20)
+
+    get leaderboard_path(tab: "all")
+    assert_select ".seed-founder", 1
+    assert_select ".seed-founder", text: /flow_founder/
+    assert_select ".seed-founder", text: /900 seeds/
+    assert_select ".seed-board", { text: /flow_founder/, count: 0 }
+    assert_select ".seed-board .seed-row:first-child .seed-pos", text: "1"
+
+    give(create_member("flow_admin2", role: :admin), 400)
+    get leaderboard_path(tab: "all")
+    assert_select ".seed-founder", 1 # other admins stay off, with no card
+  end
+
+  test "no founder card when the founder has no seeds in that period" do
+    create_member("flow_founder", role: :super_admin)
+    get leaderboard_path
+    assert_select ".seed-founder", 0
+  end
+
   test "the room tab counts only seeds earned in that room" do
     other = Room.create!(name: "Other Room", description: "x", is_public: true)
     give(@author, 20, room: @room)
