@@ -40,6 +40,12 @@
               <% if slide.action == "chess" %>
                 <div class="wn-action"><%= link_to "Play the ladder", games_chess_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
               <% end %>
+              <% if slide.action == "around" %>
+                <div class="wn-action"><%= link_to "Find breathers around me", around_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
+              <% end %>
+              <% if slide.action == "seeds" %>
+                <div class="wn-action"><%= link_to "See the leaderboard", leaderboard_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
+              <% end %>
               <% if slide.action == "background_rain" %>
                 <div class="wn-action"><span class="wn-action-label">Background rain</span><%= render "settings/rain_switch" %></div>
               <% end %>

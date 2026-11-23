@@ -66,4 +66,15 @@ class BackgroundRainToggleTest < ActionDispatch::IntegrationTest
     assert_select "dialog.wn .wn-slide:first-child .wn-action .fc-setting-switch[data-action~='rain-toggle#toggle']"
     assert_select "dialog.wn .wn-action", count: 1
   end
+
+  test "What's new can point to Breathers around you and the leaderboard" do
+    Announcement.create!(kind: :release, kicker: "What's new", title: "New in Brethreign · Around you",
+                         body: "📍 Breathers around you — Find people near you. [[around]]\n🌱 Seeds and ranks — Grow by encouraging others. [[seeds]]")
+    @ada.update_columns(created_at: 1.day.ago)
+
+    sign_in @ada
+    get edit_settings_accent_path
+    assert_select "dialog.wn .wn-action a[href='#{around_path}']", text: "Find breathers around me"
+    assert_select "dialog.wn .wn-action a[href='#{leaderboard_path}']", text: "See the leaderboard"
+  end
 end
