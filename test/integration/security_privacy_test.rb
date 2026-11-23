@@ -247,15 +247,32 @@ class SecurityPrivacyTest < ActionDispatch::IntegrationTest
     assert_match(/throwaway/, response.body)
   end
 
-  test "repeated bot blocks raise an admin alert" do
+  test "bot blocks never email on their own; they're counted for the morning summary" do
     calls = []
     ErrorAlert.stub(:notify, ->(**kw) { calls << kw }) do
-      (SignupGuard::ALERT_THRESHOLD + 1).times do
-        SignupGuard.record_block!("honeypot", where: "sign-up", remote_ip: "1.2.3.4", email: "x@example.com")
-      end
+      12.times { SignupGuard.record_block!("too_fast", where: "sign-up", remote_ip: "1.2.3.4", email: "x@example.com") }
+      SignupGuard.record_block!("honeypot", where: "password reset", remote_ip: "5.6.7.8", email: "y@example.com")
     end
-    assert_equal 1, calls.size
-    assert_match(/Bot sign-ups/, calls.first[:title])
+    assert_empty calls
+
+    blocked = SignupGuard.blocked_on(Date.current)
+    assert_equal 13, blocked[:total]
+    assert_equal({ "honeypot" => 1, "too_fast" => 12 }, blocked[:reasons])
+    assert_equal({ "sign-up" => 12, "password reset" => 1 }, blocked[:places])
+    assert_match(/5\.6\.7\.8/, blocked[:latest])
+  end
+
+  test "the morning summary emails the admins once, with bots and the day's activity" do
+    User.create!(username: "summary_admin", email: "summary-admin@example.com", password: "Pass-word-123!", role: :admin)
+    3.times { SignupGuard.record_block!("too_fast", where: "sign-up", remote_ip: "1.2.3.4", email: "x@example.com") }
+
+    assert_emails 1 do
+      DailySummaryJob.perform_now(Date.current)
+    end
+    mail = ActionMailer::Base.deliveries.last
+    assert_match(/Daily summary/, mail.subject)
+    assert_includes mail.to, "summary-admin@example.com"
+    assert_match(/Bots stopped by the sign-up guard: 3/, mail.text_part.body.to_s)
   end
 
   test "Turnstile is verified server-side when its keys are set" do

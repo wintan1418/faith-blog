@@ -1,0 +1,16 @@
+Brethreign · <%= @date.strftime("%A %-d %B %Y") %>
+
+Yesterday on Brethreign
+  New members: <%= @stats[:new_members] %>
+  Breaths published: <%= @stats[:breaths] %>
+  Comments: <%= @stats[:comments] %>
+  Messages: <%= @stats[:messages] %>
+
+Bots stopped by the sign-up guard: <%= @bots[:total] %>
+<% @bots[:reasons].each do |reason, n| %>  <%= reason.humanize %>: <%= n %>
+<% end %><% @bots[:places].each do |place, n| %>  On <%= place %>: <%= n %>
+<% end %><% if @bots[:latest].present? %>  Latest: <%= @bots[:latest] %>
+<% end %>
+<% if @bots[:total].zero? %>No bots tried to sign up.<% else %>Nothing to do unless real people say they can't join.<% end %>
+
+You only get instant emails when something is broken: a page crashing, the site check failing, or a feature that keeps failing for members.
