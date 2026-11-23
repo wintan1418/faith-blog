@@ -164,6 +164,18 @@ html.theme-dark .seed-rank--cedar    { --rank: #e3c470; }
 .seed-mine-top { display: flex; align-items: center; gap: 0.6rem; min-width: 0; margin-bottom: 0.7rem; }
 .seed-mine-note { margin: -0.2rem 0 0.6rem; font-size: 0.82rem; color: var(--fc-muted, #5a6b62); }
 
+.seed-founder {
+  margin-top: 1rem; padding: 0.75rem 1rem 0.8rem; border-radius: 18px;
+  background: color-mix(in oklch, var(--fc-gold, #84651c) 9%, var(--fc-surface, #fff));
+  border: 1px solid color-mix(in oklch, var(--fc-gold, #84651c) 40%, transparent);
+}
+.seed-founder-tag {
+  display: inline-flex; align-items: center; gap: 0.3rem; margin-bottom: 0.5rem;
+  font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fc-gold, #84651c);
+}
+.seed-founder-top { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+.seed-founder-note { margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--fc-muted, #5a6b62); }
+
 .seed-board { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
 .seed-row {
   display: flex; align-items: center; gap: 0.6rem; min-width: 0;

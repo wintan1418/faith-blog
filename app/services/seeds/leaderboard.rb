@@ -42,6 +42,18 @@ module Seeds
       Row.new(position: ahead + 1, user: user, seeds: seeds)
     end
 
+    # The founder's pinned card: their seeds for this period, with no position,
+    # so the numbered places belong to the community.
+    def founders
+      return [] unless Seeds::LEADERBOARD_EXCLUDE_STAFF
+
+      ids = User.active.where(role: Seeds::FOUNDER_ROLES).select(:id)
+      totals = events.where(user_id: ids).group(:user_id).sum(:points).select { |_, seeds| seeds.positive? }
+      User.where(id: totals.keys).includes(profile: { avatar_attachment: :blob })
+          .map { |user| Row.new(position: nil, user: user, seeds: totals[user.id].to_i) }
+          .sort_by { -it.seeds }
+    end
+
     def ranked_totals
       events.where(user_id: eligible_users.select(:id))
             .group(:user_id)

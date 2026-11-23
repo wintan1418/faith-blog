@@ -50,6 +50,23 @@
     </section>
   <% end %>
 
+  <% @founders.each do |row| %>
+    <section class="seed-founder" aria-label="Founder">
+      <span class="seed-founder-tag"><%= render_icon("sprout", classes: "h-3.5 w-3.5") %> Founder</span>
+      <div class="seed-founder-top">
+        <%= link_to user_path(row.user.username), class: "seed-row-link" do %>
+          <%= render "seeds/avatar", user: row.user %>
+          <span class="seed-row-who">
+            <span class="seed-row-name"><%= row.user.display_name.presence || row.user.username %></span>
+            <%= seed_rank_chip(row.user) %>
+          </span>
+        <% end %>
+        <span class="seed-row-seeds"><%= seeds_count(row.seeds) %></span>
+      </div>
+      <p class="seed-founder-note">Building Brethreign alongside you. Not ranked, so every place on the board belongs to the community.</p>
+    </section>
+  <% end %>
+
   <% if @rows.any? %>
     <ol class="seed-board">
       <% @rows.each do |row| %>
