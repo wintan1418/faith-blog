@@ -334,6 +334,12 @@ html.theme-dark .ba-map-canvas .leaflet-tile-pane { filter: invert(1) hue-rotate
 .cp-locate:disabled { opacity: 0.6; cursor: progress; }
 .cp-status { margin: 0; font: 600 0.8rem var(--fc-sans); color: var(--ba-mint); }
 .cp-status:empty { display: none; }
+.cp-status.is-ok, .cp-status.is-error { padding: 0.6rem 0.8rem; border-radius: 12px; font-size: 0.85rem; line-height: 1.45; }
+.cp-status.is-ok { background: color-mix(in oklch, var(--ba-mint) 14%, transparent); }
+.cp-status.is-error { color: var(--fc-ink); background: color-mix(in oklch, #e5484d 14%, transparent); border: 1px solid color-mix(in oklch, #e5484d 40%, transparent); }
+@keyframes cp-save-nudge { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--ba-mint) 0%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in oklch, var(--ba-mint) 35%, transparent); } }
+.cp-save-nudge { animation: cp-save-nudge 1s ease-in-out 3; }
+@media (prefers-reduced-motion: reduce) { .cp-save-nudge { animation: none; outline: 3px solid var(--ba-mint); outline-offset: 2px; } }
 .cp-hint { margin: 0; font: 500 0.75rem/1.5 var(--fc-sans); color: var(--fc-muted); }
 
 .ba-settings-block { display: flex; flex-direction: column; gap: 1.1rem; }

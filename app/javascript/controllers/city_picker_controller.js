@@ -134,10 +134,25 @@ export default class extends Controller {
     this.idTarget.value = city.id
     this.inputTarget.value = city.label
     this.pickedLabel = city.label
-    this.status(`${city.label} selected.`)
     this.close()
     this.dispatch("picked", { detail: city })
-    if (this.autosubmitValue) this.element.closest("form")?.requestSubmit()
+    if (this.autosubmitValue) {
+      this.status(`${city.label} selected.`, "ok")
+      this.element.closest("form")?.requestSubmit()
+    } else {
+      this.status(`${city.label}. Tap Save to keep it.`, "ok")
+      this.nudgeSave()
+    }
+  }
+
+  // Point at the form's Save button after a city is picked, so it isn't missed.
+  nudgeSave() {
+    const save = this.element.closest("form")?.querySelector("[type=submit]")
+    if (!save) return
+    save.classList.remove("cp-save-nudge")
+    void save.offsetWidth
+    save.classList.add("cp-save-nudge")
+    setTimeout(() => save.classList.remove("cp-save-nudge"), 4000)
   }
 
   blur() {
@@ -157,12 +172,12 @@ export default class extends Controller {
   }
 
   locate() {
-    if (!navigator.geolocation) return this.status("Your browser can't share a location. Type your city instead.")
+    if (!navigator.geolocation) return this.status("Your browser can't share a location. Type your city instead.", "error")
     this.status("Finding your city…")
     this.locateTarget.disabled = true
     navigator.geolocation.getCurrentPosition(
       (position) => this.sendPosition(position.coords),
-      () => { this.locateTarget.disabled = false; this.status("We couldn't get your location. Type your city instead.") },
+      (error) => { this.locateTarget.disabled = false; this.status(this.locationError(error), "error") },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
     )
   }
@@ -181,13 +196,27 @@ export default class extends Controller {
       if (!response.ok) throw new Error(String(response.status))
       this.pick(await response.json())
     } catch {
-      this.status("We couldn't find a city near you. Type your city instead.")
+      this.status("We couldn't find a city near you. Type your city instead.", "error")
     } finally {
       this.locateTarget.disabled = false
     }
   }
 
-  status(text) {
-    if (this.hasStatusTarget) this.statusTarget.textContent = text
+  // Why the browser couldn't share a location, and what to do about it.
+  locationError(error) {
+    if (error?.code === 1) {
+      return "Location is blocked for Brethreign. Allow it in your browser (the icon beside the web address → Location → Allow), then try again. Or just type your city."
+    }
+    if (error?.code === 2) {
+      return "Your device couldn't find where you are. Check that Location Services is on, or type your city."
+    }
+    return "Finding your location took too long. Try again, or type your city."
+  }
+
+  status(text, tone = "") {
+    if (!this.hasStatusTarget) return
+    this.statusTarget.textContent = text
+    this.statusTarget.classList.toggle("is-error", tone === "error")
+    this.statusTarget.classList.toggle("is-ok", tone === "ok")
   }
 }
