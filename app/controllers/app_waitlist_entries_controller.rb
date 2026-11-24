@@ -14,6 +14,11 @@ class AppWaitlistEntriesController < ApplicationController
              by: -> { request.remote_ip }, with: -> { reply_error(RATE_MESSAGE, status: :too_many_requests) }
   before_action :reject_bots!, only: :create
 
+  # GET /waitlist — a page of its own for sharing; works signed in or out.
+  def new
+    @source = params[:ref].presence ? "link:#{params[:ref]}" : "link"
+  end
+
   def create
     @entry = AppWaitlistEntry.join(email: entry_params[:email], platform: entry_params[:platform].presence || "both",
                                    source: entry_params[:source].presence || "welcome", remote_ip: request.remote_ip)

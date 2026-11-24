@@ -1,0 +1,16 @@
+<% content_for(:title) { "Join the Brethreign app waitlist" } %>
+<% content_for(:meta_description) { "Brethreign for iPhone and Android is on its way. Join the waitlist and we'll tell you the day it's out." } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 560px;">
+    <main class="fc-main">
+      <div class="fc-panel welcome waitlist-page">
+        <p class="waitlist-page-eyebrow">Brethreign for iPhone &amp; Android</p>
+        <h1 class="waitlist-page-title">Get in line for the app.</h1>
+        <p class="waitlist-page-sub">A kind place to talk about work, life and faith, in your pocket. Add your email and we'll tell you the day it's out.</p>
+        <%= render "home/get_the_app", source: @source %>
+        <p class="waitlist-page-foot">Curious already? <%= link_to "Look around Brethreign", root_path %></p>
+      </div>
+    </main>
+  </div>
+</div>
