@@ -13,7 +13,11 @@ Rails.application.routes.draw do
 
   # Dynamic, accent-tinted OG image for social shares.
   get "og.svg", to: "og#show", as: :og_image, defaults: { format: :svg }
+  # /sitemap.xml is an index of the sitemaps below (pages, then scripture).
   get "sitemap.xml", to: "sitemaps#show", as: :sitemap, defaults: { format: :xml }
+  get "sitemaps/pages.xml", to: "sitemaps#pages", as: :pages_sitemap, defaults: { format: :xml }
+  get "sitemaps/scripture-:page.xml", to: "sitemaps#scripture", as: :scripture_sitemap,
+      defaults: { format: :xml }, constraints: { page: /\d+/ }
   # IndexNow key file (/<key>.txt); the controller 404s any other name.
   get ":indexnow_key", to: "index_now_keys#show", as: :indexnow_key, format: false,
                        constraints: { indexnow_key: /[A-Za-z0-9\-]{8,128}\.txt/ }
@@ -148,7 +152,8 @@ Rails.application.routes.draw do
   # Scripture pages — a living concordance: the verse + every breath that
   # carries it. Declared after /scripture/lookup so "lookup" never parses
   # as a slug.
-  get "scripture/:slug", to: "scripture_pages#show", as: :scripture_page, constraints: { slug: /[a-z0-9\-]+/ }
+  get "scripture", to: "scripture_pages#index", as: :scripture_index
+  get "scripture/:slug", to: "scripture_pages#show", as: :scripture_page, constraints: { slug: /[A-Za-z0-9\-_]+/ }
   post "bible/search", to: "bible#search", as: :bible_search
 
   # Games / leaderboard

@@ -126,6 +126,7 @@ module SweepWorld
     in [ "resource_categories", "id" ] then @category.to_param
     in [ "scripture_pages", "slug" ] then "john-3-16"
     in [ "index_now_keys", "indexnow_key" ] then "#{IndexNow.key}.txt"
+    in [ "sitemaps", "page" ] then "1"
     in [ "church_history", "slug" ] then @figure.slug
     in [ "church_history", "era" ] then ChurchHistoryFigure.eras.keys.first
     in [ "reading_plans", "slug" ] then ReadingPlan.all.first&.slug || "none"

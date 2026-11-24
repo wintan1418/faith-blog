@@ -1,42 +1,205 @@
-<% content_for(:title) { "#{@reference} - Brethreign" } %>
-<% if @verse&.dig(:text).present? %>
-  <% content_for(:meta_description) { "#{@reference} — #{truncate(@verse[:text], length: 140)} Read every breath the Brethreign community shares around this verse." } %>
-<% end %>
+<% ref = @reference %>
+<% canonical = scripture_page_url(ref.slug) %>
+<% page_title = scripture_page_title(ref, @passage) %>
+<% description = scripture_meta_description(ref, @passage, @insight) %>
+<% content_for(:title) { page_title } %>
+<% content_for(:meta_description) { description } %>
+<% content_for(:og_title) { page_title } %>
+<% content_for(:og_description) { description } %>
+<% content_for(:og_url) { canonical } %>
+<% content_for(:og_type) { "article" } %>
+<% content_for(:canonical) { canonical } %>
+<% content_for(:structured_data) { scripture_structured_data(ref, @insight) } %>
+<% snippet = scripture_snippet(@passage.primary.first&.last) %>
+<% primary = ScriptureVerse::PRIMARY %>
 
-<div class="mystic-shell scripture-page">
-  <section class="sp-hero">
-    <div class="mystic-container max-w-3xl py-14 text-center">
-      <p class="sp-kicker"><%= render_icon("bookopen", classes: "h-4 w-4") %> Scripture</p>
-      <h1 class="sp-ref"><%= @verse&.dig(:reference).presence || @reference %></h1>
-      <% if @verse&.dig(:text).present? %>
-        <blockquote class="sp-verse">“<%= @verse[:text] %>”</blockquote>
-        <p class="sp-translation"><%= @verse[:translation].presence || "KJV" %></p>
-      <% else %>
-        <p class="sp-verse-missing">Open your Bible to <%= @reference %> — the text couldn't be fetched right now.</p>
-      <% end %>
-      <div class="sp-actions">
-        <% if user_signed_in? %>
-          <%= link_to "Breathe on this verse", new_post_path(prefill: "#{@reference} — "), class: "fc-btn fc-btn-primary" %>
+<div class="mystic-shell sx-page">
+  <article class="sx-wrap">
+    <nav class="sx-crumbs" aria-label="Breadcrumb">
+      <% scripture_breadcrumbs(ref).each_with_index do |(name, url), i| %>
+        <% if i.positive? %><span aria-hidden="true">›</span><% end %>
+        <% if url == canonical %>
+          <span aria-current="page"><%= name %></span>
         <% else %>
-          <%= link_to "Join Brethreign to breathe on it", new_user_registration_path, class: "fc-btn fc-btn-primary" %>
+          <%= link_to name, url %>
         <% end %>
-      </div>
-    </div>
-  </section>
+      <% end %>
+    </nav>
 
-  <div class="mystic-container max-w-3xl pb-14">
-    <% if @posts.any? %>
-      <h2 class="sp-section-title">Breaths that carry this verse</h2>
-      <div class="space-y-4 mt-5">
-        <% @posts.each do |post| %>
-          <%= render "posts/card", post: post %>
+    <header class="sx-hero">
+      <p class="sx-kicker"><%= render_icon("bookopen", classes: "h-4 w-4") %>
+        <%= ref.chapter? ? "Bible chapter" : "Bible #{ref.range? ? 'passage' : 'verse'}" %> · <%= ref.book.old_testament? ? "Old Testament" : "New Testament" %></p>
+      <h1 class="sx-title">
+        <span class="sx-ref"><%= ref %></span>
+        <% if snippet.present? %><span class="sx-title-quote">“<%= snippet %>”</span><% end %>
+      </h1>
+      <p class="sx-sub"><%= @insight ? "Meaning and context" : "Text, context and related verses" %><%= " · KJV, WEB, BSB" if @passage.translations.size > 1 %></p>
+
+      <% if @passage.present? && !ref.chapter? %>
+        <blockquote class="sx-verse">
+          <% @passage.primary.each do |number, text| %>
+            <% if ref.range? %><sup class="sx-vnum"><%= number %></sup><% end %><%= text %>
+          <% end %>
+        </blockquote>
+        <p class="sx-translation"><%= scripture_translation_name(primary) %></p>
+      <% elsif !@passage.present? %>
+        <p class="sx-missing">Open your Bible to <%= ref %>; the text couldn't be loaded just now.</p>
+      <% end %>
+
+      <% if @insight&.summary.present? %>
+        <p class="sx-lede"><%= @insight.summary %></p>
+      <% end %>
+    </header>
+
+    <% if ref.chapter? && @passage.present? %>
+      <section class="sx-card sx-chapter" aria-labelledby="sx-chapter-heading">
+        <h2 id="sx-chapter-heading" class="sx-h2"><%= ref %> in full</h2>
+        <div class="sx-tabs">
+          <% @passage.translations.each_with_index do |code, i| %>
+            <input type="radio" name="sx-tr" id="sx-tr-<%= code %>" class="sx-tab-input" <%= "checked" if i.zero? %>>
+            <label for="sx-tr-<%= code %>" class="sx-tab" title="<%= scripture_translation_name(code) %>"><%= scripture_translation_short(code) %></label>
+          <% end %>
+          <% @passage.texts.each do |code, verses| %>
+            <div class="sx-tab-panel sx-tab-panel--<%= code %>" lang="en">
+              <p class="sx-chapter-text">
+                <% verses.each do |number, text| %>
+                  <span class="sx-cv" id="<%= "v#{number}" if code == primary %>">
+                    <% if code == primary %>
+                      <%= link_to number, scripture_page_path(Scripture::Reference.build(ref.book, ref.chapter, number).slug), class: "sx-vnum", title: "#{ref.book.ref_name} #{ref.chapter}:#{number}" %>
+                    <% else %>
+                      <sup class="sx-vnum"><%= number %></sup>
+                    <% end %><%= text %>
+                  </span>
+                <% end %>
+              </p>
+              <p class="sx-translation"><%= scripture_translation_name(code) %> · public domain</p>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <% if !ref.chapter? && @passage.translations.size > 1 %>
+      <section class="sx-section" aria-labelledby="sx-tr-heading">
+        <h2 id="sx-tr-heading" class="sx-h2">In other translations</h2>
+        <div class="sx-translations">
+          <% @passage.texts.except(primary).each do |code, verses| %>
+            <figure class="sx-card sx-alt">
+              <blockquote><%= verses.map(&:last).join(" ") %></blockquote>
+              <figcaption><%= scripture_translation_name(code) %> (<%= scripture_translation_short(code) %>)</figcaption>
+            </figure>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <% if @insight %>
+      <section class="sx-section sx-insight" aria-labelledby="sx-meaning-heading">
+        <h2 id="sx-meaning-heading" class="sx-h2">What does <%= ref %> mean?</h2>
+        <div class="sx-prose"><%= scripture_paragraphs(@insight.explanation) %></div>
+
+        <h2 class="sx-h2">Context: who, when and why</h2>
+        <div class="sx-prose"><%= scripture_paragraphs(@insight.context) %></div>
+
+        <% if @insight.question_list.any? %>
+          <div class="sx-card sx-questions">
+            <h2 class="sx-h3">Questions to sit with</h2>
+            <ol>
+              <% @insight.question_list.each do |question| %><li><%= question %></li><% end %>
+            </ol>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+
+    <% if @passage.surrounding.size > @passage.primary.size %>
+      <section class="sx-section" aria-labelledby="sx-context-heading">
+        <h2 id="sx-context-heading" class="sx-h2">Read it in context</h2>
+        <div class="sx-card sx-context">
+          <% @passage.surrounding.each do |number, text| %>
+            <p class="<%= 'is-current' if ref.verses.cover?(number) %>">
+              <%= link_to number, scripture_page_path(Scripture::Reference.build(ref.book, ref.chapter, number).slug), class: "sx-vnum" %>
+              <%= text %>
+            </p>
+          <% end %>
+          <%= link_to "Read all of #{ref.chapter_reference} →", scripture_page_path(ref.chapter_reference.slug, anchor: "v#{ref.verse_start}"), class: "sx-more" %>
+        </div>
+      </section>
+    <% end %>
+
+    <% if @popular_here.any? %>
+      <section class="sx-section" aria-labelledby="sx-popular-heading">
+        <h2 id="sx-popular-heading" class="sx-h2">Well-known verses in <%= ref %></h2>
+        <div class="sx-chips">
+          <% @popular_here.each do |verse| %><%= link_to verse.to_s, scripture_page_path(verse.slug), class: "sx-chip" %><% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <% if @cross_references.any? %>
+      <section class="sx-section" aria-labelledby="sx-xref-heading">
+        <h2 id="sx-xref-heading" class="sx-h2">Related verses</h2>
+        <ul class="sx-xrefs">
+          <% @cross_references.each do |xref| %>
+            <% text = @cross_reference_texts[[ xref.book.position, xref.chapter, xref.verse_start || 1 ]] %>
+            <li class="sx-card">
+              <%= link_to xref.to_s, scripture_page_path(xref.slug), class: "sx-xref-ref" %>
+              <% if text %><p><%= truncate(text, length: 170, separator: " ") %></p><% end %>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+
+    <section class="sx-section" aria-labelledby="sx-talk-heading">
+      <h2 id="sx-talk-heading" class="sx-h2">What people on Brethreign are saying</h2>
+      <% if @posts.any? %>
+        <p class="sx-muted"><%= pluralize(@posts_total, "breath") %> <%= @posts_total == 1 ? "quotes" : "quote" %> <%= ref %>.</p>
+        <ul class="sx-talk">
+          <% @posts.each do |post| %>
+            <li class="sx-card">
+              <%= link_to post_path(post), class: "sx-talk-link" do %>
+                <% if post.display_title %><strong><%= post.display_title %></strong><% end %>
+                <span><%= scripture_post_excerpt(post) %></span>
+                <small><%= post.user.display_name %> · <time datetime="<%= post.published_at&.iso8601 %>"><%= post.published_at&.strftime("%-d %b %Y") %></time></small>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="sx-muted">No one has shared a thought on <%= ref %> yet.</p>
+      <% end %>
+      <div class="sx-card sx-cta">
+        <div>
+          <h3 class="sx-h3">Join the conversation</h3>
+          <p>What does <%= ref %> stir in you? Share a thought, a question or a story. Everyone is welcome, believer or curious.</p>
+        </div>
+        <% if user_signed_in? %>
+          <%= link_to "Share a thought", new_post_path(prefill: "#{ref} — "), class: "fc-btn fc-btn-primary" %>
+        <% else %>
+          <%= link_to "Join Brethreign, free", new_user_registration_path, class: "fc-btn fc-btn-primary" %>
         <% end %>
       </div>
-    <% else %>
-      <div class="mystic-panel sp-empty p-10 text-center">
-        <h2>No breaths carry <%= @reference %> yet.</h2>
-        <p class="mystic-copy mt-2">Be the first — share what this verse has done in you.</p>
-      </div>
-    <% end %>
-  </div>
+    </section>
+
+    <nav class="sx-pager" aria-label="<%= ref.chapter? ? 'Chapters' : 'Verses' %>">
+      <% if (prev_ref = ref.previous) %>
+        <%= link_to scripture_page_path(prev_ref.slug), class: "sx-card sx-pager-link", rel: "prev" do %>
+          <small>← Previous</small><span><%= prev_ref %></span>
+        <% end %>
+      <% else %><span></span><% end %>
+      <% if (next_ref = ref.next) %>
+        <%= link_to scripture_page_path(next_ref.slug), class: "sx-card sx-pager-link is-next", rel: "next" do %>
+          <small>Next →</small><span><%= next_ref %></span>
+        <% end %>
+      <% end %>
+    </nav>
+
+    <footer class="sx-sources">
+      <p>Scripture: <%= ScriptureVerse::TRANSLATIONS.values.map { |t| t[:name] }.to_sentence %> (all public domain).
+        <% if @cross_references.any? %><%= ScriptureCrossReference::ATTRIBUTION %>.<% end %>
+        <% if @insight %>Notes on this page were drafted with AI help and are meant as a starting point, not the last word.<% end %></p>
+      <p><%= link_to "Browse every book of the Bible", scripture_index_path %></p>
+    </footer>
+  </article>
 </div>

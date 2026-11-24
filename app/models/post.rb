@@ -72,6 +72,7 @@ class Post < ApplicationRecord
   # Associations
   belongs_to :user
   belongs_to :room, counter_cache: :posts_count, optional: true
+  has_many :scripture_citations, dependent: :delete_all
   has_many :comments, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
   # Per-emoji counts for the card's reaction summary: rows of
@@ -171,6 +172,15 @@ class Post < ApplicationRecord
   # or appear on the author's public profile).
   scope :named, -> { where(anonymous: false) }
   scope :featured, -> { where(featured: true) }
+  # Breaths a public scripture page may quote: live, approved, signed with
+  # the author's name, not a prayer request, and not in a private room or a
+  # prayer/struggles room.
+  scope :scripture_discussable, -> {
+    published.named.where(prayer_status: :not_a_prayer)
+             .where(user_id: User.where(active: true).select(:id))
+             .where("posts.room_id IS NULL OR posts.room_id IN (?)",
+                    Room.public_rooms.where.not(room_type: %i[prayers struggles]).select(:id))
+  }
   scope :recent, -> { order(published_at: :desc) }
   scope :popular, -> { order(views_count: :desc) }
   scope :trending, -> { published.where(published_at: 7.days.ago..).order(engagement_score: :desc) }
@@ -203,6 +213,8 @@ class Post < ApplicationRecord
 
   after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
   after_destroy_commit :revoke_seeds_after_destroy
+  # Index the Bible references this breath quotes (scripture pages list them).
+  after_commit :sync_scripture_citations, on: %i[create update]
 
   # Instance methods
   def engagement_score
@@ -552,5 +564,9 @@ class Post < ApplicationRecord
   def language_is_clean
     text = [ title, content&.to_plain_text ].compact.join(" ")
     errors.add(:base, CleanLanguage::MESSAGE) if CleanLanguage.offensive?(text)
+  end
+
+  def sync_scripture_citations
+    ScriptureCitation.sync(self)
   end
 end
