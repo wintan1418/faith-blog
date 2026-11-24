@@ -1,0 +1,64 @@
+<% title = "Read the Bible online: every book and chapter (KJV, WEB, BSB)" %>
+<% description = "All 66 books and 1,189 chapters of the Bible in the King James Version, World English Bible and Berean Standard Bible, with meaning, context and cross-references. Free, no sign-in." %>
+<% content_for(:title) { title } %>
+<% content_for(:meta_description) { description } %>
+<% content_for(:og_title) { title } %>
+<% content_for(:og_description) { description } %>
+<% content_for(:canonical) { scripture_index_url } %>
+<% content_for(:structured_data) do %>
+  <%= tag.script(json_escape({ "@context" => "https://schema.org", "@type" => "BreadcrumbList",
+        "itemListElement" => [ { "@type" => "ListItem", "position" => 1, "name" => "Bible", "item" => scripture_index_url } ] }.to_json).html_safe,
+        type: "application/ld+json") %>
+<% end %>
+
+<div class="mystic-shell sx-page">
+  <div class="sx-wrap sx-wrap--wide">
+    <header class="sx-hero">
+      <p class="sx-kicker"><%= render_icon("bookopen", classes: "h-4 w-4") %> The Bible</p>
+      <h1 class="sx-title"><span class="sx-ref">Every book, every chapter</span></h1>
+      <p class="sx-lede">Read any chapter or verse of the Bible in three public-domain translations (King James, World English and Berean Standard), with plain-English notes, context and related verses. For anyone curious.</p>
+    </header>
+
+    <% if @popular.any? %>
+      <section class="sx-section" aria-labelledby="sx-popular-heading">
+        <h2 id="sx-popular-heading" class="sx-h2">Verses people look up most</h2>
+        <div class="sx-chips">
+          <% @popular.each do |ref| %><%= link_to ref.to_s, scripture_page_path(ref.slug), class: "sx-chip" %><% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <% [ [ "Old Testament", Scripture::Canon.old_testament ], [ "New Testament", Scripture::Canon.new_testament ] ].each do |heading, books| %>
+      <section class="sx-section" aria-label="<%= heading %>">
+        <h2 class="sx-h2"><%= heading %> <small><%= books.size %> books</small></h2>
+        <div class="sx-books">
+          <% books.each do |book| %>
+            <details class="sx-card sx-book" id="<%= book.slug %>">
+              <summary data-guest-gate-allow><span><%= book.name %></span><small><%= pluralize(book.chapters, "chapter") %></small></summary>
+              <div class="sx-chapter-grid">
+                <% (1..book.chapters).each do |chapter| %>
+                  <%= link_to chapter, scripture_page_path("#{book.slug}-#{chapter}"), title: "#{book.ref_name} #{chapter}" %>
+                <% end %>
+              </div>
+            </details>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <footer class="sx-sources">
+      <p>Scripture: King James Version, World English Bible and Berean Standard Bible (all public domain). <%= ScriptureCrossReference::ATTRIBUTION %>.</p>
+    </footer>
+  </div>
+</div>
+<script>
+  // /scripture#psalm opens that book.
+  (function () {
+    var open = function () {
+      var el = location.hash && document.getElementById(location.hash.slice(1));
+      if (el && el.tagName === "DETAILS") { el.open = true; el.scrollIntoView({ block: "start" }); }
+    };
+    open();
+    window.addEventListener("hashchange", open);
+  })();
+</script>

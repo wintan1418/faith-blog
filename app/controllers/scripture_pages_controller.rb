@@ -1,45 +1,55 @@
 # frozen_string_literal: true
 
-# A page per scripture reference — /scripture/john-3-16 — showing the verse
-# text (via the cached ScriptureLookup) and every published breath that
-# mentions it. Public: testimony around a verse is for everyone.
+# Public scripture pages for the whole Bible: /scripture/psalm-23 (a chapter),
+# /scripture/psalm-101-3 (a verse), /scripture/genesis-1-11-12 (a range), and
+# the /scripture index of books and chapters.
+#
+# Each page shows the text (KJV, WEB, BSB, from the database), the stored
+# AI-written explanation if there is one (never generated here), the verses
+# around it, cross-references and the breaths that quote it. Any other
+# spelling of a reference ("psalms-23", "1-cor-13-4-to-7") 301s to its one
+# canonical address.
 class ScripturePagesController < ApplicationController
-  def show
-    @reference = parse_slug(params[:slug])
-    raise ActiveRecord::RecordNotFound unless @reference
+  DISCUSSION_LIMIT = 6
 
-    @verse = ScriptureLookup.lookup(@reference)
-    @posts = posts_mentioning(@reference)
+  def index
+    @popular = Scripture::Catalog.popular.reject(&:chapter?).first(40)
+  end
+
+  def show
+    slug = params[:slug].to_s
+    @reference = Scripture::Reference.from_slug(slug)
+    return redirect_to_book_or_404(slug) unless @reference
+    return redirect_to(scripture_page_path(@reference.slug), status: :moved_permanently) if @reference.slug != slug
+
+    @insight = ScriptureInsight.find_by(slug: @reference.slug)
+    @passage = Scripture::Passage.new(@reference)
+    @cross_references = ScriptureCrossReference.top_for(@reference)
+    @cross_reference_texts = first_verse_texts(@cross_references)
+    @popular_here = @reference.chapter? ? Scripture::Catalog.popular_in(@reference.book, @reference.chapter) : []
+    discussions = Post.scripture_discussable.where(id: ScriptureCitation.matching(@reference).select(:post_id))
+    @posts = discussions.includes(:user, :rich_text_content).recent.limit(DISCUSSION_LIMIT).to_a
+    @posts_total = @posts.size < DISCUSSION_LIMIT ? @posts.size : discussions.count
   end
 
   private
 
-  # "1-john-3-16" → "1 John 3:16" · "psalm-23" → "Psalm 23" ·
-  # "john-3-16-18" → "John 3:16-18". Trailing numbers are chapter/verse;
-  # whatever remains in front (including a leading 1/2/3) is the book.
-  def parse_slug(slug)
-    parts = slug.to_s.downcase.split("-").reject(&:blank?)
-    return nil if parts.empty?
+  # "/scripture/genesis" → the book on the index; anything else is a 404.
+  def redirect_to_book_or_404(slug)
+    book = Scripture::Canon.find(slug.tr("-", " "))
+    raise ActiveRecord::RecordNotFound unless book
 
-    nums = []
-    nums.unshift(parts.pop) while parts.any? && parts.last.match?(/\A\d{1,3}\z/) && nums.size < 3
-    return nil if nums.empty? || parts.empty?
-
-    book = parts.map { |p| p.match?(/\A[123]\z/) ? p : p.capitalize }.join(" ")
-    case nums.size
-    when 1 then "#{book} #{nums[0]}"
-    when 2 then "#{book} #{nums[0]}:#{nums[1]}"
-    else        "#{book} #{nums[0]}:#{nums[1]}-#{nums[2]}"
-    end
+    redirect_to scripture_index_path(anchor: book.slug), status: :moved_permanently
   end
 
-  def posts_mentioning(reference)
-    pattern = "%#{ActiveRecord::Base.sanitize_sql_like(reference)}%"
-    Post.published
-        .left_joins(:rich_text_content)
-        .where("action_text_rich_texts.body ILIKE :p OR posts.title ILIKE :p", p: pattern)
-        .for_cards
-        .recent
-        .limit(30)
+  # KJV text of the first verse of each cross-reference, in one query.
+  def first_verse_texts(references)
+    return {} if references.empty?
+
+    locations = references.map { |r| ScriptureVerse.where(book: r.book.position, chapter: r.chapter, verse: r.verse_start || 1) }
+    ScriptureVerse.where(translation: ScriptureVerse::PRIMARY)
+                  .merge(locations.reduce(:or))
+                  .pluck(:book, :chapter, :verse, :text)
+                  .to_h { |b, c, v, text| [ [ b, c, v ], text ] }
   end
 end

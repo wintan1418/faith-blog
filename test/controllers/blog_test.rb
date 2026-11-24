@@ -56,7 +56,7 @@ class BlogTest < ActionDispatch::IntegrationTest
     assert_match "<title>Brethreign Blog</title>", response.body
     assert_match blog_article_url("welcome-to-brethreign"), response.body
 
-    get "/sitemap.xml"
+    get "/sitemaps/pages.xml" # listed in the /sitemap.xml index
     assert_match blog_article_url("introducing-brethreign-professional"), response.body
   end
 end

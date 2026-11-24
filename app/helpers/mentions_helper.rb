@@ -66,9 +66,9 @@ module MentionsHelper
     doc.traverse do |node|
       next unless node.text?
       next if node.ancestors.any? { |a| %w[a code pre].include?(a.name) }
-      next unless node.text.match?(SOCIAL_TOKEN_REGEX)
+      next unless node.text.match?(SOCIAL_TOKEN_REGEX) || node.text.match?(Scripture::Reference::TEXT_REGEX)
 
-      linked = safe_join(social_inline_nodes(node.text, users_by_username))
+      linked = safe_join(social_inline_nodes(node.text, users_by_username, scripture: true))
       node.replace(Nokogiri::HTML::DocumentFragment.parse(linked))
     end
 
@@ -96,18 +96,34 @@ module MentionsHelper
     User.where("LOWER(username) IN (?)", usernames).index_by { |user| user.username.downcase }
   end
 
-  def social_inline_nodes(line, users_by_username)
+  # scripture: true also links Bible references ("Psalm 101:3") to their
+  # scripture pages, in the server-rendered HTML search engines read.
+  def social_inline_nodes(line, users_by_username, scripture: false)
     nodes = []
     cursor = 0
+    plain = scripture ? method(:scripture_linked_nodes) : ->(text) { [ escape_social_text(text) ] }
 
     line.to_enum(:scan, SOCIAL_TOKEN_REGEX).each do
       match = Regexp.last_match
-      nodes << escape_social_text(line[cursor...match.begin(0)]) if match.begin(0) > cursor
+      nodes.concat plain.call(line[cursor...match.begin(0)]) if match.begin(0) > cursor
       nodes.concat social_token_nodes(match[0], users_by_username)
       cursor = match.end(0)
     end
 
-    nodes << escape_social_text(line[cursor..]) if cursor < line.length
+    nodes.concat plain.call(line[cursor..]) if cursor < line.length
+    nodes
+  end
+
+  def scripture_linked_nodes(text)
+    nodes = []
+    cursor = 0
+    Scripture::Reference.scan(text).each do |reference, start, finish, matched|
+      nodes << escape_social_text(text[cursor...start]) if start > cursor
+      nodes << link_to(matched, scripture_page_path(reference.slug), class: "scripture-ref",
+                       data: { reference: reference.plain, turbo_frame: "_top" })
+      cursor = finish
+    end
+    nodes << escape_social_text(text[cursor..]) if cursor < text.length
     nodes
   end
 
