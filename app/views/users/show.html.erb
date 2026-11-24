@@ -157,6 +157,11 @@
               <%= render "seeds/progress", user: @user %>
               <%= link_to "How to earn seeds", seeds_guide_path, class: "seed-link" %>
             </div>
+            <div class="profile-actions mt-4">
+              <%= link_to invite_friends_path, class: "fc-btn" do %>
+                <%= render_icon("userplus", classes: "h-4 w-4") %> Invite friends
+              <% end %>
+            </div>
           <% end %>
 
           <% if user_signed_in? && @user != current_user %>

@@ -1,0 +1,119 @@
+<%# "Come join the conversation": the page behind a member's invite link.
+    @inviter is nil for an unknown, deactivated or under-18 member: the same
+    page then shows no one's name. Locals from JoinsController#show. %>
+<% name = @inviter&.display_name %>
+<% title = name ? "#{name} invited you to Brethreign" : "Come join the conversation on Brethreign" %>
+<% description = "Come join the conversation on Brethreign: a calm place to talk about work, life and faith. Everyone is welcome." %>
+<% content_for(:title) { title } %>
+<% content_for(:meta_description) { description } %>
+<% content_for(:og_title) { title } %>
+<% content_for(:og_description) { description } %>
+<% content_for(:og_image) { "#{request.base_url}/og/invite.jpg" } %>
+<% content_for(:og_url) { @inviter ? join_invite_url(@inviter.username) : root_url } %>
+<% content_for(:canonical) { @inviter ? join_invite_url(@inviter.username) : root_url } %>
+<% content_for(:head) do %>
+  <meta name="robots" content="noindex">
+  <meta property="og:image:type" content="image/jpeg" />
+<% end %>
+<% content_for(:bare_page) { "1" } %>
+
+<div class="welcome cj">
+  <header class="cj-top">
+    <%= link_to root_path, class: "cj-brand", aria: { label: "Brethreign" } do %>
+      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+        <circle cx="16" cy="16" r="15" fill="var(--fc-fill)"/>
+        <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19" fill="none" stroke="var(--fc-on-fill)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="22" cy="11" r="1.6" fill="var(--fc-on-fill)"/>
+      </svg>
+      <span>Brethreign</span>
+    <% end %>
+    <%= link_to "Sign in", new_user_session_path, class: "cj-signin" %>
+  </header>
+
+  <div class="cj-grid">
+    <section class="cj-hero" aria-labelledby="cj-title">
+      <% if @inviter %>
+        <div class="cj-inviter">
+          <% if @inviter.profile&.avatar&.attached? %>
+            <%= image_tag avatar_src(@inviter.profile, 192), class: "cj-avatar", alt: "" %>
+          <% else %>
+            <span class="cj-avatar is-initial" style="<%= avatar_tint_style(@inviter.username) %>"><%= @inviter.username.first.upcase %></span>
+          <% end %>
+          <span class="cj-kicker"><%= render_icon("sparkles", classes: "h-3.5 w-3.5") %> A personal invite</span>
+        </div>
+        <h1 id="cj-title" class="cj-title"><%= name %> invited you</h1>
+        <% if @inviter.professional_headline.present? %>
+          <p class="cj-headline"><%= @inviter.professional_headline %></p>
+        <% end %>
+      <% else %>
+        <span class="cj-kicker"><%= render_icon("sparkles", classes: "h-3.5 w-3.5") %> You're invited</span>
+        <h1 id="cj-title" class="cj-title">Come join the conversation</h1>
+      <% end %>
+
+      <p class="cj-sub">
+        <% if @inviter %>Come join the conversation. <% end %>Brethreign is a calm place to talk about work, life and faith:
+        honest, kind conversations with people who listen. Everyone is welcome, wherever you are with belief.
+      </p>
+
+      <ul class="cj-points" aria-label="What you'll find">
+        <li><%= render_icon("chat", classes: "h-4 w-4") %> Real conversations, no outrage</li>
+        <li><%= render_icon("users", classes: "h-4 w-4") %> People to learn from and lean on</li>
+        <li><%= render_icon("lock", classes: "h-4 w-4") %> No ads, no noise</li>
+      </ul>
+
+      <div class="auth welcome-actions cj-actions">
+        <%= render "devise/shared/google_sign_in", divider: "or" %>
+        <%= link_to new_user_registration_path, class: "welcome-btn welcome-btn-primary cj-join" do %>
+          <%= name ? "Join #{name} on Brethreign" : "Join Brethreign" %>
+        <% end %>
+        <p class="welcome-legal">
+          Free. By joining you agree to our <%= link_to "Terms", terms_path %>
+          and <%= link_to "Privacy Policy", privacy_path %>.
+        </p>
+        <p class="cj-member">Already a member? <%= link_to "Sign in", new_user_session_path %></p>
+      </div>
+    </section>
+
+    <section class="cj-convos" aria-labelledby="cj-convos-title">
+      <h2 id="cj-convos-title" class="cj-convos-title">Happening on Brethreign</h2>
+      <% if @snippets.any? %>
+        <ul class="cj-snippets">
+          <% @snippets.each do |post| %>
+            <% author = post.user %>
+            <li class="cj-snippet">
+              <div class="cj-snippet-head">
+                <% if author.profile&.avatar&.attached? %>
+                  <%= image_tag avatar_src(author.profile, 72), class: "cj-snippet-face", alt: "" %>
+                <% else %>
+                  <span class="cj-snippet-face is-initial" style="<%= avatar_tint_style(author.username) %>"><%= author.username.first.upcase %></span>
+                <% end %>
+                <span class="cj-snippet-who">
+                  <strong><%= author.display_name %></strong>
+                  <small><%= [ post.room&.name, "#{time_ago_in_words(post.published_at)} ago" ].compact.join(" · ") %></small>
+                </span>
+              </div>
+              <% if post.display_title.present? %><p class="cj-snippet-title"><%= post.display_title %></p><% end %>
+              <p class="cj-snippet-text"><%= truncate(post.content.to_plain_text.squish, length: 200, separator: " ") %></p>
+              <p class="cj-snippet-meta">
+                <span><%= render_icon("chat", classes: "h-3.5 w-3.5") %> <%= pluralize(post.comments_count, "reply", plural: "replies") %></span>
+                <span><%= render_icon("heart", classes: "h-3.5 w-3.5") %> <%= post.likes_count %></span>
+              </p>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="cj-empty">Conversations about work, family, doubt, hope and everything in between. Join to see what people are talking about today.</p>
+      <% end %>
+    </section>
+  </div>
+
+  <footer class="welcome-footer" aria-label="About Brethreign">
+    <nav>
+      <%= link_to "About", about_path %>
+      <%= link_to "Privacy", privacy_path %>
+      <%= link_to "Terms", terms_path %>
+      <%= link_to "Child safety", child_safety_path %>
+    </nav>
+    <span>&copy; <%= Date.current.year %> Brethreign</span>
+  </footer>
+</div>

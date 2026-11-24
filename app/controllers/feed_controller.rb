@@ -21,6 +21,7 @@ class FeedController < ApplicationController
     unless next_page?
       load_suggestions
       load_around_card
+      load_invite_card
     end
     # Pinned breaths (admin-featured) lead the feed — a community noticeboard.
     @pinned_posts = feed_posts_scope.where(featured: true).recent.limit(2).to_a
@@ -252,6 +253,19 @@ class FeedController < ApplicationController
   rescue StandardError => e
     Rails.logger.warn("[feed] around card failed: #{e.class}: #{e.message}")
     @around_card = nil
+  end
+
+  # "Bring someone into the conversation", a little way down the feed: for
+  # settled members (a few days in, not under 18), until closed.
+  INVITE_CARD_KEY = "invite-friends"
+  INVITE_CARD_AFTER = 3.days
+
+  def load_invite_card
+    @invite_card = current_user.created_at < INVITE_CARD_AFTER.ago &&
+                   !current_user.card_dismissed?(INVITE_CARD_KEY) && current_user.can_invite_by_link?
+  rescue StandardError => e
+    Rails.logger.warn("[feed] invite card failed: #{e.class}: #{e.message}")
+    @invite_card = false
   end
 
   def next_page?

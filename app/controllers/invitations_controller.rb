@@ -3,6 +3,7 @@
 class InvitationsController < ApplicationController
   before_action :authenticate_user!
   member_rate_limit to: 30, within: 1.hour, only: %i[create resend], name: "invites"
+  before_action :load_invite_link, only: %i[index create]
 
   def index
     @invitation = current_user.sent_invitations.build
@@ -100,6 +101,19 @@ class InvitationsController < ApplicationController
   end
 
   private
+
+  # "Invite friends": the member's personal link (/join/username), the
+  # ready-to-send message and who joined through them.
+  def load_invite_link
+    @invite_url = join_invite_url(current_user.username)
+    @invite_message = "Come join the conversation on Brethreign — a calm place to talk about work, life and faith. " \
+                      "Here's my invite: #{@invite_url}"
+    @invitees = current_user.invitees.active.includes(profile: { avatar_attachment: :blob })
+                            .order(created_at: :desc).limit(100).to_a
+    @invitee_count = current_user.invitees.active.count
+    @rewarded_ids = SeedEvent.where(user_id: current_user.id, kind: "invite_joined", source_type: "User")
+                             .pluck(:source_id).to_set
+  end
 
   def invitation_params
     params.expect(invitation: [ :email, :message ])

@@ -133,7 +133,7 @@ html.theme-dark .seed-rank--cedar    { --rank: #e3c470; }
   color: var(--fc-accent, #0b7a54); font-weight: 700; font-size: 0.9rem; text-decoration: none;
 }
 .seed-link:hover { text-decoration: underline; }
-.seed-page-foot { margin-top: 1.25rem; text-align: center; }
+.seed-page-foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; margin-top: 1.25rem; text-align: center; }
 
 .seed-tabs {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem;

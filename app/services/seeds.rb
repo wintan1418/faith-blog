@@ -17,7 +17,8 @@ module Seeds
     "streak_7"          => { points: 20,  daily_cap: nil, label: "7-day breath streak" },
     "streak_30"         => { points: 50,  daily_cap: nil, label: "30-day breath streak" },
     "streak_100"        => { points: 100, daily_cap: nil, label: "100-day breath streak" },
-    "badge"             => { points: 25,  daily_cap: nil, label: "Earn a badge" }
+    "badge"             => { points: 25,  daily_cap: nil, label: "Earn a badge" },
+    "invite_joined"     => { points: 25,  daily_cap: 10, label: "A friend joins through your invite and posts" }
   }.freeze
 
   STREAK_BONUSES = { 7 => "streak_7", 30 => "streak_30", 100 => "streak_100" }.freeze
@@ -50,6 +51,7 @@ module Seeds
       paid = award(user_id: post.user_id, kind: "breath", source: post, at: at, post: post,
                    anonymous: post.anonymous?, notify: notify)
       streak_bonus(post, at: at, notify: notify) if streak_bumped
+      invite_joined(post.user_id, at: at, notify: notify)
       paid
     end
   end
@@ -76,6 +78,7 @@ module Seeds
 
       at ||= comment.created_at || Time.current
       context = { post: post, comment_id: comment.id, actor_id: comment.user_id, at: at, notify: notify }
+      invite_joined(comment.user_id, at: at, notify: notify) if substantial_comment?(comment)
 
       # On your own breath it only counts as a reply to someone who commented first.
       paid = nil
@@ -137,6 +140,24 @@ module Seeds
       award(user_id: intercession.user_id, kind: "intercession", source: intercession,
             at: at || intercession.created_at || Time.current, post: post, actor_id: intercession.user_id,
             notify: notify)
+    end
+  end
+
+  # +25 to whoever brought a member in (users.invited_by_id), once per member
+  # and only when that member turns out to be real: an active account that
+  # published a live breath or wrote an approved comment with real words.
+  # Signing up alone pays nothing, so empty accounts can't be farmed; the
+  # daily cap limits the rest. The new member is the source, so it pays once.
+  def invite_joined(invitee_id, at: nil, notify: true)
+    safely("invite_joined #{invitee_id}") do
+      invitee = User.where(id: invitee_id, active: true).where.not(invited_by_id: nil).first
+      next unless invitee && invitee.invited_by_id != invitee.id && !invitee.site_monitor?
+
+      inviter_id = invitee.invited_by_id
+      next unless User.where(id: inviter_id, active: true).exists?
+
+      award(user_id: inviter_id, kind: "invite_joined", source: invitee, at: at || Time.current,
+            actor_id: invitee.id, notify: notify)
     end
   end
 

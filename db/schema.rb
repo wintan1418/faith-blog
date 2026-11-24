@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_090100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1119,10 +1119,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_090100) do
     t.integer "seeds_total", default: 0, null: false
     t.integer "seeds_rank_reached", default: 0, null: false
     t.integer "seeds_rank_seen", default: 0, null: false
+    t.bigint "invited_by_id"
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["last_seen_at"], name: "index_users_on_last_seen_at"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -1218,4 +1220,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_090100) do
   add_foreign_key "user_risk_profiles", "users"
   add_foreign_key "user_seen_quiz_questions", "bible_quiz_questions"
   add_foreign_key "user_seen_quiz_questions", "users"
+  add_foreign_key "users", "users", column: "invited_by_id", on_delete: :nullify
 end

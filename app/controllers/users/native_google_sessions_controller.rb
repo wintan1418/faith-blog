@@ -21,6 +21,7 @@ class Users::NativeGoogleSessionsController < ApplicationController
     return refuse("Your Google email isn't verified.", :unauthorized) unless payload["email_verified"]
 
     user = User.from_google(google_auth(payload))
+    InviteAttribution.apply!(user, cookies) if user.previously_new_record?
     unless user.active_for_authentication?
       return refuse(I18n.t("devise.failure.#{user.inactive_message}", default: "This account can't sign in."), :forbidden)
     end

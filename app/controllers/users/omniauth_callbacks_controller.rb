@@ -9,7 +9,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_google(auth)
 
     if @user.persisted?
-      session[:ad_signup] = true if @user.previously_new_record? # a new account, for ads measurement
+      if @user.previously_new_record?
+        session[:ad_signup] = true # a new account, for ads measurement
+        InviteAttribution.apply!(@user, cookies)
+      end
       set_flash_message(:notice, :success, kind: "Google") if is_navigational_format?
       sign_in_and_redirect @user, event: :authentication
     else
