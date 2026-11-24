@@ -1,0 +1,9 @@
+<%# A signed-out visitor who came through someone's shared breath (?ref=).
+    locals: sharer (ShareReferral::Sharer) %>
+<aside class="share-invite" aria-label="Invitation">
+  <span class="share-invite-avatar" style="<%= avatar_tint_style(sharer.username) %>" aria-hidden="true"><%= sharer.username.first.upcase %></span>
+  <p class="share-invite-text">
+    <strong><%= sharer.display_name %></strong> invited you to the conversation on Brethreign
+  </p>
+  <%= link_to "Join free", new_user_registration_path, class: "share-invite-cta", data: { guest_gate_allow: true } %>
+</aside>

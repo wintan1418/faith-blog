@@ -30,8 +30,15 @@
   <%# A full 1200×630 address: WhatsApp, LinkedIn, X and Google ignore a relative one. %>
   <% og = resized_image_src(@post.images.first, width: 1200, height: 630, crop: "fill", gravity: "auto") %>
   <% content_for(:og_image) { og.is_a?(String) && og.start_with?("http") ? og : "#{request.base_url}#{url_for(@post.images.first)}" } %>
-<% elsif public_breath && !@post.anonymous? %>
-  <% content_for(:og_accent) { @post.user&.accent_color } %>
+<% elsif public_breath %>
+  <%# No photo: a card drawn for this breath (PostOgCard), versioned so a
+      changed title or new counts (at most daily) show up in fresh previews. %>
+  <% og_version = (PostOgCard.new(@post).version rescue nil) %>
+  <% if og_version %>
+    <% content_for(:og_image) { post_og_image_url(@post, format: :jpg, v: og_version) } %>
+    <% content_for(:og_image_type) { "image/jpeg" } %>
+  <% end %>
+  <% content_for(:og_accent) { @post.user&.accent_color } unless @post.anonymous? %>
 <% end %>
 
 <% if @post.held_for_review? && !@post.visible_to?(current_user) %>
@@ -55,6 +62,7 @@
       </aside>
 
       <main class="post-page-main">
+        <%= render "posts/share_invite_banner", sharer: @share_sharer if @share_sharer %>
         <% if @post.held_for_review? && current_user == @post.user %>
           <div class="fc-held-banner mb-4">
             <%= render_icon("shield", classes: "h-4 w-4") %>

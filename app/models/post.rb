@@ -18,6 +18,9 @@ class Post < ApplicationRecord
   # upload so the player can show total time before the audio loads.
   has_one_attached :voice_note
 
+  # The generated link-preview image for breaths without a photo (PostOgCard).
+  has_one_attached :og_card
+
   VOICE_MAX_MS    = 90_000
   VOICE_MAX_BYTES = 6.megabytes
   IMAGE_MAX_BYTES = 10.megabytes
