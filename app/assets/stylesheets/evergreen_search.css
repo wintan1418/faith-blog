@@ -123,7 +123,7 @@ html .srch-select:focus { outline: none; border-color: var(--fc-accent); box-sha
 .srch-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .srch-section-title { margin: 0; font-size: 17px; font-weight: 800; color: var(--fc-ink); }
 .srch-section-sub { margin: 18px 0 10px; font-size: 15px; }
-.srch-section-count { margin-left: 6px; font-size: 13px; font-weight: 600; color: var(--fc-muted); }
+.srch-section-count { font-family: var(--fc-sans); margin-left: 6px; font-size: 13px; font-weight: 600; color: var(--fc-muted); }
 .srch-more { font-size: 14px; font-weight: 700; color: var(--fc-accent); text-decoration: none; white-space: nowrap; }
 .srch-more:hover { text-decoration: underline; }
 
@@ -154,7 +154,7 @@ html .srch-page .srch-result-author, html .srch-page .srch-result-room {
 }
 html .srch-page .srch-result-author:hover, html .srch-page .srch-result-room:hover { color: var(--fc-accent); }
 html .srch-page .srch-result-author.is-anon { font-weight: 600; font-style: italic; color: var(--fc-muted); }
-.srch-result-title { margin: 8px 0 0; font-size: 17px; line-height: 1.35; font-weight: 750; }
+.srch-page .srch-result-title { font-family: var(--fc-sans); margin: 8px 0 0; font-size: 17px; line-height: 1.35; font-weight: 750; }
 html .srch-page .srch-result-link { color: var(--fc-ink); text-decoration: none; }
 .srch-result-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 html .srch-page .srch-result-link:hover { color: var(--fc-accent); }

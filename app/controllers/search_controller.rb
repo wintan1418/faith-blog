@@ -136,7 +136,13 @@ class SearchController < ApplicationController
     close = []
     if @suggestion
       corrected = SiteSearch::PostSearch.new(@query.with_text(@suggestion), visibility: @visibility, filters: @filters)
-      close += corrected.call(per_page: 6).hits
+                                        .call(per_page: 6)
+      # Only suggest a spelling that finds more than what was typed.
+      if corrected.total > result.total
+        close += corrected.hits
+      else
+        @suggestion = nil
+      end
     end
     close += post_search.fuzzy_titles(limit: 6)
     @close_matches = close.uniq { |h| h.post.id }.reject { |h| seen.include?(h.post.id) }.first(6)
