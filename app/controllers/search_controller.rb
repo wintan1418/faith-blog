@@ -61,7 +61,7 @@ class SearchController < ApplicationController
   def clear_recent
     RecentSearch.where(user_id: current_user.id).delete_all
     respond_to do |format|
-      format.html { redirect_back fallback_location: search_path, notice: "Recent searches cleared." }
+      format.html { redirect_back fallback_location: search_path, notice: "Recent searches cleared.", status: :see_other }
       format.any { head :no_content }
     end
   end

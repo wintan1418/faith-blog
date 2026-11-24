@@ -85,7 +85,17 @@ html .srch-page .srch-tab:hover { color: var(--fc-ink); }
 html .srch-page .srch-tab.is-active { color: var(--fc-accent); border-bottom-color: var(--fc-accent); }
 .srch-tab:focus-visible { outline: 3px solid var(--fc-accent-glow); outline-offset: -3px; border-radius: 8px; }
 
-/* Filters */
+/* Filters (a disclosure: open when any filter is set) */
+.srch-filters-wrap { margin: 0 0 12px; }
+.srch-filters-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px; cursor: pointer; list-style: none;
+  border: 1px solid var(--fc-line-strong); background: var(--fc-surface);
+  color: var(--fc-ink); font-size: 14px; font-weight: 700;
+}
+.srch-filters-toggle::-webkit-details-marker { display: none; }
+.srch-filters-toggle:focus-visible { outline: 3px solid var(--fc-accent-glow); outline-offset: 2px; }
+.srch-filters-wrap[open] .srch-filters-toggle { margin-bottom: 10px; border-color: var(--fc-accent); color: var(--fc-accent); }
 .srch-filters {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -38,8 +38,14 @@
       <%= search_tab_link("resources", "Resources", @tab) %>
     </nav>
 
-    <% if %w[top breaths].include?(@tab) %>
-      <%= render "search/filters" %>
+    <% if @tab == "breaths" %>
+      <% active = %i[room from date type sort].count { |k| params[k].present? } + (@query.from_username && params[:from].blank? ? 1 : 0) %>
+      <details class="srch-filters-wrap" <%= "open" if active.positive? %>>
+        <summary class="srch-filters-toggle">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg> Filters<%= " (#{active})" if active.positive? %>
+        </summary>
+        <%= render "search/filters" %>
+      </details>
     <% end %>
 
     <% if @suggestion %>

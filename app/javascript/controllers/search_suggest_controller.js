@@ -114,7 +114,7 @@ export default class extends Controller {
     try {
       await fetch(this.clearUrlValue, {
         method: "DELETE",
-        headers: { "X-CSRF-Token": token, Accept: "text/html" },
+        headers: { "X-CSRF-Token": token, Accept: "application/json" },
         credentials: "same-origin"
       })
     } catch (_) { /* offline: leave the list as it is */ }
