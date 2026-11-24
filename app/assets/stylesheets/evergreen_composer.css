@@ -220,6 +220,10 @@ html.theme-dark .eg-cmp .fc-composer-pill.eg-cmp-room { color: var(--fc-accent);
   font-weight: 700;
   text-overflow: ellipsis;
   cursor: pointer;
+  /* Above the pill's ::after tap area, or taps land on the label and the
+     list of rooms never opens (Trello: "Add to Room is broken"). */
+  position: relative;
+  z-index: 1;
 }
 .eg-cmp-room-select option { color: var(--fc-ink); background: var(--fc-surface); font-weight: 500; }
 .eg-cmp-room-select:focus-visible { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
