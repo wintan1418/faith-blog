@@ -111,6 +111,14 @@ Rails.application.routes.draw do
     resource :follow, controller: "series_follows", only: [ :create, :destroy ]
   end
 
+  # Sharing a breath outside: the image sheet's data, the short link printed
+  # on the image (and in its QR code), and the link-preview card.
+  get "posts/:id/share_card", to: "share_cards#show", as: :post_share_card, defaults: { format: :json }
+  get "share/qr", to: "share_cards#qr", as: :share_qr, defaults: { format: :json }
+  get "b/:code(/:ref)", to: "short_links#show", as: :short_post,
+                        constraints: { code: /[0-9a-z]{1,12}/, ref: /[A-Za-z0-9_]{1,30}/ }
+  get "og/posts/:id.:format", to: "post_og_images#show", as: :post_og_image, constraints: { format: "jpg" }
+
   # Likes (polymorphic)
   post "likes/:likeable_type/:likeable_id", to: "likes#create", as: :likes
   delete "likes/:likeable_type/:likeable_id", to: "likes#destroy", as: :unlike

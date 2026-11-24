@@ -33,6 +33,7 @@ class PostsController < ApplicationController
       return redirect_to new_user_session_path, alert: "Please sign in to view this breath."
     end
 
+    @share_sharer = capture_share_ref
     @post.record_view!(viewer_key) unless current_user == @post.user
     @comments = @post.comments.root_comments.active.visible_for(current_user)
                      .includes(:user, :replies, likes: :user).oldest_first
@@ -304,6 +305,17 @@ class PostsController < ApplicationController
 
 
   private
+
+  # A signed-out visitor who followed someone's shared link (?ref=username):
+  # greet them with the sharer's name and remember who invited them.
+  def capture_share_ref
+    return if user_signed_in? || params[:ref].blank? || !@post.visible_to?(nil)
+
+    ShareReferral.capture(cookies: cookies, post: @post, ref: params[:ref], ip: request.remote_ip)
+  rescue StandardError => e
+    Rails.logger.warn("[share-ref] #{e.class}: #{e.message}")
+    nil
+  end
 
   def viewer_key
     current_user ? "u#{current_user.id}" : "ip#{Digest::SHA256.hexdigest(request.remote_ip.to_s).first(16)}"

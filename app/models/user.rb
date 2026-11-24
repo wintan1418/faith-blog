@@ -281,10 +281,12 @@ class User < ApplicationRecord
   # Only the super admin may see who wrote an anonymous post.
   def can_unmask_anonymous? = super_admin?
 
-  # Has a personal invite page (/join/username) that sends people their way:
-  # an active adult account. Everyone else's link shows the generic join page.
+  # Has a personal invite page (/join/username) that sends people their way,
+  # and may be credited for breaths they share (ShareReferral): an active adult
+  # account that moderators haven't restricted, suspended or banned. Everyone
+  # else's link shows the generic join page.
   def can_invite_by_link?
-    active? && !site_monitor? && !profile&.minor?
+    active? && !site_monitor? && !profile&.minor? && !risk_profile&.at_least?(:restricted)
   end
 
   # The account the site health check signs in as (SiteHealthCheck).
