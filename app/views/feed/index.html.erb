@@ -80,6 +80,10 @@
             <%= render_icon("users", classes: "eg-ico is-green") %>
             Connections
           <% end %>
+          <%= link_to invite_friends_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("userplus", classes: "eg-ico is-green") %>
+            Invite friends
+          <% end %>
           <%= link_to notifications_path, class: "fc-rail-link eg-shortcut" do %>
             <%= render_icon("bell", classes: "eg-ico is-gold") %>
             Notifications
@@ -353,6 +357,9 @@
                 <%= render "posts/card", post: item.post, reshared_by: item.reshared_by, fresh: feed_fresh?(item) %>
                 <% if index == 3 && @suggestions %>
                   <%= render "shared/brethren_suggestions", suggestions: @suggestions, nudge: @suggestion_nudge %>
+                <% end %>
+                <% if @invite_card && (index == 7 || (index == @items.size - 1 && index < 7)) %>
+                  <%= render "invitations/feed_card" %>
                 <% end %>
               <% end %>
             </div>

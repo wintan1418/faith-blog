@@ -16,6 +16,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   def new
     invitation = Invitation.find_pending_by_token(session[:invitation_token])
     build_resource(email: invitation&.email)
+    @inviter = InviteAttribution.inviter_from(cookies)
     respond_with resource
   end
 
@@ -28,6 +29,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
         resource.remember_me = true
         session[:ad_signup] = true # counted as a sign-up for ads (shared/_ad_tracking)
         accept_invitation_for(resource)
+        InviteAttribution.apply!(resource, cookies)
       end
     end
   end

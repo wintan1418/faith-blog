@@ -1,0 +1,10 @@
+<%# Feed: "Bring someone into the conversation", until closed (FeedController#load_invite_card). %>
+<section class="cj-feed-card" data-controller="onboarding" data-onboarding-key-value="fc:<%= FeedController::INVITE_CARD_KEY %>" aria-labelledby="cj-feed-card-title">
+  <span class="cj-feed-ico" aria-hidden="true"><%= render_icon("userplus", classes: "h-5 w-5") %></span>
+  <div class="cj-feed-text">
+    <p class="cj-feed-title" id="cj-feed-card-title">Bring someone into the conversation</p>
+    <p class="cj-feed-sub">Share your invite link. +<%= Seeds::RULES["invite_joined"][:points] %> seeds when a friend joins and posts.</p>
+  </div>
+  <%= link_to "Invite", invite_friends_path, class: "cj-feed-go" %>
+  <button type="button" class="cj-feed-x" data-action="click->onboarding#dismiss" aria-label="Hide this card"><%= render_icon("x", classes: "h-4 w-4") %></button>
+</section>

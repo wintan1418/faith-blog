@@ -1,6 +1,9 @@
 <% content_for(:title) { "Join - Brethreign" } %>
 
 <%= render layout: "devise/shared/auth_shell", locals: { title: "Join Brethreign", subtitle: "A place to breathe: share your story, pray, and grow together." } do %>
+  <% if @inviter %>
+    <p class="auth-invited-by"><%= render_icon("sparkles", classes: "h-4 w-4") %> <%= @inviter.display_name %> invited you</p>
+  <% end %>
   <%= render "devise/shared/google_sign_in" %>
 
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name),

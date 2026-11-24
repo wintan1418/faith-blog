@@ -84,6 +84,10 @@ class User < ApplicationRecord
   has_many :message_blocks_against, class_name: "MessageBlock", foreign_key: :blocked_id, dependent: :destroy
   has_many :sent_invitations, class_name: "Invitation", foreign_key: :inviter_id, dependent: :destroy
   has_many :accepted_invitations, class_name: "Invitation", foreign_key: :invited_user_id, dependent: :nullify
+  # Who brought this member in (their personal invite link, or an accepted
+  # email invitation) and everyone they brought in. See InviteAttribution.
+  belongs_to :invited_by, class_name: "User", optional: true
+  has_many :invitees, class_name: "User", foreign_key: :invited_by_id, inverse_of: :invited_by, dependent: :nullify
 
   # Room memberships
   has_many :room_memberships, dependent: :destroy
@@ -270,6 +274,12 @@ class User < ApplicationRecord
 
   # Only the super admin may see who wrote an anonymous post.
   def can_unmask_anonymous? = super_admin?
+
+  # Has a personal invite page (/join/username) that sends people their way:
+  # an active adult account. Everyone else's link shows the generic join page.
+  def can_invite_by_link?
+    active? && !site_monitor? && !profile&.minor?
+  end
 
   # The account the site health check signs in as (SiteHealthCheck).
   def site_monitor? = email == SiteHealthCheck::EMAIL
@@ -559,8 +569,12 @@ class User < ApplicationRecord
   # Anyone who invited this email sees "Accepted", however the person
   # signed up: Google, the app, or later without the invite link.
   def accept_pending_invitations
-    Invitation.pending.where(email: email.to_s.strip.downcase)
-              .update_all(invited_user_id: id, accepted_at: Time.current, updated_at: Time.current)
+    pending = Invitation.pending.where(email: email.to_s.strip.downcase)
+    first_inviter_id = pending.order(:created_at).pick(:inviter_id)
+    pending.update_all(invited_user_id: id, accepted_at: Time.current, updated_at: Time.current)
+    # The first person who emailed them an invite is who brought them in; a
+    # personal invite link (InviteAttribution) never overrides that.
+    update_column(:invited_by_id, first_inviter_id) if first_inviter_id && invited_by_id.nil? && first_inviter_id != id
   end
 
   def send_welcome_note

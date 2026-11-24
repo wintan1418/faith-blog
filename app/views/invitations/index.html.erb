@@ -1,49 +1,103 @@
-<% content_for(:title) { "Invites - Brethreign" } %>
+<% content_for(:title) { "Invite friends - Brethreign" } %>
+<% content_for(:app_title) { "Invite friends" } %>
+<% reward = Seeds::RULES["invite_joined"] %>
+<% share_text = "Come join the conversation on Brethreign — a calm place to talk about work, life and faith." %>
 
 <div class="mystic-shell py-8">
   <div class="mystic-container max-w-5xl">
-    <div class="mb-8">
-      <span class="mystic-kicker">Invites</span>
-      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Invite someone into the community.</h1>
-      <p class="mystic-copy mt-2 max-w-2xl">Send a personal invitation link by email, or grab your shareable link and drop it anywhere.</p>
+    <div class="cj-page-head">
+      <span class="mystic-kicker">Invite friends</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Bring someone into the conversation.</h1>
+      <p class="mystic-copy mt-2 max-w-2xl">Share your personal link anywhere. Anyone who joins through it is connected to you.</p>
     </div>
 
-    <% invite_link = new_user_registration_url(invite: current_user.username) %>
-    <section class="mystic-panel-strong mb-6 p-6"
-             data-controller="invite-link">
-      <div class="flex items-center justify-between gap-3 mb-3">
-        <div>
-          <h2 class="text-xl font-black text-[var(--fc-ink)] inline-flex items-center gap-2"><%= render_icon("link", classes: "h-5 w-5 text-[var(--fc-accent)]") %> Your invite link</h2>
-          <p class="mystic-copy mt-1 text-sm">Paste it on WhatsApp, X, anywhere — anyone who signs up through this link is associated with you.</p>
+    <% if current_user.can_invite_by_link? %>
+      <section class="cj-share" data-controller="invite-link" data-invite-link-message-value="<%= @invite_message %>"
+               data-invite-link-title-value="Come join the conversation on Brethreign" data-invite-link-url-value="<%= @invite_url %>"
+               aria-labelledby="cj-share-title">
+        <div class="cj-share-head">
+          <h2 id="cj-share-title" class="cj-share-title"><%= render_icon("link", classes: "h-5 w-5") %> Your invite link</h2>
+          <span class="cj-reward"><%= render_icon("sprout", classes: "h-4 w-4") %> +<%= reward[:points] %> seeds when a friend joins and posts</span>
         </div>
+
+        <div class="fc-invite-link-row cj-link-row">
+          <input type="text" class="fc-invite-link-input" data-invite-link-target="input" value="<%= @invite_url %>"
+                 readonly aria-label="Your invite link" data-action="focus->invite-link#select">
+          <button type="button" class="fc-btn fc-btn-primary" data-invite-link-target="copyBtn" data-action="click->invite-link#copy">
+            <%= render_icon("copy", classes: "h-4 w-4") %><span>Copy link</span>
+          </button>
+        </div>
+
+        <div class="cj-share-row" role="group" aria-label="Share your invite">
+          <button type="button" class="cj-share-btn is-native" hidden data-invite-link-target="nativeBtn" data-action="click->invite-link#share">
+            <%= render_icon("share", classes: "h-4 w-4") %> Share…
+          </button>
+          <%= link_to "https://wa.me/?#{{ text: @invite_message }.to_query}", target: "_blank", rel: "noopener", class: "cj-share-btn is-whatsapp" do %>
+            <span class="cj-share-glyph" aria-hidden="true"><%= render_icon("chat", classes: "h-3.5 w-3.5") %></span> WhatsApp
+          <% end %>
+          <%= link_to "https://twitter.com/intent/tweet?#{{ text: share_text, url: @invite_url }.to_query}", target: "_blank", rel: "noopener", class: "cj-share-btn is-x" do %>
+            <span class="cj-share-glyph" aria-hidden="true">𝕏</span> X
+          <% end %>
+          <%= link_to "https://www.linkedin.com/sharing/share-offsite/?#{{ url: @invite_url }.to_query}", target: "_blank", rel: "noopener", class: "cj-share-btn is-linkedin" do %>
+            <span class="cj-share-glyph" aria-hidden="true">in</span> LinkedIn
+          <% end %>
+          <%= link_to "https://www.facebook.com/sharer/sharer.php?#{{ u: @invite_url }.to_query}", target: "_blank", rel: "noopener", class: "cj-share-btn is-facebook" do %>
+            <span class="cj-share-glyph" aria-hidden="true">f</span> Facebook
+          <% end %>
+          <%= link_to "mailto:?#{{ subject: "Come join the conversation on Brethreign", body: @invite_message }.to_query.gsub("+", "%20")}", class: "cj-share-btn is-email" do %>
+            <span class="cj-share-glyph" aria-hidden="true"><%= render_icon("mail", classes: "h-3.5 w-3.5") %></span> Email
+          <% end %>
+        </div>
+
+        <div class="cj-message">
+          <label class="cj-message-label" for="cj-message">Ready-to-send message</label>
+          <textarea id="cj-message" class="cj-message-text" rows="3" readonly data-invite-link-target="message"><%= @invite_message %></textarea>
+          <button type="button" class="fc-btn cj-message-copy" data-invite-link-target="messageBtn" data-action="click->invite-link#copyMessage">
+            <%= render_icon("copy", classes: "h-4 w-4") %><span>Copy message</span>
+          </button>
+        </div>
+        <p class="cj-fine">Seeds are paid once per friend, after they publish their first breath or write their first comment (up to <%= reward[:daily_cap] %> friends a day). <%= link_to "How seeds work", seeds_guide_path %></p>
+      </section>
+    <% else %>
+      <section class="cj-share">
+        <p class="mystic-copy">Your personal invite link opens once you're 18. You can still invite friends by email below.</p>
+      </section>
+    <% end %>
+
+    <section class="cj-joined" aria-labelledby="cj-joined-title">
+      <div class="cj-joined-head">
+        <h2 id="cj-joined-title" class="cj-share-title"><%= render_icon("users", classes: "h-5 w-5") %> Joined through you</h2>
+        <span class="cj-joined-count"><%= @invitee_count %></span>
       </div>
-      <div class="fc-invite-link-row">
-        <input type="text"
-               class="fc-invite-link-input"
-               data-invite-link-target="input"
-               value="<%= invite_link %>"
-               readonly
-               aria-label="Your invite link">
-        <button type="button"
-                class="fc-btn fc-btn-primary"
-                data-invite-link-target="copyBtn"
-                data-action="click->invite-link#copy">
-          <%= render_icon("copy", classes: "h-4 w-4") %><span>Copy</span>
-        </button>
-      </div>
-      <div class="fc-invite-share-row">
-        <%= link_to "Share on WhatsApp",
-            "https://api.whatsapp.com/send?text=#{CGI.escape("Join me on Brethreign — a community where Christians breathe. #{invite_link}")}",
-            target: "_blank",
-            rel: "noopener",
-            class: "fc-btn" %>
-        <%= link_to "Share on X",
-            "https://twitter.com/intent/tweet?#{ {text: "Join me on Brethreign — a community where Christians breathe.", url: invite_link}.to_query}",
-            target: "_blank",
-            rel: "noopener",
-            class: "fc-btn" %>
-      </div>
+      <% if @invitees.any? %>
+        <ul class="cj-joined-list">
+          <% @invitees.each do |person| %>
+            <li class="cj-joined-item">
+              <%= link_to user_path(person.username), class: "cj-joined-person" do %>
+                <% if person.profile&.avatar&.attached? %>
+                  <%= image_tag avatar_src(person.profile, 80), class: "cj-joined-face", alt: "" %>
+                <% else %>
+                  <span class="cj-joined-face is-initial" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+                <% end %>
+                <span class="cj-joined-who">
+                  <strong><%= person.display_name %></strong>
+                  <small>Joined <%= time_ago_in_words(person.created_at) %> ago</small>
+                </span>
+              <% end %>
+              <% if @rewarded_ids.include?(person.id) %>
+                <span class="cj-joined-status is-paid"><%= render_icon("sprout", classes: "h-3.5 w-3.5") %> +<%= reward[:points] %></span>
+              <% else %>
+                <span class="cj-joined-status">Not posted yet</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="cj-joined-empty">No one yet. Send your link to someone who'd enjoy a calmer conversation.</p>
+      <% end %>
     </section>
+
+    <h2 class="cj-section-title">Invite by email</h2>
 
     <section class="mystic-panel-strong mb-6 p-6">
       <div class="flex items-center justify-between gap-3">

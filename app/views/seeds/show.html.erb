@@ -16,9 +16,10 @@
            "breath" => "Your first #{@rules["breath"][:daily_cap]} breaths each day.",
            "comment_received" => "Once per person, per breath.",
            "reaction_received" => "Up to #{@rules["reaction_received"][:daily_cap]} a day.",
-           "badge" => "Each milestone badge."
+           "badge" => "Each milestone badge.",
+           "invite_joined" => "Once per friend who joins through your invite link and publishes a breath or writes a comment. Up to #{@rules["invite_joined"][:daily_cap]} a day."
          } %>
-      <% [ %w[comment comment], %w[intercession pray], %w[breath leaf], %w[comment_received reply], %w[reaction_received heart], %w[badge trophy] ].each do |kind, icon| %>
+      <% [ %w[comment comment], %w[intercession pray], %w[breath leaf], %w[comment_received reply], %w[reaction_received heart], %w[badge trophy], %w[invite_joined userplus] ].each do |kind, icon| %>
         <% rule = @rules[kind] %>
         <li class="seed-rule">
           <span class="seed-rule-ico"><%= render_icon(icon, classes: "h-4 w-4") %></span>
@@ -50,5 +51,8 @@
     </ol>
   </section>
 
-  <p class="seed-page-foot"><%= link_to "See the leaderboard", leaderboard_path, class: "fc-btn fc-btn-primary" %></p>
+  <p class="seed-page-foot">
+    <%= link_to "See the leaderboard", leaderboard_path, class: "fc-btn fc-btn-primary" %>
+    <% if user_signed_in? %><%= link_to "Invite friends", invite_friends_path, class: "fc-btn" %><% end %>
+  </p>
 </div>

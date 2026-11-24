@@ -111,6 +111,9 @@ Rails.application.routes.draw do
   # Skill endorsements (from connections) and the digital business card.
   post "u/:username/endorse", to: "endorsements#create", as: :endorse_skill
   delete "u/:username/endorse", to: "endorsements#destroy", as: :unendorse_skill
+  # Personal invite link ("Come join the conversation") and the page members share it from.
+  get "join/:username", to: "joins#show", as: :join_invite, constraints: { username: %r{[^/.]+} }
+  get "invite", to: "invitations#index", as: :invite_friends
   get "in/:username", to: "cards#show", as: :card, constraints: { username: %r{[^/.]+} }
   patch "in/:username/style", to: "cards#style", as: :card_style, constraints: { username: %r{[^/.]+} }
 

@@ -119,7 +119,7 @@ module SweepWorld
     in [ "rooms/posts", "room_id" ] then @room.to_param
     in [ "rooms", "id" ] then @room.to_param
     in [ "posts", "id" ] then @post.to_param
-    in [ "cards" | "users" | "brethren_cards", "username" ] then @member.username
+    in [ "cards" | "users" | "brethren_cards" | "joins", "username" ] then @member.username
     in [ "portfolio_items", "username" ] then @member.username
     in [ "portfolio_items", "id" ] then @portfolio_item.id
     in [ "resource_items", "id" ] then @resource.to_param
