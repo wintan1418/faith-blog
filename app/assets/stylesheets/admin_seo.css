@@ -1,0 +1,74 @@
+/* Admin → Search & indexing (Nov 2026). Builds on the dashboard's adash cards. */
+.aseo-head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.aseo-inline-form { display: inline-flex; margin: 0; }
+.aseo-muted { font-size: 0.85rem; line-height: 1.5; color: var(--fc-muted); }
+.aseo-muted a { color: var(--fc-accent); font-weight: 700; }
+.aseo-key { min-width: 0; overflow-wrap: anywhere; }
+
+.aseo-alert { display: flex; gap: 0.6rem; align-items: flex-start; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--fc-gold-line); background: var(--fc-gold-soft); color: var(--fc-ink); font-size: 0.9rem; }
+.aseo-alert svg { flex: none; color: var(--fc-gold); margin-top: 1px; }
+.aseo-alert-inline { display: flex; gap: 0.4rem; align-items: center; font-size: 0.875rem; font-weight: 600; color: #b3261e; }
+html.theme-dark .aseo-alert-inline { color: #fca5a5; }
+
+/* Tables scroll inside their card on phones */
+.aseo-table-wrap { overflow-x: auto; margin: 0 -0.25rem; -webkit-overflow-scrolling: touch; }
+.fc-admin .admin-content .aseo-table { width: 100%; font-variant-numeric: tabular-nums; }
+.fc-admin .admin-content .aseo-table th,
+.fc-admin .admin-content .aseo-table td { padding: 0.5rem 0.5rem; text-align: left; border-bottom: 1px solid var(--fc-line); font-size: 0.875rem; }
+.fc-admin .admin-content .aseo-table th { white-space: nowrap; }
+.fc-admin .admin-content .aseo-table tbody tr:last-child td { border-bottom: 0; }
+.aseo-table .is-num { text-align: right !important; white-space: nowrap; }
+.aseo-table td.aseo-key { max-width: 22rem; }
+.aseo-table td.aseo-key > * { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aseo-log td { white-space: nowrap; }
+.aseo-log td:last-child { white-space: normal; min-width: 12rem; }
+.aseo-response { display: block; margin-top: 2px; font-size: 0.78rem; color: var(--fc-muted); }
+
+/* Sitemaps */
+.aseo-sitemaps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.aseo-sitemaps li { padding-bottom: 0.75rem; border-bottom: 1px solid var(--fc-line); }
+.aseo-sitemaps li:last-child { border-bottom: 0; padding-bottom: 0; }
+.aseo-sitemap-path { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--fc-ink); overflow-wrap: anywhere; }
+
+/* Forms */
+.aseo-form { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.fc-admin .admin-content .aseo-input { flex: 1 1 14rem; min-width: 0; min-height: 44px; padding: 0 16px; border: 1px solid var(--fc-line-strong); border-radius: 999px; font-size: 0.9375rem; }
+.aseo-indexnow-actions { display: grid; gap: 0.75rem; margin-top: 0.85rem; }
+@media (min-width: 900px) { .aseo-indexnow-actions { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
+
+/* Inspection result */
+.aseo-inspection { margin-top: 1rem; display: grid; gap: 0.75rem; }
+.aseo-inspection-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--fc-ink); }
+.aseo-facts { display: grid; gap: 0.5rem 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin: 0; }
+.aseo-facts dt { font-size: 0.78rem; font-weight: 600; color: var(--fc-muted); }
+.aseo-facts dd { margin: 0; font-size: 0.875rem; font-weight: 600; color: var(--fc-ink); }
+
+/* Setup steps */
+.aseo-steps { margin: 0 0 0.75rem; padding-left: 1.25rem; display: grid; gap: 0.6rem; font-size: 0.9rem; line-height: 1.55; color: var(--fc-soft); list-style: decimal; }
+.aseo-steps a { color: var(--fc-accent); font-weight: 700; }
+.aseo-steps code, .aseo-setup code { font-size: 0.82rem; padding: 1px 6px; border-radius: 6px; background: var(--fc-surface-2); color: var(--fc-ink); overflow-wrap: anywhere; }
+.adash-card > header .badge { font-size: 0.78rem; }
+.adash-card > header { flex-wrap: wrap; }
+
+/* Tiles: three across on wide screens, two on phones, no orphan row */
+.aseo .adash-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 900px) { .aseo .adash-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .aseo .adash-kpi__value { font-size: 1.6rem; } }
+
+/* Fixed layout so long page paths truncate instead of pushing numbers off the card */
+.fc-admin .admin-content .aseo-table:not(.aseo-log) { table-layout: fixed; min-width: 26rem; }
+.aseo-table:not(.aseo-log) th.is-num { width: 4.25rem; }
+.aseo-table:not(.aseo-log) th.is-num:nth-child(3) { width: 5rem; }
+.aseo-table td.aseo-key { max-width: none; }
+
+/* Phones: drop CTR and "Why" so the tables fit without sideways scrolling */
+@media (max-width: 520px) {
+  .fc-admin .admin-content .aseo-table:not(.aseo-log) { min-width: 0; }
+  .aseo-table:not(.aseo-log) :is(th, td):nth-child(4) { display: none; }
+  .aseo-table:not(.aseo-log) th.is-num { width: 3.4rem; }
+  .aseo-table:not(.aseo-log) th.is-num:nth-child(3) { width: 4.2rem; }
+  .fc-admin .admin-content .aseo-table th, .fc-admin .admin-content .aseo-table td { padding: 0.5rem 0.35rem; }
+  .aseo-log :is(th, td):nth-child(3) { display: none; }
+  .aseo-log td { white-space: normal; }
+  .aseo-log td:last-child { min-width: 0; }
+}

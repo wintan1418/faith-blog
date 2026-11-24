@@ -14,6 +14,9 @@ Rails.application.routes.draw do
   # Dynamic, accent-tinted OG image for social shares.
   get "og.svg", to: "og#show", as: :og_image, defaults: { format: :svg }
   get "sitemap.xml", to: "sitemaps#show", as: :sitemap, defaults: { format: :xml }
+  # IndexNow key file (/<key>.txt); the controller 404s any other name.
+  get ":indexnow_key", to: "index_now_keys#show", as: :indexnow_key, format: false,
+                       constraints: { indexnow_key: /[A-Za-z0-9\-]{8,128}\.txt/ }
 
   # Static pages
   get "about", to: "pages#about"
@@ -298,6 +301,12 @@ Rails.application.routes.draw do
     resources :city_changes, only: :index, path: "city-changes"
     get "online", to: "online#index", as: :online
     get "bots", to: "bots#index", as: :bots
+    resource :seo, only: :show, controller: "seo", path: "seo" do
+      post :refresh
+      post :sitemap
+      post :inspect_url, path: "inspect"
+      post :index_now, path: "indexnow"
+    end
     resource :push_test, only: [ :show, :create ], path: "push-test"
     resource :app_release, only: [ :edit, :update ], path: "app-versions" do
       post :remind

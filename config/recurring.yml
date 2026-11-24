@@ -49,3 +49,13 @@ production:
   bible_quiz_warm_pool:
     class: BibleQuizWarmPoolJob
     schedule: every 6 hours
+
+  # Admin → Search & indexing: sitemap to Google + IndexNow for the day's changes,
+  # then the Search Console reports the page shows.
+  search_indexing_nightly:
+    class: SearchIndexingNightlyJob
+    schedule: every day at 4am Africa/Lagos
+
+  search_console_refresh:
+    class: SearchConsoleRefreshJob
+    schedule: every day at 5am Africa/Lagos

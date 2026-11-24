@@ -5,6 +5,7 @@ class Post < ApplicationRecord
   include PgSearch::Model
   include Mentionable
   include AttachmentValidatable
+  include SearchIndexable
 
   friendly_id :slug_source, use: :slugged
 
@@ -335,6 +336,7 @@ class Post < ApplicationRecord
     BreathFanoutJob.perform_later(id)
     bump_author_streak
     broadcast_to_public_feed
+    queue_for_search_engines(force: true)
   end
 
   def held_for_review?
@@ -377,6 +379,20 @@ class Post < ApplicationRecord
     return false unless review.severity == "high"
 
     !%w[dismissed cleared].include?(review.status)
+  end
+
+  # Search engines (IndexNow) hear about a breath only while it's a public,
+  # named, non-prayer page: live, approved, and outside private rooms.
+  def search_indexable?
+    feed_visible? && !anonymous? && !prayer? && (room_id.nil? || room&.is_public?)
+  end
+
+  def search_index_urls
+    [ search_url_helpers.post_url(self) ]
+  end
+
+  def self.search_index_candidates(since)
+    published.named.where(updated_at: since..).includes(:room)
   end
 
   private

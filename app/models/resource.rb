@@ -3,6 +3,7 @@
 class Resource < ApplicationRecord
   extend FriendlyId
   include PgSearch::Model
+  include SearchIndexable
 
   friendly_id :title, use: :slugged
 
@@ -84,5 +85,13 @@ class Resource < ApplicationRecord
     when :book then "bookopen"
     else "filetext"
     end
+  end
+
+  def search_indexable?
+    approved?
+  end
+
+  def search_index_urls
+    [ search_url_helpers.resources_item_url(self) ]
   end
 end
