@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -552,6 +552,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_120000) do
     t.index ["position"], name: "index_golden_breaths_on_position"
   end
 
+  create_table "indexing_pending_urls", force: :cascade do |t|
+    t.string "url", null: false
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["url"], name: "index_indexing_pending_urls_on_url", unique: true
+  end
+
+  create_table "indexing_submissions", force: :cascade do |t|
+    t.string "engine", null: false
+    t.string "trigger", default: "auto", null: false
+    t.integer "urls_count", default: 0, null: false
+    t.jsonb "urls", default: [], null: false
+    t.integer "status_code"
+    t.text "response"
+    t.datetime "submitted_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["engine", "submitted_at"], name: "index_indexing_submissions_on_engine_and_submitted_at"
+    t.index ["submitted_at"], name: "index_indexing_submissions_on_submitted_at"
+  end
+
   create_table "invitations", force: :cascade do |t|
     t.bigint "inviter_id", null: false
     t.bigint "invited_user_id"
@@ -945,6 +967,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_120000) do
     t.index ["slug"], name: "index_rooms_on_slug", unique: true
   end
 
+  create_table "search_console_reports", force: :cascade do |t|
+    t.string "kind", null: false
+    t.jsonb "data", default: {}, null: false
+    t.text "error"
+    t.datetime "fetched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["kind"], name: "index_search_console_reports_on_kind", unique: true
+  end
+
   create_table "seed_events", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "kind", null: false
@@ -973,6 +1005,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id", "rank_index"], name: "index_seed_rank_ups_on_user_id_and_rank_index", unique: true
+  end
+
+  create_table "seo_settings", force: :cascade do |t|
+    t.string "key", null: false
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_seo_settings_on_key", unique: true
   end
 
   create_table "skill_endorsements", force: :cascade do |t|

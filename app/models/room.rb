@@ -2,6 +2,7 @@
 
 class Room < ApplicationRecord
   extend FriendlyId
+  include SearchIndexable
   friendly_id :name, use: :slugged
 
   # Enums
@@ -47,5 +48,13 @@ class Room < ApplicationRecord
     return false unless user
 
     room_memberships.exists?(user: user, role: :moderator)
+  end
+
+  def search_indexable?
+    is_public?
+  end
+
+  def search_index_urls
+    [ search_url_helpers.room_url(self) ]
   end
 end

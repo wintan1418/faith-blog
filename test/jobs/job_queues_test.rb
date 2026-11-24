@@ -8,9 +8,11 @@ class JobQueuesTest < ActiveSupport::TestCase
   EXPECTED = {
     "realtime"   => %w[PushNotificationJob MessageModerationJob],
     "moderation" => %w[AiModerationGateJob AiModerationReviewJob AvatarModerationJob PortfolioModerationJob ModerationBacklogSweepJob],
-    "default"    => %w[BadgeCheckJob WelcomeNoteJob ErrorAlertJob AppleTokenRevokeJob ScheduledPostPublisherJob SiteHealthCheckJob OfficeReplyJob],
+    "default"    => %w[BadgeCheckJob WelcomeNoteJob ErrorAlertJob AppleTokenRevokeJob ScheduledPostPublisherJob SiteHealthCheckJob OfficeReplyJob
+                       IndexNowFlushJob SearchConsoleRefreshJob],
     "bulk"       => %w[WeeklyDigestFanoutJob BroadcastFanoutJob BotsRefreshJob BibleQuizWarmPoolJob BibleQuizTopUpJob
-                       AnalyticsCleanupJob BreathFanoutJob BirthdayNotificationsJob AppUpdateReminderJob]
+                       AnalyticsCleanupJob BreathFanoutJob BirthdayNotificationsJob AppUpdateReminderJob
+                       SearchIndexingNightlyJob]
   }.freeze
 
   def polled_queues

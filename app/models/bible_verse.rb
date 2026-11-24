@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class BibleVerse < ApplicationRecord
+  include SearchIndexable
+
   validates :text, presence: true, length: { minimum: 4, maximum: 800 }
   validates :reference, length: { maximum: 120 }, allow_blank: true
 
@@ -34,5 +36,14 @@ class BibleVerse < ApplicationRecord
     return nil if pool.empty?
 
     pool[Date.current.yday % pool.size]
+  end
+
+  # An active verse has a scripture page (/scripture/<slug>) in the sitemap.
+  def search_indexable?
+    active? && reference.present?
+  end
+
+  def search_index_urls
+    [ search_url_helpers.scripture_page_url(slug: SitemapsController.scripture_slug(reference)) ]
   end
 end

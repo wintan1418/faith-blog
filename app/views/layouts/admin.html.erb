@@ -65,6 +65,7 @@
       ["Golden breaths", admin_golden_breaths_path, "flame", request.path.include?("/admin/golden_breaths")],
       ["Broadcasts", admin_broadcasts_path, "send", request.path.include?("/admin/broadcasts")],
       ["Announcements", admin_announcements_path, "megaphone", request.path.include?("/admin/announcements")],
+      ["Search & indexing", admin_seo_path, "search", request.path.start_with?("/admin/seo")],
       ["Updates bots", admin_bots_path, "newspaper", request.path.include?("/admin/bots")],
       ["App versions", edit_admin_app_release_path, "smartphone", request.path.include?("/admin/app-versions")],
       ["App waitlist", admin_app_waitlist_entries_path, "bell", request.path.include?("/admin/app-waitlist")],

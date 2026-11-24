@@ -1,0 +1,256 @@
+<% content_for(:page_title) { "Search & indexing" } %>
+<% report = ->(kind) { @reports&.dig(kind) } %>
+<% totals = report.("totals_#{@period}")&.data || {} %>
+<% status = report.("status") %>
+<% period_label = @period == "3m" ? "last 3 months" : "last 28 days" %>
+
+<div class="adash aseo">
+  <div class="adash-head">
+    <div>
+      <h2 class="adash-kicker">How search engines see Brethreign</h2>
+      <p class="adash-sub">
+        <% if @google %>
+          Google Search Console for <strong><%= SearchConsole.site %></strong>
+          · <%= status&.fetched_at ? "updated #{time_ago_in_words(status.fetched_at)} ago" : "not fetched yet" %>
+        <% else %>
+          IndexNow tells Bing, Yandex, Seznam and Naver about new pages. Google isn't connected yet.
+        <% end %>
+      </p>
+    </div>
+    <% if @google %>
+      <div class="aseo-head-actions">
+        <nav class="adash-range" aria-label="Period">
+          <% { "28d" => "28 days", "3m" => "3 months" }.each do |key, label| %>
+            <%= link_to label, admin_seo_path(period: key), class: ("is-on" if key == @period), "aria-current": (key == @period ? "true" : nil) %>
+          <% end %>
+        </nav>
+        <%= button_to "Refresh now", refresh_admin_seo_path, class: "fc-btn", form_class: "aseo-inline-form" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @google && status&.error.present? %>
+    <div class="aseo-alert" role="alert">
+      <%= render_icon("alerttriangle", classes: "h-5 w-5") %>
+      <p><strong>Last refresh had a problem.</strong> <%= status.error %></p>
+    </div>
+  <% end %>
+
+  <section class="adash-kpis" aria-label="Headline numbers">
+    <% if @google %>
+      <div class="adash-kpi">
+        <p class="adash-kpi__label">Clicks from Google</p>
+        <p class="adash-kpi__value"><%= seo_number(totals["clicks"]) %></p>
+        <p class="adash-kpi__note"><%= period_label.capitalize %></p>
+      </div>
+      <div class="adash-kpi">
+        <p class="adash-kpi__label">Impressions</p>
+        <p class="adash-kpi__value"><%= seo_number(totals["impressions"]) %></p>
+        <p class="adash-kpi__note">Times a page showed in results · CTR <%= seo_ctr(totals["ctr"]) %></p>
+      </div>
+      <div class="adash-kpi">
+        <p class="adash-kpi__label">Average position</p>
+        <p class="adash-kpi__value"><%= seo_position(totals["position"]) %></p>
+        <p class="adash-kpi__note">Lower is better; 1 is the top result</p>
+      </div>
+      <div class="adash-kpi">
+        <p class="adash-kpi__label">Pages showing in Google</p>
+        <p class="adash-kpi__value"><%= seo_number(report.("pages_seen_3m")&.data&.dig("count")) %></p>
+        <p class="adash-kpi__note">Had an impression in 3 months (Google gives no exact indexed count)</p>
+      </div>
+    <% end %>
+    <div class="adash-kpi">
+      <p class="adash-kpi__label">Sent to IndexNow</p>
+      <p class="adash-kpi__value"><%= number_with_delimiter(@indexnow_week[:urls]) %></p>
+      <p class="adash-kpi__note">
+        Pages in <%= pluralize(@indexnow_week[:requests], "request") %> over the last 7 days<%= " · #{@indexnow_week[:failed]} failed" if @indexnow_week[:failed].positive? %>
+      </p>
+    </div>
+    <div class="adash-kpi">
+      <p class="adash-kpi__label">Waiting for the next batch</p>
+      <p class="adash-kpi__value"><%= number_with_delimiter(@pending_count) %></p>
+      <p class="adash-kpi__note">Changed pages go out a few minutes after the first edit</p>
+    </div>
+  </section>
+
+  <% unless @google %>
+    <section class="adash-card aseo-setup" id="connect-google">
+      <header><h2>Connect Google Search Console</h2><span>optional · read-only reports and sitemap submit</span></header>
+      <ol class="aseo-steps">
+        <li>In <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>, pick or create a project and enable the <strong>Google Search Console API</strong>.</li>
+        <li>Under <em>IAM &amp; Admin → Service accounts</em>, create a service account (no roles needed), open it, go to <em>Keys → Add key → Create new key → JSON</em> and download the file.</li>
+        <li>In <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Search Console</a>, open the <strong><%= SearchConsole.site %></strong> property → <em>Settings → Users and permissions → Add user</em>. Paste the service account's email (it ends in <code>.iam.gserviceaccount.com</code>) and give it <strong>Full</strong> permission (needed to submit the sitemap; Restricted is enough for reports only).</li>
+        <li>On the server, set <code>GOOGLE_SEARCH_CONSOLE_CREDENTIALS</code> to the whole JSON file's contents (or a path to it) and redeploy.</li>
+      </ol>
+      <p class="aseo-muted">Once connected this page shows clicks, impressions, top searches and pages, sitemap status and URL inspection, refreshed every morning.</p>
+    </section>
+  <% end %>
+
+  <% if @google %>
+    <div class="adash-grid2">
+      <% { "queries" => "Top searches", "pages" => "Top pages" }.each do |dimension, title| %>
+        <% data = report.("#{dimension}_#{@period}") %>
+        <section class="adash-card">
+          <header><h2><%= title %></h2><span><%= period_label %></span></header>
+          <% rows = data&.data&.dig("rows") || [] %>
+          <% if rows.empty? %>
+            <p class="adash-empty"><%= data&.error.presence || "No data yet. Google's numbers arrive a few days after pages start showing." %></p>
+          <% else %>
+            <div class="aseo-table-wrap">
+              <table class="aseo-table">
+                <thead>
+                  <tr>
+                    <th scope="col"><%= dimension == "queries" ? "Search" : "Page" %></th>
+                    <th scope="col" class="is-num">Clicks</th>
+                    <th scope="col" class="is-num">Impr.</th>
+                    <th scope="col" class="is-num">CTR</th>
+                    <th scope="col" class="is-num">Pos.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% rows.each do |row| %>
+                    <tr>
+                      <td class="aseo-key">
+                        <% if dimension == "pages" %>
+                          <%= link_to seo_path(row["key"]), row["key"], target: "_blank", rel: "noopener", title: row["key"] %>
+                        <% else %>
+                          <span title="<%= row["key"] %>"><%= row["key"] %></span>
+                        <% end %>
+                      </td>
+                      <td class="is-num"><%= seo_number(row["clicks"]) %></td>
+                      <td class="is-num"><%= seo_number(row["impressions"]) %></td>
+                      <td class="is-num"><%= seo_ctr(row["ctr"]) %></td>
+                      <td class="is-num"><%= seo_position(row["position"]) %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% end %>
+        </section>
+      <% end %>
+    </div>
+
+    <div class="adash-grid2">
+      <section class="adash-card" id="sitemaps">
+        <header>
+          <h2>Sitemaps</h2>
+          <%= button_to "Resubmit sitemap", sitemap_admin_seo_path, class: "fc-btn btn-sm", form_class: "aseo-inline-form" %>
+        </header>
+        <% sitemaps = report.("sitemaps")&.data&.dig("sitemaps") || [] %>
+        <% if sitemaps.empty? %>
+          <p class="adash-empty"><%= report.("sitemaps")&.error.presence || "Google has no sitemap for this property yet. Resubmit to send #{SearchConsole::SITEMAP_URL}." %></p>
+        <% else %>
+          <ul class="aseo-sitemaps">
+            <% sitemaps.each do |sm| %>
+              <% problems = sm["errors"].to_i + sm["warnings"].to_i %>
+              <li>
+                <p class="aseo-sitemap-path"><%= link_to seo_path(sm["path"]), sm["path"], target: "_blank", rel: "noopener" %>
+                  <% if sm["isPending"] %><span class="badge">Pending</span>
+                  <% elsif sm["errors"].to_i.positive? %><span class="badge badge-primary"><%= pluralize(sm["errors"].to_i, "error") %></span>
+                  <% elsif problems.positive? %><span class="badge badge-faith"><%= pluralize(sm["warnings"].to_i, "warning") %></span>
+                  <% else %><span class="badge badge-success">Success</span><% end %>
+                </p>
+                <p class="aseo-muted">
+                  Submitted <%= seo_time(sm["lastSubmitted"]) %> · read by Google <%= seo_time(sm["lastDownloaded"]) %>
+                  <% Array(sm["contents"]).each do |c| %>· <%= seo_number(c["submitted"]) %> <%= c["type"].to_s.downcase %> URLs<% end %>
+                </p>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </section>
+
+      <section class="adash-card" id="inspect">
+        <header><h2>Inspect a URL</h2><span>Google's view of one page</span></header>
+        <%= form_with url: inspect_url_admin_seo_path, method: :post, class: "aseo-form" do |f| %>
+          <%= f.label :url, "Page address", class: "sr-only" %>
+          <%= f.url_field :url, value: @inspected_url, placeholder: "https://brethreign.com/posts/…", required: true, class: "aseo-input" %>
+          <%= f.submit "Inspect", class: "fc-btn fc-btn-primary" %>
+        <% end %>
+        <% if @inspection %>
+          <% result = @inspection.data || {} %>
+          <% index = result["indexStatusResult"] || {} %>
+          <div class="aseo-inspection">
+            <% if @inspection.error.present? %>
+              <p class="aseo-alert-inline"><%= render_icon("alerttriangle", classes: "h-4 w-4") %> <%= @inspection.error %></p>
+            <% else %>
+              <p class="aseo-inspection-head">
+                <span class="<%= seo_verdict_class(index["verdict"]) %>"><%= index["verdict"] == "PASS" ? "On Google" : seo_enum(index["verdict"]) %></span>
+                <span class="aseo-key"><%= seo_path(@inspected_url) %></span>
+              </p>
+              <dl class="aseo-facts">
+                <div><dt>Coverage</dt><dd><%= index["coverageState"].presence || "Not reported" %></dd></div>
+                <div><dt>Last crawl</dt><dd><%= index["lastCrawlTime"].present? ? seo_time(index["lastCrawlTime"]) : "Not crawled yet" %></dd></div>
+                <div><dt>Google's canonical</dt><dd class="aseo-key"><%= index["googleCanonical"].presence || "Not reported" %></dd></div>
+                <div><dt>Our canonical</dt><dd class="aseo-key"><%= index["userCanonical"].presence || "Not reported" %></dd></div>
+                <div><dt>Page fetch</dt><dd><%= seo_enum(index["pageFetchState"]) %></dd></div>
+                <div><dt>Mobile usability</dt><dd><%= seo_enum(result.dig("mobileUsabilityResult", "verdict")) %></dd></div>
+              </dl>
+            <% end %>
+            <p class="aseo-muted">
+              Google has no public API for “Request indexing” on ordinary pages. To ask Google to crawl this page now,
+              <%= link_to "open it in Search Console", result["inspectionResultLink"].presence || SearchConsole.inspect_link(@inspected_url), target: "_blank", rel: "noopener" %>
+              and press <em>Request indexing</em> there.
+            </p>
+          </div>
+        <% end %>
+      </section>
+    </div>
+  <% end %>
+
+  <section class="adash-card" id="indexnow">
+    <header>
+      <h2>IndexNow</h2>
+      <span class="<%= @indexnow_enabled ? 'badge badge-success' : 'badge' %>"><%= @indexnow_enabled ? "On" : "Off (production only)" %></span>
+    </header>
+    <p class="aseo-muted">
+      New and edited public breaths, rooms, resources and scripture pages are sent automatically to Bing, Yandex, Seznam, Naver and the other IndexNow engines,
+      a few minutes after they change, and again in a nightly sweep. Private rooms, anonymous and prayer breaths, and noindex pages are never sent.
+      Key file: <%= link_to "/#{@indexnow_key}.txt", indexnow_key_path(indexnow_key: "#{@indexnow_key}.txt"), target: "_blank", rel: "noopener", class: "aseo-key" %>
+    </p>
+    <div class="aseo-indexnow-actions">
+      <%= form_with url: index_now_admin_seo_path, method: :post, class: "aseo-form" do |f| %>
+        <%= f.label :url, "Page to send", class: "sr-only", for: "indexnow_url" %>
+        <%= f.url_field :url, id: "indexnow_url", placeholder: "https://brethreign.com/rooms/…", required: true, class: "aseo-input" %>
+        <%= f.submit "Send page", class: "fc-btn fc-btn-primary" %>
+      <% end %>
+      <%= button_to "Send all pages changed in the last 7 days", index_now_admin_seo_path(scope: "recent"), class: "fc-btn", form_class: "aseo-inline-form" %>
+    </div>
+  </section>
+
+  <section class="adash-card" id="log">
+    <header><h2>Submission log</h2><span>last <%= Admin::SeoController::LOG_SIZE %></span></header>
+    <% if @submissions.empty? %>
+      <p class="adash-empty">Nothing sent yet.</p>
+    <% else %>
+      <div class="aseo-table-wrap">
+        <table class="aseo-table aseo-log">
+          <thead>
+            <tr>
+              <th scope="col">When</th>
+              <th scope="col">Where</th>
+              <th scope="col">Why</th>
+              <th scope="col" class="is-num">Pages</th>
+              <th scope="col">Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @submissions.each do |s| %>
+              <tr>
+                <td><%= seo_time(s.submitted_at) %></td>
+                <td><%= s.engine_label %></td>
+                <td><%= s.trigger.capitalize %></td>
+                <td class="is-num" title="<%= s.urls.first(5).join("\n") %>"><%= number_with_delimiter(s.urls_count) %></td>
+                <td>
+                  <span class="<%= s.success? ? 'badge badge-success' : 'badge badge-primary' %>"><%= s.status_code || "–" %> <%= s.status_label %></span>
+                  <% unless s.success? %><span class="aseo-response" title="<%= s.response %>"><%= s.response.to_s.truncate(80) %></span><% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </section>
+</div>
