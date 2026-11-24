@@ -63,6 +63,33 @@ module SiteSearch
                  .limit(limit)
     end
 
+    # A writer's series, by title or description. Same rule as the series
+    # page (Series#readable_by?): a part the viewer may see, an active
+    # author nobody in the pair has blocked, and a public profile (staff
+    # excepted). Series are few per writer, so a scan of their titles is fine.
+    def series(limit: 12)
+      words = @query.plain_text
+      return Series.none if words.blank?
+
+      key = { key: words.first(100) }
+      scope = Series.with_listable_parts.where(user_id: @visibility.users_scope.select(:id))
+      scope = scope.where.not(user_id: Profile.where(public_profile: false).select(:user_id)) unless @visibility.staff?
+      scope.where("public.search_key(series.title) LIKE '%' || public.search_key(:key) || '%' " \
+                  "OR public.search_key(coalesce(series.description, '')) LIKE '%' || public.search_key(:key) || '%' " \
+                  "OR word_similarity(public.search_key(:key), public.search_key(series.title)) >= 0.5", key)
+           .includes(user: { profile: { avatar_attachment: :blob } })
+           .order(Arel.sql(Series.sanitize_sql_array([ "CASE WHEN public.search_key(series.title) = public.search_key(:key) THEN 0 ELSE 1 END", key ])),
+                  updated_at: :desc)
+           .limit(limit)
+    end
+
+    # Parts a reader can see, per series id.
+    def series_part_counts(series)
+      return {} if series.empty?
+
+      Post.series_listable.where(series_id: series.map(&:id)).group(:series_id).count
+    end
+
     # "john 3 16", "Ps 23", "1 cor 13:4-7" → the scripture page.
     def reference
       return @reference if defined?(@reference)

@@ -1,0 +1,14 @@
+<div class="srch-grid">
+  <% series.each do |item| %>
+    <%= link_to series_path(item), class: "srch-panel" do %>
+      <span class="srch-panel-ico"><%= render_icon("library", classes: "w-5 h-5") %></span>
+      <span class="min-w-0">
+        <strong class="srch-panel-title"><%= item.title %></strong>
+        <% if item.description.present? %>
+          <span class="srch-panel-sub line-clamp-2"><%= item.description %></span>
+        <% end %>
+        <span class="srch-kicker">@<%= item.user.username %> · <%= pluralize(@series_parts[item.id].to_i, "part") %></span>
+      </span>
+    <% end %>
+  <% end %>
+</div>

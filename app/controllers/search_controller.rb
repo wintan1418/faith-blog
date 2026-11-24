@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
-# One search page with tabs (Top, Breaths, People, Rooms, Bible, Resources),
-# the header's instant dropdown (#suggest) and a member's recent searches.
+# One search page with tabs (Top, Breaths, People, Rooms, Series, Bible,
+# Resources), the header's instant dropdown (#suggest) and a member's recent
+# searches.
 #
 # Every tab reuses SiteSearch::Visibility: search never finds anything the
 # searcher couldn't reach by browsing. Filters live in the URL, so a results
 # page can be shared.
 class SearchController < ApplicationController
-  TABS = %w[top breaths people rooms bible resources].freeze
+  TABS = %w[top breaths people rooms series bible resources].freeze
   DATES = SiteSearch::PostSearch::DATES
   TYPES = SiteSearch::PostSearch::TYPES
   SORTS = SiteSearch::PostSearch::SORTS
   SUGGEST_BREATHS = 4
+  # Old links: /search?type=users|resources|posts.
+  LEGACY_TYPES = { "users" => "people", "resources" => "resources", "posts" => "breaths" }.freeze
 
   member_rate_limit to: 40, within: 1.minute, only: :index, name: "search"
   member_rate_limit to: 150, within: 1.minute, only: :suggest, name: "search-suggest"
@@ -22,7 +25,7 @@ class SearchController < ApplicationController
   helper_method :search_params, :filters_active?
 
   def index
-    @tab = TABS.include?(params[:tab]) ? params[:tab] : "top"
+    @tab = TABS.include?(params[:tab]) ? params[:tab] : LEGACY_TYPES.fetch(params[:type], "top")
     @query = SiteSearch::Query.new(params[:q])
     @visibility = SiteSearch::Visibility.new(current_user)
     @filters = build_filters
@@ -78,8 +81,10 @@ class SearchController < ApplicationController
     @rooms = sections.rooms(limit: 3).to_a
     @reference = sections.reference
     @resources = sections.resources(limit: 2).to_a
+    @series = sections.series(limit: 2).to_a
+    @series_parts = sections.series_part_counts(@series)
     load_fallbacks(@breaths)
-    @breaths.total + @people.size + @rooms.size + @resources.size + (@reference ? 1 : 0)
+    @breaths.total + @people.size + @rooms.size + @resources.size + @series.size + (@reference ? 1 : 0)
   end
 
   def search_breaths
@@ -105,6 +110,12 @@ class SearchController < ApplicationController
     @reference = sections.reference
     @verses = sections.verses(limit: 20)
     @verses.size + (@reference ? 1 : 0)
+  end
+
+  def search_series
+    @series = sections.series(limit: 30).to_a
+    @series_parts = sections.series_part_counts(@series)
+    @series.size
   end
 
   def search_resources

@@ -202,6 +202,28 @@ class SearchPrivacyTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "series follow the series page's rules" do
+    open_series = Series.create!(user: @author, title: "Lanterns in the dark")
+    breath("lanternpart").update_columns(series_id: open_series.id, series_position: 1)
+    private_room = Room.create!(name: "Inner Room", description: "x", is_public: false)
+    hidden_series = Series.create!(user: @author, title: "Lanterns behind doors")
+    breath("doorpart", room: private_room).update_columns(series_id: hidden_series.id, series_position: 1)
+
+    sign_in @reader
+    get search_path(q: "lanterns", tab: "series")
+    assert_includes response.body, series_path(open_series)
+    assert_not_includes response.body, series_path(hidden_series), "a series with only private-room parts stays hidden"
+
+    MessageBlock.create!(blocker: @author, blocked: @reader)
+    get search_path(q: "lanterns", tab: "series")
+    assert_not_includes response.body, series_path(open_series), "a blocked author's series is hidden"
+
+    @author.profile&.update_columns(public_profile: false)
+    sign_out :user
+    get search_path(q: "lanterns", tab: "series")
+    assert_not_includes response.body, series_path(open_series) if @author.profile
+  end
+
   test "member search stays members-only" do
     get search_path(q: "lantern", tab: "people")
     assert_redirected_to new_user_session_path

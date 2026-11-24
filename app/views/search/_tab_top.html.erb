@@ -1,4 +1,4 @@
-<% nothing = @breaths.empty? && @close_matches.blank? && @people.empty? && @rooms.empty? && @reference.nil? && @resources.empty? %>
+<% nothing = @breaths.empty? && @close_matches.blank? && @people.empty? && @rooms.empty? && @reference.nil? && @resources.empty? && @series.empty? %>
 <% if nothing %>
   <%= render "search/no_results" %>
 <% else %>
@@ -61,6 +61,16 @@
       </div>
     <% end %>
   </section>
+
+  <% if @series.any? %>
+    <section class="srch-section" aria-labelledby="srch-top-series">
+      <div class="srch-section-head">
+        <h2 class="srch-section-title" id="srch-top-series">Series</h2>
+        <%= link_to "See all", search_path(search_params(tab: "series")), class: "srch-more" %>
+      </div>
+      <%= render "search/series", series: @series %>
+    </section>
+  <% end %>
 
   <% if @resources.any? %>
     <section class="srch-section" aria-labelledby="srch-top-resources">
