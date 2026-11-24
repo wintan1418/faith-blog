@@ -12,9 +12,9 @@ export const FORMATS = {
   portrait: { width: 1080, height: 1350, label: "Portrait", hint: "LinkedIn · X" }
 }
 
-const STACK = `Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`
+export const STACK = `Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`
 
-const THEMES = {
+export const THEMES = {
   light: {
     frame: ["#f6f2e9", "#ebe5d8"], card: "#ffffff", ink: "#14201b", soft: "#2c3833", muted: "#62706a",
     line: "rgba(20, 32, 27, 0.10)", shadow: "rgba(40, 34, 14, 0.16)", chip: "rgba(20, 32, 27, 0.06)", glow: 0.30
@@ -26,7 +26,7 @@ const THEMES = {
 }
 
 // The Brethreign "B" (shared/_logomark.html.erb): two soft rings and the solid mark.
-const LOGO_W = 670.46, LOGO_H = 1024
+export const LOGO_W = 670.46, LOGO_H = 1024
 const LOGO = [
   [0.2, "M366.07,509.84c-2.31.78-4.62,1.54-7.19,2.31,12.08,2.06,23.65,4.38,34.71,7.21,18.25,4.12,35.21,8.74,50.9,13.88,48.58,15.43,86.11,33.93,113.63,55.27,20.05,15.43,35.74,31.37,47.05,47.81,4.37,6.18,8.22,12.6,11.31,19.03,11.31,23.13,16.96,46.27,16.96,68.89,0,40.62-11.82,78.93-35.99,114.92-24.41,35.99-56.04,67.87-95.38,95.38-39.33,27.25-82.01,49.11-127.76,65.3-7.21,2.57-14.4,4.88-21.6,6.94-38.3,11.31-75.32,17.22-111.05,17.22-9.77,0-19.02-.77-28.28-2.82-26.74-4.88-51.15-17.22-73.52-37.02-29.83-26.49-55.02-62.47-76.09-107.98-19.03-41.12-33.68-87.92-44.22-140.36-1.03-5.15-2.06-10.54-3.09-15.94C5.4,661.27,0,600.08,0,536.84c0-9,0-17.74.25-26.22v-1.81c.26-27.24,1.03-52.95,2.57-77.37,1.8-32.13,4.88-64.02,9-94.86,2.57-17.23,5.15-34.96,7.97-53.74,10.53-52.18,25.19-98.71,43.96-139.59,21.08-45.5,46.27-81.49,76.09-107.98.23-.2.45-.4.68-.59C170.28,8.89,210.28-2.51,249.54.46c30.29,2.29,59.74,5.62,88.25,9.89,5.15.77,10.03,1.53,14.91,2.31,60.42,9.77,113.38,24.93,159.39,44.74,49.62,21.33,88.43,48.58,116.45,82.26,27.77,33.68,41.91,74.04,41.91,121.6,0,28.02-12.34,58.87-37.03,91.52-7.71,10.28-17.22,20.56-28.27,30.34-24.43,22.62-56.81,44.73-97.43,66.83-31.88,17.22-69.93,33.94-114.14,50.14-8.75,3.09-18,6.43-27.52,9.77Z"],
   [0.6, "M360.93,510.2c-1.92.65-3.85,1.29-5.99,1.92,10.06,1.72,19.71,3.65,28.92,6,15.21,3.43,29.34,7.28,42.42,11.57,40.48,12.86,71.76,28.27,94.69,46.06,16.71,12.86,29.78,26.14,39.21,39.84,3.64,5.15,6.85,10.5,9.42,15.86,9.42,19.28,14.13,38.56,14.13,57.41,0,33.85-9.85,65.78-29.99,95.77-20.35,29.99-46.7,56.56-79.48,79.48-32.77,22.71-68.34,40.92-106.47,54.42-6,2.14-12,4.07-18,5.78-31.92,9.42-62.76,14.35-92.54,14.35-8.14,0-15.85-.64-23.57-2.35-22.28-4.07-42.63-14.35-61.27-30.85-24.85-22.07-45.85-52.06-63.41-89.98-15.86-34.27-28.07-73.27-36.85-116.97-.86-4.29-1.72-8.79-2.57-13.28-9.21-48.84-13.7-99.83-13.7-152.53,0-7.5,0-14.78.21-21.85v-1.51c.22-22.7.86-44.12,2.14-64.48,1.5-26.78,4.07-53.35,7.5-79.05,2.14-14.36,4.29-29.13,6.64-44.78,8.78-43.48,20.99-82.26,36.63-116.32,17.56-37.92,38.56-67.91,63.41-89.98.19-.16.38-.33.57-.49,24.79-21.5,58.12-31,90.84-28.52,25.24,1.91,49.79,4.68,73.54,8.24,4.29.64,8.36,1.28,12.43,1.92,50.35,8.14,94.48,20.77,132.83,37.28,41.35,17.77,73.69,40.48,97.04,68.55,23.14,28.07,34.93,61.7,34.93,101.33,0,23.35-10.28,49.06-30.86,76.27-6.42,8.57-14.35,17.13-23.56,25.28-20.36,18.85-47.34,37.27-81.19,55.69-26.57,14.35-58.28,28.29-95.12,41.78-7.29,2.57-15,5.36-22.93,8.14Z"],
@@ -169,7 +169,7 @@ function linesHeight(lines, lh) {
   return lines.reduce((h, l, i) => h + lh + (l.gapBefore && i > 0 ? lh * 0.45 : 0), 0)
 }
 
-function drawLines(ctx, lines, x, y, { size, weight = 400, lh, color }) {
+export function drawLines(ctx, lines, x, y, { size, weight = 400, lh, color }) {
   ctx.fillStyle = color
   ctx.textBaseline = "alphabetic"
   ctx.textAlign = "left"
@@ -239,7 +239,7 @@ export function fitText(ctx, text, { sizes, weight = 400, maxWidth, maxHeight, l
 
 // ── Shapes ──
 
-function roundRect(ctx, x, y, w, h, r) {
+export function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath()
   if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); return }
   ctx.moveTo(x + r, y)
@@ -250,7 +250,7 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath()
 }
 
-function drawLogo(ctx, x, y, height, color) {
+export function drawLogo(ctx, x, y, height, color) {
   const scale = height / LOGO_H
   ctx.save()
   ctx.translate(x, y)
@@ -275,7 +275,7 @@ function drawIcon(ctx, name, x, y, size, color, { fill = false, width = 2 } = {}
   ctx.restore()
 }
 
-function drawQR(ctx, rows, x, y, size, ink) {
+export function drawQR(ctx, rows, x, y, size, ink) {
   const n = rows.length
   const quiet = 2
   const cell = size / (n + quiet * 2)
@@ -304,7 +304,7 @@ function coverImage(ctx, img, x, y, w, h, r) {
   ctx.restore()
 }
 
-function hexToRgba(hex, alpha) {
+export function hexToRgba(hex, alpha) {
   const h = String(hex || "#34d399").replace("#", "")
   const n = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16)
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`
@@ -393,7 +393,10 @@ function sizesFor(format) {
            reply: [48, 44, 40, 37, 34, 31], meta: 28, icon: 32, qr: 170, imgMax: 470, imgMin: 220, label: 23 }
 }
 
-// opts: { format, theme, assets, reply (a reply object, for thread cards), index, total }
+// opts: { format, theme, assets, reply (a reply object, for thread cards), index, total,
+//         bare (the card alone on a transparent canvas, for the thread video) }
+// A bare card comes back cropped to the card plus room for its shadow, with
+// canvas.cardBox = { x, y, w, h } and canvas.avatar = { x, y } (its centre).
 export function renderCard(data, opts) {
   const format = FORMATS[opts.format] ? opts.format : "story"
   const { width: W, height: H } = FORMATS[format]
@@ -411,13 +414,14 @@ export function renderCard(data, opts) {
   canvas.width = W
   canvas.height = H
   const ctx = canvas.getContext("2d")
+  const bare = !!opts.bare && format === "story"
 
   // Frame: the theme's ground with the author's colour glowing in.
   const bg = ctx.createLinearGradient(0, 0, W, H)
   bg.addColorStop(0, T.frame[0])
   bg.addColorStop(1, T.frame[1])
   ctx.fillStyle = bg
-  ctx.fillRect(0, 0, W, H)
+  if (!bare) ctx.fillRect(0, 0, W, H)
   const glow = (x, y, r, color, a) => {
     const g = ctx.createRadialGradient(x, y, 0, x, y, r)
     g.addColorStop(0, hexToRgba(color, a))
@@ -425,8 +429,10 @@ export function renderCard(data, opts) {
     ctx.fillStyle = g
     ctx.fillRect(0, 0, W, H)
   }
-  glow(W, 0, W * 0.95, accent, T.glow)
-  glow(0, H, W * 0.85, accentDeep, T.glow * 0.55)
+  if (!bare) {
+    glow(W, 0, W * 0.95, accent, T.glow)
+    glow(0, H, W * 0.85, accentDeep, T.glow * 0.55)
+  }
 
   const cardX = S.margin
   const cardW = W - S.margin * 2
@@ -437,7 +443,10 @@ export function renderCard(data, opts) {
   let areaTop = S.margin
   let areaBottom = H - S.margin
   const story = format === "story"
-  if (story) {
+  if (bare) {
+    areaTop = BARE_SHADOW_TOP
+    areaBottom = BARE_SHADOW_TOP + BARE_MAX_CARD_H
+  } else if (story) {
     const logoH = 76
     ctx.font = `700 46px ${STACK}`
     const wordW = ctx.measureText("Brethreign").width
@@ -461,7 +470,7 @@ export function renderCard(data, opts) {
   const series = reply ? null : data.series
   const contextLine = reply ? `Replying to ${data.author.anonymous ? "Anonymous" : "@" + data.author.username}` : null
   const metaH = reply || data.counts ? Math.round(S.meta * 1.6) : 0
-  const footerH = story ? 0 : S.qr + Math.round(S.pad * 0.6)
+  const footerH = story || bare ? 0 : S.qr + Math.round(S.pad * 0.6)
   const tagH = Math.round(S.label * 1.9)
 
   let fixed = S.pad + headerH + gap + metaH + S.pad + footerH
@@ -507,7 +516,7 @@ export function renderCard(data, opts) {
   // The card is as tall as its content, centred in its area.
   const contentH = (titleFit ? titleFit.height + Math.round(gap * 0.7) : 0) + (bodyFit ? bodyFit.height : 0) + (imgH ? imgH + gap : 0)
   const cardH = Math.min(maxCardH, fixed + contentH + gap)
-  const cardY = Math.round(areaTop + (maxCardH - cardH) * (story ? 0.4 : 0.5))
+  const cardY = bare ? areaTop : Math.round(areaTop + (maxCardH - cardH) * (story ? 0.4 : 0.5))
 
   ctx.save()
   ctx.shadowColor = T.shadow
@@ -672,6 +681,8 @@ export function renderCard(data, opts) {
     mx += ctx.measureText(txt).width + S.meta * 1.3
   }
 
+  if (bare) return cropBare(canvas, { x: cardX, y: cardY, w: cardW, h: cardH }, { x: ax + S.avatar / 2, y: cardY + S.pad + S.avatar / 2 })
+
   // Footer: the mark, the short link and the QR code.
   if (!story) {
     const fy = cardY + cardH - S.pad - S.qr
@@ -718,6 +729,23 @@ export function renderCard(data, opts) {
     ctx.fillText("Scan or tap the link to read more", tx, qy + 180)
   }
 
+  return canvas
+}
+
+// Bare (video) cards: at most this tall, with room above and below for the shadow.
+export const BARE_MAX_CARD_H = 1360
+const BARE_SHADOW_TOP = 70
+const BARE_SHADOW_BOTTOM = 120
+
+function cropBare(source, box, avatar) {
+  const canvas = document.createElement("canvas")
+  canvas.width = source.width
+  canvas.height = box.h + BARE_SHADOW_TOP + BARE_SHADOW_BOTTOM
+  const top = box.y - BARE_SHADOW_TOP
+  canvas.getContext("2d").drawImage(source, 0, top, source.width, canvas.height, 0, 0, source.width, canvas.height)
+  source.width = source.height = 0 // let the full-size canvas go
+  canvas.cardBox = { ...box, y: BARE_SHADOW_TOP }
+  canvas.avatar = { x: avatar.x, y: avatar.y - top }
   return canvas
 }
 

@@ -27,7 +27,7 @@ class ShareSheetTest < ApplicationSystemTestCase
       find("button.fc-breath-action").click
       click_on item
     end
-    assert_selector "dialog.share-sheet canvas.share-sheet-canvas", wait: 10
+    assert_selector "dialog.share-sheet canvas.share-sheet-canvas, dialog.share-sheet [data-testid=share-video-progress]", wait: 10
   end
 
   def canvas_sizes
@@ -56,10 +56,42 @@ class ShareSheetTest < ApplicationSystemTestCase
   test "a thread becomes one card per item" do
     visit post_path(@post)
     open_from_menu "Share as thread"
+    find("dialog.share-sheet [data-kind=cards]").click if page.has_selector?("dialog.share-sheet [data-kind=cards]", wait: 3)
 
     assert_selector "dialog.share-sheet canvas.share-sheet-canvas", count: 3
     assert_selector "dialog.share-sheet .share-slide figcaption", text: "1/3"
     find("dialog.share-sheet .share-sheet-close").click
     assert_no_selector "dialog.share-sheet"
+  end
+
+  test "a thread becomes one short story-size video" do
+    visit post_path(@post)
+    open_from_menu "Share as thread"
+
+    assert_selector "dialog.share-sheet [data-kind=video][aria-checked=true]", wait: 10
+    assert_no_selector "dialog.share-sheet [data-format=story]", visible: true
+    assert_selector "dialog.share-sheet video[data-testid=share-video]", wait: 60
+
+    info = page.evaluate_async_script(<<~JS)
+      const done = arguments[arguments.length - 1]
+      const video = document.querySelector("dialog.share-sheet video[data-testid=share-video]")
+      fetch(video.src).then(r => r.arrayBuffer()).then(buffer => {
+        const text = new TextDecoder("latin1").decode(new Uint8Array(buffer))
+        done({ width: video.videoWidth, height: video.videoHeight, duration: video.duration, muted: video.muted,
+               ftyp: text.indexOf("ftyp"), moov: text.indexOf("moov"), mdat: text.indexOf("mdat"), webm: text.charCodeAt(0) === 0x1a })
+      }).catch(e => done({ error: String(e) }))
+    JS
+    assert_equal [ 1080, 1920 ], [ info["width"], info["height"] ]
+    assert info["muted"]
+    assert_operator info["duration"], :<=, 20.5
+    unless info["webm"]
+      assert_equal 4, info["ftyp"], "an MP4"
+      assert_operator info["moov"], :<, info["mdat"], "the index comes first, so status apps can play it at once"
+    end
+    assert_selector "[data-testid=share-download]:not([disabled])", text: "Download video"
+
+    # Switching back to cards keeps the card flow as it was.
+    find("dialog.share-sheet [data-kind=cards]").click
+    assert_selector "dialog.share-sheet canvas.share-sheet-canvas", count: 3
   end
 end
