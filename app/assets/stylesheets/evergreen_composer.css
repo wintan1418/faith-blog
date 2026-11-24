@@ -865,3 +865,21 @@ dialog.fc-composer-dialog .eg-cmp-cancel { display: none; }
   }
   dialog.fc-composer-dialog[open] .fc-composer-form.eg-cmp { padding-bottom: 132px; }
 }
+
+/* Phones, full-page composer (/posts/new, edit): the fixed bottom nav covered
+   Cancel / Save draft / Breathe. Like X and LinkedIn, hide the tab bar while
+   writing and keep the action row pinned to the bottom of the screen. */
+@media (max-width: 760px) {
+  body:has(.fc-composer-panel-page) .fc-bottom-nav { display: none !important; }
+  body:not(.hotwire-native):has(.fc-composer-panel-page) { padding-bottom: 0; }
+  /* overflow: hidden on these ancestors makes them scroll boxes, which
+     stops position: sticky; clip trims the same without that side effect. */
+  .fc-app:has(.fc-composer-panel-page),
+  .fc-panel.fc-composer-panel-page { overflow: clip; }
+  .fc-composer-panel-page .fc-composer-footer.eg-cmp-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+}
