@@ -1,0 +1,60 @@
+<%# A breath's series: where it sits, previous / next, and every part.
+    Locals: post, parts, index (from series_context_for). The full list is
+    open on wide screens and folded away on phones (details-wide). %>
+<% series = post.series %>
+<% prev_part = index.positive? ? parts[index - 1] : nil %>
+<% next_part = parts[index + 1] %>
+<%# The writer's own part numbers: a part never posted stays a gap. %>
+<% number = ->(part, i) { part.series_position || (i + 1) } %>
+<% last_number = series_last_number(parts.each_with_index.map { |part, i| number.(part, i) }) %>
+<section class="sr-card" aria-labelledby="series-card-title">
+  <div class="sr-card-head">
+    <%= render_icon("library", classes: "sr-card-icon") %>
+    <div class="sr-card-heading">
+      <p class="sr-kicker">Part <%= number.(post, index) %> of <%= last_number %> · Series</p>
+      <h2 class="sr-card-title" id="series-card-title"><%= link_to series.title, series_path(series) %></h2>
+    </div>
+  </div>
+
+  <nav class="sr-card-nav" aria-label="Series parts">
+    <% if prev_part %>
+      <%= link_to post_path(prev_part), class: "sr-step is-prev", rel: "prev" do %>
+        <span class="sr-step-dir"><%= render_icon("chevronleft", classes: "sr-step-icon") %>Previous · Part <%= number.(prev_part, index - 1) %></span>
+        <span class="sr-step-title"><%= series_part_title(prev_part, length: 70) %></span>
+      <% end %>
+    <% else %>
+      <span class="sr-step is-empty" aria-hidden="true"></span>
+    <% end %>
+    <% if next_part %>
+      <%= link_to post_path(next_part), class: "sr-step is-next", rel: "next" do %>
+        <span class="sr-step-dir">Next · Part <%= number.(next_part, index + 1) %><%= render_icon("chevronright", classes: "sr-step-icon") %></span>
+        <span class="sr-step-title"><%= series_part_title(next_part, length: 70) %></span>
+      <% end %>
+    <% else %>
+      <span class="sr-step is-end">You're on the latest part.</span>
+    <% end %>
+  </nav>
+
+  <details class="sr-parts" data-controller="details-wide">
+    <summary class="sr-parts-toggle">
+      <span>All <%= pluralize(parts.size, "part") %></span>
+      <%= render_icon("chevrondown", classes: "sr-parts-chev") %>
+    </summary>
+    <ol class="sr-parts-list">
+      <% parts.each_with_index do |part, i| %>
+        <li class="sr-parts-item<%= " is-current" if i == index %>">
+          <span class="sr-parts-num"><%= number.(part, i) %></span>
+          <% if i == index %>
+            <span class="sr-parts-title" aria-current="page"><%= series_part_title(part) %></span>
+          <% else %>
+            <%= link_to series_part_title(part), post_path(part), class: "sr-parts-title" %>
+          <% end %>
+          <% if (reason = series_part_private_reason(part)) %>
+            <span class="sr-only-you" title="Only you can see this part here"><%= reason %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+    <%= link_to "Open the series page", series_path(series), class: "sr-parts-more" %>
+  </details>
+</section>

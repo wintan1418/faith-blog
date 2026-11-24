@@ -35,6 +35,7 @@ class User < ApplicationRecord
     profile&.headline.present? || profile&.skills.present? || experiences.any? || educations.any?
   end
   has_many :posts, dependent: :destroy
+  has_many :series, dependent: :destroy
   has_many :announcements, dependent: :destroy
 
   validates :accent_color, inclusion: { in: ->(_) { AccentPalette.slugs } }, allow_blank: true

@@ -72,6 +72,8 @@ class Post < ApplicationRecord
   # Associations
   belongs_to :user
   belongs_to :room, counter_cache: :posts_count, optional: true
+  # A multi-part series by the same author (see Series). At most one.
+  belongs_to :series, optional: true, inverse_of: :posts
   has_many :scripture_citations, dependent: :delete_all
   has_many :comments, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
@@ -121,6 +123,8 @@ class Post < ApplicationRecord
   validate :language_is_clean
   validates :slug, presence: true, uniqueness: true
   validate :max_images_count
+  validate :series_belongs_to_author
+  before_save :place_in_series, if: :will_save_change_to_series_id?
 
   # Search. `searchable` is a stored tsvector of the title + plain-text body
   # (GIN-indexed), refreshed by #refresh_search_vector whenever either changes.
@@ -154,7 +158,7 @@ class Post < ApplicationRecord
     { images_attachments: :blob },
     { user: { profile: { avatar_attachment: :blob } } },
     :viewer_like, :reaction_tallies,
-    { quoted_post: :user }
+    { quoted_post: :user }, :series
   ].freeze
   scope :for_cards, -> { includes(*CARD_INCLUDES) }
 
@@ -180,6 +184,13 @@ class Post < ApplicationRecord
              .where(user_id: User.where(active: true).select(:id))
              .where("posts.room_id IS NULL OR posts.room_id IN (?)",
                     Room.public_rooms.where.not(room_type: %i[prayers struggles]).select(:id))
+  }
+  # Parts a public series view may list: live, approved, signed with the
+  # author's name, not a prayer request, and not in a private room. The same
+  # bar the sitemap and scripture pages use for breaths shown to everyone.
+  scope :series_listable, -> {
+    published.named.where(prayer_status: :not_a_prayer)
+             .where("posts.room_id IS NULL OR posts.room_id IN (?)", Room.public_rooms.select(:id))
   }
   scope :recent, -> { order(published_at: :desc) }
   scope :popular, -> { order(views_count: :desc) }
@@ -309,6 +320,11 @@ class Post < ApplicationRecord
     title.presence
   end
 
+  # Fine to list on a public series page or count in "Part 2 of 3".
+  def series_listable?
+    feed_visible? && !anonymous? && !prayer? && (room_id.nil? || room&.is_public?)
+  end
+
   def has_images?
     images.attached? && images.any?
   end
@@ -417,6 +433,27 @@ class Post < ApplicationRecord
     if images.attached? && images.count > 5
       errors.add(:images, "cannot exceed 5 images per post")
     end
+  end
+
+  # Only the author's own series, and never for an anonymous breath (the
+  # series page carries the author's name).
+  def series_belongs_to_author
+    return if series_id.blank?
+
+    if series.nil? || series.user_id != user_id
+      errors.add(:series, "must be one of your own")
+    elsif anonymous?
+      errors.add(:base, "An anonymous breath can't be part of a series (the series shows your name)")
+    end
+  end
+
+  # A breath joining a series goes to the end (or takes the part number in
+  # its title) unless a place was given.
+  def place_in_series
+    return self.series_position = nil if series_id.blank?
+    return if series_position.present? && will_save_change_to_series_position?
+
+    self.series_position = series.next_position(title: SeriesTitle.effective_title(self))
   end
 
   def cannot_quote_self

@@ -65,6 +65,13 @@
         <article class="post-card" data-controller="toc"
                  data-toc-active-class="is-active">
           <%= render "posts/post_header", post: @post %>
+          <% series_parts, series_index = series_context_for(@post, current_user) %>
+          <% if series_parts %>
+            <%= link_to series_path(@post.series), class: "sr-topline" do %>
+              <%= render_icon("library", classes: "sr-topline-icon") %>
+              <span>Part <%= @post.series_position || series_index + 1 %> of <%= series_last_number(series_parts.each_with_index.map { |part, i| part.series_position || i + 1 }) %> · <strong><%= @post.series.title %></strong></span>
+            <% end %>
+          <% end %>
 
           <% if @post.has_images? %>
             <figure class="post-hero">
@@ -84,6 +91,10 @@
             <div class="post-embedded-quote">
               <%= render "posts/embedded_quote", quoted: @post.quoted_post %>
             </div>
+          <% end %>
+
+          <% if series_parts %>
+            <%= render "posts/series_card", post: @post, parts: series_parts, index: series_index %>
           <% end %>
 
           <%# Only breaths this reader may see — a draft linking here must not leak. %>

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PostsController < ApplicationController
+  include PostSeriesChoice
+
   before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_post, only: [ :show, :edit, :update, :destroy, :feature, :unfeature, :reactions, :inline_thread,
                                     :join_prayer_chain, :leave_prayer_chain, :mark_prayer_answered ]
@@ -10,6 +12,7 @@ class PostsController < ApplicationController
   # AI helpers cost money per call.
   member_rate_limit to: 40, within: 1.hour, only: :check_gentleness, name: "gentleness", json: true
   member_rate_limit to: 40, within: 1.hour, only: :suggest_scripture, name: "suggest-scripture", json: true
+  member_rate_limit to: 120, within: 1.hour, only: :series_suggestion, name: "series-suggestion", json: true
 
   def index
     # There's no posts list page; the feed is where breaths are read.
@@ -121,11 +124,14 @@ class PostsController < ApplicationController
     # flags something. The feed must never depend on a background worker having
     # run — the old born-held flow left every post stuck whenever it didn't.
     @post.moderation_status = :approved
+    series_error = assign_series_choice(@post)
 
-    if @post.save
+    if series_error.nil? && @post.save
       handle_post_links
+      finish_series_choice(@post)
       redirect_to redirect_target_after_create(@post), notice: flash_notice_for(@post)
     else
+      @post.errors.add(:base, series_error) if series_error
       @rooms = Room.public_rooms.ordered
       render :new, status: :unprocessable_entity
     end
@@ -151,9 +157,12 @@ class PostsController < ApplicationController
     end
 
     schedule_or_publish(attrs) unless @post.published?
+    @post.assign_attributes(attrs)
+    series_error = assign_series_choice(@post)
 
-    if @post.update(attrs)
+    if series_error.nil? && @post.save
       handle_post_links
+      finish_series_choice(@post)
       if @post.scheduled?
         redirect_to drafts_path, notice: flash_notice_for(@post)
       elsif @post.draft?
@@ -162,6 +171,7 @@ class PostsController < ApplicationController
         redirect_to @post, notice: "Post updated successfully!"
       end
     else
+      @post.errors.add(:base, series_error) if series_error
       @rooms = Room.public_rooms.ordered
       render :edit, status: :unprocessable_entity
     end
@@ -227,6 +237,20 @@ class PostsController < ApplicationController
   end
 
   # Composer assistants — author-facing, never block publish.
+
+  # "This looks like part 4 of The Gospel and Material Prosperity": the
+  # composer asks as the title is typed. Only the author's own breaths and
+  # series are looked at.
+  def series_suggestion
+    suggestion = SeriesSuggestions.for_title(current_user, params[:title].to_s.first(200),
+                                             exclude_post_id: params[:post_id].presence&.to_i)
+    return render(json: { ok: true, suggestion: nil }) unless suggestion
+
+    render json: { ok: true, suggestion: {
+      series_id: suggestion.series&.id, title: suggestion.title, part: suggestion.part,
+      post_ids: suggestion.post_ids, parts_count: suggestion.post_ids.size + (suggestion.series ? suggestion.series.posts.count : 0)
+    } }
+  end
 
   def check_gentleness
     text = composer_text

@@ -1,0 +1,37 @@
+<%# "Part of a series": pick one of my series, or start one by name.
+    Locals: post. Works with series-picker on the
+    form. Only the breath's author sees it (staff editing a breath don't). %>
+<% return unless user_signed_in? && (post.new_record? || post.user_id == current_user.id) %>
+<% series_list = composer_series_options %>
+<%# After a failed save, a series being started is still a new record. %>
+<% starting = post.series&.new_record? %>
+<% chosen = starting ? "new" : post.series_id %>
+<% new_title = post.series.title if starting %>
+<% field_id = post.persisted? ? "post_#{post.id}_series_id" : "post_series_id_#{SecureRandom.hex(3)}" %>
+<div class="eg-cmp-series">
+  <div class="eg-cmp-option eg-cmp-series-row">
+    <%= render_icon("library", classes: "eg-cmp-option-icon") %>
+    <label class="eg-cmp-option-text" for="<%= field_id %>">
+      <span class="eg-cmp-option-label">Part of a series</span>
+      <span class="eg-cmp-option-hint">Readers can find every part in order</span>
+    </label>
+    <span class="eg-cmp-series-pick">
+      <select name="post[series_id]" id="<%= field_id %>" class="eg-cmp-series-select"
+              data-series-picker-target="select" data-action="change->series-picker#changed">
+        <option value="">No series</option>
+        <% series_list.each do |series| %>
+          <option value="<%= series.id %>"<%= " selected" if chosen.to_s == series.id.to_s %>><%= series.title.truncate(40) %></option>
+        <% end %>
+        <option value="new"<%= " selected" if chosen.to_s == "new" %>>New series…</option>
+      </select>
+      <%= render_icon("chevrondown", classes: "eg-cmp-series-chev") %>
+    </span>
+  </div>
+  <div class="eg-cmp-series-new<%= " hidden" unless chosen.to_s == "new" %>" data-series-picker-target="newWrap">
+    <label class="sr-only" for="<%= field_id %>_new">Name your series</label>
+    <input type="text" name="post[new_series_title]" id="<%= field_id %>_new" value="<%= new_title %>"
+           maxlength="<%= Series::TITLE_MAX %>" placeholder="Name your series, e.g. The Whole Man"
+           class="eg-cmp-series-input" data-series-picker-target="newTitle">
+  </div>
+  <input type="hidden" name="post[series_adopt_post_ids]" value="" data-series-picker-target="adopt">
+</div>
