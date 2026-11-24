@@ -56,6 +56,19 @@ module PostSeriesChoice
     order_by_part_numbers(series) if @series_choice_new || adopted.any?
   end
 
+  # A just-published breath that is clearly the next part of the writer's own
+  # earlier writing joins (or starts) that series on its own; the post page
+  # then offers "Undo" (posts/_series_auto_notice).
+  def auto_group_into_series(post)
+    return unless post.series_id.nil?
+
+    result = SeriesAutoGroup.call(post)
+    return unless result
+
+    flash[:series_auto] = { "post_id" => post.id, "series" => result.series.slug, "title" => result.series.title,
+                            "number" => result.number, "created" => result.created }
+  end
+
   def existing_series_named(title)
     key = SeriesTitle.key_for(title)
     current_user.series.find { |s| SeriesTitle.key_for(s.title) == key }

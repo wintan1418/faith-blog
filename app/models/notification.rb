@@ -33,7 +33,8 @@ class Notification < ApplicationRecord
     content_removed:        27,
     skill_endorsed:         28,
     app_update:             29,
-    rank_up:                30
+    rank_up:                30,
+    series_new_part:        31
   }
 
   # Associations
@@ -52,6 +53,7 @@ class Notification < ApplicationRecord
     new_comment comment_reply new_follower mentioned post_liked comment_liked connection_request
     connection_accepted post_reshared direct_message breath_from_followee everyone_mention prayer_joined
     prayer_answered thread_new_voice circle_breath circle_prayer circle_prayer_answered birthday skill_endorsed
+    series_new_part
   ].freeze
 
   before_create :conceal_anonymous_author
@@ -95,7 +97,7 @@ class Notification < ApplicationRecord
     thread_new_voice: "comment", badge_earned: "trophy", circle_breath: "users",
     circle_prayer: "pray", circle_prayer_answered: "answered", birthday: "cake",
     content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone",
-    rank_up: "sprout"
+    rank_up: "sprout", series_new_part: "library"
   }.freeze
 
   def web_icon
@@ -177,6 +179,10 @@ class Notification < ApplicationRecord
       "#{actor&.display_name || 'Someone'} endorsed you for #{notifiable.try(:skill) || 'a skill'}#{e.(" 👍")}"
     when :app_update
       "#{e.("📲 ")}Brethreign #{notifiable.try(:latest_version)} is out. Update the app to get the newest features and fixes."
+    when :series_new_part
+      series = notifiable.try(:series)
+      part = notifiable.try(:series_position)
+      "#{actor&.display_name || 'Someone'} added #{part ? "Part #{part}" : 'a new part'} to “#{series&.title || 'a series you follow'}”#{e.(" 📖")}"
     when :birthday
       "#{e.("🎂 ")}It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -197,7 +203,7 @@ class Notification < ApplicationRecord
       end
     when :badge_earned, :rank_up
       Rails.application.routes.url_helpers.user_path(user.username)
-    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked, :thread_new_voice
+    when :post_featured, :post_liked, :post_reshared, :mentioned, :breath_from_followee, :series_new_part, :everyone_mention, :prayer_joined, :prayer_answered, :post_blocked, :post_held_for_review, :post_moderation_approved, :comment_liked, :thread_new_voice
       post = underlying_post
       if post
         Rails.application.routes.url_helpers.post_path(post)

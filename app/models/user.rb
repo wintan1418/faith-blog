@@ -36,6 +36,7 @@ class User < ApplicationRecord
   end
   has_many :posts, dependent: :destroy
   has_many :series, dependent: :destroy
+  has_many :series_follows, dependent: :delete_all
   has_many :announcements, dependent: :destroy
 
   validates :accent_color, inclusion: { in: ->(_) { AccentPalette.slugs } }, allow_blank: true

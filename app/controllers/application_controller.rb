@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::Base
   include Pagy::Backend
   include FriendlyRateLimits
+  include PendingSeriesFollow
 
   before_action :set_current_viewer
   before_action :reject_malformed_devise_params, if: :devise_controller?

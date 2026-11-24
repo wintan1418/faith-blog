@@ -491,3 +491,80 @@ html.theme-dark .sr-tool.is-remove:hover { border-color: #ff8a80; color: #ff8a80
 .sr-profile-item:hover { border-color: var(--fc-accent); }
 .sr-profile-name { font-weight: 700; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere; }
 .sr-profile-count { font-size: 12.5px; color: var(--fc-muted); }
+
+/* ── Follow, share, followers ─────────────────────────────────────────── */
+.sr-actions,
+.sr-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.sr-actions { margin-top: 16px; }
+.sr-card-actions { margin-top: 14px; }
+.sr-follow-form { margin: 0; display: inline-flex; }
+.sr-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.sr-btn-icon { width: 16px; height: 16px; flex: none; }
+.sr-follow.is-following { color: var(--fc-accent-deep); border-color: color-mix(in srgb, var(--fc-accent) 45%, transparent); }
+html.theme-dark .sr-follow.is-following { color: var(--fc-accent); }
+.sr-share { position: relative; }
+.sr-share-btn { background: var(--fc-surface); }
+/* Opens downward from the button (the card menu opens upward from a footer). */
+.sr-share .fc-share-menu { z-index: 30; top: calc(100% + 8px); bottom: auto; left: 0; right: auto; }
+.sr-followers { font-size: 13px; font-weight: 600; color: var(--fc-muted); }
+
+/* Signed-out: join to follow, crediting whoever shared the link. */
+.sr-join {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--fc-accent) 30%, transparent);
+  border-radius: var(--fc-radius);
+  background: var(--fc-accent-soft);
+  color: var(--fc-ink);
+}
+.sr-join-credit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  color: var(--fc-soft);
+}
+.sr-join-avatar { width: 26px; height: 26px; border-radius: 999px; object-fit: cover; flex: none; }
+.sr-join-title { margin: 0; font-family: var(--fc-display); font-size: 21px; font-weight: 700; line-height: 1.25; }
+.sr-join-copy { margin: 6px 0 0; font-size: 14.5px; line-height: 1.5; color: var(--fc-soft); }
+.sr-join-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 14px; }
+.sr-join-signin { font-size: 14px; font-weight: 700; color: var(--fc-accent-deep); }
+html.theme-dark .sr-join-signin { color: var(--fc-accent); }
+
+/* "Added to … as Part 5 · Undo" after an automatic grouping. */
+.sr-auto {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 10px 8px 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--fc-accent) 30%, transparent);
+  border-radius: var(--fc-radius-sm);
+  background: var(--fc-accent-soft);
+  color: var(--fc-ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+.sr-auto-icon { flex: none; width: 18px; height: 18px; color: var(--fc-accent); }
+.sr-auto-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.sr-auto-text a { font-weight: 700; color: var(--fc-accent-deep); }
+html.theme-dark .sr-auto-text a { color: var(--fc-accent); }
+.sr-auto-form { margin: 0; flex: none; }
+.sr-auto-undo {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}

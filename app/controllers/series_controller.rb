@@ -13,6 +13,8 @@ class SeriesController < ApplicationController
 
     @author = @series.author?(current_user)
     @parts = @series.parts_for(current_user)
+    @follower_count = @series.series_follows.count
+    remember_sharer
   end
 
   def update
@@ -29,6 +31,19 @@ class SeriesController < ApplicationController
   end
 
   private
+
+  # ?ref=username on a shared link: a visitor who joins from it counts as
+  # that member's invite, the same as /join/username (InviteAttribution).
+  def remember_sharer
+    return if user_signed_in? || params[:ref].blank?
+
+    sharer = User.active.includes(profile: { avatar_attachment: :blob })
+                 .find_by("LOWER(users.username) = ?", params[:ref].to_s.downcase.first(64))
+    return unless sharer&.can_invite_by_link?
+
+    InviteAttribution.remember(cookies, sharer)
+    @sharer = sharer
+  end
 
   def set_series
     @series = Series.includes(user: :profile).friendly.find(params[:slug])

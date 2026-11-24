@@ -108,6 +108,7 @@ Rails.application.routes.draw do
     resources :parts, controller: "series_parts", only: [ :destroy ] do
       patch :move, on: :member
     end
+    resource :follow, controller: "series_follows", only: [ :create, :destroy ]
   end
 
   # Likes (polymorphic)

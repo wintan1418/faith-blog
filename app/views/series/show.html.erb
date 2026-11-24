@@ -1,16 +1,21 @@
 <% author = @series.user %>
 <% author_name = author.display_name.presence || author.username %>
+<% public_parts = @parts.select(&:series_listable?) %>
 <% page_title = "#{@series.title} · a series by #{author_name}" %>
+<% share_title = "#{@series.title} · #{pluralize(public_parts.size, 'part')} by #{author.username}" %>
 <% summary = @series.description.presence ||
-             "A #{@parts.size}-part series by #{author_name} on Brethreign: #{@parts.first(3).map { |p| series_part_title(p, length: 60) }.join(' · ')}" %>
+             "A #{public_parts.size}-part series by #{author_name} on Brethreign: #{public_parts.first(3).map { |p| series_part_title(p, length: 60) }.join(' · ')}" %>
 <% content_for(:title) { "#{page_title} - Brethreign" } %>
 <% content_for(:meta_description) { summary.truncate(200) } %>
-<% content_for(:og_title) { page_title } %>
+<% content_for(:og_title) { share_title } %>
+<% if (cover_part = public_parts.find(&:has_images?)) %>
+  <% og = resized_image_src(cover_part.images.first, width: 1200, height: 630, crop: "fill", gravity: "auto") %>
+  <% content_for(:og_image) { og.is_a?(String) && og.start_with?("http") ? og : "#{request.base_url}#{url_for(cover_part.images.first)}" } %>
+<% end %>
 <% content_for(:og_description) { summary.truncate(200) } %>
 <% content_for(:og_url) { series_url(@series) } %>
 <% content_for(:canonical) { series_url(@series) } %>
 <% content_for(:og_accent) { author.accent_color } %>
-<% public_parts = @parts.select(&:series_listable?) %>
 <% if public_parts.any? %>
   <% content_for(:structured_data) do %>
     <script type="application/ld+json"><%= raw({
@@ -37,7 +42,31 @@
       <% end %>
       <span>by <strong><%= author_name %></strong> <span class="sr-byline-handle">@<%= author.username %></span></span>
     <% end %>
+    <div class="sr-actions" data-guest-gate-allow>
+      <%= render "series/follow_button", series: @series %>
+      <%= render "series/share_button", series: @series, parts: public_parts %>
+      <span class="sr-followers"><%= pluralize(@follower_count, "follower") %></span>
+    </div>
   </header>
+
+  <% unless user_signed_in? %>
+    <section class="sr-join" aria-labelledby="series-join-title" data-guest-gate-allow>
+      <% if @sharer %>
+        <p class="sr-join-credit">
+          <% if @sharer.profile&.avatar&.attached? %>
+            <%= image_tag avatar_src(@sharer.profile), class: "sr-join-avatar", alt: "" %>
+          <% end %>
+          <span><strong><%= @sharer.display_name.presence || @sharer.username %></strong> shared this series with you</span>
+        </p>
+      <% end %>
+      <h2 class="sr-join-title" id="series-join-title">Join Brethreign to follow this series</h2>
+      <p class="sr-join-copy">Get word when <%= author_name %> posts the next part, and join kind conversations about work, life and faith.</p>
+      <div class="sr-join-actions">
+        <%= button_to "Join and follow", series_follow_path(@series), class: "sr-btn is-primary", form_class: "sr-follow-form" %>
+        <%= link_to "I have an account", new_user_session_path, class: "sr-join-signin" %>
+      </div>
+    </section>
+  <% end %>
 
   <% if @author %>
     <details class="sr-manage">

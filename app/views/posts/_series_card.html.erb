@@ -16,6 +16,11 @@
     </div>
   </div>
 
+  <div class="sr-card-actions" data-guest-gate-allow>
+    <%= render "series/follow_button", series: series %>
+    <%= render "series/share_button", series: series, parts: parts.select(&:series_listable?) %>
+  </div>
+
   <nav class="sr-card-nav" aria-label="Series parts">
     <% if prev_part %>
       <%= link_to post_path(prev_part), class: "sr-step is-prev", rel: "prev" do %>
@@ -36,7 +41,7 @@
   </nav>
 
   <details class="sr-parts" data-controller="details-wide">
-    <summary class="sr-parts-toggle">
+    <summary class="sr-parts-toggle" data-guest-gate-allow>
       <span>All <%= pluralize(parts.size, "part") %></span>
       <%= render_icon("chevrondown", classes: "sr-parts-chev") %>
     </summary>

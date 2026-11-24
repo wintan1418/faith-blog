@@ -121,7 +121,7 @@ module SweepWorld
     in [ "rooms/posts", "room_id" ] then @room.to_param
     in [ "rooms", "id" ] then @room.to_param
     in [ "posts", "id" ] then @post.to_param
-    in [ "series", "slug" ] | [ "series_parts", "series_slug" ] then @series.slug
+    in [ "series", "slug" ] | [ "series_parts" | "series_follows", "series_slug" ] then @series.slug
     in [ "series_parts", "id" ] then @post.to_param
     in [ "cards" | "users" | "brethren_cards" | "joins", "username" ] then @member.username
     in [ "portfolio_items", "username" ] then @member.username

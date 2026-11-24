@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1076,6 +1076,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_170000) do
     t.index ["user_id"], name: "index_series_on_user_id"
   end
 
+  create_table "series_follows", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "series_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["series_id"], name: "index_series_follows_on_series_id"
+    t.index ["user_id", "series_id"], name: "index_series_follows_on_user_id_and_series_id", unique: true
+  end
+
   create_table "skill_endorsements", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "endorser_id", null: false
@@ -1314,6 +1323,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_170000) do
   add_foreign_key "seed_events", "users", on_delete: :cascade
   add_foreign_key "seed_rank_ups", "users", on_delete: :cascade
   add_foreign_key "series", "users", on_delete: :cascade
+  add_foreign_key "series_follows", "series", on_delete: :cascade
+  add_foreign_key "series_follows", "users", on_delete: :cascade
   add_foreign_key "skill_endorsements", "users"
   add_foreign_key "skill_endorsements", "users", column: "endorser_id"
   add_foreign_key "suggestion_dismissals", "users"

@@ -62,6 +62,11 @@
           </div>
         <% end %>
 
+        <% auto = flash[:series_auto] %>
+        <% if auto.is_a?(Hash) && auto["post_id"] == @post.id && current_user == @post.user %>
+          <%= render "posts/series_auto_notice", post: @post, info: auto %>
+        <% end %>
+
         <article class="post-card" data-controller="toc"
                  data-toc-active-class="is-active">
           <%= render "posts/post_header", post: @post %>

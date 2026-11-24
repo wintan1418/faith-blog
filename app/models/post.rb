@@ -224,6 +224,8 @@ class Post < ApplicationRecord
 
   after_create_commit -> { BadgeCheckJob.perform_later(user_id) }, if: -> { user_id.present? }
   after_destroy_commit :revoke_seeds_after_destroy
+  # Followers of its series hear about a part once it's public (see SeriesPartAlertJob).
+  after_commit :queue_series_part_alert, on: %i[create update]
   # Index the Bible references this breath quotes (scripture pages list them).
   after_commit :sync_scripture_citations, on: %i[create update]
 
@@ -362,6 +364,7 @@ class Post < ApplicationRecord
   # followers, count the streak, and drop the live "new breaths" feed marker.
   def deliver_after_moderation_release!
     BreathFanoutJob.perform_later(id)
+    SeriesPartAlertJob.set(wait: SeriesPartAlertJob::DELAY).perform_later(id) if series_id
     bump_author_streak
     broadcast_to_public_feed
     queue_for_search_engines(force: true)
@@ -601,6 +604,14 @@ class Post < ApplicationRecord
   def language_is_clean
     text = [ title, content&.to_plain_text ].compact.join(" ")
     errors.add(:base, CleanLanguage::MESSAGE) if CleanLanguage.offensive?(text)
+  end
+
+  def queue_series_part_alert
+    return unless series_id && series_listable?
+    return unless previously_new_record? || saved_change_to_series_id? || saved_change_to_status? ||
+                  saved_change_to_moderation_status?
+
+    SeriesPartAlertJob.set(wait: SeriesPartAlertJob::DELAY).perform_later(id)
   end
 
   def sync_scripture_citations

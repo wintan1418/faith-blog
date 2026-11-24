@@ -19,6 +19,8 @@ class Series < ApplicationRecord
 
   belongs_to :user
   has_many :posts, -> { order(:series_position, :published_at, :id) }, inverse_of: :series
+  has_many :series_follows, dependent: :delete_all
+  has_many :followers, through: :series_follows, source: :user
 
   validates :title, presence: true, length: { maximum: TITLE_MAX }
   validates :description, length: { maximum: DESCRIPTION_MAX }
@@ -57,6 +59,10 @@ class Series < ApplicationRecord
     return false if user.profile&.public_profile? == false && !viewer&.admin_or_moderator?
 
     parts_for(viewer).any?
+  end
+
+  def followed_by?(viewer)
+    viewer.present? && series_follows.exists?(user_id: viewer.id)
   end
 
   def author?(viewer)

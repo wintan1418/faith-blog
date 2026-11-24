@@ -129,6 +129,7 @@ class PostsController < ApplicationController
     if series_error.nil? && @post.save
       handle_post_links
       finish_series_choice(@post)
+      auto_group_into_series(@post)
       redirect_to redirect_target_after_create(@post), notice: flash_notice_for(@post)
     else
       @post.errors.add(:base, series_error) if series_error
@@ -156,13 +157,15 @@ class PostsController < ApplicationController
       attrs = attrs.except(:images)
     end
 
-    schedule_or_publish(attrs) unless @post.published?
+    was_live = @post.published?
+    schedule_or_publish(attrs) unless was_live
     @post.assign_attributes(attrs)
     series_error = assign_series_choice(@post)
 
     if series_error.nil? && @post.save
       handle_post_links
       finish_series_choice(@post)
+      auto_group_into_series(@post) unless was_live
       if @post.scheduled?
         redirect_to drafts_path, notice: flash_notice_for(@post)
       elsif @post.draft?
