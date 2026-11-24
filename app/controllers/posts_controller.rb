@@ -302,6 +302,12 @@ class PostsController < ApplicationController
   def find_post_for_set
     Post.friendly.find(params[:id])
   rescue ActiveRecord::RecordNotFound
+    # An old address — the slug with an id on the end, from before the slug was
+    # shortened — moves for good to the breath's current one (Google had these
+    # as "Duplicate without user-selected canonical" / 404s).
+    if (legacy = legacy_post_for(params[:id]))
+      return redirect_to(post_path(legacy), status: :moved_permanently)
+    end
     # Old notification emails carry post URLs baked at send time; once the
     # breath is deleted those links are dead forever. Give signed-in readers
     # a soft landing instead of the bare 404 page. Anonymous requests
@@ -309,6 +315,16 @@ class PostsController < ApplicationController
     raise unless user_signed_in?
 
     redirect_to feed_path, alert: "That breath isn't here anymore — it may have been removed."
+  end
+
+  LEGACY_SLUG = /\A(?<base>.+)-(?<uuid>\h{8}-\h{4}-\h{4}-\h{4}-\h{12})\z/
+
+  def legacy_post_for(param)
+    match = LEGACY_SLUG.match(param.to_s)
+    return unless match
+
+    # Slug part only: post ids are integers, so the uuid can't be looked up as one.
+    Post.friendly.find_by(slug: match[:base])
   end
 
   def post_params
