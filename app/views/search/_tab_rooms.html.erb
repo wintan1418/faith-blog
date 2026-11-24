@@ -1,0 +1,6 @@
+<% if @rooms.empty? %>
+  <%= render "search/no_results" %>
+<% else %>
+  <p class="srch-count" role="status"><%= pluralize(@rooms.size, "room") %> for “<%= @query.text %>”</p>
+  <%= render "search/rooms", rooms: @rooms %>
+<% end %>

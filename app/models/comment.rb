@@ -7,6 +7,9 @@ class Comment < ApplicationRecord
   # Rich text content
   has_rich_text :content
 
+  # Written by a database trigger (SiteSearch::Schema); never loaded.
+  self.ignored_columns += [ "searchable" ]
+
   # LinkedIn style: one level of replies. Replying to a reply joins the same
   # chain under the top-level comment, with an @mention of the person.
   MAX_DEPTH = 1

@@ -1,0 +1,79 @@
+<% content_for(:page_title) { "Site search" } %>
+
+<div class="adash aseo">
+  <div class="adash-head">
+    <div>
+      <h2 class="adash-kicker">What people search for on Brethreign</h2>
+      <p class="adash-sub">Full searches only (not each keystroke in the dropdown). Words are normalized; no IP addresses are kept, and names after <code>from:</code>, emails and phone numbers are blanked.</p>
+    </div>
+    <nav class="adash-range" aria-label="Period">
+      <% { "7d" => "7 days", "30d" => "30 days", "90d" => "90 days" }.each do |key, label| %>
+        <%= link_to label, admin_search_insights_path(period: key), class: ("is-on" if key == @period), "aria-current": (key == @period ? "true" : nil) %>
+      <% end %>
+    </nav>
+  </div>
+
+  <section class="adash-kpis" aria-label="Headline numbers">
+    <div class="adash-kpi">
+      <p class="adash-kpi__label">Searches</p>
+      <p class="adash-kpi__value"><%= number_with_delimiter(@totals[:searches]) %></p>
+      <p class="adash-kpi__note">By <%= pluralize(number_with_delimiter(@totals[:members]), "member") %> (plus visitors)</p>
+    </div>
+    <div class="adash-kpi">
+      <p class="adash-kpi__label">Found nothing</p>
+      <p class="adash-kpi__value"><%= number_with_delimiter(@totals[:zero]) %></p>
+      <p class="adash-kpi__note"><%= @totals[:searches].positive? ? "#{(100.0 * @totals[:zero] / @totals[:searches]).round}% of searches" : "No searches yet" %></p>
+    </div>
+    <div class="adash-kpi">
+      <p class="adash-kpi__label">With filters</p>
+      <p class="adash-kpi__value"><%= number_with_delimiter(@totals[:filtered]) %></p>
+      <p class="adash-kpi__note">Room, date, type or from:</p>
+    </div>
+    <div class="adash-kpi">
+      <p class="adash-kpi__label">Known words</p>
+      <p class="adash-kpi__value"><%= number_with_delimiter(@terms_count) %></p>
+      <p class="adash-kpi__note">Behind “Did you mean”, from public breaths</p>
+    </div>
+  </section>
+
+  <div class="adash-grid2">
+    <% [ [ "Top searches", @top, "No searches in this period." ], [ "Searches that found nothing", @zero, "Every search found something." ] ].each do |title, rows, empty| %>
+      <section class="adash-card">
+        <header><h2><%= title %></h2><span><%= { "7d" => "last 7 days", "30d" => "last 30 days", "90d" => "last 90 days" }[@period] %></span></header>
+        <% if rows.empty? %>
+          <p class="adash-empty"><%= empty %></p>
+        <% else %>
+          <div class="aseo-table-wrap">
+            <table class="aseo-table">
+              <thead>
+                <tr>
+                  <th scope="col">Search</th>
+                  <th scope="col" class="is-num">Times</th>
+                  <th scope="col" class="is-num">Members</th>
+                  <th scope="col" class="is-num">Empty</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% rows.each do |query, times, members, zero| %>
+                  <tr>
+                    <td class="aseo-key"><%= link_to query, search_path(q: query), target: "_blank", rel: "noopener", title: query %></td>
+                    <td class="is-num"><%= number_with_delimiter(times) %></td>
+                    <td class="is-num"><%= number_with_delimiter(members) %></td>
+                    <td class="is-num"><%= number_with_delimiter(zero) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+
+  <% if @tabs.any? %>
+    <section class="adash-card">
+      <header><h2>Tabs used</h2></header>
+      <p class="aseo-muted"><%= safe_join(@tabs.map { |tab, n| "#{tab.titleize}: #{number_with_delimiter(n)}" }, " · ") %></p>
+    </section>
+  <% end %>
+</div>

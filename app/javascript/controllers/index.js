@@ -214,6 +214,12 @@ application.register("scroll-progress", ScrollProgressController)
 import ScrollTopController from "./scroll_top_controller"
 application.register("scroll-top", ScrollTopController)
 
+import SearchFiltersController from "./search_filters_controller"
+application.register("search-filters", SearchFiltersController)
+
+import SearchSuggestController from "./search_suggest_controller"
+application.register("search-suggest", SearchSuggestController)
+
 import SeriesPickerController from "./series_picker_controller"
 application.register("series-picker", SeriesPickerController)
 

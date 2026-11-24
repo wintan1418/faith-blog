@@ -1,0 +1,15 @@
+<div class="srch-empty">
+  <span class="srch-empty-ico"><%= render_icon("search", classes: "w-7 h-7") %></span>
+  <h2 class="srch-empty-title">Nothing found for “<%= @query.text %>”</h2>
+  <p class="srch-empty-copy">
+    <% if @suggestion %>
+      Try <%= link_to @suggestion, search_path(search_params(q: @suggestion, page: nil)), class: "srch-didyoumean-link" %>, fewer words, or another tab.
+    <% else %>
+      Try fewer or different words, check the spelling, or look in another tab.
+    <% end %>
+  </p>
+  <div class="srch-chips">
+    <%= link_to "Browse rooms", rooms_path, class: "srch-chip" %>
+    <%= link_to "Open the Bible", scripture_index_path, class: "srch-chip" %>
+  </div>
+</div>

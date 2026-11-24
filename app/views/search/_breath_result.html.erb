@@ -1,0 +1,59 @@
+<%#
+  One breath in the results. Titles and snippets come from
+  SiteSearch::Highlighter (escaped text + <mark>). Anonymous breaths show
+  "Anonymous" and never link to, or picture, their author.
+%>
+<% post = hit.post %>
+<% author = search_breath_author(post) %>
+<article class="srch-result">
+  <div class="srch-result-meta">
+    <% if author %>
+      <%= link_to user_path(author.username), class: "srch-result-author" do %>
+        <%= search_avatar(author, size: "h-7 w-7", text: "text-xs") %>
+        <span>@<%= author.username %></span>
+      <% end %>
+    <% else %>
+      <span class="srch-result-author is-anon">
+        <span class="srch-avatar srch-avatar-fallback h-7 w-7 text-xs" aria-hidden="true">?</span>
+        <span>Anonymous</span>
+      </span>
+    <% end %>
+    <% if post.room %>
+      <span aria-hidden="true">·</span>
+      <%= link_to post.room.name, room_path(post.room), class: "srch-result-room" %>
+    <% end %>
+    <span aria-hidden="true">·</span>
+    <time datetime="<%= post.published_at&.iso8601 %>"><%= post.published_at ? "#{time_ago_in_words(post.published_at)} ago" : "" %></time>
+  </div>
+
+  <h3 class="srch-result-title">
+    <%= link_to post_path(post), class: "srch-result-link" do %>
+      <% if hit.title_html.present? %>
+        <%= hit.title_html %>
+      <% elsif post.title.present? %>
+        <%= post.title %>
+      <% else %>
+        <%= search_breath_label(post, length: 80) %>
+      <% end %>
+    <% end %>
+  </h3>
+
+  <% if hit.snippet_html.present? %>
+    <p class="srch-result-snippet"><%= hit.snippet_html %></p>
+  <% end %>
+
+  <% if hit.reply_only && hit.reply_html.present? %>
+    <p class="srch-result-reply">
+      <span class="srch-result-reply-label"><%= render_icon("messagecircle", classes: "w-3.5 h-3.5") %> Matched in a reply</span>
+      <span class="srch-result-reply-text"><%= hit.reply_html %></span>
+    </p>
+  <% end %>
+
+  <div class="srch-result-foot">
+    <span title="Reactions"><%= render_icon("heart", classes: "w-4 h-4") %> <%= number_with_delimiter(post.likes_count) %></span>
+    <span title="Replies"><%= render_icon("messagecircle", classes: "w-4 h-4") %> <%= number_with_delimiter(post.comments_count) %></span>
+    <% search_kind_badges(post).each do |icon, label| %>
+      <span class="srch-badge"><%= render_icon(icon, classes: "w-3.5 h-3.5") %> <%= label %></span>
+    <% end %>
+  </div>
+</article>

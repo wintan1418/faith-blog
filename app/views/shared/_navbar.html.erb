@@ -48,13 +48,30 @@
           n_requests = current_user.pending_connection_requests_count.to_i
           badge      = ->(n) { n > 99 ? "99+" : n }
         %>
-        <%= form_with url: search_path, method: :get, class: "eg-search", role: "search" do %>
-          <%= render_icon("search", classes: "eg-search-ico") %>
-          <input type="search" name="q" placeholder="Search Brethreign" aria-label="Search posts, people, resources" class="eg-search-input">
-        <% end %>
-        <%= link_to search_path, class: "eg-round eg-search-btn", title: "Search", aria: { label: "Search" } do %>
-          <%= render_icon("search", classes: "eg-round-ico") %>
-        <% end %>
+        <%# Instant search (search_suggest_controller). Below 1560px the box hides
+            behind the round button, which opens it as an overlay. %>
+        <div class="eg-search-wrap" data-controller="search-suggest"
+             data-search-suggest-url-value="<%= search_suggest_path %>"
+             data-search-suggest-clear-url-value="<%= search_recent_path %>"
+             data-action="focusout->search-suggest#focusout">
+          <%= form_with url: search_path, method: :get, class: "eg-search", role: "search" do %>
+            <%= render_icon("search", classes: "eg-search-ico") %>
+            <input type="search" name="q" placeholder="Search Brethreign" autocomplete="off" spellcheck="false"
+                   aria-label="Search breaths, people, rooms and the Bible" class="eg-search-input"
+                   role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="eg-search-listbox"
+                   enterkeyhint="search" data-search-suggest-target="input"
+                   data-action="input->search-suggest#input keydown->search-suggest#keydown focus->search-suggest#focus click->search-suggest#focus">
+            <button type="button" class="eg-search-close" aria-label="Close search" data-action="search-suggest#dismiss">
+              <%= render_icon("x", classes: "w-5 h-5") %>
+            </button>
+            <div id="eg-search-listbox" class="srch-dd eg-search-dd" role="listbox" aria-label="Suggestions" hidden
+                 data-search-suggest-target="panel"></div>
+          <% end %>
+          <%= link_to search_path, class: "eg-round eg-search-btn", title: "Search", aria: { label: "Search" },
+                                   data: { action: "search-suggest#open" } do %>
+            <%= render_icon("search", classes: "eg-round-ico") %>
+          <% end %>
+        </div>
 
         <%= link_to conversations_path, class: "eg-round fc-nav-inbox", title: "Messages",
               aria: { label: (n_inbox.positive? ? "Messages, #{n_inbox} unread" : "Messages") } do %>

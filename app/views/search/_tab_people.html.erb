@@ -1,0 +1,33 @@
+<% if @people.empty? %>
+  <%= render "search/no_results" %>
+<% else %>
+  <div class="srch-list">
+    <% @people.each do |user| %>
+      <div class="srch-panel srch-person-row">
+        <%= link_to user_path(user.username), class: "srch-person-link" do %>
+          <%= search_avatar(user, size: "h-12 w-12", text: "text-lg") %>
+          <span class="min-w-0">
+            <strong class="srch-panel-title">@<%= user.username %></strong>
+            <% if user.profile&.public_profile? && user.profile&.bio.present? %>
+              <span class="srch-panel-sub line-clamp-2"><%= user.profile.bio %></span>
+            <% end %>
+          </span>
+        <% end %>
+        <% if user != current_user %>
+          <% if current_user.following?(user) %>
+            <%= button_to "Following", unfollow_user_path(user.username), method: :delete, class: "btn btn-secondary srch-follow" %>
+          <% else %>
+            <%= button_to "Follow", follow_user_path(user.username), class: "btn btn-primary srch-follow" %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <% if @page > 1 || @more %>
+    <nav class="srch-pager" aria-label="Result pages">
+      <% if @page > 1 %><%= link_to "← Previous", search_path(search_params(page: @page - 1)), class: "srch-chip", rel: "prev" %><% end %>
+      <span class="srch-pager-at">Page <%= @page %></span>
+      <% if @more %><%= link_to "Next →", search_path(search_params(page: @page + 1)), class: "srch-chip", rel: "next" %><% end %>
+    </nav>
+  <% end %>
+<% end %>

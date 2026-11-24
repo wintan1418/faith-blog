@@ -229,6 +229,8 @@ Rails.application.routes.draw do
 
   # Search
   get "search", to: "search#index"
+  get "search/suggest", to: "search#suggest", as: :search_suggest
+  delete "search/recent", to: "search#clear_recent", as: :search_recent
   # The blog (public).
   get "blog", to: "blog#index", as: :blog
   get "blog/feed.xml", to: "blog#feed", as: :blog_feed, defaults: { format: :rss }
@@ -315,6 +317,7 @@ Rails.application.routes.draw do
     resources :city_changes, only: :index, path: "city-changes"
     get "online", to: "online#index", as: :online
     get "bots", to: "bots#index", as: :bots
+    get "search-insights", to: "search_insights#show", as: :search_insights
     resource :seo, only: :show, controller: "seo", path: "seo" do
       post :refresh
       post :sitemap

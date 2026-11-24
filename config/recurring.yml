@@ -56,6 +56,10 @@ production:
     class: SearchIndexingNightlyJob
     schedule: every day at 4am Africa/Lagos
 
+  search_terms_refresh:
+    class: SearchTermsRefreshJob
+    schedule: every 6 hours
+
   search_console_refresh:
     class: SearchConsoleRefreshJob
     schedule: every day at 5am Africa/Lagos

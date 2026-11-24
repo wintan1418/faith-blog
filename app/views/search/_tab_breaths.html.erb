@@ -1,0 +1,31 @@
+<% if @breaths.empty? && @close_matches.blank? %>
+  <%= render "search/no_results" %>
+<% else %>
+  <p class="srch-count" role="status"><%= search_result_count(@breaths) %> for “<%= @query.text %>”</p>
+  <div class="srch-list">
+    <% @breaths.hits.each do |hit| %>
+      <%= render "search/breath_result", hit: hit %>
+    <% end %>
+  </div>
+
+  <% if @close_matches.present? %>
+    <h2 class="srch-section-title"><%= @breaths.empty? ? "No exact matches. Close matches" : "Close matches" %></h2>
+    <div class="srch-list">
+      <% @close_matches.each do |hit| %>
+        <%= render "search/breath_result", hit: hit %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @breaths.pages > 1 %>
+    <nav class="srch-pager" aria-label="Result pages">
+      <% if @breaths.prev_page %>
+        <%= link_to "← Previous", search_path(search_params(page: @breaths.prev_page)), class: "srch-chip", rel: "prev" %>
+      <% end %>
+      <span class="srch-pager-at">Page <%= @breaths.page %> of <%= @breaths.pages %><%= "+" if @breaths.capped? %></span>
+      <% if @breaths.next_page %>
+        <%= link_to "Next →", search_path(search_params(page: @breaths.next_page)), class: "srch-chip", rel: "next" %>
+      <% end %>
+    </nav>
+  <% end %>
+<% end %>

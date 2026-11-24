@@ -1,0 +1,14 @@
+<div class="srch-grid">
+  <% rooms.each do |room| %>
+    <%= link_to room_path(room), class: "srch-panel" do %>
+      <span class="srch-panel-ico"><%= render_icon(room.icon.presence || "users", classes: "w-5 h-5") %></span>
+      <span class="min-w-0">
+        <strong class="srch-panel-title"><%= room.name %></strong>
+        <% if room.description.present? %>
+          <span class="srch-panel-sub line-clamp-2"><%= room.description %></span>
+        <% end %>
+        <span class="srch-kicker"><%= pluralize(number_with_delimiter(room.posts_count), "breath") %><%= " · Private" unless room.is_public? %></span>
+      </span>
+    <% end %>
+  <% end %>
+</div>

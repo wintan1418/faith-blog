@@ -73,6 +73,10 @@ class User < ApplicationRecord
   has_many :owned_circles, class_name: "Circle", foreign_key: :owner_id, dependent: :destroy
   has_many :circle_breaths, dependent: :destroy
   has_many :circle_prayers, dependent: :destroy
+  # Their own recent searches go with them; the anonymous search log keeps
+  # the words but forgets who searched.
+  has_many :recent_searches, dependent: :delete_all
+  has_many :search_queries, dependent: :nullify
   has_many :circle_prayer_amens, dependent: :destroy
   has_many :user_reading_plans, dependent: :destroy
   has_many :push_subscriptions, dependent: :destroy
