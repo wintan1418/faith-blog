@@ -37,11 +37,22 @@ class SeoBasicsTest < ActionDispatch::IntegrationTest
 
   test "pages carry a canonical link, a JPEG preview and structured data" do
     get root_path
-    assert_select "title", text: /Christian community for prayer, scripture and fellowship/
+    assert_select "title", text: /Sane, kind conversations about work, life and faith/
     assert_select "link[rel=canonical][href=?]", root_url
     assert_select "meta[property='og:image'][content$='/og/mint.jpg']"
     assert_select "script[type='application/ld+json']", text: /"Organization"/
     assert File.exist?(Rails.root.join("public/og/mint.jpg"))
+  end
+
+  test "a public breath with a picture shares a full image address" do
+    post = Post.create!(title: "With a picture", content: "x", room: @room, user: @ada, status: "published",
+                        moderation_status: :approved, published_at: Time.current)
+    post.images.attach(io: StringIO.new(Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")),
+                       filename: "p.png", content_type: "image/png")
+    get post_path(post)
+    image = css_select("meta[property='og:image']").first["content"]
+    assert_match %r{\Ahttps?://}, image
+    assert_equal image, css_select("meta[name='twitter:image']").first["content"]
   end
 
   test "a breath's structured data can't break out of its script tag" do

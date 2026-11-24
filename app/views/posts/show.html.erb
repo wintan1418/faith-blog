@@ -4,7 +4,7 @@
 <% public_breath = @post.visible_to?(nil) %>
 <% page_title = public_breath ? (@post.display_title || truncate(@post.content.to_plain_text.to_s.strip, length: 60, separator: " ")) : "A breath on Brethreign" %>
 <% content_for(:title) { "#{page_title} - Brethreign" } %>
-<% post_excerpt = public_breath ? truncate(@post.content.to_plain_text.to_s.strip, length: 200, separator: " ") : "A Christian community for sharing faith, prayer and encouragement." %>
+<% post_excerpt = public_breath ? truncate(@post.content.to_plain_text.to_s.strip, length: 200, separator: " ") : "Sane, kind conversations about work, life and faith on Brethreign. Everyone welcome." %>
 <% content_for(:meta_description) { post_excerpt } %>
 <% content_for(:og_title) { page_title } %>
 <% content_for(:og_description) { post_excerpt } %>
@@ -27,7 +27,9 @@
   <% end %>
 <% end %>
 <% if public_breath && @post.has_images? %>
-  <% content_for(:og_image) { url_for(@post.images.first) } %>
+  <%# A full 1200×630 address: WhatsApp, LinkedIn, X and Google ignore a relative one. %>
+  <% og = resized_image_src(@post.images.first, width: 1200, height: 630, crop: "fill", gravity: "auto") %>
+  <% content_for(:og_image) { og.is_a?(String) && og.start_with?("http") ? og : "#{request.base_url}#{url_for(@post.images.first)}" } %>
 <% elsif public_breath && !@post.anonymous? %>
   <% content_for(:og_accent) { @post.user&.accent_color } %>
 <% end %>
