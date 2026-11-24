@@ -115,4 +115,19 @@ class AppWaitlistTest < ActionDispatch::IntegrationTest
   ensure
     old.each { |k, v| ENV[k] = v }
   end
+  test "the shareable /waitlist page shows the form to guests and members" do
+    get join_waitlist_path(ref: "wintan")
+    assert_response :success
+    assert_select "form.waitlist-form input[name='app_waitlist_entry[source]'][value='link:wintan']"
+
+    sign_in users(:one) if respond_to?(:sign_in) && defined?(users)
+    get "/waitlist"
+    assert_response :success
+    assert_select "form.waitlist-form"
+  end
+
+  test "/app redirects to the waitlist" do
+    get "/app"
+    assert_redirected_to "/waitlist"
+  end
 end

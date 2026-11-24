@@ -317,6 +317,9 @@ Rails.application.routes.draw do
 
   # "Get the app" waitlist on the welcome page (open to signed-out visitors).
   post "waitlist", to: "app_waitlist_entries#create", as: :waitlist
+  # Shareable link straight to the app waitlist: brethreign.com/waitlist (also /app).
+  get "waitlist", to: "app_waitlist_entries#new", as: :join_waitlist
+  get "app", to: redirect("/waitlist")
 
   # Admin namespace
   namespace :admin do

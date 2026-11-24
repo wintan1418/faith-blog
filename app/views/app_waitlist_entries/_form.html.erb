@@ -33,7 +33,7 @@
       <p id="waitlist_error" class="waitlist-error" role="alert"><%= error %></p>
     <% end %>
 
-    <%= f.hidden_field :source, value: "welcome", id: nil %>
+    <%= f.hidden_field :source, value: local_assigns[:source] || "welcome", id: nil %>
     <%# Bot guard (SignupGuard): a field people never see, and when the form was shown. %>
     <div class="waitlist-hp" aria-hidden="true">
       <label for="waitlist_hp">Leave this field empty</label>

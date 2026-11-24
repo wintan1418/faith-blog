@@ -509,3 +509,12 @@ html .welcome .welcome-footer a:hover { color: var(--fc-ink); text-decoration: u
   .welcome-word { font-size: 2.6rem; }
   .welcome-main { max-width: 520px; }
 }
+
+/* /waitlist — the shareable "join the app waitlist" page. */
+.fc-panel.waitlist-page { display: grid; gap: 12px; padding: 28px 24px 32px; }
+.waitlist-page .welcome-app-title { display: none; }
+.waitlist-page-eyebrow { margin: 0; font-size: .78rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--fc-accent); }
+html .waitlist-page .waitlist-page-title { margin: 0; font-size: clamp(2rem, 7vw, 2.8rem); line-height: 1.05; }
+.waitlist-page-sub { margin: 0 0 8px; color: var(--fc-muted); line-height: 1.55; }
+.waitlist-page-foot { margin: 8px 0 0; font-size: .9rem; color: var(--fc-muted); }
+.waitlist-page-foot a { color: var(--fc-accent); font-weight: 600; }
