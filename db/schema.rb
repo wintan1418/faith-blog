@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
+  enable_extension "unaccent"
 
   create_table "action_push_native_devices", force: :cascade do |t|
     t.string "name"
@@ -120,6 +121,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["categories"], name: "index_ai_moderation_reviews_on_categories", using: :gin
+    t.index ["reviewable_id"], name: "index_ai_moderation_reviews_open_high_posts", where: "(((reviewable_type)::text = 'Post'::text) AND ((severity)::text = 'high'::text) AND (status <> ALL (ARRAY[1, 4])))"
     t.index ["reviewable_type", "reviewable_id"], name: "index_ai_moderation_reviews_on_reviewable"
     t.index ["reviewed_at"], name: "index_ai_moderation_reviews_on_reviewed_at"
     t.index ["severity"], name: "index_ai_moderation_reviews_on_severity"
@@ -415,12 +417,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.integer "gif_width"
     t.integer "gif_height"
     t.string "gif_title"
+    t.tsvector "searchable"
+    t.index ["created_at"], name: "index_comments_live_created_at", order: :desc, where: "((deleted_at IS NULL) AND (moderation_status = 0))"
     t.index ["deleted_at"], name: "index_comments_on_deleted_at"
     t.index ["flagged"], name: "index_comments_on_flagged"
     t.index ["moderation_status"], name: "index_comments_on_moderation_status"
     t.index ["parent_comment_id"], name: "index_comments_on_parent_comment_id"
     t.index ["post_id", "created_at"], name: "index_comments_on_post_id_and_created_at"
     t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["searchable"], name: "index_comments_search_live", where: "((deleted_at IS NULL) AND (moderation_status = 0))", using: :gin
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
@@ -788,8 +793,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.bigint "quoted_post_id"
     t.jsonb "game_share"
     t.tsvector "searchable"
+    t.text "search_title"
     t.bigint "series_id"
     t.integer "series_position"
+    t.index "\"left\"(search_title, 512)", name: "index_posts_search_title_exact", where: "((status = 1) AND (moderation_status = 0))"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
     t.index ["moderation_status"], name: "index_posts_on_moderation_status"
@@ -800,7 +807,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.index ["room_id", "status", "published_at"], name: "index_posts_on_room_id_and_status_and_published_at"
     t.index ["room_id"], name: "index_posts_on_room_id"
     t.index ["scheduled_for"], name: "index_posts_on_scheduled_for", where: "(scheduled_for IS NOT NULL)"
-    t.index ["searchable"], name: "index_posts_on_searchable", using: :gin
+    t.index ["search_title"], name: "index_posts_search_title_trgm", opclass: :gin_trgm_ops, where: "((status = 1) AND (moderation_status = 0))", using: :gin
+    t.index ["searchable"], name: "index_posts_search_live", where: "((status = 1) AND (moderation_status = 0))", using: :gin
     t.index ["series_id"], name: "index_posts_on_series_id"
     t.index ["slug"], name: "index_posts_on_slug", unique: true
     t.index ["status"], name: "index_posts_on_status"
@@ -866,6 +874,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.datetime "updated_at", null: false
     t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
     t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
+  create_table "recent_searches", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "query", limit: 120, null: false
+    t.datetime "searched_at", null: false
+    t.index ["user_id", "query"], name: "index_recent_searches_on_user_id_and_query", unique: true
+    t.index ["user_id", "searched_at"], name: "index_recent_searches_on_user_id_and_searched_at"
   end
 
   create_table "reports", force: :cascade do |t|
@@ -1014,6 +1030,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.integer "chapter", limit: 2, null: false
     t.integer "verse", limit: 2, null: false
     t.text "text", null: false
+    t.index "to_tsvector('english'::regconfig, text)", name: "index_scripture_verses_kjv_search", where: "((translation)::text = 'kjv'::text)", using: :gin
     t.index ["book", "chapter", "verse", "translation"], name: "index_scripture_verses_on_location", unique: true
   end
 
@@ -1025,6 +1042,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["kind"], name: "index_search_console_reports_on_kind", unique: true
+  end
+
+  create_table "search_queries", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "query", limit: 120, null: false
+    t.string "tab", limit: 20, default: "top", null: false
+    t.integer "results_count", default: 0, null: false
+    t.boolean "filtered", default: false, null: false
+    t.datetime "created_at", null: false
+    t.index ["created_at"], name: "index_search_queries_on_created_at"
+    t.index ["query", "created_at"], name: "index_search_queries_on_query_and_created_at"
+  end
+
+  create_table "search_terms", primary_key: "term", id: { type: :string, limit: 40 }, force: :cascade do |t|
+    t.integer "ndoc", default: 0, null: false
+    t.index ["term"], name: "index_search_terms_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "seed_events", force: :cascade do |t|
@@ -1234,6 +1267,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["id"], name: "index_users_inactive", where: "(NOT active)"
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["last_seen_at"], name: "index_users_on_last_seen_at"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
@@ -1310,6 +1344,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
   add_foreign_key "profiles", "cities", on_delete: :nullify
   add_foreign_key "profiles", "users"
   add_foreign_key "push_subscriptions", "users"
+  add_foreign_key "recent_searches", "users", on_delete: :cascade
   add_foreign_key "reports", "users", column: "reporter_id"
   add_foreign_key "reports", "users", column: "reviewed_by_id"
   add_foreign_key "reshares", "posts"
