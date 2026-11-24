@@ -201,6 +201,7 @@ class ShareSheet {
       this.canvases = [renderCard(this.data, { ...base, index: 1 })]
       replies.forEach((reply, i) => this.canvases.push(renderCard(this.data, { ...base, reply, index: i + 2 })))
       this.stage.dataset.previewFormat = this.format
+      this.stage.dataset.previewTheme = this.theme
       this.stage.classList.toggle("is-strip", this.canvases.length > 1)
       this.stage.replaceChildren(...this.canvases.map((canvas, i) => {
         canvas.className = "share-sheet-canvas"

@@ -690,7 +690,10 @@ export function renderCard(data, opts) {
     ctx.fillText("Brethreign", innerX + lw + 14, fy + S.qr / 2 - S.meta * 0.9)
     ctx.font = `600 ${S.meta}px ${STACK}`
     ctx.fillStyle = accentText
-    ctx.fillText(data.link_label, innerX, fy + S.qr / 2 + S.meta * 0.95)
+    let label = data.link_label
+    const room = innerW - (data.qr ? S.qr + 28 : 0)
+    while (ctx.measureText(label).width > room && label.length > 6) label = label.slice(0, -2) + "…"
+    ctx.fillText(label, innerX, fy + S.qr / 2 + S.meta * 0.95)
     ctx.font = `400 ${Math.round(S.meta * 0.88)}px ${STACK}`
     ctx.fillStyle = T.muted
     ctx.fillText(data.qr ? "Scan to join the conversation" : "Join the conversation", innerX, fy + S.qr / 2 + S.meta * 2.25)

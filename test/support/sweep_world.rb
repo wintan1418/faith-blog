@@ -123,7 +123,6 @@ module SweepWorld
     in [ "posts", "id" ] then @post.to_param
     in [ "series", "slug" ] | [ "series_parts" | "series_follows", "series_slug" ] then @series.slug
     in [ "series_parts", "id" ] then @post.to_param
-
     in [ "share_cards" | "post_og_images", "id" ] then @post.to_param
     in [ "post_og_images", "format" ] then "jpg"
     in [ "short_links", "code" ] then @post.id.to_s(36)

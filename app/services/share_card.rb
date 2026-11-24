@@ -175,10 +175,15 @@ class ShareCard
     nil
   end
 
-  # "Part 3 of 6 · Series name" once breaths can belong to a series. The hook
-  # is any `share_series_line` the post model offers; until then, no line.
+  # "Part 3 of 6 · Series name", counted among the parts everyone may see
+  # (SeriesHelper#series_place). Anonymous breaths are never in a series.
   def series_line
-    post.try(:share_series_line).presence
+    return if post.anonymous? || post.series.nil?
+
+    place = urls.helpers.series_place(post)
+    place && "Part #{place.first} of #{place.last} · #{post.series.title}"
+  rescue StandardError
+    nil
   end
 
   def ref = ShareReferral.ref_for(sharer, post)

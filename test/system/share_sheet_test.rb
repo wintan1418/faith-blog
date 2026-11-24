@@ -38,17 +38,16 @@ class ShareSheetTest < ApplicationSystemTestCase
     visit post_path(@post)
     open_from_menu "Snapshot for status"
 
-    find("dialog.share-sheet [data-format=story]").click
-    assert_equal [ [ 1080, 1920 ] ], canvas_sizes
-    find("dialog.share-sheet [data-format=square]").click
-    assert_selector "dialog.share-sheet [data-format=square][aria-checked=true]"
-    assert_equal [ [ 1080, 1080 ] ], canvas_sizes
-    find("dialog.share-sheet [data-format=portrait]").click
-    assert_selector "dialog.share-sheet [data-format=portrait][aria-checked=true]"
-    assert_equal [ [ 1080, 1350 ] ], canvas_sizes
+    find("dialog.share-sheet [data-theme-choice=light]").click
+    { "story" => [ 1080, 1920 ], "square" => [ 1080, 1080 ], "portrait" => [ 1080, 1350 ] }.each do |format, size|
+      find("dialog.share-sheet [data-format=#{format}]").click
+      assert_selector "dialog.share-sheet [data-format=#{format}][aria-checked=true]"
+      assert_selector "dialog.share-sheet .share-sheet-stage[data-preview-format=#{format}][data-preview-theme=light]"
+      assert_equal [ size ], canvas_sizes
+    end
 
     find("dialog.share-sheet [data-theme-choice=dark]").click
-    assert_selector "dialog.share-sheet [data-theme-choice=dark][aria-checked=true]"
+    assert_selector "dialog.share-sheet .share-sheet-stage[data-preview-theme=dark][data-preview-format=portrait]"
     corner = page.evaluate_script(%(Array.from(document.querySelector("dialog.share-sheet canvas").getContext("2d").getImageData(4, 4, 1, 1).data)))
     assert_operator corner[0..2].sum, :<, 120, "the dark card has a dark frame"
     assert_selector "[data-testid=share-download]:not([disabled])"

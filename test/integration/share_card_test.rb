@@ -147,6 +147,15 @@ class ShareCardTest < ActionDispatch::IntegrationTest
     assert_equal [ replies[0].id, replies[1].id ], data["replies"].map { _1["id"] }
   end
 
+  test "a breath in a series says which part it is" do
+    series = @author.series.create!(title: "Who Is a Teenager?")
+    parts = (1..3).map do |i|
+      Post.create!(user: @author, title: "Who Is a Teenager? (#{i})", content: "Part #{i}.", status: :published,
+                   moderation_status: :approved, published_at: 1.hour.ago, series: series)
+    end
+    assert_equal "Part 2 of 3 · Who Is a Teenager?", card(parts.second)["series"]
+  end
+
   test "QR codes are only made for this site's own addresses" do
     get share_qr_path(url: "http://www.example.com/series/abc?ref=card_sharer")
     assert_response :success
