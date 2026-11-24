@@ -1,0 +1,36 @@
+<%# Breath filters: all in the URL (GET form), so a filtered search can be shared. %>
+<%= form_with url: search_path, method: :get, class: "srch-filters",
+              data: { controller: "search-filters", turbo_action: "advance" }, aria: { label: "Filter breaths" } do %>
+  <%= hidden_field_tag :q, @query.text, id: nil %>
+  <%= hidden_field_tag :tab, "breaths", id: nil %>
+  <label class="srch-filter">
+    <span class="srch-filter-label">Room</span>
+    <%= select_tag :room, options_for_select([ [ "Any room", "" ] ] + @rooms_for_filter.map { |r| [ r.name, r.slug ] }, params[:room]),
+                   class: "srch-select", data: { action: "change->search-filters#submit" } %>
+  </label>
+  <label class="srch-filter">
+    <span class="srch-filter-label">Date</span>
+    <%= select_tag :date, options_for_select([ [ "Any time", "" ], [ "Past week", "week" ], [ "Past month", "month" ], [ "Past year", "year" ] ], params[:date]),
+                   class: "srch-select", data: { action: "change->search-filters#submit" } %>
+  </label>
+  <label class="srch-filter">
+    <span class="srch-filter-label">Type</span>
+    <%= select_tag :type, options_for_select([ [ "Everything", "" ], [ "Text only", "text" ], [ "With photos", "photo" ], [ "Voice notes", "voice" ] ], params[:type]),
+                   class: "srch-select", data: { action: "change->search-filters#submit" } %>
+  </label>
+  <label class="srch-filter">
+    <span class="srch-filter-label">Sort</span>
+    <%= select_tag :sort, options_for_select([ [ "Best match", "" ], [ "Newest", "newest" ], [ "Most loved", "loved" ] ], params[:sort]),
+                   class: "srch-select", data: { action: "change->search-filters#submit" } %>
+  </label>
+  <label class="srch-filter">
+    <span class="srch-filter-label">From</span>
+    <%= text_field_tag :from, params[:from].presence || (@query.from_username && "@#{@query.from_username}"), placeholder: "@username",
+                       class: "srch-select srch-from", autocomplete: "off", spellcheck: false,
+                       data: { action: "change->search-filters#submit" } %>
+  </label>
+  <noscript><button type="submit" class="srch-submit">Apply</button></noscript>
+  <% if filters_active? || params[:sort].present? %>
+    <%= link_to "Clear filters", search_path(q: @query.text.gsub(SiteSearch::Query::FROM, " ").squish, tab: "breaths"), class: "srch-filter-clear" %>
+  <% end %>
+<% end %>

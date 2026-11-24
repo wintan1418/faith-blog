@@ -1,0 +1,6 @@
+<% if @resources.empty? %>
+  <%= render "search/no_results" %>
+<% else %>
+  <p class="srch-count" role="status"><%= pluralize(@resources.size, "resource") %> for “<%= @query.text %>”</p>
+  <%= render "search/resources", resources: @resources %>
+<% end %>

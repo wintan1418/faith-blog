@@ -1,0 +1,25 @@
+<% if @reference.nil? && @verses.empty? %>
+  <%= render "search/no_results" %>
+<% else %>
+  <% if @reference %>
+    <%= link_to scripture_page_path(@reference.slug), class: "srch-panel srch-bible-card" do %>
+      <span class="srch-panel-ico"><%= render_icon("bookopen", classes: "w-5 h-5") %></span>
+      <span>
+        <span class="srch-kicker">Go to</span>
+        <strong class="srch-panel-title"><%= @reference %></strong>
+      </span>
+    <% end %>
+  <% end %>
+  <% if @verses.any? %>
+    <p class="srch-count" role="status"><%= pluralize(@verses.size, "verse") %> (KJV) for “<%= @query.plain_text %>”</p>
+    <div class="srch-list">
+      <% words = @query.words.flat_map { |w| w.scan(SiteSearch::Query::WORD) }.select { |w| w.length >= 3 } %>
+      <% @verses.each do |verse| %>
+        <%= link_to scripture_page_path(verse.reference.slug), class: "srch-panel srch-verse" do %>
+          <strong class="srch-panel-title"><%= verse.reference %></strong>
+          <span class="srch-panel-sub"><%= words.any? ? highlight(verse.text, words, highlighter: '<mark>\1</mark>') : verse.text %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

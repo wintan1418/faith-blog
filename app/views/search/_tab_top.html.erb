@@ -1,0 +1,84 @@
+<% nothing = @breaths.empty? && @close_matches.blank? && @people.empty? && @rooms.empty? && @reference.nil? && @resources.empty? && @series.empty? %>
+<% if nothing %>
+  <%= render "search/no_results" %>
+<% else %>
+  <% if @reference %>
+    <%= link_to scripture_page_path(@reference.slug), class: "srch-panel srch-bible-card" do %>
+      <span class="srch-panel-ico"><%= render_icon("bookopen", classes: "w-5 h-5") %></span>
+      <span>
+        <span class="srch-kicker">Bible</span>
+        <strong class="srch-panel-title"><%= @reference %></strong>
+        <span class="srch-panel-sub">Read the passage, notes and breaths that quote it</span>
+      </span>
+    <% end %>
+  <% end %>
+
+  <% if @people.any? %>
+    <section class="srch-section" aria-labelledby="srch-top-people">
+      <div class="srch-section-head">
+        <h2 class="srch-section-title" id="srch-top-people">People</h2>
+        <%= link_to "See all", search_path(search_params(tab: "people")), class: "srch-more" %>
+      </div>
+      <div class="srch-people-row">
+        <% @people.each do |user| %>
+          <%= link_to user_path(user.username), class: "srch-person" do %>
+            <%= search_avatar(user, size: "h-10 w-10") %>
+            <span class="srch-person-name">@<%= user.username %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @rooms.any? %>
+    <section class="srch-section" aria-labelledby="srch-top-rooms">
+      <div class="srch-section-head">
+        <h2 class="srch-section-title" id="srch-top-rooms">Rooms</h2>
+        <%= link_to "See all", search_path(search_params(tab: "rooms")), class: "srch-more" %>
+      </div>
+      <%= render "search/rooms", rooms: @rooms %>
+    </section>
+  <% end %>
+
+  <section class="srch-section" aria-labelledby="srch-top-breaths">
+    <div class="srch-section-head">
+      <h2 class="srch-section-title" id="srch-top-breaths">Breaths <span class="srch-section-count"><%= search_result_count(@breaths) %></span></h2>
+      <% if @breaths.total > @breaths.hits.size %>
+        <%= link_to "See all", search_path(search_params(tab: "breaths")), class: "srch-more" %>
+      <% end %>
+    </div>
+    <div class="srch-list">
+      <% @breaths.hits.each do |hit| %>
+        <%= render "search/breath_result", hit: hit %>
+      <% end %>
+    </div>
+    <% if @close_matches.present? %>
+      <h3 class="srch-section-title srch-section-sub">Close matches</h3>
+      <div class="srch-list">
+        <% @close_matches.each do |hit| %>
+          <%= render "search/breath_result", hit: hit %>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+
+  <% if @series.any? %>
+    <section class="srch-section" aria-labelledby="srch-top-series">
+      <div class="srch-section-head">
+        <h2 class="srch-section-title" id="srch-top-series">Series</h2>
+        <%= link_to "See all", search_path(search_params(tab: "series")), class: "srch-more" %>
+      </div>
+      <%= render "search/series", series: @series %>
+    </section>
+  <% end %>
+
+  <% if @resources.any? %>
+    <section class="srch-section" aria-labelledby="srch-top-resources">
+      <div class="srch-section-head">
+        <h2 class="srch-section-title" id="srch-top-resources">Library</h2>
+        <%= link_to "See all", search_path(search_params(tab: "resources")), class: "srch-more" %>
+      </div>
+      <%= render "search/resources", resources: @resources %>
+    </section>
+  <% end %>
+<% end %>

@@ -1,126 +1,74 @@
-<% content_for(:title) { "Search - Brethreign" } %>
+<% content_for(:title) { @query.text.present? ? "#{@query.text} - Search - Brethreign" : "Search - Brethreign" } %>
 
-<div class="mystic-shell">
-  <section class="mystic-hero">
-    <div class="mystic-container max-w-4xl py-12">
-      <div class="text-center">
-        <span class="mystic-kicker mx-auto">
-          <%= render_icon("search", classes: "w-4 h-4") %>
-          Search
-        </span>
-        <h1 class="mystic-title mt-4 text-4xl sm:text-6xl">Discover stories, people, and resources.</h1>
-        <p class="mystic-copy mx-auto mt-4 max-w-2xl text-lg">Search across posts, community members, and library resources.</p>
-      </div>
-
-      <%= form_with url: search_path, method: :get, class: "mx-auto mt-8 max-w-2xl" do %>
-        <div class="relative">
-          <%= render_icon("search", classes: "absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-faith-muted") %>
-          <input type="text" name="q" value="<%= @query %>"
-                 class="input h-14 rounded-full pl-12 pr-28 text-base"
-                 placeholder="Search posts, users, resources..." autofocus>
-          <button type="submit" class="btn btn-primary absolute right-2 top-1/2 -translate-y-1/2">Search</button>
-        </div>
+<div class="srch-page">
+  <header class="srch-head">
+    <h1 class="srch-title">Search</h1>
+    <%= form_with url: search_path, method: :get, class: "srch-form", role: "search",
+                  data: { controller: "search-suggest", search_suggest_url_value: search_suggest_path,
+                          search_suggest_clear_url_value: (user_signed_in? ? search_recent_path : nil),
+                          action: "focusout->search-suggest#focusout", turbo_action: "advance" } do %>
+      <% search_params.except(:q, :page).each do |key, value| %>
+        <%= hidden_field_tag key, value, id: nil %>
       <% end %>
-    </div>
-  </section>
-
-  <div class="mystic-container max-w-4xl py-8">
-    <% if @query.present? %>
-      <div class="mb-8 flex flex-wrap justify-center gap-2">
-        <%= link_to "Posts", search_path(q: @query), class: "px-5 py-2.5 rounded-full text-sm font-bold transition-all #{@result_type == :posts || @result_type.nil? ? 'bg-faith-green text-white' : 'mystic-badge'}" %>
-        <%= link_to "People", search_path(q: @query, type: "users"), class: "px-5 py-2.5 rounded-full text-sm font-bold transition-all #{@result_type == :users ? 'bg-faith-green text-white' : 'mystic-badge'}" %>
-        <%= link_to "Resources", search_path(q: @query, type: "resources"), class: "px-5 py-2.5 rounded-full text-sm font-bold transition-all #{@result_type == :resources ? 'bg-faith-green text-white' : 'mystic-badge'}" %>
+      <div class="srch-box">
+        <%= render_icon("search", classes: "srch-box-ico") %>
+        <input type="search" name="q" value="<%= @query.text %>" autocomplete="off" spellcheck="false"
+               class="srch-input" placeholder="Search breaths, people, rooms, the Bible…"
+               aria-label="Search Brethreign" role="combobox" aria-autocomplete="list" aria-expanded="false"
+               aria-controls="srch-page-listbox" enterkeyhint="search"
+               <%= "autofocus" if @query.text.blank? %>
+               data-search-suggest-target="input"
+               data-action="input->search-suggest#input keydown->search-suggest#keydown focus->search-suggest#focus click->search-suggest#focus">
+        <button type="submit" class="srch-submit">Search</button>
       </div>
-
-      <% if @results&.any? %>
-        <p class="mb-6 text-center text-sm font-semibold text-faith-muted">
-          Found <span class="text-faith-dark"><%= @results.count %></span> results for "<span class="text-faith-dark"><%= @query %></span>"
-        </p>
-
-        <% case @result_type %>
-        <% when :posts, nil %>
-          <div class="space-y-5">
-            <% @results.each do |post| %>
-              <%= render "posts/card", post: post %>
-            <% end %>
-          </div>
-        <% when :users %>
-          <div class="space-y-4">
-            <% @results.each do |user| %>
-              <div class="mystic-panel flex items-center gap-4 p-5">
-                <% if user.profile.avatar.attached? %>
-                  <%= image_tag avatar_src(user.profile, 160), class: "mystic-avatar h-16 w-16 object-cover" %>
-                <% else %>
-                  <span class="mystic-avatar mystic-avatar-fallback grid h-16 w-16 place-items-center text-xl font-bold">
-                    <%= user.username.first.upcase %>
-                  </span>
-                <% end %>
-                <div class="min-w-0 flex-1">
-                  <%= link_to user.display_name.presence || user.username, user_path(user.username), class: "text-lg font-bold text-faith-dark hover:text-faith-green" %>
-                  <p class="text-sm font-semibold text-faith-muted">@<%= user.username %></p>
-                  <% if user.profile.bio.present? %>
-                    <p class="mystic-copy mt-1 line-clamp-2 text-sm"><%= user.profile.bio %></p>
-                  <% end %>
-                </div>
-                <% if user_signed_in? && user != current_user %>
-                  <% if current_user.following?(user) %>
-                    <%= button_to "Following", unfollow_user_path(user.username), method: :delete, class: "btn btn-secondary" %>
-                  <% else %>
-                    <%= button_to "Follow", follow_user_path(user.username), class: "btn btn-primary" %>
-                  <% end %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        <% when :resources %>
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <% @results.each do |resource| %>
-              <%= link_to resources_item_path(resource), class: "mystic-card-link mystic-panel p-5" do %>
-                <div class="mb-4 flex items-start justify-between gap-4">
-                  <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white/75 text-faith-green">
-                    <%= render_icon(resource.type_icon, classes: "w-6 h-6") %>
-                  </span>
-                  <span class="mystic-badge px-3 py-1"><%= resource.resource_type.titleize %></span>
-                </div>
-                <h3 class="text-lg font-bold text-faith-dark"><%= resource.title %></h3>
-                <p class="mystic-copy mt-2 line-clamp-3 text-sm"><%= resource.description %></p>
-                <p class="mt-4 text-xs font-bold uppercase tracking-wide text-faith-muted"><%= resource.resource_category.name %></p>
-              <% end %>
-            <% end %>
-          </div>
-        <% end %>
-
-        <% if @pagy&.pages.to_i > 1 %>
-          <div class="mt-8">
-            <%== pagy_nav(@pagy) %>
-          </div>
-        <% end %>
-      <% else %>
-        <div class="mystic-panel p-12 text-center">
-          <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-white/75 text-faith-green">
-            <%= render_icon("search", classes: "w-8 h-8") %>
-          </div>
-          <h2 class="text-xl font-bold text-faith-dark">No results found</h2>
-          <p class="mystic-copy mt-2">We could not find anything matching "<%= @query %>".</p>
-          <div class="mt-6 flex justify-center gap-3">
-            <%= link_to "Browse Rooms", rooms_path, class: "btn btn-secondary" %>
-            <%= link_to "Explore Feed", feed_path, class: "btn btn-primary" %>
-          </div>
-        </div>
-      <% end %>
-    <% else %>
-      <div class="mystic-panel p-12 text-center">
-        <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-white/75 text-faith-green">
-          <%= render_icon("search", classes: "w-8 h-8") %>
-        </div>
-        <h2 class="text-xl font-bold text-faith-dark">What are you looking for?</h2>
-        <p class="mystic-copy mx-auto mt-2 max-w-md">Try a topic, username, resource title, or room theme.</p>
-        <div class="mt-6 flex flex-wrap justify-center gap-2">
-          <% %w[testimony prayer faith hope healing worship].each do |tag| %>
-            <%= link_to "##{tag}", search_path(q: tag), class: "mystic-badge px-4 py-2" %>
-          <% end %>
-        </div>
-      </div>
+      <div id="srch-page-listbox" class="srch-dd" role="listbox" aria-label="Suggestions" hidden data-search-suggest-target="panel"></div>
     <% end %>
-  </div>
+    <p class="srch-tips">
+      Tips: <code>"exact phrase"</code> · <code>-word</code> to leave out · <code>from:username</code>
+    </p>
+  </header>
+
+  <% if @query.text.present? %>
+    <nav class="srch-tabs" aria-label="What to search">
+      <%= search_tab_link("top", "Top", @tab) %>
+      <%= search_tab_link("breaths", "Breaths", @tab) %>
+      <%= search_tab_link("people", "People", @tab) %>
+      <%= search_tab_link("rooms", "Rooms", @tab) %>
+      <%= search_tab_link("series", "Series", @tab) %>
+      <%= search_tab_link("bible", "Bible", @tab) %>
+      <%= search_tab_link("resources", "Resources", @tab) %>
+    </nav>
+
+    <% if @tab == "breaths" %>
+      <% active = %i[room from date type sort].count { |k| params[k].present? } + (@query.from_username && params[:from].blank? ? 1 : 0) %>
+      <details class="srch-filters-wrap" <%= "open" if active.positive? %>>
+        <summary class="srch-filters-toggle">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg> Filters<%= " (#{active})" if active.positive? %>
+        </summary>
+        <%= render "search/filters" %>
+      </details>
+    <% end %>
+
+    <% if @suggestion %>
+      <p class="srch-didyoumean">
+        Did you mean
+        <%= link_to @suggestion, search_path(search_params(q: [ @suggestion, (@query.from_username && "from:#{@query.from_username}") ].compact.join(" "), page: nil)), class: "srch-didyoumean-link" %>?
+      </p>
+    <% end %>
+
+    <div class="srch-results">
+      <%= render "search/tab_#{@tab}" %>
+    </div>
+  <% else %>
+    <div class="srch-empty">
+      <span class="srch-empty-ico"><%= render_icon("search", classes: "w-7 h-7") %></span>
+      <h2 class="srch-empty-title">What are you looking for?</h2>
+      <p class="srch-empty-copy">Find breaths, people, rooms, a Bible verse (try “John 3 16”) or something from the library.</p>
+      <div class="srch-chips">
+        <% %w[testimony prayer faith hope healing worship].each do |word| %>
+          <%= link_to word, search_path(q: word), class: "srch-chip" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 </div>

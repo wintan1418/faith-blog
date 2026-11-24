@@ -2,7 +2,6 @@
 
 class Post < ApplicationRecord
   extend FriendlyId
-  include PgSearch::Model
   include Mentionable
   include AttachmentValidatable
   include SearchIndexable
@@ -126,29 +125,10 @@ class Post < ApplicationRecord
   validate :series_belongs_to_author
   before_save :place_in_series, if: :will_save_change_to_series_id?
 
-  # Search. `searchable` is a stored tsvector of the title + plain-text body
-  # (GIN-indexed), refreshed by #refresh_search_vector whenever either changes.
-  # Kept out of SELECT * so feed queries don't carry it around.
-  self.ignored_columns += [ "searchable" ]
-  SEARCH_VECTOR_SQL = "searchable = to_tsvector('english', coalesce(?, '') || ' ' || coalesce(?, ''))"
-
-  pg_search_scope :search,
-                  against: [ :title ],
-                  using: {
-                    tsearch: { prefix: true, dictionary: "english", tsvector_column: "searchable" }
-                  }
-
-  after_save :refresh_search_vector, if: :search_text_changed?
-
-  def search_text_changed?
-    return true if saved_change_to_id? || saved_change_to_title?
-
-    association(:rich_text_content).loaded? && rich_text_content&.saved_change_to_body?
-  end
-
-  def refresh_search_vector
-    self.class.where(id: id).update_all([ SEARCH_VECTOR_SQL, title, content&.to_plain_text.to_s ])
-  end
+  # Search vectors (`searchable`, `search_title`) are written by database
+  # triggers (SiteSearch::Schema) and read by SiteSearch::PostSearch. Kept out
+  # of SELECT * so feed queries don't carry them around.
+  self.ignored_columns += %w[searchable search_title]
 
   # Everything `posts/_card` touches, so a page of cards is a fixed number of
   # queries instead of ~10 per post (author + avatar blob, images, voice note,

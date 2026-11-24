@@ -1,0 +1,12 @@
+<div class="srch-grid">
+  <% resources.each do |resource| %>
+    <%= link_to resources_item_path(resource), class: "srch-panel" do %>
+      <span class="srch-panel-ico"><%= render_icon(resource.type_icon, classes: "w-5 h-5") %></span>
+      <span class="min-w-0">
+        <strong class="srch-panel-title"><%= resource.title %></strong>
+        <span class="srch-panel-sub line-clamp-2"><%= resource.description %></span>
+        <span class="srch-kicker"><%= resource.resource_type.to_s.titleize %> · <%= resource.resource_category&.name %></span>
+      </span>
+    <% end %>
+  <% end %>
+</div>

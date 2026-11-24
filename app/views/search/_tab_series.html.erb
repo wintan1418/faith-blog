@@ -1,0 +1,6 @@
+<% if @series.empty? %>
+  <%= render "search/no_results" %>
+<% else %>
+  <p class="srch-count" role="status"><%= pluralize(@series.size, "series") %> for “<%= @query.text %>”</p>
+  <%= render "search/series", series: @series %>
+<% end %>

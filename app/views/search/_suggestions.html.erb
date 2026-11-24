@@ -1,0 +1,83 @@
+<%#
+  The search box's dropdown (SearchController#suggest). Every choice is a
+  role="option" link with a unique id; the Stimulus controller moves through
+  them with the arrow keys.
+%>
+<% n = 0 %>
+<% opt = ->(prefix) { "srch-opt-#{prefix}-#{n += 1}" } %>
+<% if @query.blank? || @query.text.length < 2 %>
+  <% if @recent.present? %>
+    <div class="srch-dd-head">
+      <span id="srch-dd-recent">Recent searches</span>
+      <button type="button" class="srch-dd-clear" data-action="search-suggest#clearRecent">Clear</button>
+    </div>
+    <div role="group" aria-labelledby="srch-dd-recent">
+      <% @recent.each do |recent| %>
+        <%= link_to search_path(q: recent.query), id: opt.("recent"), role: "option", aria: { selected: false },
+                    class: "srch-dd-item", data: { query: recent.query, action: "click->search-suggest#pick" } do %>
+          <%= render_icon("clock", classes: "srch-dd-ico") %>
+          <span class="srch-dd-main"><%= recent.query %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="srch-dd-hint" data-search-suggest-empty>Search breaths, people, rooms and the Bible.</p>
+  <% end %>
+<% else %>
+  <% if @reference %>
+    <%= link_to scripture_page_path(@reference.slug), id: opt.("bible"), role: "option", aria: { selected: false },
+                class: "srch-dd-item", data: { action: "click->search-suggest#pick" } do %>
+      <%= render_icon("bookopen", classes: "srch-dd-ico") %>
+      <span class="srch-dd-main">Read <strong><%= @reference %></strong></span>
+      <span class="srch-dd-kind">Bible</span>
+    <% end %>
+  <% end %>
+
+  <% if @people.present? %>
+    <div role="group" aria-labelledby="srch-dd-people">
+      <p class="srch-dd-label" id="srch-dd-people">People</p>
+      <% @people.each do |user| %>
+        <%= link_to user_path(user.username), id: opt.("person"), role: "option", aria: { selected: false },
+                    class: "srch-dd-item", data: { action: "click->search-suggest#pick" } do %>
+          <%= search_avatar(user, size: "h-7 w-7", text: "text-xs") %>
+          <span class="srch-dd-main">@<%= user.username %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @rooms.present? %>
+    <div role="group" aria-labelledby="srch-dd-rooms">
+      <p class="srch-dd-label" id="srch-dd-rooms">Rooms</p>
+      <% @rooms.each do |room| %>
+        <%= link_to room_path(room), id: opt.("room"), role: "option", aria: { selected: false },
+                    class: "srch-dd-item", data: { action: "click->search-suggest#pick" } do %>
+          <%= render_icon("users", classes: "srch-dd-ico") %>
+          <span class="srch-dd-main"><%= room.name %></span>
+          <% unless room.is_public? %><span class="srch-dd-kind">Private</span><% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @breaths.present? %>
+    <div role="group" aria-labelledby="srch-dd-breaths">
+      <p class="srch-dd-label" id="srch-dd-breaths">Breaths</p>
+      <% @breaths.each do |hit| %>
+        <% post = hit.post %>
+        <%= link_to post_path(post), id: opt.("breath"), role: "option", aria: { selected: false },
+                    class: "srch-dd-item", data: { action: "click->search-suggest#pick" } do %>
+          <%= render_icon("feed", classes: "srch-dd-ico") %>
+          <span class="srch-dd-main srch-dd-clamp"><%= search_breath_label(post, length: 70) %></span>
+          <span class="srch-dd-kind"><%= (author = search_breath_author(post)) ? "@#{author.username}" : "Anonymous" %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= link_to search_path(q: @query.text), id: opt.("all"), role: "option", aria: { selected: false },
+              class: "srch-dd-item srch-dd-all", data: { action: "click->search-suggest#pick" } do %>
+    <%= render_icon("search", classes: "srch-dd-ico") %>
+    <span class="srch-dd-main">Search for “<%= @query.text %>”</span>
+  <% end %>
+<% end %>
