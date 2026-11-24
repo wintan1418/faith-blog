@@ -1,0 +1,39 @@
+<%# Share a series: the same share menu as a breath (share_controller.js), with
+    the series' address and words. A signed-in member's link carries ?ref=
+    so a friend who joins from it is counted as their invite.
+    Locals: series, parts (the public parts), label (optional). %>
+<%
+  ref = current_user&.username if user_signed_in? && current_user.can_invite_by_link?
+  share_url = series_url(series, ref: ref.presence)
+  snippet = [ series.description.presence,
+              parts.first(6).each_with_index.map { |p, i| "#{p.series_position || i + 1}. #{series_part_title(p, length: 80)}" }.join("\n") ]
+            .compact.join("\n\n").truncate(1500)
+  swatch = AccentPalette.for(series.user&.accent_color)
+%>
+<div class="fc-share sr-share" data-controller="share"
+     data-share-url-value="<%= share_url %>"
+     data-share-title-value="<%= series.title %> · <%= pluralize(parts.size, "part") %>"
+     data-share-author-value="<%= series.user.username %>"
+     data-share-snippet-value="<%= snippet %>"
+     data-share-image-value=""
+     data-share-accent-value="<%= swatch[:accent] %>"
+     data-share-accent-deep-value="<%= swatch[:accent_2] %>">
+  <button type="button" class="sr-btn sr-share-btn" data-action="click->share#toggle" aria-label="Share this series" title="Share">
+    <%= render_icon("send", classes: "sr-btn-icon") %>
+    <span><%= local_assigns[:label] || "Share" %></span>
+  </button>
+
+  <div data-share-target="menu" class="fc-share-menu hidden" role="menu">
+    <button type="button" data-action="click->share#nativeShare" role="menuitem" class="hidden" data-share-target="nativeItem">Share to WhatsApp, X, more…</button>
+    <button type="button" data-action="click->share#copyLink" role="menuitem">Copy link</button>
+    <button type="button" data-action="click->share#whatsapp" role="menuitem" data-share-target="webItem">Send to WhatsApp</button>
+    <button type="button" data-action="click->share#twitter"  role="menuitem" data-share-target="webItem">Share on X</button>
+    <button type="button" data-action="click->share#email"    role="menuitem" data-share-target="webItem">Email</button>
+    <hr class="fc-share-divider">
+    <button type="button" data-action="click->share#snapshot" role="menuitem" class="fc-share-snap">
+      Snapshot for status
+    </button>
+  </div>
+
+  <div data-share-target="toast" class="fc-share-toast hidden"></div>
+</div>

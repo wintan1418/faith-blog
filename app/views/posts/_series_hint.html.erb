@@ -1,0 +1,8 @@
+<%# Filled in by series-picker when the title looks like the next part of
+    something this writer already posted ("(Part 4)", "#3", "Day 2"). %>
+<div class="eg-cmp-series-hint hidden" data-series-picker-target="hint" aria-live="polite">
+  <%= render_icon("library", classes: "eg-cmp-series-hint-icon") %>
+  <span class="eg-cmp-series-hint-text" data-series-picker-target="hintText"></span>
+  <button type="button" class="eg-cmp-series-hint-add" data-action="series-picker#accept">Add</button>
+  <button type="button" class="eg-cmp-chip-remove" data-action="series-picker#dismiss" aria-label="Not now"><%= render_icon("x", classes: "h-4 w-4") %></button>
+</div>

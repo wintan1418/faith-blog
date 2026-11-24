@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # /sitemap.xml is a sitemap index: /sitemaps/pages.xml (breaths, rooms,
-# resources, blog) and /sitemaps/scripture-N.xml (every scripture page we
+# series, resources, blog) and /sitemaps/scripture-N.xml (every scripture page we
 # want found: all 1,189 chapters, the most-searched verses, verses members
 # quote, and every page with a written insight). Split so no file nears the
 # 50,000-URL limit.
@@ -22,6 +22,7 @@ class SitemapsController < ApplicationController
     @posts = Post.published.where(room_id: [ nil, *Room.public_rooms.select(:id) ])
                  .order(published_at: :desc).limit(POSTS_LIMIT).select(:id, :slug, :updated_at)
     @rooms = Room.public_rooms.select(:id, :slug, :updated_at)
+    @series = Series.publicly_listed.select(:id, :slug, :updated_at)
     @resources = Resource.approved.select(:id, :slug, :updated_at)
 
     expires_in 1.hour, public: true

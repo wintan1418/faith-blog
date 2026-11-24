@@ -49,6 +49,9 @@ application.register("composer-modal", ComposerModalController)
 import ComposerModeController from "./composer_mode_controller"
 application.register("composer-mode", ComposerModeController)
 
+import DetailsWideController from "./details_wide_controller"
+application.register("details-wide", DetailsWideController)
+
 import DiscoverController from "./discover_controller"
 application.register("discover", DiscoverController)
 
@@ -210,6 +213,9 @@ application.register("scroll-progress", ScrollProgressController)
 
 import ScrollTopController from "./scroll_top_controller"
 application.register("scroll-top", ScrollTopController)
+
+import SeriesPickerController from "./series_picker_controller"
+application.register("series-picker", SeriesPickerController)
 
 import ShareController from "./share_controller"
 application.register("share", ShareController)

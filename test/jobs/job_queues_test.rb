@@ -9,7 +9,7 @@ class JobQueuesTest < ActiveSupport::TestCase
     "realtime"   => %w[PushNotificationJob MessageModerationJob],
     "moderation" => %w[AiModerationGateJob AiModerationReviewJob AvatarModerationJob PortfolioModerationJob ModerationBacklogSweepJob],
     "default"    => %w[BadgeCheckJob WelcomeNoteJob ErrorAlertJob AppleTokenRevokeJob ScheduledPostPublisherJob SiteHealthCheckJob OfficeReplyJob
-                       IndexNowFlushJob SearchConsoleRefreshJob],
+                       IndexNowFlushJob SearchConsoleRefreshJob SeriesPartAlertJob],
     "bulk"       => %w[WeeklyDigestFanoutJob BroadcastFanoutJob BotsRefreshJob BibleQuizWarmPoolJob BibleQuizTopUpJob
                        AnalyticsCleanupJob BreathFanoutJob BirthdayNotificationsJob AppUpdateReminderJob
                        SearchIndexingNightlyJob ScriptureInsightJob]

@@ -1,0 +1,140 @@
+<% author = @series.user %>
+<% author_name = author.display_name.presence || author.username %>
+<% public_parts = @parts.select(&:series_listable?) %>
+<% page_title = "#{@series.title} · a series by #{author_name}" %>
+<% share_title = "#{@series.title} · #{pluralize(public_parts.size, 'part')} by #{author.username}" %>
+<% summary = @series.description.presence ||
+             "A #{public_parts.size}-part series by #{author_name} on Brethreign: #{public_parts.first(3).map { |p| series_part_title(p, length: 60) }.join(' · ')}" %>
+<% content_for(:title) { "#{page_title} - Brethreign" } %>
+<% content_for(:meta_description) { summary.truncate(200) } %>
+<% content_for(:og_title) { share_title } %>
+<% if (cover_part = public_parts.find(&:has_images?)) %>
+  <% og = resized_image_src(cover_part.images.first, width: 1200, height: 630, crop: "fill", gravity: "auto") %>
+  <% content_for(:og_image) { og.is_a?(String) && og.start_with?("http") ? og : "#{request.base_url}#{url_for(cover_part.images.first)}" } %>
+<% end %>
+<% content_for(:og_description) { summary.truncate(200) } %>
+<% content_for(:og_url) { series_url(@series) } %>
+<% content_for(:canonical) { series_url(@series) } %>
+<% content_for(:og_accent) { author.accent_color } %>
+<% if public_parts.any? %>
+  <% content_for(:structured_data) do %>
+    <script type="application/ld+json"><%= raw({
+      "@context" => "https://schema.org", "@type" => "CreativeWorkSeries",
+      "name" => @series.title, "description" => summary.truncate(200), "url" => series_url(@series),
+      "author" => { "@type" => "Person", "name" => author_name, "url" => user_url(author.username) },
+      "hasPart" => public_parts.map { |p| { "@type" => "DiscussionForumPosting", "headline" => series_part_title(p, length: 110), "url" => post_url(p) } }
+    }.to_json) %></script>
+  <% end %>
+<% end %>
+
+<div class="sr-page">
+  <header class="sr-hero">
+    <p class="sr-kicker"><%= render_icon("library", classes: "sr-kicker-icon") %>Series · <%= pluralize(@parts.size, "part") %></p>
+    <h1 class="sr-hero-title"><%= @series.title %></h1>
+    <% if @series.description.present? %>
+      <p class="sr-hero-copy"><%= @series.description %></p>
+    <% end %>
+    <%= link_to user_path(author.username), class: "sr-byline" do %>
+      <% if author.profile&.avatar&.attached? %>
+        <%= image_tag avatar_src(author.profile), class: "sr-byline-avatar", alt: "" %>
+      <% else %>
+        <span class="sr-byline-avatar" style="<%= avatar_tint_style(author.username) %>" aria-hidden="true"><%= author.username.first.upcase %></span>
+      <% end %>
+      <span>by <strong><%= author_name %></strong> <span class="sr-byline-handle">@<%= author.username %></span></span>
+    <% end %>
+    <div class="sr-actions" data-guest-gate-allow>
+      <%= render "series/follow_button", series: @series %>
+      <%= render "series/share_button", series: @series, parts: public_parts %>
+      <span class="sr-followers"><%= pluralize(@follower_count, "follower") %></span>
+    </div>
+  </header>
+
+  <% unless user_signed_in? %>
+    <section class="sr-join" aria-labelledby="series-join-title" data-guest-gate-allow>
+      <% if @sharer %>
+        <p class="sr-join-credit">
+          <% if @sharer.profile&.avatar&.attached? %>
+            <%= image_tag avatar_src(@sharer.profile), class: "sr-join-avatar", alt: "" %>
+          <% end %>
+          <span><strong><%= @sharer.display_name.presence || @sharer.username %></strong> shared this series with you</span>
+        </p>
+      <% end %>
+      <h2 class="sr-join-title" id="series-join-title">Join Brethreign to follow this series</h2>
+      <p class="sr-join-copy">Get word when <%= author_name %> posts the next part, and join kind conversations about work, life and faith.</p>
+      <div class="sr-join-actions">
+        <%= button_to "Join and follow", series_follow_path(@series), class: "sr-btn is-primary", form_class: "sr-follow-form" %>
+        <%= link_to "I have an account", new_user_session_path, class: "sr-join-signin" %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @author %>
+    <details class="sr-manage">
+      <summary class="sr-manage-toggle"><%= render_icon("settings", classes: "sr-manage-icon") %>Edit series</summary>
+      <%= form_with model: @series, url: series_path(@series), method: :patch, class: "sr-manage-form" do |f| %>
+        <%= f.label :title, "Name", class: "sr-label" %>
+        <%= f.text_field :title, maxlength: Series::TITLE_MAX, required: true, class: "sr-input" %>
+        <%= f.label :description, "Short description (optional)", class: "sr-label" %>
+        <%= f.text_area :description, maxlength: Series::DESCRIPTION_MAX, rows: 2, class: "sr-input",
+                        placeholder: "What the series is about, in a line or two" %>
+        <div class="sr-manage-actions">
+          <%= f.submit "Save", class: "sr-btn is-primary" %>
+        </div>
+      <% end %>
+      <%= button_to "Delete series", series_path(@series), method: :delete, class: "sr-btn is-danger",
+                    form_class: "sr-delete-form",
+                    data: { turbo_confirm: "Delete this series? Its breaths stay; they just won't be grouped any more." } %>
+      <p class="sr-manage-note">Part numbers are yours: a part you haven't posted stays a gap. The arrows swap a part with its neighbour. Removing a part only takes it out of the series. To add a breath, open it, choose Edit and pick this series under “Part of a series”.</p>
+    </details>
+  <% end %>
+
+  <% if @parts.empty? %>
+    <div class="sr-empty">
+      <p>No parts in this series yet. Add a breath to it from the composer or a breath's Edit page.</p>
+    </div>
+  <% else %>
+    <ol class="sr-list">
+      <% @parts.each_with_index do |part, i| %>
+        <li class="sr-item" id="part-<%= part.id %>">
+          <% number = part.series_position || i + 1 %>
+          <span class="sr-item-num" aria-hidden="true"><%= number %></span>
+          <div class="sr-item-main">
+            <p class="sr-item-kicker">Part <%= number %>
+              <% if (when_at = part.published_at || part.created_at) %>
+                · <time datetime="<%= when_at.iso8601 %>"><%= when_at.strftime("%b %-d, %Y") %></time>
+              <% end %>
+              · <%= part.reading_time %> min read
+              <% if @author && (reason = series_part_private_reason(part)) %>
+                <span class="sr-only-you" title="Only you can see this part here"><%= reason %></span>
+              <% end %>
+            </p>
+            <h2 class="sr-item-title"><%= link_to series_part_title(part), post_path(part) %></h2>
+            <% if part.display_title %>
+              <p class="sr-item-excerpt"><%= truncate(part.content&.to_plain_text.to_s.squish, length: 180, separator: " ") %></p>
+            <% end %>
+          </div>
+          <% if @author %>
+            <div class="sr-item-tools">
+              <%= button_to move_series_part_path(@series, part, direction: "up"), method: :patch, class: "sr-tool",
+                            disabled: i.zero?, form_class: "sr-tool-form",
+                            aria: { label: "Move part #{number} up" }, title: "Move up" do %>
+                <%= render_icon("arrowup", classes: "sr-tool-icon") %>
+              <% end %>
+              <%= button_to move_series_part_path(@series, part, direction: "down"), method: :patch, class: "sr-tool",
+                            disabled: i == @parts.size - 1, form_class: "sr-tool-form",
+                            aria: { label: "Move part #{number} down" }, title: "Move down" do %>
+                <%= render_icon("arrowdown", classes: "sr-tool-icon") %>
+              <% end %>
+              <%= button_to series_part_path(@series, part), method: :delete, class: "sr-tool is-remove",
+                            form_class: "sr-tool-form",
+                            aria: { label: "Remove part #{number} from the series" }, title: "Remove from series",
+                            data: { turbo_confirm: "Take this breath out of the series? The breath itself stays." } do %>
+                <%= render_icon("x", classes: "sr-tool-icon") %>
+              <% end %>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ol>
+  <% end %>
+</div>

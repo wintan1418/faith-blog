@@ -78,6 +78,9 @@
         <% if post.threaded? %>
           <span class="eg-post-flag eg-sub-item" title="Open thread"><%= render_icon("thread", classes: "eg-flag-ico") %>Thread</span>
         <% end %>
+        <% if (series_label = series_part_label(post)) %>
+          <%= link_to series_path(post.series), class: "eg-post-flag is-series eg-sub-item", title: post.series.title do %><%= render_icon("library", classes: "eg-flag-ico") %><%= series_label %><% end %>
+        <% end %>
       </span>
     </div>
 

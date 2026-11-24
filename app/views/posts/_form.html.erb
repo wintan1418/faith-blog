@@ -1,7 +1,9 @@
 <%= form_with model: post,
               class: "space-y-6",
               data: {
-                controller: "post-form composer-assistant",
+                controller: "post-form composer-assistant series-picker",
+                series_picker_url_value: series_suggestion_posts_path,
+                series_picker_post_id_value: post.id,
                 composer_assistant_gentleness_url_value: check_gentleness_posts_path,
                 composer_assistant_scripture_url_value:  suggest_scripture_posts_path
               } do |f| %>
@@ -34,7 +36,13 @@
 
   <div>
     <%= f.label :title, class: "label" %>
-    <%= f.text_field :title, class: "input", placeholder: "Give your post a meaningful title..." %>
+    <%= f.text_field :title, class: "input", placeholder: "Give your post a meaningful title...",
+                     data: { action: "input->series-picker#titleChanged" } %>
+    <div class="eg-cmp mt-2"><%= render "posts/series_hint" %></div>
+  </div>
+
+  <div class="eg-cmp eg-cmp-series-standalone">
+    <%= render "posts/series_field", post: post %>
   </div>
 
   <div data-controller="emoji-picker">

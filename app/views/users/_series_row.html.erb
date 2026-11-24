@@ -1,0 +1,17 @@
+<%# The member's series, above their breaths. Locals: series_list, counts. %>
+<% series_list = Array(series_list) %>
+<% if series_list.any? %>
+  <section class="sr-profile" aria-labelledby="profile-series-title">
+    <h2 class="sr-profile-title" id="profile-series-title"><%= render_icon("library", classes: "sr-profile-icon") %>Series</h2>
+    <ul class="sr-profile-list">
+      <% series_list.each do |series| %>
+        <li>
+          <%= link_to series_path(series), class: "sr-profile-item" do %>
+            <span class="sr-profile-name"><%= series.title %></span>
+            <span class="sr-profile-count"><%= pluralize(counts[series.id].to_i, "part") %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>

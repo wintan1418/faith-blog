@@ -1,0 +1,16 @@
+<%# Follow / Following for a series. The writer sees nothing; a signed-out
+    visitor's tap goes through sign-up and comes back following.
+    Locals: series. %>
+<% unless series.author?(current_user) %>
+  <% if user_signed_in? && series.followed_by?(current_user) %>
+    <%= button_to series_follow_path(series), method: :delete, class: "sr-btn sr-follow is-following",
+                  form_class: "sr-follow-form", aria: { pressed: true }, title: "Stop following" do %>
+      <%= render_icon("check", classes: "sr-btn-icon") %><span>Following</span>
+    <% end %>
+  <% else %>
+    <%= button_to series_follow_path(series), class: "sr-btn sr-follow is-primary", form_class: "sr-follow-form",
+                  aria: { pressed: false } do %>
+      <%= render_icon("plus", classes: "sr-btn-icon") %><span>Follow series</span>
+    <% end %>
+  <% end %>
+<% end %>

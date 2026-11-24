@@ -10,6 +10,9 @@ xml.urlset xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9" do
   @rooms.each do |room|
     xml.url { xml.loc room_url(room); xml.lastmod room.updated_at.to_date.iso8601; xml.changefreq "daily" }
   end
+  @series.each do |series|
+    xml.url { xml.loc series_url(series); xml.lastmod series.updated_at.to_date.iso8601; xml.changefreq "weekly" }
+  end
   @posts.each do |post|
     xml.url { xml.loc post_url(post); xml.lastmod post.updated_at.to_date.iso8601 }
   end

@@ -39,6 +39,7 @@ class UsersController < ApplicationController
       return
     end
 
+    load_profile_series
     posts    = profile_posts_scope.for_cards.recent.limit(60)
     reshares = Reshare.where(user: @user).includes(:user, post: Post::CARD_INCLUDES)
                       .order(created_at: :desc).limit(60)
@@ -152,7 +153,16 @@ class UsersController < ApplicationController
     user_signed_in? && current_user == @user ? scope : scope.where(anonymous: false)
   end
 
-  def profile_visible_to_viewer?(user)
+  # The "Series" row above the breaths: series with a part this viewer may
+  # read, with how many. The member sees all of their own.
+  def load_profile_series
+    own = user_signed_in? && current_user == @user
+    parts = own ? Post.where(user: @user) : Post.series_listable
+    @series_part_counts = parts.where(series_id: @user.series.select(:id)).group(:series_id).count
+    @profile_series = @user.series.where(id: @series_part_counts.keys).order(updated_at: :desc).to_a
+  end
+
+    def profile_visible_to_viewer?(user)
     return true if user.profile&.public_profile? != false
     return false unless user_signed_in?
 

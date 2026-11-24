@@ -1,0 +1,86 @@
+# Series membership checked by hand against production (November 2026).
+#
+# Read by `bin/rails series:suggest`, which only prints what it would do
+# unless run with APPLY=1. Post ids are production ids. Titles of the posts
+# are never changed; the series gets the clean, plain-letter title below.
+#
+#   author:  the writer's username (every post must be theirs)
+#   title:   the series title
+#   parts:   post ids in part order, numbered 1, 2, 3 …; or a map of
+#            post id => the writer's own part number, to keep gaps
+#   exclude: post ids left out on purpose, with the reason (reported only)
+#   create:  false to report the entry without creating anything
+#   note:    printed with the entry
+
+- author: wintan
+  title: "Who Is a Teenager?"
+  parts: { 306: 1, 310: 2, 318: 3, 331: 4, 527: 5, 337: 6 }
+  note: Part 5 (527) was posted after part 6 (337); parts go by number, not date.
+
+- author: wintan
+  title: The Redemption of the Brain
+  parts: [ 292, 303, 308, 319, 330 ]
+  note: Part 1 (292) has no number in its title.
+
+- author: wintan
+  title: Sanctified Enough to Be Loved
+  parts: { 302: 1, 309: 2, 317: 3, 332: 4, 528: 5, 338: 6 }
+  note: "Part 7 not posted yet. 302 is titled \"Sanctified Enough to Be Loved : The Problem Is Usually in the Room\", 309 \"(2/7) The Friend That Offends\", 528 \"(5/7)\"."
+
+- author: wintan
+  title: Faith vs Tradition
+  parts: [ 347, 352, 355, 361, 364 ]
+  note: "361 has no title; \"Faith vs Tradition (4)\" is the first line of its body."
+
+- author: wintan
+  title: The Whole Man
+  parts: [ 251, 258, 272, 276, 279, 294, 300, 316, 333 ]
+  exclude: { 259: "duplicate of 258 (same title, same day)" }
+
+- author: wintan
+  title: Magdalene
+  parts: [ 359, 362, 365 ]
+
+- author: wintan
+  title: The Plate and the Altar
+  parts: [ 367, 425 ]
+
+- author: wintan
+  title: Faith and the Algorithm
+  parts: [ 402, 416, 434 ]
+
+- author: wintan
+  title: The Ballot and the Altar
+  parts: [ 404, 419, 432 ]
+
+- author: wintan
+  title: "What Are We Singing?"
+  parts: [ 420, 431 ]
+
+- author: wintan
+  title: Faith in a Post-Christian World
+  parts: [ 481, 491, 505 ]
+
+- author: wintan
+  title: Love Thy Opponent
+  parts: [ 485, 497, 503 ]
+
+- author: wintan
+  title: God in the work space
+  parts: [ 139 ]
+  create: false
+  note: Only part 1 so far.
+
+- author: miss_toyosi_ojo
+  title: The Gospel and Material Prosperity
+  parts: [ 208, 215, 224 ]
+
+- author: Abbie
+  title: THE INHERITANCE
+  parts: [ 184, 188 ]
+
+- author: Ifeoluwa_MENA
+  title: Thursday Lively Poetry
+  parts: [ 263 ]
+  create: false
+  note: Only one part so far.

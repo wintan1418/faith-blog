@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -788,6 +788,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_160000) do
     t.bigint "quoted_post_id"
     t.jsonb "game_share"
     t.tsvector "searchable"
+    t.bigint "series_id"
+    t.integer "series_position"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
     t.index ["moderation_status"], name: "index_posts_on_moderation_status"
@@ -799,6 +801,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_160000) do
     t.index ["room_id"], name: "index_posts_on_room_id"
     t.index ["scheduled_for"], name: "index_posts_on_scheduled_for", where: "(scheduled_for IS NOT NULL)"
     t.index ["searchable"], name: "index_posts_on_searchable", using: :gin
+    t.index ["series_id"], name: "index_posts_on_series_id"
     t.index ["slug"], name: "index_posts_on_slug", unique: true
     t.index ["status"], name: "index_posts_on_status"
     t.index ["user_id", "published_at"], name: "index_posts_published_by_user", order: { published_at: :desc }, where: "((status = 1) AND (moderation_status = 0))"
@@ -1062,6 +1065,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_160000) do
     t.index ["key"], name: "index_seo_settings_on_key", unique: true
   end
 
+  create_table "series", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "title", null: false
+    t.string "slug", null: false
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_series_on_slug", unique: true
+    t.index ["user_id"], name: "index_series_on_user_id"
+  end
+
+  create_table "series_follows", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "series_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["series_id"], name: "index_series_follows_on_series_id"
+    t.index ["user_id", "series_id"], name: "index_series_follows_on_user_id_and_series_id", unique: true
+  end
+
   create_table "skill_endorsements", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "endorser_id", null: false
@@ -1280,6 +1303,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_160000) do
   add_foreign_key "post_tags", "tags"
   add_foreign_key "posts", "posts", column: "quoted_post_id", on_delete: :nullify
   add_foreign_key "posts", "rooms"
+  add_foreign_key "posts", "series", on_delete: :nullify
   add_foreign_key "posts", "users"
   add_foreign_key "prayer_intercessions", "posts"
   add_foreign_key "prayer_intercessions", "users"
@@ -1298,6 +1322,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_160000) do
   add_foreign_key "scripture_citations", "posts", on_delete: :cascade
   add_foreign_key "seed_events", "users", on_delete: :cascade
   add_foreign_key "seed_rank_ups", "users", on_delete: :cascade
+  add_foreign_key "series", "users", on_delete: :cascade
+  add_foreign_key "series_follows", "series", on_delete: :cascade
+  add_foreign_key "series_follows", "users", on_delete: :cascade
   add_foreign_key "skill_endorsements", "users"
   add_foreign_key "skill_endorsements", "users", column: "endorser_id"
   add_foreign_key "suggestion_dismissals", "users"

@@ -83,6 +83,7 @@ Rails.application.routes.draw do
     collection do
       post :check_gentleness
       post :suggest_scripture
+      get :series_suggestion
     end
     member do
       post :feature
@@ -100,6 +101,14 @@ Rails.application.routes.draw do
     end
     resource :bookmark, only: [ :create, :destroy ]
     resource :reshare, only: [ :create, :destroy ]
+  end
+
+  # Series: a writer's multi-part breaths in order (/series/the-whole-man).
+  resources :series, only: [ :show, :update, :destroy ], param: :slug do
+    resources :parts, controller: "series_parts", only: [ :destroy ] do
+      patch :move, on: :member
+    end
+    resource :follow, controller: "series_follows", only: [ :create, :destroy ]
   end
 
   # Likes (polymorphic)

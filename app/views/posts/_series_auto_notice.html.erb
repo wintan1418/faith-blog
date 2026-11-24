@@ -1,0 +1,15 @@
+<%# "Added to Who Is a Teenager? as Part 5 · Undo": shown once, on the post
+    page, right after a breath was put in a series automatically (see
+    SeriesAutoGroup). Locals: post, info (the flash hash). %>
+<div class="sr-auto" role="status">
+  <%= render_icon("library", classes: "sr-auto-icon") %>
+  <span class="sr-auto-text">
+    <% if info["created"] %>
+      Started the series <%= link_to info["title"], series_path(info["series"]) %> with your earlier part<%= " and this one as Part #{info['number']}" if info["number"] %>.
+    <% else %>
+      Added to <%= link_to info["title"], series_path(info["series"]) %><%= " as Part #{info['number']}" if info["number"] %>.
+    <% end %>
+  </span>
+  <%= button_to "Undo", series_part_path(info["series"], post, undo: info["created"] ? "created" : "added"),
+                method: :delete, class: "sr-auto-undo", form_class: "sr-auto-form" %>
+</div>

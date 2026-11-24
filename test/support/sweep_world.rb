@@ -39,6 +39,8 @@ module SweepWorld
     @post = Post.create!(user: @member, room: @room, title: "", content: "Grace and peace to you @sweep_other #hope",
                          status: :published, moderation_status: :approved, allow_comments: true)
     @post.images.attach(png_blob)
+    @series = @member.series.create!(title: "Sweep Series")
+    @post.update!(series: @series)
     @thread = Post.create!(user: @member, room: @room, kind: :thread, title: "A thread for sweeping",
                            content: "Let us talk about grace together.", status: :published,
                            moderation_status: :approved, allow_comments: true)
@@ -119,6 +121,8 @@ module SweepWorld
     in [ "rooms/posts", "room_id" ] then @room.to_param
     in [ "rooms", "id" ] then @room.to_param
     in [ "posts", "id" ] then @post.to_param
+    in [ "series", "slug" ] | [ "series_parts" | "series_follows", "series_slug" ] then @series.slug
+    in [ "series_parts", "id" ] then @post.to_param
     in [ "cards" | "users" | "brethren_cards" | "joins", "username" ] then @member.username
     in [ "portfolio_items", "username" ] then @member.username
     in [ "portfolio_items", "id" ] then @portfolio_item.id
