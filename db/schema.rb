@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_24_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -967,6 +967,53 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_150000) do
     t.index ["slug"], name: "index_rooms_on_slug", unique: true
   end
 
+  create_table "scripture_citations", force: :cascade do |t|
+    t.bigint "post_id", null: false
+    t.integer "book", limit: 2, null: false
+    t.integer "chapter", limit: 2, null: false
+    t.integer "verse_start", limit: 2
+    t.integer "verse_end", limit: 2
+    t.datetime "created_at", null: false
+    t.index ["book", "chapter", "verse_start"], name: "index_scripture_citations_on_location"
+    t.index ["post_id"], name: "index_scripture_citations_on_post_id"
+  end
+
+  create_table "scripture_cross_references", force: :cascade do |t|
+    t.integer "book", limit: 2, null: false
+    t.integer "chapter", limit: 2, null: false
+    t.integer "verse", limit: 2, null: false
+    t.integer "to_book", limit: 2, null: false
+    t.integer "to_chapter", limit: 2, null: false
+    t.integer "to_verse", limit: 2, null: false
+    t.integer "to_chapter_end", limit: 2
+    t.integer "to_verse_end", limit: 2
+    t.integer "votes", default: 0, null: false
+    t.index ["book", "chapter", "verse"], name: "index_scripture_xrefs_on_location"
+  end
+
+  create_table "scripture_insights", force: :cascade do |t|
+    t.string "reference", limit: 80, null: false
+    t.string "slug", limit: 80, null: false
+    t.string "summary", limit: 320
+    t.text "explanation", null: false
+    t.text "context", null: false
+    t.jsonb "questions", default: [], null: false
+    t.string "model", limit: 80
+    t.datetime "generated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_scripture_insights_on_slug", unique: true
+  end
+
+  create_table "scripture_verses", force: :cascade do |t|
+    t.string "translation", limit: 8, null: false
+    t.integer "book", limit: 2, null: false
+    t.integer "chapter", limit: 2, null: false
+    t.integer "verse", limit: 2, null: false
+    t.text "text", null: false
+    t.index ["book", "chapter", "verse", "translation"], name: "index_scripture_verses_on_location", unique: true
+  end
+
   create_table "search_console_reports", force: :cascade do |t|
     t.string "kind", null: false
     t.jsonb "data", default: {}, null: false
@@ -1248,6 +1295,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_24_150000) do
   add_foreign_key "resources", "users", column: "approved_by_id"
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
+  add_foreign_key "scripture_citations", "posts", on_delete: :cascade
   add_foreign_key "seed_events", "users", on_delete: :cascade
   add_foreign_key "seed_rank_ups", "users", on_delete: :cascade
   add_foreign_key "skill_endorsements", "users"
