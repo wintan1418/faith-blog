@@ -5,7 +5,7 @@
     <div class="mb-8">
       <span class="mystic-kicker">Settings</span>
       <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Brethren Card</h1>
-      <p class="mystic-copy mt-2 max-w-2xl">Your private connection card. Members only see it after you both connect.</p>
+      <p class="mystic-copy mt-2 max-w-2xl">Your connection card. Members see it after you both connect; your email and WhatsApp only go to the people you choose.</p>
     </div>
 
     <%= render "settings/tabs", active: :brethren_card %>
@@ -50,18 +50,25 @@
             <p class="mt-1 text-xs text-faith-muted"><%= @brethren_card.bio&.length || 0 %>/500 characters</p>
           </div>
 
-          <div class="grid gap-5 sm:grid-cols-2">
+          <div class="grid gap-5 sm:grid-cols-2" id="contact">
             <div>
-              <%= f.label :whatsapp_number, "WhatsApp Number", class: "label" %>
+              <%= f.label :whatsapp_number, "WhatsApp Number (optional)", class: "label" %>
               <%= f.text_field :whatsapp_number, class: "input", placeholder: "+234 812 345 6789" %>
               <p class="mt-1 text-xs text-faith-muted">Include country code.</p>
             </div>
 
             <div>
-              <%= f.label :email, "Email Address", class: "label" %>
+              <%= f.label :email, "Email Address (optional)", class: "label" %>
               <%= f.email_field :email, class: "input", placeholder: "name@example.com" %>
             </div>
           </div>
+
+          <section class="ctp-section is-inline" aria-labelledby="card-contact-privacy">
+            <h3 class="ctp-subtitle" id="card-contact-privacy">Who can see your contact details</h3>
+            <p class="ctp-copy ctp-small">Private by default. Pick who sees each one; manage the people you chose in
+              <%= link_to "Settings → Privacy", edit_settings_privacy_path(anchor: "contact-privacy"), class: "ctp-link" %>.</p>
+            <%= render "settings/contact_visibility_fields", card: @brethren_card %>
+          </section>
 
           <div class="rounded-lg border border-[var(--border)] bg-[var(--surface-2)] p-4">
             <p class="text-sm font-bold text-faith-dark">Profile photo</p>
@@ -113,7 +120,8 @@
             <li>1. Complete your card.</li>
             <li>2. Send or accept a connection request.</li>
             <li>3. Connected members can view each other's card.</li>
-            <li>4. Use the shared contact details respectfully.</li>
+            <li>4. Your email and WhatsApp stay private until you choose who sees them.</li>
+            <li>5. Use the contact details others share with you respectfully.</li>
           </ol>
         </section>
       </aside>

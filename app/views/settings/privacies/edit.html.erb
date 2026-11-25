@@ -5,7 +5,7 @@
     <div class="mb-8">
       <span class="mystic-kicker">Settings</span>
       <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Privacy</h1>
-      <p class="mystic-copy mt-2">Control how visible your profile is to the community.</p>
+      <p class="mystic-copy mt-2">Control how visible your profile and contact details are to the community.</p>
     </div>
 
     <%= render "settings/tabs", active: :privacy %>
@@ -59,8 +59,56 @@
             </span>
           </label>
 
+          <section class="ctp-section" id="contact-privacy" aria-labelledby="contact-privacy-title">
+            <h2 class="ctp-title" id="contact-privacy-title">Contact details &amp; privacy</h2>
+            <p class="ctp-copy">
+              Your Brethren Card email and WhatsApp number are private unless you choose otherwise. Your sign-in email
+              (<%= current_user.email %>) is never shown to other members.
+              <%= link_to "Edit the details themselves", edit_settings_brethren_card_path(anchor: "contact"), class: "ctp-link" %>.
+            </p>
+            <%= render "settings/contact_visibility_fields", card: @brethren_card %>
+            <p class="ctp-copy ctp-small">Brethreign admins can see contact details to keep the community safe. A block always hides them.</p>
+          </section>
+
           <%= f.submit "Save Changes", class: "btn btn-primary" %>
         <% end %>
+
+        <section class="ctp-section ctp-people" id="contact-people" aria-labelledby="contact-people-title">
+          <h3 class="ctp-subtitle" id="contact-people-title">Connections I chose (<%= @contact_shares.size %>)</h3>
+          <p class="ctp-copy ctp-small">They see any detail not set to “Only me”. You can also add someone with “Share my contact” on their profile or in a chat.</p>
+          <% if @contact_shares.any? %>
+            <ul class="ctp-list">
+              <% @contact_shares.each do |share| %>
+                <% person = share.viewer %>
+                <li class="ctp-person">
+                  <%= link_to user_path(person.username), class: "ctp-person-who" do %>
+                    <% if person.profile&.avatar&.attached? %>
+                      <%= image_tag avatar_src(person.profile, 96), class: "ctp-avatar", alt: "" %>
+                    <% else %>
+                      <span class="ctp-avatar" style="<%= avatar_tint_style(person.username) %>"><%= person.username.first.upcase %></span>
+                    <% end %>
+                    <span class="min-w-0"><span class="ctp-person-name"><%= person.display_name %></span><span class="ctp-person-handle">@<%= person.username %><%= " · not connected now, so they can't see it" unless @connection_ids.include?(person.id) %></span></span>
+                  <% end %>
+                  <%= button_to "Remove", contact_share_path(share), method: :delete, class: "ctp-remove", form_class: "ctp-remove-form",
+                                aria: { label: "Stop sharing with #{person.display_name}" } %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="ctp-empty">Nobody yet.</p>
+          <% end %>
+
+          <% if @shareable_connections.any? %>
+            <%= form_with url: contact_shares_path, method: :post, class: "ctp-add" do %>
+              <label class="sr-only" for="contact_share_user_id">Add a connection</label>
+              <%= select_tag :user_id, options_from_collection_for_select(@shareable_connections, :id, ->(u) { "#{u.display_name} (@#{u.username})" }),
+                             prompt: "Add one of your connections…", id: "contact_share_user_id", class: "input ctp-select", required: true %>
+              <button type="submit" class="btn btn-secondary ctp-add-btn">Add</button>
+            <% end %>
+          <% elsif @contact_shares.empty? %>
+            <p class="ctp-copy ctp-small">When you connect with brethren, you can add them here.</p>
+          <% end %>
+        </section>
       </div>
     </div>
   </div>

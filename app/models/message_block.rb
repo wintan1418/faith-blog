@@ -23,13 +23,15 @@ class MessageBlock < ApplicationRecord
 
   private
 
-  # A block ends the relationship: no connection (so no Brethren Card access)
-  # and no follow either way. Unblocking doesn't bring them back.
+  # A block ends the relationship: no connection (so no Brethren Card access),
+  # no shared contact details and no follow either way. Unblocking doesn't bring them back.
   def sever_ties
     ConnectionRequest.where(sender_id: blocker_id, receiver_id: blocked_id)
                      .or(ConnectionRequest.where(sender_id: blocked_id, receiver_id: blocker_id)).destroy_all
     Follow.where(follower_id: blocker_id, following_id: blocked_id)
           .or(Follow.where(follower_id: blocked_id, following_id: blocker_id)).destroy_all
+    ContactShare.where(owner_id: blocker_id, viewer_id: blocked_id)
+                .or(ContactShare.where(owner_id: blocked_id, viewer_id: blocker_id)).destroy_all
   end
 
   def cannot_block_self

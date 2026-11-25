@@ -28,6 +28,8 @@ Your Brethren Card is a private card that you fill in once and share only with y
 - **WhatsApp number:** if you'd like connections to be able to message you there.
 - **Email:** if you'd like to share it.
 
+Both are private until you decide otherwise. In **Settings → Privacy → Contact details & privacy**, choose for each one: only me, connections you pick, all your connections, or everyone. You can also tap **Share my contact** on a connection's profile or in a chat.
+
 <figure class="bl-shot">
   <img src="/blog/shots/brethren-card.jpg" alt="Settings, Brethren Card tab, described as 'Your private connection card. Members only see it after you both connect.' The Card Details form shows a Complete badge and filled-in Church / Assembly, What You Do and About You fields">
   <figcaption>Fill it in at Settings → Brethren Card. The Complete badge shows when it's ready.</figcaption>

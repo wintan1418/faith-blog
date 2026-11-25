@@ -1,0 +1,26 @@
+<%# The two "who can see" choices for the Brethren Card's email and WhatsApp.
+    Posts as brethren_card[email_visibility] / brethren_card[whatsapp_visibility]
+    inside whatever form renders it (Privacy settings or the card editor). %>
+<% card = local_assigns.fetch(:card) %>
+<div class="ctp-fields">
+  <% [[:email, "Email", card.email], [:whatsapp, "WhatsApp / phone", card.whatsapp_number]].each do |field, title, value| %>
+    <div class="ctp-field" id="contact_<%= field %>_visibility" role="radiogroup" aria-labelledby="contact_<%= field %>_visibility_title">
+      <div class="ctp-legend">
+        <span class="ctp-legend-title" id="contact_<%= field %>_visibility_title"><%= render_icon(field == :email ? "mail" : "phone", classes: "h-4 w-4") %> Who can see my <%= field == :email ? "email" : "WhatsApp number" %>?</span>
+        <span class="ctp-legend-value"><%= value.presence || "Not added yet" %></span>
+      </div>
+      <div class="ctp-options">
+        <% BrethrenCard::VISIBILITY_OPTIONS.each do |level, opt| %>
+          <label class="ctp-option">
+            <%= radio_button_tag "brethren_card[#{field}_visibility]", level, card.visibility_for(field) == level,
+                                 id: "brethren_card_#{field}_visibility_#{level}", class: "ctp-radio" %>
+            <span class="ctp-option-text">
+              <span class="ctp-option-label"><%= opt[:label] %><%= " (default)" if level == "only_me" %></span>
+              <span class="ctp-option-hint"><%= opt[:hint] %></span>
+            </span>
+          </label>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

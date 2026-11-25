@@ -1,0 +1,37 @@
+<%# "Share my contact" / "Stop sharing my contact" with a connection, from
+    their profile (style :profile) or the chat menu (style :menu). Also links
+    a non-connection to contact details the member made public. %>
+<% style = local_assigns.fetch(:style, :profile) %>
+<% share = current_user.contact_shares.find_by(viewer_id: user.id) %>
+<% their_card = user.brethren_card %>
+<% theirs_visible = their_card&.visible_contact_for(current_user).present? %>
+<% connected = current_user.connected_with?(user) %>
+<% unless MessageBlock.between?(current_user, user) %>
+  <% if style == :menu %>
+    <% if share && connected %>
+      <%= button_to "Stop sharing my contact", contact_share_path(share), method: :delete, form_class: "w-full", class: "msg-menu-item" %>
+    <% elsif connected %>
+      <%= button_to "Share my contact", contact_shares_path(user_id: user.id), method: :post, form_class: "w-full", class: "msg-menu-item",
+                    data: { turbo_confirm: "Let #{user.display_name} see your email and WhatsApp number? You can stop sharing any time." } %>
+    <% end %>
+    <% if theirs_visible %>
+      <%= link_to "#{user.display_name}'s contact details", brethren_card_path(user.username, anchor: "contact"), class: "msg-menu-item" %>
+    <% end %>
+  <% else %>
+    <% if share && connected %>
+      <%= button_to contact_share_path(share), method: :delete, class: "ctp-share-btn is-on", form_class: "ctp-share-form" do %>
+        <%= render_icon("check", classes: "h-4 w-4") %> Contact shared · Stop sharing
+      <% end %>
+    <% elsif connected %>
+      <%= button_to contact_shares_path(user_id: user.id), method: :post, class: "ctp-share-btn", form_class: "ctp-share-form",
+                    data: { turbo_confirm: "Let #{user.display_name} see your email and WhatsApp number? You can stop sharing any time." } do %>
+        <%= render_icon("phone", classes: "h-4 w-4") %> Share my contact
+      <% end %>
+    <% end %>
+    <% if theirs_visible && !connected %>
+      <%= link_to brethren_card_path(user.username, anchor: "contact"), class: "ctp-share-btn" do %>
+        <%= render_icon("mail", classes: "h-4 w-4") %> Their contact details
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
