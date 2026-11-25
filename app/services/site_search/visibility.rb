@@ -64,6 +64,7 @@ module SiteSearch
         "AND amr.reviewable_type = 'Post' AND amr.severity = 'high' AND amr.status NOT IN (1, 4))"
       ]
       parts << exclude_users_sql("#{a}.user_id", blocked_ids) if blocked_ids.any?
+      parts << "(#{a}.page_id IS NULL OR #{a}.page_id <> ALL('{#{suspended_page_ids.join(',')}}'::bigint[]))" if suspended_page_ids.any?
       parts << "(#{a}.room_id IS NULL OR #{a}.room_id <> ALL('{#{hidden_room_ids.join(',')}}'::bigint[]))" if hidden_room_ids.any?
       parts += [ "NOT #{a}.anonymous", "#{a}.prayer_status = 0" ] if guest?
       parts.join(" AND ")
@@ -89,6 +90,11 @@ module SiteSearch
     # so the planner can estimate how many rows it removes.
     def inactive_user_ids
       @inactive_user_ids ||= User.where(active: false).or(User.where(email: SiteHealthCheck::EMAIL)).pluck(:id)
+    end
+
+    # Pages taken down by moderators: their posts leave search with them.
+    def suspended_page_ids
+      @suspended_page_ids ||= Page.suspended.pluck(:id)
     end
 
     def exclude_users_sql(column, ids)

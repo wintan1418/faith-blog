@@ -1,0 +1,45 @@
+<%# About and details. Locals: f, page. %>
+<div class="pg-field">
+  <%= f.label :about, "About (optional)", class: "pg-label" %>
+  <%= f.text_area :about, class: "pg-input pg-textarea", rows: 5, maxlength: 5000,
+                  placeholder: "Who you are, what you do, who it's for." %>
+</div>
+<div class="pg-field">
+  <%= render "around/city_picker", profile: page, scope: "page", field_id: "page_location", label: "Where is it? (optional)" %>
+</div>
+<div class="pg-field-row">
+  <div class="pg-field">
+    <%= f.label :website, "Website (optional)", class: "pg-label" %>
+    <%= f.url_field :website, class: "pg-input", maxlength: 255, placeholder: "https://", inputmode: "url", autocapitalize: "off" %>
+  </div>
+  <div class="pg-field">
+    <%= f.label :founded_year, "Year founded (optional)", class: "pg-label" %>
+    <%= f.number_field :founded_year, class: "pg-input", min: 1, max: Date.current.year, inputmode: "numeric", placeholder: "1998" %>
+  </div>
+</div>
+<div class="pg-field-row">
+  <div class="pg-field">
+    <%= f.label :email, "Contact email (optional, shown on the page)", class: "pg-label" %>
+    <%= f.email_field :email, class: "pg-input", maxlength: 255, autocapitalize: "off" %>
+  </div>
+  <div class="pg-field">
+    <%= f.label :phone, "Phone (optional, shown on the page)", class: "pg-label" %>
+    <%= f.telephone_field :phone, class: "pg-input", maxlength: 40 %>
+  </div>
+</div>
+<div class="pg-field-row">
+  <div class="pg-field">
+    <%= f.label :size_range, "Size (optional)", class: "pg-label" %>
+    <%= f.select :size_range, Page::SIZE_RANGES, { include_blank: "Choose…" }, class: "pg-input" %>
+  </div>
+  <div class="pg-field">
+    <%= f.label :tradition, "Denomination or tradition (optional)", class: "pg-label" %>
+    <%= f.text_field :tradition, class: "pg-input", maxlength: 120, placeholder: "e.g. Pentecostal, Anglican, Non-denominational" %>
+  </div>
+</div>
+<div class="pg-field">
+  <%= f.label :service_times, "Service or opening times (optional)", class: "pg-label" %>
+  <%= f.text_area :service_times, class: "pg-input pg-textarea", rows: 3, maxlength: 600,
+                  placeholder: "Sundays 8:00 am and 10:30 am\nWednesdays 6:00 pm Bible study" %>
+  <p class="pg-hint-text">One per line.</p>
+</div>

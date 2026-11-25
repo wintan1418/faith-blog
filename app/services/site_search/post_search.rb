@@ -181,7 +181,7 @@ module SiteSearch
         parts << "p.room_id = #{filters[:room].id.to_i}" if filters[:room]
         if filters[:author]
           # from: never matches an anonymous breath — that would unmask it.
-          parts << "p.user_id = #{filters[:author].id.to_i} AND NOT p.anonymous"
+          parts << "p.user_id = #{filters[:author].id.to_i} AND NOT p.anonymous AND p.page_id IS NULL"
         end
         parts << "p.published_at >= #{conn.quote(filters[:since])}" if filters[:since]
         case filters[:type].to_s

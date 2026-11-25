@@ -22,7 +22,7 @@ module SeriesAutoGroup
     series = user.series.find { |s| SeriesTitle.key_for(s.title) == parsed.key }
     earlier = []
     if series.nil?
-      matching = user.posts.named.where.not(id: post.id).where.not(title: [ nil, "" ]).includes(:series)
+      matching = user.posts.named.where(page_id: post.page_id).where.not(id: post.id).where.not(title: [ nil, "" ]).includes(:series)
                      .order(created_at: :desc).limit(SeriesSuggestions::LOOKBACK)
                      .select { |p| SeriesTitle.parse(p.title)&.key == parsed.key }
       series = matching.filter_map(&:series).find { |s| s.user_id == user.id }

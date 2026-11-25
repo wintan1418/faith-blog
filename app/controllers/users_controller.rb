@@ -149,7 +149,8 @@ class UsersController < ApplicationController
   # Anonymous breaths never appear on (or count toward) their author's
   # profile — that would unmask them. The author still sees their own.
   def profile_posts_scope
-    scope = @user.posts.published
+    # Posts written as a page belong to the page, not the writer's profile.
+    scope = @user.posts.published.personal
     user_signed_in? && current_user == @user ? scope : scope.where(anonymous: false)
   end
 

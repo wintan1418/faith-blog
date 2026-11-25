@@ -1,0 +1,19 @@
+<section class="pg-panel">
+  <h2 class="pg-panel-title">About <%= @page.name %></h2>
+  <% if @page.about.present? %>
+    <div class="pg-about"><%= simple_format(h(@page.about), {}, sanitize: true) %></div>
+  <% else %>
+    <p class="pg-muted">No description yet.</p>
+  <% end %>
+</section>
+<% if @page.service_times_lines.any? %>
+  <section class="pg-panel">
+    <h2 class="pg-panel-title"><%= render_icon("clock", classes: "pg-panel-icon") %><%= @page.church? || @page.fellowship? ? "Service times" : "Opening times" %></h2>
+    <ul class="pg-times">
+      <% @page.service_times_lines.each do |line| %><li><%= line %></li><% end %>
+    </ul>
+  </section>
+<% end %>
+<div class="pg-about-details">
+  <%= render "org_pages/details", page: @page, compact: false %>
+</div>

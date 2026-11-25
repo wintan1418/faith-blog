@@ -39,7 +39,7 @@ class ShareCard
       qr: qr_modules(link),
       accent: palette[:accent],
       accent_deep: palette[:accent_2],
-      author: author_json(post_author),
+      author: post_page ? page_author_json(post_page) : author_json(post_author),
       title: post.display_title.to_s,
       text: clip(plain_text(post.content), TEXT_LIMIT),
       truncated: plain_text(post.content).length > TEXT_LIMIT,
@@ -114,6 +114,26 @@ class ShareCard
 
   def post_author = post.anonymous? ? nil : post.user
 
+  # A post written as a page is shown as the page.
+  def post_page = post.anonymous? ? nil : post.page
+
+  def page_author_json(page)
+    logo = page.logo.attached? ? page.logo : nil
+    Author.new(
+      anonymous: false,
+      name: page.name,
+      username: page.handle,
+      initial: page.initial,
+      avatar_url: logo && { url: urls.helpers.resized_image_src(logo, width: 200, height: 200, crop: "fill").then { |s| s.is_a?(String) ? s : nil },
+                            fallback: urls.rails_storage_proxy_path(logo) },
+      verified: page.verified?,
+      founder: false
+    ).to_h
+  rescue StandardError
+    Author.new(anonymous: false, name: page.name, username: page.handle, initial: page.initial, avatar_url: nil,
+               verified: page.verified?, founder: false).to_h
+  end
+
   def author_json(user, op: false)
     return Author.new(anonymous: true, name: op ? "Anonymous (author)" : "Anonymous", username: nil, initial: nil,
                       avatar_url: nil, verified: false, founder: false).to_h unless user
@@ -157,11 +177,11 @@ class ShareCard
   # The accent of whoever wrote it; an anonymous breath wears the house colour
   # so the colour can't hint at who wrote it.
   def palette
-    @palette ||= AccentPalette.for(post.anonymous? ? nil : post.user&.accent_color)
+    @palette ||= AccentPalette.for(post.anonymous? || post.page_id ? nil : post.user&.accent_color)
   end
 
   def seeds
-    return 0 if post.anonymous?
+    return 0 if post.anonymous? || post.page_id
 
     SeedEvent.where(post_id: post.id, user_id: post.user_id).sum(:points).to_i
   rescue StandardError

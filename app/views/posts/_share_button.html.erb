@@ -6,7 +6,7 @@
   sharer    = user_signed_in? ? current_user : nil
   share_url = post_url(post, ref: ShareReferral.ref_for(sharer, post))
   snippet   = truncate(post.content.to_plain_text.to_s.strip, length: 1500, separator: " ")
-  author    = post.anonymous? ? "anonymous" : post.user.username
+  author    = post.anonymous? ? "anonymous" : (post.page_post? ? post.page.handle : post.user.username)
   imageable = post.visible_to?(nil)
 %>
 <div class="fc-share" data-controller="share"

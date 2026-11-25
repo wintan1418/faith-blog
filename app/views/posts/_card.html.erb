@@ -11,7 +11,7 @@
   praying_request = post.prayer_status_prayer_pending?
   answered        = post.prayer_status_prayer_answered?
   posted_at       = post.published_at || post.created_at
-  verified        = !post.anonymous? && post.user.respond_to?(:verified_at) && post.user.verified_at.present?
+  verified        = !post.anonymous? && !post.page_post? && post.user.respond_to?(:verified_at) && post.user.verified_at.present?
 %>
 <article class="fc-breath eg-post<%= ' fc-card-held-author' if post.held_for_review? %><%= ' is-prayer' if praying_request %><%= ' is-answered' if answered %><%= ' is-pinned' if post.featured? %>" id="<%= dom_id(post) %>">
   <% if praying_request || answered %>
@@ -36,7 +36,11 @@
 
   <header class="fc-breath-head eg-post-head">
     <div class="fc-breath-avatar">
-      <% if post.anonymous? %>
+      <% if post.page_post? %>
+        <%= link_to org_page_path(post.page), tabindex: -1, aria: { hidden: true } do %>
+          <%= page_logo(post.page, classes: "eg-avatar pg-post-logo", px: 96) %>
+        <% end %>
+      <% elsif post.anonymous? %>
         <span class="eg-avatar"><%= render_icon("users", classes: "h-5 w-5") %></span>
       <% elsif post.user.profile&.avatar&.attached? %>
         <%= link_to user_path(post.user.username), tabindex: -1, aria: { hidden: true } do %>
@@ -51,7 +55,12 @@
 
     <div class="fc-breath-head-author eg-post-who">
       <span class="eg-post-name-row">
-        <% if post.anonymous? %>
+        <% if post.page_post? %>
+          <%= link_to post.page.name, org_page_path(post.page), class: "fc-breath-name" %>
+          <%= page_verified_badge(post.page) %>
+          <span class="pg-chip" title="Posted by this page">Page</span>
+          <span class="fc-breath-handle">@<%= post.page.handle %></span>
+        <% elsif post.anonymous? %>
           <span class="fc-breath-name">Anonymous</span>
         <% else %>
           <%= link_to post.user.display_name, user_path(post.user.username), class: "fc-breath-name" %>

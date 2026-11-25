@@ -61,7 +61,7 @@
               <%= link_to comment.user.username, user_path(comment.user.username), class: "cm-name" %>
               <%= seed_rank_chip(comment.user, compact: true, extra_class: "cm-rank") %>
             <% end %>
-            <% if comment.user_id == post.user_id %><span class="cm-badge">Author</span><% end %>
+            <% if comment.user_id == post.user_id && !post.page_id %><span class="cm-badge">Author</span><% end %>
             <time class="cm-time" datetime="<%= comment.created_at.iso8601 %>" title="<%= l(comment.created_at, format: :long) %>">
               <%= time_ago_short(comment.created_at) %><%= " · edited" if comment.edited? %>
             </time>

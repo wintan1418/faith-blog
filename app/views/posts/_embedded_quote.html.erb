@@ -28,7 +28,11 @@
               class: "fc-embedded-quote#{variant == :composer ? ' is-preview' : ''}",
               data: { turbo_frame: "_top" } do %>
     <header class="fc-embedded-quote-head">
-      <% if quoted.anonymous? %>
+      <% if quoted.page_post? %>
+        <%= page_logo(quoted.page, classes: "fc-embedded-quote-avatar pg-quote-logo", px: 48) %>
+        <span class="fc-embedded-quote-name"><%= quoted.page.name %></span>
+        <span class="fc-embedded-quote-handle">@<%= quoted.page.handle %></span>
+      <% elsif quoted.anonymous? %>
         <span class="fc-embedded-quote-avatar"><%= render_icon("users", classes: "h-3.5 w-3.5") %></span>
         <span class="fc-embedded-quote-name">Anonymous</span>
       <% else %>

@@ -74,15 +74,23 @@ class PostOgCard
 
   attr_reader :post
 
-  def palette = @palette ||= AccentPalette.for(post.anonymous? ? nil : post.user&.accent_color)
+  def palette = @palette ||= AccentPalette.for(post.anonymous? || post.page_id ? nil : post.user&.accent_color)
 
   def author = post.anonymous? ? nil : post.user
+
+  # A post written as a page shows the page (name, handle, logo), not its writer.
+  def page = post.anonymous? ? nil : post.page
+
+  def shown_name = page ? page.name : (author ? author.display_name : "Anonymous")
+  def shown_handle = page ? page.handle : author&.username
+  def shown_verified? = page ? page.verified? : author&.verified_at.present?
+  def shown_initial = page ? page.initial : author&.username.to_s.first.to_s.upcase
 
   # ── Versioning ──────────────────────────────────────────────────────
 
   def content_key
     @content_key ||= Digest::SHA256.hexdigest([
-      DESIGN, post.title.to_s, body_text.first(600), post.anonymous?, author&.username, author&.verified_at.present?,
+      DESIGN, post.title.to_s, body_text.first(600), post.anonymous?, shown_name, shown_handle, shown_verified?,
       palette[:accent], avatar_blob&.id, label
     ].join("\u0001")).first(10)
   end
@@ -289,10 +297,10 @@ class PostOgCard
     y = HEIGHT - PAD - AVATAR
     draw_avatar(y)
     name_x = PAD + AVATAR + 20
-    name = text_image(author ? author.display_name : "Anonymous", size: 30, weight: "Bold")
+    name = text_image(clean(shown_name), size: 30, weight: "Bold")
     place(name, name_x, y + 6)
-    place(tint(mask("verified"), palette[:accent_2]), name_x + name.width + 10, y + 7) if author&.verified_at.present?
-    place(text_image(author ? "@#{author.username} · #{date}" : date, size: 23, color: MUTED), name_x, y + 46)
+    place(tint(mask("verified"), palette[:accent_2]), name_x + name.width + 10, y + 7) if shown_verified?
+    place(text_image(shown_handle ? "@#{shown_handle} · #{date}" : date, size: 23, color: MUTED), name_x, y + 46)
 
     cta = text_image("Join the conversation", size: 22, weight: "Bold", color: ON_ACCENT)
     pill_w = cta.width + 56
@@ -321,13 +329,14 @@ class PostOgCard
       place(photo.bandjoin(circle.cast(:uchar)).copy(interpretation: :srgb), PAD, y)
     else
       place(tint(circle, palette[:accent]), PAD, y)
-      initial = text_image(author.username.first.upcase, size: 34, weight: "Bold", color: ON_ACCENT)
+      initial = text_image(shown_initial, size: 34, weight: "Bold", color: ON_ACCENT)
       place(initial, PAD + (AVATAR - initial.width) / 2.0, y + (AVATAR - initial.height) / 2.0)
     end
   end
 
   def avatar_blob
-    return unless author
+    return page.logo.blob if page&.logo&.attached?
+    return if page || author.nil?
 
     avatar = author.profile&.avatar
     avatar.blob if avatar&.attached?

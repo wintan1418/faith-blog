@@ -79,7 +79,8 @@ module Mentionable
       unless existing_notification
         Notification.create(
           user: user,
-          actor: mentioned_by_user,
+          # A post written as a page speaks as the page: no member face on the alert.
+          actor: (try(:page_id).present? ? nil : mentioned_by_user),
           notifiable: self,
           notification_type: :mentioned
         )

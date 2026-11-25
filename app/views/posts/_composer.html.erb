@@ -25,7 +25,7 @@
 <%= form_with model: post,
     html: { class: "fc-composer-form eg-cmp", multipart: true, data: {
       turbo_action: ("replace" if local_assigns[:page]),
-      controller: "post-form composer-mode composer-assistant paste-images caret-clear series-picker",
+      controller: "post-form composer-mode composer-assistant paste-images caret-clear series-picker post-as",
       composer_mode_initial_value: mode,
       series_picker_url_value: series_suggestion_posts_path,
       series_picker_post_id_value: post.id,
@@ -60,14 +60,36 @@
     <% end %>
 
     <%# Who and where %>
+    <%# "Post as": you, or a page you help run (owner, admin or editor). A
+        post's identity is fixed once it's written, so editing doesn't offer it. %>
+    <% postable_pages = post.new_record? ? current_user.postable_pages : [] %>
+    <% as_page = post.page if post.page_id %>
     <div class="eg-cmp-who">
-      <% if current_user.profile&.avatar&.attached? %>
-        <%= image_tag avatar_src(current_user.profile), class: "eg-cmp-avatar", alt: "" %>
-      <% else %>
-        <span class="eg-cmp-avatar" style="<%= avatar_tint_style(current_user.username) %>" aria-hidden="true"><%= current_user.username.first.upcase %></span>
+      <span data-post-as-target="avatar" data-identity="" <%= "hidden" if as_page %>>
+        <% if current_user.profile&.avatar&.attached? %>
+          <%= image_tag avatar_src(current_user.profile), class: "eg-cmp-avatar", alt: "" %>
+        <% else %>
+          <span class="eg-cmp-avatar" style="<%= avatar_tint_style(current_user.username) %>" aria-hidden="true"><%= current_user.username.first.upcase %></span>
+        <% end %>
+      </span>
+      <% (postable_pages | [ as_page ].compact).each do |page| %>
+        <span data-post-as-target="avatar" data-identity="<%= page.id %>" <%= "hidden" unless as_page&.id == page.id %>>
+          <%= page_logo(page, classes: "eg-cmp-avatar pg-cmp-logo", px: 96) %>
+        </span>
       <% end %>
       <div class="eg-cmp-who-text">
-        <p class="eg-cmp-name"><%= current_user.display_name.presence || current_user.username %></p>
+        <% if postable_pages.any? %>
+          <label class="pg-cmp-as">
+            <span class="pg-cmp-as-label">Post as</span>
+            <%= f.select :page_id,
+                         [ [ "You · @#{current_user.username}", "", { "data-name" => current_user.display_name.presence || current_user.username } ] ] +
+                           postable_pages.map { |page| [ "#{page.name} (page)", page.id, { "data-name" => page.name } ] },
+                         {}, class: "pg-cmp-as-select", data: { post_as_target: "select", action: "change->post-as#change" },
+                         aria: { label: "Post as" } %>
+            <%= render_icon("chevrondown", classes: "eg-cmp-room-chev") %>
+          </label>
+        <% end %>
+        <p class="eg-cmp-name" data-post-as-target="name"><%= as_page ? as_page.name : (current_user.display_name.presence || current_user.username) %></p>
         <label class="fc-composer-pill eg-cmp-room">
           <span class="sr-only">Room</span>
           <%= render_icon("users", classes: "eg-cmp-room-icon") %>
@@ -230,13 +252,13 @@
 
     <%# Options: each a row with a switch and a one-line hint. %>
     <div class="eg-cmp-options">
-      <label class="eg-cmp-option">
+      <label class="eg-cmp-option" data-post-as-target="anonymousRow" <%= "hidden" if as_page %>>
         <%= render_icon("eyeoff", classes: "eg-cmp-option-icon") %>
         <span class="eg-cmp-option-text">
           <span class="eg-cmp-option-label">Post anonymously</span>
           <span class="eg-cmp-option-hint">Your name is hidden from the brethren</span>
         </span>
-        <%= f.check_box :anonymous, class: "eg-cmp-switch", role: "switch" %>
+        <%= f.check_box :anonymous, class: "eg-cmp-switch", role: "switch", data: { post_as_target: "anonymous" } %>
       </label>
 
       <%# The picker shows the phone's own time; the hidden field sends it with its time zone. %>

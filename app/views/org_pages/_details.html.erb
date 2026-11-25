@@ -1,0 +1,36 @@
+<%# The page's details card. Locals: page, compact. %>
+<section class="pg-panel pg-details">
+  <h2 class="pg-panel-title"><%= compact ? "About" : "Details" %></h2>
+  <% if compact && page.about.present? %>
+    <p class="pg-details-about"><%= truncate(page.about.squish, length: 220, separator: " ") %>
+      <%= link_to "More", about_org_page_path(page), class: "pg-link" %></p>
+  <% end %>
+  <dl class="pg-dl">
+    <div><dt><%= render_icon(page.category_icon, classes: "pg-dl-icon") %><span class="sr-only">Category</span></dt><dd><%= page.category_label %></dd></div>
+    <% if page.place.present? %>
+      <div><dt><%= render_icon("mappin", classes: "pg-dl-icon") %><span class="sr-only">Location</span></dt><dd><%= page.place %></dd></div>
+    <% end %>
+    <% if page.website.present? %>
+      <div><dt><%= render_icon("link", classes: "pg-dl-icon") %><span class="sr-only">Website</span></dt>
+        <dd><%= link_to page.website.sub(%r{\Ahttps?://}, "").delete_suffix("/"), page.website, rel: "noopener nofollow", target: "_blank", class: "pg-link" %></dd></div>
+    <% end %>
+    <% if page.email.present? %>
+      <div><dt><%= render_icon("mail", classes: "pg-dl-icon") %><span class="sr-only">Email</span></dt><dd><%= mail_to page.email, page.email, class: "pg-link" %></dd></div>
+    <% end %>
+    <% if page.phone.present? %>
+      <div><dt><%= render_icon("smartphone", classes: "pg-dl-icon") %><span class="sr-only">Phone</span></dt><dd><%= link_to page.phone, "tel:#{page.phone.gsub(/[^\d+]/, '')}", class: "pg-link" %></dd></div>
+    <% end %>
+    <% if page.tradition.present? %>
+      <div><dt><%= render_icon("church", classes: "pg-dl-icon") %><span class="sr-only">Tradition</span></dt><dd><%= page.tradition %></dd></div>
+    <% end %>
+    <% if page.founded_year %>
+      <div><dt><%= render_icon("calendar", classes: "pg-dl-icon") %><span class="sr-only">Founded</span></dt><dd>Founded <%= page.founded_year %></dd></div>
+    <% end %>
+    <% if page.size_range.present? %>
+      <div><dt><%= render_icon("users", classes: "pg-dl-icon") %><span class="sr-only">Size</span></dt><dd><%= page.size_range %> <%= page.church? || page.fellowship? ? "members" : "people" %></dd></div>
+    <% end %>
+    <% if page.verified? %>
+      <div><dt><%= render_icon("badgecheck", classes: "pg-dl-icon") %><span class="sr-only">Verified</span></dt><dd>Verified by Brethreign</dd></div>
+    <% end %>
+  </dl>
+</section>

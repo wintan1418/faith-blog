@@ -24,6 +24,7 @@ class SitemapsController < ApplicationController
     @rooms = Room.public_rooms.select(:id, :slug, :updated_at)
     @series = Series.publicly_listed.select(:id, :slug, :updated_at)
     @resources = Resource.approved.select(:id, :slug, :updated_at)
+    @org_pages = Page.listed.select(:id, :handle, :updated_at).order(followers_count: :desc).limit(5_000)
 
     expires_in 1.hour, public: true
     render formats: [ :xml ]

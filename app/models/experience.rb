@@ -10,6 +10,29 @@ class Experience < ApplicationRecord
   TYPE_LABELS = EMPLOYMENT_TYPES.index_with { |t| t }.merge("Ministry" => "Church or ministry service").freeze
 
   belongs_to :user
+  # Optional link to the organisation's Page. The member appears on the page's
+  # People tab only if they tick "Show me on this page" (listed_on_page).
+  belongs_to :page, optional: true
+
+  # The form takes a page handle ("@gracechapel"); blank unlinks it.
+  def page_handle = page&.handle
+
+  def page_handle=(value)
+    handle = value.to_s.strip.delete_prefix("@")
+    self.page = handle.present? ? Page.listed.by_handle(handle).first : nil
+    @page_handle_missing = handle.present? && page.nil?
+  end
+
+  validate { errors.add(:page_handle, "doesn't match any page") if @page_handle_missing }
+  before_save { self.listed_on_page = false if page_id.nil? }
+
+  # Members a page may show on its People tab: they said so, their profile is
+  # public, and they're active adults.
+  scope :listed_for_page, ->(page) {
+    joins(user: :profile).where(page: page, listed_on_page: true)
+                         .merge(User.active).merge(Profile.adults_or_unknown)
+                         .where(profiles: { public_profile: true })
+  }
 
   # A first role sets up the professional profile: tick it on an open feed.
   after_commit -> { OnboardingChecklist.broadcast_refresh(user) }, on: %i[create destroy]

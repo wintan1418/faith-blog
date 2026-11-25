@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_25_120200) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_090200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -562,7 +562,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_120200) do
     t.datetime "updated_at", null: false
     t.string "organization_key"
     t.string "title_key"
+    t.bigint "page_id"
+    t.boolean "listed_on_page", default: false, null: false
     t.index ["organization_key"], name: "index_experiences_on_organization_key"
+    t.index ["page_id"], name: "index_experiences_on_page_id", where: "(page_id IS NOT NULL)"
     t.index ["title_key"], name: "index_experiences_on_title_key"
     t.index ["user_id", "start_on"], name: "index_experiences_on_user_id_and_start_on"
     t.index ["user_id"], name: "index_experiences_on_user_id"
@@ -777,6 +780,69 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_120200) do
     t.index ["office_conversation_id"], name: "index_office_messages_on_office_conversation_id"
   end
 
+  create_table "page_follows", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["page_id", "created_at"], name: "index_page_follows_on_page_id_and_created_at"
+    t.index ["page_id", "user_id"], name: "index_page_follows_on_page_id_and_user_id", unique: true
+    t.index ["user_id"], name: "index_page_follows_on_user_id"
+  end
+
+  create_table "page_memberships", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "role", default: 2, null: false
+    t.integer "status", default: 0, null: false
+    t.bigint "invited_by_id"
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invited_by_id"], name: "index_page_memberships_on_invited_by_id"
+    t.index ["page_id", "user_id"], name: "index_page_memberships_on_page_id_and_user_id", unique: true
+    t.index ["page_id"], name: "index_page_memberships_on_page_id"
+    t.index ["user_id", "status", "role"], name: "index_page_memberships_on_user_id_and_status_and_role"
+    t.index ["user_id"], name: "index_page_memberships_on_user_id"
+  end
+
+  create_table "pages", force: :cascade do |t|
+    t.string "name", limit: 80, null: false
+    t.string "handle", limit: 30, null: false
+    t.integer "category", default: 0, null: false
+    t.string "tagline", limit: 160
+    t.text "about"
+    t.string "website", limit: 255
+    t.string "email", limit: 255
+    t.string "phone", limit: 40
+    t.bigint "city_id"
+    t.string "location", limit: 100
+    t.integer "founded_year"
+    t.string "size_range", limit: 20
+    t.string "tradition", limit: 120
+    t.text "service_times"
+    t.datetime "verified_at"
+    t.bigint "verified_by_id"
+    t.integer "verification_status", default: 0, null: false
+    t.text "verification_note"
+    t.datetime "verification_requested_at"
+    t.integer "status", default: 0, null: false
+    t.datetime "suspended_at"
+    t.integer "plan", default: 0, null: false
+    t.integer "followers_count", default: 0, null: false
+    t.bigint "created_by_id"
+    t.tsvector "searchable"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((handle)::text)", name: "index_pages_on_lower_handle", unique: true
+    t.index ["city_id"], name: "index_pages_on_city_id"
+    t.index ["created_by_id"], name: "index_pages_on_created_by_id"
+    t.index ["searchable"], name: "index_pages_on_searchable", using: :gin
+    t.index ["status", "category"], name: "index_pages_on_status_and_category"
+    t.index ["verification_status"], name: "index_pages_verification_requested", where: "(verification_status = 1)"
+    t.index ["verified_by_id"], name: "index_pages_on_verified_by_id"
+  end
+
   create_table "portfolio_items", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "title", limit: 100, null: false
@@ -846,10 +912,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_120200) do
     t.text "search_title"
     t.bigint "series_id"
     t.integer "series_position"
+    t.bigint "page_id"
     t.index "\"left\"(search_title, 512)", name: "index_posts_search_title_exact", where: "((status = 1) AND (moderation_status = 0))"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
     t.index ["moderation_status"], name: "index_posts_on_moderation_status"
+    t.index ["page_id", "published_at"], name: "index_posts_on_page_id_and_published_at", where: "(page_id IS NOT NULL)"
     t.index ["prayer_status"], name: "index_posts_on_prayer_status"
     t.index ["published_at"], name: "index_posts_on_published_at"
     t.index ["published_at"], name: "index_posts_published_feed", order: :desc, where: "((status = 1) AND (moderation_status = 0))"
@@ -1362,6 +1430,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_120200) do
   add_foreign_key "conversation_participants", "users"
   add_foreign_key "donations", "users", on_delete: :nullify
   add_foreign_key "educations", "users"
+  add_foreign_key "experiences", "pages", on_delete: :nullify
   add_foreign_key "experiences", "users"
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "follows", "users", column: "following_id"
@@ -1382,11 +1451,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_120200) do
   add_foreign_key "office_briefings", "users", column: "updated_by_id", on_delete: :nullify
   add_foreign_key "office_conversations", "users"
   add_foreign_key "office_messages", "office_conversations"
+  add_foreign_key "page_follows", "pages", on_delete: :cascade
+  add_foreign_key "page_follows", "users", on_delete: :cascade
+  add_foreign_key "page_memberships", "pages", on_delete: :cascade
+  add_foreign_key "page_memberships", "users", column: "invited_by_id", on_delete: :nullify
+  add_foreign_key "page_memberships", "users", on_delete: :cascade
+  add_foreign_key "pages", "cities", on_delete: :nullify
+  add_foreign_key "pages", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "pages", "users", column: "verified_by_id", on_delete: :nullify
   add_foreign_key "portfolio_items", "users"
   add_foreign_key "post_links", "posts", column: "source_post_id"
   add_foreign_key "post_links", "posts", column: "target_post_id"
   add_foreign_key "post_tags", "posts"
   add_foreign_key "post_tags", "tags"
+  add_foreign_key "posts", "pages", on_delete: :nullify
   add_foreign_key "posts", "posts", column: "quoted_post_id", on_delete: :nullify
   add_foreign_key "posts", "rooms"
   add_foreign_key "posts", "series", on_delete: :nullify

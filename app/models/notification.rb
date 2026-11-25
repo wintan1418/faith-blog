@@ -35,7 +35,11 @@ class Notification < ApplicationRecord
     app_update:             29,
     rank_up:                30,
     series_new_part:        31,
-    bible_reminder:         32
+    bible_reminder:         32,
+    page_invite:            33,
+    page_new_follower:      34,
+    page_verified:          35,
+    page_mentioned:         36
   }
 
   # Associations
@@ -54,7 +58,7 @@ class Notification < ApplicationRecord
     new_comment comment_reply new_follower mentioned post_liked comment_liked connection_request
     connection_accepted post_reshared direct_message breath_from_followee everyone_mention prayer_joined
     prayer_answered thread_new_voice circle_breath circle_prayer circle_prayer_answered birthday skill_endorsed
-    series_new_part
+    series_new_part page_invite page_mentioned
   ].freeze
 
   before_create :conceal_anonymous_author
@@ -98,7 +102,8 @@ class Notification < ApplicationRecord
     thread_new_voice: "comment", badge_earned: "trophy", circle_breath: "users",
     circle_prayer: "pray", circle_prayer_answered: "answered", birthday: "cake",
     content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone",
-    rank_up: "sprout", series_new_part: "library", bible_reminder: "bookopen"
+    rank_up: "sprout", series_new_part: "library", bible_reminder: "bookopen",
+    page_invite: "building", page_new_follower: "userplus", page_verified: "badgecheck", page_mentioned: "megaphone"
   }.freeze
 
   def web_icon
@@ -129,7 +134,7 @@ class Notification < ApplicationRecord
     when :resource_rejected
       "Your resource was not approved"
     when :mentioned
-      "#{actor&.display_name || 'Someone'} mentioned you"
+      "#{voice_name} mentioned you"
     when :post_liked
       "#{actor&.display_name || 'Someone'} reacted to your post"
     when :comment_liked
@@ -139,7 +144,7 @@ class Notification < ApplicationRecord
     when :connection_accepted
       "#{actor&.display_name || 'Someone'} accepted your connection request"
     when :post_reshared
-      "#{actor&.display_name || 'Someone'} reshared your post"
+      "#{voice_name} reshared your post"
     when :direct_message
       direct_message_text
     when :breath_from_followee
@@ -171,7 +176,9 @@ class Notification < ApplicationRecord
     when :circle_prayer_answered
       "A prayer in #{circle_name_suffix('your circle')} was marked answered#{e.(" 🌟")}"
     when :content_removed
-      if notifiable.is_a?(PortfolioItem)
+      if notifiable.is_a?(Page)
+        "#{e.("🛡 ")}A picture on your page “#{notifiable.name}” was removed because it breaks our community guidelines. Please choose another."
+      elsif notifiable.is_a?(PortfolioItem)
         "#{e.("🛡 ")}“#{notifiable.title.to_s.truncate(40)}” was hidden from your portfolio because it breaks our community guidelines. Edit it or remove it."
       else
         "#{e.("🛡 ")}Your profile photo was removed because it breaks our community guidelines. Please choose another."
@@ -187,6 +194,14 @@ class Notification < ApplicationRecord
     when :bible_reminder
       reading = notifiable.try(:portion)&.label
       "Have you read your Bible today?#{" Today: #{reading}." if reading}#{e.(" 📖")}"
+    when :page_invite
+      "#{actor&.display_name || 'Someone'} invited you to help run #{page_name_for_alert} as #{notifiable.try(:role_label)&.downcase&.then { |r| r == 'admin' ? 'an admin' : "an #{r}" } || 'a member of its team'}"
+    when :page_new_follower
+      followers_alert_text
+    when :page_verified
+      "#{page_name_for_alert} is now verified#{e.(" ✓")}"
+    when :page_mentioned
+      "#{notifiable.try(:author_name) || 'Someone'} mentioned your page"
     when :birthday
       "#{e.("🎂 ")}It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -233,10 +248,19 @@ class Notification < ApplicationRecord
       chapter = notifiable.try(:portion)&.first
       routes = Rails.application.routes.url_helpers
       chapter ? routes.scripture_page_path(chapter.slug) : routes.feed_path
+    when :page_invite
+      Rails.application.routes.url_helpers.org_page_path(notifiable.page) # the invite banner is there
+    when :page_new_follower, :page_verified
+      Rails.application.routes.url_helpers.org_page_path(notifiable)
+    when :page_mentioned
+      post = underlying_post
+      post ? Rails.application.routes.url_helpers.post_path(post) : Rails.application.routes.url_helpers.notifications_path
     when :app_update
       Rails.application.routes.url_helpers.app_update_store_path # straight on to the Play Store
     when :content_removed
-      if notifiable.is_a?(PortfolioItem)
+      if notifiable.is_a?(Page)
+        Rails.application.routes.url_helpers.manage_org_page_path(notifiable)
+      elsif notifiable.is_a?(PortfolioItem)
         Rails.application.routes.url_helpers.edit_settings_portfolio_item_path(notifiable)
       else
         Rails.application.routes.url_helpers.edit_settings_profile_path
@@ -265,6 +289,33 @@ class Notification < ApplicationRecord
     end
 
     nil
+  end
+
+  # Who "said" it: a post written as a page speaks as the page, not as the
+  # member who wrote it.
+  def voice_name
+    post = notifiable if notifiable.is_a?(Post)
+    return post.page.name if post&.page && (actor_id.nil? || post.user_id == actor_id)
+
+    actor&.display_name || "Someone"
+  end
+
+  # The page an alert is about (a Page, or a PageMembership's page).
+  def page_name_for_alert
+    page = notifiable.is_a?(Page) ? notifiable : notifiable.try(:page)
+    page&.name.present? ? "“#{page.name}”" : "a page"
+  end
+
+  # "3 new people followed “Grace Chapel”": the one daily alert counts up
+  # everyone who followed since it was made.
+  def followers_alert_text
+    page = notifiable
+    return "Your page has a new follower" unless page.is_a?(Page)
+
+    since = created_at || Time.current
+    others = page.follows.where(created_at: (since - 1.second)..).where.not(user_id: actor_id).count
+    name = actor&.display_name || "Someone"
+    others.positive? ? "#{name} and #{others} #{others == 1 ? 'other' : 'others'} followed “#{page.name}”" : "#{name} followed “#{page.name}”"
   end
 
   # "in <circle name>" when the notifiable still has its circle, else fallback.
@@ -304,7 +355,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
-    return if birthday? || skill_endorsed? || app_update? || rank_up? || bible_reminder? # a push and the alert are enough; no emails for these
+    return if birthday? || skill_endorsed? || app_update? || rank_up? || bible_reminder? || page_new_follower? || page_mentioned? # a push and the alert are enough; no emails for these
     return if notifiable.is_a?(Message) && notifiable.quiet? # e.g. the welcome note, which has its own email
 
     NotificationMailer.with(notification: self).community_notification.deliver_later
@@ -329,6 +380,7 @@ class Notification < ApplicationRecord
     web    = WebPushConfig.configured? && user.push_subscriptions.exists?
     native = NativePushConfig.configured? && user.push_devices.deliverable.exists?
     return unless web || native
+    return if page_new_follower? # counted up in the alerts list; no buzz per follower
 
     PushNotificationJob.perform_later(self)
   end

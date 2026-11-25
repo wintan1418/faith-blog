@@ -10,6 +10,14 @@
     <%= f.label :organization, "Organisation", class: "label" %>
     <%= f.text_field :organization, class: "input", required: true, maxlength: 100, placeholder: "Company or organisation" %>
   </div>
+  <div class="pro-page-link">
+    <%= f.label :page_handle, "Its Brethreign page (optional)", class: "label" %>
+    <%= f.text_field :page_handle, class: "input", maxlength: 31, placeholder: "@gracechapel", autocapitalize: "off", autocomplete: "off", spellcheck: false %>
+    <p class="mt-1 text-xs text-faith-muted">Link the role to its page. <%= link_to "Find a page", pages_directory_path, class: "underline", target: "_blank" %></p>
+    <label class="mt-2 flex items-center gap-2 text-sm font-semibold">
+      <%= f.check_box :listed_on_page %> Show me on this page's People tab
+    </label>
+  </div>
   <div class="grid gap-5 sm:grid-cols-2">
     <div>
       <%= f.label :employment_type, "Employment type", class: "label" %>

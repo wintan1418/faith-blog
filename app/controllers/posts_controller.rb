@@ -98,12 +98,20 @@ class PostsController < ApplicationController
       end
     end
 
+    # "Post as Grace Chapel" from the page itself (/posts/new?as=gracechapel).
+    if params[:as].present?
+      @post.page = current_user.postable_pages.find { |page| page.handle.casecmp?(params[:as].to_s) }
+    end
+
     @rooms = Room.public_rooms.ordered
     preload_quoted_post(params[:quote])
   end
 
   def create
     @post = current_user.posts.build(post_params)
+    # Posting as a page: only one the writer helps run (the model checks too).
+    @post.page_id = nil if @post.page_id && current_user.postable_pages.none? { |page| page.id == @post.page_id }
+    @post.anonymous = false if @post.page_id
     sanitize_quoted_post!(@post)
     # Can't breathe into a private room you're not in.
     @post.room = nil if @post.room && !@post.room.accessible_by?(current_user)
@@ -144,7 +152,7 @@ class PostsController < ApplicationController
   end
 
   def update
-    attrs = post_params
+    attrs = post_params.except(:page_id) # who a post speaks as is fixed once it's written
     uploaded    = Array(attrs[:images]).reject(&:blank?)
     removed_ids = Array(nested_param(:post, :remove_image_ids)).reject(&:blank?).map(&:to_i)
 
@@ -367,7 +375,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.expect(post: [ :title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, :voice_note, :voice_duration_ms, :quoted_post_id, images: [] ])
+    params.expect(post: [ :title, :content, :room_id, :status, :kind, :prayer_status, :anonymous, :allow_comments, :tag_list, :scheduled_for, :voice_note, :voice_duration_ms, :quoted_post_id, :page_id, images: [] ])
   end
 
   # Resolve ?quote=ID for the new-post flow. Only accept posts the viewer is
@@ -429,7 +437,9 @@ class PostsController < ApplicationController
   end
 
   def authorize_post!
-    unless @post.user == current_user || current_user_admin?
+    # A page's owner and admins may also take down a post written as their page.
+    page_manager = action_name == "destroy" && @post.page&.manager?(current_user)
+    unless @post.user == current_user || current_user_admin? || page_manager
       redirect_to @post, alert: "You're not authorized to perform this action."
     end
   end

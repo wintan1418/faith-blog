@@ -76,6 +76,9 @@ class Post < ApplicationRecord
   belongs_to :room, counter_cache: :posts_count, optional: true
   # A multi-part series by the same author (see Series). At most one.
   belongs_to :series, optional: true, inverse_of: :posts
+  # Written as a page (Page): shown as the page, while user_id keeps the
+  # member who wrote it for moderation and audit.
+  belongs_to :page, optional: true
   has_many :scripture_citations, dependent: :delete_all
   has_many :comments, dependent: :destroy
   has_many :likes, as: :likeable, dependent: :destroy
@@ -126,6 +129,8 @@ class Post < ApplicationRecord
   validates :slug, presence: true, uniqueness: true
   validate :max_images_count
   validate :series_belongs_to_author
+  validate :page_post_allowed, if: -> { page_id.present? && (new_record? || will_save_change_to_page_id?) }
+  validate :page_post_not_anonymous, if: -> { page_id.present? }
   before_save :place_in_series, if: :will_save_change_to_series_id?
 
   # Search vectors (`searchable`, `search_title`) are written by database
@@ -141,7 +146,8 @@ class Post < ApplicationRecord
     { images_attachments: :blob },
     { user: { profile: { avatar_attachment: :blob } } },
     :viewer_like, :reaction_tallies,
-    { quoted_post: :user }, :series
+    { quoted_post: [ :user, { page: { logo_attachment: :blob } } ] }, :series,
+    { page: { logo_attachment: :blob } }
   ].freeze
   scope :for_cards, -> { includes(*CARD_INCLUDES) }
 
@@ -153,7 +159,14 @@ class Post < ApplicationRecord
   # Public "published" feed — must be both published-status AND moderation-approved.
   # Held / blocked posts deliberately stay out of feeds; authors and admins reach
   # them via direct links (see Post#visible_to?).
-  scope :published, -> { published_status.moderation_visible }
+  scope :published, -> { published_status.moderation_visible.without_suspended_pages }
+  # A suspended page's posts leave every feed with it.
+  scope :without_suspended_pages, -> {
+    where("posts.page_id IS NULL OR posts.page_id NOT IN (SELECT pages.id FROM pages WHERE pages.status = 1)")
+  }
+  # Posts in the member's own name (not written as a page they run).
+  scope :personal, -> { where(page_id: nil) }
+  scope :as_page, -> { where.not(page_id: nil) }
   scope :drafts, -> { where(status: :draft) }
   # Breaths that carry their author's name (anonymous ones never count toward
   # or appear on the author's public profile).
@@ -191,6 +204,8 @@ class Post < ApplicationRecord
   before_update :note_edit_for_moderation
   after_update_commit :recheck_moderation_after_edit
   after_commit :fanout_to_followers, on: :create, if: -> { published? && moderation_approved? }
+  # "@gracechapel" in a post: the page's managers hear about it (once).
+  after_commit :notify_mentioned_pages, on: :create, if: -> { published? }
   after_update_commit :fanout_to_followers_on_publish
   after_commit :bump_author_streak, on: :create, if: -> { published? && moderation_approved? }
   after_update_commit :bump_author_streak_on_publish
@@ -235,8 +250,13 @@ class Post < ApplicationRecord
   end
 
   def author_name
-    anonymous? ? "Anonymous" : user.display_name
+    return "Anonymous" if anonymous?
+
+    page_post? ? page.name : user.display_name
   end
+
+  # Written as a page (and shown as it).
+  def page_post? = page_id.present? && page.present?
 
   def reading_time
     word_count = content.to_plain_text.split.size
@@ -315,7 +335,7 @@ class Post < ApplicationRecord
   end
 
   def feed_visible?
-    published? && published_at.present? && published_at <= Time.current && moderation_approved?
+    published? && published_at.present? && published_at <= Time.current && moderation_approved? && !page&.suspended?
   end
 
   # Applied by AiModerationGateJob once the async gate has classified a freshly
@@ -442,6 +462,32 @@ class Post < ApplicationRecord
     self.series_position = series.next_position(title: SeriesTitle.effective_title(self))
   end
 
+  def page_post_allowed
+    if page.nil? || !page.active?
+      errors.add(:page, "isn't available")
+    elsif !page.editor?(user)
+      errors.add(:base, "You can only post as a page you help run")
+    end
+  end
+
+  def page_post_not_anonymous
+    errors.add(:base, "A page can't post anonymously") if anonymous?
+  end
+
+  def notify_mentioned_pages
+    handles = extract_mentions.map(&:downcase).uniq.first(10) - %w[everyone all here]
+    return if handles.empty?
+
+    taken = User.where("lower(username) IN (?)", handles).pluck(Arel.sql("lower(username)"))
+    Page.listed.where("lower(handle) IN (?)", handles - taken).where.not(id: page_id).find_each do |mentioned|
+      mentioned.managers.where.not(id: user_id).find_each do |manager|
+        Notification.create(user: manager, notifiable: self, notification_type: :page_mentioned)
+      end
+    end
+  rescue StandardError => e
+    Rails.logger.warn("[page-mentions] failed for post #{id}: #{e.class}: #{e.message}")
+  end
+
   def cannot_quote_self
     return unless quoted_post_id.present? && quoted_post_id == id
     errors.add(:quoted_post_id, "can't be itself")
@@ -464,7 +510,7 @@ class Post < ApplicationRecord
 
     notification = Notification.create(
       user: target.user,
-      actor: user,
+      actor: (page_id ? nil : user), # a page's quote speaks as the page
       notifiable: self,
       notification_type: :post_reshared
     )

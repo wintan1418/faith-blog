@@ -8,7 +8,7 @@
 # searcher couldn't reach by browsing. Filters live in the URL, so a results
 # page can be shared.
 class SearchController < ApplicationController
-  TABS = %w[top breaths people rooms series bible resources].freeze
+  TABS = %w[top breaths people pages rooms series bible resources].freeze
   DATES = SiteSearch::PostSearch::DATES
   TYPES = SiteSearch::PostSearch::TYPES
   SORTS = SiteSearch::PostSearch::SORTS
@@ -55,6 +55,7 @@ class SearchController < ApplicationController
       @reference = sections.reference
       @people = sections.people_quick(limit: 3)
       @rooms = sections.rooms(limit: 3).to_a
+      @org_pages = sections.pages(limit: 2).to_a
       search = SiteSearch::PostSearch.new(@query, visibility: @visibility, filters: {})
       @breaths = search.call(per_page: SUGGEST_BREATHS, snippets: false, include_replies: false).hits
     end
@@ -79,12 +80,13 @@ class SearchController < ApplicationController
     @breaths = post_search.call(page: 1, per_page: 6)
     @people = sections.people(limit: 3).to_a
     @rooms = sections.rooms(limit: 3).to_a
+    @org_pages = sections.pages(limit: 3).to_a
     @reference = sections.reference
     @resources = sections.resources(limit: 2).to_a
     @series = sections.series(limit: 2).to_a
     @series_parts = sections.series_part_counts(@series)
     load_fallbacks(@breaths)
-    @breaths.total + @people.size + @rooms.size + @resources.size + @series.size + (@reference ? 1 : 0)
+    @breaths.total + @people.size + @org_pages.size + @rooms.size + @resources.size + @series.size + (@reference ? 1 : 0)
   end
 
   def search_breaths
@@ -99,6 +101,14 @@ class SearchController < ApplicationController
     @more = @people.size > 20
     @people = @people.first(20)
     @people.size
+  end
+
+  def search_pages
+    @page = params[:page].to_i.clamp(1, 50)
+    @org_pages = sections.pages(limit: 21, offset: (@page - 1) * 20).to_a
+    @more = @org_pages.size > 20
+    @org_pages = @org_pages.first(20)
+    @org_pages.size
   end
 
   def search_rooms

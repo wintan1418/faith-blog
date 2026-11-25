@@ -83,7 +83,7 @@
     <% @top_breaths.each do |post| %>
       <div style="border: 1px solid #e6ece8; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;">
         <p style="margin: 0 0 4px; font-size: 13px; color: #6c7c72;">
-          <strong style="color: #17251d;"><%= post.user.display_name %></strong>
+          <strong style="color: #17251d;"><%= post.author_name %></strong>
           <% if post.room %> · <%= post.room.name %><% end %>
           · <%= post.published_at.strftime("%b %-d") %>
         </p>
@@ -109,7 +109,7 @@
     <% @open_prayers.each do |post| %>
       <div style="border-left: 3px solid #a78bfa; padding: 6px 12px; margin-bottom: 8px;">
         <p style="margin: 0; color: #52665a; font-size: 14px;">
-          <strong style="color: #17251d;"><%= post.user.display_name %></strong> — <%= truncate(post.content.to_plain_text, length: 140) %>
+          <strong style="color: #17251d;"><%= post.author_name %></strong> — <%= truncate(post.content.to_plain_text, length: 140) %>
         </p>
       </div>
     <% end %>

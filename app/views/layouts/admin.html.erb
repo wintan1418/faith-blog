@@ -62,6 +62,7 @@
       ["Users", admin_users_path, "users", request.path.include?("/admin/users")],
       ["Posts", admin_posts_path, "filetext", request.path.include?("/admin/posts")],
       ["Rooms", admin_rooms_path, "users", request.path.include?("/admin/rooms")],
+      ["Pages", admin_pages_path, "building", request.path.start_with?("/admin/pages")],
       ["Resources", admin_resources_path, "bookopen", request.path.include?("/admin/resources")],
       ["Reports", admin_reports_path, "shield", request.path.include?("/admin/reports")],
       ["City changes", admin_city_changes_path, "mappin", request.path.include?("/admin/city-changes")],

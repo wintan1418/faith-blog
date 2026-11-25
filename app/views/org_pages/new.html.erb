@@ -1,0 +1,67 @@
+<% content_for(:title) { "Create a page - Brethreign" } %>
+<% content_for(:app_title) { "Create a page" } %>
+<% steps = [ [ "basics", "Name" ], [ "handle", "Address" ], [ "images", "Pictures" ], [ "details", "Details" ] ] %>
+<% error_step = if @page.errors.any?
+                  keys = @page.errors.attribute_names
+                  if (keys & %i[name category]).any? then 0
+                  elsif (keys & %i[handle tagline]).any? then 1
+                  elsif (keys & %i[logo cover]).any? then 2
+                  else 3 end
+                else 0 end %>
+
+<div class="pg-shell pg-create">
+  <header class="pg-create-head">
+    <div>
+      <p class="pg-kicker"><%= render_icon("building", classes: "pg-kicker-icon") %>New page</p>
+      <h1 class="pg-dir-title">Create a page</h1>
+      <p class="pg-dir-copy">For a church, ministry, fellowship, business, school, NGO or community you help run.</p>
+    </div>
+  </header>
+
+  <% if @block_reason %>
+    <div class="pg-panel pg-blocked">
+      <%= render_icon("clock", classes: "pg-empty-icon") %>
+      <p class="pg-empty-title">Not just yet</p>
+      <p><%= @block_reason %></p>
+      <%= link_to "Browse pages", pages_directory_path, class: "pg-btn" %>
+    </div>
+  <% else %>
+    <%= form_with model: @page, url: org_pages_path, method: :post, multipart: true,
+                  html: { class: "pg-wizard pg-panel", novalidate: false,
+                          data: { controller: "page-wizard", page_wizard_check_url_value: org_page_handle_check_path,
+                                  page_wizard_start_value: error_step, turbo: false } } do |f| %>
+      <ol class="pg-steps" aria-label="Steps">
+        <% steps.each_with_index do |(key, label), i| %>
+          <li class="pg-step-dot" data-page-wizard-target="dot"><span><%= i + 1 %></span><%= label %></li>
+        <% end %>
+      </ol>
+      <%= render "org_pages/errors", page: @page %>
+
+      <section class="pg-step" data-page-wizard-target="step" aria-label="Name">
+        <h2 class="pg-step-title">What's it called?</h2>
+        <%= render "org_pages/fields_basics", f: f, page: @page %>
+      </section>
+      <section class="pg-step" data-page-wizard-target="step" aria-label="Address">
+        <h2 class="pg-step-title">Its address on Brethreign</h2>
+        <%= render "org_pages/fields_handle", f: f, page: @page %>
+      </section>
+      <section class="pg-step" data-page-wizard-target="step" aria-label="Pictures">
+        <h2 class="pg-step-title">Add a logo and cover</h2>
+        <%= render "org_pages/fields_images", f: f, page: @page %>
+      </section>
+      <section class="pg-step" data-page-wizard-target="step" aria-label="Details">
+        <h2 class="pg-step-title">A few details</h2>
+        <%= render "org_pages/fields_details", f: f, page: @page %>
+        <p class="pg-hint-text">By creating a page you confirm you're allowed to represent it. Brethreign may remove pages that impersonate others.</p>
+      </section>
+
+      <div class="pg-wizard-nav">
+        <button type="button" class="pg-btn" data-page-wizard-target="back" data-action="page-wizard#back" hidden>Back</button>
+        <button type="button" class="pg-btn is-primary" data-page-wizard-target="next" data-action="page-wizard#next" hidden>Next</button>
+        <%= f.button type: "submit", class: "pg-btn is-primary", data: { page_wizard_target: "submit" } do %>
+          <%= render_icon("check", classes: "pg-btn-icon") %><span>Create page</span>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

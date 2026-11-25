@@ -7,6 +7,13 @@ module Settings
 
     def new
       @experience = current_user.experiences.new(current: true)
+      # From a page's People tab: "Work, serve or worship here? Add it".
+      if params[:page].present? && (page = Page.listed.by_handle(params[:page]).first)
+        @experience.page = page
+        @experience.organization = page.name
+        @experience.listed_on_page = true
+        @experience.employment_type = "Ministry" if page.church? || page.ministry? || page.fellowship?
+      end
     end
 
     def create
@@ -41,7 +48,7 @@ module Settings
 
     def experience_params
       params.expect(experience: [ :title, :organization, :employment_type, :location,
-                                  :start_month, :end_month, :current, :description ])
+                                  :start_month, :end_month, :current, :description, :page_handle, :listed_on_page ])
     end
   end
 end

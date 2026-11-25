@@ -148,6 +148,9 @@
             <% end %>
 
             <div class="eg-menu-sep" role="separator"></div>
+            <%= link_to pages_directory_path, class: "fc-dropdown-item eg-menu-item" do %>
+              <%= render_icon("building", classes: "eg-menu-ico") %> Pages
+            <% end %>
             <%= link_to circles_path, class: "fc-dropdown-item eg-menu-item" do %>
               <%= render_icon("pray", classes: "eg-menu-ico") %> Prayer Circles
             <% end %>

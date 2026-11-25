@@ -13,6 +13,9 @@ class BreathFanoutJob < ApplicationJob
     # Anonymous breaths are never fanned out to the author's followers: a
     # "someone you follow breathed" alert would unmask them.
     return if post.anonymous?
+    # A page's posts reach its followers through their Following feed, not an
+    # alert each (and never as "<writer> breathed": the page said it).
+    return if post.page_id.present?
 
     author = post.user
     follower_ids = author.followers.pluck(:id)

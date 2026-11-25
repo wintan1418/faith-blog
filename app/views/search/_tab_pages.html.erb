@@ -1,0 +1,14 @@
+<% if @org_pages.empty? %>
+  <%= render "search/no_results" %>
+<% else %>
+  <p class="srch-count" role="status"><%= pluralize(@org_pages.size, "page") %> for “<%= @query.text %>”</p>
+  <%= render "search/pages", pages: @org_pages %>
+  <% if @page > 1 || @more %>
+    <nav class="srch-pager" aria-label="Result pages">
+      <% if @page > 1 %><%= link_to "← Previous", search_path(search_params(page: @page - 1)), class: "srch-chip", rel: "prev" %><% end %>
+      <span class="srch-pager-at">Page <%= @page %></span>
+      <% if @more %><%= link_to "Next →", search_path(search_params(page: @page + 1)), class: "srch-chip", rel: "next" %><% end %>
+    </nav>
+  <% end %>
+<% end %>
+<p class="srch-count"><%= link_to "Browse all pages", pages_directory_path, class: "srch-more" %></p>

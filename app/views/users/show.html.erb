@@ -133,7 +133,7 @@
               <small>Following</small>
             <% end %>
             <div class="profile-stat">
-              <% visible_breath_count = (user_signed_in? && current_user == @user ? @user.posts.published : @user.posts.published.named).count %><span data-profile-hero-target="count" data-count="<%= visible_breath_count %>"><%= visible_breath_count %></span>
+              <% visible_breath_count = (user_signed_in? && current_user == @user ? @user.posts.published.personal : @user.posts.published.personal.named).count %><span data-profile-hero-target="count" data-count="<%= visible_breath_count %>"><%= visible_breath_count %></span>
               <small>Breaths</small>
             </div>
             <%# Your own total is everything; others see seeds earned in the open
