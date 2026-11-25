@@ -42,7 +42,7 @@
       <%= render "admin/office/conversations/status", conversation: @conversation %>
     <% else %>
       <div class="office-welcome">
-        <span class="office-mark" aria-hidden="true">~</span>
+        <span class="office-mark" aria-hidden="true"><%= render "shared/logomark" %></span>
         <h2>Good to see you, <%= current_user.display_name.split.first %>.</h2>
         <p class="office-muted">Talk it through here: breaths, flyers, emails to members, announcements, numbers. Drafts come back as cards; nothing goes out until you press the button.</p>
         <div class="office-suggestions">

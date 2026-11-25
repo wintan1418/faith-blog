@@ -47,13 +47,10 @@ dialog.guest-gate[open] { animation: guest-gate-in 0.18s ease-out; }
 .guest-gate-mark {
   display: inline-grid;
   place-items: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--fc-fill);
-  color: var(--fc-on-fill);
+  height: 64px;
+  color: var(--br-logo-mark);
 }
-.guest-gate-mark svg { width: 62%; height: 62%; }
+.guest-gate-mark svg { height: 100%; width: auto; }
 .guest-gate-title {
   margin-top: 1rem;
   font-family: var(--fc-display);

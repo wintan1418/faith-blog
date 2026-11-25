@@ -29,7 +29,8 @@ html.theme-dark .fc-admin {
   padding: 1.25rem 1rem;
 }
 .fc-admin .admin-brand { border-bottom-color: var(--fc-line); }
-.fc-admin .admin-brand .text-sm { font-family: var(--fc-display); font-size: 1.125rem; font-weight: 700; }
+.fc-admin .admin-brand-lockup { display: flex; flex-direction: column; gap: 6px; }
+.fc-admin .admin-brand-logo { height: 30px; }
 .fc-admin .admin-side-nav { gap: 2px; overflow-y: auto; }
 .fc-admin .admin-side-link {
   min-height: 44px;

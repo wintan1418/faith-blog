@@ -2,14 +2,9 @@
   <div class="mystic-container">
     <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
       <div class="md:col-span-2">
-        <div class="mb-4 flex items-center gap-3">
-          <span class="grid h-10 w-10 place-items-center rounded-2xl bg-white/10 text-white">
-            <%= render_icon("sparkles", classes: "w-5 h-5") %>
-          </span>
-          <div>
-            <p class="font-bold">Brethreign</p>
-            <p class="text-sm text-white/65">A thoughtful home for faith-filled conversation.</p>
-          </div>
+        <div class="mb-4">
+          <%= render "shared/logo", css_class: "h-9 [--br-logo-word:#f5f1e6]", label: "Brethreign" %>
+          <p class="mt-2 text-sm text-white/65">A thoughtful home for faith-filled conversation.</p>
         </div>
         <p class="max-w-xl text-sm leading-6 text-white/70">
           Share testimonies, ask for prayer, join rooms, save resources, and keep walking with people who are serious about encouragement and wisdom.

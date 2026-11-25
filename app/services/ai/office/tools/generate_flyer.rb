@@ -5,9 +5,10 @@ module Ai
     module Tools
       class GenerateFlyer < Base
         BRAND = <<~BRAND.squish
-          Style: Brethreign brand. Deep green #0E8A5F and mint #34D399 on a near-black #0b1110 or soft light background,
-          elegant serif headings, generous space, calm and warm, modern and premium, not clip-art. A small "~" breath mark
-          may sit near a corner as the logo. Faith-natural imagery (light, gardens, open hands, people together); no
+          Style: Brethreign brand. Evergreen #12704F and mint #3CDB9D, with cream #F5F1E6 and a touch of gold #F5B748,
+          on a near-black #07110D or soft cream background, elegant serif headings, generous space, calm and warm,
+          modern and premium, not clip-art. Do not draw any logo, wordmark or symbol for Brethreign; leave a clean
+          corner free for the real logo. Faith-natural imagery (light, gardens, open hands, people together); no
           crosses unless asked, no stock-photo clichés, no watermarks.
         BRAND
 

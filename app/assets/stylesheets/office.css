@@ -100,9 +100,8 @@
   flex: none; display: grid; place-items: center;
   width: 1.75rem; height: 1.75rem; border-radius: 999px;
   background: var(--office-green); color: #fff;
-  font-family: "Playfair Display", Georgia, serif; font-size: 1.15rem; font-weight: 700; line-height: 1;
-  padding-bottom: 0.2rem;
 }
+.office-avatar svg { height: 62%; width: auto; }
 
 /* The assistant's Markdown */
 .office-prose { min-width: 0; color: var(--admin-ink); line-height: 1.65; font-size: 0.98rem; overflow-wrap: anywhere; }
@@ -277,9 +276,9 @@ html.theme-dark .office-card-error, html.theme-dark .office-tool-chip.is-error {
 .office-welcome { padding: 2rem 0 1rem; display: grid; gap: 0.85rem; justify-items: start; }
 .office-mark {
   display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border-radius: 999px;
-  background: var(--office-green); color: #fff; padding-bottom: 0.35rem;
-  font-family: "Playfair Display", Georgia, serif; font-size: 2.25rem; font-weight: 700; line-height: 1;
+  background: var(--office-green); color: #fff;
 }
+.office-mark svg { height: 60%; width: auto; }
 .office-welcome h2 { font-family: "Playfair Display", Georgia, serif; font-size: 1.75rem; font-weight: 700; color: var(--admin-ink); }
 .office-welcome > p { max-width: 36rem; font-size: 0.95rem; }
 .office-suggestions { display: flex; flex-wrap: wrap; gap: 0.5rem; }

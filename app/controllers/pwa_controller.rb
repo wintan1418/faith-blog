@@ -16,11 +16,15 @@ class PwaController < ApplicationController
       scope: "/",
       display: "standalone",
       orientation: "portrait",
-      background_color: "#0b1417",
-      theme_color: "#0b1417",
+      background_color: "#07110d",
+      theme_color: "#07110d",
+      # The Brethreign mark on a night tile. ?v= makes installed apps pick up
+      # the new icons after the November 2026 rebrand.
       icons: [
-        { src: asset_path_for("icon-192.png"), sizes: "192x192", type: "image/png", purpose: "any" },
-        { src: asset_path_for("icon.png"), sizes: "512x512", type: "image/png", purpose: "any maskable" }
+        { src: "/icon-192.png?v=2", sizes: "192x192", type: "image/png", purpose: "any" },
+        { src: "/icon.png?v=2", sizes: "512x512", type: "image/png", purpose: "any" },
+        { src: "/icon-maskable-192.png?v=2", sizes: "192x192", type: "image/png", purpose: "maskable" },
+        { src: "/icon-maskable-512.png?v=2", sizes: "512x512", type: "image/png", purpose: "maskable" }
       ],
       shortcuts: [
         { name: "Feed",          short_name: "Feed",       url: "/feed" },
@@ -38,13 +42,5 @@ class PwaController < ApplicationController
     response.headers["Service-Worker-Allowed"] = "/"
     response.headers["Cache-Control"] = "no-cache"
     render template: "pwa/service_worker", layout: false, formats: [ :js ]
-  end
-
-  private
-
-  def asset_path_for(name)
-    helpers.asset_path(name)
-  rescue StandardError
-    "/#{name}"
   end
 end

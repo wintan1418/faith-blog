@@ -23,7 +23,7 @@ class PostOgCard
   HEIGHT = 630
   PAD = 72
   AVATAR = 76
-  DESIGN = "1"
+  DESIGN = "2" # bump to redraw every stored card (2: the November 2026 logo)
   COUNTS_TTL = 1.day
   FONT_FILE = Rails.root.join("vendor/fonts/Inter.ttf").to_s
   FONT = "Inter"
@@ -249,8 +249,9 @@ class PostOgCard
   end
 
   def draw_header
-    place(tint(mask("logomark"), palette[:accent_2]), PAD, PAD)
-    place(text_image("Brethreign", size: 30, weight: "Bold"), PAD + 44, PAD + 6)
+    # The Brethreign logo (brand pack): the mark in the accent, the wordmark in ink.
+    place(tint(mask("logo-mark"), palette[:accent_2]), PAD, PAD)
+    place(tint(mask("logo-word"), INK), PAD, PAD)
 
     tag = text_image(label.upcase, size: 17, weight: "Bold", color: palette[:accent_2])
     w = tag.width + 36

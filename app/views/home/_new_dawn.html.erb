@@ -1,13 +1,12 @@
-<%# "A new dawn": the old mark (green circle, white wave) sets like the moon
-    while the new B mark rises like the sun, then beats like a heart.
-    Pure CSS (welcome.css, "New dawn"). The styles at rest ARE the final scene;
-    the keyframes only run from night towards it, so the first paint is always
-    complete, and prefers-reduced-motion simply shows the risen sun. %>
-<% wave = "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3" %>
+<%# "A new dawn": the new Brethreign mark rises like the sun over the
+    horizon, then beats like a heart. Pure CSS (welcome.css, "New dawn"). The
+    styles at rest ARE the final scene; the keyframes only run from night
+    towards it, so the first paint is always complete, and
+    prefers-reduced-motion simply shows the risen sun. %>
 <% stars = [ [ 8, 12, 2 ], [ 18, 30, 1 ], [ 30, 8, 1 ], [ 44, 20, 2 ], [ 58, 6, 1 ], [ 66, 26, 1 ], [ 78, 12, 2 ], [ 88, 32, 1 ], [ 93, 8, 1 ], [ 12, 44, 1 ], [ 52, 38, 1 ] ] %>
 
 <figure class="dawn-wrap">
-  <div class="dawn" role="img" aria-label="The old Brethreign logo sets like the moon as the new logo rises like the sun. New look coming soon.">
+  <div class="dawn" role="img" aria-label="The new Brethreign logo rises like the sun at dawn.">
     <span class="dawn-sky dawn-sky-night"></span>
     <span class="dawn-sky dawn-sky-dawn"></span>
     <span class="dawn-stars">
@@ -16,17 +15,11 @@
       <% end %>
     </span>
 
-    <span class="dawn-moon-path">
-      <span class="dawn-moon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="<%= wave %>"/></svg>
-      </span>
-    </span>
-
     <span class="dawn-sun-path">
       <span class="dawn-sun">
         <span class="dawn-glow"></span>
         <span class="dawn-ripple"></span>
-        <span class="dawn-beat"><%= render "shared/logomark", css_class: "dawn-mark" %></span>
+        <span class="dawn-beat"><%= render "shared/logomark", css_class: "dawn-mark", color: "#3cdb9d" %></span>
       </span>
     </span>
 
@@ -34,7 +27,7 @@
   </div>
 
   <figcaption class="dawn-caption">
-    <span class="dawn-eyebrow">Unveiling soon</span>
-    <span class="dawn-line">A new dawn for Brethreign. Our new look is almost here.</span>
+    <span class="dawn-eyebrow">Our new look is here</span>
+    <span class="dawn-line">A new dawn for Brethreign.</span>
   </figcaption>
 </figure>

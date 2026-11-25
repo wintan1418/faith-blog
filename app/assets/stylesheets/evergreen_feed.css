@@ -83,23 +83,11 @@ html nav.eg-topbar .eg-topbar-inner {
   color: var(--fc-ink) !important;
   text-decoration: none;
 }
-.eg-brand-mark {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--fc-fill);
-  color: var(--fc-on-fill);
-}
-.eg-brand-mark svg { width: 24px; height: 24px; }
-.eg-brand-word {
-  font-family: var(--fc-display);
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0;
-}
+/* The logo from the brand pack (shared/_logo): mint mark, wordmark in
+   evergreen (light) or cream (dark); see brand_polish.css. Where the bar is
+   tight only the mark shows (.eg-brand-mark). */
+.eg-brand-logo { height: 34px; width: auto; }
+.eg-brand-mark { display: none; height: 34px; width: auto; color: var(--br-logo-mark); }
 
 .eg-pills {
   margin: 0 auto;
@@ -302,16 +290,16 @@ html.theme-dark .eg-menu .fc-dropdown-danger { color: #ff8a80 !important; }
   html .eg-pills .eg-pill { padding: 0; width: 48px; justify-content: center; }
 }
 @media (max-width: 860px) {
-  .eg-brand-word { display: none; }
+  .eg-brand-logo { display: none; }
+  .eg-brand-mark { display: block; }
 }
 /* Phones: compact bar; the bottom nav carries Feed/Rooms/Breathe/Bible/Profile. */
 @media (max-width: 760px) {
   html nav.eg-topbar .eg-topbar-inner { height: 58px !important; padding: 0 10px 0 14px; gap: 6px; }
   .eg-pills { display: none; }
   .eg-brand { margin-right: auto; gap: 8px; }
-  .eg-brand-word { display: inline; font-size: 21px; }
-  .eg-brand-mark { width: 32px; height: 32px; }
-  .eg-brand-mark svg { width: 20px; height: 20px; }
+  .eg-brand-logo { display: block; height: 30px; }
+  .eg-brand-mark { display: none; }
   .eg-actions-bar.fc-topbar-actions { gap: 6px; }
   html .eg-round { width: 40px; height: 40px; }
   html .eg-me { width: 40px; height: 40px; }
@@ -323,9 +311,7 @@ html.theme-dark .eg-menu .fc-dropdown-danger { color: #ff8a80 !important; }
 @media (max-width: 370px) {
   html nav.eg-topbar .eg-topbar-inner { padding: 0 8px 0 10px; gap: 4px; }
   .eg-brand { gap: 6px; }
-  .eg-brand-word { font-size: 18px; }
-  .eg-brand-mark { width: 28px; height: 28px; }
-  .eg-brand-mark svg { width: 18px; height: 18px; }
+  .eg-brand-logo { height: 26px; }
   .eg-actions-bar.fc-topbar-actions { gap: 4px; }
   html .eg-round, html .eg-me { width: 36px; height: 36px; }
   .eg-me-img { width: 32px; height: 32px; }
@@ -562,12 +548,13 @@ html .eg-feed .eg-rooms { padding: 14px 8px 8px; gap: 2px; }
   gap: 10px;
 }
 .eg-today > * { position: relative; }
-.eg-today .eg-today-waves {
+/* A large, faint Brethreign mark as the strip's watermark. */
+.eg-today .eg-today-mark {
   position: absolute;
-  right: -20px;
-  bottom: -14px;
-  width: 320px;
-  height: 120px;
+  right: 22px;
+  bottom: -34px;
+  width: auto;
+  height: 190px;
   color: rgba(255, 255, 255, 0.10);
   pointer-events: none;
 }
@@ -866,7 +853,7 @@ html .eg-golden .fc-golden-dot.is-active { background: var(--fc-gold-fill); }
   .eg-today-ref { font-size: 10px; letter-spacing: 0.08em; }
   .eg-today-foot { gap: 10px; }
   html .eg-today .eg-today-read { font-size: 13px; }
-  .eg-today .eg-today-waves { width: 220px; height: 80px; right: -24px; }
+  .eg-today .eg-today-mark { height: 130px; right: 12px; bottom: -24px; }
 
   /* The composer collapses to one pill; the chips stay one swipe away. */
   html .eg-feed .fc-panel.eg-composer { padding: 6px !important; border-radius: 999px !important; gap: 0; }

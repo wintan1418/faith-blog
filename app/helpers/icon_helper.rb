@@ -79,8 +79,6 @@ module IconHelper
     "alerttriangle" => "M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01",
     "swords" => "M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M14.5 6.5 18 3h3v3l-3.5 3.5M5 14l4 4M7 17l-3 3M3 19l2 2",
     "flame" => "M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z",
-    "breathe" => "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3",
-    "wave" => "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3",
     "newspaper" => "M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5M10 6h8v4h-8z",
     "blog" => "M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2M18 14h-8M15 18h-5M10 6h8v4h-8z",
     "cake" => "M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1M2 21h20M7 8v3M12 8v3M17 8v3M7 4h.01M12 4h.01M17 4h.01",
@@ -185,6 +183,8 @@ module IconHelper
     icon_name = raw_name.downcase.gsub(/[^a-z0-9_]/, "")
     icon_name = ALIASES[icon_name] || icon_name
     icon_name = icon_name.delete("_")
+    # "Breathe" (post) wears the Brethreign mark (BrandHelper).
+    return brand_mark_svg(classes) if %w[breathe wave].include?(icon_name)
     if (path = ICONS[icon_name] || ICONS[ALIASES[icon_name].to_s])
       return icon_svg(path, classes)
     end

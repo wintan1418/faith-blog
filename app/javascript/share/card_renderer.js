@@ -6,6 +6,8 @@
 // bold/italic, so styled titles look right on every phone whatever fonts it
 // has; emoji come from the system emoji font through the canvas font stack.
 
+import { LOCKUP_W, LOCKUP_H, LOCKUP_MARK, LOCKUP_WORD } from "./brand_art"
+
 export const FORMATS = {
   story:    { width: 1080, height: 1920, label: "Story",    hint: "WhatsApp · Instagram status" },
   square:   { width: 1080, height: 1080, label: "Square",   hint: "Feed post" },
@@ -261,6 +263,23 @@ export function drawLogo(ctx, x, y, height, color) {
   return LOGO_W * scale
 }
 
+// The Brethreign logo (mark + "brethreign" wordmark) from the brand pack, the
+// mark and the word in their own colours. Returns the width drawn.
+export function lockupWidth(height) { return LOCKUP_W * (height / LOCKUP_H) }
+export function drawLockup(ctx, x, y, height, markColor, wordColor) {
+  const scale = height / LOCKUP_H
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.scale(scale, scale)
+  ctx.fillStyle = markColor
+  for (const [alpha, d] of LOCKUP_MARK) { ctx.globalAlpha = alpha; ctx.fill(new Path2D(d)) }
+  ctx.globalAlpha = 1
+  ctx.fillStyle = wordColor
+  for (const d of LOCKUP_WORD) ctx.fill(new Path2D(d))
+  ctx.restore()
+  return lockupWidth(height)
+}
+
 function drawIcon(ctx, name, x, y, size, color, { fill = false, width = 2 } = {}) {
   ctx.save()
   ctx.translate(x, y)
@@ -448,15 +467,7 @@ export function renderCard(data, opts) {
     areaBottom = BARE_SHADOW_TOP + BARE_MAX_CARD_H
   } else if (story) {
     const logoH = 76
-    ctx.font = `700 46px ${STACK}`
-    const wordW = ctx.measureText("Brethreign").width
-    const totalW = LOGO_W * (logoH / LOGO_H) + 18 + wordW
-    const lx = (W - totalW) / 2
-    const lw = drawLogo(ctx, lx, 118, logoH, accentText)
-    ctx.fillStyle = T.ink
-    ctx.textBaseline = "middle"
-    ctx.textAlign = "left"
-    ctx.fillText("Brethreign", lx + lw + 18, 118 + logoH / 2 + 2)
+    drawLockup(ctx, (W - lockupWidth(logoH)) / 2, 118, logoH, accentText, T.ink)
     areaTop = 250
     areaBottom = H - 430
   }
@@ -694,11 +705,8 @@ export function renderCard(data, opts) {
     ctx.stroke()
     if (data.qr) drawQR(ctx, data.qr, innerX + innerW - S.qr, fy + 6, S.qr - 6, "#0f1a16")
     const lh = Math.round(S.qr * 0.36)
-    const lw = drawLogo(ctx, innerX, fy + S.qr / 2 - lh / 2 - S.meta * 0.9, lh, accentText)
-    ctx.font = `700 ${Math.round(S.name * 0.95)}px ${STACK}`
-    ctx.fillStyle = T.ink
+    drawLockup(ctx, innerX, fy + S.qr / 2 - lh / 2 - S.meta * 0.9, lh, accentText, T.ink)
     ctx.textBaseline = "middle"
-    ctx.fillText("Brethreign", innerX + lw + 14, fy + S.qr / 2 - S.meta * 0.9)
     ctx.font = `600 ${S.meta}px ${STACK}`
     ctx.fillStyle = accentText
     let label = data.link_label

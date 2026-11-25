@@ -21,10 +21,10 @@ class CanonicalHostAndIconsTest < ActionDispatch::IntegrationTest
 
   test "pages link the real favicon and icons" do
     get "/users/sign_in"
-    assert_select "link[rel=icon][href='/favicon.ico']"
-    assert_select "link[rel=icon][href='/favicon-96.png']"
-    assert_select "link[rel=apple-touch-icon][href='/apple-touch-icon.png']"
-    %w[favicon.ico favicon-96.png icon.png icon-192.png apple-touch-icon.png].each do |file|
+    assert_select "link[rel=icon][href='/favicon.ico?v=2']"
+    assert_select "link[rel=icon][href='/favicon-96.png?v=2']"
+    assert_select "link[rel=apple-touch-icon][href='/apple-touch-icon.png?v=2']"
+    %w[favicon.ico favicon-96.png icon.png icon-192.png icon-maskable-512.png icon-maskable-192.png apple-touch-icon.png].each do |file|
       assert File.size(Rails.public_path.join(file)) > 500, "#{file} looks empty"
     end
   end

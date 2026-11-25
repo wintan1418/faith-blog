@@ -34,20 +34,23 @@ class WelcomePageTest < ActionDispatch::IntegrationTest
     assert_select "meta[property='og:image']"
   end
 
-  test "the welcome page tells the new dawn story" do
+  test "the welcome page shows the new look: the B rises at dawn, the logo beside it" do
     get root_path
 
     assert_select ".welcome-brand figure.dawn-wrap" do
-      assert_select ".dawn[role=img][aria-label=?]",
-                    "The old Brethreign logo sets like the moon as the new logo rises like the sun. New look coming soon."
-      assert_select ".dawn-moon svg path" # the current mark, as the moon
-      assert_select ".dawn-sun svg.dawn-mark path", count: 3 # the new B: two rings and the B
-      assert_select ".dawn-sun svg.dawn-mark path[fill-opacity='.2']"
-      assert_select ".dawn-sun svg.dawn-mark path[fill-opacity='.6']"
-      assert_select "figcaption .dawn-eyebrow", text: "Unveiling soon"
-      assert_select "figcaption", text: /A new dawn for Brethreign\. Our new look is almost here\./
+      assert_select ".dawn[role=img][aria-label=?]", "The new Brethreign logo rises like the sun at dawn."
+      assert_select ".dawn-moon", count: 0 # the old mark is retired
+      assert_select ".dawn-sun svg.dawn-mark path", count: 3 # the B: two halos and the B
+      assert_select ".dawn-sun svg.dawn-mark path[fill-opacity='0.2']"
+      assert_select ".dawn-sun svg.dawn-mark path[fill-opacity='0.6']"
+      assert_select "figcaption .dawn-eyebrow", text: "Our new look is here"
+      assert_select "figcaption", text: /A new dawn for Brethreign\./
     end
-    assert_select ".welcome-word", text: "Brethreign"
+    # The logo is the brand pack artwork (mark + wordmark paths), not typed text.
+    assert_select ".welcome-brand svg.br-logo.welcome-logo" do
+      assert_select "g.br-logo-mark path", count: 3
+      assert_select "g.br-logo-word path", count: 10
+    end
   end
 
   test "the welcome page has Get the app: coming-soon badges and the waitlist form" do

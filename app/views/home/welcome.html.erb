@@ -1,6 +1,6 @@
 <%# The front door for signed-out web visitors at "/".
-    Computers: "A new dawn" (the logo story) large on the left with the
-    wordmark, headline and actions on the right. Phones: stacked, the scene as
+    Computers: "A new dawn" (the new mark rising) large on the left with the
+    logo, headline and actions on the right. Phones: stacked, the scene as
     a short banner on top. "Get the app" (coming soon + waitlist) sits under
     the actions. The public feed is behind "Look around first". %>
 <% content_for(:title) { "Brethreign · Sane, kind conversations about work, life and faith" } %>
@@ -12,7 +12,7 @@
   <div class="welcome-grid">
     <div class="welcome-brand">
       <%= render "home/new_dawn" %>
-      <span class="welcome-word" aria-hidden="true">Brethreign</span>
+      <%= render "shared/logo", css_class: "welcome-logo" %>
     </div>
 
     <section class="welcome-main" aria-labelledby="welcome-title">

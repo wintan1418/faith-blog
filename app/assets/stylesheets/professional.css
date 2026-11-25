@@ -465,7 +465,9 @@ html.theme-dark a.pfw-by { color: var(--fc-ink); }
 .bcard--light { background: radial-gradient(circle at 100% 0%, rgba(52,211,153,0.28), transparent 55%), linear-gradient(140deg, #ffffff, #e9f1ec); color: #10201a; border-color: #d6e1da; }
 .bcard-brand { display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 0.95rem; }
 .bcard-brand > span:first-child { display: inline-flex; align-items: center; gap: 0.45rem; }
-.bcard-brand img { border-radius: 6px; }
+/* The logo takes the card's ink, so it reads on every card style. */
+.bcard-brand .bcard-logo { height: 22px; }
+.bcard-brand .bcard-logo .br-logo-mark, .bcard-brand .bcard-logo .br-logo-word { color: currentColor; }
 .bcard-open { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(255,255,255,0.14); }
 .bcard--light .bcard-open { background: rgba(14,138,95,0.12); color: #0e7a52; }
 .bcard-who { display: flex; align-items: center; gap: 0.9rem; position: relative; z-index: 1; }

@@ -21,7 +21,7 @@
     <%# The card itself %>
     <section class="bcard bcard--<%= profile&.card_style || "mint" %>" aria-label="<%= name %>'s card">
       <div class="bcard-brand">
-        <span><%= image_tag "/icon.svg", alt: "", width: 22, height: 22 %> Brethreign</span>
+        <span><%= render "shared/logo", css_class: "bcard-logo", label: "Brethreign" %></span>
         <% if open_to.any? %><span class="bcard-open"><%= Profile::OPEN_TO[open_to.first][:badge] %></span><% end %>
       </div>
       <div class="bcard-who">
@@ -46,7 +46,7 @@
     <div class="card-qr">
       <div class="card-qr-box" role="img" aria-label="QR code for <%= @card_url %>"><%= sanitize @qr_svg, tags: %w[svg path rect g], attributes: %w[viewBox xmlns width height fill d shape-rendering version x y transform] %></div>
       <span class="card-qr-avatar">
-        <% if profile&.avatar&.attached? %><%= image_tag avatar_src(profile, 96), alt: "" %><% else %><%= image_tag "/icon.svg", alt: "" %><% end %>
+        <% if profile&.avatar&.attached? %><%= image_tag avatar_src(profile, 96), alt: "" %><% else %><%= image_tag "/icon-192.png", alt: "" %><% end %>
       </span>
       <p>Scan to see <%= @owner ? "my" : "#{name}'s" %> profile</p>
     </div>
