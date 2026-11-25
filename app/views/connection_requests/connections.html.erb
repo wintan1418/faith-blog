@@ -47,11 +47,14 @@
               <%= button_to conversations_path(recipient_id: user.id), method: :post, class: "btn btn-secondary btn-sm" do %>
                 Message
               <% end %>
-              <% if user.brethren_card&.whatsapp_link %>
-                <%= link_to "WhatsApp", user.brethren_card.whatsapp_link, target: "_blank", rel: "noopener", class: "btn btn-secondary btn-sm" %>
+              <%# Only what this connection chose to share with you. %>
+              <% card = user.brethren_card %>
+              <% hints = { connected: true, shared: @shared_with_me.include?(user.id) } %>
+              <% if card&.contact_visible_to?(:whatsapp, current_user, **hints) %>
+                <%= link_to "WhatsApp", card.whatsapp_link, target: "_blank", rel: "noopener", class: "btn btn-secondary btn-sm" %>
               <% end %>
-              <% if user.brethren_card&.gmail_link %>
-                <%= link_to "Email", user.brethren_card.gmail_link, target: "_blank", rel: "noopener", class: "btn btn-secondary btn-sm" %>
+              <% if card&.contact_visible_to?(:email, current_user, **hints) %>
+                <%= link_to "Email", card.gmail_link, target: "_blank", rel: "noopener", class: "btn btn-secondary btn-sm" %>
               <% end %>
             </div>
           </div>

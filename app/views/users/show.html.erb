@@ -176,7 +176,8 @@
               <%= render "users/follow_actions", user: @user %>
               <%= render "users/connection_actions", user: @user %>
             </div>
-            <div class="profile-safety mt-3 flex flex-wrap gap-4 text-sm">
+            <div class="profile-safety mt-3 flex flex-wrap items-center gap-4 text-sm">
+              <%= render "users/contact_share", user: @user, style: :profile %>
               <%= render "users/block_button", user: @user, classes: "inline-flex items-center gap-1.5 text-[var(--fc-muted)] hover:text-red-600" %>
             </div>
           <% end %>

@@ -4,6 +4,7 @@ module Settings
     before_action :set_brethren_card
 
     def edit
+      current_user.update_column(:contact_privacy_notice_pending, false) if current_user.contact_privacy_notice_pending?
     end
 
     def update
@@ -22,7 +23,8 @@ module Settings
     end
 
     def brethren_card_params
-      params.expect(brethren_card: [ :church_or_assembly, :bio, :occupation, :whatsapp_number, :email ])
+      params.expect(brethren_card: [ :church_or_assembly, :bio, :occupation, :whatsapp_number, :email,
+                                           :email_visibility, :whatsapp_visibility ])
     end
   end
 end

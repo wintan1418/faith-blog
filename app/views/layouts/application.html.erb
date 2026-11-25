@@ -199,6 +199,7 @@
         <%= render "seeds/rank_up_modal", user: current_user if user_signed_in? && current_user.rank_up_pending? %>
       </div>
       <%= render "shared/app_update_banner" if outdated_android_app? %>
+      <%= render "shared/contact_privacy_notice" if user_signed_in? && current_user.contact_privacy_notice_pending? && controller_path != "settings/privacies" %>
 
       <main>
         <%= yield %>

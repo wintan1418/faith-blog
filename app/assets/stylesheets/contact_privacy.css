@@ -1,0 +1,89 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Contact details & privacy (ctp-*): the "who can see" choices, the people
+   a member chose, "Share my contact", and the one-time notice.
+   Evergreen tokens (--fc-*), so light, dark and members' accents all work.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.ctp-section { display: grid; gap: 12px; padding-top: 8px; scroll-margin-top: 96px; }
+.ctp-section.is-inline { padding: 16px; border: 1px solid var(--fc-line); border-radius: 16px; background: var(--fc-surface-2, var(--fc-surface)); }
+.ctp-people { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--fc-line); }
+.ctp-title { font-size: 1.25rem; font-weight: 800; color: var(--fc-ink); margin: 0; }
+.ctp-subtitle { font-size: 1.05rem; font-weight: 800; color: var(--fc-ink); margin: 0; }
+.ctp-copy { color: var(--fc-soft, var(--fc-muted)); font-size: 0.95rem; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
+.ctp-small { font-size: 0.85rem; color: var(--fc-muted); }
+.ctp-link { font-weight: 700; color: var(--fc-accent-ink, var(--fc-accent)); text-decoration: underline; text-underline-offset: 2px; }
+
+.ctp-fields { display: grid; gap: 14px; }
+@media (min-width: 900px) { .ctp-section:not(.is-inline) .ctp-fields { grid-template-columns: 1fr 1fr; } }
+.ctp-field { margin: 0; padding: 14px; min-width: 0; border: 1px solid var(--fc-line); border-radius: 16px; background: var(--fc-surface); }
+.ctp-legend { display: grid; gap: 2px; margin-bottom: 10px; min-width: 0; }
+.ctp-legend-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; color: var(--fc-ink); }
+.ctp-legend-value { color: var(--fc-muted); font-size: 0.85rem; overflow-wrap: anywhere; }
+.ctp-options { display: grid; gap: 6px; }
+.ctp-option {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; min-height: 44px;
+  border: 1px solid var(--fc-line); border-radius: 12px; cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.ctp-option:hover { border-color: var(--fc-line-strong, var(--fc-accent)); }
+.ctp-option:has(.ctp-radio:checked) {
+  border-color: var(--fc-accent);
+  background: color-mix(in oklch, var(--fc-accent) 10%, var(--fc-surface));
+}
+.ctp-option:has(.ctp-radio:focus-visible) { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
+.ctp-radio { margin-top: 3px; width: 18px; height: 18px; flex: none; accent-color: var(--fc-fill, var(--fc-accent)); }
+.ctp-option-text { display: grid; gap: 2px; min-width: 0; }
+.ctp-option-label { font-weight: 700; color: var(--fc-ink); }
+.ctp-option-hint { font-size: 0.82rem; color: var(--fc-muted); line-height: 1.4; }
+
+.ctp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ctp-person { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--fc-line); border-radius: 14px; background: var(--fc-surface); }
+.ctp-person-who { display: flex; align-items: center; gap: 10px; min-width: 0; text-decoration: none; color: inherit; }
+.ctp-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; display: grid; place-items: center; font-weight: 800; color: #fff; }
+.ctp-person-name { display: block; font-weight: 700; color: var(--fc-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ctp-person-handle { display: block; font-size: 0.82rem; color: var(--fc-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ctp-remove-form { margin: 0; flex: none; }
+.ctp-remove {
+  min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--fc-line-strong, var(--fc-line));
+  background: transparent; color: var(--fc-ink); font-weight: 700; font-size: 0.88rem; cursor: pointer;
+}
+.ctp-remove:hover { border-color: #dc2626; color: #dc2626; }
+.ctp-empty { color: var(--fc-muted); font-size: 0.9rem; margin: 0; }
+.ctp-add { display: flex; gap: 8px; flex-wrap: wrap; }
+.ctp-select { flex: 1 1 220px; min-width: 0; min-height: 44px; }
+.ctp-add-btn { min-height: 44px; }
+
+/* Brethren Card: who sees each detail (owner only) */
+.ctp-seen-by { display: block; margin-top: 2px; font-size: 0.76rem; font-weight: 700; color: var(--fc-accent-ink, var(--fc-muted)); }
+.ctp-card-note { margin: 12px 0 0; text-align: center; font-size: 0.88rem; color: var(--fc-muted); }
+.ctp-card-note.text-left { text-align: left; }
+
+/* "Share my contact" on a profile */
+.ctp-share-form { margin: 0; display: inline-flex; }
+.ctp-share-btn {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px;
+  border-radius: 999px; border: 1px solid var(--fc-line-strong, var(--fc-line)); background: var(--fc-surface);
+  color: var(--fc-ink); font-weight: 700; font-size: 0.85rem; cursor: pointer; text-decoration: none;
+}
+.ctp-share-btn:hover { border-color: var(--fc-accent); }
+.ctp-share-btn.is-on { border-color: var(--fc-accent); background: color-mix(in oklch, var(--fc-accent) 12%, var(--fc-surface)); }
+
+/* Business card /in/:username contact rows */
+.card-contact { display: grid; gap: 8px; }
+.card-contact-row {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; min-height: 52px; border-radius: 16px;
+  border: 1px solid var(--fc-line); background: var(--fc-surface); color: var(--fc-ink); text-decoration: none;
+}
+.card-contact-row:hover { border-color: var(--fc-accent); }
+.card-contact-icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; background: color-mix(in oklch, var(--fc-accent) 16%, var(--fc-surface)); }
+.card-contact-label { display: block; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fc-muted); }
+.card-contact-value { display: block; font-weight: 700; overflow-wrap: anywhere; }
+
+/* One-time notice (reuses .fc-app-update) */
+.ctp-notice-icon { display: inline-grid; place-items: center; flex: none; color: var(--fc-accent-ink, var(--fc-accent)); }
+.ctp-notice-form { margin: 0; flex: none; display: inline-flex; }
+.ctp-notice .fc-app-update__close { cursor: pointer; display: inline-grid; place-items: center; }
+@media (max-width: 520px) {
+  .ctp-notice { flex-wrap: wrap; }
+  .ctp-notice > span:nth-child(2) { flex: 1 1 calc(100% - 80px); }
+}

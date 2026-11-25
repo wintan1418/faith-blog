@@ -12,6 +12,8 @@ class ConnectionRequestsController < ApplicationController
 
   def connections
     @connections = current_user.connections
+    ActiveRecord::Associations::Preloader.new(records: @connections, associations: :brethren_card).call
+    @shared_with_me = current_user.received_contact_shares.pluck(:owner_id).to_set
     @suggestions = BrethrenSuggestions.for(current_user, limit: 10)
   end
 

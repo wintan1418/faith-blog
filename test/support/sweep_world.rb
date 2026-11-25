@@ -151,6 +151,7 @@ module SweepWorld
     in [ "church_history", "era" ] then ChurchHistoryFigure.eras.keys.first
     in [ "reading_plans", "slug" ] then ReadingPlan.all.first&.slug || "none"
     in [ "notifications", "id" ] then @notification.id
+    in [ "contact_shares", "id" ] then 0
     in [ "blog", "slug" ] then BlogArticle.all.first&.slug || "none"
     in [ "settings/experiences", "id" ] then @experience.id
     in [ "settings/educations", "id" ] then @education.id

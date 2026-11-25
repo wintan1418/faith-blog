@@ -43,6 +43,7 @@
       </button>
       <div data-dropdown-target="menu" class="msg-menu hidden">
         <%= link_to "View profile", user_path(other_user.username), class: "msg-menu-item" %>
+        <%= render "users/contact_share", user: other_user, style: :menu %>
         <% if current_user.blocked_message_user?(other_user) %>
           <%= button_to "Unblock #{other_user.display_name}", message_block_path(other_user), method: :delete, form_class: "w-full", class: "msg-menu-item" %>
         <% else %>

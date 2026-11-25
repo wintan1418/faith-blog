@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_150100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -294,6 +294,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
     t.boolean "is_complete", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "email_visibility", default: 0, null: false
+    t.integer "whatsapp_visibility", default: 0, null: false
     t.index ["user_id"], name: "index_brethren_cards_on_user_id", unique: true
   end
 
@@ -496,6 +498,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
     t.index ["sender_id", "receiver_id"], name: "index_connection_requests_on_sender_id_and_receiver_id", unique: true
     t.index ["sender_id"], name: "index_connection_requests_on_sender_id"
     t.index ["status"], name: "index_connection_requests_on_status"
+  end
+
+  create_table "contact_shares", force: :cascade do |t|
+    t.bigint "owner_id", null: false
+    t.bigint "viewer_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_id", "viewer_id"], name: "index_contact_shares_on_owner_id_and_viewer_id", unique: true
+    t.index ["viewer_id"], name: "index_contact_shares_on_viewer_id"
   end
 
   create_table "conversation_participants", force: :cascade do |t|
@@ -1426,6 +1437,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
     t.integer "seeds_rank_reached", default: 0, null: false
     t.integer "seeds_rank_seen", default: 0, null: false
     t.bigint "invited_by_id"
+    t.boolean "contact_privacy_notice_pending", default: false, null: false
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
@@ -1471,6 +1483,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
   add_foreign_key "comments", "users"
   add_foreign_key "connection_requests", "users", column: "receiver_id"
   add_foreign_key "connection_requests", "users", column: "sender_id"
+  add_foreign_key "contact_shares", "users", column: "owner_id", on_delete: :cascade
+  add_foreign_key "contact_shares", "users", column: "viewer_id", on_delete: :cascade
   add_foreign_key "conversation_participants", "conversations"
   add_foreign_key "conversation_participants", "users"
   add_foreign_key "donations", "users", on_delete: :nullify

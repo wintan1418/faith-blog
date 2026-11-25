@@ -5,27 +5,34 @@
       <div>
         <span class="mystic-kicker">Private Profile Card</span>
         <h2 class="profile-section-title mt-3">My Brethren Card</h2>
-        <p class="mystic-copy mt-2">Shared only when connection requests are accepted.</p>
+        <p class="mystic-copy mt-2">Connections see your church and about. Your email and WhatsApp are seen only by who you choose.</p>
       </div>
       <%= link_to "Edit Card", edit_settings_brethren_card_path, class: "btn btn-secondary" %>
     </div>
 
     <% if current_user.brethren_card&.complete? %>
+      <% card = current_user.brethren_card %>
       <div class="grid gap-4 md:grid-cols-2">
         <% [
-          ["Church / Assembly", current_user.brethren_card.church_or_assembly],
-          ["Occupation", current_user.brethren_card.occupation],
-          ["WhatsApp", current_user.brethren_card.whatsapp_number],
-          ["Email", current_user.brethren_card.email],
-          ["About", current_user.brethren_card.bio]
-        ].each do |label, value| %>
+          ["Church / Assembly", card.church_or_assembly, nil],
+          ["Occupation", card.occupation, nil],
+          ["WhatsApp", card.whatsapp_number, :whatsapp],
+          ["Email", card.email, :email],
+          ["About", card.bio, nil]
+        ].each do |label, value, field| %>
           <% next if value.blank? %>
           <div class="profile-card-field">
             <p class="profile-card-label"><%= label %></p>
             <p class="profile-card-value"><%= value %></p>
+            <% if field %>
+              <p class="ctp-seen-by">Seen by: <%= contact_visibility_label(card, field) %></p>
+            <% end %>
           </div>
         <% end %>
       </div>
+      <p class="ctp-card-note text-left">
+        <%= link_to "Choose who can see your contact details", edit_settings_privacy_path(anchor: "contact-privacy"), class: "font-bold text-faith-green" %>
+      </p>
     <% else %>
       <div class="profile-card-empty">
         <h3>Complete Your Brethren Card</h3>

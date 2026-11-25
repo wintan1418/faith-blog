@@ -20,14 +20,14 @@
         </span>
 
         <h1 class="mt-4 text-3xl font-extrabold text-faith-dark"><%= @user.display_name %></h1>
-        <% if @brethren_card&.occupation.present? %>
+        <% if @full_card && @brethren_card&.occupation.present? %>
           <p class="mt-1 text-base font-semibold text-faith-muted"><%= @brethren_card.occupation %></p>
         <% end %>
         <span class="mystic-badge mt-4 px-3 py-1">Brethreign Connection</span>
       </header>
 
       <div class="mt-6 space-y-3">
-        <% if @brethren_card&.church_or_assembly.present? %>
+        <% if @full_card && @brethren_card&.church_or_assembly.present? %>
           <section class="bc-field">
             <span class="bc-icon"><%= render_icon("church", classes: "h-4 w-4") %></span>
             <div>
@@ -37,7 +37,7 @@
           </section>
         <% end %>
 
-        <% if @brethren_card&.bio.present? %>
+        <% if @full_card && @brethren_card&.bio.present? %>
           <section class="bc-field">
             <span class="bc-icon"><%= render_icon("file_text", classes: "h-4 w-4") %></span>
             <div>
@@ -48,32 +48,42 @@
         <% end %>
       </div>
 
-      <% if @brethren_card&.whatsapp_number.present? || @brethren_card&.email.present? %>
-        <footer class="mt-6 border-t border-[var(--border)] pt-5">
-          <p class="bc-label mb-3 text-center">Contact Details</p>
+      <footer class="mt-6 border-t border-[var(--border)] pt-5" id="contact">
+        <p class="bc-label mb-3 text-center">Contact Details</p>
+        <% if @contact.any? %>
           <div class="grid gap-3 sm:grid-cols-2">
-            <% if @brethren_card&.whatsapp_number.present? %>
+            <% if @contact[:whatsapp] %>
               <%= link_to @brethren_card.whatsapp_link, target: "_blank", rel: "noopener", class: "bc-contact" do %>
                 <span class="bc-icon"><%= render_icon("phone", classes: "h-4 w-4") %></span>
                 <span class="min-w-0">
                   <span class="block text-xs font-bold text-faith-dark">WhatsApp</span>
-                  <span class="block truncate text-sm text-faith-muted"><%= @brethren_card.whatsapp_number %></span>
+                  <span class="block truncate text-sm text-faith-muted"><%= @contact[:whatsapp] %></span>
+                  <% if @owner %><span class="ctp-seen-by">Seen by: <%= contact_visibility_label(@brethren_card, :whatsapp) %></span><% end %>
                 </span>
               <% end %>
             <% end %>
 
-            <% if @brethren_card&.email.present? %>
+            <% if @contact[:email] %>
               <%= link_to @brethren_card.gmail_link, target: "_blank", rel: "noopener", class: "bc-contact" do %>
                 <span class="bc-icon"><%= render_icon("mail", classes: "h-4 w-4") %></span>
                 <span class="min-w-0">
                   <span class="block text-xs font-bold text-faith-dark">Email</span>
-                  <span class="block truncate text-sm text-faith-muted"><%= @brethren_card.email %></span>
+                  <span class="block truncate text-sm text-faith-muted"><%= @contact[:email] %></span>
+                  <% if @owner %><span class="ctp-seen-by">Seen by: <%= contact_visibility_label(@brethren_card, :email) %></span><% end %>
                 </span>
               <% end %>
             <% end %>
           </div>
-        </footer>
-      <% end %>
+        <% end %>
+        <% if @owner %>
+          <p class="ctp-card-note">
+            <% if @contact.empty? %>You haven't added an email or WhatsApp number.<% end %>
+            <%= link_to "Choose who can see your contact details", edit_settings_privacy_path(anchor: "contact-privacy"), class: "font-bold text-faith-green" %>
+          </p>
+        <% elsif @contact.empty? %>
+          <p class="ctp-card-note"><%= @user.display_name %> keeps their contact details private. You can still send a message.</p>
+        <% end %>
+      </footer>
     </article>
   </div>
 </div>
