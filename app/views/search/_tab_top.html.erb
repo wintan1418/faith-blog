@@ -1,4 +1,4 @@
-<% nothing = @breaths.empty? && @close_matches.blank? && @people.empty? && @rooms.empty? && @reference.nil? && @resources.empty? && @series.empty? %>
+<% nothing = @breaths.empty? && @close_matches.blank? && @people.empty? && @org_pages.empty? && @rooms.empty? && @reference.nil? && @resources.empty? && @series.empty? %>
 <% if nothing %>
   <%= render "search/no_results" %>
 <% else %>
@@ -27,6 +27,16 @@
           <% end %>
         <% end %>
       </div>
+    </section>
+  <% end %>
+
+  <% if @org_pages.any? %>
+    <section class="srch-section" aria-labelledby="srch-top-pages">
+      <div class="srch-section-head">
+        <h2 class="srch-section-title" id="srch-top-pages">Pages</h2>
+        <%= link_to "See all", search_path(search_params(tab: "pages")), class: "srch-more" %>
+      </div>
+      <%= render "search/pages", pages: @org_pages %>
     </section>
   <% end %>
 

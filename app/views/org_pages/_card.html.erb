@@ -1,0 +1,16 @@
+<%# A page in the directory. Locals: page, following (bool). %>
+<article class="pg-card">
+  <%= link_to org_page_path(page), class: "pg-card-link" do %>
+    <span class="pg-card-cover" aria-hidden="true">
+      <% if page.cover.attached? %><%= image_tag page_cover_src(page, width: 600), alt: "", loading: "lazy" %><% end %>
+    </span>
+    <%= page_logo(page, classes: "pg-card-logo", px: 128) %>
+    <span class="pg-card-name"><%= page.name %><%= page_verified_badge(page) %></span>
+    <span class="pg-card-sub"><%= page_subline(page) %></span>
+    <% if page.tagline.present? %><span class="pg-card-tagline"><%= page.tagline %></span><% end %>
+    <span class="pg-card-count"><%= page_followers_label(page) %></span>
+  <% end %>
+  <% unless user_signed_in? && page.editor?(current_user) %>
+    <%= render "org_pages/follow_button", page: page, following: following, compact: true %>
+  <% end %>
+</article>

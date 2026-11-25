@@ -1,0 +1,30 @@
+<%# Share a page: link, apps, and the image card with a QR code (the share
+    sheet used for breaths and series). Locals: page. %>
+<%
+  ref = current_user&.username if user_signed_in? && current_user.can_invite_by_link?
+  share_url = org_page_url(page, ref: ref.presence)
+  snippet = [ page.tagline, page_subline(page) ].compact_blank.join("\n")
+  swatch = AccentPalette.for(nil)
+%>
+<div class="fc-share pg-share" data-controller="share"
+     data-share-url-value="<%= share_url %>"
+     data-share-title-value="<%= page.name %> on Brethreign"
+     data-share-author-value="<%= page.handle %>"
+     data-share-snippet-value="<%= snippet %>"
+     data-share-image-value="<%= page.cover.attached? ? url_for(page.cover) : "" %>"
+     data-share-accent-value="<%= swatch[:accent] %>"
+     data-share-accent-deep-value="<%= swatch[:accent_2] %>">
+  <button type="button" class="pg-btn" data-action="click->share#toggle" aria-label="Share this page" title="Share">
+    <%= render_icon("send", classes: "pg-btn-icon") %><span>Share</span>
+  </button>
+  <div data-share-target="menu" class="fc-share-menu hidden" role="menu">
+    <button type="button" data-action="click->share#nativeShare" role="menuitem" class="hidden" data-share-target="nativeItem">Share to WhatsApp, X, more…</button>
+    <button type="button" data-action="click->share#copyLink" role="menuitem">Copy link</button>
+    <button type="button" data-action="click->share#whatsapp" role="menuitem" data-share-target="webItem">Send to WhatsApp</button>
+    <button type="button" data-action="click->share#twitter" role="menuitem" data-share-target="webItem">Share on X</button>
+    <button type="button" data-action="click->share#email" role="menuitem" data-share-target="webItem">Email</button>
+    <hr class="fc-share-divider">
+    <button type="button" data-action="click->share#snapshot" role="menuitem" class="fc-share-snap">Card with QR code</button>
+  </div>
+  <div data-share-target="toast" class="fc-share-toast hidden"></div>
+</div>

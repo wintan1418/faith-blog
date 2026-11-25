@@ -1,0 +1,109 @@
+<% description = (@page.tagline.presence || @page.about.to_s.squish.presence || "#{@page.category_label} on Brethreign").truncate(200) %>
+<% content_for(:title) { "#{@page.name} (@#{@page.handle}) · #{@page.category_label} - Brethreign" } %>
+<% content_for(:app_title) { @page.name } %>
+<% content_for(:meta_description) { description } %>
+<% content_for(:og_title) { "#{@page.name} on Brethreign" } %>
+<% content_for(:og_description) { description } %>
+<% content_for(:og_url) { org_page_url(@page) } %>
+<% content_for(:canonical) { org_page_url(@page) } %>
+<% if @page.active? %>
+  <% og_version = (PageOgCard.new(@page).version rescue nil) %>
+  <% if og_version %>
+    <% content_for(:og_image) { page_og_image_url(@page, format: :jpg, v: og_version) } %>
+    <% content_for(:og_image_type) { "image/jpeg" } %>
+  <% end %>
+  <% content_for(:structured_data) do %>
+    <script type="application/ld+json"><%= raw({
+      "@context" => "https://schema.org",
+      "@type" => (@page.church? ? "Church" : (@page.school? ? "EducationalOrganization" : (@page.nonprofit? ? "NGO" : "Organization"))),
+      "name" => @page.name, "alternateName" => "@#{@page.handle}", "url" => org_page_url(@page),
+      "description" => description,
+      "logo" => (@page.logo.attached? ? url_for(@page.logo) : nil),
+      "image" => (@page.cover.attached? ? url_for(@page.cover) : nil),
+      "sameAs" => [ @page.website ].compact_blank.presence,
+      "foundingDate" => @page.founded_year&.to_s,
+      "address" => (@page.city ? { "@type" => "PostalAddress", "addressLocality" => @page.city.name, "addressRegion" => @page.city.admin1_name, "addressCountry" => @page.city.country_code } : nil),
+      "interactionStatistic" => { "@type" => "InteractionCounter", "interactionType" => "https://schema.org/FollowAction", "userInteractionCount" => @page.followers_count }
+    }.compact.to_json) %></script>
+  <% end %>
+<% end %>
+
+<div class="pg-shell">
+  <% if @invite %>
+    <div class="pg-banner" role="status">
+      <%= render_icon("building", classes: "pg-banner-icon") %>
+      <p><strong><%= @invite.invited_by&.username ? "@#{@invite.invited_by.username}" : "The page" %></strong> invited you to help run this page as <%= @invite.role == "admin" ? "an admin" : "an editor" %>.</p>
+      <div class="pg-banner-actions">
+        <%= button_to "Accept", accept_org_page_invite_path(@page, @invite), class: "pg-btn is-primary" %>
+        <%= button_to "Decline", org_page_team_member_path(@page, @invite), method: :delete, class: "pg-btn" %>
+      </div>
+    </div>
+  <% end %>
+  <% if @page.suspended? %>
+    <div class="pg-banner is-warn" role="status">
+      <%= render_icon("shield", classes: "pg-banner-icon") %>
+      <p>This page is suspended by Brethreign moderators. Only its team and staff can see it.</p>
+    </div>
+  <% end %>
+
+  <section class="pg-hero">
+    <div class="pg-cover">
+      <% if @page.cover.attached? %>
+        <%= image_tag page_cover_src(@page), alt: "", class: "pg-cover-img" %>
+      <% end %>
+    </div>
+    <div class="pg-hero-body">
+      <%= page_logo(@page, classes: "pg-hero-logo", px: 240) %>
+      <div class="pg-hero-main">
+        <h1 class="pg-name"><%= @page.name %><%= page_verified_badge(@page, classes: "h-5 w-5") %></h1>
+        <p class="pg-sub"><%= render_icon(@page.category_icon, classes: "pg-sub-icon") %><%= page_subline(@page) %></p>
+        <% if @page.tagline.present? %><p class="pg-tagline"><%= @page.tagline %></p><% end %>
+        <p class="pg-stats"><strong data-pg-followers><%= page_followers_label(@page) %></strong> <span aria-hidden="true">·</span> @<%= @page.handle %></p>
+      </div>
+      <div class="pg-actions">
+        <% if @role %>
+          <%= link_to new_post_path(as: @page.handle), class: "pg-btn is-primary" do %>
+            <%= render_icon("pen", classes: "pg-btn-icon") %><span>Post as page</span>
+          <% end %>
+          <% if @page.manager?(current_user) %>
+            <%= link_to manage_org_page_path(@page), class: "pg-btn" do %>
+              <%= render_icon("settings", classes: "pg-btn-icon") %><span>Manage page</span>
+            <% end %>
+          <% end %>
+        <% elsif @page.active? %>
+          <%= render "org_pages/follow_button", page: @page, following: @following %>
+        <% end %>
+        <% if (contact = page_contact_href(@page)) %>
+          <%= link_to contact, class: "pg-btn", rel: "noopener", target: (contact.start_with?("http") ? "_blank" : nil) do %>
+            <%= render_icon(contact.start_with?("mailto") ? "mail" : "externallink", classes: "pg-btn-icon") %><span><%= contact.start_with?("mailto") ? "Message" : "Website" %></span>
+          <% end %>
+        <% end %>
+        <%= render "org_pages/share_button", page: @page if @page.active? %>
+        <% if user_signed_in? && !@role && @page.active? %>
+          <%= render "reports/button", reportable: @page, label: "Report", classes: "pg-btn pg-report",
+                     reason: "Reported from the page: may be fake, impersonating someone or breaking the guidelines." %>
+        <% end %>
+        <% if user_signed_in? && current_user.admin_or_moderator? %>
+          <%= link_to "Admin", admin_page_path(@page), class: "pg-btn" %>
+        <% end %>
+      </div>
+    </div>
+    <nav class="pg-tabs" aria-label="Page sections">
+      <%= link_to "Posts", org_page_path(@page), class: "pg-tab#{' is-active' if @tab == 'posts'}", aria: { current: (@tab == "posts" ? "page" : nil) } %>
+      <%= link_to "About", about_org_page_path(@page), class: "pg-tab#{' is-active' if @tab == 'about'}", aria: { current: (@tab == "about" ? "page" : nil) } %>
+      <%= link_to "People", people_org_page_path(@page), class: "pg-tab#{' is-active' if @tab == 'people'}", aria: { current: (@tab == "people" ? "page" : nil) } %>
+      <% if @page.manager?(current_user) %>
+        <%= link_to "Admin", manage_org_page_path(@page), class: "pg-tab" %>
+      <% end %>
+    </nav>
+  </section>
+
+  <div class="pg-grid">
+    <main class="pg-main">
+      <%= render "org_pages/tab_#{@tab}" %>
+    </main>
+    <aside class="pg-aside">
+      <%= render "org_pages/details", page: @page, compact: true %>
+    </aside>
+  </div>
+</div>

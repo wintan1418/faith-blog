@@ -1,0 +1,137 @@
+<% content_for(:title) { "Manage #{@page.name} - Brethreign" } %>
+<% content_for(:app_title) { "Manage page" } %>
+<% owner = @page.owner?(current_user) %>
+
+<div class="pg-shell pg-manage">
+  <header class="pg-manage-head">
+    <%= link_to org_page_path(@page), class: "pg-manage-back" do %>
+      <%= page_logo(@page, classes: "pg-manage-logo", px: 96) %>
+      <span class="min-w-0">
+        <span class="pg-kicker">Manage page</span>
+        <span class="pg-manage-name"><%= @page.name %><%= page_verified_badge(@page) %></span>
+      </span>
+    <% end %>
+    <%= link_to "View page", org_page_path(@page), class: "pg-btn" %>
+  </header>
+
+  <nav class="pg-tabs pg-manage-tabs" aria-label="Manage">
+    <%= link_to "Details", manage_org_page_path(@page), class: "pg-tab#{' is-active' if @tab == 'details'}" %>
+    <%= link_to "Team", manage_org_page_path(@page, tab: "team"), class: "pg-tab#{' is-active' if @tab == 'team'}" %>
+    <%= link_to "Verification", manage_org_page_path(@page, tab: "verification"), class: "pg-tab#{' is-active' if @tab == 'verification'}" %>
+  </nav>
+
+  <% case @tab %>
+  <% when "details" %>
+    <%= form_with model: @page, url: org_page_path(@page), method: :patch, multipart: true, class: "pg-panel pg-form", data: { turbo: false } do |f| %>
+      <%= render "org_pages/errors", page: @page %>
+      <h2 class="pg-panel-title">Name and kind</h2>
+      <%= render "org_pages/fields_basics", f: f, page: @page %>
+      <h2 class="pg-panel-title">Address and tagline</h2>
+      <% if owner || current_user.admin_or_moderator? %>
+        <%= render "org_pages/fields_handle", f: f, page: @page %>
+        <p class="pg-hint-text">Changing the address breaks old links to the page.</p>
+      <% else %>
+        <p class="pg-muted">Address: /p/<%= @page.handle %> (only the owner can change it)</p>
+        <div class="pg-field">
+          <%= f.label :tagline, "Tagline (optional)", class: "pg-label" %>
+          <%= f.text_field :tagline, class: "pg-input", maxlength: 160 %>
+        </div>
+      <% end %>
+      <h2 class="pg-panel-title">Pictures</h2>
+      <%= render "org_pages/fields_images", f: f, page: @page %>
+      <h2 class="pg-panel-title">Details</h2>
+      <%= render "org_pages/fields_details", f: f, page: @page %>
+      <div class="pg-form-actions">
+        <%= f.button "Save changes", type: "submit", class: "pg-btn is-primary" %>
+      </div>
+    <% end %>
+
+  <% when "team" %>
+    <section class="pg-panel">
+      <h2 class="pg-panel-title">Team</h2>
+      <p class="pg-muted">Owners and admins edit the page and its team. Editors can post as the page. Posts show the page's name; Brethreign keeps who wrote each one for safety.</p>
+      <ul class="pg-team">
+        <% @team.each do |m| %>
+          <li class="pg-team-row">
+            <% if m.user.profile&.avatar&.attached? %>
+              <%= image_tag avatar_src(m.user.profile, 80), class: "pg-person-avatar object-cover", alt: "" %>
+            <% else %>
+              <span class="pg-person-avatar" style="<%= avatar_tint_style(m.user.username) %>"><%= m.user.username.first.upcase %></span>
+            <% end %>
+            <span class="pg-team-who">
+              <%= link_to "@#{m.user.username}", user_path(m.user.username), class: "pg-person-name" %>
+              <span class="pg-person-role"><%= m.role_label %><%= " · invited, waiting to accept" if m.pending? %><%= " · you" if m.user_id == current_user.id %></span>
+            </span>
+            <span class="pg-team-actions">
+              <% if owner && !m.owner? %>
+                <%= form_with url: org_page_team_member_path(@page, m), method: :patch, class: "pg-inline-form", data: { controller: "auto-submit" } do %>
+                  <label class="sr-only" for="role_<%= m.id %>">Role for @<%= m.user.username %></label>
+                  <select name="role" id="role_<%= m.id %>" class="pg-input pg-input-sm" data-action="change->auto-submit#submit">
+                    <option value="admin" <%= "selected" if m.admin? %>>Admin</option>
+                    <option value="editor" <%= "selected" if m.editor? %>>Editor</option>
+                  </select>
+                <% end %>
+              <% end %>
+              <% if !m.owner? && (owner || (m.editor? && !m.owner?) || m.user_id == current_user.id) %>
+                <%= button_to (m.user_id == current_user.id ? "Leave" : "Remove"), org_page_team_member_path(@page, m), method: :delete,
+                              class: "pg-btn is-quiet", data: { turbo_confirm: (m.user_id == current_user.id ? "Leave this page's team?" : "Remove @#{m.user.username} from the team?") } %>
+              <% end %>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+
+      <h3 class="pg-panel-subtitle">Invite someone</h3>
+      <%= form_with url: org_page_team_path(@page), method: :post, class: "pg-invite" do %>
+        <label class="sr-only" for="invite_username">Username</label>
+        <input type="text" name="username" id="invite_username" class="pg-input" placeholder="@username" required maxlength="31" autocapitalize="off" autocomplete="off" spellcheck="false">
+        <label class="sr-only" for="invite_role">Role</label>
+        <select name="role" id="invite_role" class="pg-input pg-input-sm">
+          <option value="editor">Editor</option>
+          <% if owner %><option value="admin">Admin</option><% end %>
+        </select>
+        <button type="submit" class="pg-btn is-primary">Send invite</button>
+      <% end %>
+      <p class="pg-hint-text">They get an alert and join once they accept. Up to <%= PageMembership::MAX_TEAM %> admins and editors.</p>
+
+      <% if owner %>
+        <% admins = @team.select { |m| m.admin? && m.active? } %>
+        <h3 class="pg-panel-subtitle">Hand over the page</h3>
+        <% if admins.any? %>
+          <%= form_with url: transfer_org_page_path(@page), method: :post, class: "pg-invite",
+                        data: { turbo_confirm: "Make them the owner? You'll become an admin." } do %>
+            <label class="sr-only" for="transfer_username">New owner</label>
+            <select name="username" id="transfer_username" class="pg-input">
+              <% admins.each do |m| %><option value="<%= m.user.username %>">@<%= m.user.username %></option><% end %>
+            </select>
+            <button type="submit" class="pg-btn">Make owner</button>
+          <% end %>
+        <% else %>
+          <p class="pg-muted">Invite an admin first: only an admin can take over the page.</p>
+        <% end %>
+      <% end %>
+    </section>
+
+  <% when "verification" %>
+    <section class="pg-panel">
+      <h2 class="pg-panel-title"><%= render_icon("badgecheck", classes: "pg-panel-icon") %>Verification</h2>
+      <% if @page.verified? %>
+        <p>This page is verified. The badge shows beside its name everywhere on Brethreign.</p>
+      <% elsif @page.verification_requested? %>
+        <p>Thanks: your request is with our team (sent <%= time_ago_in_words(@page.verification_requested_at) %> ago). We'll let you know.</p>
+        <p class="pg-muted">What you told us: <%= @page.verification_note %></p>
+      <% else %>
+        <% if @page.verification_declined? %>
+          <p class="pg-muted">We couldn't verify the page last time. You can ask again with more to go on.</p>
+        <% end %>
+        <p>A verified badge tells people this is the real page. Tell us how we can confirm you run it: a link to the official website or social account that mentions Brethreign or your role, and who you are there.</p>
+        <%= form_with url: org_page_verification_path(@page), method: :post, class: "pg-form" do %>
+          <label class="pg-label" for="verification_note">How can we confirm it?</label>
+          <textarea name="note" id="verification_note" class="pg-input pg-textarea" rows="4" maxlength="1000" required minlength="10"
+                    placeholder="I'm the media lead. Our website gracechapel.org/contact lists this page."></textarea>
+          <div class="pg-form-actions"><button type="submit" class="pg-btn is-primary">Ask for verification</button></div>
+        <% end %>
+      <% end %>
+    </section>
+  <% end %>
+</div>

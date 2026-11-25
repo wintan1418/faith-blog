@@ -1,0 +1,34 @@
+<%# Logo and cover. Locals: f, page. %>
+<div class="pg-images" data-controller="image-preview">
+  <div class="pg-field">
+    <span class="pg-label">Cover image (optional)</span>
+    <label class="pg-cover-pick" for="page_cover">
+      <span class="pg-cover-preview" data-image-preview-target="cover">
+        <% if page.persisted? && page.cover.attached? %><%= image_tag page_cover_src(page, width: 900), alt: "" %><% end %>
+      </span>
+      <span class="pg-pick-label"><%= render_icon("image", classes: "pg-btn-icon") %>Choose a wide picture</span>
+    </label>
+    <%= f.file_field :cover, accept: "image/jpeg,image/png,image/webp", class: "sr-only", id: "page_cover",
+                     data: { action: "change->image-preview#show", preview: "cover" } %>
+    <p class="pg-hint-text">Best at 1500 × 500 (3:1). Up to 10 MB.</p>
+    <% if page.persisted? && page.cover.attached? %>
+      <label class="pg-check"><%= f.check_box :remove_cover, {}, "1", "0" %> Remove the cover</label>
+    <% end %>
+  </div>
+  <div class="pg-field">
+    <span class="pg-label">Logo (optional)</span>
+    <label class="pg-logo-pick" for="page_logo">
+      <span class="pg-logo-preview" data-image-preview-target="logo">
+        <% if page.persisted? && page.logo.attached? %><%= image_tag resized_image_src(page.logo, width: 200, height: 200, crop: "fill"), alt: "" %><% end %>
+      </span>
+      <span class="pg-pick-label"><%= render_icon("camera", classes: "pg-btn-icon") %>Choose a logo</span>
+    </label>
+    <%= f.file_field :logo, accept: "image/jpeg,image/png,image/webp", class: "sr-only", id: "page_logo",
+                     data: { action: "change->image-preview#show", preview: "logo" } %>
+    <p class="pg-hint-text">A square picture, at least 400 × 400. Up to 8 MB.</p>
+    <% if page.persisted? && page.logo.attached? %>
+      <label class="pg-check"><%= f.check_box :remove_logo, {}, "1", "0" %> Remove the logo</label>
+    <% end %>
+  </div>
+  <p class="pg-hint-text">Pictures are checked against our community guidelines.</p>
+</div>

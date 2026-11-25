@@ -1,0 +1,23 @@
+<% if @posts.empty? %>
+  <div class="pg-empty">
+    <%= render_icon("feed", classes: "pg-empty-icon") %>
+    <p class="pg-empty-title">No posts yet</p>
+    <% if @role %>
+      <p>Say hello to your followers. Your post shows as <strong><%= @page.name %></strong>.</p>
+      <%= link_to "Write the first post", new_post_path(as: @page.handle), class: "pg-btn is-primary" %>
+    <% else %>
+      <p>Follow <%= @page.name %> to see their posts in your Following feed.</p>
+    <% end %>
+  </div>
+<% else %>
+  <div class="pg-posts" id="page_posts">
+    <% @posts.each do |post| %>
+      <%= render "posts/card", post: post %>
+    <% end %>
+  </div>
+  <% if @pagy.next %>
+    <nav class="pg-more">
+      <%= link_to "Older posts", org_page_path(@page, page: @pagy.next), class: "pg-btn", rel: "next" %>
+    </nav>
+  <% end %>
+<% end %>

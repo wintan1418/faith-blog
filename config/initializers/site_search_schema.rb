@@ -11,7 +11,10 @@ ActiveSupport.on_load(:active_record) do
     def load_schema(db_config, *args, **kwargs)
       super.tap do
         pool = respond_to?(:migration_connection_pool) ? migration_connection_pool : ActiveRecord::Base.connection_pool
-        pool.with_connection { |connection| SiteSearch::Schema.install!(connection) }
+        pool.with_connection do |connection|
+          SiteSearch::Schema.install!(connection)
+          SiteSearch::PageSchema.install!(connection) # page-aware post triggers, after the base ones
+        end
       end
     end
   end)

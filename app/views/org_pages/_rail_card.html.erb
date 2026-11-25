@@ -1,0 +1,15 @@
+<%# The page beside one of its posts (post page's right rail). Locals: page. %>
+<div class="post-rail-card pg-rail-card">
+  <%= link_to org_page_path(page), class: "pg-rail-head" do %>
+    <%= page_logo(page, classes: "pg-rail-logo", px: 128) %>
+    <span class="min-w-0">
+      <span class="pg-rail-name"><%= page.name %><%= page_verified_badge(page) %></span>
+      <span class="pg-rail-sub"><%= page_subline(page) %></span>
+    </span>
+  <% end %>
+  <% if page.tagline.present? %><p class="pg-rail-tagline"><%= page.tagline %></p><% end %>
+  <p class="pg-rail-count"><%= page_followers_label(page) %></p>
+  <% unless user_signed_in? && page.editor?(current_user) %>
+    <%= render "org_pages/follow_button", page: page, following: page.followed_by?(current_user) %>
+  <% end %>
+</div>

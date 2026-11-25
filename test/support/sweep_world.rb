@@ -103,6 +103,16 @@ module SweepWorld
                                                          payload: { "card" => { "kind" => "breath", "title" => "Draft", "body" => "A drafted breath for review." } })
     @figure = ChurchHistoryFigure.first || ChurchHistoryFigure.create!(name: "Augustine", slug: "augustine", era: ChurchHistoryFigure.eras.keys.first)
 
+    # A page run by the member (the other member invited to its team), with a
+    # post written as it, a follower and its alerts.
+    @org_page = Page.create!(name: "Sweep Chapel", handle: "sweepchapel", category: "church", created_by: @member)
+    @org_page.memberships.create!(user: @member, role: :owner, status: :active)
+    @page_invite = @org_page.memberships.create!(user: @other, role: :editor, status: :pending, invited_by: @member)
+    @page_post = Post.create!(user: @member, page: @org_page, content: "News from the chapel.", status: :published,
+                              moderation_status: :approved)
+    PageFollow.create!(page: @org_page, user: @admin)
+    Notification.create!(user: @other, actor: @member, notifiable: @page_invite, notification_type: :page_invite)
+    Notification.create!(user: @member, notifiable: @org_page, notification_type: :page_verified)
     Notification.create!(user: @member, actor: @other, notifiable: @member, notification_type: :birthday)
     Notification.create!(user: @member, notifiable: @member.profile, notification_type: :content_removed)
     Notification.create!(user: @member, notifiable: @portfolio_item, notification_type: :content_removed)
@@ -151,6 +161,9 @@ module SweepWorld
     in [ "message_files", "message_id" ] then @file_message.id
     in [ "message_files", "id" ] then @file_attachment.id
     in [ "message_files", "filename" ] then "pixel.png"
+    in [ "org_pages" | "page_follows" | "page_memberships" | "page_og_images" | "admin/pages", "handle" ] then @org_page.handle
+    in [ "page_og_images", "format" ] then "jpg"
+    in [ "page_memberships", "id" ] then @page_invite.id
     in [ "admin/users", "id" ] then @member.id
     in [ "admin/rooms", "id" ] then @room.to_param
     in [ "admin/posts", "id" ] then @post.to_param

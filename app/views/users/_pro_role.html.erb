@@ -1,9 +1,17 @@
 <%# One role on the Professional tab. Locals: experience, owner. %>
 <li class="pro-item">
-  <%= render "users/org_mark", name: experience.organization %>
+  <% if experience.page&.active? %>
+    <%= link_to org_page_path(experience.page), class: "pro-org-page", aria: { label: experience.page.name } do %>
+      <%= page_logo(experience.page, classes: "pro-org-mark pg-pro-logo", px: 96) %>
+    <% end %>
+  <% else %>
+    <%= render "users/org_mark", name: experience.organization %>
+  <% end %>
   <div class="pro-item-main">
     <p class="pro-item-title"><%= experience.title %></p>
-    <p class="pro-item-sub"><%= [ experience.organization, experience.type_label ].compact_blank.join(" · ") %></p>
+    <p class="pro-item-sub">
+      <% if experience.page&.active? %><%= link_to experience.organization, org_page_path(experience.page), class: "pro-org-link" %><%= page_verified_badge(experience.page, classes: "h-3.5 w-3.5") %><% else %><%= experience.organization %><% end %><%= " · #{experience.type_label}" if experience.type_label.present? %>
+    </p>
     <p class="pro-item-meta"><%= experience.date_range %> · <%= experience.duration %></p>
     <% if experience.location.present? %><p class="pro-item-meta"><%= experience.location %></p><% end %>
     <% if experience.description.present? %>

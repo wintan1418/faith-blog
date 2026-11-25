@@ -1,4 +1,6 @@
-<% unless post.anonymous? %>
+<% if post.page_post? %>
+  <%= render "org_pages/rail_card", page: post.page %>
+<% elsif !post.anonymous? %>
   <div class="post-rail-card post-author-card">
     <% if post.user.profile&.avatar&.attached? %>
       <%= image_tag avatar_src(post.user.profile, 160), class: "post-author-card-avatar object-cover" %>
@@ -20,7 +22,7 @@
         <span>Followers</span>
       </div>
       <div>
-        <p><%= post.user.posts.published.named.count %></p>
+        <p><%= post.user.posts.published.personal.named.count %></p>
         <span>Breaths</span>
       </div>
     </div>
@@ -41,12 +43,12 @@
 </div>
 
 <%
-  more_from_author = post.user.posts.published.named
+  more_from_author = post.user.posts.published.personal.named
                           .where.not(id: post.id)
                           .recent
                           .limit(3)
 %>
-<% if !post.anonymous? && more_from_author.any? %>
+<% if !post.anonymous? && !post.page_post? && more_from_author.any? %>
   <div class="post-rail-card post-related-card">
     <p class="post-rail-label">More from <%= post.user.username %></p>
     <ul class="post-related-list">

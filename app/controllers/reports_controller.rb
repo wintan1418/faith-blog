@@ -33,6 +33,8 @@ class ReportsController < ApplicationController
     when "User"
       # A member (from Breathers around you); never yourself.
       User.active.where.not(id: current_user.id).find(reportable_id)
+    when "Page"
+      Page.find(reportable_id).tap { |page| raise ActiveRecord::RecordNotFound unless page.visible_to?(current_user) }
     when "Message"
       conversation = current_user.conversations.joins(:messages).where(messages: { id: reportable_id }).first!
       conversation.messages.find(reportable_id)

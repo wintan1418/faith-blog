@@ -119,6 +119,30 @@ Rails.application.routes.draw do
                         constraints: { code: /[0-9a-z]{1,12}/, ref: /[A-Za-z0-9_]{1,30}/ }
   get "og/posts/:id.:format", to: "post_og_images#show", as: :post_og_image, constraints: { format: "jpg" }
 
+  # Pages: churches, ministries, fellowships, businesses, schools, NGOs and
+  # communities. /pages is the directory; a page lives at /p/<handle>.
+  get "pages", to: "org_pages#index", as: :pages_directory
+  get "pages/new", to: "org_pages#new", as: :new_org_page
+  post "pages", to: "org_pages#create", as: :org_pages
+  get "pages/handle", to: "org_pages#handle_check", as: :org_page_handle_check, defaults: { format: :json }
+  get "og/pages/:handle.:format", to: "page_og_images#show", as: :page_og_image,
+                                  constraints: { format: "jpg", handle: /[A-Za-z0-9_]{1,30}/ }
+  scope "p/:handle", constraints: { handle: /[A-Za-z0-9_]{1,30}/ } do
+    get "/", to: "org_pages#show", as: :org_page
+    patch "/", to: "org_pages#update"
+    get "about", to: "org_pages#show", defaults: { tab: "about" }, as: :about_org_page
+    get "people", to: "org_pages#show", defaults: { tab: "people" }, as: :people_org_page
+    get "manage", to: "org_pages#manage", as: :manage_org_page
+    post "verification", to: "org_pages#request_verification", as: :org_page_verification
+    post "follow", to: "page_follows#create", as: :org_page_follow
+    delete "follow", to: "page_follows#destroy"
+    post "team", to: "page_memberships#create", as: :org_page_team
+    patch "team/:id", to: "page_memberships#update", as: :org_page_team_member
+    delete "team/:id", to: "page_memberships#destroy"
+    post "team/:id/accept", to: "page_memberships#accept", as: :accept_org_page_invite
+    post "transfer", to: "page_memberships#transfer", as: :transfer_org_page
+  end
+
   # Likes (polymorphic)
   post "likes/:likeable_type/:likeable_id", to: "likes#create", as: :likes
   delete "likes/:likeable_type/:likeable_id", to: "likes#destroy", as: :unlike
@@ -333,6 +357,15 @@ Rails.application.routes.draw do
     root to: "dashboard#index"
     resources :app_waitlist_entries, only: :index, path: "app-waitlist"
     resources :city_changes, only: :index, path: "city-changes"
+    resources :pages, only: %i[index show], param: :handle do
+      member do
+        post :verify
+        post :unverify
+        post :decline
+        post :suspend
+        post :reinstate
+      end
+    end
     get "online", to: "online#index", as: :online
     get "bots", to: "bots#index", as: :bots
     get "search-insights", to: "search_insights#show", as: :search_insights

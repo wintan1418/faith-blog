@@ -98,7 +98,7 @@
           <% end %>
           <% if post.user != current_user %>
             <%= render "reports/button", reportable: post, label: "Report", classes: "fc-action w-full" %>
-            <%= render "users/block_button", user: post.user, classes: "fc-action w-full" unless post.anonymous? %>
+            <%= render "users/block_button", user: post.user, classes: "fc-action w-full" unless post.anonymous? || post.page_id %>
           <% end %>
         </div>
       </div>

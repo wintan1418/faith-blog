@@ -1,6 +1,25 @@
 <header class="post-header">
   <div class="post-author-row">
-    <% if post.anonymous? %>
+    <% if post.page_post? %>
+      <%= link_to org_page_path(post.page), class: "post-author-avatar pg-header-logo" do %>
+        <%= page_logo(post.page, classes: "pg-header-logo-img", px: 96) %>
+      <% end %>
+      <div class="post-author-meta">
+        <p class="post-author-name">
+          <%= link_to post.page.name, org_page_path(post.page) %>
+          <%= page_verified_badge(post.page) %>
+          <span class="pg-chip">Page</span>
+        </p>
+        <p class="post-author-handle">
+          @<%= post.page.handle %>
+          <span class="post-meta-dot">·</span>
+          <%= (post.published_at || post.created_at).strftime("%B %-d, %Y") %>
+        </p>
+      </div>
+      <% if (!user_signed_in? || !post.page.editor?(current_user)) && post.page.active? %>
+        <%= render "org_pages/follow_button", page: post.page, following: post.page.followed_by?(current_user), compact: true %>
+      <% end %>
+    <% elsif post.anonymous? %>
       <span class="post-author-avatar"><%= render_icon("users", classes: "h-5 w-5") %></span>
       <div class="post-author-meta">
         <p class="post-author-name">Anonymous</p>

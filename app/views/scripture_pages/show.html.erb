@@ -170,7 +170,7 @@
               <%= link_to post_path(post), class: "sx-talk-link" do %>
                 <% if post.display_title %><strong><%= post.display_title %></strong><% end %>
                 <span><%= scripture_post_excerpt(post) %></span>
-                <small><%= post.user.display_name %> · <time datetime="<%= post.published_at&.iso8601 %>"><%= post.published_at&.strftime("%-d %b %Y") %></time></small>
+                <small><%= post.author_name %> · <time datetime="<%= post.published_at&.iso8601 %>"><%= post.published_at&.strftime("%-d %b %Y") %></time></small>
               <% end %>
             </li>
           <% end %>

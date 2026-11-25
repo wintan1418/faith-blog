@@ -1,0 +1,32 @@
+<section class="pg-panel">
+  <h2 class="pg-panel-title">People at <%= @page.name %></h2>
+  <p class="pg-muted">Members who list <%= @page.name %> on their profile and chose to be shown here.</p>
+  <% if @people.empty? %>
+    <div class="pg-empty is-inline">
+      <p>Nobody yet.</p>
+    </div>
+  <% else %>
+    <ul class="pg-people">
+      <% @people.each do |experience| %>
+        <% user = experience.user %>
+        <li>
+          <%= link_to user_path(user.username), class: "pg-person" do %>
+            <% if user.profile&.avatar&.attached? %>
+              <%= image_tag avatar_src(user.profile, 96), class: "pg-person-avatar object-cover", alt: "" %>
+            <% else %>
+              <span class="pg-person-avatar" style="<%= avatar_tint_style(user.username) %>"><%= user.username.first.upcase %></span>
+            <% end %>
+            <span class="min-w-0">
+              <span class="pg-person-name">@<%= user.username %></span>
+              <span class="pg-person-role"><%= experience.title %><%= " · #{experience.type_label}" if experience.volunteering? %><%= " (past)" unless experience.current? %></span>
+            </span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+  <% if user_signed_in? %>
+    <p class="pg-muted pg-people-how">Work, serve or worship here? Add it to your profile under
+      <%= link_to "Experience", new_settings_experience_path(page: @page.handle), class: "pg-link" %> and tick “Show me on this page”.</p>
+  <% end %>
+</section>

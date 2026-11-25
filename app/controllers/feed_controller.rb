@@ -50,7 +50,7 @@ class FeedController < ApplicationController
       blocked = current_user.blocked_user_ids
       scope = scope.where.not(user_id: blocked) if blocked.any?
       @new_posts_count = scope.count
-      author_ids = scope.named.reorder(published_at: :desc).limit(30).pluck(:user_id).uniq.first(3)
+      author_ids = scope.named.personal.reorder(published_at: :desc).limit(30).pluck(:user_id).uniq.first(3)
       authors = User.includes(profile: { avatar_attachment: :blob }).where(id: author_ids).index_by(&:id)
       @new_posts_authors = author_ids.filter_map { |id| authors[id] }
     else
@@ -79,7 +79,12 @@ class FeedController < ApplicationController
 
     # Anonymous breaths stay out of Following — showing one here would tell
     # you it came from someone you follow.
-    posts    = Post.published.named.where(user_id: followed_user_ids).recent
+    # Plus posts from pages they follow. A page's post is the page speaking,
+    # so following its writer alone doesn't bring it in.
+    followed_page_ids = current_user.page_follows.pluck(:page_id)
+    posts = Post.published.named.personal.where(user_id: followed_user_ids)
+    posts = posts.or(Post.published.named.where(page_id: followed_page_ids)) if followed_page_ids.any?
+    posts = posts.recent
     reshares = Reshare.where(user_id: followed_user_ids).order(created_at: :desc)
     @items = paged_feed(posts: posts, reshares: reshares)
     respond_to_feed

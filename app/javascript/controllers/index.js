@@ -270,3 +270,15 @@ application.register("daily-bible", DailyBibleController)
 
 import BibleDwellController from "./bible_dwell_controller"
 application.register("bible-dwell", BibleDwellController)
+
+import PageWizardController from "./page_wizard_controller"
+application.register("page-wizard", PageWizardController)
+
+import ImagePreviewController from "./image_preview_controller"
+application.register("image-preview", ImagePreviewController)
+
+import AutoSubmitController from "./auto_submit_controller"
+application.register("auto-submit", AutoSubmitController)
+
+import PostAsController from "./post_as_controller"
+application.register("post-as", PostAsController)

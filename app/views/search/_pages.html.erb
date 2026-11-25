@@ -1,0 +1,13 @@
+<%# Pages in search results. Locals: pages. %>
+<div class="srch-grid">
+  <% pages.each do |page| %>
+    <%= link_to org_page_path(page), class: "srch-panel srch-page" do %>
+      <%= page_logo(page, classes: "srch-page-logo", px: 96) %>
+      <span class="min-w-0">
+        <strong class="srch-panel-title"><%= page.name %><%= page_verified_badge(page, classes: "h-4 w-4") %></strong>
+        <% if page.tagline.present? %><span class="srch-panel-sub line-clamp-2"><%= page.tagline %></span><% end %>
+        <span class="srch-kicker"><%= page_subline(page) %> · <%= page_followers_label(page) %></span>
+      </span>
+    <% end %>
+  <% end %>
+</div>

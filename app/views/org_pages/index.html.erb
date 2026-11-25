@@ -1,0 +1,94 @@
+<% content_for(:title) { "Pages: churches, ministries, businesses and communities - Brethreign" } %>
+<% content_for(:app_title) { "Pages" } %>
+<% content_for(:meta_description) { "Find churches, ministries, fellowships, businesses, schools and communities on Brethreign, and follow their news." } %>
+
+<div class="pg-shell pg-dir">
+  <header class="pg-dir-head">
+    <div>
+      <p class="pg-kicker"><%= render_icon("building", classes: "pg-kicker-icon") %>Pages</p>
+      <h1 class="pg-dir-title">Churches, ministries, businesses and communities</h1>
+      <p class="pg-dir-copy">Follow the places you belong to and hear their news in your feed.</p>
+    </div>
+    <% if user_signed_in? %>
+      <%= link_to new_org_page_path, class: "pg-btn is-primary pg-dir-create" do %>
+        <%= render_icon("plus", classes: "pg-btn-icon") %><span>Create a page</span>
+      <% end %>
+    <% end %>
+  </header>
+
+  <%= form_with url: pages_directory_path, method: :get, class: "pg-dir-search", role: "search", data: { turbo_action: "replace" } do %>
+    <label for="pg_dir_q" class="sr-only">Search pages</label>
+    <%= render_icon("search", classes: "pg-dir-search-icon") %>
+    <input type="search" id="pg_dir_q" name="q" value="<%= @query %>" placeholder="Search by name, city or tradition" class="pg-dir-input" maxlength="100" autocomplete="off">
+    <% if @category %><input type="hidden" name="category" value="<%= @category %>"><% end %>
+  <% end %>
+
+  <nav class="pg-chips" aria-label="Categories">
+    <%= link_to "All", pages_directory_path(q: @query.presence), class: "pg-cat#{' is-active' if @category.nil?}" %>
+    <% Page::CATEGORIES.each do |key, info| %>
+      <%= link_to pages_directory_path(category: key, q: @query.presence), class: "pg-cat#{' is-active' if @category == key}" do %>
+        <%= render_icon(info[:icon], classes: "pg-cat-icon") %><%= info[:label] %>
+      <% end %>
+    <% end %>
+  </nav>
+
+  <% if @browsing && @my_pages.present? %>
+    <section class="pg-dir-section" aria-labelledby="pg-mine">
+      <h2 class="pg-dir-h2" id="pg-mine">Pages you run</h2>
+      <div class="pg-mine">
+        <% @my_pages.each do |page| %>
+          <%= link_to org_page_path(page), class: "pg-mine-item" do %>
+            <%= page_logo(page, classes: "pg-mine-logo", px: 80) %>
+            <span class="min-w-0"><span class="pg-mine-name"><%= page.name %></span><span class="pg-mine-sub"><%= page_followers_label(page) %></span></span>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @browsing && @near.present? %>
+    <section class="pg-dir-section" aria-labelledby="pg-near">
+      <h2 class="pg-dir-h2" id="pg-near"><%= render_icon("mappin", classes: "pg-dir-h2-icon") %>Pages near you<% if @city %> <span class="pg-dir-h2-sub">around <%= @city.name %></span><% end %></h2>
+      <div class="pg-cards">
+        <% @near.each do |page| %><%= render "org_pages/card", page: page, following: @followed_ids.include?(page.id) %><% end %>
+      </div>
+    </section>
+  <% elsif @browsing && user_signed_in? && @city.nil? %>
+    <%= link_to around_path, class: "pg-hint" do %>
+      <%= render_icon("mappin", classes: "pg-btn-icon") %><span>Add your city to see pages near you</span><%= render_icon("chevronright", classes: "pg-btn-icon") %>
+    <% end %>
+  <% end %>
+
+  <% if @browsing && @suggested.present? %>
+    <section class="pg-dir-section" aria-labelledby="pg-suggested">
+      <h2 class="pg-dir-h2" id="pg-suggested">Suggested for you</h2>
+      <div class="pg-cards">
+        <% @suggested.each do |page| %><%= render "org_pages/card", page: page, following: @followed_ids.include?(page.id) %><% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <section class="pg-dir-section" aria-labelledby="pg-all">
+    <h2 class="pg-dir-h2" id="pg-all">
+      <% if @query.present? %>Pages for “<%= @query %>”<% elsif @category %><%= Page::CATEGORIES.dig(@category, :label) %> pages<% else %>All pages<% end %>
+      <span class="pg-dir-h2-sub"><%= number_with_delimiter(@pagy.count) %></span>
+    </h2>
+    <% if @pages.any? %>
+      <div class="pg-cards">
+        <% @pages.each do |page| %><%= render "org_pages/card", page: page, following: @followed_ids.include?(page.id) %><% end %>
+      </div>
+      <% if @pagy.pages > 1 %>
+        <nav class="pg-more" aria-label="More pages">
+          <% if @pagy.prev %><%= link_to "← Previous", pages_directory_path(q: @query.presence, category: @category, page: @pagy.prev), class: "pg-btn", rel: "prev" %><% end %>
+          <% if @pagy.next %><%= link_to "Next →", pages_directory_path(q: @query.presence, category: @category, page: @pagy.next), class: "pg-btn", rel: "next" %><% end %>
+        </nav>
+      <% end %>
+    <% else %>
+      <div class="pg-empty">
+        <%= render_icon("building", classes: "pg-empty-icon") %>
+        <p class="pg-empty-title">No pages found</p>
+        <p>Is your church, ministry or business missing? <%= link_to "Create its page", new_org_page_path, class: "pg-link" %>.</p>
+      </div>
+    <% end %>
+  </section>
+</div>

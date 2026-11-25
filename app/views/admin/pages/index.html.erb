@@ -1,0 +1,57 @@
+<% content_for(:page_title) { "Pages" } %>
+
+<div class="space-y-6">
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-bold text-[var(--fc-ink)]">Pages</h2>
+        <p class="mt-1 text-sm text-[var(--fc-muted)]">Churches, ministries, businesses and communities. Verify only after checking the page really belongs to who it says (a link on their official site or social account).</p>
+      </div>
+      <%= form_with url: admin_pages_path, method: :get, class: "flex gap-2" do %>
+        <% if @filter %><input type="hidden" name="filter" value="<%= @filter %>"><% end %>
+        <input type="search" name="q" value="<%= @query %>" placeholder="Name or handle" class="rounded-lg border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] px-3 py-2 text-sm">
+        <button class="btn btn-secondary">Search</button>
+      <% end %>
+    </div>
+    <nav class="mt-4 flex flex-wrap gap-2 text-sm" aria-label="Filter">
+      <% [ [ nil, "All (#{@counts[:all]})" ], [ "requests", "Verification requests (#{@counts[:requests]})" ], [ "verified", "Verified (#{@counts[:verified]})" ],
+           [ "suspended", "Suspended (#{@counts[:suspended]})" ], [ "protected", "Famous names" ] ].each do |key, label| %>
+        <%= link_to label, admin_pages_path(filter: key), class: "rounded-full border px-3 py-1 font-semibold #{@filter == key ? 'border-[var(--fc-accent)] text-[var(--fc-accent)]' : 'border-[var(--fc-line-strong)] text-[var(--fc-muted)]'}" %>
+      <% end %>
+    </nav>
+
+    <% if @pages.any? %>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-sm" id="admin-pages">
+          <thead>
+            <tr class="text-left text-[var(--fc-muted)]">
+              <th class="py-1 pr-4">Page</th><th class="py-1 pr-4">Category</th><th class="py-1 pr-4">Followers</th>
+              <th class="py-1 pr-4">Status</th><th class="py-1 text-right">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @pages.each do |page| %>
+              <tr class="border-t border-[var(--fc-line)]">
+                <td class="py-2 pr-4">
+                  <%= link_to admin_page_path(page), class: "font-semibold text-[var(--fc-ink)]" do %><%= page.name %><% end %>
+                  <span class="text-[var(--fc-muted)]">@<%= page.handle %></span>
+                  <% if page.protected_name? %><span class="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-800">Famous name</span><% end %>
+                </td>
+                <td class="py-2 pr-4"><%= page.category_label %></td>
+                <td class="py-2 pr-4"><%= number_with_delimiter(page.followers_count) %></td>
+                <td class="py-2 pr-4">
+                  <%= page.suspended? ? "Suspended" : "Active" %>
+                  <% if page.verified? %> · <strong>Verified</strong><% elsif page.verification_requested? %> · <strong class="text-amber-700">Asked to verify</strong><% end %>
+                </td>
+                <td class="py-2 text-right text-[var(--fc-muted)] whitespace-nowrap"><%= time_ago_in_words(page.created_at) %> ago</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
+    <% else %>
+      <p class="mt-4 text-sm text-[var(--fc-muted)]">No pages here.</p>
+    <% end %>
+  </div>
+</div>

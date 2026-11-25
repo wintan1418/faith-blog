@@ -13,6 +13,9 @@
       <% if reviewable.is_a?(Post) %>
         <h2 class="mt-1 text-xl font-extrabold text-[var(--fc-ink)]"><%= reviewable.title %></h2>
         <div class="prose prose-sm mt-3 max-w-none text-[var(--fc-soft)]"><%= reviewable.content %></div>
+      <% elsif reviewable.is_a?(Page) %>
+        <h2 class="mt-1 text-base font-bold text-[var(--fc-ink)]">Page picture: <%= link_to "#{reviewable.name} (@#{reviewable.handle})", admin_page_path(reviewable), class: "underline" %></h2>
+        <p class="mt-2 text-sm text-[var(--fc-muted)]">The flagged logo or cover was removed and the page's managers were told.</p>
       <% elsif reviewable.is_a?(Comment) %>
         <h2 class="mt-1 text-base font-bold text-[var(--fc-ink)]">Comment on post #<%= reviewable.post_id %></h2>
         <div class="prose prose-sm mt-3 max-w-none text-[var(--fc-soft)]"><%= reviewable.content %></div>

@@ -1,0 +1,18 @@
+<%# Name and kind of page. Locals: f, page. %>
+<div class="pg-field">
+  <%= f.label :name, "Page name", class: "pg-label" %>
+  <%= f.text_field :name, class: "pg-input", required: true, maxlength: 80, autocomplete: "organization",
+                   placeholder: "Grace Chapel Akure", data: { page_wizard_target: "name", action: "input->page-wizard#nameChanged" } %>
+  <p class="pg-hint-text">The name people know it by.</p>
+</div>
+<fieldset class="pg-field">
+  <legend class="pg-label">What kind of page is it?</legend>
+  <div class="pg-kinds">
+    <% Page::CATEGORIES.each do |key, info| %>
+      <label class="pg-kind">
+        <%= f.radio_button :category, key, class: "pg-kind-radio" %>
+        <span class="pg-kind-box"><%= render_icon(info[:icon], classes: "pg-kind-icon") %><span><%= info[:label] %></span></span>
+      </label>
+    <% end %>
+  </div>
+</fieldset>

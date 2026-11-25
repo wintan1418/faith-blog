@@ -47,6 +47,15 @@ module SiteSearch
                  .limit(limit).to_a
     end
 
+    # Pages (churches, ministries, businesses…): active ones only, by name,
+    # handle, tagline, category, place and about (PageDirectory#search).
+    def pages(limit: 12, offset: 0)
+      words = @query.plain_text.presence || @query.text
+      return Page.none if words.blank?
+
+      PageDirectory.new(@visibility.viewer).search(words).limit(limit).offset(offset)
+    end
+
     # Rooms are few: match name or description, accent- and style-insensitively.
     def rooms(limit: 12)
       words = @query.plain_text

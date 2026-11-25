@@ -38,7 +38,15 @@
     <%# Save now sits on the card's action bar (one button, so saving updates in place). %>
     <% if user_signed_in? && post.user != current_user %>
       <%= render "reports/button", reportable: post, label: "Report" %>
-      <%= render "users/block_button", user: post.user unless post.anonymous? %>
+      <%= render "users/block_button", user: post.user unless post.anonymous? || post.page_post? %>
+    <% end %>
+
+    <% if user_signed_in? && post.page_post? && post.user != current_user && post.page.manager?(current_user) %>
+      <%= button_to post_path(post), method: :delete, form_class: "contents", class: "fc-action w-full", role: "menuitem",
+                    data: { turbo_confirm: "Take this post off #{post.page.name}? It will be deleted." } do %>
+        <%= render_icon("x", classes: "h-4 w-4") %>
+        <span class="fc-action-label">Remove from page</span>
+      <% end %>
     <% end %>
   </div>
 </div>

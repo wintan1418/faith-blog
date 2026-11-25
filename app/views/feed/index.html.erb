@@ -56,6 +56,10 @@
             <%= render_icon("mappin", classes: "eg-ico is-green") %>
             Breathers around you
           <% end %>
+          <%= link_to pages_directory_path, class: "fc-rail-link eg-shortcut" do %>
+            <%= render_icon("building", classes: "eg-ico is-green") %>
+            Pages
+          <% end %>
           <%= link_to games_path, class: "fc-rail-link eg-shortcut" do %>
             <%= render_icon("games", classes: "eg-ico is-violet") %>
             Games
@@ -432,6 +436,9 @@
         <% end %>
         <%= link_to bookmarks_path, class: "eg-quicklink" do %>
           <%= render_icon("bookmark", classes: "eg-ico is-blue") %> Bookmarks
+        <% end %>
+        <%= link_to pages_directory_path, class: "eg-quicklink" do %>
+          <%= render_icon("building", classes: "eg-ico is-green") %> Pages
         <% end %>
         <%= link_to people_path, class: "eg-quicklink" do %>
           <%= render_icon("users", classes: "eg-ico is-green") %> People

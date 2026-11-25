@@ -77,7 +77,7 @@
                 <div class="home-author-avatar"><%= post.anonymous? || post.user.blank? ? "A" : post.user.username.first.upcase %></div>
                 <div class="home-author-copy">
                   <div>
-                    <strong><%= post.anonymous? || post.user.blank? ? "Anonymous" : post.user.display_name %></strong>
+                    <strong><%= post.anonymous? || post.user.blank? ? "Anonymous" : post.author_name %></strong>
                     <% if post.room %>
                       <%= link_to post.room.name, room_path(post.room), class: "home-room-pill" %>
                     <% end %>

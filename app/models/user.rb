@@ -35,6 +35,17 @@ class User < ApplicationRecord
     profile&.headline.present? || profile&.skills.present? || experiences.any? || educations.any?
   end
   has_many :posts, dependent: :destroy
+  # Pages (churches, ministries, businesses…) they help run or follow.
+  has_many :page_memberships, dependent: :delete_all
+  has_many :page_follows, dependent: :delete_all
+  has_many :followed_pages, through: :page_follows, source: :page
+
+  # Pages this member may post as (owner, admin or editor), active ones only.
+  def postable_pages
+    @postable_pages ||= Page.listed.joins(:memberships)
+                            .where(page_memberships: { user_id: id, status: PageMembership.statuses[:active] })
+                            .includes(logo_attachment: :blob).order(:name).to_a
+  end
   has_many :series, dependent: :destroy
   has_many :series_follows, dependent: :delete_all
   has_many :announcements, dependent: :destroy
@@ -250,6 +261,7 @@ class User < ApplicationRecord
   end
 
   def reload(*)
+    @postable_pages = nil
     @blocking_ids = @blocked_user_ids = nil
     super
   end

@@ -1,0 +1,69 @@
+<% content_for(:page_title) { "Page: #{@page.name}" } %>
+
+<div class="space-y-6">
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <%= page_logo(@page, classes: "h-14 w-14 rounded-xl", px: 112) %>
+        <div>
+          <h2 class="text-xl font-extrabold text-[var(--fc-ink)]"><%= @page.name %> <% if @page.verified? %><span class="text-[var(--fc-accent)]">✓ verified</span><% end %></h2>
+          <p class="text-sm text-[var(--fc-muted)]">@<%= @page.handle %> · <%= @page.category_label %> · <%= @page.place || "no place" %> · <%= page_followers_label(@page) %></p>
+          <% if @page.protected_name? %><p class="mt-1 text-xs font-bold text-amber-800">Uses a famous church or organisation name: check carefully before verifying.</p><% end %>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <%= link_to "View page", org_page_path(@page), class: "btn btn-secondary" %>
+        <% if @page.verified? %>
+          <%= button_to "Remove verification", unverify_admin_page_path(@page), class: "btn btn-secondary", data: { turbo_confirm: "Remove the verified badge?" } %>
+        <% else %>
+          <%= button_to "Verify", verify_admin_page_path(@page), class: "btn btn-primary", data: { turbo_confirm: "Verify #{@page.name}? Its managers will be told." } %>
+          <% if @page.verification_requested? %>
+            <%= button_to "Decline request", decline_admin_page_path(@page), class: "btn btn-secondary" %>
+          <% end %>
+        <% end %>
+        <% if @page.suspended? %>
+          <%= button_to "Reinstate", reinstate_admin_page_path(@page), class: "btn btn-secondary" %>
+        <% else %>
+          <%= button_to "Suspend", suspend_admin_page_path(@page), class: "btn btn-danger", data: { turbo_confirm: "Suspend this page? It and its posts disappear for everyone but its team." } %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @page.verification_requested? || @page.verification_note.present? %>
+      <div class="mt-5 rounded-lg border border-[var(--fc-line)] p-4">
+        <p class="text-sm font-bold text-[var(--fc-ink)]">Verification request <%= "(#{time_ago_in_words(@page.verification_requested_at)} ago)" if @page.verification_requested_at %> · <%= @page.verification_status.humanize %></p>
+        <p class="mt-1 whitespace-pre-wrap text-sm text-[var(--fc-soft)]"><%= @page.verification_note %></p>
+      </div>
+    <% end %>
+
+    <dl class="mt-5 grid gap-3 text-sm md:grid-cols-2">
+      <div><dt class="font-bold text-[var(--fc-muted)]">Tagline</dt><dd><%= @page.tagline.presence || "—" %></dd></div>
+      <div><dt class="font-bold text-[var(--fc-muted)]">Website</dt><dd><%= @page.website ? link_to(@page.website, @page.website, rel: "noopener nofollow", target: "_blank", class: "underline") : "—" %></dd></div>
+      <div><dt class="font-bold text-[var(--fc-muted)]">Created</dt><dd><%= @page.created_at.to_fs(:long) %> by <%= @page.created_by ? link_to("@#{@page.created_by.username}", admin_user_path(@page.created_by), class: "underline") : "—" %></dd></div>
+      <div><dt class="font-bold text-[var(--fc-muted)]">Posts</dt><dd><%= @page.posts.count %> (<%= @page.public_posts.count %> live)</dd></div>
+      <div class="md:col-span-2"><dt class="font-bold text-[var(--fc-muted)]">About</dt><dd class="whitespace-pre-wrap"><%= @page.about.presence || "—" %></dd></div>
+    </dl>
+  </div>
+
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h3 class="text-base font-bold text-[var(--fc-ink)]">Team</h3>
+    <ul class="mt-3 space-y-1 text-sm">
+      <% @team.each do |m| %>
+        <li><%= link_to "@#{m.user.username}", admin_user_path(m.user), class: "font-semibold underline" %> · <%= m.role_label %><%= " (invited)" if m.pending? %></li>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h3 class="text-base font-bold text-[var(--fc-ink)]">Reports</h3>
+    <% if @reports.any? %>
+      <ul class="mt-3 space-y-2 text-sm">
+        <% @reports.each do |report| %>
+          <li><%= link_to "Report ##{report.id}", admin_report_path(report), class: "font-semibold underline" %> · <%= report.status.humanize %> · @<%= report.reporter&.username %>: <%= truncate(report.reason, length: 120) %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="mt-2 text-sm text-[var(--fc-muted)]">No reports.</p>
+    <% end %>
+  </div>
+</div>

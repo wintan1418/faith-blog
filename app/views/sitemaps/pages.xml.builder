@@ -13,6 +13,10 @@ xml.urlset xmlns: "http://www.sitemaps.org/schemas/sitemap/0.9" do
   @series.each do |series|
     xml.url { xml.loc series_url(series); xml.lastmod series.updated_at.to_date.iso8601; xml.changefreq "weekly" }
   end
+  xml.url { xml.loc pages_directory_url; xml.changefreq "daily"; xml.priority 0.6 }
+  @org_pages.each do |page|
+    xml.url { xml.loc org_page_url(page); xml.lastmod page.updated_at.to_date.iso8601; xml.changefreq "weekly"; xml.priority 0.7 }
+  end
   @posts.each do |post|
     xml.url { xml.loc post_url(post); xml.lastmod post.updated_at.to_date.iso8601 }
   end

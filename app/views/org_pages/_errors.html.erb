@@ -1,0 +1,6 @@
+<% if page.errors.any? %>
+  <div class="pg-errors" role="alert">
+    <strong>Please fix:</strong>
+    <ul><% page.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul>
+  </div>
+<% end %>

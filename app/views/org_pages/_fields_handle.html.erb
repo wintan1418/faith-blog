@@ -1,0 +1,16 @@
+<%# Handle (address) and tagline. Locals: f, page. %>
+<div class="pg-field">
+  <%= f.label :handle, "Page address", class: "pg-label" %>
+  <div class="pg-handle">
+    <span class="pg-handle-prefix"><%= request.host.delete_prefix("www.") %>/p/</span>
+    <%= f.text_field :handle, class: "pg-input pg-handle-input", required: true, maxlength: 30, minlength: 3,
+                     pattern: "[A-Za-z0-9_]{3,30}", autocapitalize: "off", autocomplete: "off", spellcheck: false,
+                     placeholder: "gracechapel",
+                     data: { page_wizard_target: "handle", action: "input->page-wizard#handleChanged" } %>
+  </div>
+  <p class="pg-hint-text" data-page-wizard-target="handleStatus" aria-live="polite">Letters, numbers and underscores. People can mention the page as @handle.</p>
+</div>
+<div class="pg-field">
+  <%= f.label :tagline, "Tagline (optional)", class: "pg-label" %>
+  <%= f.text_field :tagline, class: "pg-input", maxlength: 160, placeholder: "A family church in the heart of Akure" %>
+</div>

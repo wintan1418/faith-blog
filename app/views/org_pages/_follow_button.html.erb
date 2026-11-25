@@ -1,0 +1,17 @@
+<%# Follow / Following for a page. Locals: page, following, compact (optional).
+    Replaced in place after a tap (turbo stream); signed-out visitors go
+    through sign-up. %>
+<% compact = local_assigns[:compact] %>
+<div id="<%= dom_id(page, :follow) %>" class="pg-follow-wrap" data-guest-gate-allow>
+  <% if following %>
+    <%= button_to org_page_follow_path(page), method: :delete, class: "pg-btn pg-follow is-following#{' is-compact' if compact}",
+                  form_class: "pg-follow-form", aria: { pressed: true }, title: "Stop following #{page.name}" do %>
+      <%= render_icon("check", classes: "pg-btn-icon") %><span>Following</span>
+    <% end %>
+  <% else %>
+    <%= button_to org_page_follow_path(page), class: "pg-btn pg-follow is-primary#{' is-compact' if compact}",
+                  form_class: "pg-follow-form", aria: { pressed: false } do %>
+      <%= render_icon("plus", classes: "pg-btn-icon") %><span>Follow</span>
+    <% end %>
+  <% end %>
+</div>

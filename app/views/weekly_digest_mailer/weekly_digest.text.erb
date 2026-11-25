@@ -33,7 +33,7 @@ Prayers answered this week
 What your circle has been breathing
 -----------------------------------
 <% @top_breaths.each do |post| %>
-- <%= post.user.display_name %><% if post.room %> · <%= post.room.name %><% end %> · <%= post.published_at.strftime("%b %-d") %>
+- <%= post.author_name %><% if post.room %> · <%= post.room.name %><% end %> · <%= post.published_at.strftime("%b %-d") %>
   <% if post.title.present? %><%= post.title %>
   <% end %><%= truncate(post.content.to_plain_text, length: 180) %>
   Likes <%= post.likes_count %>, comments <%= post.comments_count %>
@@ -46,7 +46,7 @@ What your circle has been breathing
 Prayer chains still in motion
 -----------------------------
 <% @open_prayers.each do |post| %>
-- <%= post.user.display_name %>: <%= truncate(post.content.to_plain_text, length: 140) %>
+- <%= post.author_name %>: <%= truncate(post.content.to_plain_text, length: 140) %>
 <% end %>
 <% end %>
 

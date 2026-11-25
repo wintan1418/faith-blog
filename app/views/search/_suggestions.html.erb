@@ -46,6 +46,20 @@
     </div>
   <% end %>
 
+  <% if @org_pages.present? %>
+    <div role="group" aria-labelledby="srch-dd-pages">
+      <p class="srch-dd-label" id="srch-dd-pages">Pages</p>
+      <% @org_pages.each do |page| %>
+        <%= link_to org_page_path(page), id: opt.("page"), role: "option", aria: { selected: false },
+                    class: "srch-dd-item", data: { action: "click->search-suggest#pick" } do %>
+          <%= page_logo(page, classes: "srch-dd-page-logo", px: 56) %>
+          <span class="srch-dd-main"><%= page.name %></span>
+          <span class="srch-dd-kind"><%= page.category_label %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
   <% if @rooms.present? %>
     <div role="group" aria-labelledby="srch-dd-rooms">
       <p class="srch-dd-label" id="srch-dd-rooms">Rooms</p>
