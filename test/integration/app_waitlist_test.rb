@@ -130,4 +130,13 @@ class AppWaitlistTest < ActionDispatch::IntegrationTest
     get "/app"
     assert_redirected_to "/waitlist"
   end
+  test "store badges turn into download links once the store URL is set" do
+    ENV["IOS_STORE_URL"] = "https://apps.apple.com/app/brethreign/id6835821959"
+    get join_waitlist_path
+    assert_select "a.app-badge-get[href='https://apps.apple.com/app/brethreign/id6835821959']"
+    assert_select "meta[name='apple-itunes-app'][content='app-id=6835821959']"
+    assert_select ".app-badge-soon", text: "Coming soon", count: 1
+  ensure
+    ENV.delete("IOS_STORE_URL")
+  end
 end
