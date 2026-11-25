@@ -1,0 +1,26 @@
+# Brethreign's official accounts: the one place to change them.
+# Shown in the "Follow Brethreign" rows (footer, feed rail, welcome page,
+# /p/brethreign, emails, What's new), the feed's follow card, and the
+# Organization "sameAs" for search engines. Handles and links only.
+# public/404.html is a static file: update its links by hand too
+# (test/models/brand_socials_test.rb checks they match).
+x:
+  label: X
+  handle: "@_Brethreign_"
+  url: https://x.com/_Brethreign_
+instagram:
+  label: Instagram
+  handle: "@breth_reign"
+  url: https://www.instagram.com/breth_reign/
+linkedin:
+  label: LinkedIn
+  handle: Brethreign
+  url: https://www.linkedin.com/company/brethreign/
+substack:
+  label: Substack
+  handle: breathreigns
+  url: https://breathreigns.substack.com
+email:
+  label: Email
+  handle: social@brethreign.com
+  url: mailto:social@brethreign.com

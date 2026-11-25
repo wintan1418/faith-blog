@@ -1,0 +1,346 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Feedback surveys (fb-*) and "Follow Brethreign" rows (sx-*).
+   Evergreen tokens (--fc-*), so light, dark and members' accents all work.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Survey: the questions ── */
+.fb-form { display: flex; flex-direction: column; gap: 14px; }
+.fb-rating, .fb-choices { border: 0; margin: 0; padding: 0; min-width: 0; }
+.fb-question {
+  font-family: var(--fc-serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--fc-ink);
+  margin-bottom: 4px;
+}
+.fb-sub { color: var(--fc-muted); font-size: 0.9rem; margin-bottom: 4px; }
+.fb-label { display: block; color: var(--fc-soft); font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+.fb-scale { display: flex; gap: 6px; margin-top: 10px; }
+.fb-rating.is-stars .fb-scale { gap: 4px; }
+.fb-pick { cursor: pointer; display: inline-flex; }
+.fb-pick:has(input:focus-visible) { outline: 2px solid var(--fc-accent); outline-offset: 2px; border-radius: 10px; }
+.fb-star {
+  display: inline-flex;
+  padding: 4px;
+  color: var(--fc-line-strong);
+  transition: color 120ms ease, transform 120ms ease;
+}
+.fb-star svg { fill: transparent; transition: fill 120ms ease; }
+.fb-pick:hover .fb-star { transform: scale(1.08); }
+.fb-pick.is-lit .fb-star { color: var(--fc-gold-fill); }
+.fb-pick.is-lit .fb-star svg { fill: var(--fc-gold-fill); }
+.fb-rating.is-nps .fb-scale { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px; }
+.fb-rating.is-nps .fb-pick { display: block; }
+.fb-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 10px;
+  background: var(--fc-surface);
+  color: var(--fc-soft);
+  font-weight: 800;
+  font-size: 0.92rem;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.fb-pick:hover .fb-num { border-color: var(--fc-accent); }
+.fb-pick.is-picked .fb-num { background: var(--fc-fill); border-color: var(--fc-fill); color: var(--fc-on-fill); }
+.fb-scale-ends { display: flex; justify-content: space-between; margin-top: 4px; color: var(--fc-muted); font-size: 0.76rem; }
+.fb-chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.fb-chip { cursor: pointer; }
+.fb-chip span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  color: var(--fc-soft);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.fb-chip input:checked + span { background: var(--fc-accent-soft); border-color: var(--fc-accent); color: var(--fc-accent); }
+.fb-chip input:focus-visible + span { outline: 2px solid var(--fc-accent); outline-offset: 2px; }
+.fb-textarea {
+  width: 100%;
+  min-height: 76px;
+  padding: 10px 12px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: var(--fc-radius-sm);
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+  font-size: 16px; /* no zoom on iPhone */
+  resize: vertical;
+}
+.fb-textarea:focus { outline: none; border-color: var(--fc-accent); box-shadow: 0 0 0 3px var(--fc-accent-soft); }
+.fb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.fb-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+.fb-link {
+  background: none;
+  border: 0;
+  padding: 6px 2px;
+  color: var(--fc-accent);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.fb-link.is-quiet { color: var(--fc-muted); font-weight: 600; }
+.fb-link:hover { text-decoration: underline; }
+.fb-error {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(185, 28, 28, 0.08);
+  color: #b91c1c;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+html.theme-dark .fb-error { color: #fca5a5; }
+.fb-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fc-accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Thank you ── */
+.fb-thanks { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 10px 0 4px; }
+.fb-thanks-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: var(--fc-accent-soft);
+  color: var(--fc-accent);
+  animation: fb-pop 380ms cubic-bezier(.2, 1.4, .4, 1);
+}
+.fb-thanks-title { font-family: var(--fc-serif); font-size: 1.3rem; font-weight: 700; color: var(--fc-ink); }
+.fb-thanks-text { color: var(--fc-muted); font-size: 0.92rem; max-width: 30rem; }
+.fb-thanks-seeds {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--fc-gold-soft);
+  color: var(--fc-gold);
+  font-weight: 800;
+  font-size: 0.86rem;
+}
+html.theme-dark .fb-thanks-seeds { background: rgba(184, 122, 20, 0.16); color: #f0c46b; }
+@keyframes fb-pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ── Survey page ── */
+.fb-page { max-width: 36rem; margin: 0 auto; padding: 28px 16px 48px; }
+.fb-page-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--fc-line);
+  border-radius: var(--fc-radius);
+  background: var(--fc-card);
+  box-shadow: var(--sh-md);
+}
+.fb-foot { border-top: 1px solid var(--fc-line); padding-top: 10px; }
+
+/* ── Feed pop-up: a bottom sheet ── */
+.fb-sheet {
+  position: fixed;
+  z-index: 80;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: min(440px, calc(100vw - 24px));
+  transform: translate(-50%, calc(100% + 40px));
+  opacity: 0;
+  transition: transform 320ms cubic-bezier(.2, .9, .3, 1), opacity 220ms ease;
+  pointer-events: none;
+}
+.fb-sheet.is-open { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.fb-sheet-card {
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  padding: 14px 18px 16px;
+  border: 1px solid var(--fc-line);
+  border-radius: 22px;
+  background: var(--fc-card);
+  box-shadow: var(--sh-lg);
+}
+.fb-sheet-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.fb-sheet .fb-question { font-size: 1.12rem; }
+.fb-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: var(--fc-muted);
+}
+.fb-x:hover { background: var(--fc-surface-3); color: var(--fc-ink); }
+@media (min-width: 1024px) {
+  .fb-sheet { left: auto; right: 24px; bottom: 24px; transform: translate(0, calc(100% + 40px)); }
+  .fb-sheet.is-open { transform: translate(0, 0); }
+}
+/* Above the phone tab bar on the web; the apps have their own native tabs. */
+@media (max-width: 1023px) {
+  body:not(.hotwire-native) .fb-sheet { bottom: calc(80px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fb-sheet, .fb-thanks-mark { transition: none; animation: none; }
+}
+
+/* ── Follow Brethreign ── */
+.sx-follow { display: flex; flex-direction: column; gap: 8px; }
+.sx-title { color: var(--fc-soft); font-size: 0.82rem; font-weight: 800; }
+.sx-list { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.sx-icon { width: 18px; height: 18px; flex: none; }
+html .sx-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  background: var(--fc-surface);
+  color: var(--fc-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+html .sx-link:hover { color: var(--fc-accent); border-color: var(--fc-accent); background: var(--fc-accent-soft); }
+.sx-follow.is-icons .sx-link, .sx-follow.is-dark .sx-link { width: 38px; padding: 0; justify-content: center; }
+.sx-follow.is-chips .sx-link { min-height: 32px; padding: 0 10px; font-size: 0.8rem; }
+.sx-follow.is-chips .sx-list { margin-top: 8px; }
+html .sx-follow.is-dark .sx-link { background: transparent; border-color: rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.75); }
+html .sx-follow.is-dark .sx-link:hover { color: #fff; border-color: rgba(255, 255, 255, 0.5); background: rgba(255, 255, 255, 0.06); }
+.sx-follow.is-dark .sx-title { color: rgba(255, 255, 255, 0.8); }
+
+.sx-rail-card { padding: 14px 16px; }
+.sx-rail-links { margin-top: 10px; color: var(--fc-muted); font-size: 0.78rem; line-height: 1.7; }
+.sx-rail-links a { color: var(--fc-muted); text-decoration: none; }
+.sx-rail-links a:hover { color: var(--fc-accent); text-decoration: underline; }
+.sx-feed-card { align-items: flex-start; }
+.sx-feed-card .cj-feed-ico { margin-top: 2px; }
+.welcome-footer .sx-follow { align-items: center; margin-bottom: 10px; }
+
+/* What's new: "Follow Brethreign" opens the links under the button. */
+.wn-socials { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.wn-socials > summary { list-style: none; cursor: pointer; }
+.wn-socials > summary::-webkit-details-marker { display: none; }
+.wn-socials-sheet {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--fc-line);
+  border-radius: 16px;
+  background: var(--fc-surface-2);
+  animation: fb-pop 260ms ease;
+}
+.wn-socials-sheet .sx-list { justify-content: center; }
+
+/* A page's social fields (Manage page). */
+.pg-socials-fields { border: 0; padding: 0; margin: 0; }
+.pg-field-row.is-wrap { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.pg-sublabel { font-size: 13px; font-weight: 600; color: var(--fc-muted); }
+
+/* ── Admin → Feedback (afb-*) ── */
+.afb-radio { display: flex; align-items: flex-start; gap: 8px; color: var(--fc-soft); font-size: 0.9rem; line-height: 1.4; cursor: pointer; }
+.afb-radio input { margin-top: 3px; accent-color: var(--fc-accent); }
+.afb-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+@media (max-width: 640px) { .afb-two { grid-template-columns: 1fr; } }
+.afb-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--fc-surface-3);
+  color: var(--fc-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.afb-status.is-live { background: var(--fc-accent-soft); color: var(--fc-accent); }
+.afb-status.is-scheduled { background: var(--fc-gold-soft); color: var(--fc-gold); }
+html.theme-dark .afb-status.is-scheduled { background: rgba(184, 122, 20, 0.16); color: #f0c46b; }
+.afb-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.afb-title { font-family: var(--fc-serif); font-size: 1.6rem; font-weight: 700; color: var(--fc-ink); margin: 4px 0; }
+.afb-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.afb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.afb-stat, .afb-panel {
+  border: 1px solid var(--fc-line);
+  border-radius: var(--fc-radius-sm);
+  background: var(--fc-card);
+  box-shadow: var(--sh-sm);
+}
+.afb-stat { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; }
+.afb-stat-label { color: var(--fc-muted); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.afb-stat-value { color: var(--fc-ink); font-size: 1.7rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.afb-stat-note { color: var(--fc-muted); font-size: 0.78rem; }
+.afb-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.afb-panel { padding: 16px; margin-bottom: 14px; }
+.afb-grid .afb-panel { margin-bottom: 0; }
+.afb-panel-title { color: var(--fc-ink); font-weight: 800; margin-bottom: 10px; }
+.afb-preview { display: flex; flex-direction: column; gap: 4px; color: var(--fc-soft); font-size: 0.9rem; }
+.afb-bars { display: flex; flex-direction: column; gap: 4px; list-style: none; margin: 0; padding: 0; }
+.afb-bar-row {
+  display: grid;
+  grid-template-columns: 2.6rem 1fr 2.6rem;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border-radius: 8px;
+  color: var(--fc-soft);
+  font-size: 0.86rem;
+  text-decoration: none;
+}
+a.afb-bar-row:hover, .afb-bar-row.is-active { background: var(--fc-surface-3); }
+.afb-bar-label { font-weight: 700; font-variant-numeric: tabular-nums; }
+.afb-bar-row:has(.is-wide) { grid-template-columns: minmax(6rem, 34%) 1fr 2.6rem; }
+.afb-bar-label.is-wide { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.afb-bar-track { height: 12px; border-radius: 999px; background: var(--fc-surface-3); overflow: hidden; }
+.afb-bar-fill { display: block; height: 100%; min-width: 2px; border-radius: 999px; background: var(--fc-accent); }
+.afb-bar-fill.is-good { background: var(--fc-accent); }
+.afb-bar-fill.is-low { background: var(--fc-gold-fill); }
+.afb-bar-count { text-align: right; font-variant-numeric: tabular-nums; color: var(--fc-muted); }
+.afb-comments-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.afb-filter { display: flex; flex-wrap: wrap; gap: 4px; }
+.afb-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  color: var(--fc-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.afb-filter-chip.is-active { background: var(--fc-fill); border-color: var(--fc-fill); color: var(--fc-on-fill); }
+.afb-answers { list-style: none; margin: 0; padding: 0; }
+.afb-answer { padding: 12px 0; border-top: 1px solid var(--fc-line); }
+.afb-answer-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.afb-answer-rating { color: var(--fc-gold-fill); font-weight: 800; letter-spacing: 0.05em; }
+.afb-answer-who { color: var(--fc-accent); font-weight: 700; }
+.afb-answer-meta { color: var(--fc-muted); font-size: 0.8rem; }
+.afb-answer-choice { display: inline-block; margin-top: 4px; padding: 1px 9px; border-radius: 999px; background: var(--fc-accent-soft); color: var(--fc-accent); font-size: 0.8rem; font-weight: 700; }
+.afb-answer-comment { margin-top: 4px; color: var(--fc-ink); white-space: pre-line; overflow-wrap: anywhere; }
+
+/* The scroll-to-top button steps aside while the survey sheet is up. */
+body:has(.fb-sheet.is-open) .fc-scroll-top { opacity: 0; pointer-events: none; }
+.sx-rail-card .sx-list { gap: 5px; }
+html .sx-rail-card .sx-link { width: 34px; min-height: 34px; }
+.sx-rail-card .sx-icon { width: 16px; height: 16px; }

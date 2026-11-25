@@ -17,4 +17,9 @@ class ConcurrencyKeysTest < ActiveSupport::TestCase
     assert_nothing_raised { BibleReminderJob.new.concurrency_key }
     assert_nothing_raised { BibleReminderJob.new(Time.current).concurrency_key }
   end
+
+  test "feedback delivery key accepts a campaign id and a time" do
+    assert_nothing_raised { FeedbackCampaignDeliveryJob.new(3).concurrency_key }
+    assert_nothing_raised { FeedbackCampaignDeliveryJob.new(3, now: Time.current).concurrency_key }
+  end
 end

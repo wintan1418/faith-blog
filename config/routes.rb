@@ -42,6 +42,13 @@ Rails.application.routes.draw do
   get "feed/updates",   to: "feed#updates"
   get "feed/new_posts", to: "feed#new_posts", as: :feed_new_posts
 
+  # Feedback surveys (Admin → Feedback): the survey page from the alert, and
+  # the feed pop-up's answer / "Not now" / "Don't ask again".
+  get  "feedback/:id",         to: "feedback#show",    as: :feedback_survey
+  post "feedback/:id",         to: "feedback#create"
+  post "feedback/:id/snooze",  to: "feedback#snooze",  as: :snooze_feedback_survey
+  post "feedback/:id/decline", to: "feedback#decline", as: :decline_feedback_survey
+
   # Who's online: heartbeat from the signed-in layout, and the feed's "Online now" row.
   post "presence/ping", to: "presence#ping", as: :presence_ping
   get "presence/strip", to: "presence#strip", as: :presence_strip
@@ -433,6 +440,12 @@ Rails.application.routes.draw do
       end
     end
     resources :announcements, only: [ :index, :new, :create, :destroy ]
+    resources :feedback_campaigns, path: "feedback" do
+      member do
+        post :launch
+        post :close
+      end
+    end
 
     # The Office: the founder's AI assistant.
     get "office", to: "office/conversations#index", as: :office

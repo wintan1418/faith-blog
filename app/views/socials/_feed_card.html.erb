@@ -1,0 +1,14 @@
+<%# Feed: "Follow us on X, Instagram, LinkedIn and Substack". Shown once (FeedController#load_socials_card):
+    it's remembered as seen when it scrolls into view, and closing it or tapping a link hides it. %>
+<section class="cj-feed-card sx-feed-card" data-controller="socials-card"
+         data-socials-card-key-value="<%= FeedController::SOCIALS_CARD_KEY %>" aria-labelledby="sx-feed-card-title">
+  <span class="cj-feed-ico" aria-hidden="true"><%= render_icon("megaphone", classes: "h-5 w-5") %></span>
+  <div class="cj-feed-text">
+    <p class="cj-feed-title" id="sx-feed-card-title">Follow Brethreign</p>
+    <p class="cj-feed-sub">Follow us on X, Instagram, LinkedIn and Substack — get news, verses and updates.</p>
+    <div data-action="click->socials-card#used">
+      <%= render "socials/follow_row", title: nil, email: false, variant: "chips" %>
+    </div>
+  </div>
+  <button type="button" class="cj-feed-x" data-action="click->socials-card#dismiss" aria-label="Hide this card"><%= render_icon("x", classes: "h-4 w-4") %></button>
+</section>

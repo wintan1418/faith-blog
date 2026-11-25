@@ -142,6 +142,13 @@
           <% end %>
         </section>
       <% end %>
+      <section class="eg-card sx-rail-card" aria-label="About Brethreign">
+        <%= render "socials/follow_row", variant: "icons" %>
+        <nav class="sx-rail-links" aria-label="About">
+          <%= link_to "About", about_path %> · <%= link_to "Guidelines", guidelines_path %> ·
+          <%= link_to "Privacy", privacy_path %> · <%= link_to "Terms", terms_path %>
+        </nav>
+      </section>
     </aside>
 
     <main class="fc-main eg-main">
@@ -367,6 +374,9 @@
                 <% if @invite_card && (index == 7 || (index == @items.size - 1 && index < 7)) %>
                   <%= render "invitations/feed_card" %>
                 <% end %>
+                <% if @socials_card && (index == 5 || (index == @items.size - 1 && index < 5)) %>
+                  <%= render "socials/feed_card" %>
+                <% end %>
               <% end %>
             </div>
 
@@ -415,6 +425,7 @@
         </div>
       </div>
       <% end %>
+      <%= render "feedback/sheet", campaign: @feedback_campaign if @feedback_campaign %>
     </main>
 
     <aside class="fc-aside eg-right" data-discover-target="panel" aria-label="Discover">
@@ -611,6 +622,9 @@
           <% end %>
         </section>
       <% end %>
+      <section class="eg-card sx-rail-card eg-phone-only" aria-label="Follow Brethreign">
+        <%= render "socials/follow_row", variant: "icons" %>
+      </section>
     </aside>
   </div>
 

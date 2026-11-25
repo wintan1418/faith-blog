@@ -79,6 +79,15 @@
             <%= check_box_tag "email_notifications_enabled", "1", current_user.email_notifications_enabled, class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
           </label>
 
+          <label class="mystic-panel flex items-center justify-between gap-4 p-4">
+            <span>
+              <span class="block font-bold text-faith-dark">Feedback surveys</span>
+              <span class="text-sm text-faith-muted">Now and then, a 30-second question about how Brethreign is working for you.</span>
+            </span>
+            <%= hidden_field_tag "feedback_surveys", "0", id: nil %>
+            <%= check_box_tag "feedback_surveys", "1", !current_user.card_dismissed?(FeedbackCampaign::OPT_OUT_KEY), class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+          </label>
+
           <% if @room_memberships.any? %>
             <div class="space-y-3">
               <% @room_memberships.each do |membership| %>

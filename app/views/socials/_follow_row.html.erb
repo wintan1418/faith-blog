@@ -1,0 +1,22 @@
+<%# "Follow Brethreign": a row of plain social icons.
+    Locals: accounts (default: Brethreign's), title (nil for no heading),
+    variant ("row" icons with labels, "icons" icons only, "dark" on dark backgrounds),
+    email (include the email address; default true). %>
+<% accounts = local_assigns[:accounts] || brand_social_accounts(email: local_assigns.fetch(:email, true)) %>
+<% variant = local_assigns[:variant] || "row" %>
+<% title = local_assigns.key?(:title) ? local_assigns[:title] : "Follow Brethreign" %>
+<% if accounts.any? %>
+  <div class="sx-follow is-<%= variant %>">
+    <% if title %><p class="sx-title"><%= title %></p><% end %>
+    <ul class="sx-list">
+      <% accounts.each do |account| %>
+        <li>
+          <%= link_to account.url, **social_link_options(account, classes: "sx-link is-#{account.key}") do %>
+            <%= social_icon(account.key, classes: "sx-icon") %>
+            <span class="<%= variant == 'row' ? 'sx-label' : 'sr-only' %>"><%= account.label %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

@@ -282,3 +282,9 @@ application.register("auto-submit", AutoSubmitController)
 
 import PostAsController from "./post_as_controller"
 application.register("post-as", PostAsController)
+
+import FeedbackController from "./feedback_controller"
+application.register("feedback", FeedbackController)
+
+import SocialsCardController from "./socials_card_controller"
+application.register("socials-card", SocialsCardController)

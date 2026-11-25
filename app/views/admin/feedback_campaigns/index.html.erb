@@ -1,0 +1,35 @@
+<% content_for(:page_title) { "Feedback" } %>
+
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <p class="text-sm text-[var(--fc-muted)]">Ask members how Brethreign is working for them: an alert plus a gentle pop-up on the feed.</p>
+  <%= link_to "+ New survey", new_admin_feedback_campaign_path, class: "fc-btn fc-btn-primary" %>
+</div>
+
+<% if @campaigns.any? %>
+  <ul class="fc-cms-list">
+    <% @campaigns.each do |campaign| %>
+      <li class="fc-cms-row">
+        <div class="fc-cms-body">
+          <p class="flex flex-wrap items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[var(--fc-accent-2)]">
+            <%= render "status", campaign: campaign %>
+            <%= campaign.rating_nps? ? "0–10" : "1–5 stars" %> · <%= campaign.audience_label %>
+          </p>
+          <p class="text-base font-extrabold text-[var(--fc-ink)]"><%= link_to campaign.title, admin_feedback_campaign_path(campaign) %></p>
+          <p class="fc-cms-meta">
+            <%= pluralize(campaign.responses_count, "response") %>
+            <% if campaign.starts_at %> · starts <%= l(campaign.starts_at, format: :short) %><% end %>
+            <% if campaign.ends_at %> · ends <%= l(campaign.ends_at, format: :short) %><% end %>
+          </p>
+        </div>
+        <div class="fc-cms-actions">
+          <%= link_to "Results", admin_feedback_campaign_path(campaign), class: "fc-btn" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-10 text-center">
+    <p class="text-base font-bold text-[var(--fc-ink)]">No surveys yet.</p>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">Start with “How is Brethreign working for you?”.</p>
+  </div>
+<% end %>

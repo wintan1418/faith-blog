@@ -1,0 +1,138 @@
+<% content_for(:page_title) { "Feedback survey" } %>
+<% c = @campaign %>
+<% answered = c.answered.count %>
+<% dist = c.distribution %>
+<% dist_max = [ dist.values.max.to_i, 1 ].max %>
+
+<div class="afb-head">
+  <div>
+    <p class="flex flex-wrap items-center gap-2 text-sm text-[var(--fc-muted)]">
+      <%= render "status", campaign: c %>
+      <span><%= c.rating_nps? ? "0–10 (NPS)" : "1–5 stars" %></span> · <span><%= c.audience_label %></span>
+      <% if c.also_push? %> · <span>with push</span><% end %>
+    </p>
+    <h1 class="afb-title"><%= c.title %></h1>
+    <p class="text-sm text-[var(--fc-muted)]">
+      <% if c.starts_at %><%= c.scheduled? ? "Starts" : "Started" %> <%= l(c.starts_at, format: :long) %><% end %>
+      <% if c.ends_at %> · <%= c.ended? ? "Ended" : "Ends" %> <%= l(c.closed_at || c.ends_at, format: :long) %><% end %>
+      <% if c.created_by %> · by <%= c.created_by.username %><% end %>
+    </p>
+  </div>
+  <div class="afb-actions">
+    <% if c.draft? %>
+      <%= button_to launch_admin_feedback_campaign_path(c), class: "fc-btn fc-btn-primary", form_class: "inline",
+            data: { turbo_confirm: "Launch this survey#{c.starts_at&.future? ? " for #{l(c.starts_at, format: :short)}" : ' now'}? About #{number_with_delimiter(@audience_size)} members will get an alert#{c.also_push? ? ' and a push' : ''}." } do %>
+        <%= render_icon("send", classes: "h-4 w-4") %> Launch
+      <% end %>
+      <%= link_to "Edit", edit_admin_feedback_campaign_path(c), class: "fc-btn" %>
+      <%= button_to "Delete draft", admin_feedback_campaign_path(c), method: :delete, class: "fc-btn", form_class: "inline",
+            data: { turbo_confirm: "Delete this draft?" } %>
+    <% elsif !c.closed? && !c.ended? %>
+      <%= button_to "Close survey", close_admin_feedback_campaign_path(c), class: "fc-btn", form_class: "inline",
+            data: { turbo_confirm: "Close this survey? Members won't be asked any more." } %>
+    <% end %>
+    <% unless c.draft? %>
+      <%= link_to admin_feedback_campaign_path(c, format: :csv), class: "fc-btn", data: { turbo: false } do %>
+        <%= render_icon("download", classes: "h-4 w-4") %> Export CSV
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<% if c.draft? %>
+  <div class="afb-panel">
+    <p class="afb-panel-title">Preview</p>
+    <ul class="afb-preview">
+      <li><strong>Rating:</strong> <%= c.rating_nps? ? "0–10, “How likely are you to recommend Brethreign?”" : "1–5 stars" %></li>
+      <li><strong>Text box:</strong> <%= c.follow_up_prompt.presence || "none" %></li>
+      <li><strong>Multiple choice:</strong> <%= c.choices? ? "#{c.choice_question} (#{c.choice_options.join(' / ')})" : "none" %></li>
+      <li><strong>Audience now:</strong> <%= number_with_delimiter(@audience_size) %> members</li>
+    </ul>
+  </div>
+<% else %>
+  <div class="afb-stats">
+    <div class="afb-stat"><span class="afb-stat-label">Responses</span><span class="afb-stat-value"><%= number_with_delimiter(answered) %></span></div>
+    <div class="afb-stat">
+      <span class="afb-stat-label">Response rate</span>
+      <span class="afb-stat-value"><%= c.response_rate ? "#{c.response_rate}%" : "—" %></span>
+      <span class="afb-stat-note">of <%= number_with_delimiter(c.targeted_count.nonzero? || @audience_size.to_i) %> alerted</span>
+    </div>
+    <% if c.rating_nps? %>
+      <div class="afb-stat"><span class="afb-stat-label">NPS</span><span class="afb-stat-value"><%= c.nps_score.nil? ? "—" : format("%+d", c.nps_score) %></span><span class="afb-stat-note">promoters − detractors</span></div>
+    <% end %>
+    <div class="afb-stat"><span class="afb-stat-label">Average</span><span class="afb-stat-value"><%= c.average_rating || "—" %></span><span class="afb-stat-note">out of <%= c.rating_range.max %></span></div>
+  </div>
+
+  <div class="afb-grid">
+    <section class="afb-panel" aria-labelledby="afb-dist-title">
+      <p class="afb-panel-title" id="afb-dist-title">Ratings</p>
+      <ul class="afb-bars">
+        <% dist.to_a.reverse.each do |rating, count| %>
+          <li>
+            <%= link_to admin_feedback_campaign_path(c, rating: (@rating_filter == rating ? nil : rating)),
+                  class: "afb-bar-row#{' is-active' if @rating_filter == rating}", title: "Show only #{rating}" do %>
+              <span class="afb-bar-label"><%= c.rating_nps? ? rating : "#{rating}★" %></span>
+              <span class="afb-bar-track"><span class="afb-bar-fill<%= c.rating_nps? ? (rating >= 9 ? ' is-good' : rating <= 6 ? ' is-low' : '') : '' %>" style="width: <%= (count * 100.0 / dist_max).round(1) %>%"></span></span>
+              <span class="afb-bar-count"><%= count %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+
+    <% if c.choices? %>
+      <% choices = c.choice_counts %>
+      <% choice_max = [ choices.values.max.to_i, 1 ].max %>
+      <section class="afb-panel" aria-labelledby="afb-choice-title">
+        <p class="afb-panel-title" id="afb-choice-title"><%= c.choice_question %></p>
+        <ul class="afb-bars">
+          <% choices.each do |option, count| %>
+            <li class="afb-bar-row">
+              <span class="afb-bar-label is-wide"><%= option %></span>
+              <span class="afb-bar-track"><span class="afb-bar-fill" style="width: <%= (count * 100.0 / choice_max).round(1) %>%"></span></span>
+              <span class="afb-bar-count"><%= count %></span>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  </div>
+
+  <section class="afb-panel" aria-labelledby="afb-comments-title">
+    <div class="afb-comments-head">
+      <p class="afb-panel-title" id="afb-comments-title">Answers<%= " rated #{@rating_filter}" if @rating_filter %></p>
+      <nav class="afb-filter" aria-label="Filter by rating">
+        <%= link_to "All", admin_feedback_campaign_path(c), class: "afb-filter-chip#{' is-active' unless @rating_filter}" %>
+        <% c.rating_range.each do |r| %>
+          <%= link_to r, admin_feedback_campaign_path(c, rating: r), class: "afb-filter-chip#{' is-active' if @rating_filter == r}" %>
+        <% end %>
+      </nav>
+    </div>
+    <% if @answers.any? %>
+      <ul class="afb-answers">
+        <% @answers.each do |answer| %>
+          <li class="afb-answer">
+            <div class="afb-answer-top">
+              <span class="afb-answer-rating"><%= c.rating_nps? ? "#{answer.rating}/10" : "★" * answer.rating.to_i %></span>
+              <% if answer.user %>
+                <%= link_to answer.user.display_name, user_path(answer.user.username), class: "afb-answer-who", target: "_blank", rel: "noopener" %>
+              <% else %>
+                <span class="afb-answer-who">Deleted account</span>
+              <% end %>
+              <span class="afb-answer-meta"><%= answer.platform_label %> · <%= l(answer.submitted_at, format: :short) %></span>
+            </div>
+            <% if answer.choice.present? %><p class="afb-answer-choice"><%= answer.choice %></p><% end %>
+            <% if answer.comment.present? %>
+              <p class="afb-answer-comment"><%= answer.comment %></p>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <% if @pagy.pages > 1 %><div class="mt-4"><%== pagy_nav(@pagy) %></div><% end %>
+    <% else %>
+      <p class="text-sm text-[var(--fc-muted)]">No answers<%= " with this rating" if @rating_filter %> yet.</p>
+    <% end %>
+  </section>
+<% end %>
+
+<p class="mt-6"><%= link_to "← All surveys", admin_feedback_campaigns_path, class: "fc-btn" %></p>

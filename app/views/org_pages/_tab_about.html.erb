@@ -14,6 +14,12 @@
     </ul>
   </section>
 <% end %>
+<% page_socials = page_social_accounts(@page) %>
+<% if page_socials.any? %>
+  <section class="pg-panel">
+    <%= render "socials/follow_row", accounts: page_socials, title: "Follow #{@page.name}" %>
+  </section>
+<% end %>
 <div class="pg-about-details">
   <%= render "org_pages/details", page: @page, compact: false %>
 </div>

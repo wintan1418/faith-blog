@@ -19,9 +19,10 @@
            "badge" => "Each milestone badge.",
            "bible_read" => "Once a day, when you read a chapter or tick it off on the feed.",
            "bible_prayed" => "Once a day, when you say Amen to the prayer after your reading.",
-           "invite_joined" => "Once per friend who joins through your invite link and publishes a breath or writes a comment. Up to #{@rules["invite_joined"][:daily_cap]} a day."
+           "invite_joined" => "Once per friend who joins through your invite link and publishes a breath or writes a comment. Up to #{@rules["invite_joined"][:daily_cap]} a day.",
+           "feedback" => "Once per survey, when the Brethreign team asks how things are going."
          } %>
-      <% [ %w[comment comment], %w[intercession pray], %w[breath leaf], %w[comment_received reply], %w[reaction_received heart], %w[bible_read bookopen], %w[bible_prayed pray], %w[badge trophy], %w[invite_joined userplus] ].each do |kind, icon| %>
+      <% [ %w[comment comment], %w[intercession pray], %w[breath leaf], %w[comment_received reply], %w[reaction_received heart], %w[bible_read bookopen], %w[bible_prayed pray], %w[badge trophy], %w[invite_joined userplus], %w[feedback chat] ].each do |kind, icon| %>
         <% rule = @rules[kind] %>
         <li class="seed-rule">
           <span class="seed-rule-ico"><%= render_icon(icon, classes: "h-4 w-4") %></span>

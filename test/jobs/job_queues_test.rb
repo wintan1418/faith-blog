@@ -12,7 +12,7 @@ class JobQueuesTest < ActiveSupport::TestCase
                        IndexNowFlushJob SearchConsoleRefreshJob SeriesPartAlertJob],
     "bulk"       => %w[WeeklyDigestFanoutJob BroadcastFanoutJob BotsRefreshJob BibleQuizWarmPoolJob BibleQuizTopUpJob
                        AnalyticsCleanupJob BreathFanoutJob BirthdayNotificationsJob AppUpdateReminderJob
-                       SearchIndexingNightlyJob ScriptureInsightJob BibleReminderJob ChapterPrayerJob]
+                       SearchIndexingNightlyJob ScriptureInsightJob BibleReminderJob ChapterPrayerJob FeedbackCampaignDeliveryJob]
   }.freeze
 
   def polled_queues
