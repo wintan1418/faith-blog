@@ -1,0 +1,10 @@
+<%# The six-digit code box: numbers only, the phone's one-time-code autofill,
+    and it sends itself once six digits are in. %>
+<div class="auth-field">
+  <%= label_tag :code, local_assigns.fetch(:label, "6-digit code"), class: "auth-label" %>
+  <%= text_field_tag :code, nil, class: "auth-input sec-code-input", inputmode: "numeric", autocomplete: "one-time-code",
+                     pattern: "[0-9]*", maxlength: 6, minlength: 6, placeholder: "••••••", required: local_assigns.fetch(:required, true),
+                     autofocus: !hotwire_native_app?, spellcheck: false, "aria-describedby": "code-help",
+                     data: { code_entry_target: "input", action: "input->code-entry#typed" } %>
+  <p id="code-help" class="auth-hint"><%= local_assigns[:hint] || "Check your inbox (and the spam folder). The code works for 10 minutes." %></p>
+</div>

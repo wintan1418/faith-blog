@@ -1,0 +1,9 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; font-size: 15.5px; line-height: 1.65;">
+  <%= render "heading", kicker: "Two-step login", title: "Two-step login is off" %>
+  <% if @by_admin %>
+    <p style="margin: 0 0 14px;">Hi <%= @user.username %>, as you asked, the Brethreign team turned off two-step login for your account so you can get back in. You can turn it on again any time in <a href="<%= settings_security_url %>" style="color: #0e5c43; font-weight: 700;">Settings → Security</a>.</p>
+  <% else %>
+    <p style="margin: 0 0 14px;">Hi <%= @user.username %>, two-step login was turned off for your account. Signing in now needs only your password (or Google / Apple). You can turn it on again any time in <a href="<%= settings_security_url %>" style="color: #0e5c43; font-weight: 700;">Settings → Security</a>.</p>
+  <% end %>
+  <%= render "wasnt_you" %>
+</div>

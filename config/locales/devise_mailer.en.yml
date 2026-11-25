@@ -1,0 +1,8 @@
+# Subjects for Devise's emails (the bodies are app/views/devise/mailer/*).
+en:
+  devise:
+    mailer:
+      reset_password_instructions:
+        subject: "Choose a new Brethreign password"
+      unlock_instructions:
+        subject: "Your Brethreign account is locked for a while"

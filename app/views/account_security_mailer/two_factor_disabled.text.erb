@@ -1,0 +1,7 @@
+Hi <%= @user.username %>,
+
+<% if @by_admin %>As you asked, the Brethreign team turned off two-step login for your account so you can get back in.<% else %>Two-step login was turned off for your account. Signing in now needs only your password (or Google / Apple).<% end %>
+
+Turn it on again any time: <%= settings_security_url %>
+
+<%= render "wasnt_you" %>

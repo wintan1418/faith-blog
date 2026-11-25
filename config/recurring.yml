@@ -22,6 +22,10 @@ production:
     class: AnalyticsCleanupJob
     schedule: every Sunday at 3am Africa/Lagos
 
+  account_security_cleanup:
+    class: AccountSecurityCleanupJob
+    schedule: every day at 3:30am Africa/Lagos
+
   daily_summary:
     class: DailySummaryJob
     schedule: every day at 7am Africa/Lagos

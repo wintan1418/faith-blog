@@ -65,6 +65,7 @@ class WriteRouteSweepTest < ActionDispatch::IntegrationTest
     in [ "invitations", "id" ] then 0
     in [ "whats_new", "id" ] then 0
     in [ "settings/languages", "id" ] then 0
+    in [ "settings/devices", "id" ] then 0
     in [ "admin/office/conversations", "conversation_id" ] then @office_conversation.id
     in [ "giving", _ ] then "x"
     in [ "admin/bots", "id" ] then 0

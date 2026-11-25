@@ -1,0 +1,15 @@
+<% content_for(:title) { "Confirm your new email - Brethreign" } %>
+<%= render layout: "devise/shared/auth_shell", locals: { title: "Confirm your new email", subtitle: "We sent a 6-digit code to #{@new_email}." } do %>
+  <div data-controller="code-entry" data-code-entry-cooldown-value="<%= @cooldown.to_i %>">
+    <%= form_with url: settings_email_change_path, method: :patch, class: "auth-form", data: { code_entry_target: "form" } do %>
+      <%= render "account_security/error", message: @error %>
+      <p class="sec-lead">Your account keeps using <strong><%= current_user.email %></strong> until you enter the code. We'll let that address know about the change.</p>
+      <%= render "account_security/code_field" %>
+      <%= submit_tag "Confirm new email", class: "auth-submit", data: { turbo_submits_with: "Checking…" } %>
+    <% end %>
+    <%= render "account_security/resend", url: resend_settings_email_change_path, cooldown: @cooldown %>
+  </div>
+  <div class="sec-footer-links">
+    <%= button_to "Keep my current email", settings_email_change_path, method: :delete, class: "sec-link-button", form: { class: "sec-inline-form" } %>
+  </div>
+<% end %>

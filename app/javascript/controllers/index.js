@@ -288,3 +288,9 @@ application.register("feedback", FeedbackController)
 
 import SocialsCardController from "./socials_card_controller"
 application.register("socials-card", SocialsCardController)
+
+import CodeEntryController from "./code_entry_controller"
+application.register("code-entry", CodeEntryController)
+
+import CopyTextController from "./copy_text_controller"
+application.register("copy-text", CopyTextController)

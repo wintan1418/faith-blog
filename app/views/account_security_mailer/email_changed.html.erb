@@ -1,0 +1,6 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; font-size: 15.5px; line-height: 1.65;">
+  <%= render "heading", kicker: "Email changed", title: "Your email address was changed" %>
+  <p style="margin: 0 0 14px;">Hi <%= @user.username %>, the email for your Brethreign account was changed from this address (<%= @old_email %>) to <strong><%= @new_email_masked %></strong>. We'll send account emails there from now on.</p>
+  <p style="margin: 0;">If you did this, you're all set.</p>
+  <%= render "wasnt_you", lead: "Secure your account now. It switches your email back to this address, signs out every device, and emails you a link to choose a new password." %>
+</div>

@@ -1,0 +1,24 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; font-size: 15.5px; line-height: 1.65;">
+  <% if @purpose == "change_email" %>
+    <%= render "heading", kicker: "Confirm your new email", title: "Is this your new address?" %>
+    <p style="margin: 0 0 14px;">Hi <%= @user.username %>, you asked to change your Brethreign email to <strong><%= @email %></strong>. Enter this code to confirm it:</p>
+  <% else %>
+    <%= render "heading", kicker: "Verify your email", title: "One small step, #{@user.username}" %>
+    <p style="margin: 0 0 14px;">Enter this code on Brethreign to verify your email. It keeps your account safe and lets us reach you if you ever need help getting back in.</p>
+  <% end %>
+
+  <%= render "code", code: @code %>
+
+  <% if @link %>
+    <p style="margin: 0 0 18px; text-align: center;">
+      <a href="<%= @link %>" style="display: inline-block; background: #0e5c43; color: #ffffff; font-weight: 700; padding: 12px 22px; border-radius: 999px; text-decoration: none;">
+        <%= @purpose == "change_email" ? "Confirm my new email" : "Verify my email" %>
+      </a>
+    </p>
+    <p style="margin: 0 0 14px; color: #5e6862; font-size: 13px; text-align: center;">Or tap the button instead of typing the code.</p>
+  <% end %>
+
+  <p style="margin: 18px 0 0; color: #5e6862; font-size: 13px;">
+    Didn't ask for this? You can ignore this email<%= @purpose == "change_email" ? ": your email won't change" : "" %>. Never share this code with anyone, not even someone who says they're from Brethreign.
+  </p>
+</div>

@@ -67,11 +67,24 @@
           <div>
             <%= f.label :email, class: "label" %>
             <%= f.email_field :email, class: "input" %>
+            <p class="mt-1 text-sm text-faith-muted">
+              <% if current_user.email_verified? %>
+                <span class="sec-badge is-on"><%= render_icon("check", classes: "h-3.5 w-3.5") %> Verified</span>
+                A new address gets a 6-digit code before it's switched.
+              <% else %>
+                <span class="sec-badge is-warn">Not verified</span>
+                <%= link_to "Verify it now", email_verification_path(return_to: edit_settings_account_path), class: "underline" %>.
+                A new address gets a 6-digit code before it's switched.
+              <% end %>
+            </p>
           </div>
 
           <div class="border-t border-faith-green/10 pt-5">
             <h3 class="mb-1 text-sm font-bold text-faith-dark">Change Password</h3>
-            <p class="mb-4 text-sm text-faith-muted">Leave blank if you do not want to change your password.</p>
+            <p class="mb-4 text-sm text-faith-muted">
+              Leave blank if you do not want to change your password.
+              <% unless current_user.email_verified? %>Changing it needs a <%= link_to "verified email", email_verification_path(return_to: edit_settings_account_path), class: "underline" %> first.<% end %>
+            </p>
             <div class="space-y-4">
               <div>
                 <%= f.label :password, "New Password", class: "label" %>
@@ -102,6 +115,14 @@
           <%= f.submit "Save Changes", class: "btn btn-primary" %>
         <% end %>
       </div>
+    </div>
+
+    <div class="mystic-panel-strong mt-6 flex flex-wrap items-center justify-between gap-3 p-5">
+      <div>
+        <h2 class="text-base font-bold text-faith-dark">Security</h2>
+        <p class="mystic-copy text-sm">Two-step login, and the devices signed in to your account.</p>
+      </div>
+      <%= link_to "Open Security", settings_security_path, class: "btn btn-secondary" %>
     </div>
 
     <div class="mt-6 rounded-3xl border border-red-200 bg-red-50/80 p-6">

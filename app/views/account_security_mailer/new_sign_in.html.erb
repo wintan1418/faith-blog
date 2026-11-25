@@ -1,0 +1,13 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; font-size: 15.5px; line-height: 1.65;">
+  <%= render "heading", kicker: "New sign-in", title: "New sign-in to your account" %>
+  <p style="margin: 0 0 14px;">Hi <%= @user.username %>, your Brethreign account was just signed in to on a device we haven't seen before<%= " (with #{@method})" if @method %>.</p>
+  <table role="presentation" style="width: 100%; border-collapse: collapse; background: #f5f1e8; border-radius: 12px; margin: 0 0 16px; font-size: 14px;">
+    <tr><td style="padding: 10px 14px; color: #5e6862;">Device</td><td style="padding: 10px 14px; text-align: right;"><strong><%= @device_name %></strong></td></tr>
+    <tr><td style="padding: 10px 14px; color: #5e6862;">Near</td><td style="padding: 10px 14px; text-align: right;"><%= @location || "Unknown place" %></td></tr>
+    <tr><td style="padding: 10px 14px; color: #5e6862;">When</td><td style="padding: 10px 14px; text-align: right;"><%= @time.in_time_zone("Africa/Lagos").strftime("%-d %B %Y, %-l:%M %p") %> WAT</td></tr>
+  </table>
+  <p style="margin: 0 0 6px;">If this was you, there's nothing to do. You can see every device signed in to your account in <a href="<%= settings_security_url %>" style="color: #0e5c43; font-weight: 700;">Settings → Security</a>.</p>
+  <p style="margin: 0; color: #5e6862; font-size: 13px;">The place is approximate, based on the network.</p>
+
+  <%= render "wasnt_you" %>
+</div>

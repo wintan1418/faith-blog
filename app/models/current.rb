@@ -7,4 +7,6 @@ class Current < ActiveSupport::CurrentAttributes
   attribute :user
   # Seeds the viewer earned during this request (the "+5 seeds" toast).
   attribute :seeds_earned, default: 0
+  # The signed-in session's device row (UserDevice), when there is one.
+  attribute :user_device_id
 end

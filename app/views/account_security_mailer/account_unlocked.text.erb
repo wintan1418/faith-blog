@@ -1,0 +1,7 @@
+Hi <%= @user.username %>,
+
+Your Brethreign account was locked for a while after too many wrong passwords or codes. It's unlocked now, and you can sign in again.
+
+Forgot your password? Choose a new one: <%= reset_url %>
+
+<%= render "wasnt_you", lead: "If you weren't trying to sign in, someone may be guessing your password. Secure your account: it signs out every device and lets you choose a new password." %>

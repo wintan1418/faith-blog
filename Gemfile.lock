@@ -383,6 +383,7 @@ GEM
       actionpack (>= 7.0)
       railties (>= 7.0)
     rexml (3.4.4)
+    rotp (6.4.0)
     rqrcode (2.2.0)
       chunky_png (~> 1.0)
       rqrcode_core (~> 1.0)
@@ -534,6 +535,7 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.0)
+  rotp (~> 6.3)
   rqrcode (~> 2.2)
   rubocop-rails-omakase
   rubyzip (~> 3.2)

@@ -10,7 +10,7 @@ class OrgPagesSystemTest < ApplicationSystemTestCase
   setup do
     ENV["AI_MODERATION_STUB"] = "1"
     seen = { welcomed_at: Time.current, seen_release_id: Announcement.maximum(:id).to_i, created_at: 30.days.ago,
-             tour_completed_at: Time.current }
+             tour_completed_at: Time.current, email_verified_at: Time.current }
     @member = create_member("pages_sys_member", **seen)
     owner = create_member("pages_sys_owner", **seen)
     @other = Page.create!(name: "Grace Chapel", handle: "gracechapelsys", category: "church", created_by: owner)

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  include AccountSecurity
+
   # Devise modules
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
@@ -186,7 +188,11 @@ class User < ApplicationRecord
   def self.from_google(auth)
     email = auth.info.email.to_s.downcase
     user = find_by(provider: auth.provider, uid: auth.uid)
-    return user if user
+    if user
+      # The provider has just proven the address again.
+      user.mark_email_verified! if email.present? && user.email.to_s.casecmp?(email) && oauth_email_verified?(auth)
+      return user
+    end
 
     user = find_by(email: email)
     return create_from_oauth!(auth, email) unless user
@@ -200,6 +206,7 @@ class User < ApplicationRecord
     first_link = user.provider.blank?
     user.provider = auth.provider
     user.uid = auth.uid
+    user.email_verified_at ||= Time.current
     if first_link || user.encrypted_password.blank?
       user.password = Devise.friendly_token.first(32)
       user.password_generated = true
@@ -215,7 +222,7 @@ class User < ApplicationRecord
 
   def self.create_from_oauth!(auth, email)
     user = new(email: email, username: unique_username_from(auth), password: Devise.friendly_token.first(32),
-               provider: auth.provider, uid: auth.uid)
+               provider: auth.provider, uid: auth.uid, email_verified_at: Time.current)
     user.password_generated = true
     user.save!
     user

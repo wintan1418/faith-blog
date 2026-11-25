@@ -5,13 +5,17 @@ class ApplicationController < ActionController::Base
   include FriendlyRateLimits
   include PendingSeriesFollow
 
+  before_action :check_device_session
   before_action :set_current_viewer
   before_action :reject_malformed_devise_params, if: :devise_controller?
   before_action :configure_permitted_parameters, if: :devise_controller?
-  before_action :touch_last_seen,                 if: :user_signed_in?
+  # (Guarded inside, not with `if: :user_signed_in?`: a skip_before_action
+  # `only:` still evaluates the `if`, which would sign in during the password
+  # POST before Users::SessionsController#create can ask for a sign-in check.)
+  before_action :touch_last_seen
   before_action :require_supported_app_version
   after_action :track_page_view
-  after_action :deliver_seeds_toast, if: :user_signed_in?
+  after_action :deliver_seeds_toast
 
   helper_method :current_user_admin?, :current_user_moderator?, :current_user_super_admin?
 
@@ -108,6 +112,23 @@ class ApplicationController < ActionController::Base
     root_path
   end
 
+  # Ends this browser's session when the member signed it out from another
+  # device (Settings → Security). See AccountDevices.
+  def check_device_session
+    # Only a session that already exists: this must never run the password
+    # strategy (that would sign in before the sign-in check).
+    return unless warden.authenticated?(:user)
+    return if AccountDevices.check(warden.user(:user), request) == :ok
+
+    sign_out(:user)
+    message = "You were signed out on this device. Please sign in again."
+    if request.format.html? || request.format.turbo_stream?
+      redirect_to new_user_session_path, alert: message, status: :see_other
+    else
+      head :unauthorized
+    end
+  end
+
   # Refresh user's last_seen_at on each authenticated request, but
   # throttle to once a minute so we don't write on every page hit.
   def set_current_viewer
@@ -115,7 +136,7 @@ class ApplicationController < ActionController::Base
   end
 
   def touch_last_seen
-    return unless current_user
+    return unless user_signed_in?
 
     record_app_version
     last = current_user.last_seen_at
@@ -148,7 +169,7 @@ class ApplicationController < ActionController::Base
   # celebration) appended; a redirect carries it to the next page in the flash.
   def deliver_seeds_toast
     points = Current.seeds_earned.to_i
-    return unless points.positive?
+    return unless points.positive? && user_signed_in?
 
     if response.media_type == "text/vnd.turbo-stream.html" && response.successful?
       fresh = User.find(current_user.id)

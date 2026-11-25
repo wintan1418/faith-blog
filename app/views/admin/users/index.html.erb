@@ -57,9 +57,12 @@
           <td class="px-6 py-4"><span class="badge badge-secondary"><%= user.role.humanize %></span></td>
           <td class="px-6 py-4">
             <span class="badge <%= user.active? ? 'badge-success' : 'badge-primary' %>"><%= user.active? ? "Active" : "Suspended" %></span>
+            <span class="mt-1 block text-xs <%= user.email_verified? ? 'text-emerald-700' : 'text-amber-700' %>"><%= user.email_verified? ? "Email verified" : "Email not verified" %></span>
+            <% if user.two_factor_enabled? %><span class="block text-xs text-emerald-700">2FA on</span><% end %>
           </td>
           <td class="px-6 py-4 text-right">
             <div class="flex justify-end gap-2">
+              <%= link_to "Security", security_admin_user_path(user), class: "btn btn-secondary btn-sm" %>
               <% if current_user.outranks?(user) %>
                 <% if user.active? %>
                   <%= button_to "Suspend", suspend_admin_user_path(user), method: :post, class: "btn btn-secondary btn-sm text-red-600" %>

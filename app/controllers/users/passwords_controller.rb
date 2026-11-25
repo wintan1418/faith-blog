@@ -7,10 +7,38 @@ module Users
   # wins: sign them out and show the form.
   class PasswordsController < Devise::PasswordsController
     include AuthRateLimiting
+    include SignInChecks
 
     prepend_before_action :sign_out_for_reset_link, only: :edit
     throttle_auth only: :create, per_ip: 5, per_email: 3, within: 15.minutes
     before_action :verify_turnstile, only: :create
+
+    # Opening the reset link proves they read this inbox, so the address
+    # counts as verified.
+    def update
+      request.env[AccountDevices::SIGN_IN_OPTIONS] = { method: "password_reset" }
+      super do |resource|
+        EmailVerification.verified!(resource, request: request) if resource.persisted? && resource.errors.empty?
+      end
+    end
+
+    protected
+
+    # With two-step login on, a new password alone doesn't sign in: the
+    # authenticator code is still asked for (unless this device is trusted).
+    def sign_in_after_reset_password?
+      super && !two_step_needed?
+    end
+
+    def after_resetting_password_path_for(resource)
+      return super unless resource_class.sign_in_after_reset_password && two_step_needed?
+
+      begin_sign_in_check(resource, method: "password_reset") || new_session_path(resource_name)
+    end
+
+    def two_step_needed?
+      resource.persisted? && resource.two_factor_enabled? && !AccountDevices.trusted?(resource, request)
+    end
 
     private
 

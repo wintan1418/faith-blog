@@ -1,0 +1,11 @@
+Hi <%= @user.username %>,
+
+Your Brethreign account was just signed in to on a device we haven't seen before<%= " (with #{@method})" if @method %>.
+
+Device: <%= @device_name %>
+Near:   <%= @location || "Unknown place" %> (approximate)
+When:   <%= @time.in_time_zone("Africa/Lagos").strftime("%-d %B %Y, %-l:%M %p") %> WAT
+
+If this was you, there's nothing to do. See every device signed in to your account: <%= settings_security_url %>
+
+<%= render "wasnt_you" %>

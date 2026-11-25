@@ -3,6 +3,7 @@ require_relative "../config/environment"
 require "rails/test_help"
 require_relative "support/klipy_stubs"
 require_relative "support/bible_text_fixture"
+require_relative "support/account_security_helpers"
 
 Rails.application.reload_routes!
 

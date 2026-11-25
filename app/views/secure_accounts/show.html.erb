@@ -1,0 +1,15 @@
+<% content_for(:title) { "Secure your account - Brethreign" } %>
+<%= render layout: "devise/shared/auth_shell", locals: { title: "Secure your account", subtitle: "For #{@user.masked_email}" } do %>
+  <div class="auth-form">
+    <p class="sec-lead">If something happened on your account that wasn't you, this puts you back in control. It will:</p>
+    <ul class="sec-list">
+      <li>Sign out every phone and browser, including this one</li>
+      <li>Switch off your current password and email you a link to choose a new one</li>
+      <li>Turn off two-step login (in case someone else turned it on)</li>
+      <% if @revert_email %><li>Switch your email back to <strong><%= @revert_email %></strong></li><% end %>
+    </ul>
+    <%= button_to "Secure my account", secure_account_path(token: params[:token]), method: :post,
+                  class: "auth-submit", form: { class: "sec-inline-form" }, data: { turbo: false, turbo_submits_with: "Securing…" } %>
+    <p class="auth-hint">Need help? Write to us at <%= mail_to(BrandSocials.email || "support@brethreign.com") %>. We'll never ask for your password or a code.</p>
+  </div>
+<% end %>

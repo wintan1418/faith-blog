@@ -3,6 +3,9 @@
 Devise.setup do |config|
   config.mailer_sender = Rails.application.credentials.dig(:smtp, :from) || ENV.fetch("MAILER_FROM", "Brethreign <noreply@brethreign.com>")
 
+  # Devise's emails (reset password, unlock) use the branded mailer layout.
+  config.parent_mailer = "ApplicationMailer"
+
   require "devise/orm/active_record"
 
   config.case_insensitive_keys = [ :email ]
@@ -34,10 +37,12 @@ Devise.setup do |config|
   config.unlock_in = 1.hour
   config.last_attempt_warning = true
 
-  # Tell the OLD address when the email changes, and the member when their
-  # password changes — so a hijacked session can't quietly take the account.
-  config.send_email_changed_notification = true
-  config.send_password_change_notification = true
+  # The OLD address is told when the email changes, and the member when their
+  # password changes, so a hijacked session can't quietly take the account.
+  # AccountSecurityMailer sends those (branded, with "Wasn't you?" help), so
+  # Devise's own plain versions are off.
+  config.send_email_changed_notification = false
+  config.send_password_change_notification = false
   config.email_regexp = /\A[^@\s]+@[^@\s]+\z/
   config.reset_password_within = 6.hours
   config.sign_out_via = :delete

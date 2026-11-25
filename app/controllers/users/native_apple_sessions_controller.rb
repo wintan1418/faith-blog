@@ -4,6 +4,8 @@
 # app catches that link, shows Apple's sheet, and posts the identity token here
 # from inside the web view (so the session cookie lands where the app needs it).
 class Users::NativeAppleSessionsController < ApplicationController
+  include SignInChecks
+
   rate_limit to: 20, within: 5.minutes, only: :create, store: AuthThrottleStore.store,
              with: -> { refuse(AuthRateLimiting::TOO_MANY_MESSAGE, :too_many_requests) }
 
@@ -28,7 +30,15 @@ class Users::NativeAppleSessionsController < ApplicationController
       return refuse(I18n.t("devise.failure.#{user.inactive_message}", default: "This account can't sign in."), :forbidden)
     end
 
+    # Apple proved the address (it may be a private relay address).
+    user.mark_email_verified! if email.present? && verified?(claims) && user.email.to_s.casecmp?(email)
     remember_apple_token(user)
+    # Two-step login: the app follows "location" to the authenticator-code screen.
+    if (check_path = begin_sign_in_check(user, method: "apple"))
+      return render json: { location: check_path }
+    end
+
+    request.env[AccountDevices::SIGN_IN_OPTIONS] = { method: user.previously_new_record? ? "signup" : "apple" }
     sign_in(user, event: :authentication)
     render json: { location: after_sign_in_path_for(user) }
   rescue AppleIdentityToken::Invalid, ActionController::ParameterMissing

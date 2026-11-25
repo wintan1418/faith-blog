@@ -26,6 +26,9 @@ class PushDevicesController < ApplicationController
 
     if device.save
       cookies.signed.permanent[COOKIE] = { value: token, httponly: true, same_site: :lax }
+      # Remember which signed-in device owns the token, so signing that device
+      # out (Settings → Security) stops its notifications too.
+      UserDevice.where(id: Current.user_device_id, user_id: current_user.id).update_all(push_token: token) if Current.user_device_id
       head :created
     else
       render json: { errors: device.errors.full_messages }, status: :unprocessable_entity

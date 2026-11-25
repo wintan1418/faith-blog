@@ -1,0 +1,151 @@
+<% content_for(:title) { "Security Settings - Brethreign" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-8">
+      <span class="mystic-kicker">Settings</span>
+      <h1 class="mystic-title mt-3 text-4xl sm:text-5xl">Security</h1>
+      <p class="mystic-copy mt-2">Your email, two-step login, and the devices signed in to your account.</p>
+    </div>
+
+    <%= render "settings/tabs", active: :security %>
+
+    <%# Email verification %>
+    <section class="mystic-panel-strong sec-panel" id="email" aria-labelledby="sec-email-title">
+      <div class="sec-panel-head">
+        <%= render_icon("mail", classes: "sec-panel-icon") %>
+        <div>
+          <h2 id="sec-email-title" class="sec-panel-title">Email</h2>
+          <p class="sec-panel-copy"><%= current_user.email %></p>
+        </div>
+        <% if current_user.email_verified? %>
+          <span class="sec-badge is-on"><%= render_icon("check", classes: "h-3.5 w-3.5") %> Verified</span>
+        <% else %>
+          <span class="sec-badge is-warn">Not verified</span>
+        <% end %>
+      </div>
+      <% unless current_user.email_verified? %>
+        <p class="sec-panel-body">Verify your email to keep your account safe. It's needed before you change your password, turn on two-step login or create a Page.</p>
+        <div class="sec-actions"><%= link_to "Verify my email", email_verification_path(return_to: settings_security_path), class: "btn btn-primary" %></div>
+      <% end %>
+      <p class="sec-panel-foot">To change your email or password, go to <%= link_to "Account", edit_settings_account_path %>.</p>
+    </section>
+
+    <%# Two-step login %>
+    <section class="mystic-panel-strong sec-panel" id="two-step" aria-labelledby="sec-2fa-title">
+      <div class="sec-panel-head">
+        <%= render_icon("shieldcheck", classes: "sec-panel-icon") %>
+        <div>
+          <h2 id="sec-2fa-title" class="sec-panel-title">Two-step login</h2>
+          <p class="sec-panel-copy">A code from an authenticator app, as well as your password, when you sign in on a new device.</p>
+        </div>
+        <% if current_user.two_factor_enabled? %>
+          <span class="sec-badge is-on">On</span>
+        <% else %>
+          <span class="sec-badge">Off</span>
+        <% end %>
+      </div>
+
+      <% if current_user.two_factor_enabled? %>
+        <p class="sec-panel-body">
+          On since <%= current_user.otp_enabled_at.strftime("%-d %B %Y") %>.
+          You have <strong><%= pluralize(current_user.recovery_codes_left, "recovery code") %></strong> left.
+          Devices you trust skip the code for 30 days.
+        </p>
+        <div class="sec-forms">
+          <%= form_with url: recovery_codes_settings_two_factor_path, method: :post, class: "sec-form" do %>
+            <p class="sec-form-title">New recovery codes</p>
+            <p class="sec-form-copy">The old ones stop working.</p>
+            <div class="sec-form-row">
+              <%= text_field_tag :code, nil, class: "input sec-small-code", placeholder: "Code from your app", inputmode: "numeric",
+                                 autocomplete: "one-time-code", required: true, "aria-label": "Code from your authenticator app" %>
+              <%= submit_tag "Show new codes", class: "btn btn-secondary" %>
+            </div>
+          <% end %>
+          <%= form_with url: settings_two_factor_path, method: :delete, class: "sec-form" do %>
+            <p class="sec-form-title">Turn off two-step login</p>
+            <p class="sec-form-copy"><%= current_user.password_known? ? "Enter your password or a code from your app." : "Enter a code from your app (or a recovery code)." %></p>
+            <div class="sec-form-row">
+              <% if current_user.password_known? %>
+                <%= password_field_tag :current_password, nil, class: "input", placeholder: "Your password", autocomplete: "current-password", "aria-label": "Your password" %>
+              <% end %>
+              <%= text_field_tag :code, nil, class: "input sec-small-code", placeholder: current_user.password_known? ? "or app code" : "App code", autocomplete: "one-time-code", "aria-label": "Authenticator or recovery code" %>
+              <%= submit_tag "Turn off", class: "btn btn-danger", data: { turbo_confirm: "Turn off two-step login? Your account will be less protected." } %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="sec-panel-body">Works with Google Authenticator, Microsoft Authenticator, Authy, 1Password and similar apps. Even if someone learns your password, they can't sign in without your phone.</p>
+        <div class="sec-actions">
+          <% if current_user.email_verified? %>
+            <%= link_to "Turn on two-step login", new_settings_two_factor_path, class: "btn btn-primary" %>
+          <% else %>
+            <%= link_to "Verify your email to turn this on", email_verification_path(return_to: new_settings_two_factor_path), class: "btn btn-secondary" %>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
+    <%# Devices & sessions %>
+    <section class="mystic-panel-strong sec-panel" id="devices" aria-labelledby="sec-devices-title">
+      <div class="sec-panel-head">
+        <%= render_icon("smartphone", classes: "sec-panel-icon") %>
+        <div>
+          <h2 id="sec-devices-title" class="sec-panel-title">Devices &amp; sessions</h2>
+          <p class="sec-panel-copy">Where your account is signed in. Places are approximate.</p>
+        </div>
+      </div>
+
+      <ul class="sec-devices" role="list">
+        <% @signed_in_devices.each do |device| %>
+          <% this_one = device.id == @current_device_id %>
+          <li class="sec-device<%= ' is-current' if this_one %>">
+            <%= render_icon(device.app? ? "smartphone" : "laptop", classes: "sec-device-icon") %>
+            <div class="sec-device-main">
+              <p class="sec-device-name"><%= device.name %><% if this_one %> <span class="sec-badge is-on">This device</span><% end %></p>
+              <p class="sec-device-meta">
+                <%= this_one ? "Active now" : "Active #{time_ago_in_words(device.last_active)} ago" %><%= " · #{device.location}" if device.location.present? %>
+                <% if device.trusted? %> · Trusted until <%= device.trusted_until.strftime("%-d %b") %><% end %>
+              </p>
+            </div>
+            <% unless this_one %>
+              <%= button_to "Sign out", settings_device_path(device), method: :delete, class: "btn btn-secondary btn-sm",
+                            form: { class: "sec-inline-form" },
+                            data: { turbo_confirm: "Sign out #{device.name}?" } %>
+            <% end %>
+          </li>
+        <% end %>
+        <% if @signed_in_devices.empty? %>
+          <li class="sec-device"><p class="sec-device-meta">No devices to show yet.</p></li>
+        <% end %>
+      </ul>
+
+      <% if @signed_in_devices.any? { |d| d.id != @current_device_id } || current_user.sessions_reset_at.nil? %>
+        <div class="sec-actions">
+          <%= button_to "Sign out everywhere else", others_settings_devices_path, method: :delete, class: "btn btn-secondary",
+                        form: { class: "sec-inline-form" },
+                        data: { turbo_confirm: "Sign out every other phone and browser? You'll stay signed in here." } %>
+        </div>
+      <% end %>
+
+      <% if @past_devices.any? %>
+        <details class="sec-details">
+          <summary>Signed out recently (<%= @past_devices.size %>)</summary>
+          <ul class="sec-devices is-past" role="list">
+            <% @past_devices.each do |device| %>
+              <li class="sec-device">
+                <%= render_icon(device.app? ? "smartphone" : "laptop", classes: "sec-device-icon") %>
+                <div class="sec-device-main">
+                  <p class="sec-device-name"><%= device.name %></p>
+                  <p class="sec-device-meta">Last active <%= time_ago_in_words(device.last_active) %> ago<%= " · #{device.location}" if device.location.present? %></p>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </details>
+      <% end %>
+
+      <p class="sec-panel-foot">See something you don't recognise? Sign it out, then change your password in <%= link_to "Account", edit_settings_account_path %>.</p>
+    </section>
+  </div>
+</div>

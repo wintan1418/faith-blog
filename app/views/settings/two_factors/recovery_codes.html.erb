@@ -1,0 +1,24 @@
+<% content_for(:title) { "Your recovery codes - Brethreign" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-6">
+      <span class="mystic-kicker">Settings · Security</span>
+      <h1 class="mystic-title mt-3 text-3xl sm:text-4xl"><%= @fresh ? "Two-step login is on" : "Your new recovery codes" %></h1>
+      <p class="mystic-copy mt-2">Save these codes somewhere safe, like a password manager or on paper. If you lose your phone, each code lets you sign in once.</p>
+    </div>
+
+    <section class="mystic-panel-strong sec-panel" data-controller="copy-text" data-copy-text-text-value="<%= @recovery_codes.join("\n") %>">
+      <ul class="sec-recovery" role="list" aria-label="Recovery codes">
+        <% @recovery_codes.each do |code| %>
+          <li><code><%= code %></code></li>
+        <% end %>
+      </ul>
+      <p class="sec-panel-body"><strong>We'll only show these once.</strong> Brethreign will never ask you for them.</p>
+      <div class="sec-actions">
+        <button type="button" class="btn btn-secondary" data-action="copy-text#copy" data-copy-text-target="button">Copy codes</button>
+        <%= link_to "I've saved them", settings_security_path, class: "btn btn-primary" %>
+      </div>
+    </section>
+  </div>
+</div>

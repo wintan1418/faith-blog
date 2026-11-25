@@ -205,6 +205,7 @@ class ActionSweepTest < ActionDispatch::IntegrationTest
     patch settings_background_rain_path, params: { on: "" }, as: :json
     ok!
     new_password = SecureRandom.base58(16)
+    @member.mark_email_verified! # changing the password needs a verified email
     patch settings_account_path, params: { user: { password: new_password, password_confirmation: new_password, current_password: password } }
     ok!
     assert @member.reload.valid_password?(new_password)

@@ -1,0 +1,11 @@
+Hi <%= @resource.username %>,
+
+There were too many wrong passwords or codes for your Brethreign account, so we locked it to keep it safe. It unlocks by itself in an hour, or straight away with this link:
+
+<%= unlock_url(@resource, unlock_token: @token) %>
+
+WASN'T YOU?
+Someone may be guessing your password. Secure your account (signs out every device and emails you a link to choose a new password):
+<%= secure_account_url(token: @resource.secure_account_token) %>
+
+Brethreign will never ask for your password or a code.

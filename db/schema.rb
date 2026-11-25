@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_130300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1223,6 +1223,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
     t.index ["term"], name: "index_search_terms_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
+  create_table "security_codes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "purpose", null: false
+    t.string "email", null: false
+    t.string "code_digest", null: false
+    t.string "link_digest"
+    t.integer "attempts", default: 0, null: false
+    t.datetime "expires_at", null: false
+    t.datetime "consumed_at"
+    t.string "ip"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ip", "created_at"], name: "index_security_codes_on_ip_and_created_at"
+    t.index ["link_digest"], name: "index_security_codes_on_link_digest", unique: true
+    t.index ["user_id", "purpose", "created_at"], name: "index_security_codes_on_user_id_and_purpose_and_created_at"
+    t.index ["user_id"], name: "index_security_codes_on_user_id"
+  end
+
+  create_table "security_events", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "actor_id"
+    t.string "kind", null: false
+    t.string "ip"
+    t.string "device_name"
+    t.string "location"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.index ["actor_id"], name: "index_security_events_on_actor_id"
+    t.index ["kind", "ip", "created_at"], name: "index_security_events_on_kind_and_ip_and_created_at"
+    t.index ["user_id", "created_at"], name: "index_security_events_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_security_events_on_user_id"
+  end
+
   create_table "seed_events", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "kind", null: false
@@ -1323,6 +1356,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "slug"], name: "index_user_badges_on_user_id_and_slug", unique: true
     t.index ["user_id"], name: "index_user_badges_on_user_id"
+  end
+
+  create_table "user_devices", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "device_digest", null: false
+    t.string "session_digest"
+    t.string "name", null: false
+    t.string "platform", default: "web", null: false
+    t.string "user_agent"
+    t.string "ip"
+    t.string "location"
+    t.datetime "verified_at"
+    t.datetime "trusted_until"
+    t.datetime "signed_in_at"
+    t.datetime "last_active_at"
+    t.datetime "signed_out_at"
+    t.string "push_token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["session_digest"], name: "index_user_devices_on_session_digest", unique: true
+    t.index ["user_id", "device_digest"], name: "index_user_devices_on_user_id_and_device_digest", unique: true
+    t.index ["user_id"], name: "index_user_devices_on_user_id"
   end
 
   create_table "user_languages", force: :cascade do |t|
@@ -1426,6 +1481,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
     t.integer "seeds_rank_reached", default: 0, null: false
     t.integer "seeds_rank_seen", default: 0, null: false
     t.bigint "invited_by_id"
+    t.datetime "email_verified_at"
+    t.text "otp_secret_ciphertext"
+    t.datetime "otp_enabled_at"
+    t.bigint "otp_last_used_step"
+    t.string "otp_recovery_digests", default: [], null: false, array: true
+    t.datetime "sessions_reset_at"
     t.index ["accent_color"], name: "index_users_on_accent_color"
     t.index ["android_app_version"], name: "index_users_on_android_app_version"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
@@ -1533,6 +1594,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
   add_foreign_key "room_memberships", "rooms"
   add_foreign_key "room_memberships", "users"
   add_foreign_key "scripture_citations", "posts", on_delete: :cascade
+  add_foreign_key "security_codes", "users", on_delete: :cascade
+  add_foreign_key "security_events", "users", column: "actor_id", on_delete: :nullify
+  add_foreign_key "security_events", "users", on_delete: :cascade
   add_foreign_key "seed_events", "users", on_delete: :cascade
   add_foreign_key "seed_rank_ups", "users", on_delete: :cascade
   add_foreign_key "series", "users", on_delete: :cascade
@@ -1543,6 +1607,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
   add_foreign_key "suggestion_dismissals", "users"
   add_foreign_key "suggestion_dismissals", "users", column: "dismissed_user_id"
   add_foreign_key "user_badges", "users"
+  add_foreign_key "user_devices", "users", on_delete: :cascade
   add_foreign_key "user_languages", "users"
   add_foreign_key "user_reading_plans", "users"
   add_foreign_key "user_risk_profiles", "users"
