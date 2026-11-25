@@ -202,10 +202,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_090200) do
     t.datetime "updated_at", null: false
     t.string "theme", limit: 32
     t.integer "flags_count", default: 0, null: false
+    t.string "verse_key", limit: 80
+    t.string "content_key", limit: 255
+    t.index ["content_key"], name: "index_bible_quiz_questions_on_content_key"
     t.index ["fingerprint"], name: "index_bible_quiz_questions_on_fingerprint", unique: true
     t.index ["kind"], name: "index_bible_quiz_questions_on_kind"
     t.index ["theme", "difficulty"], name: "index_bible_quiz_questions_on_theme_and_difficulty"
     t.index ["theme"], name: "index_bible_quiz_questions_on_theme"
+    t.index ["verse_key"], name: "index_bible_quiz_questions_on_verse_key"
   end
 
   create_table "bible_reading_days", force: :cascade do |t|
@@ -1149,6 +1153,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_090200) do
     t.integer "verse", limit: 2, null: false
     t.text "text", null: false
     t.index "to_tsvector('english'::regconfig, text)", name: "index_scripture_verses_kjv_search", where: "((translation)::text = 'kjv'::text)", using: :gin
+    t.index "to_tsvector('english'::regconfig, text)", name: "index_scripture_verses_text_search", using: :gin
     t.index ["book", "chapter", "verse", "translation"], name: "index_scripture_verses_on_location", unique: true
   end
 

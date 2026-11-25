@@ -152,4 +152,79 @@ class QuizQuestionReportsTest < ActionDispatch::IntegrationTest
     assert_select "tbody tr", count: 1
     assert_select "td", text: /Quiz question ##{@question.id}/
   end
+
+  # Two "resolved" reports once left their questions live and unchanged.
+  test "a quiz report can't be resolved while the question is live and unchanged" do
+    sign_in @player
+    report(reason: "other", note: "Typo")
+    r = Report.last
+
+    sign_in @admin
+    get admin_report_path(r)
+    assert_select "a", text: "Edit question"
+    assert_select "button", text: "Retire question"
+    assert_select "button", text: "Resolve", count: 0
+
+    post resolve_admin_report_path(r)
+    assert_redirected_to admin_report_path(r)
+    assert r.reload.pending?
+
+    get admin_reports_path(type: "BibleQuizQuestion")
+    assert_select "button", text: "Resolve", count: 0
+  end
+
+  test "editing the question fixes it, puts it back in the quiz and resolves its reports" do
+    other = User.create!(username: "qr_other", email: "qr_other@example.com", password: @pass)
+    sign_in @player
+    report(reason: "wrong_answer")
+    sign_in other
+    report(reason: "unclear")
+    assert @question.reload.retired?
+    r = @question.reports.first
+
+    sign_in @admin
+    get edit_question_admin_report_path(r)
+    assert_response :success
+    assert_select "textarea[name='bible_quiz_question[prompt]']", text: @question.prompt
+
+    patch update_question_admin_report_path(r), params: { bible_quiz_question: {
+      prompt: "What did Jesus say just before he gave up the ghost?", correct_index: "0", reference: "John 19:30",
+      explanation: "John 19:30 — It is finished.", choices: [ "It is finished", "Father, forgive them", "I thirst", "Into thy hands" ]
+    } }
+    assert_redirected_to admin_reports_path(type: "BibleQuizQuestion")
+    @question.reload
+    assert_equal 0, @question.correct_index
+    assert_equal "What did Jesus say just before he gave up the ghost?", @question.prompt
+    assert_not @question.retired?
+    assert @question.reports.all?(&:resolved?)
+  end
+
+  test "an edit that still gives the answer away is refused" do
+    q = BibleQuizQuestion.create!(kind: "reference", prompt: "'Jesus wept.' Where is this?", reference: "John 11:35",
+                                  choices: [ "John 11:35", "Luke 19:41", "Mark 3:5", "John 3:16" ], correct_index: 0)
+    sign_in @player
+    report(reason: "unclear", question: q)
+    r = Report.last
+
+    sign_in @admin
+    patch update_question_admin_report_path(r), params: { bible_quiz_question: {
+      prompt: "John 11:35 says 'Jesus wept.' Where is this?", correct_index: "0", reference: "John 11:35",
+      choices: q.choices
+    } }
+    assert_response :unprocessable_entity
+    assert_select "[role=alert]", text: /gives the answer away/
+    assert r.reload.pending?
+  end
+
+  test "after retiring, a resolve goes through" do
+    sign_in @player
+    report(reason: "other", note: "Typo")
+    r = Report.last
+    @question.retire!
+
+    sign_in @admin
+    post resolve_admin_report_path(r)
+    assert_redirected_to admin_reports_path
+    assert r.reload.resolved?
+  end
 end

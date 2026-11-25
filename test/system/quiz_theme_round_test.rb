@@ -24,7 +24,7 @@ class QuizThemeRoundTest < ApplicationSystemTestCase
       "Complete: \"God forbid that I should glory, save in the ___ of our Lord Jesus Christ\" (Galatians 6:14)",
       "Who bore our sins in his own body on the tree? (1 Peter 2:24)" ].each_with_index do |prompt, i|
       BibleQuizQuestion.create!(kind: "what_does", prompt: prompt, choices: [ "Peace", "Cross", "Christ", "Law" ].rotate(i),
-                                correct_index: 0, reference: "Colossians 1:20", explanation: "KJV", theme: "the_cross", difficulty: "easy")
+                                correct_index: 0, reference: [ "Colossians 1:20", "Galatians 6:14", "1 Peter 2:24" ][i], explanation: "KJV", theme: "the_cross", difficulty: "easy")
     end
     12.times do |i|
       BibleQuizQuestion.create!(kind: "which_book", prompt: "Unrelated question #{i} about Jericho?",

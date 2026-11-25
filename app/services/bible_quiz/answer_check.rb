@@ -8,6 +8,9 @@
 #   fill_blank  the marked word must be in the KJV text of the reference
 #   reference   the marked "chapter:verse" must be the reference's
 #   which_book  the marked book must be the reference's book
+#   true_phrase exactly one choice may be in the Bible (KJV, WEB or BSB
+#               verse text, BibleQuiz::PhraseCheck) — the marked one; a
+#               decoy that is real Scripture makes the question :wrong
 #
 # If exactly one other choice is the right one, the answer is corrected
 # (:fixed); if none or several fit, the question is :wrong; kinds we can't
@@ -15,29 +18,36 @@
 module BibleQuiz
   class AnswerCheck
     Result = Data.define(:status, :correct_index)
-    CHECKED_KINDS = %w[fill_blank reference which_book].freeze
+    CHECKED_KINDS = %w[fill_blank reference which_book true_phrase].freeze
 
-    def self.call(kind:, choices:, correct_index:, reference:, lookup: ScriptureLookup)
-      new(kind:, choices:, correct_index:, reference:, lookup:).call
+    # phrases: a BibleQuiz::PhraseCheck (pass one in to share its cache
+    # across many questions).
+    def self.call(kind:, choices:, correct_index:, reference:, lookup: ScriptureLookup, phrases: nil)
+      new(kind:, choices:, correct_index:, reference:, lookup:, phrases:).call
     end
 
-    def initialize(kind:, choices:, correct_index:, reference:, lookup:)
+    def initialize(kind:, choices:, correct_index:, reference:, lookup:, phrases: nil)
       @kind = kind.to_s
       @choices = Array(choices).map(&:to_s)
       @correct = correct_index.to_i
       @reference = reference.to_s.strip
       @lookup = lookup
+      @phrases = phrases
     end
 
     def call
-      return unknown unless CHECKED_KINDS.include?(@kind) && @reference.present?
+      return unknown unless CHECKED_KINDS.include?(@kind)
+      return unknown if @reference.blank? && @kind != "true_phrase"
 
       hits = case @kind
       when "fill_blank" then fill_blank_hits
       when "reference" then reference_hits
       when "which_book" then book_hits
+      when "true_phrase" then phrase_hits
       end
       return unknown if hits.nil?
+      # Every decoy must be NOT in the Bible.
+      return Result.new(status: :wrong, correct_index: @correct) if @kind == "true_phrase" && hits.size > 1
       return Result.new(status: :ok, correct_index: @correct) if hits.include?(@correct)
       return Result.new(status: :fixed, correct_index: hits.first) if hits.size == 1
 
@@ -54,6 +64,14 @@ module BibleQuiz
 
       words = " #{normalize(text)} "
       @choices.each_index.select { |i| (w = normalize(@choices[i])).present? && words.include?(" #{w} ") }
+    end
+
+    # Choices that are in the Bible; nil when the verse text isn't loaded.
+    def phrase_hits
+      return nil unless @phrases || PhraseCheck.available?
+
+      phrases = @phrases || PhraseCheck.new
+      @choices.each_index.select { |i| phrases.biblical?(@choices[i]) }
     end
 
     def reference_hits
