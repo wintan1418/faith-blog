@@ -40,9 +40,10 @@
             <% if report.pending? %>
               <div class="flex justify-end gap-2">
                 <% if report.reportable.is_a?(BibleQuizQuestion) %>
-                  <%= link_to "Review", admin_report_path(report), class: "btn btn-secondary btn-sm" %>
+                  <%= link_to "Review", admin_report_path(report), class: "btn btn-primary btn-sm" %>
+                <% else %>
+                  <%= button_to "Resolve", resolve_admin_report_path(report), method: :post, class: "btn btn-primary btn-sm" %>
                 <% end %>
-                <%= button_to "Resolve", resolve_admin_report_path(report), method: :post, class: "btn btn-primary btn-sm" %>
                 <%= button_to "Dismiss", dismiss_admin_report_path(report), method: :post, class: "btn btn-secondary btn-sm" %>
               </div>
             <% else %>

@@ -57,7 +57,7 @@ class GameQualityTest < ActionDispatch::IntegrationTest
       BibleQuizQuestion.create!(
         kind: "which_book", prompt: "Pool question #{i} of the round?",
         choices: %w[Romans Acts John Jude], correct_index: 0,
-        reference: "Romans 1:1", explanation: "KJV", theme: "faith", difficulty: "easy"
+        reference: "Romans 1:#{i + 1}", explanation: "KJV", theme: "faith", difficulty: "easy"
       )
     end
 

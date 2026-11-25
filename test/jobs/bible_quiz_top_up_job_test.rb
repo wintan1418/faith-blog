@@ -15,7 +15,7 @@ class BibleQuizTopUpJobTest < ActiveSupport::TestCase
         Ai::Bible::QuizGenerator::Question.new(
           kind: "which_book", prompt: "Top-up question #{i} #{SecureRandom.hex(4)}?",
           choices: %w[Romans Acts John Jude], correct_index: 0,
-          reference: "Romans 1:1", explanation: "KJV", theme: "faith", difficulty: "easy"
+          reference: "Psalm #{calls + 10}:#{i + 1}", explanation: "KJV", theme: "faith", difficulty: "easy"
         )
       end
     end

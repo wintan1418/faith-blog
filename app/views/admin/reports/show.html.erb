@@ -36,12 +36,18 @@
 
   <% if @report.pending? %>
     <div class="mt-6 flex flex-wrap gap-2">
-      <% if @report.reportable.is_a?(BibleQuizQuestion) %>
+      <% if (quiz = @report.reportable.is_a?(BibleQuizQuestion)) %>
         <%= button_to "Retire question", retire_question_admin_report_path(@report), method: :post, class: "btn btn-danger",
                       data: { turbo_confirm: "Take this question out of the quiz?" } %>
+        <%= link_to "Edit question", edit_question_admin_report_path(@report), class: "btn btn-primary" %>
       <% end %>
-      <%= button_to "Resolve", resolve_admin_report_path(@report), method: :post, class: "btn btn-primary" %>
+      <% if !quiz || question_dealt_with?(@report.reportable) %>
+        <%= button_to "Resolve", resolve_admin_report_path(@report), method: :post, class: "btn btn-primary" %>
+      <% end %>
       <%= button_to "Dismiss", dismiss_admin_report_path(@report), method: :post, class: "btn btn-secondary" %>
     </div>
+    <% if quiz && !question_dealt_with?(@report.reportable) %>
+      <p class="mt-2 text-sm text-gray-600">To resolve this report, fix the question (Edit question) or take it out of the quiz (Retire question). Dismiss it if the question is fine.</p>
+    <% end %>
   <% end %>
 </div>

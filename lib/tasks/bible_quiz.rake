@@ -99,7 +99,7 @@ namespace :bible_quiz do
     puts "Done. Retired #{retired} off-theme questions. Run bible_quiz:warm_pool to refill thin themes."
   end
 
-  desc "Check marked answers against the Bible: fix clear mistakes, retire the rest (fill_blank / reference / which_book)"
+  desc "Check marked answers against the Bible: fix clear mistakes, retire the rest (fill_blank / reference / which_book / true_phrase)"
   task audit_answers: :environment do
     counts = Hash.new(0)
     BibleQuizQuestion.trusted.where(kind: BibleQuiz::AnswerCheck::CHECKED_KINDS).find_each do |q|
@@ -115,6 +115,24 @@ namespace :bible_quiz do
       end
     end
     puts "Done. ok=#{counts[:ok]} fixed=#{counts[:fixed]} retired=#{counts[:wrong]} unchecked=#{counts[:unknown]}"
+  end
+
+  desc "Retire giveaway / non-biblical true_phrase / duplicate quiz questions (dry run; APPLY=1 to change; RETIRE_IDS=937,1074)"
+  task audit: :environment do
+    apply = ENV["APPLY"] == "1"
+    ids = ENV.fetch("RETIRE_IDS", "937,1074").split(",").map(&:strip).reject(&:empty?)
+    puts apply ? "APPLYING changes." : "Dry run — nothing will change (APPLY=1 to apply)."
+    s = BibleQuiz::Audit.new(apply: apply, retire_ids: ids).call
+    puts ""
+    puts "Summary#{' (dry run)' unless apply}:"
+    puts "  keys backfilled          #{s.keys_backfilled}"
+    puts "  answer given away        #{s.giveaways} retired"
+    puts "  true_phrase failing      #{s.phrases_wrong} retired, #{s.phrases_fixed} answer fixed, #{s.phrases_unchecked} unchecked"
+    puts "  #{"listed (#{ids.join(',')})".ljust(24)} #{s.explicit} retired"
+    puts "  duplicates               #{s.duplicates} retired across #{s.duplicate_groups} groups (one kept per group)"
+    puts "  total retired            #{s.retired}"
+    puts "  pending reports resolved #{s.reports_resolved}"
+    puts "  trusted questions now    #{BibleQuizQuestion.trusted.count}#{' (unchanged — dry run)' unless apply}"
   end
 
   desc "Show pool stats by theme / difficulty"
