@@ -225,4 +225,15 @@ module ApplicationHelper
   def android_store_url
     "https://play.google.com/store/apps/details?id=com.brethreign.app"
   end
+
+  # Store links switch the "Coming soon" badges to Download once the env var is set
+  # (IOS_STORE_URL / ANDROID_STORE_URL on Hatchbox).
+  def app_store_url(platform)
+    ENV[platform == :ios ? "IOS_STORE_URL" : "ANDROID_STORE_URL"].presence
+  end
+
+  # Safari's Smart App Banner, only once the App Store link is set.
+  def ios_app_id
+    app_store_url(:ios).to_s[/id(\d+)/, 1]
+  end
 end

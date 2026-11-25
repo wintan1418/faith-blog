@@ -33,6 +33,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Brethreign">
     <%= csrf_meta_tags %>
+    <% if ios_app_id %><meta name="apple-itunes-app" content="app-id=<%= ios_app_id %>"><% end %>
     <%= csp_meta_tag %>
 
     <%# PWA %>

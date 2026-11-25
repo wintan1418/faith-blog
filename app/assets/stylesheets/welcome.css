@@ -518,3 +518,6 @@ html .waitlist-page .waitlist-page-title { margin: 0; font-size: clamp(2rem, 7vw
 .waitlist-page-sub { margin: 0 0 8px; color: var(--fc-muted); line-height: 1.55; }
 .waitlist-page-foot { margin: 8px 0 0; font-size: .9rem; color: var(--fc-muted); }
 .waitlist-page-foot a { color: var(--fc-accent); font-weight: 600; }
+
+/* Store badge once the app is live: the pill becomes a Download link. */
+html .welcome .app-badge-get { text-decoration: none; background: var(--fc-accent); color: #fff; }
