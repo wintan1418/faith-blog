@@ -31,7 +31,10 @@ body:has(.welcome) .fc-rain { display: none; }
 /* ── The brand: "A new dawn" scene + the logo (shared/_logo) ── */
 .welcome-brand { display: flex; flex-direction: column; align-items: stretch; gap: 0.6rem; min-width: 0; }
 /* On phones the caption already names Brethreign; the logo shows on computers. */
-.welcome-logo { display: none; }
+/* Phones: the logo leads the page, above the new-dawn banner. */
+.welcome-logo { display: block; order: -1; height: 2.1rem; width: auto; align-self: flex-start; margin: 0.2rem 0 0.4rem; color: var(--fc-accent); }
+.welcome-logo .br-logo-mark { color: #3cdb9d; }
+html.theme-dark .welcome-logo .br-logo-word { color: #f5f1e6; }
 
 /* ── New dawn: the new B mark rises like the sun ──
    The resting styles below are the FINAL scene (day broken, sun up).
@@ -449,7 +452,7 @@ html .welcome .welcome-footer a:hover { color: var(--fc-ink); text-decoration: u
   }
   /* The scene stays in view while the right column (with Get the app) scrolls. */
   .welcome-brand { align-items: center; align-self: start; position: sticky; top: 3rem; gap: 1.4rem; }
-  .welcome-logo { display: block; height: 3.4rem; width: auto; }
+  .welcome-logo { display: block; order: 0; align-self: center; margin: 0; height: 3.4rem; width: auto; }
   .dawn-wrap { --sun-size: 40%; }
   .welcome-brand .dawn-wrap { width: min(100%, 440px); }
   .dawn { height: auto; aspect-ratio: 1 / 1.04; border-radius: 32px; }
