@@ -39,7 +39,8 @@ class Notification < ApplicationRecord
     page_invite:            33,
     page_new_follower:      34,
     page_verified:          35,
-    page_mentioned:         36
+    page_mentioned:         36,
+    feedback_request:       37
   }
 
   # Associations
@@ -103,7 +104,8 @@ class Notification < ApplicationRecord
     circle_prayer: "pray", circle_prayer_answered: "answered", birthday: "cake",
     content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone",
     rank_up: "sprout", series_new_part: "library", bible_reminder: "bookopen",
-    page_invite: "building", page_new_follower: "userplus", page_verified: "badgecheck", page_mentioned: "megaphone"
+    page_invite: "building", page_new_follower: "userplus", page_verified: "badgecheck", page_mentioned: "megaphone",
+    feedback_request: "chat"
   }.freeze
 
   def web_icon
@@ -202,6 +204,8 @@ class Notification < ApplicationRecord
       "#{page_name_for_alert} is now verified#{e.(" ✓")}"
     when :page_mentioned
       "#{notifiable.try(:author_name) || 'Someone'} mentioned your page"
+    when :feedback_request
+      "#{e.("💬 ")}We'd love your feedback — 30 seconds#{": #{notifiable.title}" if notifiable.respond_to?(:title)}"
     when :birthday
       "#{e.("🎂 ")}It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -255,6 +259,8 @@ class Notification < ApplicationRecord
     when :page_mentioned
       post = underlying_post
       post ? Rails.application.routes.url_helpers.post_path(post) : Rails.application.routes.url_helpers.notifications_path
+    when :feedback_request
+      Rails.application.routes.url_helpers.feedback_survey_path(notifiable)
     when :app_update
       Rails.application.routes.url_helpers.app_update_store_path # straight on to the Play Store
     when :content_removed
@@ -355,7 +361,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
-    return if birthday? || skill_endorsed? || app_update? || rank_up? || bible_reminder? || page_new_follower? || page_mentioned? # a push and the alert are enough; no emails for these
+    return if birthday? || skill_endorsed? || app_update? || rank_up? || bible_reminder? || page_new_follower? || page_mentioned? || feedback_request? # a push and the alert are enough; no emails for these
     return if notifiable.is_a?(Message) && notifiable.quiet? # e.g. the welcome note, which has its own email
 
     NotificationMailer.with(notification: self).community_notification.deliver_later
@@ -381,6 +387,7 @@ class Notification < ApplicationRecord
     native = NativePushConfig.configured? && user.push_devices.deliverable.exists?
     return unless web || native
     return if page_new_follower? # counted up in the alerts list; no buzz per follower
+    return if feedback_request? && !notifiable.try(:also_push?) # surveys buzz only when the admin asked
 
     PushNotificationJob.perform_later(self)
   end

@@ -131,7 +131,7 @@ class OrgPagesController < ApplicationController
   end
 
   def page_params
-    attrs = params.expect(page: PAGE_FIELDS)
+    attrs = params.expect(page: [ *PAGE_FIELDS, { socials: Page::SOCIAL_NETWORKS.keys } ])
     attrs[:city_id] = nil if attrs.key?(:city_id) && attrs[:city_id].blank?
     attrs
   end

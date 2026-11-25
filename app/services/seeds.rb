@@ -20,7 +20,8 @@ module Seeds
     "badge"             => { points: 25,  daily_cap: nil, label: "Earn a badge" },
     "invite_joined"     => { points: 25,  daily_cap: 10, label: "A friend joins through your invite and posts" },
     "bible_read"        => { points: 3,   daily_cap: 1,  label: "Read your Bible today" },
-    "bible_prayed"      => { points: 2,   daily_cap: 1,  label: "Pray after your reading" }
+    "bible_prayed"      => { points: 2,   daily_cap: 1,  label: "Pray after your reading" },
+    "feedback"          => { points: 5,   daily_cap: 1,  label: "Answer a Brethreign feedback survey" }
   }.freeze
 
   STREAK_BONUSES = { 7 => "streak_7", 30 => "streak_30", 100 => "streak_100" }.freeze
@@ -179,6 +180,16 @@ module Seeds
       next unless day&.user_id
 
       award(user_id: day.user_id, kind: "bible_prayed", source: day, at: at || Time.current, on: day.read_on,
+            notify: notify)
+    end
+  end
+
+  # +5 for answering a feedback survey (once per survey, once a day at most).
+  def feedback_given(response, at: nil, notify: true)
+    safely("feedback #{response&.id}") do
+      next unless response&.user_id && response.submitted?
+
+      award(user_id: response.user_id, kind: "feedback", source: response, at: at || response.submitted_at,
             notify: notify)
     end
   end

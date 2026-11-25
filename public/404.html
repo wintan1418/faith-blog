@@ -49,6 +49,14 @@
       a.btn:active { transform: scale(0.97); }
       footer { margin-top: 2.5rem; font-size: 0.78rem; color: #75847a; }
       footer img { display: block; margin: 0 auto; height: 22px; width: auto; opacity: 0.85; }
+      .socials { display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.6rem; }
+      .socials a {
+        display: grid; place-items: center; width: 40px; height: 40px; border-radius: 999px;
+        color: #c8d3cf; border: 1px solid rgba(255, 255, 255, 0.12); transition: color 140ms ease, border-color 140ms ease;
+      }
+      .socials a:hover { color: #34d399; border-color: rgba(52, 211, 153, 0.5); }
+      .socials svg { width: 18px; height: 18px; }
+      .socials-title { margin: 2rem 0 0; font-size: 0.78rem; font-weight: 700; color: #75847a; }
     </style>
   </head>
   <body>
@@ -60,6 +68,15 @@
       <h1>The breath you're looking for isn't here.</h1>
       <p>It may have been removed, or the link wasn't quite right.</p>
       <a class="btn" href="/">← Back to the feed</a>
+      <!-- Follow Brethreign: keep in step with config/socials.yml (test/models/brand_socials_test.rb checks). -->
+      <p class="socials-title">Follow Brethreign</p>
+      <nav class="socials" aria-label="Follow Brethreign">
+        <a href="https://x.com/_Brethreign_" target="_blank" rel="noopener me" aria-label="X (@_Brethreign_)" title="X"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path fill="currentColor" stroke="none" d="M17.75 3h3.07l-6.71 7.67L22 21h-6.18l-4.84-6.33L5.44 21H2.37l7.18-8.2L2 3h6.33l4.38 5.79zm-1.08 16.2h1.7L7.4 4.73H5.58z"/></svg></a>
+        <a href="https://www.instagram.com/breth_reign/" target="_blank" rel="noopener me" aria-label="Instagram (@breth_reign)" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.linkedin.com/company/brethreign/" target="_blank" rel="noopener me" aria-label="LinkedIn (Brethreign)" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="3.5"/><path d="M8 10.5v6.5"/><circle cx="8" cy="7.4" r="1.15" fill="currentColor" stroke="none"/><path d="M12 17v-6.5M12 13.4a2.6 2.6 0 0 1 5.2 0V17"/></svg></a>
+        <a href="https://breathreigns.substack.com" target="_blank" rel="noopener me" aria-label="Substack (breathreigns)" title="Substack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path fill="currentColor" stroke="none" d="M4 3.5h16v2.3H4zM4 8.1h16v2.3H4zM4 12.7h16V21l-8-4.5L4 21z"/></svg></a>
+        <a href="mailto:social@brethreign.com" aria-label="Email (social@brethreign.com)" title="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.8 6.6 8.2 6.3 8.2-6.3"/></svg></a>
+      </nav>
       <footer><img src="/brand/brethreign-logo-cream.svg" alt="Brethreign" height="22"></footer>
     </main>
   </body>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_26_090200) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -575,6 +575,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_090200) do
     t.index ["user_id"], name: "index_experiences_on_user_id"
   end
 
+  create_table "feedback_campaigns", force: :cascade do |t|
+    t.string "title", limit: 160, null: false
+    t.integer "rating_kind", default: 0, null: false
+    t.string "follow_up_prompt", limit: 200
+    t.string "choice_question", limit: 200
+    t.string "choice_options", default: [], null: false, array: true
+    t.integer "audience", default: 0, null: false
+    t.boolean "also_push", default: false, null: false
+    t.datetime "starts_at"
+    t.datetime "ends_at"
+    t.datetime "launched_at"
+    t.datetime "delivered_at"
+    t.datetime "closed_at"
+    t.integer "targeted_count", default: 0, null: false
+    t.integer "responses_count", default: 0, null: false
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_feedback_campaigns_on_created_by_id"
+    t.index ["launched_at", "starts_at"], name: "index_feedback_campaigns_on_launched_at_and_starts_at"
+  end
+
+  create_table "feedback_responses", force: :cascade do |t|
+    t.bigint "feedback_campaign_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "rating"
+    t.text "comment"
+    t.string "choice", limit: 120
+    t.string "platform", limit: 20
+    t.datetime "submitted_at"
+    t.datetime "declined_at"
+    t.datetime "snoozed_until"
+    t.integer "snooze_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["feedback_campaign_id", "submitted_at"], name: "index_feedback_responses_on_campaign_and_submitted"
+    t.index ["user_id", "feedback_campaign_id"], name: "index_feedback_responses_on_user_id_and_feedback_campaign_id", unique: true
+  end
+
   create_table "follows", force: :cascade do |t|
     t.bigint "follower_id", null: false
     t.bigint "following_id", null: false
@@ -838,6 +877,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_090200) do
     t.tsvector "searchable"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "socials", default: {}, null: false
     t.index "lower((handle)::text)", name: "index_pages_on_lower_handle", unique: true
     t.index ["city_id"], name: "index_pages_on_city_id"
     t.index ["created_by_id"], name: "index_pages_on_created_by_id"
@@ -1437,6 +1477,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_090200) do
   add_foreign_key "educations", "users"
   add_foreign_key "experiences", "pages", on_delete: :nullify
   add_foreign_key "experiences", "users"
+  add_foreign_key "feedback_campaigns", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "feedback_responses", "feedback_campaigns", on_delete: :cascade
+  add_foreign_key "feedback_responses", "users", on_delete: :cascade
   add_foreign_key "follows", "users", column: "follower_id"
   add_foreign_key "follows", "users", column: "following_id"
   add_foreign_key "game_attempts", "users"

@@ -1,0 +1,63 @@
+<%# The survey's questions. Locals: campaign, response (may be nil), context ("page" or "sheet"). %>
+<% response ||= nil %>
+<% picked = response&.rating %>
+<%= form_with url: feedback_survey_path(campaign), method: :post, class: "fb-form",
+      data: { turbo_frame: "_top" } do |f| %>
+  <%= hidden_field_tag :context, context %>
+  <% if response&.errors&.any? %>
+    <p class="fb-error" role="alert"><%= response.errors.full_messages.to_sentence %></p>
+  <% end %>
+
+  <fieldset class="fb-rating <%= campaign.rating_nps? ? 'is-nps' : 'is-stars' %>">
+    <legend class="fb-question"><%= campaign.title %></legend>
+    <% if campaign.rating_question && campaign.rating_question != campaign.title %>
+      <p class="fb-sub"><%= campaign.rating_question %></p>
+    <% end %>
+    <div class="fb-scale" role="radiogroup" aria-label="<%= campaign.rating_nps? ? 'Score from 0 to 10' : 'Rating from 1 to 5 stars' %>">
+      <% campaign.rating_range.each do |value| %>
+        <label class="fb-pick" title="<%= campaign.rating_nps? ? value : pluralize(value, 'star') %>">
+          <input type="radio" name="feedback[rating]" value="<%= value %>" class="sr-only"
+                 <%= "checked" if picked == value %> required
+                 data-feedback-target="rating" data-action="change->feedback#pick">
+          <% if campaign.rating_nps? %>
+            <span class="fb-num"><%= value %></span>
+          <% else %>
+            <span class="fb-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M12 3.2l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 16.6l-5.3 2.9 1.1-5.9L3.4 9.5l6-.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+            <span class="sr-only"><%= pluralize(value, "star") %></span>
+          <% end %>
+        </label>
+      <% end %>
+    </div>
+    <% if campaign.rating_nps? %>
+      <div class="fb-scale-ends" aria-hidden="true"><span>Not likely</span><span>Very likely</span></div>
+    <% end %>
+  </fieldset>
+
+  <% if campaign.choices? %>
+    <fieldset class="fb-choices">
+      <legend class="fb-label"><%= campaign.choice_question %></legend>
+      <div class="fb-chip-row">
+        <% campaign.choice_options.each do |option| %>
+          <label class="fb-chip">
+            <input type="radio" name="feedback[choice]" value="<%= option %>" class="sr-only" <%= "checked" if response&.choice == option %>>
+            <span><%= option %></span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+  <% end %>
+
+  <% if campaign.follow_up_prompt.present? %>
+    <label class="fb-label" for="feedback_comment_<%= campaign.id %>_<%= context %>"><%= campaign.follow_up_prompt %></label>
+    <textarea id="feedback_comment_<%= campaign.id %>_<%= context %>" name="feedback[comment]" rows="3" maxlength="2000"
+              class="fb-textarea" placeholder="Optional — a sentence or two helps a lot"><%= response&.comment %></textarea>
+  <% end %>
+
+  <div class="fb-actions">
+    <button type="submit" class="fc-btn fc-btn-primary fb-submit" data-feedback-target="submit" <%= "disabled" unless picked %>>Submit</button>
+    <% if context == "sheet" %>
+      <button type="button" class="fb-link" data-action="feedback#later">Not now</button>
+      <button type="button" class="fb-link is-quiet" data-action="feedback#never">Don't ask again</button>
+    <% end %>
+  </div>
+<% end %>

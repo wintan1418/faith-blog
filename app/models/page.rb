@@ -68,6 +68,13 @@ class Page < ApplicationRecord
   normalizes :handle, with: ->(h) { h.to_s.strip.delete_prefix("@") }
   normalizes :name, :tagline, :tradition, :location, with: ->(v) { v.to_s.squish.presence }
   normalizes :website, with: ->(v) { PageHandle.normalize_url(v) }
+  # The page's own social accounts: { "instagram" => "https://instagram.com/…" }.
+  SOCIAL_NETWORKS = { "x" => "X", "instagram" => "Instagram", "facebook" => "Facebook", "youtube" => "YouTube",
+                      "linkedin" => "LinkedIn", "substack" => "Substack" }.freeze
+  normalizes :socials, with: ->(v) {
+    (v.respond_to?(:to_h) ? v.to_h : {}).to_h { |k, url| [ k.to_s, PageHandle.normalize_url(url.to_s.strip.first(255)) ] }
+      .select { |k, url| SOCIAL_NETWORKS.key?(k) && url.present? }
+  }
   normalizes :email, with: ->(v) { v.to_s.strip.downcase.presence }
   normalizes :phone, with: ->(v) { v.to_s.squish.presence }
 
@@ -78,6 +85,7 @@ class Page < ApplicationRecord
   validates :tagline, length: { maximum: 160 }
   validates :about, length: { maximum: 5_000 }
   validates :website, length: { maximum: 255 }
+  validate :socials_are_links
   validates :website, format: { with: %r{\Ahttps?://[^\s/$.?#][^\s]*\z}i, message: "should be a web address" }, allow_blank: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
   validates :phone, length: { maximum: 40 }, format: { with: /\A[+\d\s().\-]*\z/, message: "may only use digits, spaces and + ( ) -" }
@@ -227,5 +235,10 @@ class Page < ApplicationRecord
 
       Ai::Moderation::Client.stub? ? PageImageModerationJob.perform_now(self, name) : PageImageModerationJob.perform_later(self, name)
     end
+  end
+
+  def socials_are_links
+    bad = socials.to_h.reject { |_k, url| url.to_s.match?(%r{\Ahttps?://[^\s/$.?#][^\s]*\z}i) }
+    bad.each_key { |k| errors.add(:socials, "#{SOCIAL_NETWORKS[k] || k} should be a web address") }
   end
 end

@@ -1,0 +1,18 @@
+<%# Feed pop-up: a bottom sheet that slides in while reading (feedback_controller.js). Locals: campaign. %>
+<% response = campaign.responses.find_by(user_id: current_user.id) %>
+<aside class="fb-sheet" hidden
+       data-controller="feedback"
+       data-feedback-prompt-value="true"
+       data-feedback-snooze-url-value="<%= snooze_feedback_survey_path(campaign) %>"
+       data-feedback-decline-url-value="<%= decline_feedback_survey_path(campaign) %>"
+       aria-label="Quick feedback">
+  <div class="fb-sheet-card">
+    <div class="fb-sheet-top">
+      <span class="fb-kicker"><%= render_icon("chat", classes: "h-4 w-4") %> 30-second feedback</span>
+      <button type="button" class="fb-x" data-action="feedback#later" aria-label="Not now"><%= render_icon("x", classes: "h-4 w-4") %></button>
+    </div>
+    <div id="feedback_<%= campaign.id %>_sheet">
+      <%= render "feedback/form", campaign: campaign, response: response, context: "sheet" %>
+    </div>
+  </div>
+</aside>

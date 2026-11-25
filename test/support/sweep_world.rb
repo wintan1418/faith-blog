@@ -97,6 +97,8 @@ module SweepWorld
     @mod_log = ModerationLog.create!(moderator: @admin, target: @post, action: "hold")
     @bible_verse = BibleVerse.create!(text: "Jesus wept.", reference: "John 11:35")
     @golden_breath = GoldenBreath.create!(text: "Grace upon grace.")
+    @feedback_campaign = FeedbackCampaign.create!(title: "How is Brethreign working for you?", created_by: @admin)
+    @feedback_campaign.launch!
     @broadcast = Broadcast.create!(subject: "Hello all", sender: @admin, body: "<p>Grace and peace to every member this week.</p>")
     @office_conversation = OfficeConversation.create!(user: @admin, title: "Planning")
     @office_card = @office_conversation.messages.create!(role: 1, content: "Here is a draft",
@@ -174,6 +176,7 @@ module SweepWorld
     in [ "admin/golden_breaths", "id" ] then @golden_breath.id
     in [ "admin/moderation_reviews", "id" ] then @review.id
     in [ "admin/broadcasts", "id" ] then @broadcast.id
+    in [ "admin/feedback_campaigns" | "feedback", "id" ] then @feedback_campaign.id
     in [ "admin/office/conversations", "id" ] then @office_conversation.id
     in [ "admin/office/cards", "id" ] then @office_card.id
     in [ "email_unsubscribes", "token" ] then "not-a-real-token"

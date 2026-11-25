@@ -1,0 +1,13 @@
+<%# After answering. Locals: campaign, response. %>
+<% seeds = response && SeedEvent.where(user_id: response.user_id, kind: "feedback", source_type: "FeedbackResponse", source_id: response.id).pick(:points) %>
+<div class="fb-thanks" data-feedback-target="thanks" role="status">
+  <span class="fb-thanks-mark" aria-hidden="true"><%= render_icon("answered", classes: "h-7 w-7") %></span>
+  <p class="fb-thanks-title">Thank you!</p>
+  <p class="fb-thanks-text">Your answer goes straight to the Brethreign team and helps us build this well.</p>
+  <% if seeds %>
+    <p class="fb-thanks-seeds"><%= render_icon("sprout", classes: "h-4 w-4") %> +<%= seeds %> seeds</p>
+  <% end %>
+  <% if local_assigns[:context] == "sheet" %>
+    <button type="button" class="fb-link fb-thanks-close" data-action="feedback#hide">Close</button>
+  <% end %>
+</div>

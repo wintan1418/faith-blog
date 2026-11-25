@@ -1,0 +1,21 @@
+<% content_for(:title) { "Feedback - Brethreign" } %>
+<% content_for(:app_title) { "Feedback" } %>
+
+<div class="fb-page">
+  <section class="fb-page-card" data-controller="feedback" aria-labelledby="fb-page-kicker">
+    <p class="fb-kicker" id="fb-page-kicker"><%= render_icon("chat", classes: "h-4 w-4") %> We'd love your feedback · 30 seconds</p>
+    <div id="feedback_<%= @campaign.id %>_page">
+      <% if @response&.submitted? %>
+        <%= render "feedback/thanks", campaign: @campaign, response: @response %>
+      <% elsif !@campaign.live? %>
+        <div class="fb-thanks" role="status">
+          <p class="fb-thanks-title">This survey has closed</p>
+          <p class="fb-thanks-text">Thank you all the same. There'll be another chance to tell us what you think.</p>
+        </div>
+      <% else %>
+        <%= render "feedback/form", campaign: @campaign, response: @response, context: "page" %>
+      <% end %>
+    </div>
+    <p class="fb-foot"><%= link_to "Back to the feed", feed_path, class: "fb-link" %></p>
+  </section>
+</div>

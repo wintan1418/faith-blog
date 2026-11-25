@@ -23,6 +23,8 @@ class FeedController < ApplicationController
       load_around_card
       load_invite_card
       load_daily_bible
+      load_feedback_prompt
+      load_socials_card
     end
     # Pinned breaths (admin-featured) lead the feed — a community noticeboard.
     @pinned_posts = feed_posts_scope.where(featured: true).recent.limit(2).to_a
@@ -272,6 +274,25 @@ class FeedController < ApplicationController
   rescue StandardError => e
     Rails.logger.warn("[feed] invite card failed: #{e.class}: #{e.message}")
     @invite_card = false
+  end
+
+  # A feedback survey's pop-up (FeedbackCampaign.prompt_for decides who and when).
+  def load_feedback_prompt
+    @feedback_campaign = FeedbackCampaign.prompt_for(current_user)
+  end
+
+  # "Follow Brethreign on X, Instagram…": once, for members on their second
+  # day and third visit or later, until closed (or seen: see socials_card_controller.js).
+  SOCIALS_CARD_KEY = "follow-socials"
+  SOCIALS_CARD_AFTER_VISITS = 3
+
+  def load_socials_card
+    @socials_card = current_user.created_at < 1.day.ago &&
+                    !current_user.card_dismissed?(SOCIALS_CARD_KEY) &&
+                    Ahoy::Visit.where(user_id: current_user.id).limit(SOCIALS_CARD_AFTER_VISITS).count >= SOCIALS_CARD_AFTER_VISITS
+  rescue StandardError => e
+    Rails.logger.warn("[feed] socials card failed: #{e.class}: #{e.message}")
+    @socials_card = false
   end
 
   # "Have you read your Bible today?" at the top of the feed. Never lets the feed fail.

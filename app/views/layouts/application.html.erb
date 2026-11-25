@@ -55,7 +55,8 @@
       "@graph" => [
         { "@type" => "Organization", "@id" => "#{request.base_url}/#org", "name" => "Brethreign",
           "url" => "#{request.base_url}/", "logo" => "#{request.base_url}/icon.png",
-          "sameAs" => [ "https://play.google.com/store/apps/details?id=com.brethreign.app" ] },
+          "sameAs" => [ "https://play.google.com/store/apps/details?id=com.brethreign.app", *BrandSocials.same_as ],
+          "contactPoint" => { "@type" => "ContactPoint", "contactType" => "public relations", "email" => BrandSocials.email }.compact },
         { "@type" => "WebSite", "@id" => "#{request.base_url}/#site", "name" => "Brethreign",
           "url" => "#{request.base_url}/", "publisher" => { "@id" => "#{request.base_url}/#org" } }
       ]

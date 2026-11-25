@@ -52,6 +52,14 @@
               <% if slide.action == "waitlist" %>
                 <div class="wn-action"><%= link_to "Join the app waitlist", join_waitlist_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
               <% end %>
+              <% if slide.action == "socials" %>
+                <details class="wn-action wn-socials">
+                  <summary class="fc-btn fc-btn-primary">Follow Brethreign</summary>
+                  <div class="wn-socials-sheet" data-action="click->whats-new#markSeen">
+                    <%= render "socials/follow_row", title: nil, email: false, variant: "row" %>
+                  </div>
+                </details>
+              <% end %>
               <% if slide.action == "background_rain" %>
                 <div class="wn-action"><span class="wn-action-label">Background rain</span><%= render "settings/rain_switch" %></div>
               <% end %>

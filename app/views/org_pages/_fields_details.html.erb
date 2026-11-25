@@ -43,3 +43,15 @@
                   placeholder: "Sundays 8:00 am and 10:30 am\nWednesdays 6:00 pm Bible study" %>
   <p class="pg-hint-text">One per line.</p>
 </div>
+<fieldset class="pg-field pg-socials-fields">
+  <legend class="pg-label">Social accounts (optional, shown on the About tab)</legend>
+  <div class="pg-field-row is-wrap">
+    <% Page::SOCIAL_NETWORKS.each do |key, label| %>
+      <div class="pg-field">
+        <%= label_tag "page_socials_#{key}", label, class: "pg-sublabel" %>
+        <%= url_field_tag "page[socials][#{key}]", page.socials.to_h[key], id: "page_socials_#{key}", class: "pg-input",
+                          maxlength: 255, placeholder: "https://", inputmode: "url", autocapitalize: "off" %>
+      </div>
+    <% end %>
+  </div>
+</fieldset>
