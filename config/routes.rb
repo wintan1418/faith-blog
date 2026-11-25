@@ -315,7 +315,9 @@ Rails.application.routes.draw do
       get :delete # confirmation screen before destroy
     end
     resource :notifications, only: [ :edit, :update ]
-    resource :privacy, only: [ :edit, :update ]
+    resource :privacy, only: [ :edit, :update ] do
+      post :dismiss_contact_notice
+    end
     # Security: email verification, two-step login, devices & sessions.
     resource :security, only: :show
     resource :two_factor, only: %i[new create destroy] do
@@ -348,6 +350,8 @@ Rails.application.routes.draw do
 
   # Brethren Card & Connection Requests
   resources :brethren_cards, only: [ :show ], param: :username
+  # "Share my contact": the people a member chose to share their contact details with.
+  resources :contact_shares, only: [ :create, :destroy ]
   resources :suggestion_dismissals, only: [ :create ]
   resources :connection_requests, only: [ :index, :create ] do
     member do

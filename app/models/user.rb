@@ -116,6 +116,9 @@ class User < ApplicationRecord
 
   # Brethren Card & Connection Requests
   has_one :brethren_card, dependent: :destroy
+  # People this member shared their contact details with, and who shared with them.
+  has_many :contact_shares, foreign_key: :owner_id, inverse_of: :owner, dependent: :destroy
+  has_many :received_contact_shares, class_name: "ContactShare", foreign_key: :viewer_id, inverse_of: :viewer, dependent: :destroy
   has_many :sent_connection_requests, class_name: "ConnectionRequest", foreign_key: :sender_id, dependent: :destroy
   has_many :received_connection_requests, class_name: "ConnectionRequest", foreign_key: :receiver_id, dependent: :destroy
 
@@ -271,6 +274,21 @@ class User < ApplicationRecord
     @postable_pages = nil
     @blocking_ids = @blocked_user_ids = nil
     super
+  end
+
+  # Brethreign admins can see members' contact details (to keep people safe);
+  # members' privacy settings don't apply to them.
+  def contact_privacy_exempt? = admin? || super_admin?
+
+  # Never put the account email, password hash or tokens into a JSON
+  # rendering by accident.
+  SERIALIZE_EXCEPT = %w[email unconfirmed_email encrypted_password reset_password_token confirmation_token
+                        unlock_token uid current_sign_in_ip last_sign_in_ip].freeze
+
+  def serializable_hash(options = nil)
+    options = (options || {}).dup
+    options[:except] = Array(options[:except]).map(&:to_s) | SERIALIZE_EXCEPT
+    super(options)
   end
 
   def admin_or_moderator?

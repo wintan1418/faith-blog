@@ -59,6 +59,23 @@
     </div>
     <p class="card-link"><%= @card_url.sub(%r{\Ahttps?://}, "") %></p>
 
+    <% if @contact.any? %>
+      <section class="card-contact" aria-label="Contact details">
+        <% if @contact[:whatsapp] %>
+          <%= link_to @member.brethren_card.whatsapp_link, class: "card-contact-row", target: "_blank", rel: "noopener" do %>
+            <span class="card-contact-icon" aria-hidden="true"><%= render_icon("phone", classes: "h-4 w-4") %></span>
+            <span class="min-w-0"><span class="card-contact-label">WhatsApp</span><span class="card-contact-value"><%= @contact[:whatsapp] %></span></span>
+          <% end %>
+        <% end %>
+        <% if @contact[:email] %>
+          <%= link_to @member.brethren_card.gmail_link, class: "card-contact-row" do %>
+            <span class="card-contact-icon" aria-hidden="true"><%= render_icon("mail", classes: "h-4 w-4") %></span>
+            <span class="min-w-0"><span class="card-contact-label">Email</span><span class="card-contact-value"><%= @contact[:email] %></span></span>
+          <% end %>
+        <% end %>
+      </section>
+    <% end %>
+
     <% if @owner %>
       <div class="card-styles">
         <span>Card colour</span>
@@ -69,7 +86,8 @@
           <% end %>
         </div>
       </div>
-      <p class="card-note">“Save contact” shares your name, current role and this link, never your Brethren Card details.</p>
+      <p class="card-note">“Save contact” shares your name, current role and this link. Your email and WhatsApp are added only for people your
+        <%= link_to "contact privacy settings", edit_settings_privacy_path(anchor: "contact-privacy") %> allow.</p>
     <% else %>
       <section class="card-summary">
         <% if open_to.any? %>
@@ -88,7 +106,7 @@
           <%= link_to "View full profile", user_path(m.username, tab: "professional"), class: "bl-btn bl-btn--primary card-cta" %>
         <% else %>
           <%= link_to "Join Brethreign to connect", new_user_registration_path, class: "bl-btn bl-btn--primary card-cta" %>
-          <p class="card-note">Free. Contact details stay private until you connect.</p>
+          <p class="card-note">Free. Members choose who sees their contact details.</p>
         <% end %>
       </section>
     <% end %>

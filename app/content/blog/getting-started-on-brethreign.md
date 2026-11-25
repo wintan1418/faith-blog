@@ -40,7 +40,7 @@ A face and a few words help people recognise you and feel at ease saying hello.
 
 ## 3. Complete your Brethren Card
 
-Your Brethren Card is a private card for the people you connect with. It holds your church or assembly, what you do, a short "about you", and, if you choose, your WhatsApp number and email. Only your connections ever see it.
+Your Brethren Card is a private card for the people you connect with. It holds your church or assembly, what you do, a short "about you", and, if you choose, your WhatsApp number and email. Only your connections see the card, and your WhatsApp number and email stay hidden until you choose who sees them (Settings → Privacy).
 
 You need a complete card before you can send connection requests, so it's worth doing now.
 

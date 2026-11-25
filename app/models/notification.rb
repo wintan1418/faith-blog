@@ -40,7 +40,8 @@ class Notification < ApplicationRecord
     page_new_follower:      34,
     page_verified:          35,
     page_mentioned:         36,
-    feedback_request:       37
+    feedback_request:       37,
+    contact_shared:         38
   }
 
   # Associations
@@ -59,7 +60,7 @@ class Notification < ApplicationRecord
     new_comment comment_reply new_follower mentioned post_liked comment_liked connection_request
     connection_accepted post_reshared direct_message breath_from_followee everyone_mention prayer_joined
     prayer_answered thread_new_voice circle_breath circle_prayer circle_prayer_answered birthday skill_endorsed
-    series_new_part page_invite page_mentioned
+    series_new_part page_invite page_mentioned contact_shared
   ].freeze
 
   before_create :conceal_anonymous_author
@@ -105,7 +106,7 @@ class Notification < ApplicationRecord
     content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone",
     rank_up: "sprout", series_new_part: "library", bible_reminder: "bookopen",
     page_invite: "building", page_new_follower: "userplus", page_verified: "badgecheck", page_mentioned: "megaphone",
-    feedback_request: "chat"
+    feedback_request: "chat", contact_shared: "mail"
   }.freeze
 
   def web_icon
@@ -206,6 +207,8 @@ class Notification < ApplicationRecord
       "#{notifiable.try(:author_name) || 'Someone'} mentioned your page"
     when :feedback_request
       "#{e.("💬 ")}We'd love your feedback — 30 seconds#{": #{notifiable.title}" if notifiable.respond_to?(:title)}"
+    when :contact_shared
+      "#{actor&.display_name || 'Someone'} shared their contact details with you"
     when :birthday
       "#{e.("🎂 ")}It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -246,6 +249,8 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.circle_path(notifiable.circle)
     when :birthday
       Rails.application.routes.url_helpers.user_path(actor.username)
+    when :contact_shared
+      Rails.application.routes.url_helpers.brethren_card_path(actor.username)
     when :skill_endorsed
       Rails.application.routes.url_helpers.user_path(user.username, tab: "professional")
     when :bible_reminder
@@ -361,7 +366,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
-    return if birthday? || skill_endorsed? || app_update? || rank_up? || bible_reminder? || page_new_follower? || page_mentioned? || feedback_request? # a push and the alert are enough; no emails for these
+    return if birthday? || skill_endorsed? || app_update? || rank_up? || bible_reminder? || page_new_follower? || page_mentioned? || feedback_request? || contact_shared? # a push and the alert are enough; no emails for these
     return if notifiable.is_a?(Message) && notifiable.quiet? # e.g. the welcome note, which has its own email
 
     NotificationMailer.with(notification: self).community_notification.deliver_later

@@ -3,8 +3,9 @@
 require "rqrcode"
 
 # The digital business card: brethreign.com/in/username. A shareable card
-# with a QR code, "Save contact" (a vCard with only professional details,
-# never the private Brethren Card) and a short public summary.
+# with a QR code, "Save contact" (a vCard) and a short public summary. The
+# member's email and WhatsApp number appear on it, and in the vCard, only for
+# viewers their contact privacy settings allow (BrethrenCard#contact_visible_to?).
 class CardsController < ApplicationController
   skip_before_action :authenticate_user!, raise: false
   before_action :set_member
@@ -14,6 +15,7 @@ class CardsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless visible?
 
     @card_url = card_url(@member.username)
+    @contact = @member.brethren_card&.visible_contact_for(user_signed_in? ? current_user : nil) || {}
     respond_to do |format|
       format.html { @qr_svg = qr_svg(@card_url) }
       format.vcf do
@@ -33,7 +35,7 @@ class CardsController < ApplicationController
   private
 
   def set_member
-    @member = User.active.includes(:profile).find_by!(username: params[:username])
+    @member = User.active.includes(:profile, :brethren_card).find_by!(username: params[:username])
   end
 
   # Private profiles: only the member, their connections and moderators.
@@ -57,6 +59,8 @@ class CardsController < ApplicationController
     lines << "TITLE:#{esc.call(role.title)}" if role
     lines << "ORG:#{esc.call(role.organization)}" if role
     lines << "NOTE:#{esc.call(@member.professional_headline)}" if @member.professional_headline.present?
+    lines << "EMAIL;TYPE=INTERNET:#{esc.call(@contact[:email])}" if @contact[:email]
+    lines << "TEL;TYPE=CELL:#{esc.call(@contact[:whatsapp])}" if @contact[:whatsapp]
     lines << "URL:#{@card_url}"
     lines << "END:VCARD"
     lines.join("\r\n") + "\r\n"

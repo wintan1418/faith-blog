@@ -1,0 +1,10 @@
+<%# One-time notice for members who had contact details on their Brethren Card
+    when contact privacy arrived (users.contact_privacy_notice_pending). It goes
+    once they open the setting or tap "Got it". %>
+<div class="fc-app-update ctp-notice" id="contact_privacy_notice" role="status">
+  <span class="ctp-notice-icon" aria-hidden="true"><%= render_icon("lock", classes: "h-5 w-5") %></span>
+  <span><strong>Your contact details are now private.</strong> Choose who can see them.</span>
+  <%= link_to "Choose", edit_settings_privacy_path(anchor: "contact-privacy"), class: "fc-btn-primary fc-app-update__action" %>
+  <%= button_to dismiss_contact_notice_settings_privacy_path, method: :post, class: "fc-app-update__close", form_class: "ctp-notice-form",
+                aria: { label: "Got it" }, title: "Got it" do %><%= render_icon("x", classes: "h-4 w-4") %><% end %>
+</div>
