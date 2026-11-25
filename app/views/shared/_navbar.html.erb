@@ -6,14 +6,12 @@
   marked data-native-action (compose, bible, theme, sign-out), so each of
   those must exist once here.
 %>
-<% wave = "M3.5 13c2.2-4.5 4.8-4.5 7 0s4.8 4.5 7 0c.8-1.6 1.7-2.6 3-3" %>
 <nav class="fc-topbar eg-topbar sticky top-0 z-50">
   <div class="fc-topbar-inner eg-topbar-inner">
     <%= link_to (user_signed_in? ? feed_path : root_path), class: "eg-brand", aria: { label: "Brethreign home" } do %>
-      <span class="eg-brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="<%= wave %>"/></svg>
-      </span>
-      <span class="eg-brand-word">Brethreign</span>
+      <%# The full logo (mark + wordmark); widths where the bar is tight show only the mark. %>
+      <%= render "shared/logo", css_class: "eg-brand-logo" %>
+      <%= render "shared/logomark", css_class: "eg-brand-mark" %>
     <% end %>
 
     <div class="eg-pills" role="navigation" aria-label="Main">
@@ -94,7 +92,7 @@
                 class="eg-breathe fc-compose-btn"
                 data-native-action="compose"
                 data-action="click->composer-modal#open">
-          <svg class="eg-breathe-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="<%= wave %>"/></svg>
+          <%= render_icon("breathe", classes: "eg-breathe-ico") %>
           Breathe
         </button>
 
@@ -243,7 +241,7 @@
     <% end %>
     <button type="button" class="fc-bottom-nav-item fc-bottom-nav-compose" data-action="click->composer-modal#open">
       <span class="eg-bottom-bubble">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="<%= wave %>"/></svg>
+        <%= render_icon("breathe", classes: "eg-bottom-bubble-ico") %>
       </span>
       <span>Breathe</span>
     </button>

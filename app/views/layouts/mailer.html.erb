@@ -8,6 +8,15 @@
   </head>
 
   <body>
+    <%# The Brethreign logo (brand pack PNG: email clients don't show SVG).
+        Emails that draw their own header set content_for(:own_brand). %>
+    <% unless content_for?(:own_brand) %>
+      <div style="max-width: 560px; margin: 0 auto; padding: 8px 0 16px;">
+        <a href="<%= root_url %>" style="display: inline-block; text-decoration: none;">
+          <img src="<%= root_url %>brand/brethreign-logo-darkg.png" width="162" height="36" alt="Brethreign" style="display: block; border: 0; width: 162px; height: 36px;">
+        </a>
+      </div>
+    <% end %>
     <%= yield %>
   </body>
 </html>

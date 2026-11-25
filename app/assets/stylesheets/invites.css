@@ -23,12 +23,9 @@ html .cj-top .cj-brand {
   align-items: center;
   gap: 0.55rem;
   min-height: 44px;
-  color: var(--fc-ink);
-  font-family: var(--fc-display);
-  font-size: 1.3rem;
-  font-weight: 700;
   text-decoration: none;
 }
+html .cj-top .cj-logo { height: 32px; }
 html .cj-top .cj-signin {
   display: inline-flex;
   align-items: center;

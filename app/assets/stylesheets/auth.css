@@ -44,13 +44,12 @@ body.hotwire-native .auth { min-height: 100dvh; }
   width: 64px;
   height: 64px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #34d399, #059669);
-  color: #042f1d;
-  box-shadow: 0 14px 36px -10px rgba(5, 150, 105, 0.65);
+  background: #3cdb9d;
+  color: #07110d;
+  box-shadow: 0 14px 36px -10px rgba(18, 112, 79, 0.65);
   animation: auth-core 8s ease-in-out infinite;
 }
-.auth-breath-wave { width: 70%; height: 70%; }
-.auth-breath-wave path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: auth-draw 1.6s 0.2s ease-out forwards; }
+.auth-breath-b { height: 62%; width: auto; animation: auth-mark-in 0.9s 0.15s ease-out both; }
 
 /* Inhale 4s, exhale 4s. */
 @keyframes auth-breathe {
@@ -61,7 +60,7 @@ body.hotwire-native .auth { min-height: 100dvh; }
   0%, 100% { transform: scale(0.96); }
   50% { transform: scale(1.04); }
 }
-@keyframes auth-draw { to { stroke-dashoffset: 0; } }
+@keyframes auth-mark-in { from { opacity: 0; transform: scale(0.82); } }
 
 /* ── Brand panel (computers) ── */
 .auth-side { display: none; }
@@ -235,7 +234,7 @@ html .auth .auth-divider span { background: none; padding: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .auth-breath-ring, .auth-breath-core { animation: none; }
-  .auth-breath-wave path { animation: none; stroke-dashoffset: 0; }
+  .auth-breath-b { animation: none; }
 }
 
 /* Keep the sign-in pages calm: no floating scripture text over the form. */

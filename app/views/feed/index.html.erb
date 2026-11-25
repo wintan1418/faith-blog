@@ -145,7 +145,7 @@
           be a day off late at night), the breath streak, the verse of the day
           and who is online right now. %>
       <section class="eg-today" aria-label="Today">
-        <svg class="eg-today-waves" viewBox="0 0 320 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M0 70c40-50 80-50 120 0s80 50 120 0 60-40 80-20M0 100c40-50 80-50 120 0s80 50 120 0 60-40 80-20"/></svg>
+        <%= render "shared/logomark", css_class: "eg-today-mark" %>
         <div class="eg-today-top">
           <h1 class="eg-today-date">
             <time datetime="<%= Time.current.utc.iso8601 %>" data-controller="local-time" data-local-time-format-value="today"><%= Date.current.strftime("%A, %-d %B") %></time>

@@ -13,13 +13,13 @@
 <% when "assistant" %>
   <div id="<%= dom_id(message) %>" class="office-msg office-msg--assistant<%= ' is-empty' if message.content.blank? && !message.failed? %>">
     <% if message.failed? %>
-      <span class="office-avatar" aria-hidden="true">~</span>
+      <span class="office-avatar" aria-hidden="true"><%= render "shared/logomark" %></span>
       <div class="office-error">
         <p><%= message.content %></p>
         <%= button_to "Try again", retry_admin_office_conversation_path(message.conversation), class: "fc-btn", form_class: "inline" %>
       </div>
     <% elsif message.content.present? %>
-      <span class="office-avatar" aria-hidden="true">~</span>
+      <span class="office-avatar" aria-hidden="true"><%= render "shared/logomark" %></span>
       <div class="office-reply">
         <div class="office-prose"><%= office_markdown(message.content) %></div>
         <div class="office-reply-tools"><%= office_copy_button(message.content, class_name: "office-copy-btn") %></div>

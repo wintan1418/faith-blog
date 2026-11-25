@@ -44,7 +44,7 @@ self.addEventListener("push", (event) => {
   const options = {
     body: data.body || "",
     icon: data.icon || "/icon.png",
-    badge: "/icon.png",
+    badge: "/badge-96.png", // Android shows only its shape: the white B mark
     tag: data.tag || "brethreign",
     data: { url: data.url || "/feed" },
     renotify: true, // re-alert when a same-tag notification (e.g. a chat) updates

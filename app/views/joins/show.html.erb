@@ -20,12 +20,7 @@
 <div class="welcome cj">
   <header class="cj-top">
     <%= link_to root_path, class: "cj-brand", aria: { label: "Brethreign" } do %>
-      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
-        <circle cx="16" cy="16" r="15" fill="var(--fc-fill)"/>
-        <path d="M7 19 C 11 13, 14 13, 16 19 C 18 25, 21 25, 25 19" fill="none" stroke="var(--fc-on-fill)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="22" cy="11" r="1.6" fill="var(--fc-on-fill)"/>
-      </svg>
-      <span>Brethreign</span>
+      <%= render "shared/logo", css_class: "cj-logo" %>
     <% end %>
     <%= link_to "Sign in", new_user_session_path, class: "cj-signin" %>
   </header>

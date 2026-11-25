@@ -78,9 +78,8 @@
       <div class="admin-shell">
         <aside class="admin-sidebar">
           <%= link_to admin_root_path, class: "admin-brand" do %>
-            <span class="fc-brand-mark"><%= render_icon("breathe", classes: "h-4 w-4") %></span>
-            <span>
-              <span class="block text-sm font-extrabold text-[var(--fc-ink)]">Brethreign</span>
+            <span class="admin-brand-lockup">
+              <%= render "shared/logo", css_class: "admin-brand-logo", label: "Brethreign" %>
               <span class="block text-xs font-bold text-[var(--fc-muted)]">Admin console</span>
             </span>
           <% end %>

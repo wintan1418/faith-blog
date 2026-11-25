@@ -28,25 +28,18 @@ body:has(.welcome) .fc-rain { display: none; }
   padding: 1.25rem 1rem 2rem;
 }
 
-/* ── The brand: "A new dawn" scene + wordmark ── */
+/* ── The brand: "A new dawn" scene + the logo (shared/_logo) ── */
 .welcome-brand { display: flex; flex-direction: column; align-items: stretch; gap: 0.6rem; min-width: 0; }
-/* On phones the caption already names Brethreign; the wordmark shows on computers. */
-.welcome-word {
-  display: none;
-  font-family: var(--fc-display);
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.01em;
-}
+/* On phones the caption already names Brethreign; the logo shows on computers. */
+.welcome-logo { display: none; }
 
-/* ── New dawn: the old mark sets like the moon, the new B rises like the sun ──
-   The resting styles below are the FINAL scene (day broken, sun up, moon gone).
+/* ── New dawn: the new B mark rises like the sun ──
+   The resting styles below are the FINAL scene (day broken, sun up).
    Each animation runs once from its night keyframe towards that rest, with
    fill-mode backwards so the first paint is already the full night scene and
    nothing waits on JavaScript. Only transform and opacity move.
-   Timeline: 0-0.5s night · moon sets 0.5-4.5s · sky warms 0.8-5s ·
-   sun rises 2.6-6s · heartbeat from 6.2s, every 1.1s.
+   Timeline: 0-0.3s night · sky warms 0.3-3.3s · sun rises 0.6-3.6s ·
+   heartbeat from 3.8s, every 1.1s.
    Positions are custom properties so the phone banner can re-place things. */
 .dawn-wrap {
   position: relative;
@@ -54,9 +47,6 @@ body:has(.welcome) .fc-rain { display: none; }
   min-width: 0;
   --dawn-night: #060d1c;
   --horizon: 74%;
-  --moon-x: 30%;
-  --moon-top: 11%;
-  --moon-size: 17%;
   --sun-x: 50%;
   --sun-y: 47%;
   --sun-size: 44%;
@@ -83,9 +73,9 @@ body:has(.welcome) .fc-rain { display: none; }
     radial-gradient(ellipse 70% 42% at var(--sun-x) var(--horizon), rgba(240, 205, 120, 0.85) 0%, rgba(212, 175, 89, 0.45) 30%, rgba(212, 175, 89, 0) 70%),
     radial-gradient(ellipse 95% 60% at var(--sun-x) var(--horizon), rgba(60, 219, 157, 0.38) 0%, rgba(60, 219, 157, 0) 70%),
     linear-gradient(180deg, #08162a 0%, #0a2a26 32%, #0d4a37 58%, #1f7a58 76%, #0d6a4b 100%);
-  animation: dawn-warm 4.2s ease-in-out 0.8s both;
+  animation: dawn-warm 3s ease-in-out 0.3s both;
 }
-.dawn-stars { inset: 0; opacity: 0.12; animation: dawn-stars 4s ease-in 0.6s both; }
+.dawn-stars { inset: 0; opacity: 0.12; animation: dawn-stars 2.8s ease-in 0.3s both; }
 .dawn-stars i {
   width: 2px;
   height: 2px;
@@ -95,32 +85,8 @@ body:has(.welcome) .fc-rain { display: none; }
 }
 .dawn-stars i.is-big { width: 3px; height: 3px; opacity: 0.95; box-shadow: 0 0 6px rgba(245, 241, 230, 0.7); }
 
-/* The moon: the current logo, pale glow. Its path layer is the whole scene,
-   so translateY(%) is a fraction of the scene's height. */
-.dawn-moon-path {
-  inset: 0;
-  opacity: 0;
-  transform: translateY(72%);
-  animation: dawn-moonset 4s cubic-bezier(0.4, 0.1, 0.6, 0.95) 0.5s both;
-}
-.dawn-moon {
-  position: absolute;
-  left: var(--moon-x);
-  top: var(--moon-top);
-  height: var(--moon-size);
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #0d6a4b;
-  color: #ffffff;
-  transform: translateX(-50%);
-  box-shadow: 0 0 0 4px rgba(245, 241, 230, 0.08), 0 0 28px 6px rgba(245, 241, 230, 0.22);
-}
-.dawn-moon svg { width: 62%; height: 62%; }
-
 /* The sun: the new B mark with its rings, a warm glow and a heartbeat. */
-.dawn-sun-path { inset: 0; animation: dawn-sunrise 3.4s cubic-bezier(0.22, 0.7, 0.3, 1) 2.6s both; }
+.dawn-sun-path { inset: 0; animation: dawn-sunrise 3s cubic-bezier(0.22, 0.7, 0.3, 1) 0.6s both; }
 .dawn-sun {
   position: absolute;
   left: var(--sun-x);
@@ -144,7 +110,7 @@ body:has(.welcome) .fc-rain { display: none; }
 .dawn-beat { inset: 0; display: grid; place-items: center; }
 .dawn-mark { width: 100%; height: 100%; filter: drop-shadow(0 0 10px rgba(60, 219, 157, 0.45)); }
 
-/* The land the moon sinks behind and the sun rises from. */
+/* The land the sun rises from. */
 .dawn-ground {
   left: -15%;
   right: -15%;
@@ -157,16 +123,11 @@ body:has(.welcome) .fc-rain { display: none; }
 }
 
 /* Heartbeat: lub-dub (1 → 1.12 → 1 → 1.07 → 1), then rest. */
-.dawn-beat { animation: dawn-heartbeat 1.1s ease-in-out 6.2s infinite; }
-.dawn-ripple { animation: dawn-ripple 1.1s ease-out 6.2s infinite; }
+.dawn-beat { animation: dawn-heartbeat 1.1s ease-in-out 3.8s infinite; }
+.dawn-ripple { animation: dawn-ripple 1.1s ease-out 3.8s infinite; }
 
 @keyframes dawn-warm    { from { opacity: 0; } }
 @keyframes dawn-stars   { from { opacity: 1; } }
-@keyframes dawn-moonset {
-  0%   { opacity: 1; transform: translateY(0); }
-  60%  { opacity: 0.85; }
-  100% { opacity: 0; transform: translateY(72%); }
-}
 @keyframes dawn-sunrise {
   0%   { opacity: 0; transform: translateY(58%); }
   25%  { opacity: 1; }
@@ -223,13 +184,10 @@ body:has(.welcome) .fc-rain { display: none; }
   line-height: 1.25;
   text-shadow: 0 1px 12px rgba(7, 18, 13, 0.8);
 }
-/* Phones: the moon and sun live on the right, the words on the left. */
+/* Phones: the sun lives on the right, the words on the left. */
 @media (max-width: 959.98px) {
   .dawn-wrap {
     --horizon: 76%;
-    --moon-x: 66%;
-    --moon-top: 12%;
-    --moon-size: 21%;
     --sun-x: 78%;
     --sun-y: 46%;
     --sun-size: 52%;
@@ -491,7 +449,7 @@ html .welcome .welcome-footer a:hover { color: var(--fc-ink); text-decoration: u
   }
   /* The scene stays in view while the right column (with Get the app) scrolls. */
   .welcome-brand { align-items: center; align-self: start; position: sticky; top: 3rem; gap: 1.4rem; }
-  .welcome-word { display: block; }
+  .welcome-logo { display: block; height: 3.4rem; width: auto; }
   .dawn-wrap { --sun-size: 40%; }
   .welcome-brand .dawn-wrap { width: min(100%, 440px); }
   .dawn { height: auto; aspect-ratio: 1 / 1.04; border-radius: 32px; }
@@ -506,7 +464,6 @@ html .welcome .welcome-footer a:hover { color: var(--fc-ink); text-decoration: u
   }
   .dawn-eyebrow { align-self: center; font-size: 0.7rem; }
   .dawn-line { font-size: 1.12rem; }
-  .welcome-word { font-size: 2.6rem; }
   .welcome-main { max-width: 520px; }
 }
 

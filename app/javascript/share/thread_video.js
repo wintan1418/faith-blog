@@ -10,7 +10,7 @@
 // front) when available, faster than real time; otherwise MediaRecorder on
 // the canvas in real time (MP4 where the browser can, else WebM).
 import { Muxer, ArrayBufferTarget } from "mp4-muxer"
-import { renderCard, THEMES, STACK, LOGO_W, LOGO_H, drawLogo, drawQR, hexToRgba, fitText, drawLines, roundRect, plainText } from "./card_renderer"
+import { renderCard, THEMES, STACK, LOGO_W, LOGO_H, drawLogo, drawLockup, lockupWidth, drawQR, hexToRgba, fitText, drawLines, roundRect, plainText } from "./card_renderer"
 
 export const W = 1080
 export const H = 1920
@@ -185,22 +185,15 @@ class Scene {
     return c
   }
 
-  brand(ctx, cx, y, logoH, size) {
-    ctx.font = `700 ${size}px ${STACK}`
-    const wordW = ctx.measureText("Brethreign").width
-    const lw = LOGO_W * (logoH / LOGO_H)
-    const x = cx - (lw + 16 + wordW) / 2
-    drawLogo(ctx, x, y, logoH, this.accentText)
-    ctx.fillStyle = this.T.ink
-    ctx.textAlign = "left"
-    ctx.textBaseline = "middle"
-    ctx.fillText("Brethreign", x + lw + 16, y + logoH / 2 + 2)
+  // The Brethreign logo (brand pack artwork), centred on cx.
+  brand(ctx, cx, y, logoH) {
+    drawLockup(ctx, cx - lockupWidth(logoH) / 2, y, logoH, this.accentText, this.T.ink)
   }
 
   makeHeader() {
     const c = this.makeBand(0, VIEW_TOP + 110, true)
     const ctx = c.getContext("2d")
-    this.brand(ctx, W / 2, 92, 62, 40)
+    this.brand(ctx, W / 2, 92, 62)
     const voices = this.cards.length
     ctx.font = `600 28px ${STACK}`
     ctx.fillStyle = this.T.muted
@@ -254,7 +247,7 @@ class Scene {
     const c = this.layer()
     const ctx = c.getContext("2d")
     const cx = W / 2
-    this.brand(ctx, cx, 400, 84, 54)
+    this.brand(ctx, cx, 400, 84)
 
     // The QR on a card of its own.
     const qs = 420

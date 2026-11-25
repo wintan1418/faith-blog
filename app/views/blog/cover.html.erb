@@ -16,7 +16,9 @@
     background: repeating-radial-gradient(circle, transparent 0 46px, color-mix(in srgb, <%= c %> 14%, transparent) 46px 47px); opacity: .7; }
   .copy { position: absolute; left: 72px; top: 64px; bottom: 64px; width: <%= shots.size == 2 ? 560 : 600 %>px; display: flex; flex-direction: column; }
   .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; letter-spacing: .01em; }
-  .mark { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #34d399, #0e8a5f); display: grid; place-items: center; color: #04261a; font-size: 26px; font-weight: 800; }
+  .brand .br-logo { display: block; height: 40px; width: auto; }
+  .brand .br-logo-mark { color: #3cdb9d; }
+  .brand .br-logo-word { color: #f5f1e6; }
   .brand span { color: #a9bdb4; font-weight: 700; }
   .cat { margin-top: auto; width: fit-content; padding: 7px 16px; border-radius: 999px; font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
     color: <%= c %>; background: color-mix(in srgb, <%= c %> 16%, transparent); border: 1px solid color-mix(in srgb, <%= c %> 45%, transparent); }
@@ -33,7 +35,7 @@
 <body>
   <div class="rings"></div>
   <div class="copy">
-    <div class="brand"><div class="mark">~</div>Brethreign <span>· Blog</span></div>
+    <div class="brand"><%= render "shared/logo", label: "Brethreign" %> <span>· Blog</span></div>
     <div class="cat"><%= a.category %></div>
     <h1><%= a.cover_title %></h1>
     <p class="foot"><%= a.minutes %> min read · brethreign.com/blog</p>
