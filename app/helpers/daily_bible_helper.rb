@@ -11,6 +11,15 @@ module DailyBibleHelper
     end
   end
 
+  # Where "Read today's chapter" goes from elsewhere (What's new): the first
+  # chapter of the member's next reading, or the feed card if that can't be worked out.
+  def daily_bible_today_path
+    chapter = user_signed_in? && BibleHabit.for(current_user).portion&.first
+    chapter ? scripture_page_path(chapter.slug) : feed_path
+  rescue StandardError
+    feed_path
+  end
+
   # The chapter a member read today, for "Share what stood out".
   def daily_bible_read_today_label(habit)
     slug = habit.user.bible_reading_days.where(read_on: habit.today).pick(:first_chapter)

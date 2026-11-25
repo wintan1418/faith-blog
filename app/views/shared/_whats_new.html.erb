@@ -46,6 +46,12 @@
               <% if slide.action == "seeds" %>
                 <div class="wn-action"><%= link_to "See the leaderboard", leaderboard_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
               <% end %>
+              <% if slide.action == "bible_today" %>
+                <div class="wn-action"><%= link_to "Read today's chapter", daily_bible_today_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
+              <% end %>
+              <% if slide.action == "waitlist" %>
+                <div class="wn-action"><%= link_to "Join the app waitlist", join_waitlist_path, class: "fc-btn fc-btn-primary", data: { action: "whats-new#markSeen" } %></div>
+              <% end %>
               <% if slide.action == "background_rain" %>
                 <div class="wn-action"><span class="wn-action-label">Background rain</span><%= render "settings/rain_switch" %></div>
               <% end %>

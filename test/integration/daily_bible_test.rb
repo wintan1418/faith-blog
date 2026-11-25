@@ -207,4 +207,14 @@ class DailyBibleTest < ActionDispatch::IntegrationTest
     post daily_bible_amen_path, headers: TURBO
     refute habit.prayed_today?
   end
+
+  test "What's new can point to today's chapter and the app waitlist" do
+    Announcement.create!(kind: :release, kicker: "What's new", title: "New in Brethreign · Daily Bible",
+                         body: "📖 Read your Bible, pray every day — A chapter a day. [[bible_today]]\n📲 The app — Join the waitlist. [[waitlist]]")
+    @member.update_columns(created_at: 1.day.ago)
+    sign_in @member
+    get edit_settings_notifications_path
+    assert_select "dialog.wn .wn-action a[href=?][data-action='whats-new#markSeen']", scripture_page_path("john-1"), text: "Read today's chapter"
+    assert_select "dialog.wn .wn-action a[href=?][data-action='whats-new#markSeen']", join_waitlist_path, text: "Join the app waitlist"
+  end
 end
