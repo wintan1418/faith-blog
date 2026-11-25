@@ -235,4 +235,10 @@ class OrgPagesTest < ActionDispatch::IntegrationTest
     assert_equal "Grace Chapel", author["name"]
     assert_equal "gracechapel", author["username"]
   end
+
+  test "@handle of a page links to the page" do
+    mention = Post.create!(user: @reader, content: "Thank you @gracechapel for Sunday", status: :published, moderation_status: :approved)
+    get post_path(mention)
+    assert_select "a.mention-link.is-page[href='/p/gracechapel']", text: "@gracechapel"
+  end
 end

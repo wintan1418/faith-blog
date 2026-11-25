@@ -93,7 +93,12 @@ module MentionsHelper
     usernames -= %w[everyone all here]
     return {} if usernames.blank?
 
-    User.where("LOWER(username) IN (?)", usernames).index_by { |user| user.username.downcase }
+    found = User.where("LOWER(username) IN (?)", usernames).index_by { |user| user.username.downcase }
+    # "@gracechapel" with no member by that name is a page (members win a tie).
+    missing = usernames - found.keys
+    return found if missing.empty?
+
+    found.merge(Page.listed.where("LOWER(handle) IN (?)", missing).index_by { |page| page.handle.downcase })
   end
 
   # scripture: true also links Bible references ("Psalm 101:3") to their
@@ -153,6 +158,9 @@ module MentionsHelper
     else
       user = users_by_username[handle.downcase]
       return escape_social_text(token) unless user
+      if user.is_a?(Page)
+        return link_to("@#{user.handle}", org_page_path(user), class: "mention-link is-page", data: { turbo_frame: "_top" })
+      end
 
       # _top: mentions also appear inside frames (reply threads).
       link_to("@#{user.username}", user_path(user.username), class: "mention-link", data: { turbo_frame: "_top" })
