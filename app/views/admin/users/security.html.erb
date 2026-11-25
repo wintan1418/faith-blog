@@ -1,0 +1,101 @@
+<% content_for(:page_title) { "Security · #{@user.username}" } %>
+
+<p class="mb-4 text-sm"><%= link_to "← All members", admin_users_path(q: @user.username), class: "text-emerald-700 font-semibold" %></p>
+
+<div class="mb-6 grid gap-4 md:grid-cols-3">
+  <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Email</p>
+    <p class="mt-1 font-semibold text-gray-900 break-all"><%= @user.email %></p>
+    <% if @user.email_verified? %>
+      <p class="mt-1 text-sm text-emerald-700">Verified <%= @user.email_verified_at.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b %Y") %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-amber-700">Not verified</p>
+      <%= button_to "Resend verification code", resend_verification_admin_user_path(@user), method: :post,
+                    class: "btn btn-secondary btn-sm mt-3", data: { turbo_confirm: "Email #{@user.username} a new verification code?" } %>
+    <% end %>
+  </div>
+
+  <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Two-step login</p>
+    <% if @user.two_factor_enabled? %>
+      <p class="mt-1 font-semibold text-emerald-700">On since <%= @user.otp_enabled_at.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b %Y") %></p>
+      <p class="text-sm text-gray-600"><%= pluralize(@user.recovery_codes_left, "recovery code") %> left</p>
+      <% if current_user.outranks?(@user) %>
+        <%= form_with url: reset_two_factor_admin_user_path(@user), method: :post, class: "mt-3 grid gap-2" do %>
+          <%= text_field_tag :reason, nil, class: "admin-search-input", placeholder: "Why? (e.g. lost phone, checked by video call)", "aria-label": "Reason" %>
+          <%= submit_tag "Reset two-step login", class: "btn btn-secondary btn-sm text-red-600",
+                         data: { turbo_confirm: "Turn off two-step login for #{@user.username}? Only do this once you're sure it's really them." } %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p class="mt-1 font-semibold text-gray-700">Off</p>
+    <% end %>
+  </div>
+
+  <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Sign-in</p>
+    <p class="mt-1 text-sm text-gray-700"><%= @user.provider.present? ? "#{@user.oauth_provider_name}#{' + password' if @user.password_known?}" : "Email and password" %></p>
+    <p class="text-sm text-gray-700"><%= pluralize(@user.sign_in_count, "sign-in") %> in total</p>
+    <% if @user.access_locked? %><p class="mt-1 text-sm font-semibold text-red-700">Locked (too many wrong tries)</p><% end %>
+  </div>
+</div>
+
+<h2 class="mb-2 text-lg font-bold text-gray-900">Recent sign-ins</h2>
+<div class="mb-6 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+  <table class="w-full text-sm">
+    <thead class="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
+      <tr><th class="px-4 py-2">When</th><th class="px-4 py-2">How</th><th class="px-4 py-2">Device</th><th class="px-4 py-2">Near</th></tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100">
+      <% @sign_ins.each do |event| %>
+        <tr>
+          <td class="px-4 py-2 whitespace-nowrap"><%= event.created_at.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b, %H:%M") %></td>
+          <td class="px-4 py-2"><%= event.metadata["method"].to_s.humanize.presence || "Password" %><%= " · new device" if event.metadata["new_device"] %></td>
+          <td class="px-4 py-2"><%= event.device_name %></td>
+          <td class="px-4 py-2"><%= event.location || "—" %></td>
+        </tr>
+      <% end %>
+      <% if @sign_ins.empty? %><tr><td colspan="4" class="px-4 py-3 text-gray-500">No sign-ins recorded yet.</td></tr><% end %>
+    </tbody>
+  </table>
+</div>
+
+<h2 class="mb-2 text-lg font-bold text-gray-900">Devices</h2>
+<div class="mb-6 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+  <table class="w-full text-sm">
+    <thead class="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
+      <tr><th class="px-4 py-2">Device</th><th class="px-4 py-2">Last active</th><th class="px-4 py-2">Near</th><th class="px-4 py-2">State</th></tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100">
+      <% @devices.each do |device| %>
+        <tr>
+          <td class="px-4 py-2"><%= device.name %></td>
+          <td class="px-4 py-2 whitespace-nowrap"><%= time_ago_in_words(device.last_active) %> ago</td>
+          <td class="px-4 py-2"><%= device.location || "—" %></td>
+          <td class="px-4 py-2"><%= device.signed_in? ? "Signed in" : "Signed out" %><%= " · trusted" if device.trusted? %></td>
+        </tr>
+      <% end %>
+      <% if @devices.empty? %><tr><td colspan="4" class="px-4 py-3 text-gray-500">No devices recorded yet.</td></tr><% end %>
+    </tbody>
+  </table>
+</div>
+
+<h2 class="mb-2 text-lg font-bold text-gray-900">Security log</h2>
+<div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+  <table class="w-full text-sm">
+    <thead class="border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
+      <tr><th class="px-4 py-2">When</th><th class="px-4 py-2">What</th><th class="px-4 py-2">Device</th><th class="px-4 py-2">By</th></tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100">
+      <% @events.each do |event| %>
+        <tr>
+          <td class="px-4 py-2 whitespace-nowrap"><%= event.created_at.in_time_zone(AdminDashboardStats::TZ).strftime("%-d %b, %H:%M") %></td>
+          <td class="px-4 py-2"><%= event.label %></td>
+          <td class="px-4 py-2"><%= [ event.device_name, event.location ].compact.join(" · ") %></td>
+          <td class="px-4 py-2"><%= event.actor&.username || "Member" %></td>
+        </tr>
+      <% end %>
+      <% if @events.empty? %><tr><td colspan="4" class="px-4 py-3 text-gray-500">Nothing yet.</td></tr><% end %>
+    </tbody>
+  </table>
+</div>

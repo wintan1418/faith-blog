@@ -5,6 +5,8 @@
 # and posts the resulting ID token here (from inside the web view, so the
 # session cookie lands where the app needs it).
 class Users::NativeGoogleSessionsController < ApplicationController
+  include SignInChecks
+
   rate_limit to: 20, within: 5.minutes, only: :create, store: AuthThrottleStore.store,
              with: -> { refuse(AuthRateLimiting::TOO_MANY_MESSAGE, :too_many_requests) }
 
@@ -26,6 +28,12 @@ class Users::NativeGoogleSessionsController < ApplicationController
       return refuse(I18n.t("devise.failure.#{user.inactive_message}", default: "This account can't sign in."), :forbidden)
     end
 
+    # Two-step login: the app follows "location" to the authenticator-code screen.
+    if (check_path = begin_sign_in_check(user, method: "google"))
+      return render json: { location: check_path }
+    end
+
+    request.env[AccountDevices::SIGN_IN_OPTIONS] = { method: user.previously_new_record? ? "signup" : "google" }
     sign_in(user, event: :authentication)
     render json: { location: after_sign_in_path_for(user) }
   rescue Google::Auth::IDTokens::VerificationError, ActionController::ParameterMissing

@@ -89,8 +89,9 @@ class SeriesFollowAndShareTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_user_registration_path
 
     newcomer = sign_up("series_newcomer")
-    assert_redirected_to series_path(@series)
-    follow_redirect!
+    # "Check your email" first, then on to the series.
+    assert_redirected_to email_verification_path(return_to: series_path(@series))
+    get series_path(@series)
     assert_response :success
     assert @series.followed_by?(newcomer)
     assert_select ".sr-follow[aria-pressed=true]"

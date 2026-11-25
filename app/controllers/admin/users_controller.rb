@@ -3,11 +3,13 @@
 class Admin::UsersController < ApplicationController
   before_action :authenticate_admin!
   layout "admin"
-  before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin ]
+  before_action :set_user, only: [ :show, :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin,
+                                   :security, :resend_verification, :reset_two_factor ]
   # Role changes and deleting accounts are for super admins only; and nobody
   # can act on themselves or on someone of equal or higher rank.
   before_action :require_super_admin!, only: [ :destroy, :make_moderator, :make_admin ]
-  before_action :require_outranks_target!, only: [ :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin ]
+  before_action :require_outranks_target!, only: [ :edit, :update, :destroy, :suspend, :activate, :make_moderator, :make_admin,
+                                                   :reset_two_factor ]
 
   FILTERS = {
     "all" => "All", "online" => "Online now", "active" => "Active in 7 days", "new" => "Joined this week",
@@ -67,6 +69,43 @@ class Admin::UsersController < ApplicationController
     @user.update(role: :moderator)
     ModerationLog.log_action(moderator: current_user, action: "promoted_to_moderator", target: @user)
     redirect_to admin_user_path(@user), notice: "User promoted to moderator."
+  end
+
+  # Account security for one member: verification, two-step login, devices
+  # and recent sign-ins (approximate place only).
+  def security
+    @devices = @user.user_devices.by_recent.limit(20)
+    @events = @user.security_events.recent.includes(:actor).limit(40)
+    @sign_ins = @user.security_events.sign_ins.recent.limit(10)
+  end
+
+  # Emails the member a fresh verification code (to their own address only).
+  def resend_verification
+    if @user.email_verified?
+      return redirect_to(security_admin_user_path(@user), notice: "#{@user.username}'s email is already verified.")
+    end
+
+    EmailVerification.send_code!(@user)
+    SecurityEvent.record!(:admin_resent_verification, user: @user, actor: current_user, request: request)
+    ModerationLog.log_action(moderator: current_user, action: "resent_email_verification", target: @user)
+    redirect_to security_admin_user_path(@user), notice: "A new verification code is on its way to #{@user.masked_email}."
+  rescue SecurityCode::RateLimited => e
+    redirect_to security_admin_user_path(@user), alert: e.message
+  end
+
+  # For a member who lost their phone and recovery codes (after checking it's
+  # really them). They're emailed about it.
+  def reset_two_factor
+    unless @user.two_factor_enabled?
+      return redirect_to(security_admin_user_path(@user), notice: "Two-step login is already off for #{@user.username}.")
+    end
+
+    @user.disable_two_factor!
+    SecurityEvent.record!(:admin_reset_two_factor, user: @user, actor: current_user, request: request)
+    ModerationLog.log_action(moderator: current_user, action: "reset_two_factor", target: @user,
+                             notes: params[:reason].to_s.strip.first(500).presence)
+    AccountSecurityMailer.with(user: @user, by_admin: true).two_factor_disabled.deliver_later
+    redirect_to security_admin_user_path(@user), notice: "Two-step login is off for #{@user.username}. They've been emailed."
   end
 
   def make_admin

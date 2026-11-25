@@ -1,23 +1,20 @@
 Welcome home, <%= @user.username %>
 
-Dear <%= @user.username %>,
-
-<%= WelcomeNote.opening(existing: @existing) %>
-
-<%= WelcomeNote.paragraphs.first %>
+<%= WelcomeNote.opening(existing: @existing) %> <%= WelcomeNote.intro %>
 
 "<%= WelcomeNote::PSALM[0] %>" (<%= WelcomeNote::PSALM[1] %>)
 
-<%= WelcomeNote.paragraphs.last %>
-
-A few first steps, whenever you're ready:
-<% WelcomeNote::STEPS.each do |lead, rest| %>
-- <%= lead %> <%= rest %>
+Three first steps, whenever you're ready:
+<% WelcomeNote::STEPS.each_with_index do |(key, title, line), i| %>
+<%= i + 1 %>. <%= title %>: <%= line %>
+   <%= @step_urls[key] %>
 <% end %>
+<% if @ios_url || @android_url %>
 
-<%= WelcomeNote.safety %>
-
-"<%= WelcomeNote::HEBREWS[0] %>" (<%= WelcomeNote::HEBREWS[1] %>)
+Brethreign on your phone:
+<% if @ios_url %>App Store: <%= @ios_url %>
+<% end %><% if @android_url %>Google Play: <%= @android_url %>
+<% end %><% end %>
 
 <%= WelcomeNote.closing %>
 

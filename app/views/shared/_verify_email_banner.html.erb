@@ -1,0 +1,9 @@
+<%# Gentle nudge for members whose email isn't verified yet. Nothing is
+    blocked; "Not now" hides it for the rest of the week (on every device). %>
+<div class="sec-verify-banner" role="status" data-controller="onboarding"
+     data-onboarding-key-value="fc:<%= verify_email_banner_key %>">
+  <%= render_icon("shieldcheck", classes: "sec-verify-banner__icon") %>
+  <span><strong>Verify your email to keep your account safe.</strong> It takes a minute: we'll send a 6-digit code to <%= current_user.masked_email %>.</span>
+  <%= link_to "Verify", email_verification_path(return_to: request.get? ? request.fullpath : nil), class: "fc-btn-primary fc-app-update__action" %>
+  <button type="button" class="sec-verify-banner__close" data-action="click->onboarding#dismiss" aria-label="Not now"><%= render_icon("x", classes: "h-4 w-4") %></button>
+</div>

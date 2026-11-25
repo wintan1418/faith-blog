@@ -1,0 +1,68 @@
+<% content_for(:title) { "Confirm it's you - Brethreign" } %>
+<% if @step == "otp" %>
+  <%= render layout: "devise/shared/auth_shell", locals: { title: "Two-step login", subtitle: "Enter the 6-digit code from your authenticator app." } do %>
+    <div data-controller="code-entry">
+      <%= form_with url: sign_in_check_path, method: :post, class: "auth-form",
+                    data: { turbo: hotwire_native_app?, code_entry_target: "form" } do %>
+        <%= render "account_security/error", message: @error %>
+        <p class="sec-lead">Signing in as <strong><%= @user.masked_email %></strong> on <strong><%= @info.name %></strong>.</p>
+
+        <div data-code-entry-target="codePanel">
+          <%= render "account_security/code_field", label: "Authenticator code", hint: "Open your authenticator app (Google Authenticator, Authy, 1Password…) and type the code shown for Brethreign." %>
+        </div>
+
+        <details class="sec-details" data-action="toggle->code-entry#recoveryToggled">
+          <summary>Lost your phone? Use a recovery code</summary>
+          <div class="auth-field">
+            <%= label_tag :recovery_code, "Recovery code", class: "auth-label" %>
+            <%= text_field_tag :recovery_code, nil, class: "auth-input", autocomplete: "off", autocapitalize: "none",
+                               spellcheck: false, placeholder: "abcd-1234", data: { code_entry_target: "recovery" } %>
+            <p class="auth-hint">One of the 10 codes you saved when you turned on two-step login. Each works once.</p>
+          </div>
+        </details>
+
+        <label class="auth-check">
+          <%= check_box_tag :trust_device, "1", true %>
+          <span>Trust this device for 30 days</span>
+        </label>
+
+        <%= submit_tag "Verify", class: "auth-submit", data: { turbo_submits_with: "Checking…" } %>
+      <% end %>
+    </div>
+
+    <div class="sec-footer-links">
+      <%= button_to "Cancel and use another account", sign_in_check_path, method: :delete, class: "sec-link-button", form: { class: "sec-inline-form" } %>
+    </div>
+  <% end %>
+<% else %>
+  <%= render layout: "devise/shared/auth_shell", locals: { title: "Is this you?", subtitle: "We sent a 6-digit code to #{@user.masked_email}." } do %>
+    <div data-controller="code-entry" data-code-entry-cooldown-value="<%= @cooldown.to_i %>">
+      <%= form_with url: sign_in_check_path, method: :post, class: "auth-form",
+                    data: { turbo: hotwire_native_app?, code_entry_target: "form" } do %>
+        <%= render "account_security/error", message: @error %>
+        <div class="sec-device-card">
+          <%= render_icon(@info.platform == "web" ? "laptop" : "smartphone", classes: "sec-device-icon") %>
+          <p>
+            Signing in on <strong><%= @info.name %></strong><% if @info.location %> near <strong><%= @info.location %></strong><% end %>.
+            We haven't seen this device before, so we're checking it's really you.
+          </p>
+        </div>
+
+        <%= render "account_security/code_field" %>
+
+        <label class="auth-check">
+          <%= check_box_tag :trust_device, "1", true %>
+          <span>Trust this device (don't ask again here)</span>
+        </label>
+
+        <%= submit_tag "Confirm it's me", class: "auth-submit", data: { turbo_submits_with: "Checking…" } %>
+      <% end %>
+
+      <%= render "account_security/resend", url: resend_sign_in_check_path, cooldown: @cooldown %>
+    </div>
+
+    <div class="sec-footer-links">
+      <%= button_to "Not you? Cancel", sign_in_check_path, method: :delete, class: "sec-link-button", form: { class: "sec-inline-form" } %>
+    </div>
+  <% end %>
+<% end %>

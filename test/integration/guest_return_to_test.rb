@@ -5,7 +5,10 @@ class GuestReturnToTest < ActionDispatch::IntegrationTest
   test "signing up from the dialog returns to the tapped page" do
     get new_user_registration_path(return_to: "/posts/abc?ref=feed")
     post user_registration_path, params: { user: { username: "returner", email: "returner@example.com", password: SecureRandom.base58(16) } }.merge(human_signup_fields)
-    assert_redirected_to "/posts/abc?ref=feed"
+    # "Check your email" first; verifying (or "Do this later") goes on to the tapped page.
+    assert_redirected_to email_verification_path(return_to: "/posts/abc?ref=feed")
+    follow_redirect!
+    assert_select "a[href=?]", "/posts/abc?ref=feed", text: "Do this later"
   end
 
   test "signing in from the dialog returns to the tapped page" do
@@ -19,7 +22,9 @@ class GuestReturnToTest < ActionDispatch::IntegrationTest
 
   test "without return_to a new member still lands on the feed" do
     post user_registration_path, params: { user: { username: "plainjoin", email: "plainjoin@example.com", password: SecureRandom.base58(16) } }.merge(human_signup_fields)
-    assert_redirected_to feed_path
+    assert_redirected_to email_verification_path
+    follow_redirect!
+    assert_select "a[href=?]", feed_path, text: "Do this later"
   end
 
   test "unsafe or pointless return_to values are ignored" do
@@ -33,7 +38,7 @@ class GuestReturnToTest < ActionDispatch::IntegrationTest
   test "an unsafe return_to does not change where sign-up lands" do
     get new_user_registration_path(return_to: "//evil.example/steal")
     post user_registration_path, params: { user: { username: "safejoin", email: "safejoin@example.com", password: SecureRandom.base58(16) } }.merge(human_signup_fields)
-    assert_redirected_to feed_path
+    assert_redirected_to email_verification_path
   end
 
   test "the apps still land on the feed" do

@@ -1,0 +1,15 @@
+<% if @purpose == "change_email" %>
+Hi <%= @user.username %>, you asked to change your Brethreign email to <%= @email %>. Enter this code to confirm it:
+<% else %>
+Hi <%= @user.username %>, enter this code on Brethreign to verify your email:
+<% end %>
+
+    <%= @code %>
+
+It works for 10 minutes.
+<% if @link %>
+
+Or open this link: <%= @link %>
+<% end %>
+
+Didn't ask for this? You can ignore this email. Never share this code with anyone, not even someone who says they're from Brethreign.

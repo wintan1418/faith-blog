@@ -1,0 +1,45 @@
+<% content_for(:title) { "Turn on two-step login - Brethreign" } %>
+
+<div class="mystic-shell py-8">
+  <div class="mystic-container max-w-3xl">
+    <div class="mb-6">
+      <span class="mystic-kicker">Settings · Security</span>
+      <h1 class="mystic-title mt-3 text-3xl sm:text-4xl">Turn on two-step login</h1>
+      <p class="mystic-copy mt-2">Three quick steps with an authenticator app on your phone.</p>
+    </div>
+
+    <section class="mystic-panel-strong sec-panel" data-controller="code-entry" data-code-entry-auto-submit-value="false">
+      <ol class="sec-steps">
+        <li>
+          <p class="sec-step-title">Get an authenticator app</p>
+          <p class="sec-panel-body">Google Authenticator, Microsoft Authenticator, Authy or 1Password all work. They're free.</p>
+        </li>
+        <li>
+          <p class="sec-step-title">Add Brethreign to the app</p>
+          <div class="sec-qr-row">
+            <div class="sec-qr" role="img" aria-label="QR code to add Brethreign to your authenticator app"><%= raw @qr_svg %></div>
+            <div class="sec-qr-help">
+              <p class="sec-panel-body">Scan this code with the app. On this phone? Tap the button, or copy the key into the app.</p>
+              <%= link_to "Open in authenticator app", @uri, class: "btn btn-secondary btn-sm", data: { turbo: false } %>
+              <p class="sec-key-label">Setup key</p>
+              <p class="sec-key"><code><%= @secret.scan(/.{1,4}/).join(" ") %></code></p>
+            </div>
+          </div>
+        </li>
+        <li>
+          <p class="sec-step-title">Enter the 6-digit code the app shows</p>
+          <%= form_with url: settings_two_factor_path, method: :post, class: "sec-form", data: { code_entry_target: "form" } do %>
+            <%= render "account_security/error", message: @error %>
+            <div class="sec-form-row">
+              <%= text_field_tag :code, nil, class: "input sec-code-input sec-code-inline", inputmode: "numeric", autocomplete: "one-time-code",
+                                 pattern: "[0-9]*", maxlength: 6, placeholder: "123456", required: true, "aria-label": "6-digit code",
+                                 data: { code_entry_target: "input", action: "input->code-entry#typed" } %>
+              <%= submit_tag "Turn on", class: "btn btn-primary", data: { turbo_submits_with: "Checking…" } %>
+            </div>
+          <% end %>
+        </li>
+      </ol>
+      <p class="sec-panel-foot"><%= link_to "Not now", settings_security_path %></p>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,7 @@
+Hi <%= @user.username %>,
+
+The email for your Brethreign account was changed from this address (<%= @old_email %>) to <%= @new_email_masked %>. We'll send account emails there from now on.
+
+If you did this, you're all set.
+
+<%= render "wasnt_you", lead: "Secure your account now. It switches your email back to this address, signs out every device, and emails you a link to choose a new password." %>

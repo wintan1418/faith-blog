@@ -181,6 +181,8 @@ module SweepWorld
     in [ "admin/office/conversations", "id" ] then @office_conversation.id
     in [ "admin/office/cards", "id" ] then @office_card.id
     in [ "email_unsubscribes", "token" ] then "not-a-real-token"
+    in [ "email_verifications", "token" ] then "not-a-real-verification-token"
+    in [ "secure_accounts", "token" ] then "not-a-real-token"
     else nil
     end
   end

@@ -1,0 +1,10 @@
+<%# "Send a new code", waiting out the cooldown (counts down in the browser). %>
+<div class="sec-resend">
+  <span>Didn't get it?</span>
+  <%= button_to url, method: :post, class: "sec-link-button", form: { class: "sec-inline-form" },
+                params: local_assigns.fetch(:params, {}),
+                disabled: cooldown.to_i.positive?,
+                data: { code_entry_target: "resend", turbo_submits_with: "Sending…" } do %>
+    Send a new code<span data-code-entry-target="countdown"><%= " in #{cooldown}s" if cooldown.to_i.positive? %></span>
+  <% end %>
+</div>

@@ -162,10 +162,13 @@ class Page < ApplicationRecord
 
   # ── Creating one ────────────────────────────────────────────────────
 
+  VERIFY_EMAIL_REASON = "Please verify your email address first. It keeps your page and your account safe."
+
   # Why this member can't make a page right now, or nil when they can.
   def self.creation_block_reason(user)
     return "Sign in to make a page." unless user
     return nil if user.admin_or_moderator?
+    return VERIFY_EMAIL_REASON unless user.email_verified?
     return "Pages can be made by members aged 18 and over." if user.profile&.minor?
     return "Your account can't make pages right now." if user.risk_profile&.at_least?(:restricted)
     unless user.provider.present? || (user.created_at && user.created_at <= MIN_ACCOUNT_AGE.ago)

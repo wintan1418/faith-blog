@@ -8,6 +8,18 @@ Rails.application.routes.draw do
     unlocks: "users/unlocks"
   }
 
+  # Account security: the sign-in check ("Is this you?" / authenticator code),
+  # verifying an email address, and "Wasn't you? Secure your account".
+  resource :sign_in_check, only: %i[show create destroy], path: "users/sign_in/check",
+                           controller: "users/sign_in_checks" do
+    post :resend
+  end
+  resource :email_verification, only: %i[show create update], path: "verify-email"
+  get "verify-email/:token", to: "email_verifications#confirm", as: :confirm_email_verification,
+                             constraints: { token: /[A-Za-z0-9_\-]{20,100}/ }
+  get "secure-account/:token", to: "secure_accounts#show", as: :secure_account, constraints: { token: /[^\/]+/ }
+  post "secure-account/:token", to: "secure_accounts#create", constraints: { token: /[^\/]+/ }
+
   # Root path
   root "home#index"
 
@@ -306,6 +318,18 @@ Rails.application.routes.draw do
     resource :privacy, only: [ :edit, :update ] do
       post :dismiss_contact_notice
     end
+    # Security: email verification, two-step login, devices & sessions.
+    resource :security, only: :show
+    resource :two_factor, only: %i[new create destroy] do
+      post :recovery_codes
+      get :recovery_codes, action: :show_recovery_codes # shown once, right after they're made
+    end
+    resources :devices, only: :destroy do
+      delete :others, on: :collection, action: :destroy_others
+    end
+    resource :email_change, only: %i[show update destroy] do
+      post :resend
+    end
     resource :updates, only: [ :update ] # which Updates bots a member sees
     resource :brethren_card, only: [ :edit, :update ]
     resource :professional, only: [ :edit, :update ]
@@ -399,6 +423,9 @@ Rails.application.routes.draw do
         post :activate
         post :make_moderator
         post :make_admin
+        get :security
+        post :resend_verification
+        post :reset_two_factor
       end
     end
     resources :rooms

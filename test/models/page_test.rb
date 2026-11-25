@@ -7,7 +7,7 @@ require "test_helper"
 class PageTest < ActiveSupport::TestCase
   setup do
     ENV["AI_MODERATION_STUB"] = "1"
-    @owner = create_member("pg_owner", created_at: 30.days.ago)
+    @owner = create_member("pg_owner", created_at: 30.days.ago, email_verified_at: Time.current)
     @page = make_page(@owner, "Grace Chapel", "gracechapel")
   end
 
@@ -54,6 +54,8 @@ class PageTest < ActiveSupport::TestCase
 
   test "who may make a page: age or a proven email, adults, at most three owned" do
     fresh = create_member("pg_fresh")
+    assert_equal Page::VERIFY_EMAIL_REASON, Page.creation_block_reason(fresh), "an unverified email verifies first"
+    fresh.mark_email_verified!
     assert_match(/after 7 days/, Page.creation_block_reason(fresh))
     fresh.update_columns(provider: "google_oauth2", uid: "123")
     assert_nil Page.creation_block_reason(fresh.reload), "Google / Apple sign-ups can make one straight away"
@@ -63,7 +65,7 @@ class PageTest < ActiveSupport::TestCase
     make_page(@owner, "Third Place", "thirdplace")
     assert_match(/already own 3/, Page.creation_block_reason(@owner))
 
-    teen = create_member("pg_teen", created_at: 30.days.ago)
+    teen = create_member("pg_teen", created_at: 30.days.ago, email_verified_at: Time.current)
     teen.profile.update_columns(birth_year: Date.current.year - 15)
     assert_match(/18/, Page.creation_block_reason(teen.reload))
   end

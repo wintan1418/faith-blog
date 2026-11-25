@@ -388,6 +388,7 @@ class ContactPrivacyTest < ActionDispatch::IntegrationTest
   test "the share alert goes to the app and push, not email, and carries no contact details" do
     set_visibility("everyone")
     sign_in @owner
+    get edit_settings_privacy_path # first request: any "new sign-in" alert for this device goes out here
     assert_no_enqueued_emails do
       post contact_shares_path(user_id: @connection.id)
     end

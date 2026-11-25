@@ -11,7 +11,7 @@ class JobQueuesTest < ActiveSupport::TestCase
     "default"    => %w[BadgeCheckJob WelcomeNoteJob ErrorAlertJob AppleTokenRevokeJob ScheduledPostPublisherJob SiteHealthCheckJob OfficeReplyJob
                        IndexNowFlushJob SearchConsoleRefreshJob SeriesPartAlertJob],
     "bulk"       => %w[WeeklyDigestFanoutJob BroadcastFanoutJob BotsRefreshJob BibleQuizWarmPoolJob BibleQuizTopUpJob
-                       AnalyticsCleanupJob BreathFanoutJob BirthdayNotificationsJob AppUpdateReminderJob
+                       AnalyticsCleanupJob AccountSecurityCleanupJob BreathFanoutJob BirthdayNotificationsJob AppUpdateReminderJob
                        SearchIndexingNightlyJob ScriptureInsightJob BibleReminderJob ChapterPrayerJob FeedbackCampaignDeliveryJob]
   }.freeze
 

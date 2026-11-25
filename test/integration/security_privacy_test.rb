@@ -154,10 +154,20 @@ class SecurityPrivacyTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert @author.reload.valid_password?(@pass)
 
-    assert_emails 1 do # the OLD address hears about the change
+    # The new address gets a code first; the account keeps its email until it's typed in.
+    assert_emails 1 do
       patch settings_account_path, params: { user: { email: "moved@example.com", current_password: @pass } }
     end
+    assert_redirected_to settings_email_change_path
+    assert_equal "sec-author@example.com", @author.reload.email
+    code_mail = ActionMailer::Base.deliveries.last
+    assert_equal [ "moved@example.com" ], code_mail.to
+
+    assert_emails 1 do # the OLD address hears about the change
+      patch settings_email_change_path, params: { code: code_mail.text_part.body.to_s[/\b\d{6}\b/] }
+    end
     assert_equal "moved@example.com", @author.reload.email
+    assert @author.email_verified?
     assert_equal [ "sec-author@example.com" ], ActionMailer::Base.deliveries.last.to
 
     patch settings_account_path, params: { user: { username: "sec_author_2" } }
@@ -176,7 +186,9 @@ class SecurityPrivacyTest < ActionDispatch::IntegrationTest
 
     google.update_columns(current_sign_in_at: 1.minute.ago)
     patch settings_account_path, params: { user: { email: "gonly2@example.com" } }
-    assert_equal "gonly2@example.com", google.reload.email
+    assert_redirected_to settings_email_change_path
+    code = SecurityCode.where(user: google, purpose: "change_email").last
+    assert_equal "gonly2@example.com", code.email
   end
 
   # ── 4. Brute force ──

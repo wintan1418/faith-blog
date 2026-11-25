@@ -21,8 +21,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def create
+    request.env[AccountDevices::SIGN_IN_OPTIONS] = { method: "signup" }
     super do |resource|
       if resource.persisted?
+        # "Check your email": a code (and a one-tap link) to verify the address.
+        EmailVerification.send_code(resource, request: request)
         # Default new accounts to "stay signed in" — same UX as LinkedIn / X.
         # The session cookie is 6mo (config/initializers/session_store.rb)
         # and the remember-me cookie extends every visit.
@@ -32,6 +35,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
         InviteAttribution.apply!(resource, cookies)
       end
     end
+  end
+
+  # Email and password changes go through Settings → Account (current
+  # password, a code to the new address, security emails); Devise's own
+  # /users/edit form would skip all of that.
+  def edit
+    redirect_to edit_settings_account_path
+  end
+
+  def update
+    redirect_to edit_settings_account_path, status: :see_other
   end
 
   # Devise's own DELETE /users removed the account at once: no typed-username
@@ -51,11 +65,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
     devise_parameter_sanitizer.permit(:account_update, keys: [ :username ])
   end
 
+  # Web: "Check your email" (the code screen), then wherever they were going.
+  # The apps reload every tab on sign-in, so they land on the feed, where the
+  # verify banner leads to the same screen.
   def after_sign_up_path_for(resource)
     stored = stored_location_for(resource)
     return feed_path if hotwire_native_app?
 
-    stored || feed_path
+    email_verification_path(return_to: stored.presence)
   end
 
   def after_inactive_sign_up_path_for(resource)

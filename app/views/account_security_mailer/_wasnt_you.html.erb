@@ -1,0 +1,12 @@
+<%# "Wasn't you?" — the same help at the foot of every security email. %>
+<div style="margin: 24px 0 0; padding: 16px 18px; background: #fbf3e4; border: 1px solid #ecd9b4; border-radius: 12px;">
+  <p style="margin: 0 0 8px; font-weight: 700; color: #17251d;">Wasn't you?</p>
+  <p style="margin: 0 0 14px; color: #3b4741; font-size: 14px; line-height: 1.6;">
+    <%= local_assigns[:lead] || "Secure your account now. It signs out every device, switches off your password and emails you a link to choose a new one." %>
+  </p>
+  <a href="<%= secure_url %>" style="display: inline-block; background: #0e5c43; color: #ffffff; font-weight: 700; padding: 11px 18px; border-radius: 999px; text-decoration: none; font-size: 14px;">Secure my account</a>
+  <p style="margin: 14px 0 0; color: #5e6862; font-size: 13px; line-height: 1.6;">
+    <% help = BrandSocials.email || "support@brethreign.com" %>
+    Need help? Write to <a href="mailto:<%= help %>" style="color: #0e5c43;"><%= help %></a> and a real person will help you. Brethreign will never ask for your password or a code.
+  </p>
+</div>

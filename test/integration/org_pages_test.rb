@@ -64,6 +64,12 @@ class OrgPagesTest < ActionDispatch::IntegrationTest
 
   test "making a page: the creator becomes its owner; new accounts wait" do
     sign_in @reader
+    # An unverified email is asked to verify first.
+    post org_pages_path, params: { page: { name: "Too Soon", handle: "toosoonpage", category: "church" } }
+    assert_redirected_to new_org_page_path
+    assert_equal Page::VERIFY_EMAIL_REASON, flash[:alert]
+    @reader.mark_email_verified!
+
     assert_difference -> { Page.count } do
       post org_pages_path, params: { page: { name: "Hope Fellowship", handle: "hopefellowship", category: "fellowship",
                                              tagline: "Students growing together", city_id: cities(:akure).id,
@@ -77,7 +83,7 @@ class OrgPagesTest < ActionDispatch::IntegrationTest
     post org_pages_path, params: { page: { name: "Taken", handle: "HopeFellowship", category: "church" } }
     assert_response :unprocessable_entity
 
-    newbie = create_member("op_newbie")
+    newbie = create_member("op_newbie", email_verified_at: Time.current)
     sign_in newbie
     get new_org_page_path
     assert_select ".pg-blocked", text: /after 7 days/

@@ -65,6 +65,7 @@ class JobSweepTest < ActiveSupport::TestCase
 
   test "housekeeping, quiz pool, office, error alerts, health check" do
     run_job(AnalyticsCleanupJob)
+    run_job(AccountSecurityCleanupJob)
     run_job(BibleQuizWarmPoolJob)
     run_job(BibleQuizTopUpJob)
     @office_conversation.messages.create!(role: 0, content: "Draft a breath about rest.")

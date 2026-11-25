@@ -1,0 +1,11 @@
+Hi <%= @user.username %>,
+
+Someone just signed in to your account with your password on <%= @device_name %><%= " near #{@location}" if @location %>, a device we haven't seen you use before.
+
+If it's you, enter this code to finish signing in:
+
+    <%= @code %>
+
+It works for 10 minutes.
+
+<%= render "wasnt_you", lead: "Someone knows your password. Don't share this code. Secure your account: it signs out every device and lets you choose a new password." %>

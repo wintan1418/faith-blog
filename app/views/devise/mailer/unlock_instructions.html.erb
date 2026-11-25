@@ -1,0 +1,14 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; font-size: 15.5px; line-height: 1.65;">
+  <p style="margin: 0 0 6px; color: #0e5c43; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 800;">Account locked</p>
+  <h1 style="margin: 0 0 16px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; line-height: 1.25; color: #17251d; font-weight: 700;">We locked your account for a while</h1>
+  <p style="margin: 0 0 14px;">Hi <%= @resource.username %>, there were too many wrong passwords or codes for your Brethreign account, so we locked it to keep it safe. It unlocks by itself in an hour, or straight away with this button:</p>
+  <p style="margin: 0 0 18px;">
+    <a href="<%= unlock_url(@resource, unlock_token: @token) %>" style="display: inline-block; background: #0e5c43; color: #ffffff; font-weight: 700; padding: 12px 22px; border-radius: 999px; text-decoration: none;">Unlock my account</a>
+  </p>
+  <div style="margin: 24px 0 0; padding: 16px 18px; background: #fbf3e4; border: 1px solid #ecd9b4; border-radius: 12px;">
+    <p style="margin: 0 0 8px; font-weight: 700;">Wasn't you?</p>
+    <p style="margin: 0 0 14px; color: #3b4741; font-size: 14px;">Someone may be guessing your password. Secure your account: it signs out every device and emails you a link to choose a new password.</p>
+    <a href="<%= secure_account_url(token: @resource.secure_account_token) %>" style="display: inline-block; background: #0e5c43; color: #ffffff; font-weight: 700; padding: 11px 18px; border-radius: 999px; text-decoration: none; font-size: 14px;">Secure my account</a>
+    <p style="margin: 14px 0 0; color: #5e6862; font-size: 13px;">Brethreign will never ask for your password or a code.</p>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<% content_for(:title) { "Verify your email - Brethreign" } %>
+<%= render layout: "devise/shared/auth_shell",
+           locals: { title: "Check your email",
+                     subtitle: @code_sent ? "We sent a 6-digit code to #{current_user.email}." : "We'll send a 6-digit code to #{current_user.email}." } do %>
+  <div data-controller="code-entry" data-code-entry-cooldown-value="<%= @cooldown.to_i %>">
+    <% if @code_sent %>
+      <%= form_with url: email_verification_path, method: :patch, class: "auth-form", data: { code_entry_target: "form" } do %>
+        <%= hidden_field_tag :return_to, @return_to if @return_to %>
+        <%= render "account_security/error", message: @error %>
+        <p class="sec-lead">Enter the code, or tap the button in the email. Verifying keeps your account safe and lets us help you get back in if you ever need it.</p>
+        <%= render "account_security/code_field" %>
+        <%= submit_tag "Verify my email", class: "auth-submit", data: { turbo_submits_with: "Checking…" } %>
+      <% end %>
+      <%= render "account_security/resend", url: email_verification_path, cooldown: @cooldown, params: { return_to: @return_to }.compact %>
+    <% else %>
+      <div class="auth-form">
+        <p class="sec-lead">Verifying your email keeps your account safe and lets us help you get back in if you ever need it. It takes a minute.</p>
+        <%= button_to "Send me a code", email_verification_path, method: :post, params: { return_to: @return_to }.compact,
+                      class: "auth-submit", form: { class: "sec-inline-form" }, data: { turbo_submits_with: "Sending…" } %>
+      </div>
+    <% end %>
+  </div>
+
+  <p class="auth-switch">
+    Wrong address? <%= link_to "Change your email", edit_settings_account_path %>
+    · <%= link_to "Do this later", @return_to || feed_path %>
+  </p>
+<% end %>

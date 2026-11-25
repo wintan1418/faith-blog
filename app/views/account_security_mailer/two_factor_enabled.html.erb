@@ -1,0 +1,6 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; font-size: 15.5px; line-height: 1.65;">
+  <%= render "heading", kicker: "Two-step login", title: "Two-step login is on" %>
+  <p style="margin: 0 0 14px;">Hi <%= @user.username %>, from now on signing in to Brethreign on a new device asks for the 6-digit code from your authenticator app as well as your password. Thank you for keeping your account safe.</p>
+  <p style="margin: 0;">Keep your recovery codes somewhere safe. If you lose your phone, each one lets you sign in once.</p>
+  <%= render "wasnt_you" %>
+</div>

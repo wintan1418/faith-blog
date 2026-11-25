@@ -6,16 +6,15 @@
 class WelcomeNote
   SIGN_OFF = [ "Yours faithfully,", "Oluwadare Juwon (Wintan)", "Chief Steward, Brethreign" ].freeze
 
+  # The three first steps in the welcome email: [key, title, line]. The
+  # mailer links each key (profile settings, today's chapter, Rooms).
   STEPS = [
-    [ "Take your first breath.", "Share a thought, a verse, or simply what's on your heart today." ],
-    [ "Ask for prayer, or pray for someone.", "Tap \"Praying\" on a request and the person will know they're not alone." ],
-    [ "Find your room.", "Join rooms like Prayer Warriors, Bible Study, Young Adults or Brethren in Business." ],
-    [ "Complete your Brethren Card,", "so the brethren you meet can truly know you." ],
-    [ "Open the Bible and the games,", "for a reading plan, a quiz, or the verse of the day." ]
+    [ :profile, "Complete your profile", "Add a photo and a few words, so the brethren you meet can truly know you." ],
+    [ :bible, "Read today's chapter", "Open the Word alongside the family. A few quiet minutes is enough." ],
+    [ :rooms, "Join a Room", "Prayer Warriors, Bible Study, Young Adults and more: find brethren who share your heart." ]
   ].freeze
 
   PSALM = [ "Behold, how good and how pleasant it is for brethren to dwell together in unity!", "Psalm 133:1" ].freeze
-  HEBREWS = [ "And let us consider one another to provoke unto love and to good works.", "Hebrews 10:24" ].freeze
 
   def self.subject(user) = "Welcome home, #{user.username}"
   def self.preheader = "You're among family now. A note from the Brethreign family."
@@ -30,16 +29,9 @@ class WelcomeNote
     end
   end
 
-  def self.paragraphs
-    [
-      "Brethreign is a place for brothers and sisters in Christ to breathe together: to share what God is doing in us, " \
-      "carry one another's burdens in prayer, open the Word side by side, and walk the road of faith in every part of life, " \
-      "from our homes and churches to our work and dreams.",
-      "We're still in our early and humble days, but we're full of faith for what God will grow here. And you're part of it."
-    ]
-  end
+  # One sentence for the welcome email (the inbox note says the same).
+  def self.intro = "Brethreign is a home for brothers and sisters in Christ to breathe together: to share what God is doing, carry one another in prayer and open the Word side by side."
 
-  def self.safety = "This is a safe place. We guard it carefully, so that every member can speak freely and be treated with love."
   def self.closing = "We're so glad you're here. Please pray for this family, and keep breathing."
 
   # The shorter inbox note from the founder.
@@ -47,11 +39,11 @@ class WelcomeNote
     <<~TEXT.strip
       Dear #{user.username},
 
-      #{opening(existing: existing)} Brethreign is a home for brothers and sisters in Christ to breathe together: to share what God is doing, carry one another in prayer and open the Word side by side.
+      #{opening(existing: existing)} #{intro}
 
       "#{PSALM[0]}" (#{PSALM[1]})
 
-      When you're ready, take your first breath, pray for someone, join a room and complete your Brethren Card. And if there's anything on your heart, reply here. I read every message.
+      When you're ready, complete your profile, read today's chapter and join a Room. And if there's anything on your heart, reply here. I read every message.
 
       Please pray for this family, and keep breathing.
 

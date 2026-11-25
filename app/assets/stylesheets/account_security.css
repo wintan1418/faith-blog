@@ -1,0 +1,211 @@
+/* ==========================================
+   Account security: code screens ("Check your email", "Is this you?",
+   two-step login), Settings → Security, the verify-email banner.
+   Colours come from the theme variables, so light and dark both work.
+   ========================================== */
+
+/* ── Code screens (inside the auth shell) ── */
+.sec-lead { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--auth-muted, var(--fc-muted, #64748b)); }
+.sec-lead strong { color: var(--auth-ink, var(--fc-ink, #0f172a)); }
+
+.sec-code-input {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 1.7rem !important;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  text-align: center;
+  padding-left: 0.45em !important;
+  height: 60px;
+}
+.sec-code-input::placeholder { letter-spacing: 0.3em; opacity: 0.35; }
+.sec-code-inline { max-width: 12rem; height: 48px; font-size: 1.25rem !important; letter-spacing: 0.3em; }
+
+.sec-device-card {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--fc-line, rgba(15, 23, 42, 0.1));
+  background: color-mix(in oklch, var(--fc-accent, #059669) 7%, var(--fc-surface, #fff));
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--fc-ink, #0f172a);
+}
+.sec-device-card p { margin: 0; }
+.sec-device-card .sec-device-icon { margin-top: 2px; }
+
+.sec-resend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 1.1rem;
+  font-size: 0.92rem;
+  color: var(--fc-muted, #64748b);
+}
+.sec-inline-form { display: inline; margin: 0; }
+.sec-link-button {
+  border: 0;
+  padding: 0.25rem 0.1rem;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--fc-accent, #059669);
+  cursor: pointer;
+  text-decoration: none;
+}
+.sec-link-button:disabled { color: var(--fc-muted, #64748b); cursor: default; font-weight: 600; }
+.sec-link-button:not(:disabled):hover { text-decoration: underline; }
+
+.sec-footer-links { margin-top: 1.25rem; text-align: center; font-size: 0.9rem; }
+.sec-footer-links .sec-link-button { color: var(--fc-muted, #64748b); font-weight: 600; }
+
+.sec-details { font-size: 0.92rem; color: var(--fc-muted, #64748b); }
+.sec-details > summary { cursor: pointer; font-weight: 600; color: var(--fc-accent, #059669); padding: 0.25rem 0; }
+.sec-details[open] > summary { margin-bottom: 0.6rem; }
+
+.sec-list { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; font-size: 0.93rem; color: var(--fc-ink, #0f172a); }
+
+/* ── Settings → Security ── */
+.sec-panel { padding: 1.25rem; margin-bottom: 1.25rem; }
+@media (min-width: 640px) { .sec-panel { padding: 1.5rem; } }
+.sec-panel-head { display: flex; align-items: flex-start; gap: 0.85rem; }
+.sec-panel-head > div { flex: 1; min-width: 0; }
+.sec-panel-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  border-radius: 12px;
+  color: var(--fc-accent, #059669);
+  background: color-mix(in oklch, var(--fc-accent, #059669) 12%, transparent);
+}
+.sec-panel-title { margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--fc-ink, #0f172a); }
+.sec-panel-copy { margin: 0.15rem 0 0; font-size: 0.9rem; color: var(--fc-muted, #64748b); overflow-wrap: break-word; word-break: break-word; }
+.sec-panel-body { margin: 0.9rem 0 0; font-size: 0.93rem; line-height: 1.6; color: var(--fc-ink, #0f172a); }
+.sec-panel-foot { margin: 1rem 0 0; font-size: 0.85rem; color: var(--fc-muted, #64748b); }
+.sec-panel-foot a { color: var(--fc-accent, #059669); font-weight: 700; }
+.sec-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+
+.sec-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+  color: var(--fc-muted, #64748b);
+  background: var(--fc-surface-2, rgba(15, 23, 42, 0.06));
+  vertical-align: middle;
+}
+.sec-badge.is-on { color: #0e5c43; background: rgba(16, 185, 129, 0.16); }
+.sec-badge.is-warn { color: #92400e; background: rgba(245, 158, 11, 0.18); }
+.theme-dark .sec-badge.is-on { color: #6ee7b7; background: rgba(16, 185, 129, 0.18); }
+.theme-dark .sec-badge.is-warn { color: #fcd34d; background: rgba(245, 158, 11, 0.16); }
+
+.sec-forms { display: grid; gap: 1rem; margin-top: 1rem; }
+.sec-form { display: grid; gap: 0.4rem; }
+.sec-form-title { margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--fc-ink, #0f172a); }
+.sec-form-copy { margin: 0; font-size: 0.85rem; color: var(--fc-muted, #64748b); }
+.sec-form-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.sec-form-row .input { flex: 1 1 10rem; min-width: 0; margin: 0; }
+.sec-small-code { max-width: 14rem; }
+
+.sec-devices { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+.sec-device {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid var(--fc-line, rgba(15, 23, 42, 0.1));
+  background: var(--fc-surface, #fff);
+}
+.sec-device.is-current { border-color: color-mix(in oklch, var(--fc-accent, #059669) 45%, transparent); }
+.sec-device-icon { flex-shrink: 0; width: 22px; height: 22px; color: var(--fc-accent, #059669); }
+.sec-device-main { flex: 1; min-width: 0; }
+.sec-device-name { margin: 0; font-weight: 700; font-size: 0.95rem; color: var(--fc-ink, #0f172a); }
+.sec-device-meta { margin: 0.1rem 0 0; font-size: 0.83rem; color: var(--fc-muted, #64748b); }
+.sec-devices.is-past .sec-device { opacity: 0.75; }
+
+/* Two-step setup */
+.sec-steps { list-style: decimal; margin: 0; padding-left: 1.3rem; display: grid; gap: 1.4rem; }
+.sec-steps > li::marker { font-weight: 800; color: var(--fc-accent, #059669); }
+.sec-step-title { margin: 0; font-weight: 800; color: var(--fc-ink, #0f172a); }
+.sec-step-title + .sec-panel-body { margin-top: 0.3rem; }
+.sec-qr-row { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: flex-start; margin-top: 0.75rem; }
+.sec-qr { width: 196px; max-width: 100%; padding: 6px; border-radius: 16px; background: #ffffff; border: 1px solid rgba(15, 23, 42, 0.1); }
+.sec-qr svg { display: block; width: 100%; height: auto; }
+.sec-qr-help { flex: 1 1 14rem; min-width: 0; }
+.sec-qr-help .sec-panel-body { margin-top: 0; margin-bottom: 0.75rem; }
+.sec-key-label { margin: 1rem 0 0.25rem; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fc-muted, #64748b); }
+.sec-key { margin: 0; }
+.sec-key code {
+  display: inline-block;
+  padding: 0.45rem 0.7rem;
+  border-radius: 10px;
+  background: var(--fc-surface-2, rgba(15, 23, 42, 0.06));
+  color: var(--fc-ink, #0f172a);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.sec-recovery {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  border-radius: 14px;
+  background: var(--fc-surface-2, rgba(15, 23, 42, 0.05));
+}
+.sec-recovery code { font-size: 1.02rem; font-weight: 700; letter-spacing: 0.06em; color: var(--fc-ink, #0f172a); }
+
+/* ── "Verify your email" banner ── */
+.sec-verify-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.875rem;
+  background: color-mix(in oklch, var(--fc-accent, #059669) 12%, var(--fc-surface, #fff));
+  border: 1px solid color-mix(in oklch, var(--fc-accent, #059669) 32%, transparent);
+  color: var(--fc-ink, inherit);
+  font-size: 0.9rem;
+}
+.sec-verify-banner > span { flex: 1; min-width: 0; }
+.sec-verify-banner__icon { flex-shrink: 0; width: 22px; height: 22px; color: var(--fc-accent, #059669); }
+.sec-verify-banner__action { flex-shrink: 0; padding: 0.4rem 0.95rem; border-radius: 999px; text-decoration: none; }
+.sec-verify-banner__close {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fc-muted, #64748b);
+  cursor: pointer;
+}
+@media (min-width: 1024px) { .sec-verify-banner { max-width: 72rem; margin: 0.75rem auto 0; } }
+@media (max-width: 520px) {
+  .sec-verify-banner { flex-wrap: wrap; font-size: 0.86rem; }
+  .sec-verify-banner > span { flex: 1 1 calc(100% - 3rem); }
+  .sec-verify-banner__icon { display: none; }
+}
+
+/* Phones on the website: the fixed bottom nav covered the last link of the
+   auth pages ("Not you? Cancel", "Create an account"). Leave room for it. */
+@media (max-width: 760px) {
+  body:not(.hotwire-native) .auth-main { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px)); }
+}

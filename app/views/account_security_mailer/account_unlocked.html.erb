@@ -1,0 +1,6 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; font-size: 15.5px; line-height: 1.65;">
+  <%= render "heading", kicker: "Account unlocked", title: "Your account is unlocked" %>
+  <p style="margin: 0 0 14px;">Hi <%= @user.username %>, your Brethreign account was locked for a while after too many wrong passwords or codes. It's unlocked now, and you can sign in again.</p>
+  <p style="margin: 0;">Forgot your password? <a href="<%= reset_url %>" style="color: #0e5c43; font-weight: 700;">Choose a new one</a>.</p>
+  <%= render "wasnt_you", lead: "If you weren't trying to sign in, someone may be guessing your password. Secure your account: it signs out every device and lets you choose a new password." %>
+</div>

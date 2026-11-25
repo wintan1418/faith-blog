@@ -23,7 +23,11 @@
       <%= render_icon("clock", classes: "pg-empty-icon") %>
       <p class="pg-empty-title">Not just yet</p>
       <p><%= @block_reason %></p>
-      <%= link_to "Browse pages", pages_directory_path, class: "pg-btn" %>
+      <% if @block_reason == Page::VERIFY_EMAIL_REASON %>
+        <%= link_to "Verify my email", email_verification_path(return_to: new_org_page_path), class: "pg-btn" %>
+      <% else %>
+        <%= link_to "Browse pages", pages_directory_path, class: "pg-btn" %>
+      <% end %>
     </div>
   <% else %>
     <%= form_with model: @page, url: org_pages_path, method: :post, multipart: true,
