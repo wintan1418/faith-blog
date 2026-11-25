@@ -6,6 +6,7 @@ module Settings
 
     def edit
       @room_memberships = current_user.room_memberships.includes(:room).order("rooms.name")
+      @bible_habit = BibleHabit.for(current_user)
     end
 
     def update

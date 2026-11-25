@@ -29,6 +29,14 @@
     <strong class="eg-walk-value"><%= streak.positive? ? pluralize(streak, "day") : "Start" %></strong>
   </div>
 
+  <% if (bible = current_user.bible_habit) %>
+    <div class="eg-walk-row">
+      <span class="eg-tile is-green"><%= render_icon("bookopen", classes: "h-5 w-5") %></span>
+      <span class="eg-walk-label">Bible streak</span>
+      <strong class="eg-walk-value"><%= bible.streak.positive? ? pluralize(bible.streak, "day") : (bible.read_today? ? "Today" : "Start") %></strong>
+    </div>
+  <% end %>
+
   <% if plan %>
     <%= link_to reading_plan_path(plan.plan_slug), class: "eg-walk-row" do %>
       <span class="eg-tile is-green"><%= render_icon("calendar", classes: "h-5 w-5") %></span>
@@ -46,7 +54,7 @@
         <p class="eg-walk-done"><%= render_icon("answered", classes: "h-4 w-4") %> Done for today</p>
       <% end %>
     </div>
-  <% else %>
+  <% elsif current_user.bible_habit.nil? %>
     <%= link_to reading_plans_path, class: "eg-walk-row" do %>
       <span class="eg-tile is-green"><%= render_icon("calendar", classes: "h-5 w-5") %></span>
       <span class="eg-walk-label">Reading plan</span>

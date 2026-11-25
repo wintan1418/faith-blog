@@ -47,6 +47,18 @@
             </span>
           </label>
 
+          <% bible = current_user.bible_habit %>
+          <label class="mystic-panel flex items-start gap-3 p-5">
+            <%= hidden_field_tag "bible[show_streak]", "0", id: nil %>
+            <%= check_box_tag "bible[show_streak]", "1", bible.nil? || bible.show_streak?,
+                  id: "bible_show_streak",
+                  class: "mt-1 h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+            <span>
+              <span class="block font-bold text-faith-dark">Show my Bible reading streak on my profile</span>
+              <span class="mt-1 block text-sm text-faith-muted">"12 days in the Word" on your profile. On the feed, others only ever see how many brethren read today, never who.</span>
+            </span>
+          </label>
+
           <%= f.submit "Save Changes", class: "btn btn-primary" %>
         <% end %>
       </div>

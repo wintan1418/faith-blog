@@ -1,0 +1,28 @@
+<%# "Pray it": a short prayer from the chapter just read, with the verses it
+    draws on, "Amen" (today's prayer done) and "Share this prayer" (a prayer
+    breath, ready to post). Shown on the chapter page after reading and in the
+    feed card's prayer sheet. Locals: habit, chapter (a chapter Reference). %>
+<% prayer = ChapterPrayer.for(chapter) %>
+<% prayed = habit.prayed_today? %>
+<section class="db-prayer<%= ' is-prayed' if prayed %>" aria-label="Pray it">
+  <p class="db-kicker"><%= render_icon("pray", classes: "db-i16") %> Pray it · <%= chapter %></p>
+  <p class="db-prayer-text"><%= prayer.body %></p>
+  <% if (verses = prayer.verse_references).any? %>
+    <p class="db-prayer-verses">Drawn from
+      <% verses.each_with_index do |verse, i| %><%= ", " if i.positive? %><%= link_to verse.to_s, scripture_page_path(verse.slug) %><% end %></p>
+  <% end %>
+  <div class="db-actions">
+    <% if prayed %>
+      <p class="db-prayed"><%= render_icon("check", classes: "db-i16") %> Amen. Read &amp; prayed today</p>
+    <% else %>
+      <%= button_to "Amen", daily_bible_amen_path, params: { chapter: chapter.slug },
+            class: "db-btn db-btn-primary", form_class: "db-inline-form db-grow" %>
+    <% end %>
+    <button type="button" class="db-btn db-btn-quiet"
+            data-action="click->composer-modal#openWith"
+            data-composer-modal-mode-param="prayer"
+            data-composer-modal-prefill-param="<%= "Praying through #{chapter} today: #{prayer.body}" %>">
+      <%= render_icon("pen", classes: "db-i16") %> Share this prayer
+    </button>
+  </div>
+</section>

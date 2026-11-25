@@ -22,6 +22,7 @@ class FeedController < ApplicationController
       load_suggestions
       load_around_card
       load_invite_card
+      load_daily_bible
     end
     # Pinned breaths (admin-featured) lead the feed — a community noticeboard.
     @pinned_posts = feed_posts_scope.where(featured: true).recent.limit(2).to_a
@@ -266,6 +267,15 @@ class FeedController < ApplicationController
   rescue StandardError => e
     Rails.logger.warn("[feed] invite card failed: #{e.class}: #{e.message}")
     @invite_card = false
+  end
+
+  # "Have you read your Bible today?" at the top of the feed. Never lets the feed fail.
+  def load_daily_bible
+    @bible_habit = BibleHabit.for(current_user)
+    @bible_readers = BibleReadingDay.readers_on(@bible_habit.today)
+  rescue StandardError => e
+    Rails.logger.warn("[feed] daily bible card failed: #{e.class}: #{e.message}")
+    @bible_habit = nil
   end
 
   def next_page?

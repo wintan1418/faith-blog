@@ -14,6 +14,10 @@ module Settings
         current_user.update_column(:show_online_status, ActiveModel::Type::Boolean.new.cast(user_privacy_params[:show_online_status]) == true)
       end
 
+      if params.dig(:bible, :show_streak).present?
+        BibleHabit.for(current_user).update!(show_streak: ActiveModel::Type::Boolean.new.cast(params.dig(:bible, :show_streak)) == true)
+      end
+
       if @profile.update(privacy_params)
         redirect_to edit_settings_privacy_path, notice: "Privacy settings updated."
       else

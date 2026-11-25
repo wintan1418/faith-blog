@@ -1,0 +1,57 @@
+<%# The Daily Bible settings sheet: which plan, the daily reminder, and whether
+    the streak shows on your profile. Opened by daily-bible#openSheet. %>
+<dialog class="db-sheet" data-daily-bible-target="sheet" aria-labelledby="db-sheet-title"
+        data-action="click->daily-bible#backdrop keydown.esc->daily-bible#closeSheet">
+  <%= form_with url: daily_bible_path, method: :patch, class: "db-sheet-body" do %>
+    <span class="db-sheet-grip" aria-hidden="true"></span>
+    <button type="button" class="db-sheet-close" data-action="daily-bible#closeSheet" aria-label="Close"><%= render_icon("x", classes: "db-i16") %></button>
+    <h2 class="db-sheet-title" id="db-sheet-title">Your daily reading</h2>
+    <p class="db-sheet-sub">Missed a day? Nothing is lost. Today's reading is always the next one you haven't read.</p>
+
+    <fieldset class="db-plans">
+      <legend class="db-label">Reading plan</legend>
+      <% DailyBible::Plan.all.each do |plan| %>
+        <% done = habit.plan_positions[plan.slug].to_i %>
+        <label class="db-plan">
+          <%= radio_button_tag "plan_slug", plan.slug, habit.plan.slug == plan.slug, class: "db-plan-input" %>
+          <span class="db-plan-text">
+            <span class="db-plan-name"><%= plan.title %></span>
+            <span class="db-plan-blurb"><%= plan.blurb %></span>
+            <% if done.positive? %>
+              <span class="db-plan-at"><%= plan.finished?(done) ? "Finished" : "You're on day #{number_with_delimiter((done % plan.size) + 1)} of #{number_with_delimiter(plan.size)}" %></span>
+            <% end %>
+          </span>
+        </label>
+      <% end %>
+    </fieldset>
+
+    <div class="db-setting">
+      <label class="db-switch">
+        <%= hidden_field_tag "reminder_enabled", "0", id: nil %>
+        <%= check_box_tag "reminder_enabled", "1", habit.reminder_enabled?, id: "db_reminder_enabled" %>
+        <span>
+          <span class="db-setting-name">Remind me if I haven't read</span>
+          <span class="db-setting-note">One gentle reminder a day, never more.</span>
+        </span>
+      </label>
+      <label class="db-time">
+        <span class="sr-only">Reminder time</span>
+        <%= select_tag "reminder_time", options_for_select(daily_bible_reminder_options(habit), habit.reminder_time_label), id: "db_reminder_time" %>
+      </label>
+    </div>
+
+    <div class="db-setting">
+      <label class="db-switch">
+        <%= hidden_field_tag "show_streak", "0", id: nil %>
+        <%= check_box_tag "show_streak", "1", habit.show_streak?, id: "db_show_streak" %>
+        <span>
+          <span class="db-setting-name">Show my reading streak on my profile</span>
+          <span class="db-setting-note">Others only ever see a count of who read today, never names.</span>
+        </span>
+      </label>
+    </div>
+
+    <%= hidden_field_tag "time_zone", habit.time_zone, id: nil, data: { daily_bible_target: "zoneField" } %>
+    <button type="submit" class="db-btn db-btn-primary db-sheet-save">Save</button>
+  <% end %>
+</dialog>

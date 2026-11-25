@@ -1,0 +1,64 @@
+<%# Daily Bible on a chapter page, for signed-in members. place "top" sits
+    above the text and runs the one-minute reading timer; place "end" sits
+    under the text with "I've read it". Both redraw after a read.
+    Locals: habit, chapter (a chapter Reference), place ("top" or "end"). %>
+<% portion = habit.portion %>
+<% in_plan = portion&.include?(chapter) %>
+<% read = habit.read_today? %>
+<% streak = habit.streak %>
+<% read_params = { source: "chapter", chapter: chapter.slug } %>
+<% step = in_plan && !portion.single? ? portion.chapters.index { |c| c.book == chapter.book && c.chapter == chapter.chapter } : nil %>
+<% next_in_portion = step && portion.chapters[step + 1] %>
+
+<% if place == "top" %>
+  <div id="daily_bible_bar_top" class="db-bar<%= ' is-done' if read && !in_plan %>"
+       <% if habit.dwell_counts?(chapter) %>
+         data-controller="bible-dwell"
+         data-bible-dwell-url-value="<%= daily_bible_read_path %>"
+         data-bible-dwell-chapter-value="<%= chapter.slug %>"
+         data-bible-dwell-seconds-value="<%= BibleHabit::DWELL_SECONDS %>"
+       <% end %>>
+    <span class="db-tile<%= ' is-done' if read && !in_plan %>" aria-hidden="true"><%= render_icon(read && !in_plan ? "check" : "bookopen", classes: "db-i18") %></span>
+    <div class="db-bar-text">
+      <% if in_plan %>
+        <p class="db-bar-title">Today's reading · <%= portion.label %><% if step %> <span class="db-bar-step">(<%= step + 1 %> of <%= portion.chapters.size %>)</span><% end %></p>
+        <p class="db-bar-sub">
+          <% if read %>Read today<% if streak > 1 %> · <%= daily_bible_streak_text(streak) %><% end %>. This is your next reading in <%= habit.plan.title %>.
+          <% else %>Stay with it a minute and we'll count today, or tap “I've read it” when you finish.<% end %>
+        </p>
+      <% elsif read %>
+        <p class="db-bar-title">Read today<% if streak > 1 %> · <%= render_icon("flame", classes: "db-i16") %> <%= daily_bible_streak_text(streak) %><% end %></p>
+        <p class="db-bar-sub"><% unless habit.prayed_today? %>A short prayer from this chapter is waiting at the end. <% end %><% if portion %>Next in your plan: <%= link_to portion.label, scripture_page_path(portion.first.slug) %><% else %>Lovely to see you in the Word.<% end %></p>
+      <% else %>
+        <p class="db-bar-title">Have you read your Bible today?</p>
+        <p class="db-bar-sub">Reading this chapter counts for today.<% if portion %> Your plan's next reading: <%= link_to portion.label, scripture_page_path(portion.first.slug) %>.<% end %></p>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div id="daily_bible_bar_end" class="db-end">
+    <% if in_plan || !read %>
+      <p class="db-end-text"><%= in_plan ? "Finished #{chapter}?" : "Read #{chapter}?" %></p>
+      <div class="db-end-actions">
+        <% if next_in_portion %>
+          <%= link_to "Next: #{next_in_portion}", scripture_page_path(next_in_portion.slug), class: "db-btn db-btn-quiet" %>
+        <% end %>
+        <%= button_to (in_plan && step ? "I've read today's reading" : "I've read it"), daily_bible_read_path, params: read_params,
+              class: "db-btn db-btn-primary", form_class: "db-inline-form" %>
+      </div>
+    <% else %>
+      <p class="db-end-text"><%= render_icon("check", classes: "db-i16") %> <%= habit.prayed_today? ? "Read & prayed today" : "Read today" %><% if streak > 1 %> · <%= daily_bible_streak_text(streak) %><% end %></p>
+      <div class="db-end-actions">
+        <% if portion %>
+          <%= link_to "Next: #{portion.label}", scripture_page_path(portion.first.slug), class: "db-btn db-btn-quiet" %>
+        <% end %>
+        <button type="button" class="db-btn db-btn-quiet"
+                data-action="click->composer-modal#openWith"
+                data-composer-modal-prefill-param="<%= daily_bible_share_prefill(chapter.to_s) %>">
+          <%= render_icon("pen", classes: "db-i16") %> Share what stood out
+        </button>
+      </div>
+      <%= render "daily_bible/prayer", habit: habit, chapter: chapter %>
+    <% end %>
+  </div>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_25_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_120200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -165,6 +165,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_090000) do
     t.index ["created_at"], name: "index_app_waitlist_entries_on_created_at"
   end
 
+  create_table "bible_habits", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "plan_slug", default: "chapter-a-day", null: false
+    t.jsonb "plan_positions", default: {}, null: false
+    t.string "time_zone", default: "Africa/Lagos", null: false
+    t.integer "current_streak", default: 0, null: false
+    t.integer "longest_streak", default: 0, null: false
+    t.integer "days_read", default: 0, null: false
+    t.date "last_read_on"
+    t.date "last_prayed_on"
+    t.boolean "show_streak", default: true, null: false
+    t.date "card_collapsed_on"
+    t.date "card_hidden_on"
+    t.boolean "reminder_enabled", default: true, null: false
+    t.integer "reminder_minute", default: 420, null: false
+    t.datetime "next_reminder_at"
+    t.date "last_reminded_on"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_read_on"], name: "index_bible_habits_on_last_read_on"
+    t.index ["next_reminder_at"], name: "index_bible_habits_on_next_reminder_at", where: "reminder_enabled"
+    t.index ["user_id"], name: "index_bible_habits_on_user_id", unique: true
+  end
+
   create_table "bible_quiz_questions", force: :cascade do |t|
     t.string "kind", limit: 32, null: false
     t.text "prompt", null: false
@@ -182,6 +206,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_090000) do
     t.index ["kind"], name: "index_bible_quiz_questions_on_kind"
     t.index ["theme", "difficulty"], name: "index_bible_quiz_questions_on_theme_and_difficulty"
     t.index ["theme"], name: "index_bible_quiz_questions_on_theme"
+  end
+
+  create_table "bible_reading_days", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.date "read_on", null: false
+    t.string "plan_slug"
+    t.string "first_chapter"
+    t.string "source", null: false
+    t.integer "portions_completed", default: 0, null: false
+    t.datetime "prayed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["read_on"], name: "index_bible_reading_days_on_read_on"
+    t.index ["user_id", "read_on"], name: "index_bible_reading_days_on_user_id_and_read_on", unique: true
   end
 
   create_table "bible_verses", force: :cascade do |t|
@@ -278,6 +316,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_090000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_certifications_on_user_id"
+  end
+
+  create_table "chapter_prayers", force: :cascade do |t|
+    t.string "slug", limit: 80, null: false
+    t.string "reference", limit: 80, null: false
+    t.text "body", null: false
+    t.jsonb "verses", default: [], null: false
+    t.string "model", limit: 80
+    t.datetime "generated_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_chapter_prayers_on_slug", unique: true
   end
 
   create_table "church_history_eras", force: :cascade do |t|
@@ -1283,6 +1333,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_090000) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_moderation_reviews", "users"
   add_foreign_key "announcements", "users"
+  add_foreign_key "bible_habits", "users", on_delete: :cascade
+  add_foreign_key "bible_reading_days", "users", on_delete: :cascade
   add_foreign_key "bookmarks", "posts"
   add_foreign_key "bookmarks", "users"
   add_foreign_key "bot_items", "bot_sources"

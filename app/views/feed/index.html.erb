@@ -177,6 +177,8 @@
         </div>
       </section>
 
+      <%= render "daily_bible/card", habit: @bible_habit, readers: @bible_readers if @bible_habit %>
+
       <%= render "feed/birthdays", birthdays: @birthdays_today %>
 
       <%# The Daily Breath question is the composer's prompt. %>

@@ -63,3 +63,9 @@ production:
   search_console_refresh:
     class: SearchConsoleRefreshJob
     schedule: every day at 5am Africa/Lagos
+
+  # "Have you read your Bible today?": each member's reminder at their own
+  # local time (default 7:00), once a day, only if they haven't read yet.
+  bible_reminders:
+    class: BibleReminderJob
+    schedule: every 15 minutes

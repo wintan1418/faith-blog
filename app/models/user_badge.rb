@@ -57,6 +57,26 @@ class UserBadge < ApplicationRecord
       blurb: "A flawless game round (5+ questions)",
       earned: ->(u) { u.game_attempts.where("score = max_score AND max_score >= 5").exists? }
     },
+    "bible_7" => {
+      name: "A Week in the Word", emoji: "📖", icon: "bookopen",
+      blurb: "Read the Bible seven days in a row",
+      earned: ->(u) { u.bible_habit&.longest_streak.to_i >= 7 }
+    },
+    "bible_30" => {
+      name: "A Month in the Word", emoji: "📖", icon: "bookopen",
+      blurb: "A thirty-day Bible reading streak",
+      earned: ->(u) { u.bible_habit&.longest_streak.to_i >= 30 }
+    },
+    "bible_100" => {
+      name: "Rooted", emoji: "🌳", icon: "tree",
+      blurb: "Read the Bible a hundred days in a row",
+      earned: ->(u) { u.bible_habit&.longest_streak.to_i >= 100 }
+    },
+    "bible_365" => {
+      name: "A Year in the Word", emoji: "🌿", icon: "cedar",
+      blurb: "A full year of reading the Bible every day",
+      earned: ->(u) { u.bible_habit&.longest_streak.to_i >= 365 }
+    },
     "gatherer" => {
       name: "Gatherer", emoji: "🤝", icon: "handshake",
       blurb: "Someone you invited joined the brethren",

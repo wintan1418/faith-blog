@@ -51,6 +51,10 @@
       <% end %>
     </header>
 
+    <% if @bible_habit && @passage.present? %>
+      <%= render "daily_bible/bar", habit: @bible_habit, chapter: ref, place: "top" %>
+    <% end %>
+
     <% if ref.chapter? && @passage.present? %>
       <section class="sx-card sx-chapter" aria-labelledby="sx-chapter-heading">
         <h2 id="sx-chapter-heading" class="sx-h2"><%= ref %> in full</h2>
@@ -77,6 +81,11 @@
           <% end %>
         </div>
       </section>
+      <% if @bible_habit %>
+        <%= render "daily_bible/bar", habit: @bible_habit, chapter: ref, place: "end" %>
+      <% elsif !user_signed_in? %>
+        <%= render "daily_bible/guest_prompt" %>
+      <% end %>
     <% end %>
 
     <% if !ref.chapter? && @passage.translations.size > 1 %>

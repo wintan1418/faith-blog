@@ -79,6 +79,8 @@ class User < ApplicationRecord
   has_many :search_queries, dependent: :nullify
   has_many :circle_prayer_amens, dependent: :destroy
   has_many :user_reading_plans, dependent: :destroy
+  has_one  :bible_habit, dependent: :destroy
+  has_many :bible_reading_days, dependent: :delete_all
   has_many :push_subscriptions, dependent: :destroy
   # Phones running the iOS / Android apps
   has_many :push_devices, class_name: "ApplicationPushDevice", as: :owner, dependent: :destroy
