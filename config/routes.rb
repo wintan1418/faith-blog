@@ -375,6 +375,8 @@ Rails.application.routes.draw do
         post :resolve
         post :dismiss
         post :retire_question
+        get :edit_question
+        patch :update_question
       end
     end
     resources :bible_verses do

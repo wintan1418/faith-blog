@@ -33,4 +33,30 @@ class BibleQuiz::AnswerCheckTest < ActiveSupport::TestCase
                             reference: "1 Corinthians 1:27").status
     assert_equal :unknown, check(kind: "what_does", choices: %w[a b c d], correct_index: 0, reference: "John 3:16").status
   end
+
+  # Report #1074: "All options are phrases in the Bible".
+  test "true_phrase: a decoy that is real Scripture (any translation) makes the question wrong" do
+    extend BibleTextFixture
+    seed_bible_text
+    r = check(kind: "true_phrase", reference: "",
+              choices: [ "Pray without ceasing.", "Faith without works is dead.", "Bear ye one another's burdens.",
+                         "Love covers a multitude of sins." ], correct_index: 0)
+    assert_equal :wrong, r.status
+  end
+
+  test "true_phrase: one real phrase and three non-biblical sayings pass; a mismarked one is fixed" do
+    extend BibleTextFixture
+    seed_bible_text
+    choices = [ "God helps those who help themselves", "Pray without ceasing.", "Cleanliness is next to godliness",
+                "This too shall pass" ]
+    assert_equal :ok, check(kind: "true_phrase", reference: "1 Thessalonians 5:17", choices: choices, correct_index: 1).status
+    r = check(kind: "true_phrase", reference: nil, choices: choices, correct_index: 0)
+    assert_equal [ :fixed, 1 ], [ r.status, r.correct_index ]
+    assert_equal :wrong, check(kind: "true_phrase", reference: nil, choices: choices.values_at(0, 2, 3) + [ "Let go and let God" ],
+                               correct_index: 0).status
+  end
+
+  test "true_phrase is unknown when the Bible text isn't loaded" do
+    assert_equal :unknown, check(kind: "true_phrase", reference: nil, choices: %w[a b c d], correct_index: 0).status
+  end
 end

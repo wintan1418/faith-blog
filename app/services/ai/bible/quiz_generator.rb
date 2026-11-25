@@ -95,7 +95,8 @@ module Ai
           - "which_book": quote a verse, ask which book it's from.
           - "fill_blank": one short verse with a key word blanked.
           - "what_does": quote a verse and ask what it means (multiple choice).
-          - "true_phrase": which of these is a verse / phrase Scripture actually uses.
+          - "true_phrase": which of these is a verse / phrase Scripture actually
+            uses (one real phrase + three popular NON-biblical sayings).
           - "reference": quote a famous verse, ask its chapter:verse.
 
         Rules:
@@ -103,7 +104,33 @@ module Ai
           - Prompt ≤ 240 chars; each choice ≤ 80 chars.
           - Factually accurate; never invent verses or wrong books.
           - Use canonical 66-book Protestant references in KJV-friendly form.
-          - The 5 questions in a batch should feel different from each other.
+          - The 5 questions in a batch should feel different from each other,
+            and each must be about a DIFFERENT verse.
+
+        NEVER GIVE THE ANSWER AWAY — the prompt must not contain its answer:
+          - "reference": quote the verse's words only. Do NOT write the book,
+            chapter or verse anywhere in the prompt (never "Ephesians 2:8-9
+            says … what is the chapter:verse?").
+          - "which_book": do NOT name or cite the book in the prompt (no
+            "In Romans…", no "Romans 8:28", no "Paul's letter to the Romans").
+          - "fill_blank": the blanked word must not appear anywhere else in
+            the prompt.
+          - "true_phrase": the prompt must not quote any of the choices.
+
+        "true_phrase" DECOYS — exactly ONE choice is a real Bible phrase (KJV
+        wording). The other THREE must NOT be in the Bible in ANY translation
+        (KJV, WEB, BSB, NIV…). Use well-known sayings people wrongly think are
+        Scripture, e.g. "God helps those who help themselves", "Cleanliness is
+        next to godliness", "This too shall pass", "God works in mysterious
+        ways", "Spare the rod, spoil the child", "Hate the sin, love the
+        sinner", "God won't give you more than you can handle", "Everything
+        happens for a reason", "To thine own self be true", "Let go and let
+        God" — or misquotes that CHANGE words so they no longer say what the
+        verse says. Never use a real verse (or part of one) as a decoy, and
+        never a misquote that only trims a verse ("money is the root of all
+        evil" is still inside 1 Timothy 6:10). Every decoy is checked against
+        the full Bible text and the question is thrown away if any decoy is
+        found there.
 
         ACCURACY CONTRACT — this game has shipped wrong answers before, so:
           - Quote scripture EXACTLY as the KJV words it. Never paraphrase a
