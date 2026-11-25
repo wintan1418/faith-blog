@@ -18,7 +18,9 @@ module Seeds
     "streak_30"         => { points: 50,  daily_cap: nil, label: "30-day breath streak" },
     "streak_100"        => { points: 100, daily_cap: nil, label: "100-day breath streak" },
     "badge"             => { points: 25,  daily_cap: nil, label: "Earn a badge" },
-    "invite_joined"     => { points: 25,  daily_cap: 10, label: "A friend joins through your invite and posts" }
+    "invite_joined"     => { points: 25,  daily_cap: 10, label: "A friend joins through your invite and posts" },
+    "bible_read"        => { points: 3,   daily_cap: 1,  label: "Read your Bible today" },
+    "bible_prayed"      => { points: 2,   daily_cap: 1,  label: "Pray after your reading" }
   }.freeze
 
   STREAK_BONUSES = { 7 => "streak_7", 30 => "streak_30", 100 => "streak_100" }.freeze
@@ -161,6 +163,26 @@ module Seeds
     end
   end
 
+  # +3 once a day for reading Scripture (the day is the member's own date).
+  def bible_read(day, at: nil, notify: true)
+    safely("bible_read #{day&.id}") do
+      next unless day&.user_id
+
+      award(user_id: day.user_id, kind: "bible_read", source: day, at: at || Time.current, on: day.read_on,
+            notify: notify)
+    end
+  end
+
+  # +2 once a day for "Amen" on the prayer after reading.
+  def bible_prayed(day, at: nil, notify: true)
+    safely("bible_prayed #{day&.id}") do
+      next unless day&.user_id
+
+      award(user_id: day.user_id, kind: "bible_prayed", source: day, at: at || Time.current, on: day.read_on,
+            notify: notify)
+    end
+  end
+
   def badge_awarded(badge, at: nil, notify: true)
     safely("badge #{badge&.id}") do
       next unless badge&.user_id
@@ -212,9 +234,10 @@ module Seeds
 
   # ── Internals ─────────────────────────────────────────────────────────
 
-  def award(user_id:, kind:, source:, at:, post: nil, comment_id: nil, actor_id: nil, anonymous: false, notify: true)
+  # `on`: the day the daily cap counts against (default: the day of `at`).
+  def award(user_id:, kind:, source:, at:, on: nil, post: nil, comment_id: nil, actor_id: nil, anonymous: false, notify: true)
     rule = RULES.fetch(kind)
-    day = at.in_time_zone.to_date
+    day = on || at.in_time_zone.to_date
     source_type = source.class.polymorphic_name
     before = after = nil
 

@@ -193,6 +193,20 @@ class AdminDashboardStats
   def onboarding_hidden = User.where.not(onboarding_dismissed_at: nil).where(onboarding_completed_at: nil).count
   def tour_taken = User.where.not(tour_completed_at: nil).count
 
+  # Daily Bible: who read today (each member's own date; Lagos "today" is close
+  # enough for a headline), live streaks, and how many keep the reminder on.
+  def daily_bible
+    today = Time.current.in_time_zone(TZ).to_date
+    week = BibleReadingDay.where(read_on: (today - 6)..today)
+    [
+      [ "Read today", BibleReadingDay.where(read_on: today).count, nil ],
+      [ "Read this week", week.distinct.count(:user_id), "different members, last 7 days" ],
+      [ "Active streaks", BibleHabit.where(last_read_on: (today - 1)..).where(current_streak: 2..).count, "2+ days in a row, still going" ],
+      [ "Longest streak", BibleHabit.maximum(:longest_streak).to_i, "days" ],
+      [ "Reminders on", BibleHabit.where(reminder_enabled: true).count, "of #{BibleHabit.count} readers set up" ]
+    ]
+  end
+
   def app_users = User.where.not(android_app_version: nil).count
   def professional_profiles = Profile.where.not(headline: [ nil, "" ]).count
 

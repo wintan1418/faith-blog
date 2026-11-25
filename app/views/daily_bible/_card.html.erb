@@ -1,0 +1,130 @@
+<%# "Have you read your Bible today?" at the top of the feed. Three states:
+    to read (today's portion, Read / I've read it), folded down to one line,
+    and done (a compact tick with the streak, "Pray it" for a short prayer
+    from the chapter, and "Share what stood out"). Closing the done state
+    puts the card away until tomorrow.
+    Locals: habit (BibleHabit), readers (members who read today),
+    offer_prayer (optional: open "Pray it" straight after "I've read it"). %>
+<% if habit.card_hidden_today? %>
+  <div id="daily_bible_card" hidden></div>
+<% else %>
+  <% portion = habit.portion %>
+  <% streak = habit.streak %>
+  <% read = habit.read_today? %>
+  <% state = read ? "is-done" : (habit.card_collapsed_today? ? "is-folded" : "is-open") %>
+  <section id="daily_bible_card" class="db-card <%= state %>" aria-label="Daily Bible"
+           data-controller="daily-bible"
+           data-daily-bible-zone-value="<%= habit.time_zone %>"
+           data-daily-bible-zone-url-value="<%= daily_bible_zone_path %>"
+           <% if read && local_assigns[:offer_prayer] && !habit.prayed_today? %>data-daily-bible-open-prayer-value="true"<% end %>>
+    <% if read %>
+      <% label = daily_bible_read_today_label(habit) %>
+      <% prayer_chapter = habit.today_chapter %>
+      <% prayed = habit.prayed_today? %>
+      <div class="db-done">
+        <span class="db-tile is-done" aria-hidden="true"><%= render_icon("check", classes: "db-i18") %></span>
+        <div class="db-done-text">
+          <p class="db-done-title">
+            <span><%= prayed ? "Read & prayed today" : "Read today" %></span>
+            <% if streak > 1 %>
+              <span class="db-dot" aria-hidden="true">·</span>
+              <span class="db-streak-inline" title="Days in a row you've read"><%= render_icon("flame", classes: "db-i16") %> <%= daily_bible_streak_text(streak) %></span>
+            <% end %>
+          </p>
+          <p class="db-done-sub">
+            <%= daily_bible_readers_text(readers, read: true) %><% if portion %> · Next: <%= portion.label %><% end %>
+          </p>
+        </div>
+        <div class="db-done-actions">
+          <% if prayer_chapter && !prayed %>
+            <button type="button" class="db-btn db-btn-primary db-btn-sm" data-action="daily-bible#openPrayer">
+              <%= render_icon("pray", classes: "db-i16") %> Pray it
+            </button>
+          <% end %>
+          <button type="button" class="db-btn db-btn-quiet db-btn-sm"
+                  data-action="click->composer-modal#openWith"
+                  data-composer-modal-prefill-param="<%= daily_bible_share_prefill(label) %>">
+            <%= render_icon("pen", classes: "db-i16") %> Share what stood out
+          </button>
+          <%= button_to daily_bible_card_path, params: { state: "hidden" }, class: "db-icon-btn", form_class: "db-inline-form",
+                aria: { label: "Hide until tomorrow" }, title: "Hide until tomorrow" do %>
+            <%= render_icon("x", classes: "db-i16") %>
+          <% end %>
+        </div>
+      </div>
+    <% elsif habit.card_collapsed_today? %>
+      <div class="db-mini">
+        <span class="db-tile" aria-hidden="true"><%= render_icon("bookopen", classes: "db-i18") %></span>
+        <% if portion %>
+          <%= link_to scripture_page_path(portion.first.slug), class: "db-mini-text" do %>
+            <strong>Have you read your Bible today?</strong>
+            <span><%= portion.label %></span>
+          <% end %>
+        <% else %>
+          <p class="db-mini-text"><strong>Have you read your Bible today?</strong></p>
+        <% end %>
+        <%= button_to daily_bible_card_path, params: { state: "open" }, class: "db-icon-btn", form_class: "db-inline-form",
+              aria: { label: "Open the Daily Bible card" }, title: "Open" do %>
+          <%= render_icon("chevrondown", classes: "db-i16") %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="db-top">
+        <p class="db-kicker"><%= render_icon("bookopen", classes: "db-i16") %> Daily Bible</p>
+        <div class="db-tools">
+          <% if streak > 1 %>
+            <span class="db-streak" title="Days in a row you've read"><%= render_icon("flame", classes: "db-i16") %> <%= daily_bible_streak_text(streak) %></span>
+          <% end %>
+          <button type="button" class="db-icon-btn" data-action="daily-bible#openSheet"
+                  aria-label="Reading plan and reminder" title="Reading plan and reminder">
+            <%= render_icon("settings", classes: "db-i16") %>
+          </button>
+          <%= button_to daily_bible_card_path, params: { state: "collapsed" }, class: "db-icon-btn db-fold", form_class: "db-inline-form",
+                aria: { label: "Fold this card for today" }, title: "Fold for today" do %>
+            <%= render_icon("chevrondown", classes: "db-i16") %>
+          <% end %>
+        </div>
+      </div>
+
+      <h2 class="db-title">Have you read your Bible today?</h2>
+
+      <% if portion %>
+        <%= link_to scripture_page_path(portion.first.slug), class: "db-passage" do %>
+          <span class="db-passage-ref"><%= portion.label %></span>
+          <span class="db-passage-meta"><%= habit.plan.title %> · about <%= portion.minutes %> min</span>
+        <% end %>
+        <div class="db-progress" role="progressbar" aria-label="Plan progress"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="<%= habit.progress_percent %>">
+          <span style="width: <%= [ habit.progress_percent, 2 ].max %>%"></span>
+        </div>
+        <p class="db-progress-text">Day <%= number_with_delimiter(habit.portion_number) %> of <%= number_with_delimiter(habit.plan.size) %><% if habit.plan.repeats? %> · then it starts again<% end %></p>
+
+        <div class="db-actions">
+          <%= link_to (portion.single? ? "Read today's chapter" : "Start today's reading"), scripture_page_path(portion.first.slug),
+                class: "db-btn db-btn-primary" %>
+          <%= button_to "I've read it", daily_bible_read_path, params: { source: "card" },
+                class: "db-btn db-btn-quiet", form_class: "db-inline-form db-grow" %>
+        </div>
+      <% else %>
+        <p class="db-finished">You finished <strong><%= habit.plan.title %></strong>. Well done. Pick what to read next.</p>
+        <div class="db-actions">
+          <button type="button" class="db-btn db-btn-primary" data-action="daily-bible#openSheet">Choose a plan</button>
+        </div>
+      <% end %>
+
+      <p class="db-foot"><%= render_icon("users", classes: "db-i16") %> <%= daily_bible_readers_text(readers) %></p>
+    <% end %>
+
+    <%= render "daily_bible/sheet", habit: habit %>
+    <% if read && prayer_chapter %>
+      <dialog class="db-sheet db-prayer-sheet" data-daily-bible-target="prayerSheet" aria-label="Pray it"
+              data-action="click->daily-bible#backdrop keydown.esc->daily-bible#closePrayer">
+        <div class="db-sheet-body">
+          <span class="db-sheet-grip" aria-hidden="true"></span>
+          <button type="button" class="db-sheet-close" data-action="daily-bible#closePrayer" aria-label="Close"><%= render_icon("x", classes: "db-i16") %></button>
+          <%= render "daily_bible/prayer", habit: habit, chapter: prayer_chapter %>
+        </div>
+      </dialog>
+    <% end %>
+  </section>
+<% end %>

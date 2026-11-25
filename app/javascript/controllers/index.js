@@ -264,3 +264,9 @@ application.register("around-map", AroundMapController)
 
 import AroundHelloController from "./around_hello_controller"
 application.register("around-hello", AroundHelloController)
+
+import DailyBibleController from "./daily_bible_controller"
+application.register("daily-bible", DailyBibleController)
+
+import BibleDwellController from "./bible_dwell_controller"
+application.register("bible-dwell", BibleDwellController)

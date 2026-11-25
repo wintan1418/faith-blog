@@ -123,6 +123,18 @@
     </section>
   </div>
 
+  <h2 class="adash-section">Daily Bible</h2>
+  <p class="adash-sub">“Have you read your Bible today?” on the feed and chapter pages</p>
+  <section class="adash-kpis" aria-label="Daily Bible">
+    <% s.daily_bible.each do |label, value, note| %>
+      <div class="adash-kpi">
+        <p class="adash-kpi__label"><%= label %></p>
+        <p class="adash-kpi__value"><%= number_with_delimiter(value) %></p>
+        <% if note %><p class="adash-kpi__note"><%= note %></p><% end %>
+      </div>
+    <% end %>
+  </section>
+
   <h2 class="adash-section">Onboarding</h2>
   <p class="adash-sub">Members who have done each step of the getting-started list on the feed</p>
   <%= render "admin/dashboard/onboarding", stats: s %>

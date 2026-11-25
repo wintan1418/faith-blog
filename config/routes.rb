@@ -207,6 +207,13 @@ Rails.application.routes.draw do
   get  "history/figure/:slug",   to: "church_history#figure",    as: :church_history_figure
   get  "history/era/:era",       to: "church_history#chronicle", as: :church_history_chronicle
 
+  # "Have you read your Bible today?" (feed card, chapter pages, settings sheet).
+  post  "bible-today/read", to: "daily_bible#read", as: :daily_bible_read
+  patch "bible-today", to: "daily_bible#update", as: :daily_bible
+  post  "bible-today/amen", to: "daily_bible#amen", as: :daily_bible_amen
+  post  "bible-today/card", to: "daily_bible#card", as: :daily_bible_card
+  post  "bible-today/zone", to: "daily_bible#zone", as: :daily_bible_zone
+
   resources :reading_plans, only: [ :index, :show ], param: :slug do
     member do
       post :start

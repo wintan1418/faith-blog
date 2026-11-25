@@ -34,7 +34,8 @@ class Notification < ApplicationRecord
     skill_endorsed:         28,
     app_update:             29,
     rank_up:                30,
-    series_new_part:        31
+    series_new_part:        31,
+    bible_reminder:         32
   }
 
   # Associations
@@ -97,7 +98,7 @@ class Notification < ApplicationRecord
     thread_new_voice: "comment", badge_earned: "trophy", circle_breath: "users",
     circle_prayer: "pray", circle_prayer_answered: "answered", birthday: "cake",
     content_removed: "shield", skill_endorsed: "thumbsup", app_update: "smartphone",
-    rank_up: "sprout", series_new_part: "library"
+    rank_up: "sprout", series_new_part: "library", bible_reminder: "bookopen"
   }.freeze
 
   def web_icon
@@ -183,6 +184,9 @@ class Notification < ApplicationRecord
       series = notifiable.try(:series)
       part = notifiable.try(:series_position)
       "#{actor&.display_name || 'Someone'} added #{part ? "Part #{part}" : 'a new part'} to “#{series&.title || 'a series you follow'}”#{e.(" 📖")}"
+    when :bible_reminder
+      reading = notifiable.try(:portion)&.label
+      "Have you read your Bible today?#{" Today: #{reading}." if reading}#{e.(" 📖")}"
     when :birthday
       "#{e.("🎂 ")}It's #{actor&.display_name || 'a brother or sister'}'s birthday today. Wish them well!"
     else
@@ -225,6 +229,10 @@ class Notification < ApplicationRecord
       Rails.application.routes.url_helpers.user_path(actor.username)
     when :skill_endorsed
       Rails.application.routes.url_helpers.user_path(user.username, tab: "professional")
+    when :bible_reminder
+      chapter = notifiable.try(:portion)&.first
+      routes = Rails.application.routes.url_helpers
+      chapter ? routes.scripture_page_path(chapter.slug) : routes.feed_path
     when :app_update
       Rails.application.routes.url_helpers.app_update_store_path # straight on to the Play Store
     when :content_removed
@@ -296,7 +304,7 @@ class Notification < ApplicationRecord
 
   def deliver_email_notification
     return unless user.email_notifications_enabled?
-    return if birthday? || skill_endorsed? || app_update? || rank_up? # a push and the alert are enough; no emails for these
+    return if birthday? || skill_endorsed? || app_update? || rank_up? || bible_reminder? # a push and the alert are enough; no emails for these
     return if notifiable.is_a?(Message) && notifiable.quiet? # e.g. the welcome note, which has its own email
 
     NotificationMailer.with(notification: self).community_notification.deliver_later

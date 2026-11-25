@@ -30,9 +30,21 @@ class ScripturePagesController < ApplicationController
     discussions = Post.scripture_discussable.where(id: ScriptureCitation.matching(@reference).select(:post_id))
     @posts = discussions.includes(:user, :rich_text_content).recent.limit(DISCUSSION_LIMIT).to_a
     @posts_total = @posts.size < DISCUSSION_LIMIT ? @posts.size : discussions.count
+    load_daily_bible
   end
 
   private
+
+  # "Have you read your Bible today?" on whole-chapter pages, for members.
+  # Never lets the page fail.
+  def load_daily_bible
+    return unless user_signed_in? && @reference.chapter?
+
+    @bible_habit = BibleHabit.for(current_user)
+  rescue StandardError => e
+    Rails.logger.warn("[daily_bible] scripture page: #{e.class}: #{e.message}")
+    @bible_habit = nil
+  end
 
   # "/scripture/genesis" → the book on the index; anything else is a 404.
   def redirect_to_book_or_404(slug)

@@ -36,6 +36,33 @@
       </div>
     </div>
 
+    <div class="mystic-panel-strong overflow-hidden mb-6" id="daily-bible-reminder">
+      <div class="border-b border-faith-green/10 p-6">
+        <h2 class="text-xl font-bold text-faith-dark">Daily Bible reminder</h2>
+        <p class="mystic-copy text-sm">“Have you read your Bible today?” One gentle nudge a day, at your time, and only if you haven't read yet.</p>
+      </div>
+      <div class="p-6">
+        <%= form_with url: daily_bible_path, method: :patch, class: "space-y-5", data: { turbo: false } do %>
+          <label class="mystic-panel flex items-center justify-between gap-4 p-4">
+            <span>
+              <span class="block font-bold text-faith-dark">Remind me to read</span>
+              <span class="text-sm text-faith-muted">A push and an alert, never more than one a day.</span>
+            </span>
+            <%= hidden_field_tag "reminder_enabled", "0", id: nil %>
+            <%= check_box_tag "reminder_enabled", "1", @bible_habit.reminder_enabled?, id: "settings_bible_reminder_enabled", class: "h-4 w-4 rounded border-faith-green/20 text-faith-green focus:ring-faith-green" %>
+          </label>
+          <label class="mystic-panel flex items-center justify-between gap-4 p-4">
+            <span>
+              <span class="block font-bold text-faith-dark">Time</span>
+              <span class="text-sm text-faith-muted">Your local time (<%= @bible_habit.time_zone.tr("_", " ") %>).</span>
+            </span>
+            <%= select_tag "reminder_time", options_for_select(daily_bible_reminder_options(@bible_habit), @bible_habit.reminder_time_label), id: "settings_bible_reminder_time", class: "rounded-xl border-faith-green/20" %>
+          </label>
+          <%= submit_tag "Save reminder", class: "btn btn-primary" %>
+        <% end %>
+      </div>
+    </div>
+
     <div class="mystic-panel-strong overflow-hidden">
       <div class="border-b border-faith-green/10 p-6">
         <h2 class="text-xl font-bold text-faith-dark">Email & Room Notifications</h2>

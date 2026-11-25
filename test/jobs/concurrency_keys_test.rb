@@ -12,4 +12,9 @@ class ConcurrencyKeysTest < ActiveSupport::TestCase
   test "office reply key accepts its argument" do
     assert_nothing_raised { OfficeReplyJob.new(7).concurrency_key }
   end
+
+  test "bible reminder key accepts no arguments and a time" do
+    assert_nothing_raised { BibleReminderJob.new.concurrency_key }
+    assert_nothing_raised { BibleReminderJob.new(Time.current).concurrency_key }
+  end
 end

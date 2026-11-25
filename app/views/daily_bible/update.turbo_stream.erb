@@ -1,0 +1,5 @@
+<%= turbo_stream.replace "daily_bible_card", partial: "daily_bible/card", locals: { habit: @habit, readers: BibleReadingDay.readers_on(@habit.today), offer_prayer: @offer_prayer } %>
+<% if @chapter %>
+  <%= turbo_stream.replace "daily_bible_bar_top", partial: "daily_bible/bar", locals: { habit: @habit, chapter: @chapter, place: "top" } %>
+  <%= turbo_stream.replace "daily_bible_bar_end", partial: "daily_bible/bar", locals: { habit: @habit, chapter: @chapter, place: "end" } %>
+<% end %>
