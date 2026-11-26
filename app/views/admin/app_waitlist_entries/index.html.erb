@@ -6,7 +6,7 @@
     <div class="flex flex-wrap items-start justify-between gap-4">
       <div>
         <h2 class="text-lg font-bold text-[var(--fc-ink)]">Waiting for the app</h2>
-        <p class="mt-1 text-sm text-[var(--fc-muted)]">People who asked, on the welcome page, for an email when the iPhone or Android app is out. Nothing is emailed yet. These are personal email addresses: keep the CSV private.</p>
+        <p class="mt-1 text-sm text-[var(--fc-muted)]">People who asked, on the welcome page, for an email when the iPhone or Android app is out. Each person gets a confirmation when they join, and one email per app when you send the launch email below. These are personal email addresses: keep the CSV private.</p>
       </div>
       <%= link_to "Download CSV", admin_app_waitlist_entries_path(format: :csv), class: "fc-btn fc-btn-primary", data: { turbo: false } %>
     </div>
@@ -23,6 +23,20 @@
         </div>
       <% end %>
     </dl>
+
+    <div class="mt-5 flex flex-wrap gap-3">
+      <% WaitlistMailer::STORES.each do |platform, store| %>
+        <% waiting = AppWaitlistEntry.waiting_for(platform).count %>
+        <% if WaitlistMailer.live?(platform) %>
+          <%= button_to "Email #{store[:name]} waitlist that the app is out (#{waiting} waiting)",
+                        notify_admin_app_waitlist_entries_path(platform: platform), method: :post,
+                        class: "fc-btn #{waiting.positive? ? 'fc-btn-primary' : ''}", disabled: waiting.zero?,
+                        form: { data: { turbo_confirm: "Email #{waiting} #{'person'.pluralize(waiting)} that Brethreign is on #{store[:store]}?" } } %>
+        <% else %>
+          <span class="text-sm text-[var(--fc-muted)]"><%= store[:name] %>: set <%= store[:env] %> on the server when the app is live, then send the launch email here (<%= waiting %> waiting).</span>
+        <% end %>
+      <% end %>
+    </div>
   </div>
 
   <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
@@ -34,6 +48,7 @@
               <th class="py-1 pr-4">Email</th>
               <th class="py-1 pr-4">Platform</th>
               <th class="py-1 pr-4">From</th>
+              <th class="py-1 pr-4">Emailed</th>
               <th class="py-1 text-right">Joined</th>
             </tr>
           </thead>
@@ -43,6 +58,7 @@
                 <td class="py-2 pr-4 font-semibold text-[var(--fc-ink)] break-all"><%= entry.email %></td>
                 <td class="py-2 pr-4"><%= names.fetch(entry.platform, entry.platform) %></td>
                 <td class="py-2 pr-4 text-[var(--fc-muted)]"><%= entry.source.presence || "—" %></td>
+                <td class="py-2 pr-4 text-[var(--fc-muted)] whitespace-nowrap"><%= [ ("joined" if entry.confirmed_at), ("iPhone launch" if entry.ios_notified_at), ("Android launch" if entry.android_notified_at) ].compact.join(", ").presence || "not yet" %></td>
                 <td class="py-2 text-right text-[var(--fc-muted)] whitespace-nowrap" title="<%= entry.created_at.iso8601 %>"><%= time_ago_in_words(entry.created_at) %> ago</td>
               </tr>
             <% end %>

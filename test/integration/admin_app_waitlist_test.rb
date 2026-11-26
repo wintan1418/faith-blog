@@ -53,4 +53,24 @@ class AdminAppWaitlistTest < ActionDispatch::IntegrationTest
     assert_equal %w[email platform source signed_up_at updated_at], rows.first
     assert_equal %w[newer@example.com older@example.com], rows.drop(1).map(&:first)
   end
+
+  test "admins can send the launch email once the store link is set" do
+    sign_in @admin
+    old = ENV["IOS_STORE_URL"]
+    ENV["IOS_STORE_URL"] = "https://apps.apple.com/app/brethreign/id123"
+    assert_enqueued_with(job: WaitlistLaunchJob, args: [ "ios" ]) do
+      post notify_admin_app_waitlist_entries_path(platform: "ios")
+    end
+    assert_redirected_to admin_app_waitlist_entries_path
+    assert_match(/to 2 people/, flash[:notice])
+  ensure
+    ENV["IOS_STORE_URL"] = old
+  end
+
+  test "members can't send the launch email" do
+    sign_in @member
+    assert_no_enqueued_jobs(only: WaitlistLaunchJob) do
+      post notify_admin_app_waitlist_entries_path(platform: "ios")
+    end
+  end
 end

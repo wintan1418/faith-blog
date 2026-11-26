@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_27_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -161,6 +161,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
     t.string "ip_hash"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "confirmed_at"
+    t.datetime "ios_notified_at"
+    t.datetime "android_notified_at"
     t.index "lower((email)::text)", name: "index_app_waitlist_entries_on_lower_email", unique: true
     t.index ["created_at"], name: "index_app_waitlist_entries_on_created_at"
   end
@@ -1005,9 +1008,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
     t.bigint "quoted_post_id"
     t.jsonb "game_share"
     t.tsvector "searchable"
-    t.text "search_title"
     t.bigint "series_id"
     t.integer "series_position"
+    t.text "search_title"
     t.bigint "page_id"
     t.jsonb "reading_share"
     t.index "\"left\"(search_title, 512)", name: "index_posts_search_title_exact", where: "((status = 1) AND (moderation_status = 0))"

@@ -390,12 +390,16 @@ Rails.application.routes.draw do
   post "waitlist", to: "app_waitlist_entries#create", as: :waitlist
   # Shareable link straight to the app waitlist: brethreign.com/waitlist (also /app).
   get "waitlist", to: "app_waitlist_entries#new", as: :join_waitlist
+  get "waitlist/leave/:token", to: "app_waitlist_entries#leave", as: :leave_waitlist
+  post "waitlist/leave/:token", to: "app_waitlist_entries#destroy"
   get "app", to: redirect("/waitlist")
 
   # Admin namespace
   namespace :admin do
     root to: "dashboard#index"
-    resources :app_waitlist_entries, only: :index, path: "app-waitlist"
+    resources :app_waitlist_entries, only: :index, path: "app-waitlist" do
+      post "notify/:platform", on: :collection, action: :notify, as: :notify, constraints: { platform: /ios|android/ }
+    end
     resources :city_changes, only: :index, path: "city-changes"
     resources :pages, only: %i[index show], param: :handle do
       member do

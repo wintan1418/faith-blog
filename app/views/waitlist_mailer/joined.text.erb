@@ -1,0 +1,22 @@
+You're on the list
+
+<% if @live.any? -%>
+Thanks for joining the Brethreign app waitlist. Good news: you don't have to wait.
+
+<% @live.each do |(_platform, store, url)| -%>
+<%= store[:button] %>: <%= url %>
+<% end -%>
+<% if @entry.platform == "both" && @live.size < 2 -%>
+
+We'll email you again when Brethreign is on <%= @live.map(&:first).include?("ios") ? "Android" : "iPhone" %> too.
+<% end -%>
+<% else -%>
+Thanks for joining the Brethreign app waitlist. We'll email <%= @entry.email %> as soon as Brethreign is on <%= @entry.platform_name %>.
+<% end -%>
+
+Until then, Brethreign works in any browser at <%= @site_url %>
+
+With love,
+The Brethreign team
+
+Leave the waitlist: <%= @leave_url %>

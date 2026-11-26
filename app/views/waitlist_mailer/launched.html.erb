@@ -1,0 +1,13 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; line-height: 1.65; font-size: 15.5px;">
+  <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 26px; line-height: 1.2; margin: 4px 0 16px; color: #17251d;">Brethreign is on <%= @store[:store] %></h1>
+  <p style="margin: 0 0 16px;">You asked us to tell you when the Brethreign <%= @store[:name] %> app was out. It's here.</p>
+  <p style="margin: 0 0 20px;">Read your Bible every day, share a breath, join Rooms and message friends, all from your phone.</p>
+  <p style="margin: 0 0 22px;">
+    <a href="<%= @store_url %>" style="display: inline-block; padding: 12px 22px; border-radius: 999px; background: #0e5c43; color: #ffffff; font-weight: 800; font-size: 15px; text-decoration: none;"><%= @store[:button] %></a>
+  </p>
+  <% if @entry.platform == "both" && @platform == "ios" && !WaitlistMailer.live?("android") %>
+    <p style="margin: 0 0 16px;">On Android too? It's on its way, and we'll email you the moment it's out.</p>
+  <% end %>
+  <p style="margin: 0 0 22px;">With love,<br>The Brethreign team</p>
+  <p style="margin: 24px 0 0; color: #5e6862; font-size: 12px;">Sent to <strong><%= @entry.email %></strong> because you joined the Brethreign app waitlist. <a href="<%= @leave_url %>" style="color: #5e6862;">Leave the waitlist</a></p>
+</div>

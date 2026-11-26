@@ -1,0 +1,19 @@
+<div style="max-width: 560px; margin: 0 auto; font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17251d; line-height: 1.65; font-size: 15.5px;">
+  <h1 style="font-family: Georgia, 'Times New Roman', serif; font-size: 26px; line-height: 1.2; margin: 4px 0 16px; color: #17251d;">You're on the list</h1>
+  <% if @live.any? %>
+    <p style="margin: 0 0 16px;">Thanks for joining the Brethreign app waitlist. Good news: you don't have to wait.</p>
+    <p style="margin: 0 0 20px;">
+      <% @live.each do |(_platform, store, url)| %>
+        <a href="<%= url %>" style="display: inline-block; margin: 0 8px 8px 0; padding: 11px 18px; border-radius: 999px; background: #0e5c43; color: #ffffff; font-weight: 800; font-size: 14px; text-decoration: none;"><%= store[:button] %></a>
+      <% end %>
+    </p>
+    <% if @entry.platform == "both" && @live.size < 2 %>
+      <p style="margin: 0 0 16px;">We'll email you again when Brethreign is on <%= @live.map(&:first).include?("ios") ? "Android" : "iPhone" %> too.</p>
+    <% end %>
+  <% else %>
+    <p style="margin: 0 0 16px;">Thanks for joining the Brethreign app waitlist. We'll email <strong><%= @entry.email %></strong> as soon as Brethreign is on <%= @entry.platform_name %>.</p>
+  <% end %>
+  <p style="margin: 0 0 20px;">Until then, Brethreign works in any browser at <a href="<%= @site_url %>" style="color: #0e5c43; font-weight: 700;">brethreign.com</a>: a kind place for conversations about work, life and faith.</p>
+  <p style="margin: 0 0 22px;">With love,<br>The Brethreign team</p>
+  <p style="margin: 24px 0 0; color: #5e6862; font-size: 12px;">Sent to <strong><%= @entry.email %></strong> because you joined the Brethreign app waitlist. <a href="<%= @leave_url %>" style="color: #5e6862;">Leave the waitlist</a></p>
+</div>

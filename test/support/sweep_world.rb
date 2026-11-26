@@ -154,6 +154,7 @@ module SweepWorld
     in [ "reading_plans", "slug" ] then ReadingPlan.all.first&.slug || "none"
     in [ "notifications", "id" ] then @notification.id
     in [ "contact_shares", "id" ] then 0
+    in [ "app_waitlist_entries", "token" ] then AppWaitlistEntry.find_or_create_by!(email: "sweep@example.com") { |e| e.platform = "ios" }.leave_token
     in [ "blog", "slug" ] then BlogArticle.all.first&.slug || "none"
     in [ "settings/experiences", "id" ] then @experience.id
     in [ "settings/educations", "id" ] then @education.id
