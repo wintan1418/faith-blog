@@ -1,0 +1,93 @@
+<%# "Your walk" on phones and in the apps, where the left rail (feed/_walk)
+    isn't shown: one row of stat cards that scrolls sideways, folded to a
+    single line when closed. Each card opens the place it counts.
+    Bible reading is left out while the Daily Bible card above is open (it
+    shows today's chapter and the streak), so the two don't repeat each other;
+    folded or put away, the strip carries the Bible streak instead.
+    Locals: plan (UserReadingPlan or nil), habit (BibleHabit or nil), prayer_room %>
+<%
+  plan = local_assigns[:plan]
+  habit = local_assigns[:habit]
+  streak = current_user.current_breath_streak.to_i
+  breathed_today = current_user.posts.published.where(created_at: Time.current.all_day).exists?
+  prayed = walk_prayed_this_week(current_user)
+  bible_streak = habit&.streak.to_i
+  show_bible = habit && (habit.card_hidden_today? || habit.card_collapsed_today?)
+  portion = habit&.portion if show_bible
+%>
+<details class="eg-walkstrip" id="your-walk" open data-controller="walk-strip" data-action="toggle->walk-strip#remember">
+  <summary class="eg-walkstrip-head">
+    <span class="eg-walkstrip-title">Your walk</span>
+    <%# What's left to see when it's folded. %>
+    <span class="eg-walkstrip-peek" aria-hidden="true">
+      <span><%= render_icon("flame", classes: "eg-walkstrip-peek-icon is-gold") %><%= streak %></span>
+      <% if habit %><span><%= render_icon("bookopen", classes: "eg-walkstrip-peek-icon is-green") %><%= bible_streak %></span><% end %>
+      <% if plan %><span><%= render_icon("calendar", classes: "eg-walkstrip-peek-icon is-green") %><%= plan.current_day %>/<%= plan.days_total %></span><% end %>
+      <span><%= render_icon("pray", classes: "eg-walkstrip-peek-icon is-violet") %><%= prayed %></span>
+    </span>
+    <span class="eg-walkstrip-toggle"><span class="sr-only">Show or hide</span><%= render_icon("chevrondown", classes: "h-4 w-4") %></span>
+  </summary>
+
+  <div class="eg-walkstrip-row" role="list">
+    <% if breathed_today %>
+      <%= link_to user_path(current_user.username), class: "eg-walkstat", role: "listitem" do %>
+        <span class="eg-tile is-gold"><%= render_icon("flame", classes: "h-4 w-4") %></span>
+        <strong class="eg-walkstat-value"><%= walk_days(streak) %></strong>
+        <span class="eg-walkstat-label">Breath streak</span>
+        <span class="eg-walkstat-sub is-done">Breathed today</span>
+      <% end %>
+    <% else %>
+      <button type="button" class="eg-walkstat" role="listitem" data-action="click->composer-modal#open">
+        <span class="eg-tile is-gold"><%= render_icon("flame", classes: "h-4 w-4") %></span>
+        <strong class="eg-walkstat-value"><%= walk_days(streak) %></strong>
+        <span class="eg-walkstat-label">Breath streak</span>
+        <span class="eg-walkstat-sub is-link">Breathe today</span>
+      </button>
+    <% end %>
+
+    <% if show_bible %>
+      <%= link_to (portion ? scripture_page_path(portion.first.slug) : daily_bible_start_path), class: "eg-walkstat", role: "listitem" do %>
+        <span class="eg-tile is-green"><%= render_icon("bookopen", classes: "h-4 w-4") %></span>
+        <strong class="eg-walkstat-value"><%= bible_streak.positive? ? pluralize(bible_streak, "day") : (habit.read_today? ? "Today" : "Start") %></strong>
+        <span class="eg-walkstat-label">Bible streak</span>
+        <% if habit.read_today? %>
+          <span class="eg-walkstat-sub is-done">Read today</span>
+        <% elsif portion %>
+          <span class="eg-walkstat-sub"><%= portion.label %></span>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if plan %>
+      <%= link_to reading_plan_path(plan.plan_slug), class: "eg-walkstat is-plan", role: "listitem" do %>
+        <span class="eg-tile is-green"><%= render_icon("calendar", classes: "h-4 w-4") %></span>
+        <strong class="eg-walkstat-value">Day <%= plan.current_day %>/<%= plan.days_total %></strong>
+        <span class="eg-walkstat-label"><%= plan.plan&.title.presence || "Reading plan" %></span>
+        <span class="eg-walkstat-bar" aria-hidden="true"><span style="width: <%= plan.progress_percent %>%"></span></span>
+        <% if plan.can_check_in_today? && (ref = plan.today_reading&.dig(:reference)).present? %>
+          <span class="eg-walkstat-sub">Today: <%= ref %></span>
+        <% elsif !plan.can_check_in_today? %>
+          <span class="eg-walkstat-sub is-done">Done for today</span>
+        <% end %>
+      <% end %>
+    <% elsif habit.nil? %>
+      <%= link_to reading_plans_path, class: "eg-walkstat", role: "listitem" do %>
+        <span class="eg-tile is-green"><%= render_icon("calendar", classes: "h-4 w-4") %></span>
+        <strong class="eg-walkstat-value is-link">Start</strong>
+        <span class="eg-walkstat-label">Reading plan</span>
+      <% end %>
+    <% end %>
+
+    <%= link_to walk_prayer_path(local_assigns[:prayer_room]), class: "eg-walkstat", role: "listitem" do %>
+      <span class="eg-tile is-violet"><%= render_icon("pray", classes: "h-4 w-4") %></span>
+      <strong class="eg-walkstat-value"><%= prayed %></strong>
+      <span class="eg-walkstat-label">Prayed this week</span>
+      <span class="eg-walkstat-sub is-link">Pray for someone</span>
+    <% end %>
+
+    <%= link_to walk_path, class: "eg-walkstat is-more", role: "listitem", aria: { label: "See your whole walk" } do %>
+      <span class="eg-walkstat-more-icon"><%= render_icon("chevronright", classes: "h-5 w-5") %></span>
+      <span class="eg-walkstat-label">See all</span>
+    <% end %>
+  </div>
+</details>

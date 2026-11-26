@@ -191,6 +191,9 @@
 
       <%= render "daily_bible/card", habit: @bible_habit, readers: @bible_readers if @bible_habit %>
 
+      <%# Phones and the apps: the left rail's "Your walk" as a strip (hidden on computers). %>
+      <%= render "feed/walk_strip", plan: @user_reading_plan, habit: @bible_habit, prayer_room: @prayer_room %>
+
       <%= render "feed/birthdays", birthdays: @birthdays_today %>
 
       <%# The Daily Breath question is the composer's prompt. %>

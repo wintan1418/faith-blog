@@ -3,10 +3,7 @@
     this week. Locals: plan (UserReadingPlan or nil), extra_class %>
 <%
   streak = current_user.current_breath_streak.to_i
-  week = 1.week.ago..
-  # Prayer chains joined plus "Praying" taps on requests, this week.
-  prayed_this_week = current_user.prayer_intercessions.where(created_at: week).count +
-                     current_user.likes.where(reaction_type: :praying, created_at: week).count
+  prayed_this_week = walk_prayed_this_week(current_user)
 %>
 <section class="eg-card eg-walk <%= local_assigns[:extra_class] %>" aria-label="Your walk">
   <%= link_to user_path(current_user.username), class: "eg-walk-me" do %>
@@ -26,7 +23,7 @@
   <div class="eg-walk-row">
     <span class="eg-tile is-gold"><%= render_icon("flame", classes: "h-5 w-5") %></span>
     <span class="eg-walk-label">Breath streak</span>
-    <strong class="eg-walk-value"><%= streak.positive? ? pluralize(streak, "day") : "Start" %></strong>
+    <strong class="eg-walk-value"><%= walk_days(streak) %></strong>
   </div>
 
   <% if (bible = current_user.bible_habit) %>

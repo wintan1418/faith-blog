@@ -132,6 +132,8 @@ application.register("message-edit", MessageEditController)
 
 import MessageMenuController from "./message_menu_controller"
 application.register("message-menu", MessageMenuController)
+import WalkStripController from "./walk_strip_controller"
+application.register("walk-strip", WalkStripController)
 
 import MessageShareController from "./message_share_controller"
 application.register("message-share", MessageShareController)

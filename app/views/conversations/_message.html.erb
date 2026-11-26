@@ -1,4 +1,5 @@
 <% message = local_assigns.fetch(:message) %>
+<% quick_reactions = %w[❤️ 🙏 😂 😮 😢 👍] %>
 <%# Never touch current_user eagerly — this partial is also rendered in
     Action Cable broadcasts (no request context), where current_user raises. %>
 <% viewer_id = local_assigns[:viewer_id] || current_user&.id %>
@@ -39,7 +40,8 @@
         <span class="sr-only"><%= mine ? "You" : message.sender.display_name %>:</span>
       <% end %>
 
-      <div class="msg-bubble<%= ' is-plain' if plain %><%= ' has-voice' if !deleted && !removed && message.has_voice_note? %>" data-controller="message-menu" data-action="click->message-menu#toggle">
+      <div class="msg-bubble<%= ' is-plain' if plain %><%= ' has-voice' if !deleted && !removed && message.has_voice_note? %>" data-controller="message-menu"
+           data-action="click->message-menu#swallowClick:capture click->message-menu#toggle mouseenter->message-menu#hoverPlace touchstart->message-menu#holdStart:passive touchmove->message-menu#holdMove:passive touchend->message-menu#holdEnd touchcancel->message-menu#holdEnd contextmenu->message-menu#suppressContextMenu">
         <% if deleted %>
           <p class="msg-deleted">This message was deleted</p>
         <% elsif removed %>
@@ -77,14 +79,11 @@
             <div class="msg-media-row">
               <div class="msg-images <%= "is-grid-#{[message.images.count, 4].min}" %>" data-controller="lightbox">
                 <% message.images.each do |img| %>
-                  <%# Each photo has its own download arrow, so saving it doesn't
-                      mean opening it full screen first. %>
+                  <%# Tapping opens the viewer (with Save); Download is also in the ⋯ menu. %>
                   <div class="msg-image-wrap">
                     <%= image_tag photo_src(img, width: 900), class: "msg-image", loading: "lazy", alt: "Photo",
                                   data: { download: message_file_download_path(message, img),
                                           download_legacy: rails_blob_path(img, disposition: "attachment") } %>
-                    <%= render "conversations/media_download", message: message, attachment: img,
-                               label: "Download photo", class_name: "msg-media-get is-on-photo" %>
                   </div>
                 <% end %>
               </div>
@@ -138,8 +137,6 @@
                   <span class="msg-voice-total" data-voice-player-target="total"></span>
                 </span>
               </div>
-              <%= render "conversations/media_download", message: message, attachment: message.voice_note,
-                         label: "Download voice note", class_name: "msg-media-get" %>
               <% unless deleted || removed %>
                 <button type="button" class="msg-more" data-action="message-menu#toggleFromButton"
                         title="Message options" aria-label="Message options"><%= render_icon("more", classes: "h-5 w-5") %></button>
@@ -169,9 +166,16 @@
         <% unless deleted || removed %>
           <div class="msg-actions" data-message-menu-target="actions"
                data-controller="emoji-reactions message-edit"
+               data-action="message-menu:closed->emoji-reactions#hideQuick"
                data-emoji-reactions-url-value="<%= likes_path(likeable_type: "Message", likeable_id: message.id) %>"
+               data-emoji-reactions-unlike-url-value="<%= unlike_path(likeable_type: "Message", likeable_id: message.id) %>"
+               data-emoji-reactions-mine-emoji-value="<%= user_like&.display_emoji %>"
                data-emoji-reactions-token-value="<%= form_authenticity_token %>">
-            <button type="button" class="msg-action" data-action="click->emoji-reactions#toggle" title="React" aria-label="React">
+            <div class="msg-action-row">
+            <%# React: one small button; tap (or hover on a computer) pops up the quick-reaction pill. %>
+            <button type="button" class="msg-action msg-action--react" title="React" aria-label="React"
+                    aria-haspopup="true" aria-expanded="false"
+                    data-action="click->emoji-reactions#toggleQuick mouseenter->emoji-reactions#hoverQuick">
               <%= render_icon("smile", classes: "h-4 w-4") %>
             </button>
             <button type="button" class="msg-action msg-action--reply" title="Reply" aria-label="Reply to this message"
@@ -180,6 +184,12 @@
                     data-reply-snippet="<%= message.quote_snippet %>">
               <%= render_icon("reply", classes: "h-4 w-4") %>
             </button>
+            <% if message.body.present? %>
+              <button type="button" class="msg-action" title="Copy" aria-label="Copy text"
+                      data-action="message-menu#copy" data-message-menu-text-param="<%= message.body %>">
+                <%= render_icon("copy", classes: "h-4 w-4") %>
+              </button>
+            <% end %>
             <%= link_to forward_conversation_message_path(message.conversation_id, message), class: "msg-action",
                   title: "Forward", aria: { label: "Forward to another chat" }, data: { turbo_frame: "_top" } do %>
               <%= render_icon("forward", classes: "h-4 w-4") %>
@@ -194,6 +204,19 @@
                       data-message-share-files-value="<%= share_docs.to_json %>"
                       data-action="click->message-share#share">
                 <%= render_icon("share", classes: "h-4 w-4") %>
+              </button>
+            <% end %>
+            <%# Download / save lives here, not as buttons on the bubble (QA: too loud). %>
+            <% if message.has_voice_note? %>
+              <%= render "conversations/media_download", message: message, attachment: message.voice_note,
+                         label: "Download voice note", class_name: "msg-action msg-action--download" %>
+            <% elsif message.has_images? && message.images.size == 1 %>
+              <%= render "conversations/media_download", message: message, attachment: message.images.first,
+                         label: "Download photo", class_name: "msg-action msg-action--download" %>
+            <% elsif message.has_images? %>
+              <button type="button" class="msg-action msg-action--download" data-action="message-menu#viewPhotos"
+                      title="Save photos" aria-label="Save photos (opens the viewer)">
+                <%= render_icon("download", classes: "h-4 w-4") %>
               </button>
             <% end %>
             <% if mine %>
@@ -213,6 +236,21 @@
                 <%= render_icon("flag", classes: "h-4 w-4") %>
               <% end %>
             <% end %>
+            </div>
+            <%# The quick-reaction pill: tap an emoji to react (tap yours again to take
+                it back), + for any emoji. Pinned on screen next to React when open. %>
+            <div class="msg-react-pill" role="group" aria-label="Choose a reaction" hidden
+                 data-emoji-reactions-target="quick">
+              <% quick_reactions.each do |emoji| %>
+                <% chosen = user_like&.display_emoji == emoji %>
+                <button type="button" class="msg-react-quick<%= ' is-mine' if chosen %>"
+                        data-action="click->emoji-reactions#quick" data-emoji-reactions-emoji-param="<%= emoji %>"
+                        title="<%= chosen ? 'Remove your reaction' : 'React' %>" aria-label="<%= chosen ? 'Remove reaction' : 'React with' %> <%= emoji %>"
+                        aria-pressed="<%= chosen %>"><%= emoji %></button>
+              <% end %>
+              <button type="button" class="msg-react-more" data-action="click->emoji-reactions#toggle"
+                      title="More reactions" aria-label="More reactions"><%= render_icon("plus", classes: "h-4 w-4") %></button>
+            </div>
             <div class="fc-reaction-picker hidden" data-emoji-reactions-target="picker">
               <emoji-picker style="width: 300px; height: 340px;"></emoji-picker>
             </div>
@@ -221,7 +259,7 @@
       </div>
 
       <% if !deleted && !removed && (emoji_groups.any? || user_like) %>
-        <%# Chats are one-on-one, so reactions show without a count. %>
+        <%# Compact chips grouped by emoji; a count only when more than one person chose it. %>
         <div class="msg-reactions">
           <% emoji_groups.each do |emoji, group| %>
             <% mine_emoji = user_like&.display_emoji == emoji %>
@@ -230,12 +268,14 @@
               <%= button_to unlike_path(likeable_type: "Message", likeable_id: message.id),
                   method: :delete, form_class: "inline", class: "msg-reaction is-mine", title: "Remove your reaction" do %>
                 <span><%= emoji %></span>
+                <% if group.size > 1 %><span class="msg-reaction-count"><%= group.size %></span><% end %>
                 <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
               <% end %>
             <% else %>
               <%= button_to likes_path(likeable_type: "Message", likeable_id: message.id, reaction_emoji: emoji),
                   form_class: "inline", class: "msg-reaction" do %>
                 <span><%= emoji %></span>
+                <% if group.size > 1 %><span class="msg-reaction-count"><%= group.size %></span><% end %>
                 <% if tip.present? %><span class="fc-reaction-tip" role="tooltip"><%= tip %></span><% end %>
               <% end %>
             <% end %>

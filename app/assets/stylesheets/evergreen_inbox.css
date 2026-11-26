@@ -291,7 +291,7 @@ html body .msg-page .msg-filters .msg-filter-count {
   box-shadow: none;
   color: var(--fc-on-fill);
 }
-.msg-item.is-mine .msg-bubble a:not(.msg-doc):not(.msg-quote):not(.msg-media-get):not(.msg-action) { color: inherit; text-decoration: underline; }
+.msg-item.is-mine .msg-bubble a:not(.msg-doc):not(.msg-quote):not(.msg-action) { color: inherit; text-decoration: underline; }
 /* Photos alone, or a verse alone: no bubble around them. */
 .msg-page .msg-bubble.is-plain,
 .msg-page .msg-item.is-mine .msg-bubble.is-plain {
@@ -463,11 +463,6 @@ html.theme-dark .msg-page .msg-quote { background: var(--fc-surface-2); }
 .msg-voice-player.is-playing .msg-voice-current { display: inline; }
 .msg-voice-player.is-playing .msg-voice-total { display: none; }
 .msg-voice-total:empty::before { content: "0:00"; }
-.msg-page .msg-bubble .msg-media-get { width: 36px; height: 36px; border: 0; background: var(--fc-surface-2); color: var(--fc-accent); }
-.msg-page .msg-item.is-mine .msg-bubble .msg-media-get:not(.is-on-photo) {
-  background: color-mix(in oklch, var(--fc-on-fill) 16%, var(--fc-fill));
-  color: var(--fc-on-fill);
-}
 .msg-more { width: 40px; height: 40px; color: inherit; }
 .msg-more svg { opacity: 0.8; }
 
@@ -484,16 +479,83 @@ html.theme-dark .msg-page .msg-quote { background: var(--fc-surface-2); }
 .msg-page .msg-money-tip strong { color: var(--fc-gold); }
 .msg-money-tip-icon { display: inline-block; width: 14px; height: 14px; margin: -2px 2px 0 0; vertical-align: middle; color: var(--fc-gold); }
 
-/* Hover / tap actions */
+/* Hover (computers) / ⋯, tap or long press (phones): the message menu, one
+   compact row of actions led by React. A phone's open menu is pinned on screen
+   by message_menu_controller (position: fixed, inside the screen edges); on a
+   computer it floats above the bubble on hover. */
 .msg-actions {
+  top: auto;
+  bottom: calc(100% + 4px);
+  left: 0;
+  right: auto;
+  z-index: 40;
+  gap: 2px;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  padding: 3px;
   border: 0;
+  border-radius: 999px;
   background: var(--fc-surface);
-  box-shadow: 0 0 0 1px var(--fc-line), 0 6px 18px rgba(0, 0, 0, 0.12);
+  color: var(--fc-ink);
+  box-shadow: 0 0 0 1px var(--fc-line), 0 8px 24px rgba(0, 0, 0, 0.16);
 }
-.msg-item.is-mine .msg-actions { right: auto; left: 0; }
-.msg-action { width: 34px; height: 34px; color: var(--fc-muted); }
+.msg-item.is-mine .msg-actions { left: auto; right: 0; }
+.msg-actions.opens-down { bottom: auto; top: calc(100% + 4px); }
+/* Opacity only: a transform here would shift the pinned pill inside it. */
+.msg-actions.is-open { animation: msg-fade-in 120ms ease-out; }
+@keyframes msg-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.msg-action-row { display: flex; align-items: center; gap: 2px; }
+.msg-action-row form { margin: 0; display: inline-flex; }
+.msg-action { width: 34px; height: 34px; color: var(--fc-muted); text-decoration: none; }
 .msg-action:hover { background: var(--fc-surface-2); color: var(--fc-ink); }
-@media (hover: none), (pointer: coarse) { .msg-action { width: 44px; height: 44px; } }
+.msg-action.is-done { color: var(--fc-accent); background: var(--fc-accent-soft); }
+.msg-action--react[aria-expanded="true"] { color: var(--fc-accent); background: var(--fc-accent-soft); }
+.msg-page .msg-item.is-mine .msg-bubble .msg-actions .msg-action { color: var(--fc-muted); }
+.msg-page .msg-item.is-mine .msg-bubble .msg-actions .msg-action--react[aria-expanded="true"] { color: var(--fc-accent); }
+
+/* The quick-reaction pill that pops up from React. */
+.msg-react-pill {
+  position: fixed;
+  z-index: 80;
+  display: flex; align-items: center; gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--fc-surface);
+  box-shadow: 0 0 0 1px var(--fc-line), 0 10px 28px rgba(0, 0, 0, 0.2);
+  animation: msg-pill-in 160ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.msg-react-pill[hidden] { display: none; }
+/* Bridges the gap to React so a mouse moving up doesn't fall off it. */
+.msg-react-pill::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 10px; }
+.msg-react-pill.is-below::after { top: auto; bottom: 100%; }
+@keyframes msg-pill-in { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+.msg-react-quick, .msg-react-more {
+  display: inline-grid; place-items: center; flex: none;
+  width: 36px; height: 36px; border: 0; border-radius: 999px;
+  background: transparent; cursor: pointer;
+  font-size: 1.3rem; line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+.msg-react-quick:hover, .msg-react-quick:focus-visible { background: var(--fc-surface-2); transform: scale(1.18); outline: none; }
+.msg-react-quick:active { transform: scale(0.92); }
+.msg-react-quick.is-mine { background: var(--fc-accent-soft); box-shadow: inset 0 0 0 1px var(--fc-accent-glow); }
+.msg-react-more { color: var(--fc-muted); background: var(--fc-surface-2); }
+.msg-react-more:hover { color: var(--fc-ink); }
+@media (prefers-reduced-motion: reduce) {
+  .msg-actions.is-open, .msg-react-pill { animation: none; }
+  .msg-react-quick, .msg-react-more { transition: none; }
+  .msg-react-quick:hover, .msg-react-quick:focus-visible { transform: none; }
+}
+@media (hover: none), (pointer: coarse) {
+  .msg-react-quick, .msg-react-more { width: 42px; height: 42px; font-size: 1.45rem; }
+  .msg-action { width: 44px; height: 44px; }
+  /* A long press opens the menu, so it shouldn't also select text or show
+     the phone's own image menu. */
+  .msg-bubble { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .msg-bubble .msg-image { -webkit-touch-callout: none; }
+  .msg-bubble.has-open-menu { box-shadow: 0 0 0 2px var(--fc-accent-glow); }
+}
 @media (hover: hover) and (pointer: fine) {
   .msg-item:hover { background: transparent; }
 }
@@ -515,6 +577,7 @@ html.theme-dark .msg-page .msg-quote { background: var(--fc-surface-2); }
   font-size: 0.8rem;
 }
 .msg-page .msg-reaction.is-mine { background: var(--fc-accent-soft); box-shadow: 0 0 0 1px var(--fc-accent-glow); }
+.msg-page .msg-reaction .msg-reaction-count { font-size: 0.72rem; font-weight: 700; color: var(--fc-muted); font-variant-numeric: tabular-nums; }
 
 /* Seen / Sent and the typing dots sit at the foot of the chat. */
 .msg-receipt {

@@ -116,27 +116,41 @@ class InboxFileDownloadsTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(@message)} a.msg-doc[data-legacy-href*='/rails/active_storage/']", count: 2
     assert_select "##{dom_id(@message)} img.msg-image[data-download-legacy*='/rails/active_storage/']", count: 1
   end
-  # Trello #94: every photo, document and voice note has its own download arrow.
-  test "each photo, document and voice note in a chat has its own download arrow" do
+  # Trello #94 made every file downloadable; QA (s79j8vDe) found the arrows on
+  # photos and voice notes too loud, so Download now sits in the ⋯ menu.
+  test "photos and voice notes download from the message menu, not from buttons on the bubble" do
     @message.images.attach(io: file_fixture_or_jpeg, filename: "IMG_2042.jpeg", content_type: "image/jpeg")
     @message.save!
     voice = @chat.messages.new(sender: @ada, body: "")
     voice.voice_note.attach(io: StringIO.new("OggS voice"), filename: "voice-note.ogg", content_type: "audio/ogg")
     voice.save!
+    single = @chat.messages.new(sender: @ada, body: "")
+    single.images.attach(io: file_fixture_or_jpeg, filename: "One.jpeg", content_type: "image/jpeg")
+    single.save!
 
     sign_in @ben
     get conversation_path(@chat)
     assert_response :success
 
+    # No download buttons on the bubbles themselves.
+    assert_select ".msg-image-wrap a", count: 0
+    assert_select ".msg-voice-row a", count: 0
+    assert_select "a.msg-media-get", count: 0
+
+    # Several photos: the menu's Save opens the viewer, which saves each one.
+    assert_select "##{dom_id(@message)} .msg-actions button.msg-action--download[data-action~='message-menu#viewPhotos']"
     @message.images.each do |img|
-      assert_select "##{dom_id(@message)} .msg-image-wrap a.msg-media-get.is-on-photo[href=?][data-turbo=false]", download_path(img)
+      assert_select "##{dom_id(@message)} img.msg-image[data-download=?]", download_path(img)
     end
-    assert_select "##{dom_id(@message)} a.msg-media-get.is-on-photo[data-legacy-href*='/rails/active_storage/']", count: 2
     assert_select "##{dom_id(@message)} a.msg-doc .msg-doc-get svg", count: 2
 
-    assert_select "##{dom_id(voice)} .msg-voice-row a.msg-media-get[href=?]", download_path(voice.voice_note.attachment, message: voice)
-    assert_select "##{dom_id(voice)} .msg-voice-row a.msg-media-get[data-legacy-href*='/rails/active_storage/']"
-    assert_select "##{dom_id(voice)} a.msg-media-get[aria-label=?]", "Download voice note: voice-note.ogg"
+    # One photo: the menu links straight to it.
+    assert_select "##{dom_id(single)} .msg-actions a.msg-action--download[href=?][data-turbo=false]", download_path(single.images.first, message: single)
+    assert_select "##{dom_id(single)} .msg-actions a.msg-action--download[data-legacy-href*='/rails/active_storage/']"
+
+    assert_select "##{dom_id(voice)} .msg-actions a.msg-action--download[href=?]", download_path(voice.voice_note.attachment, message: voice)
+    assert_select "##{dom_id(voice)} .msg-actions a.msg-action--download[data-legacy-href*='/rails/active_storage/']"
+    assert_select "##{dom_id(voice)} a.msg-action--download[aria-label=?]", "Download voice note: voice-note.ogg"
 
     # And the arrow's link hands out the voice note itself.
     sign_in @ben
@@ -145,10 +159,11 @@ class InboxFileDownloadsTest < ActionDispatch::IntegrationTest
     assert_includes response.headers["Content-Disposition"], "voice-note.ogg"
   end
 
-  test "deleted messages show no download arrows" do
+  test "deleted messages show no download links" do
     @message.update_columns(deleted_at: Time.current)
     sign_in @ben
     get conversation_path(@chat)
-    assert_select "##{dom_id(@message)} a.msg-media-get", count: 0
+    assert_select "##{dom_id(@message)} a.msg-action--download", count: 0
+    assert_select "##{dom_id(@message)} .msg-actions", count: 0
   end
 end
