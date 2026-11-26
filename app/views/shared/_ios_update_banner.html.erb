@@ -1,0 +1,8 @@
+<%# Inside the iPhone/iPad app when the App Store has a newer version (Admin → App versions). "Not now" hides it for a week. %>
+<div class="fc-app-update" role="status"
+     data-controller="onboarding"
+     data-onboarding-key-value="fc:<%= ios_update_card_key %>">
+  <span><strong>Update available.</strong> Brethreign <%= ios_latest_version %> is on the App Store, and you have <%= ios_app_version %>. Update for the newest features and fixes.</span>
+  <%= link_to "Update", ios_store_url, class: "fc-btn-primary fc-app-update__action" %>
+  <button type="button" class="fc-app-update__close" data-action="click->onboarding#dismiss" aria-label="Not now"><%= render_icon("x", classes: "h-4 w-4") %></button>
+</div>

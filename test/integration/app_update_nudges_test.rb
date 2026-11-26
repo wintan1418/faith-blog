@@ -119,4 +119,32 @@ class AppUpdateNudgesTest < ActionDispatch::IntegrationTest
     visit_as "1.0.6", edit_settings_account_path
     assert_select "a", text: "Update now"
   end
+
+  IOS_APP = "Brethreign/%s; NativeShare; NativeDownloads; Hotwire Native iOS; Turbo Native iOS; Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X)"
+
+  test "an older iPhone app sees the App Store update banner, the latest one doesn't" do
+    AppRelease.create!(platform: "ios", latest_version: "1.0.12")
+    get feed_path, headers: { "User-Agent" => format(IOS_APP, "1.0.11") }
+    assert_select ".fc-app-update", text: /1\.0\.12 is on the App Store/
+
+    get feed_path, headers: { "User-Agent" => format(IOS_APP, "1.0.12") }
+    assert_select ".fc-app-update", false
+  end
+
+  test "no iPhone banner until an App Store version is set, and never for Android" do
+    get feed_path, headers: { "User-Agent" => format(IOS_APP, "1.0.9") }
+    assert_select ".fc-app-update", false
+
+    AppRelease.create!(platform: "ios", latest_version: "1.0.12")
+    get feed_path, headers: { "User-Agent" => format(APP, "1.0.6") }
+    assert_select ".fc-app-update", text: /Google Play|is out/
+    assert_select ".fc-app-update", text: /App Store/, count: 0
+  end
+
+  test "Not now hides the iPhone banner for the week" do
+    AppRelease.create!(platform: "ios", latest_version: "1.0.12")
+    @user.dismiss_card!("ios-update-1-0-12-w#{Date.current.cweek}")
+    get feed_path, headers: { "User-Agent" => format(IOS_APP, "1.0.11") }
+    assert_select ".fc-app-update", false
+  end
 end
