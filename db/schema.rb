@@ -350,6 +350,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
     t.index ["user_id"], name: "index_certifications_on_user_id"
   end
 
+  create_table "chapter_notes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "slug", limit: 80, null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "slug"], name: "index_chapter_notes_on_user_id_and_slug", unique: true
+  end
+
   create_table "chapter_prayers", force: :cascade do |t|
     t.string "slug", limit: 80, null: false
     t.string "reference", limit: 80, null: false
@@ -359,7 +368,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
     t.datetime "generated_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "version", default: 1, null: false
+    t.text "burden"
+    t.jsonb "points", default: [], null: false
+    t.jsonb "key_verses", default: [], null: false
+    t.jsonb "themes", default: [], null: false
     t.index ["slug"], name: "index_chapter_prayers_on_slug", unique: true
+    t.index ["version"], name: "index_chapter_prayers_on_version"
   end
 
   create_table "church_history_eras", force: :cascade do |t|
@@ -994,6 +1009,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
     t.bigint "series_id"
     t.integer "series_position"
     t.bigint "page_id"
+    t.jsonb "reading_share"
     t.index "\"left\"(search_title, 512)", name: "index_posts_search_title_exact", where: "((status = 1) AND (moderation_status = 0))"
     t.index ["featured"], name: "index_posts_on_featured"
     t.index ["kind"], name: "index_posts_on_kind"
@@ -1562,6 +1578,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
   add_foreign_key "broadcasts", "users", column: "sender_id"
   add_foreign_key "celebrations", "posts", on_delete: :nullify
   add_foreign_key "certifications", "users"
+  add_foreign_key "chapter_notes", "users", on_delete: :cascade
   add_foreign_key "circle_breaths", "circles"
   add_foreign_key "circle_breaths", "users"
   add_foreign_key "circle_memberships", "circles"

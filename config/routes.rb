@@ -256,6 +256,11 @@ Rails.application.routes.draw do
   post  "bible-today/amen", to: "daily_bible#amen", as: :daily_bible_amen
   post  "bible-today/card", to: "daily_bible#card", as: :daily_bible_card
   post  "bible-today/zone", to: "daily_bible#zone", as: :daily_bible_zone
+  get   "bible-today/share/new", to: "daily_bible#new_share", as: :new_daily_bible_share
+  post  "bible-today/share", to: "daily_bible#share", as: :daily_bible_share
+  patch "bible-today/notes", to: "daily_bible#notes", as: :daily_bible_notes
+  # "Start your daily reading" on a shared reading card: the plan picker.
+  get   "bible-today", to: "daily_bible#start", as: :daily_bible_start
 
   resources :reading_plans, only: [ :index, :show ], param: :slug do
     member do

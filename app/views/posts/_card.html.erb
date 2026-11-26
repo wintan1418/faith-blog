@@ -100,6 +100,11 @@
     </div>
   </header>
 
+  <% if post.reading_reflection? %>
+    <div class="eg-post-body">
+      <%= render "posts/reading_card", post: post %>
+    </div>
+  <% else %>
   <%
     plain_text   = post.content.to_plain_text.to_s
     # Rich cards show ~6 lines behind a fade curtain (max-height 9.5em),
@@ -122,6 +127,7 @@
               data-action="click->expand-text#expand">…more</button>
     <% end %>
   </div>
+  <% end %>
 
   <div class="eg-post-extras">
     <% if post.game_share.present? %>

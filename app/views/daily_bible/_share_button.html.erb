@@ -1,0 +1,22 @@
+<%# "Share what I read": the button and its sheet. The form (key verse,
+    what stood out, today's burden, my notes, status image) loads when the
+    sheet first opens. Locals: chapter (a chapter Reference), small (optional). %>
+<span class="db-share" data-controller="reading-share">
+  <button type="button" class="db-btn db-btn-quiet<%= ' db-btn-sm' if local_assigns[:small] %>"
+          data-action="reading-share#open" data-testid="share-what-i-read">
+    <%= render_icon("share", classes: "db-i16") %> Share what I read
+  </button>
+  <dialog class="db-sheet db-share-sheet" data-reading-share-target="dialog" aria-label="Share what I read"
+          data-action="click->reading-share#backdrop keydown.esc->reading-share#close">
+    <div class="db-sheet-body">
+      <span class="db-sheet-grip" aria-hidden="true"></span>
+      <button type="button" class="db-sheet-close" data-action="reading-share#close" aria-label="Close"><%= render_icon("x", classes: "db-i16") %></button>
+      <h2 class="db-sheet-title">Share what you read</h2>
+      <p class="db-sheet-sub">A reading card for the feed that invites others to read <%= chapter %> and pray too.</p>
+      <turbo-frame id="reading_share_form_<%= chapter.slug %>" loading="lazy" src="<%= new_daily_bible_share_path(chapter: chapter.slug) %>"
+                   data-reading-share-target="frame">
+        <p class="db-share-loading">Getting <%= chapter %> ready…</p>
+      </turbo-frame>
+    </div>
+  </dialog>
+</span>

@@ -417,6 +417,7 @@ function sizesFor(format) {
 // A bare card comes back cropped to the card plus room for its shadow, with
 // canvas.cardBox = { x, y, w, h } and canvas.avatar = { x, y } (its centre).
 export function renderCard(data, opts) {
+  if (data.reading && !opts.bare) return renderReadingCard(data, opts)
   const format = FORMATS[opts.format] ? opts.format : "story"
   const { width: W, height: H } = FORMATS[format]
   const T = THEMES[opts.theme] || THEMES.light
@@ -759,4 +760,224 @@ function cropBare(source, box, avatar) {
 
 export function canvasToBlob(canvas) {
   return new Promise((resolve, reject) => canvas.toBlob(b => (b ? resolve(b) : reject(new Error("Could not make the image"))), "image/png"))
+}
+
+// ── "Read your Bible, pray every day": a shared reading ──
+// data.reading: { chapter, verse_label, verse_text, translation, note, notes,
+//                 burden, streak, name }. The QR code and link go to the chapter.
+
+const GOLD = { light: { ink: "#8a5a0b", soft: "#fbf3e2", bar: "#d4a85a" }, dark: { ink: "#f3d9a4", soft: "rgba(212,168,90,0.16)", bar: "#d4a85a" } }
+
+function readingSizes(format) {
+  if (format === "story") return { margin: 64, pad: 68, radius: 48, kicker: 26, title: [96, 88, 80, 72], verse: [58, 52, 48, 44, 40, 36, 33, 30], text: [40, 37, 34, 31, 29, 27, 25], label: 24, meta: 30, qr: 236, chip: 30 }
+  if (format === "square") return { margin: 44, pad: 52, radius: 40, kicker: 20, title: [66, 60, 54], verse: [40, 36, 33, 30, 28, 26, 24], text: [29, 27, 25, 23, 22], label: 19, meta: 24, qr: 150, chip: 23 }
+  return { margin: 52, pad: 58, radius: 44, kicker: 22, title: [76, 70, 64, 58], verse: [46, 42, 38, 35, 32, 29], text: [33, 31, 29, 27, 25], label: 21, meta: 26, qr: 170, chip: 26 }
+}
+
+export function renderReadingCard(data, opts) {
+  const format = FORMATS[opts.format] ? opts.format : "story"
+  const { width: W, height: H } = FORMATS[format]
+  const theme = opts.theme === "dark" ? "dark" : "light"
+  const T = THEMES[theme]
+  const G = GOLD[theme]
+  const S = readingSizes(format)
+  const r = data.reading || {}
+  const accent = data.accent || "#1f8a5b"
+  const accentDeep = data.accent_deep || accent
+  const accentText = theme === "dark" ? accent : accentDeep
+  const story = format === "story"
+
+  const canvas = document.createElement("canvas")
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext("2d")
+
+  const bg = ctx.createLinearGradient(0, 0, W, H)
+  bg.addColorStop(0, T.frame[0])
+  bg.addColorStop(1, T.frame[1])
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, W, H)
+  const glow = (x, y, rad, color, a) => {
+    const g = ctx.createRadialGradient(x, y, 0, x, y, rad)
+    g.addColorStop(0, hexToRgba(color, a))
+    g.addColorStop(1, hexToRgba(color, 0))
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, W, H)
+  }
+  glow(W, 0, W * 0.95, accent, T.glow)
+  glow(0, H, W * 0.85, "#d4a85a", T.glow * 0.5)
+
+  const cardX = S.margin
+  const cardW = W - S.margin * 2
+  const innerX = cardX + S.pad
+  const innerW = cardW - S.pad * 2
+  let areaTop = S.margin
+  let areaBottom = H - S.margin
+  if (story) {
+    const logoH = 76
+    drawLockup(ctx, (W - lockupWidth(logoH)) / 2, 118, logoH, accentText, T.ink)
+    areaTop = 250
+    areaBottom = H - 430
+  }
+  const gap = Math.round(S.pad * 0.5)
+  const footerH = story ? 0 : S.qr + Math.round(S.pad * 0.6)
+  const kickerH = Math.round(S.kicker * 1.9)
+  const maxCardH = areaBottom - areaTop
+
+  // Measure: the chapter title, the verse, what stood out, notes, the burden.
+  const titleFit = fitText(ctx, r.chapter || "", { sizes: S.title, weight: 800, maxWidth: innerW, maxHeight: S.title[0] * 2.4, lineHeight: 1.1, base: { bold: true } })
+  const chipH = r.streak > 1 ? Math.round(S.chip * 1.8) : 0
+  const fixed = S.pad + kickerH + gap + titleFit.height + (chipH ? chipH + gap * 0.6 : 0) + gap + footerH + S.pad
+  const room = maxCardH - fixed
+  const labelH = Math.round(S.label * 1.7)
+  // Each part gets a fair share of the room (the verse a little more); what a
+  // short part leaves over goes to the parts that still need it.
+  const parts = [
+    { kind: "verse", label: null, text: r.verse_text ? `“${r.verse_text}”` : null, sizes: S.verse, weight: 1.35, font: 600 },
+    { kind: "note", label: "What stood out to me", text: r.note, sizes: S.text, weight: 1, font: 400 },
+    { kind: "notes", label: "From my notes", text: r.notes, sizes: S.text, weight: 0.8, font: 400 },
+    { kind: "burden", label: "Today's prayer burden", text: r.burden, sizes: S.text, weight: 1, font: 400 }
+  ].filter(p => p.text)
+  // A square has room for three parts at a readable size: my notes give way.
+  if (format === "square" && parts.length > 3) parts.splice(parts.findIndex(p => p.kind === "notes"), 1)
+  const extraFor = (p) => (p.label ? labelH : 0) + (p.kind === "verse" ? S.meta * 1.9 : 0) + gap
+  const fitPart = (p, budget) => fitText(ctx, p.text, { sizes: p.sizes, weight: p.font, maxWidth: p.kind === "verse" ? innerW - 34 : innerW,
+    maxHeight: Math.max(p.sizes[p.sizes.length - 1] * 1.45, budget - extraFor(p)), lineHeight: p.kind === "verse" ? 1.36 : 1.42 })
+  const totalWeight = parts.reduce((sum, p) => sum + p.weight, 0) || 1
+  // Everything at its smallest size first; if even that doesn't fit, each part
+  // gets a weighted share and is cut to it.
+  parts.forEach(p => { p.fit = fitPart({ ...p, sizes: [p.sizes[p.sizes.length - 1]] }, 1e6) })
+  if (parts.reduce((sum, p) => sum + p.fit.height + extraFor(p), 0) > room) {
+    parts.forEach(p => { p.budget = room * p.weight / totalWeight; p.fit = fitPart(p, p.budget) })
+  }
+  for (let pass = 0; pass < 4; pass++) {
+    const used = parts.reduce((sum, p) => sum + p.fit.height + extraFor(p), 0)
+    const spare = room - used
+    const hungry = parts.filter(p => p.fit.clipped || p.fit.size < p.sizes[0])
+    if (spare < 20 || !hungry.length) break
+    // The verse is the heart of the card: it gets most of what's spare.
+    const verseFirst = hungry.some(p => p.kind === "verse") && hungry.length > 1
+    hungry.forEach(p => {
+      const share = verseFirst ? (p.kind === "verse" ? spare * 0.6 : spare * 0.4 / (hungry.length - 1)) : spare / hungry.length
+      p.budget = p.fit.height + extraFor(p) + share
+      p.fit = fitPart(p, p.budget)
+    })
+  }
+  const blocks = parts.map(p => ({ kind: p.kind, label: p.label, fit: p.fit, h: p.fit.height + extraFor(p) - gap }))
+
+  const contentH = blocks.reduce((h, b) => h + b.h + gap, 0)
+  const cardH = Math.min(maxCardH, fixed + contentH)
+  const cardY = Math.round(areaTop + (maxCardH - cardH) * (story ? 0.4 : 0.5))
+
+  ctx.save()
+  ctx.shadowColor = T.shadow
+  ctx.shadowBlur = 60
+  ctx.shadowOffsetY = 18
+  ctx.fillStyle = T.card
+  roundRect(ctx, cardX, cardY, cardW, cardH, S.radius)
+  ctx.fill()
+  ctx.restore()
+  ctx.strokeStyle = T.line
+  ctx.lineWidth = 2
+  roundRect(ctx, cardX, cardY, cardW, cardH, S.radius)
+  ctx.stroke()
+  ctx.save()
+  roundRect(ctx, cardX, cardY, cardW, cardH, S.radius)
+  ctx.clip()
+  const band = ctx.createLinearGradient(cardX, 0, cardX + cardW, 0)
+  band.addColorStop(0, accent)
+  band.addColorStop(1, "#d4a85a")
+  ctx.fillStyle = band
+  ctx.fillRect(cardX, cardY, cardW, 10)
+  ctx.restore()
+
+  let y = cardY + S.pad
+  drawPill(ctx, "READ YOUR BIBLE, PRAY EVERY DAY", innerX, y, { size: S.kicker, height: kickerH, color: G.ink, bg: G.soft, padX: S.kicker * 0.9, weight: 800 })
+  y += kickerH + gap
+  drawLines(ctx, titleFit.lines, innerX, y, { size: titleFit.size, weight: 800, lh: titleFit.lh, color: T.ink })
+  y += titleFit.height
+  if (chipH) {
+    y += gap * 0.6
+    drawPill(ctx, `🔥 ${r.streak} days in the Word`, innerX, y, { size: S.chip, height: chipH, color: accentText, bg: hexToRgba(accent, 0.14), padX: S.chip * 0.8 })
+    y += chipH
+  }
+  y += gap
+
+  for (const b of blocks) {
+    if (b.label) {
+      ctx.font = `800 ${S.label}px ${STACK}`
+      ctx.fillStyle = b.kind === "burden" ? G.ink : T.muted
+      ctx.textBaseline = "top"
+      ctx.textAlign = "left"
+      ctx.fillText(b.label.toUpperCase(), innerX, y)
+      y += labelH
+    }
+    if (b.kind === "verse") {
+      ctx.fillStyle = G.bar
+      roundRect(ctx, innerX, y + 4, 8, b.fit.height - 8, 4)
+      ctx.fill()
+      drawLines(ctx, b.fit.lines, innerX + 34, y, { size: b.fit.size, weight: 600, lh: b.fit.lh, color: T.ink })
+      y += b.fit.height
+      ctx.font = `700 ${S.meta}px ${STACK}`
+      ctx.fillStyle = accentText
+      ctx.textBaseline = "top"
+      ctx.fillText(`${r.verse_label || ""}${r.translation ? ` · ${r.translation}` : ""}`, innerX + 34, y + S.meta * 0.5)
+      y += S.meta * 1.9
+    } else {
+      drawLines(ctx, b.fit.lines, innerX, y, { size: b.fit.size, weight: 400, lh: b.fit.lh, color: b.kind === "burden" ? T.soft : T.ink })
+      y += b.fit.height
+    }
+    y += gap
+  }
+
+  const cta = `Read ${r.chapter || "it"} with me`
+  if (!story) {
+    const fy = cardY + cardH - S.pad - S.qr
+    ctx.strokeStyle = T.line
+    ctx.lineWidth = 2
+    ctx.beginPath()
+    ctx.moveTo(innerX, fy - Math.round(S.pad * 0.3))
+    ctx.lineTo(innerX + innerW, fy - Math.round(S.pad * 0.3))
+    ctx.stroke()
+    if (data.qr) drawQR(ctx, data.qr, innerX + innerW - S.qr, fy + 6, S.qr - 6, "#0f1a16")
+    const lh = Math.round(S.qr * 0.3)
+    drawLockup(ctx, innerX, fy + 4, lh, accentText, T.ink)
+    ctx.textBaseline = "middle"
+    ctx.textAlign = "left"
+    const textRoom = innerW - (data.qr ? S.qr + 28 : 0)
+    ctx.font = `700 ${S.meta}px ${STACK}`
+    ctx.fillStyle = T.ink
+    ctx.fillText(cta, innerX, fy + lh + S.meta * 1.2)
+    ctx.font = `600 ${Math.round(S.meta * 0.9)}px ${STACK}`
+    ctx.fillStyle = accentText
+    let label = data.link_label || ""
+    while (ctx.measureText(label).width > textRoom && label.length > 6) label = label.slice(0, -2) + "…"
+    ctx.fillText(label, innerX, fy + lh + S.meta * 2.4)
+    ctx.font = `400 ${Math.round(S.meta * 0.82)}px ${STACK}`
+    ctx.fillStyle = T.muted
+    ctx.fillText("Read your Bible, pray every day · brethreign.com", innerX, fy + lh + S.meta * 3.5)
+  } else {
+    const qy = H - 360
+    const qs = S.qr
+    const qx = S.margin + 8
+    if (data.qr) drawQR(ctx, data.qr, qx, qy, qs, "#0f1a16")
+    const tx = data.qr ? qx + qs + 44 : qx
+    ctx.textAlign = "left"
+    ctx.textBaseline = "alphabetic"
+    ctx.fillStyle = T.ink
+    ctx.font = `700 46px ${STACK}`
+    let ctaText = cta
+    while (ctx.measureText(ctaText).width > W - tx - S.margin && ctaText.length > 6) ctaText = ctaText.slice(0, -2) + "…"
+    ctx.fillText(ctaText, tx, qy + 70)
+    ctx.fillStyle = accentText
+    ctx.font = `600 34px ${STACK}`
+    let link = data.link_label || ""
+    while (ctx.measureText(link).width > W - tx - S.margin && link.length > 6) link = link.slice(0, -2) + "…"
+    ctx.fillText(link, tx, qy + 128)
+    ctx.fillStyle = T.muted
+    ctx.font = `400 28px ${STACK}`
+    ctx.fillText("Read your Bible, pray every day", tx, qy + 178)
+    ctx.fillText("brethreign.com", tx, qy + 216)
+  }
+  return canvas
 }

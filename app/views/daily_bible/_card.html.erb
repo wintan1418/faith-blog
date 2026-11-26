@@ -16,7 +16,8 @@
            data-controller="daily-bible"
            data-daily-bible-zone-value="<%= habit.time_zone %>"
            data-daily-bible-zone-url-value="<%= daily_bible_zone_path %>"
-           <% if read && local_assigns[:offer_prayer] && !habit.prayed_today? %>data-daily-bible-open-prayer-value="true"<% end %>>
+           <% if read && local_assigns[:offer_prayer] && !habit.prayed_today? %>data-daily-bible-open-prayer-value="true"<% end %>
+           <% if params[:bible] == "plans" %>data-daily-bible-open-sheet-value="true"<% end %>>
     <% if read %>
       <% label = daily_bible_read_today_label(habit) %>
       <% prayer_chapter = habit.today_chapter %>
@@ -41,11 +42,15 @@
               <%= render_icon("pray", classes: "db-i16") %> Pray it
             </button>
           <% end %>
-          <button type="button" class="db-btn db-btn-quiet db-btn-sm"
-                  data-action="click->composer-modal#openWith"
-                  data-composer-modal-prefill-param="<%= daily_bible_share_prefill(label) %>">
-            <%= render_icon("pen", classes: "db-i16") %> Share what stood out
-          </button>
+          <% if prayer_chapter %>
+            <%= render "daily_bible/share_button", chapter: prayer_chapter, small: true %>
+          <% else %>
+            <button type="button" class="db-btn db-btn-quiet db-btn-sm"
+                    data-action="click->composer-modal#openWith"
+                    data-composer-modal-prefill-param="<%= daily_bible_share_prefill(label) %>">
+              <%= render_icon("pen", classes: "db-i16") %> Share what stood out
+            </button>
+          <% end %>
           <%= button_to daily_bible_card_path, params: { state: "hidden" }, class: "db-icon-btn", form_class: "db-inline-form",
                 aria: { label: "Hide until tomorrow" }, title: "Hide until tomorrow" do %>
             <%= render_icon("x", classes: "db-i16") %>

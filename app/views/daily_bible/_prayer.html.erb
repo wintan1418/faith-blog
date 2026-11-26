@@ -1,16 +1,53 @@
-<%# "Pray it": a short prayer from the chapter just read, with the verses it
-    draws on, "Amen" (today's prayer done) and "Share this prayer" (a prayer
-    breath, ready to post). Shown on the chapter page after reading and in the
-    feed card's prayer sheet. Locals: habit, chapter (a chapter Reference). %>
+<%# "Pray it": the prayer burden from the chapter just read (ChapterPrayer).
+    Today's burden, 3-5 prayer points each with the verse it comes from (a
+    tap scrolls to the verse on the chapter page, or opens it from the feed),
+    then a short closing prayer, "Amen" (today's prayer done) and "Share this
+    prayer". Shown on the chapter page after reading and in the feed card's
+    prayer sheet. Locals: habit, chapter (a chapter Reference), on_page
+    (optional: true on that chapter's own page, so verse links just scroll). %>
 <% prayer = ChapterPrayer.for(chapter) %>
 <% prayed = habit.prayed_today? %>
-<section class="db-prayer<%= ' is-prayed' if prayed %>" aria-label="Pray it">
+<% on_page = local_assigns[:on_page] %>
+<% verse_href = ->(ref) { on_page ? "##{"v#{ref.verse_start}"}" : scripture_page_path(chapter.slug, anchor: "v#{ref.verse_start}") } %>
+<section class="db-prayer<%= ' is-prayed' if prayed %>" aria-label="Pray it" data-testid="pray-it">
   <p class="db-kicker"><%= render_icon("pray", classes: "db-i16") %> Pray it · <%= chapter %></p>
-  <p class="db-prayer-text"><%= prayer.body %></p>
-  <% if (verses = prayer.verse_references).any? %>
-    <p class="db-prayer-verses">Drawn from
-      <% verses.each_with_index do |verse, i| %><%= ", " if i.positive? %><%= link_to verse.to_s, scripture_page_path(verse.slug) %><% end %></p>
+
+  <% if prayer.burden.present? %>
+    <div class="db-burden">
+      <p class="db-label">Today's burden</p>
+      <p class="db-burden-text"><%= prayer.burden %></p>
+    </div>
   <% end %>
+
+  <% if prayer.points? %>
+    <div class="db-points-wrap">
+      <p class="db-label">Prayer points</p>
+      <ol class="db-points">
+        <% prayer.points.each do |point| %>
+          <li class="db-point">
+            <span class="db-point-top">
+              <% if point.label %><span class="db-point-kind is-<%= point.kind %>"><%= point.label %></span><% end %>
+              <a class="db-point-ref" href="<%= verse_href.call(point.reference) %>" aria-label="Read <%= point.reference %>"><%= render_icon("bookopen", classes: "db-i14") %><%= point.reference %></a>
+            </span>
+            <span class="db-point-text"><%= point.text %></span>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  <% elsif !prayer.current? %>
+    <p class="db-prayer-wait"><%= render_icon("clock", classes: "db-i14") %> Prayer points drawn from <%= chapter %> are being prepared. Pray this meanwhile.</p>
+  <% end %>
+
+  <div class="db-closing">
+    <% if prayer.points? %><p class="db-label">Closing prayer</p><% end %>
+    <p class="db-prayer-text"><%= prayer.body %></p>
+  </div>
+
+  <% if !prayer.points? && (verses = prayer.verse_references).any? %>
+    <p class="db-prayer-verses">Drawn from
+      <% verses.each_with_index do |verse, i| %><%= ", " if i.positive? %><%= link_to verse.to_s, verse_href.call(verse) %><% end %></p>
+  <% end %>
+
   <div class="db-actions">
     <% if prayed %>
       <p class="db-prayed"><%= render_icon("check", classes: "db-i16") %> Amen. Read &amp; prayed today</p>
@@ -21,7 +58,7 @@
     <button type="button" class="db-btn db-btn-quiet"
             data-action="click->composer-modal#openWith"
             data-composer-modal-mode-param="prayer"
-            data-composer-modal-prefill-param="<%= "Praying through #{chapter} today: #{prayer.body}" %>">
+            data-composer-modal-prefill-param="<%= daily_bible_prayer_share_text(chapter, prayer) %>">
       <%= render_icon("pen", classes: "db-i16") %> Share this prayer
     </button>
   </div>

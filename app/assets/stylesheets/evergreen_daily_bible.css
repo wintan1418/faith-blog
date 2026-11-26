@@ -157,6 +157,119 @@ html body .db-prayed { margin: 0; flex: 1 1 auto; display: inline-flex; align-it
 .db-prayer-sheet .db-prayer { padding-top: 4px; }
 .db-prayer-sheet .db-kicker { padding-right: 40px; }
 
+.db-i14 { width: 14px; height: 14px; flex: none; }
+.db-prayer .db-label { margin: 0 0 6px; }
+html body .db-burden-text {
+  margin: 0; font: 600 17px/1.5 var(--fc-serif); color: var(--fc-ink);
+}
+.db-points { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; counter-reset: db-point; }
+html body .db-point {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 12px 12px; border-radius: var(--fc-radius-sm); border: 1px solid var(--fc-line); background: var(--fc-surface);
+}
+.db-point-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.db-point-kind {
+  display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px;
+  font: 800 10px/1 var(--fc-sans); letter-spacing: 0.08em; text-transform: uppercase;
+  background: var(--eg-green-soft, var(--fc-accent-soft)); color: var(--eg-green-ink, var(--fc-accent));
+}
+.db-point-kind.is-confession, .db-point-kind.is-lament { background: var(--fc-surface-3); color: var(--fc-soft); }
+.db-point-kind.is-praise, .db-point-kind.is-thanksgiving { background: var(--fc-gold-soft); color: var(--fc-gold); }
+html body .db-point-text { font: 500 15px/1.45 var(--fc-sans); color: var(--fc-ink); }
+html body a.db-point-ref, html body a.db-point-ref:visited {
+  display: inline-flex; align-items: center; gap: 5px; min-height: 28px;
+  padding: 0 10px; border-radius: 999px; background: var(--fc-gold-soft); border: 1px solid var(--fc-gold-line);
+  font: 700 12.5px/1 var(--fc-sans); color: var(--fc-gold); text-decoration: none;
+}
+html body a.db-point-ref:hover { border-color: var(--fc-gold-fill); }
+html body .db-prayer-wait { margin: 0; display: flex; gap: 6px; align-items: center; font: 500 13px/1.4 var(--fc-sans); color: var(--fc-muted); }
+.db-closing .db-prayer-text { font-size: 16.5px; }
+.db-prayer-sheet .db-sheet-body { gap: 10px; }
+
+/* The verse a prayer point points to, when tapped on the chapter page. */
+html body .sx-cv[id] { scroll-margin-top: 96px; }
+html body .sx-cv:target { background: var(--fc-gold-soft); box-shadow: 0 0 0 4px var(--fc-gold-soft); border-radius: 4px; transition: background 0.6s; }
+
+/* ── Share what I read ────────────────────────────────────────────────── */
+.db-share { display: contents; }
+html body .db-share-loading { margin: 0; font: 500 14px/1.4 var(--fc-sans); color: var(--fc-muted); }
+.db-share-form { display: flex; flex-direction: column; gap: 14px; }
+.db-field { display: flex; flex-direction: column; gap: 0; }
+html body .db-textarea, html body .db-select {
+  width: 100%; border-radius: 14px; border: 1px solid var(--fc-line-strong); background: var(--fc-surface); color: var(--fc-ink);
+  font: 500 15px/1.5 var(--fc-sans); padding: 10px 12px; box-shadow: none;
+}
+html body .db-select { height: 44px; padding: 0 12px; }
+html body .db-textarea:focus, html body .db-select:focus { outline: 2px solid var(--fc-accent); outline-offset: 1px; border-color: transparent; }
+html body .db-verse-preview {
+  display: block; margin-top: 8px; padding: 10px 12px; border-left: 3px solid var(--fc-gold-fill); border-radius: 0 10px 10px 0;
+  background: var(--fc-gold-soft); font: 500 15px/1.5 var(--fc-serif); color: var(--fc-ink);
+}
+html body .db-verse-preview[hidden] { display: none; }
+.db-check { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--fc-line); }
+.db-check:has(input:checked) { border-color: var(--fc-accent); background: var(--fc-accent-soft); }
+html body .db-check input { margin: 3px 0 0; width: 18px; height: 18px; flex: none; accent-color: var(--fc-accent); }
+.db-check span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.db-check strong { font: 700 14px/1.3 var(--fc-sans); color: var(--fc-ink); }
+.db-check small { font: 500 13px/1.4 var(--fc-sans); color: var(--fc-muted); }
+html body .db-share-hint { margin: 0; font: 500 12.5px/1.45 var(--fc-sans); color: var(--fc-muted); }
+
+/* ── My notes (chapter pages) ─────────────────────────────────────────── */
+html body .db-notes {
+  margin: 12px 0 0; border-radius: var(--fc-radius-sm); border: 1px solid var(--fc-line); background: var(--fc-surface); color: var(--fc-ink);
+}
+.db-notes-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; cursor: pointer; list-style: none; }
+.db-notes-head::-webkit-details-marker { display: none; }
+.db-notes-title { display: inline-flex; align-items: center; gap: 6px; font: 700 15px/1.3 var(--fc-sans); }
+.db-notes-private { display: inline-flex; align-items: center; gap: 4px; font: 700 11px/1 var(--fc-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fc-muted); }
+.db-notes-form { display: flex; flex-direction: column; gap: 10px; padding: 0 14px 14px; }
+.db-notes-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+html body .db-notes-status { margin: 0; display: inline-flex; align-items: center; gap: 5px; font: 500 12.5px/1.4 var(--fc-sans); color: var(--fc-muted); }
+
+/* ── Reading card in the feed and on the post page (rc-*) ─────────────── */
+html body .rc-card {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 12px;
+  margin: 2px 0 4px; padding: 18px 18px 16px; border-radius: 20px;
+  border: 1px solid var(--fc-gold-line);
+  background:
+    radial-gradient(120% 80% at 100% 0%, var(--fc-accent-soft) 0%, transparent 55%),
+    linear-gradient(180deg, var(--fc-gold-soft) 0%, var(--fc-surface) 70%);
+  color: var(--fc-ink);
+}
+html body .rc-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, var(--fc-accent), var(--fc-gold-fill)); }
+.rc-i14 { width: 14px; height: 14px; flex: none; }
+.rc-i16 { width: 16px; height: 16px; flex: none; }
+.rc-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+html body .rc-kicker { margin: 0; display: inline-flex; align-items: center; gap: 6px; font: 800 11px/1.2 var(--fc-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--fc-gold); }
+.rc-streak { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px; border-radius: 999px; background: var(--fc-surface); border: 1px solid var(--fc-gold-line); font: 700 12px/1 var(--fc-sans); color: var(--fc-ink); white-space: nowrap; }
+html body .rc-title { margin: -4px 0 0; font: 700 28px/1.15 var(--fc-display); }
+html body .rc-title a, html body .rc-title a:visited { color: var(--fc-ink); text-decoration: none; }
+html body .rc-verse { margin: 0; padding: 4px 0 4px 14px; border-left: 3px solid var(--fc-gold-fill); }
+html body .rc-verse p { margin: 0; font: 500 18px/1.55 var(--fc-serif); color: var(--fc-ink); }
+html body .rc-verse cite { display: block; margin-top: 6px; font: 700 12.5px/1.3 var(--fc-sans); font-style: normal; color: var(--fc-muted); }
+html body .rc-verse cite a { color: var(--fc-accent); text-decoration: none; }
+.rc-block { display: flex; flex-direction: column; gap: 4px; }
+html body .rc-label { margin: 0; display: inline-flex; align-items: center; gap: 5px; font: 800 10.5px/1.2 var(--fc-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--fc-muted); }
+html body .rc-note-copy, html body .rc-note-copy * { font-size: 15.5px; line-height: 1.55; }
+html body .rc-notes-copy { margin: 0 0 4px; font: 500 14.5px/1.55 var(--fc-sans); color: var(--fc-soft); }
+html body .rc-burden { padding: 10px 12px; border-radius: 14px; background: var(--fc-surface); border: 1px solid var(--fc-line); }
+.rc-burden .rc-label { color: var(--fc-gold); }
+html body .rc-burden-text { margin: 0; font: 500 15px/1.5 var(--fc-sans); color: var(--fc-ink); }
+.rc-ctas { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+html body .rc-btn, html body a.rc-btn {
+  flex: 1 1 0; min-height: 44px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font: 700 14px/1 var(--fc-sans); text-decoration: none; white-space: nowrap;
+}
+html body a.rc-btn-primary, html body a.rc-btn-primary:visited { background: var(--fc-fill); color: var(--fc-on-fill); }
+html body a.rc-btn-primary:hover { background: var(--fc-fill-hover); color: var(--fc-on-fill); }
+html body a.rc-btn-quiet, html body a.rc-btn-quiet:visited { background: var(--fc-surface); color: var(--eg-green-ink, var(--fc-accent)); border: 1px solid var(--fc-line-strong); }
+html body a.rc-btn-quiet:hover { border-color: var(--fc-accent); }
+@media (max-width: 420px) {
+  html body .rc-card { padding: 16px 14px 14px; }
+  html body .rc-title { font-size: 25px; }
+  .rc-ctas { flex-direction: column; }
+}
+
 /* ── Chapter pages ────────────────────────────────────────────────────── */
 html body .db-bar {
   display: flex; align-items: flex-start; gap: 12px; margin: 18px 0 16px; padding: 12px 14px;

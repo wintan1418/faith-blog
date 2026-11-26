@@ -310,6 +310,17 @@ class Post < ApplicationRecord
     game_share.present? ? GAME_SHARES[game_share["slug"]] : nil
   end
 
+  # "Read your Bible, pray every day" shared from a chapter (ReadingShare):
+  # drawn as a reading card in place of the plain body.
+  def reading_reflection? = reading_share.present? && reading_share_info.present?
+
+  def reading_share_info
+    return @reading_share_info if defined?(@reading_share_info) && @reading_share_info_for == reading_share
+
+    @reading_share_info_for = reading_share
+    @reading_share_info = ReadingShare.from(self)
+  end
+
   # FriendlyId source: prefer the explicit title, otherwise fall back to the
   # first chunk of the breath body so untitled breaths still get a slug.
   def slug_source

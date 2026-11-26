@@ -83,6 +83,7 @@
       </section>
       <% if @bible_habit %>
         <%= render "daily_bible/bar", habit: @bible_habit, chapter: ref, place: "end" %>
+        <%= render "daily_bible/notes", chapter: ref, note: @chapter_note %>
       <% elsif !user_signed_in? %>
         <%= render "daily_bible/guest_prompt" %>
       <% end %>

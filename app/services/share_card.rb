@@ -55,6 +55,7 @@ class ShareCard
       series: series_line,
       share_text: share_text
     }
+    add_reading(payload) if post.reading_reflection?
     if thread
       candidates = reply_candidates
       payload[:reply_candidates] = candidates.map { |c| reply_json(c) }
@@ -204,6 +205,31 @@ class ShareCard
     place && "Part #{place.first} of #{place.last} · #{post.series.title}"
   rescue StandardError
     nil
+  end
+
+  # A shared reading ("Read your Bible, pray every day") is drawn as a reading
+  # card, and its QR code and link go to the chapter, so whoever scans it
+  # lands on the reading itself.
+  def add_reading(payload)
+    share = post.reading_share_info
+    chapter_url = urls.scripture_page_url(share.chapter.slug)
+    payload.merge!(
+      link: chapter_url,
+      link_label: "#{urls.request.host.to_s.delete_prefix('www.')}/scripture/#{share.chapter.slug}",
+      qr: qr_modules(chapter_url),
+      share_text: "#{share.read_label}: #{ReadingShare::TAGLINE}. #{chapter_url}",
+      reading: {
+        chapter: share.chapter.to_s,
+        verse_label: share.verse&.to_s,
+        verse_text: share.verse_text,
+        translation: share.verse_text ? "KJV" : nil,
+        note: share.note? ? clip(plain_text(post.content), 600) : nil,
+        notes: share.notes,
+        burden: share.burden,
+        streak: share.streak,
+        name: post.anonymous? ? nil : (post_page ? post_page.name : post_author&.display_name)
+      }
+    )
   end
 
   def ref = ShareReferral.ref_for(sharer, post)
