@@ -524,11 +524,12 @@ html .fc-breath-actions .fc-breath-action.is-prayer-action.is-joined:active {
 }
 
 /* ── The logo (shared/_logo + shared/_logomark, from the brand pack) ──────
-   Light pages: mint mark, evergreen word. Dark pages: mint mark, cream word.
-   Pack colours: mint #3cdb9d, evergreen #12704f, cream #f5f1e6. */
+   Light pages: the pack's single-colour dark green lockup (mark and word in
+   #0d6a4b; mint beside evergreen clashed). Dark pages: mint mark, cream word.
+   Pack colours: darkg #0d6a4b, mint #3cdb9d, cream #f5f1e6. */
 :root {
-  --br-logo-mark: #3cdb9d;
-  --br-logo-word: #12704f;
+  --br-logo-mark: #0d6a4b;
+  --br-logo-word: #0d6a4b;
 }
 html.theme-dark {
   --br-logo-mark: #3cdb9d;
