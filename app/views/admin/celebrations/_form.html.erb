@@ -1,0 +1,128 @@
+<%# Admin → Celebrations: one occasion. Times are entered in the occasion's own time zone. %>
+<% zones = [["Lagos (WAT)", "Africa/Lagos"], ["Accra (GMT)", "Africa/Accra"], ["Nairobi (EAT)", "Africa/Nairobi"],
+            ["Johannesburg (SAST)", "Africa/Johannesburg"], ["London", "Europe/London"], ["New York (Eastern)", "America/New_York"],
+            ["Chicago (Central)", "America/Chicago"], ["Los Angeles (Pacific)", "America/Los_Angeles"], ["Toronto", "America/Toronto"], ["UTC", "UTC"]] %>
+<% zones << [celebration.time_zone, celebration.time_zone] unless zones.any? { |_, z| z == celebration.time_zone } %>
+<% field = "cel-admin-input" %>
+
+<div class="cel-admin-form-card">
+  <%= form_with model: [:admin, celebration], class: "cel-admin-form", html: { multipart: true } do |f| %>
+    <% if celebration.errors.any? %>
+      <div class="cel-admin-errors" role="alert"><%= celebration.errors.full_messages.to_sentence %></div>
+    <% end %>
+
+    <fieldset>
+      <legend>The occasion</legend>
+      <div class="cel-admin-grid">
+        <div>
+          <%= f.label :name, "Name (admin only)" %>
+          <%= f.text_field :name, required: true, placeholder: "Thanksgiving (US) 2026", class: field %>
+        </div>
+        <div>
+          <%= f.label :greeting_title, "Greeting title" %>
+          <%= f.text_field :greeting_title, required: true, placeholder: "Happy Thanksgiving", class: field %>
+        </div>
+      </div>
+      <div>
+        <%= f.label :message, "Short message" %>
+        <%= f.text_area :message, rows: 2, maxlength: 400, placeholder: "Counting our blessings together today. Grateful for every one of you.", class: field %>
+      </div>
+      <div class="cel-admin-grid">
+        <div>
+          <%= f.label :scripture_reference, "Scripture (optional)" %>
+          <%= f.text_field :scripture_reference, placeholder: "Psalm 100:4", class: field %>
+          <p class="cel-admin-hint">Leave the text empty and the KJV is filled in from the Bible.</p>
+        </div>
+        <div>
+          <%= f.label :hashtag, "Hashtag" %>
+          <%= f.text_field :hashtag, placeholder: "Thanksgiving", class: field %>
+          <p class="cel-admin-hint">Added to "Share a greeting".</p>
+        </div>
+      </div>
+      <div>
+        <%= f.label :scripture_text, "Verse text (KJV)" %>
+        <%= f.text_area :scripture_text, rows: 2, class: field %>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Artwork</legend>
+      <div class="cel-admin-grid is-3">
+        <div>
+          <%= f.label :accent_color, "Accent colour" %>
+          <%= f.color_field :accent_color, class: "cel-admin-color" %>
+        </div>
+        <div>
+          <%= f.label :emblem, "Emblem (emoji or flag)" %>
+          <%= f.text_field :emblem, placeholder: "🍂", maxlength: 16, class: field %>
+        </div>
+        <div>
+          <%= f.label :effect, "Moving touch" %>
+          <%= f.select :effect, Celebration::EFFECTS.invert, {}, class: field %>
+          <p class="cel-admin-hint">Off for members who ask for reduced motion.</p>
+        </div>
+      </div>
+      <div>
+        <%= f.label :artwork, "Or upload an image (optional, up to 5MB)" %>
+        <%= f.file_field :artwork, accept: "image/png,image/jpeg,image/webp", class: field %>
+        <% if celebration.artwork.attached? %>
+          <label class="cel-admin-check"><%= check_box_tag "celebration[remove_artwork]", "1", false, id: "celebration_remove_artwork" %> Remove the uploaded image (use the built-in theme)</label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>When</legend>
+      <div class="cel-admin-grid is-3">
+        <div>
+          <%= f.label :starts_local, "Starts" %>
+          <%= f.datetime_local_field :starts_local, value: celebration.starts_local, required: true, class: field %>
+        </div>
+        <div>
+          <%= f.label :ends_local, "Ends" %>
+          <%= f.datetime_local_field :ends_local, value: celebration.ends_local, required: true, class: field %>
+        </div>
+        <div>
+          <%= f.label :time_zone, "Time zone" %>
+          <%= f.select :time_zone, zones, {}, class: field %>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Who sees it</legend>
+      <div class="cel-admin-radios">
+        <label><%= f.radio_button :audience, "everyone" %> Everyone</label>
+        <label><%= f.radio_button :audience, "countries" %> Members in these countries</label>
+      </div>
+      <div class="cel-admin-countries">
+        <%= f.collection_check_boxes :country_codes, Celebration::COUNTRIES.to_a, :first, :last do |b| %>
+          <label class="cel-admin-check"><%= b.check_box %> <%= b.text %></label>
+        <% end %>
+      </div>
+      <div>
+        <%= f.label :country_list, "Other countries (ISO codes, e.g. ZM, RW)" %>
+        <%= f.text_field :country_list, value: celebration.country_list, class: field %>
+        <p class="cel-admin-hint">A member's country comes from their city, or from where they're connecting when they haven't set one.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Links and sharing</legend>
+      <div>
+        <%= f.label :post_link, "\"See the post\" link (optional)" %>
+        <%= f.text_field :post_link, value: celebration.post_link, placeholder: "https://brethreign.com/posts/happy-thanksgiving", class: field %>
+        <p class="cel-admin-hint">Paste the link of a breath, e.g. the official Brethreign page's greeting.</p>
+      </div>
+      <label class="cel-admin-check"><%= f.check_box :share_card %> Offer the share card</label>
+    </fieldset>
+
+    <div class="cel-admin-foot">
+      <%= link_to "Cancel", admin_celebrations_path, class: "fc-btn" %>
+      <%= f.submit celebration.persisted? ? "Save" : "Save as draft", class: "fc-btn" %>
+      <% unless celebration.persisted? %>
+        <%= f.submit "Save and activate", name: "activate", class: "fc-btn fc-btn-primary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

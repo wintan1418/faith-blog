@@ -201,12 +201,19 @@
       <%= render "shared/app_update_banner" if outdated_android_app? %>
       <%= render "shared/verify_email_banner" if show_verify_email_banner? %>
       <%= render "shared/contact_privacy_notice" if user_signed_in? && current_user.contact_privacy_notice_pending? && controller_path != "settings/privacies" %>
+      <%# Brethreign Celebrates: a light strip on the main pages (the feed has the full banner). %>
+      <%= render "celebrations/strip", celebration: current_celebration if celebration_strip_page? && current_celebration %>
 
       <main>
         <%= yield %>
       </main>
 
-      <%= render "shared/whats_new", release: Announcement.unseen_release_for(current_user) if user_signed_in? %>
+      <% if user_signed_in? %>
+        <% unseen_release = Announcement.unseen_release_for(current_user) %>
+        <%= render "shared/whats_new", release: unseen_release %>
+        <%# The occasion's one-time pop-up, never on top of "What's new". %>
+        <%= render "celebrations/popup", celebration: current_celebration if celebration_popup?(current_celebration, release_showing: unseen_release.present?) %>
+      <% end %>
 
       <%= render "shared/reactors_modal" %>
       <%= render "shared/guest_gate" if guest_gate? %>

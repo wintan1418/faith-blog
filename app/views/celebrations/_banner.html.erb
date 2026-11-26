@@ -1,0 +1,26 @@
+<%# Brethreign Celebrates: the occasion banner at the top of the feed.
+    locals: celebration, preview (admin preview: no dismissing) %>
+<% preview = local_assigns[:preview] %>
+<section class="cel-banner" id="celebration-banner" style="<%= celebration_style(celebration) %>"
+         aria-labelledby="cel-title-<%= celebration.id %>"
+         data-controller="celebration"
+         data-celebration-key-value="<%= celebration.dismissal_key unless preview %>"
+         data-celebration-card-value="<%= celebration_card_data(celebration) %>">
+  <%= render "celebrations/fx", celebration: celebration %>
+  <%= render "celebrations/art", celebration: celebration %>
+  <div class="cel-body">
+    <p class="cel-kicker">Brethreign celebrates</p>
+    <h2 class="cel-title" id="cel-title-<%= celebration.id %>"><%= celebration.greeting_title %></h2>
+    <% if celebration.message.present? %><p class="cel-message"><%= celebration.message %></p><% end %>
+    <% if celebration.scripture_text.present? %>
+      <blockquote class="cel-verse">
+        <p>&ldquo;<%= celebration.scripture_text %>&rdquo;</p>
+        <cite><%= celebration.scripture_reference %> <span>KJV</span></cite>
+      </blockquote>
+    <% end %>
+    <%= render "celebrations/actions", celebration: celebration %>
+  </div>
+  <button type="button" class="cel-close" data-action="celebration#dismiss" aria-label="Dismiss <%= celebration.greeting_title %>" <%= "disabled" if preview %>>
+    <%= render_icon("x", classes: "h-4 w-4") %>
+  </button>
+</section>

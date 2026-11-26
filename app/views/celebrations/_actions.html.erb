@@ -1,0 +1,26 @@
+<%# Share a greeting (composer), Send to a friend, Share card and See the post.
+    locals: celebration, compact (strip: fewer, smaller buttons) %>
+<% compact = local_assigns[:compact] %>
+<div class="cel-actions">
+  <button type="button" class="cel-btn is-primary"
+          data-action="click->celebration#used click->composer-modal#openWith"
+          data-composer-modal-prefill-param="<%= celebration.greeting_prefill %>"
+          aria-label="Share a greeting" title="Share a greeting">
+    <%= render_icon("compose", classes: "cel-btn-ico") %><span class="cel-btn-label">Share a greeting</span>
+  </button>
+  <% unless compact %>
+    <button type="button" class="cel-btn" data-action="celebration#sendToFriend">
+      <%= render_icon("send", classes: "cel-btn-ico") %>Send to a friend
+    </button>
+    <% if celebration.share_card? %>
+      <button type="button" class="cel-btn" data-action="celebration#shareCard" data-testid="celebration-share-card">
+        <%= render_icon("image", classes: "cel-btn-ico") %>Share card
+      </button>
+    <% end %>
+  <% end %>
+  <% if celebration.post %>
+    <%= link_to post_path(celebration.post), class: "cel-btn is-link", data: { action: "celebration#used" } do %>
+      See the post<%= render_icon("chevronright", classes: "cel-btn-ico") %>
+    <% end %>
+  <% end %>
+</div>

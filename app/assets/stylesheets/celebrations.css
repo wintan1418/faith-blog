@@ -1,0 +1,372 @@
+/* ==========================================
+   Brethreign Celebrates (celebrations/_banner, _strip, _popup, _fx and the
+   logo accent). Evergreen tokens plus the occasion's own accent (--cel-accent,
+   set inline), so light, dark and every occasion colour work.
+   ========================================== */
+
+.cel-banner, .cel-strip, .cel-popup, .cel-logo-accent {
+  --cel-accent: #0e5c43;
+  --cel-ink: color-mix(in srgb, var(--cel-accent) 80%, var(--fc-ink));
+  --cel-wash: color-mix(in srgb, var(--cel-accent) 7%, var(--fc-surface));
+  --cel-line: color-mix(in srgb, var(--cel-accent) 24%, var(--fc-line));
+}
+html.theme-dark .cel-banner, html.theme-dark .cel-strip, html.theme-dark .cel-popup {
+  --cel-ink: color-mix(in srgb, var(--cel-accent) 50%, #ffffff);
+  --cel-wash: color-mix(in srgb, var(--cel-accent) 14%, var(--fc-surface));
+  --cel-line: color-mix(in srgb, var(--cel-accent) 40%, var(--fc-line));
+}
+
+/* ── Banner (top of the feed) ── */
+
+.cel-banner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 20px;
+  margin-bottom: 16px;
+  padding: 22px 56px 22px 22px;
+  border: 1px solid var(--cel-line);
+  border-radius: var(--fc-radius, 20px);
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--cel-accent) 12%, transparent), transparent 60%),
+    var(--cel-wash);
+  color: var(--fc-ink);
+  overflow: hidden;
+  isolation: isolate;
+  transition: opacity 0.24s ease, transform 0.24s ease;
+  animation: cel-in 0.4s ease-out both;
+}
+.cel-banner.is-leaving, .cel-strip.is-leaving { opacity: 0; transform: translateY(-6px); }
+@keyframes cel-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.cel-body { position: relative; z-index: 1; min-width: 0; }
+.cel-kicker {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cel-ink);
+}
+.cel-title {
+  margin-top: 4px;
+  font-family: var(--fc-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--fc-ink);
+}
+.cel-message { margin-top: 6px; font-size: 0.96rem; line-height: 1.5; color: var(--fc-soft); }
+.cel-verse {
+  margin: 12px 0 0;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid var(--cel-accent);
+}
+.cel-verse p { font-family: var(--fc-serif); font-style: italic; font-size: 1rem; line-height: 1.55; color: var(--fc-soft); }
+.cel-verse cite { display: block; margin-top: 4px; font-style: normal; font-size: 0.8rem; font-weight: 700; color: var(--cel-ink); }
+.cel-verse cite span { font-weight: 600; color: var(--fc-muted); }
+
+/* Artwork: the uploaded image or the built-in theme. */
+.cel-art {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, var(--cel-accent), color-mix(in srgb, var(--cel-accent) 62%, #000));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--cel-accent) 30%, transparent);
+  overflow: hidden;
+}
+.cel-art img { width: 100%; height: 100%; object-fit: cover; }
+.cel-art-ring {
+  position: absolute;
+  inset: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.32);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+.cel-art-emblem { position: relative; font-size: 2.4rem; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18)); }
+
+/* Actions */
+.cel-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.cel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--fc-line-strong);
+  border-radius: 999px;
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+.cel-btn:hover { border-color: var(--cel-accent); }
+.cel-btn:active { transform: scale(0.98); }
+.cel-btn:focus-visible, .cel-close:focus-visible { outline: 2px solid var(--cel-accent); outline-offset: 2px; }
+.cel-btn.is-primary {
+  border-color: var(--cel-accent);
+  background: var(--cel-accent);
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
+}
+.cel-btn.is-primary:hover { background: color-mix(in srgb, var(--cel-accent) 86%, #000); }
+.cel-btn.is-link { border-color: transparent; background: transparent; color: var(--cel-ink); padding: 0 8px; }
+.cel-btn-ico { width: 16px; height: 16px; flex: none; }
+
+.cel-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fc-surface) 70%, transparent);
+  color: var(--fc-muted);
+  cursor: pointer;
+}
+.cel-close:hover { color: var(--fc-ink); background: var(--fc-surface); }
+.cel-close:disabled { opacity: 0.4; cursor: default; }
+.cel-close.is-small { position: static; width: 32px; height: 32px; flex: none; }
+
+/* ── Strip (other main pages) ── */
+
+.cel-strip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 24px);
+  max-width: 1180px;
+  margin: 10px auto 0;
+  padding: 6px 8px 6px 14px;
+  border: 1px solid var(--cel-line);
+  border-radius: 16px;
+  background: var(--cel-wash);
+  overflow: hidden;
+  isolation: isolate;
+  transition: opacity 0.24s ease, transform 0.24s ease;
+  animation: cel-in 0.4s ease-out both;
+}
+.cel-strip-emblem { position: relative; z-index: 1; font-size: 1.25rem; line-height: 1; }
+.cel-strip-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cel-strip-text strong { font-family: var(--fc-display); font-size: 1rem; color: var(--fc-ink); overflow: hidden; text-overflow: ellipsis; }
+.cel-strip-ref { font-size: 0.8rem; font-weight: 700; color: var(--cel-ink); }
+.cel-strip .cel-actions { position: relative; z-index: 1; margin: 0; flex-wrap: nowrap; }
+.cel-strip .cel-btn { min-height: 34px; padding: 0 12px; font-size: 0.82rem; }
+
+/* ── Pop-up (once, on the first open during the occasion) ── */
+
+dialog.cel-popup {
+  width: min(440px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 26px;
+  background: var(--fc-surface);
+  color: var(--fc-ink);
+  box-shadow: var(--sh-lg);
+  overflow: auto;
+}
+dialog.cel-popup::backdrop { background: rgba(12, 18, 16, 0.5); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+dialog.cel-popup[open] { animation: cel-pop-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
+dialog.cel-popup.is-leaving { opacity: 0; transform: translateY(8px) scale(0.98); transition: opacity 0.2s ease, transform 0.2s ease; }
+@keyframes cel-pop-in { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+.cel-popup-card { position: relative; overflow: hidden; isolation: isolate; }
+.cel-popup .cel-art { width: 100%; height: 168px; border-radius: 0; box-shadow: none; }
+.cel-popup .cel-art-ring { inset: auto; width: 112px; height: 112px; }
+.cel-popup .cel-art-emblem { font-size: 3.4rem; }
+.cel-popup .cel-close { background: rgba(255, 255, 255, 0.85); color: #1c211e; }
+.cel-popup .cel-body { padding: 20px 22px 22px; text-align: center; }
+.cel-popup .cel-verse { border-left: 0; padding: 0; }
+.cel-popup .cel-verse::before {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 3px;
+  margin: 0 auto 10px;
+  border-radius: 3px;
+  background: var(--cel-accent);
+}
+.cel-popup .cel-actions { justify-content: center; }
+
+/* ── Logo accent (navbar) ── */
+
+.eg-brand { position: relative; }
+.cel-logo-accent {
+  position: absolute;
+  top: -7px;
+  left: -5px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--fc-surface);
+  box-shadow: 0 0 0 2px var(--cel-accent), 0 2px 6px rgba(0, 0, 0, 0.12);
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+  animation: cel-logo-in 0.5s 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+@keyframes cel-logo-in { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: none; } }
+
+/* ── The moving touch ── */
+
+.cel-fx { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.cel-fx i {
+  position: absolute;
+  top: -8%;
+  left: var(--x);
+  display: block;
+  width: 8px;
+  height: 8px;
+  opacity: 0;
+  animation: cel-fall calc(9s + var(--i) * 0.7s) linear infinite;
+  animation-delay: calc(var(--i) * -1.3s);
+}
+@keyframes cel-fall {
+  0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg); }
+  12%  { opacity: 0.55; }
+  85%  { opacity: 0.45; }
+  100% { opacity: 0; transform: translate3d(24px, 340px, 0) rotate(260deg); }
+}
+.cel-fx.is-confetti i { width: 7px; height: 4px; border-radius: 1px; background: var(--cel-accent); }
+.cel-fx.is-confetti i:nth-child(3n) { background: #e9be68; }
+.cel-fx.is-confetti i:nth-child(3n + 1) { background: color-mix(in srgb, var(--cel-accent) 45%, #ffffff); }
+.cel-fx.is-leaves i, .cel-fx.is-petals i { width: 10px; height: 6px; background: var(--cel-accent); border-radius: 0 100% 0 100%; }
+.cel-fx.is-leaves i:nth-child(2n) { background: #c2410c; }
+.cel-fx.is-leaves i:nth-child(3n) { background: #d9a441; }
+.cel-fx.is-petals i { border-radius: 60% 40% 60% 40%; background: color-mix(in srgb, var(--cel-accent) 40%, #ffffff); }
+.cel-fx.is-lights i, .cel-fx.is-stars i {
+  top: var(--y);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffe9b8;
+  box-shadow: 0 0 10px 3px color-mix(in srgb, #ffd479 70%, transparent);
+  animation: cel-twinkle calc(2.6s + var(--i) * 0.35s) ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.6s);
+}
+.cel-fx.is-lights i { top: calc(6px + (var(--i) * 3px)); }
+.cel-fx.is-lights i:nth-child(3n) { background: color-mix(in srgb, var(--cel-accent) 50%, #ffffff); }
+.cel-fx.is-stars i { width: 3px; height: 3px; }
+@keyframes cel-twinkle { 0%, 100% { opacity: 0.12; transform: scale(0.8); } 50% { opacity: 0.75; transform: scale(1.15); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cel-fx { display: none; }
+  .cel-banner, .cel-strip, dialog.cel-popup[open], .cel-logo-accent { animation: none; }
+  .cel-banner, .cel-strip { transition: none; }
+}
+
+/* ── Phones ── */
+
+@media (max-width: 640px) {
+  .cel-banner {
+    display: block;
+    margin: 0 0 12px;
+    padding: 16px 44px 16px 14px;
+    border-radius: 18px;
+  }
+  .cel-banner .cel-art { float: left; width: 56px; height: 56px; margin: 2px 12px 4px 0; border-radius: 16px; }
+  .cel-banner .cel-art-ring { inset: 7px; }
+  .cel-banner .cel-art-emblem { font-size: 1.5rem; }
+  .cel-banner .cel-title { font-size: 1.3rem; }
+  .cel-banner .cel-body { position: static; }
+  .cel-banner .cel-kicker, .cel-banner .cel-title, .cel-banner .cel-message, .cel-banner .cel-verse, .cel-banner .cel-actions { position: relative; z-index: 1; }
+  .cel-banner .cel-verse, .cel-banner .cel-actions { clear: both; }
+  .cel-banner .cel-actions { gap: 6px; }
+  .cel-banner .cel-btn { min-height: 38px; padding: 0 12px; font-size: 0.84rem; }
+  .cel-close { top: 8px; right: 8px; }
+  .cel-strip { width: calc(100% - 16px); margin-top: 8px; padding-left: 12px; }
+  .cel-strip-ref { display: none; }
+  .cel-strip .cel-btn.is-primary { width: 38px; padding: 0; justify-content: center; }
+  .cel-strip .cel-btn.is-primary .cel-btn-label { display: none; }
+  .cel-strip .cel-btn.is-link { display: none; }
+}
+
+/* In the iOS/Android apps there is no web top bar, so the strip sits a little lower. */
+body.hotwire-native .cel-strip { margin-top: 12px; }
+body.hotwire-native .cel-banner { margin-top: 4px; }
+
+/* The card sheet shows one square/story card: no thread strip. */
+.cel-card-sheet .share-sheet-stage { min-height: 320px; }
+
+/* ── Admin → Celebrations ── */
+
+.cel-admin-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.cel-admin-tools {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+  margin-bottom: 20px; padding: 16px 18px;
+  border: 1px solid var(--fc-line-strong); border-radius: 16px; background: var(--fc-surface);
+}
+.cel-admin-tools-title { font-weight: 800; color: var(--fc-ink); }
+.cel-admin-tools-text { max-width: 60ch; font-size: 0.88rem; color: var(--fc-muted); }
+.cel-admin-tools-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.cel-admin-toggle label { display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 700; color: var(--fc-ink); cursor: pointer; }
+.cel-admin-section { margin: 18px 0 8px; font-family: var(--fc-sans); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fc-muted); }
+.cel-admin-empty { font-size: 0.9rem; color: var(--fc-muted); }
+.fc-cms-row.cel-admin-row { grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; }
+.fc-cms-row.cel-admin-row .fc-cms-text { font-size: 0.95rem; }
+.cel-admin-swatch {
+  --cel-accent: #0e5c43;
+  display: grid; place-items: center; flex: none; width: 44px; height: 44px; border-radius: 14px;
+  background: linear-gradient(145deg, var(--cel-accent), color-mix(in srgb, var(--cel-accent) 62%, #000));
+  font-size: 1.3rem;
+}
+.cel-admin-name { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-weight: 800; color: var(--fc-ink); }
+.cel-admin-badge {
+  padding: 2px 8px; border-radius: 999px; background: var(--fc-surface-3);
+  font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fc-muted);
+}
+.cel-admin-badge.is-live-now { background: var(--fc-accent-soft); color: var(--fc-accent); }
+.cel-admin-badge.is-scheduled { background: var(--fc-gold-soft); color: var(--fc-gold); }
+.cel-admin-preview { margin-bottom: 18px; }
+.cel-admin-preview-feed { max-width: 680px; }
+.cel-admin-form-card { padding: 20px; border: 1px solid var(--fc-line-strong); border-radius: 16px; background: var(--fc-surface); }
+.cel-admin-form { display: flex; flex-direction: column; gap: 18px; }
+.cel-admin-form fieldset { display: flex; flex-direction: column; gap: 12px; padding: 0; border: 0; }
+.cel-admin-form legend { margin-bottom: 8px; font-family: var(--fc-display); font-size: 1.1rem; font-weight: 700; color: var(--fc-ink); }
+.cel-admin-form label { display: block; font-size: 0.86rem; font-weight: 700; color: var(--fc-ink); }
+.cel-admin-input {
+  width: 100%; margin-top: 4px; padding: 9px 12px;
+  border: 1px solid var(--fc-line-strong); border-radius: 10px; background: var(--fc-surface-2); color: var(--fc-ink); font-size: 0.92rem;
+}
+.cel-admin-color { width: 64px; height: 42px; margin-top: 4px; padding: 2px; border: 1px solid var(--fc-line-strong); border-radius: 10px; background: var(--fc-surface-2); }
+.cel-admin-hint { margin-top: 4px; font-size: 0.78rem; color: var(--fc-muted); }
+.cel-admin-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cel-admin-grid.is-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cel-admin-radios { display: flex; flex-wrap: wrap; gap: 16px; }
+.cel-admin-radios label, label.cel-admin-check { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.cel-admin-countries { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.cel-admin-errors { padding: 10px 12px; border-radius: 10px; background: #fef2f2; color: #b42318; font-size: 0.88rem; }
+.cel-admin-foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+@media (max-width: 640px) {
+  .cel-admin-head { flex-direction: column; }
+  .cel-admin-grid, .cel-admin-grid.is-3 { grid-template-columns: minmax(0, 1fr); }
+  .fc-cms-row.cel-admin-row { grid-template-columns: 44px minmax(0, 1fr); }
+  .fc-cms-row.cel-admin-row .fc-cms-actions { grid-column: 1 / -1; justify-content: flex-start; }
+}

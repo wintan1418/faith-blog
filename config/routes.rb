@@ -471,6 +471,16 @@ Rails.application.routes.draw do
       end
     end
     resources :announcements, only: [ :index, :new, :create, :destroy ]
+    resources :celebrations, except: :show do
+      member do
+        patch :activate
+        patch :deactivate
+      end
+      collection do
+        post :seed_presets
+        patch :auto_activate
+      end
+    end
     resources :feedback_campaigns, path: "feedback" do
       member do
         post :launch

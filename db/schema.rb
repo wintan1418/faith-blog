@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_26_150100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_183100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -310,6 +310,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_150100) do
     t.datetime "updated_at", null: false
     t.index ["sender_id"], name: "index_broadcasts_on_sender_id"
     t.index ["status"], name: "index_broadcasts_on_status"
+  end
+
+  create_table "celebrations", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "preset_key"
+    t.string "greeting_title", null: false
+    t.text "message"
+    t.string "scripture_reference"
+    t.text "scripture_text"
+    t.string "hashtag"
+    t.string "accent_color", default: "#0e5c43", null: false
+    t.string "emblem"
+    t.string "effect", default: "none", null: false
+    t.datetime "starts_at", null: false
+    t.datetime "ends_at", null: false
+    t.string "time_zone", default: "Africa/Lagos", null: false
+    t.integer "audience", default: 0, null: false
+    t.string "country_codes", default: [], null: false, array: true
+    t.bigint "post_id"
+    t.boolean "share_card", default: true, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_celebrations_on_post_id"
+    t.index ["preset_key"], name: "index_celebrations_on_preset_key", unique: true
+    t.index ["status", "ends_at"], name: "index_celebrations_on_status_and_ends_at"
   end
 
   create_table "certifications", force: :cascade do |t|
@@ -1325,6 +1351,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_150100) do
     t.index ["user_id", "series_id"], name: "index_series_follows_on_user_id_and_series_id", unique: true
   end
 
+  create_table "site_settings", force: :cascade do |t|
+    t.string "key", null: false
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_site_settings_on_key", unique: true
+  end
+
   create_table "skill_endorsements", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "endorser_id", null: false
@@ -1526,6 +1560,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_150100) do
   add_foreign_key "bot_items", "bot_sources"
   add_foreign_key "brethren_cards", "users"
   add_foreign_key "broadcasts", "users", column: "sender_id"
+  add_foreign_key "celebrations", "posts", on_delete: :nullify
   add_foreign_key "certifications", "users"
   add_foreign_key "circle_breaths", "circles"
   add_foreign_key "circle_breaths", "users"

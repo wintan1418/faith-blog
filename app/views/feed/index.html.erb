@@ -152,6 +152,7 @@
     </aside>
 
     <main class="fc-main eg-main">
+      <%= render "celebrations/banner", celebration: current_celebration if current_celebration %>
       <%# Today: the reader's own date (the server runs on UTC, so its date can
           be a day off late at night), the breath streak, the verse of the day
           and who is online right now. %>
