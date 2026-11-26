@@ -1,0 +1,14 @@
+Brethreign is on <%= @store[:store] %>
+
+You asked us to tell you when the Brethreign <%= @store[:name] %> app was out. It's here.
+
+<%= @store[:button] %>: <%= @store_url %>
+<% if @entry.platform == "both" && @platform == "ios" && !WaitlistMailer.live?("android") -%>
+
+On Android too? It's on its way, and we'll email you the moment it's out.
+<% end -%>
+
+With love,
+The Brethreign team
+
+Leave the waitlist: <%= @leave_url %>

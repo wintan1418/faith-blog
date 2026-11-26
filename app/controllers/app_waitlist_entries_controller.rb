@@ -4,7 +4,8 @@
 # guest gate lets it through). Turbo swaps the form for a thank-you; without
 # JavaScript it redirects back to the welcome page with a flash.
 #
-# No email is sent yet: see AppWaitlistEntry for where a launch mailer goes.
+# Joining sends a confirmation email; GET/POST /waitlist/leave/:token removes
+# someone (the link at the bottom of every waitlist email).
 class AppWaitlistEntriesController < ApplicationController
   BOT_MESSAGE = "We couldn't add you just now. Please try again in a moment."
   RATE_MESSAGE = "That's a lot of tries from here. Please wait a few minutes and try again."
@@ -13,6 +14,8 @@ class AppWaitlistEntriesController < ApplicationController
   rate_limit to: 15, within: 10.minutes, only: :create, name: "waitlist", store: RateLimitStore.store,
              by: -> { request.remote_ip }, with: -> { reply_error(RATE_MESSAGE, status: :too_many_requests) }
   before_action :reject_bots!, only: :create
+  before_action :find_by_token, only: %i[leave destroy]
+  skip_forgery_protection only: :destroy # one-click unsubscribe from mail apps (RFC 8058)
 
   # GET /waitlist — a page of its own for sharing; works signed in or out.
   def new
@@ -24,6 +27,7 @@ class AppWaitlistEntriesController < ApplicationController
                                    source: entry_params[:source].presence || "welcome", remote_ip: request.remote_ip)
 
     if @entry.persisted? && @entry.errors.empty?
+      WaitlistConfirmationJob.perform_later(@entry.id) if @entry.confirmed_at.nil?
       respond_to do |format|
         format.turbo_stream { render turbo_stream: turbo_stream.replace("app_waitlist", partial: "app_waitlist_entries/thanks", locals: { entry: @entry }) }
         format.html { redirect_to root_path(anchor: ANCHOR), notice: thanks_message(@entry) }
@@ -33,7 +37,21 @@ class AppWaitlistEntriesController < ApplicationController
     end
   end
 
+  # GET /waitlist/leave/:token — a button, so link scanners can't remove anyone.
+  def leave; end
+
+  # POST /waitlist/leave/:token
+  def destroy
+    @entry&.destroy
+    @left = true
+    render :leave
+  end
+
   private
+
+  def find_by_token
+    @entry = AppWaitlistEntry.find_by_leave_token(params[:token])
+  end
 
   def entry_params
     optional_params(:app_waitlist_entry).permit(:email, :platform, :source)

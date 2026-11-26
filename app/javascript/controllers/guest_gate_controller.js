@@ -17,7 +17,7 @@ const OPEN_PATHS = [
   /^\/users\/?$/,                                                       // sign-up form submit
   /^\/auth\//,                                                          // app sign-in hand-offs
   /^\/(privacy|terms|child-safety|about|guidelines|contact)\/?$/,
-  /^\/waitlist\/?$/,                                                     // "Get the app" on the welcome page
+  /^\/waitlist(\/leave\/[^/]+)?\/?$/,                                                   // "Get the app" on the welcome page
   /^\/scripture(\/|$)/                                                   // the public Bible pages (books, chapters, verses)
 ]
 

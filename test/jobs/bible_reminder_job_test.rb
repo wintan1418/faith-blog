@@ -52,7 +52,7 @@ class BibleReminderJobTest < ActiveSupport::TestCase
 
   test "skips members away for 30 days, and those who turned it off" do
     due!
-    @member.update_columns(last_seen_at: 31.days.ago)
+    @member.update_columns(last_seen_at: morning - 31.days)
     assert_no_difference(-> { Notification.count }) { BibleReminderJob.perform_now(morning) }
 
     other = create_member("reminder_off", last_seen_at: 1.hour.ago)

@@ -139,4 +139,30 @@ class AppWaitlistTest < ActionDispatch::IntegrationTest
   ensure
     ENV.delete("IOS_STORE_URL")
   end
+
+  test "joining queues a confirmation email" do
+    assert_enqueued_with(job: WaitlistConfirmationJob) do
+      post waitlist_path, params: waitlist_params, headers: TURBO
+    end
+  end
+
+  test "the leave link asks first, then removes the email" do
+    entry = AppWaitlistEntry.create!(email: "leaving@example.com", platform: "ios")
+    get leave_waitlist_path(token: entry.leave_token)
+    assert_response :success
+    assert_includes response.body, "leaving@example.com"
+    assert AppWaitlistEntry.exists?(entry.id)
+
+    post leave_waitlist_path(token: entry.leave_token)
+    assert_response :success
+    assert_includes response.body, "You've left the waitlist."
+    assert_not AppWaitlistEntry.exists?(entry.id)
+  end
+
+  test "a bad leave link removes no one" do
+    entry = AppWaitlistEntry.create!(email: "staying@example.com", platform: "ios")
+    post leave_waitlist_path(token: "nope")
+    assert_response :success
+    assert AppWaitlistEntry.exists?(entry.id)
+  end
 end

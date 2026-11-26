@@ -22,6 +22,20 @@ class Admin::AppWaitlistEntriesController < ApplicationController
     end
   end
 
+  # POST /admin/app-waitlist/notify/:platform — "the app is out" email to everyone
+  # waiting for that platform who hasn't had it yet.
+  def notify
+    platform = params[:platform]
+    unless WaitlistMailer.live?(platform)
+      return redirect_to admin_app_waitlist_entries_path, alert: "Set #{WaitlistMailer::STORES.dig(platform, :env)} on the server first, so the email has a store link."
+    end
+
+    waiting = AppWaitlistEntry.waiting_for(platform).count
+    WaitlistLaunchJob.perform_later(platform)
+    redirect_to admin_app_waitlist_entries_path,
+                notice: "Sending the #{WaitlistMailer::STORES.dig(platform, :name)} launch email to #{waiting} #{'person'.pluralize(waiting)}."
+  end
+
   private
 
   def csv_for(entries)

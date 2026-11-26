@@ -1,0 +1,22 @@
+<% content_for(:title) { "Leave the Brethreign app waitlist" } %>
+
+<div class="fc-app">
+  <div class="fc-shell" style="grid-template-columns: minmax(0, 1fr); max-width: 560px;">
+    <main class="fc-main">
+      <div class="fc-panel welcome waitlist-page" data-guest-gate-allow>
+        <% if @left %>
+          <h1 class="waitlist-page-title">You've left the waitlist.</h1>
+          <p class="waitlist-page-sub">We won't send you any more app emails. You're always welcome back.</p>
+        <% elsif @entry %>
+          <h1 class="waitlist-page-title">Leave the app waitlist?</h1>
+          <p class="waitlist-page-sub">We'll stop emailing <strong><%= @entry.email %></strong> about the Brethreign app.</p>
+          <%= button_to "Leave the waitlist", request.path, method: :post, class: "fc-btn fc-btn-primary", form: { data: { turbo: false } } %>
+        <% else %>
+          <h1 class="waitlist-page-title">This link has expired.</h1>
+          <p class="waitlist-page-sub">You may have already left the waitlist.</p>
+        <% end %>
+        <p class="waitlist-page-foot"><%= link_to "Go to Brethreign", root_path %></p>
+      </div>
+    </main>
+  </div>
+</div>
