@@ -38,7 +38,7 @@
 
     <dl class="mt-5 grid gap-3 text-sm md:grid-cols-2">
       <div><dt class="font-bold text-[var(--fc-muted)]">Tagline</dt><dd><%= @page.tagline.presence || "—" %></dd></div>
-      <div><dt class="font-bold text-[var(--fc-muted)]">Website</dt><dd><%= @page.website ? link_to(@page.website, @page.website, rel: "noopener nofollow", target: "_blank", class: "underline") : "—" %></dd></div>
+      <div><dt class="font-bold text-[var(--fc-muted)]">Website</dt><dd><%= (site = https_href(@page.website)) ? link_to(@page.website, site, rel: "noopener nofollow", target: "_blank", class: "underline") : "—" %></dd></div>
       <div><dt class="font-bold text-[var(--fc-muted)]">Created</dt><dd><%= @page.created_at.to_fs(:long) %> by <%= @page.created_by ? link_to("@#{@page.created_by.username}", admin_user_path(@page.created_by), class: "underline") : "—" %></dd></div>
       <div><dt class="font-bold text-[var(--fc-muted)]">Posts</dt><dd><%= @page.posts.count %> (<%= @page.public_posts.count %> live)</dd></div>
       <div class="md:col-span-2"><dt class="font-bold text-[var(--fc-muted)]">About</dt><dd class="whitespace-pre-wrap"><%= @page.about.presence || "—" %></dd></div>
