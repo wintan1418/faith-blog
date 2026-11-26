@@ -12,8 +12,8 @@ import { loadEmojiPicker } from "../lazy_libs"
 const HOLD_MS = 450
 
 export default class extends Controller {
-  static targets = ["picker"]
-  static values  = { url: String, unlikeUrl: String, token: String, mine: Boolean, quick: { type: String, default: "❤️" } }
+  static targets = ["picker", "quick"]
+  static values  = { url: String, unlikeUrl: String, token: String, mine: Boolean, quick: { type: String, default: "❤️" }, mineEmoji: String }
 
   connect() {
     this.boundOutsideClick = this.outsideClick.bind(this)
@@ -27,6 +27,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.hideQuick()
     document.removeEventListener("click", this.boundOutsideClick)
     this.stopFollowingScroll()
     this.cancelHold()
@@ -70,6 +71,94 @@ export default class extends Controller {
     this.openPicker(event.currentTarget)
   }
 
+  // ── Quick-reaction pill (chat messages) ────────────────────────────────
+  // One small React button; tapping it (or hovering it with a mouse) pops up
+  // a floating pill of six emojis and a + for the full picker. Choosing one
+  // reacts and closes it; a tap outside or Escape closes it too.
+  toggleQuick(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    if (!this.hasQuickTarget) return
+    // A keyboard press (detail 0) moves focus into the pill; taps and clicks don't.
+    this.quickTarget.hidden ? this.showQuick(event.currentTarget, event.detail === 0) : this.hideQuick()
+  }
+
+  hoverQuick(event) {
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return
+    if (this.hasQuickTarget && this.quickTarget.hidden) this.showQuick(event.currentTarget)
+  }
+
+  showQuick(button, focus = false) {
+    const pill = this.quickTarget
+    this.quickButton = button
+    pill.hidden = false
+    button.setAttribute("aria-expanded", "true")
+    this.placeQuick()
+    this.boundQuickOutside ||= (e) => {
+      if (!this.quickTarget.contains(e.target) && e.target !== this.quickButton && !e.target.closest?.(".fc-reaction-picker")) this.hideQuick()
+    }
+    this.boundQuickKey ||= (e) => { if (e.key === "Escape") this.hideQuick() }
+    this.boundQuickLeave ||= () => this.hideQuick()
+    setTimeout(() => document.addEventListener("click", this.boundQuickOutside, true), 0)
+    document.addEventListener("keydown", this.boundQuickKey)
+    // Leaving the message (mouse) closes it; the menu hides with it.
+    this.element.closest(".msg-item")?.addEventListener("mouseleave", this.boundQuickLeave)
+    if (focus) pill.querySelector(".msg-react-quick")?.focus({ preventScroll: true })
+  }
+
+  hideQuick() {
+    if (!this.hasQuickTarget || this.quickTarget.hidden) return
+    this.quickTarget.hidden = true
+    this.quickTarget.style.cssText = ""
+    this.quickButton?.setAttribute("aria-expanded", "false")
+    document.removeEventListener("click", this.boundQuickOutside, true)
+    document.removeEventListener("keydown", this.boundQuickKey)
+    this.element.closest(".msg-item")?.removeEventListener("mouseleave", this.boundQuickLeave)
+  }
+
+  // Above the React button (below when there's no room), inside the screen.
+  placeQuick() {
+    const pill = this.quickTarget
+    const button = this.quickButton
+    if (!button) return
+    const margin = 8
+    Object.assign(pill.style, { position: "fixed", left: "0px", top: "0px", right: "auto", bottom: "auto" })
+    // Measure without the pop-in scale, or every number comes out shrunk.
+    pill.style.animation = "none"
+    const origin = pill.getBoundingClientRect()
+    const width = pill.offsetWidth
+    const height = pill.offsetHeight
+    pill.style.animation = ""
+    const b = button.getBoundingClientRect()
+    const head = document.querySelector(".msg-thread-head")?.getBoundingClientRect()
+    const topLimit = Math.max(margin, head ? head.bottom + 4 : margin)
+
+    let top = b.top - height - 6
+    let below = false
+    if (top < topLimit) { top = b.bottom + 6; below = true }
+    top = Math.max(margin, Math.min(top, window.innerHeight - height - margin))
+    const left = Math.max(margin, Math.min(b.left + b.width / 2 - width / 2, document.documentElement.clientWidth - width - margin))
+
+    pill.style.left = `${Math.round(left - origin.left)}px`
+    pill.style.top = `${Math.round(top - origin.top)}px`
+    pill.style.transformOrigin = `${Math.round(b.left + b.width / 2 - left)}px ${below ? "top" : "bottom"}`
+    pill.classList.toggle("is-below", below)
+  }
+
+  // A chat message's quick-reaction row: tap an emoji to react with it, or
+  // tap the one you already chose to take it back.
+  quick(event) {
+    event.preventDefault()
+    event.stopPropagation()
+    const emoji = event.params.emoji
+    if (!emoji) return
+    if (emoji === this.mineEmojiValue && this.unlikeUrlValue) {
+      this.hideQuick()
+      return this.send(this.unlikeUrlValue, "DELETE")
+    }
+    return this.choose(emoji)
+  }
+
   openPicker(button) {
     if (!this.hasPickerTarget) return
     loadEmojiPicker()
@@ -95,6 +184,7 @@ export default class extends Controller {
   show() {
     this.pickerTarget.classList.remove("hidden")
     this.place()
+    this.hideQuick() // the full picker takes over from the quick pill
     setTimeout(() => document.addEventListener("click", this.boundOutsideClick), 50)
     this.boundHideOnScroll ||= () => this.hide()
     // Page scrolls only (not the picker's own list): it's pinned to the screen.
@@ -146,6 +236,7 @@ export default class extends Controller {
 
   choose(emoji) {
     this.hide()
+    this.hideQuick()
     const form = new FormData()
     form.set("reaction_emoji", emoji)
     // urlValue already carries likeable_type/id as query params; preserve them.

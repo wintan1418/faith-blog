@@ -1191,3 +1191,107 @@ html body .eg-post > :last-child:not(.fc-breath-thread) { padding-bottom: 4px; }
 /* The shell is its own layer (z-index: 1), which put the open Discover sheet
    under the page dimmer. While the sheet is open, lift it out. */
 html body.fc-discover-open .eg-feed .fc-shell { z-index: auto; }
+
+/* ── "Your walk" strip (phones and the apps) ─────────────────────────────
+   The left rail's Your walk is hidden on phones (only in the Discover sheet),
+   so testers never found it. Here it's a row of stat cards that scrolls
+   sideways, foldable to one line. Computers keep the left rail. */
+.eg-walkstrip { display: none; }
+@media (max-width: 760px) {
+  .eg-walkstrip {
+    display: block;
+    border: 1px solid var(--fc-line);
+    border-radius: 18px;
+    background: var(--fc-surface);
+    overflow: hidden;
+  }
+  /* The strip shows the breath streak; the Today card doesn't repeat it. */
+  .eg-main:has(.eg-walkstrip) .eg-today-streak { display: none; }
+}
+.eg-walkstrip-head {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 44px; padding: 6px 10px 6px 14px;
+  list-style: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.eg-walkstrip-head::-webkit-details-marker { display: none; }
+.eg-walkstrip-title { flex: none; font-family: var(--fc-display); font-size: 16px; font-weight: 700; color: var(--fc-ink); }
+.eg-walkstrip-peek {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--fc-soft);
+  overflow: hidden;
+  opacity: 0; transition: opacity 150ms ease;
+}
+.eg-walkstrip-peek > span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.eg-walkstrip:not([open]) .eg-walkstrip-peek { opacity: 1; }
+.eg-walkstrip-peek-icon { width: 14px; height: 14px; }
+.eg-walkstrip-peek-icon.is-gold { color: var(--fc-gold); }
+html:not(.theme-dark) .eg-walkstrip-peek-icon.is-gold { color: var(--fc-gold-fill); }
+.eg-walkstrip-peek-icon.is-green { color: var(--fc-accent); }
+.eg-walkstrip-peek-icon.is-violet { color: var(--eg-violet); }
+.eg-walkstrip-toggle {
+  flex: none; display: grid; place-items: center;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--eg-chip); color: var(--fc-soft);
+  transition: transform 180ms ease;
+}
+.eg-walkstrip[open] .eg-walkstrip-toggle { transform: rotate(180deg); }
+.eg-walkstrip:not([open]) .eg-walkstrip-head { min-height: 48px; }
+
+.eg-walkstrip-row {
+  display: flex; gap: 8px;
+  padding: 0 12px 12px;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity; scroll-padding: 12px;
+  scrollbar-width: none;
+}
+.eg-walkstrip-row::-webkit-scrollbar { display: none; }
+html .eg-walkstat {
+  flex: none; scroll-snap-align: start;
+  display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 8px; row-gap: 1px;
+  align-content: start; align-items: center;
+  width: 148px; min-height: 84px; padding: 10px 12px;
+  border: 0; border-radius: 14px;
+  background: var(--fc-surface-2, var(--eg-chip));
+  box-shadow: inset 0 0 0 1px var(--fc-line);
+  color: var(--fc-ink) !important; text-align: left; text-decoration: none !important;
+  font: inherit; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease;
+}
+html .eg-walkstat:active { transform: scale(0.97); }
+.eg-walkstat .eg-tile { width: 30px; height: 30px; grid-row: span 2; }
+.eg-walkstat .eg-walkstat-value, .eg-walkstat .eg-walkstat-label { grid-column: 2; }
+.eg-walkstat .eg-walkstat-sub, .eg-walkstat .eg-walkstat-bar { grid-column: 1 / -1; }
+.eg-walkstat-value { font-size: 16px; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eg-walkstat-value.is-link { color: var(--fc-accent); }
+.eg-walkstat-label {
+  font-size: 12px; font-weight: 600; line-height: 1.25; color: var(--fc-soft);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.eg-walkstat-sub {
+  padding-top: 6px; max-width: 100%;
+  font-size: 11.5px; font-weight: 600; color: var(--fc-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.eg-walkstat-sub.is-done { color: var(--fc-accent); }
+.eg-walkstat-sub.is-link { color: var(--fc-accent); }
+.eg-walkstat.is-plan { width: 168px; }
+.eg-walkstat-bar { display: block; width: 100%; height: 4px; margin-top: 8px; border-radius: 999px; background: var(--eg-chip); overflow: hidden; }
+.eg-walkstat-bar > span { display: block; height: 100%; min-width: 4px; border-radius: inherit; background: var(--fc-accent); }
+html .eg-walkstat.is-more {
+  width: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  background: transparent; box-shadow: inset 0 0 0 1px var(--fc-line);
+}
+.eg-walkstat-more-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--eg-chip); color: var(--fc-accent); }
+@media (prefers-reduced-motion: reduce) {
+  .eg-walkstrip-toggle, html .eg-walkstat, .eg-walkstrip-peek { transition: none; }
+}
+
+/* /walk: the full card on a page of its own. */
+.eg-walk-page { padding: 16px; }
+.eg-walk-page-inner { max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.eg-walk-page-note { margin: 0; font-size: 13px; color: var(--fc-muted); text-align: center; }
+html .eg-walk-page-back { align-self: center; display: inline-flex; align-items: center; gap: 6px; }
+body.hotwire-native .eg-walk-page-back { display: none; }

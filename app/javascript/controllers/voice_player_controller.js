@@ -42,12 +42,16 @@ export default class extends Controller {
     this.element.classList.toggle("is-playing", this.playing)
   }
 
+  // Tapping the waveform jumps there; on a paused note it also starts playing
+  // (a tap on a voice note should play it, not only the round button).
   seek(event) {
-    if (!this.duration()) return
-    const rect = this.progressTarget.getBoundingClientRect()
-    const x = (event.clientX ?? event.touches?.[0]?.clientX ?? 0) - rect.left
-    const pct = Math.max(0, Math.min(1, x / rect.width))
-    this.audioTarget.currentTime = pct * this.duration()
+    if (this.duration()) {
+      const rect = this.progressTarget.getBoundingClientRect()
+      const x = (event.clientX ?? event.touches?.[0]?.clientX ?? 0) - rect.left
+      const pct = Math.max(0, Math.min(1, x / rect.width))
+      this.audioTarget.currentTime = pct * this.duration()
+    }
+    if (this.audioTarget.paused) this.toggle(event)
   }
 
   onTimeUpdate() {

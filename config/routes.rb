@@ -566,6 +566,8 @@ Rails.application.routes.draw do
     post "tour/restart", action: :restart_tour, as: :restart_tour
   end
   get "me", to: "me#show", as: :me
+  # "Your walk": streaks, reading plan and prayers, a page of its own (phones reach it from the feed strip and the profile).
+  get "walk", to: "walk#show", as: :walk
   get "configurations/ios_v1.json",     to: "configurations#ios_v1",     defaults: { format: :json }
   get "configurations/android_v1.json", to: "configurations#android_v1", defaults: { format: :json }
 

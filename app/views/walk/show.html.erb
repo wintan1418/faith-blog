@@ -1,0 +1,13 @@
+<% content_for(:title) { "Your walk - Brethreign" } %>
+<% content_for(:app_title) { "Your walk" } %>
+<div class="fc-app eg-feed eg-walk-page">
+  <div class="eg-walk-page-inner">
+    <%= render "feed/walk", plan: @user_reading_plan, extra_class: "eg-walk-page-card" %>
+    <p class="eg-walk-page-note">
+      Streaks count days in a row. Breathe, read and pray a little each day to keep them going.
+    </p>
+    <%= link_to feed_path, class: "eg-btn eg-btn-soft eg-walk-page-back" do %>
+      <%= render_icon("chevron_left", classes: "h-4 w-4") %> Back to the feed
+    <% end %>
+  </div>
+</div>
