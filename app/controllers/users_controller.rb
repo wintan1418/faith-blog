@@ -137,7 +137,9 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    @user = User.find_by!(username: params[:username])
+    # Usernames keep their capitals ("Victoria"), but links and @mentions often arrive lower-case.
+    @user = User.find_by(username: params[:username]) ||
+            User.where("LOWER(username) = ?", params[:username].to_s.downcase).first!
   end
 
   def redirect_private_profile

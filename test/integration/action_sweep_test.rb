@@ -268,6 +268,7 @@ class ActionSweepTest < ActionDispatch::IntegrationTest
     post feature_admin_post_path(@post)
     ok!
     get admin_user_path(@member)
-    assert_redirected_to admin_users_path(q: @member.username)
+    assert_response :success
+    assert_select "h1", text: /#{@member.username}/
   end
 end
