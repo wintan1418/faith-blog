@@ -296,3 +296,6 @@ application.register("code-entry", CodeEntryController)
 
 import CopyTextController from "./copy_text_controller"
 application.register("copy-text", CopyTextController)
+
+import CelebrationController from "./celebration_controller"
+application.register("celebration", CelebrationController)

@@ -1,0 +1,10 @@
+<% content_for(:page_title) { "Edit #{@celebration.name}" } %>
+
+<section class="cel-admin-preview" aria-label="Preview">
+  <p class="cel-admin-section">Preview (as saved)</p>
+  <div class="cel-admin-preview-feed">
+    <%= render "celebrations/banner", celebration: @celebration, preview: true %>
+  </div>
+</section>
+
+<%= render "form", celebration: @celebration %>

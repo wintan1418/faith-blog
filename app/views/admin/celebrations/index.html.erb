@@ -1,0 +1,65 @@
+<% content_for(:page_title) { "Celebrations" } %>
+
+<div class="cel-admin-head">
+  <p class="text-sm text-[var(--fc-muted)]">
+    Special occasions members see as a banner on the feed, a strip on other pages, a one-time pop-up and a share card.
+    Nothing goes live until you activate it.
+  </p>
+  <%= link_to "+ New occasion", new_admin_celebration_path, class: "fc-btn fc-btn-primary" %>
+</div>
+
+<section class="cel-admin-tools" aria-label="Calendar">
+  <div>
+    <p class="cel-admin-tools-title">Built-in calendar</p>
+    <p class="cel-admin-tools-text">Christmas, Easter, Good Friday, Pentecost, New Year, Mother's and Father's Day, Thanksgiving and national days, with dates worked out for the next 12 months.</p>
+  </div>
+  <div class="cel-admin-tools-actions">
+    <%= button_to "Add next 12 months", seed_presets_admin_celebrations_path, class: "fc-btn", form_class: "inline" %>
+    <%= form_with url: auto_activate_admin_celebrations_path, method: :patch, class: "cel-admin-toggle", data: { controller: "auto-submit" } do %>
+      <%= hidden_field_tag :on, "0", id: nil %>
+      <label>
+        <%= check_box_tag :on, "1", @auto_activate, data: { action: "auto-submit#submit" }, id: "auto_activate_presets" %>
+        Auto-activate presets
+      </label>
+      <noscript><%= submit_tag "Save", class: "fc-btn" %></noscript>
+    <% end %>
+  </div>
+</section>
+
+<% [["Live now", @running], ["Upcoming", @upcoming], ["Past", @past]].each do |heading, list| %>
+  <% next if list.empty? && heading == "Past" %>
+  <h2 class="cel-admin-section"><%= heading %></h2>
+  <% if list.empty? %>
+    <p class="cel-admin-empty"><%= heading == "Live now" ? "Nothing is running right now." : "Nothing scheduled. Add the calendar above or create one." %></p>
+  <% else %>
+    <ul class="fc-cms-list">
+      <% list.each do |c| %>
+        <li class="fc-cms-row cel-admin-row" id="<%= dom_id(c) %>">
+          <span class="cel-admin-swatch" style="--cel-accent: <%= c.accent_color %>" aria-hidden="true"><%= c.emblem.presence || "✨" %></span>
+          <div class="fc-cms-body">
+            <p class="cel-admin-name">
+              <%= c.name %>
+              <span class="cel-admin-badge is-<%= c.status_label.parameterize %>"><%= c.status_label %></span>
+              <% if c.preset? %><span class="cel-admin-badge">Preset</span><% end %>
+            </p>
+            <p class="fc-cms-text"><%= c.greeting_title %><%= " · #{c.scripture_reference}" if c.scripture_reference %></p>
+            <p class="fc-cms-meta">
+              <%= c.local_starts_at.strftime("%a %-d %b %Y, %H:%M") %> → <%= c.local_ends_at.strftime("%a %-d %b, %H:%M") %>
+              (<%= c.time_zone %>) · <%= c.audience_label %><%= " · linked post" if c.post %><%= " · no share card" unless c.share_card? %>
+            </p>
+          </div>
+          <div class="fc-cms-actions">
+            <% if c.draft? %>
+              <%= button_to "Activate", activate_admin_celebration_path(c), method: :patch, class: "fc-btn fc-btn-primary", form_class: "inline" %>
+            <% else %>
+              <%= button_to "Deactivate", deactivate_admin_celebration_path(c), method: :patch, class: "fc-btn", form_class: "inline" %>
+            <% end %>
+            <%= link_to "Edit", edit_admin_celebration_path(c), class: "fc-btn" %>
+            <%= button_to "Delete", admin_celebration_path(c), method: :delete, class: "fc-btn", form_class: "inline",
+                data: { turbo_confirm: "Delete #{c.name}?" } %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>

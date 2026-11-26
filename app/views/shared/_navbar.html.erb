@@ -12,6 +12,10 @@
       <%# The full logo (mark + wordmark); widths where the bar is tight show only the mark. %>
       <%= render "shared/logo", css_class: "eg-brand-logo" %>
       <%= render "shared/logomark", css_class: "eg-brand-mark" %>
+      <%# A small seasonal accent on the logo while an occasion runs. %>
+      <% if (celebration = current_celebration) %>
+        <span class="cel-logo-accent" style="<%= celebration_style(celebration) %>" title="<%= celebration.greeting_title %>" aria-hidden="true"><%= celebration.emblem.presence || "✨" %></span>
+      <% end %>
     <% end %>
 
     <div class="eg-pills" role="navigation" aria-label="Main">

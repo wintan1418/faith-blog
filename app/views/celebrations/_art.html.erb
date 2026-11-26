@@ -1,0 +1,11 @@
+<%# The occasion's artwork: the uploaded image, or the built-in theme (a soft
+    accent wash with the emblem). %>
+<% art = celebration_art_url(celebration) %>
+<div class="cel-art<%= ' has-image' if art %>" aria-hidden="true">
+  <% if art %>
+    <%= image_tag art, alt: "", loading: "lazy", decoding: "async" %>
+  <% else %>
+    <span class="cel-art-ring"></span>
+    <span class="cel-art-emblem"><%= celebration.emblem.presence || "✨" %></span>
+  <% end %>
+</div>

@@ -73,3 +73,8 @@ production:
   bible_reminders:
     class: BibleReminderJob
     schedule: every 15 minutes
+
+  # Brethreign Celebrates: next year's occasions appear as drafts for the admin.
+  celebration_presets:
+    class: CelebrationPresetsJob
+    schedule: every month on the 1st at 6am Africa/Lagos

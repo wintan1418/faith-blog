@@ -1,0 +1,16 @@
+<%# The lighter celebration strip on other main pages. %>
+<div class="cel-strip" id="celebration-strip" style="<%= celebration_style(celebration) %>"
+     data-controller="celebration"
+     data-celebration-key-value="<%= celebration.dismissal_key %>"
+     data-celebration-card-value="<%= celebration_card_data(celebration) %>">
+  <%= render "celebrations/fx", celebration: celebration %>
+  <span class="cel-strip-emblem" aria-hidden="true"><%= celebration.emblem.presence || "✨" %></span>
+  <p class="cel-strip-text">
+    <strong><%= celebration.greeting_title %></strong>
+    <% if celebration.scripture_reference.present? %><span class="cel-strip-ref"><%= celebration.scripture_reference %></span><% end %>
+  </p>
+  <%= render "celebrations/actions", celebration: celebration, compact: true %>
+  <button type="button" class="cel-close is-small" data-action="celebration#dismiss" aria-label="Dismiss <%= celebration.greeting_title %>">
+    <%= render_icon("x", classes: "h-4 w-4") %>
+  </button>
+</div>

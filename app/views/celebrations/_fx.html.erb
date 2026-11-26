@@ -1,0 +1,7 @@
+<%# The occasion's small moving touch (confetti, leaves, lights…): purely
+    decorative, behind the text, and off for prefers-reduced-motion. %>
+<% if celebration.effect.present? && celebration.effect != "none" %>
+  <span class="cel-fx is-<%= celebration.effect %>" aria-hidden="true">
+    <% 9.times do |i| %><i style="--i: <%= i %>; --x: <%= 4 + (i * 41) % 92 %>%; --y: <%= 8 + (i * 37) % 70 %>%"></i><% end %>
+  </span>
+<% end %>

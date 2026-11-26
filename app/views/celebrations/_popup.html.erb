@@ -1,0 +1,27 @@
+<%# The gentle one-time pop-up on the first open during an occasion. Opening
+    it is remembered on the account, so it never shows twice. %>
+<dialog class="cel-popup" id="celebration-popup" style="<%= celebration_style(celebration) %>"
+        aria-labelledby="cel-pop-title" data-turbo-temporary
+        data-controller="celebration"
+        data-celebration-popup-key-value="<%= celebration.popup_key %>"
+        data-celebration-card-value="<%= celebration_card_data(celebration) %>">
+  <div class="cel-popup-card">
+    <%= render "celebrations/fx", celebration: celebration %>
+    <%= render "celebrations/art", celebration: celebration %>
+    <button type="button" class="cel-close" data-action="celebration#closePopup" aria-label="Close">
+      <%= render_icon("x", classes: "h-4 w-4") %>
+    </button>
+    <div class="cel-body">
+      <p class="cel-kicker">Brethreign celebrates</p>
+      <h2 class="cel-title" id="cel-pop-title"><%= celebration.greeting_title %></h2>
+      <% if celebration.message.present? %><p class="cel-message"><%= celebration.message %></p><% end %>
+      <% if celebration.scripture_text.present? %>
+        <blockquote class="cel-verse">
+          <p>&ldquo;<%= celebration.scripture_text %>&rdquo;</p>
+          <cite><%= celebration.scripture_reference %> <span>KJV</span></cite>
+        </blockquote>
+      <% end %>
+      <%= render "celebrations/actions", celebration: celebration %>
+    </div>
+  </div>
+</dialog>
