@@ -91,7 +91,7 @@ class PostOgCard
   def content_key
     @content_key ||= Digest::SHA256.hexdigest([
       DESIGN, post.title.to_s, body_text.first(600), post.anonymous?, shown_name, shown_handle, shown_verified?,
-      palette[:accent], avatar_blob&.id, label
+      palette[:accent], avatar_blob&.id, label, reading&.data&.to_json
     ].join("\u0001")).first(10)
   end
 
@@ -145,7 +145,12 @@ class PostOgCard
 
   def title_text = clean(post.title.to_s)
 
+  # "Read your Bible, pray every day" shared from a chapter: drawn as a
+  # reading card (chapter, key verse or burden, "Read John 1").
+  def reading = post.reading_reflection? ? post.reading_share_info : nil
+
   def label
+    return "Read your Bible, pray every day" if reading
     return "Answered prayer" if post.prayer_status_prayer_answered?
     return "Prayer request" if post.prayer_status_prayer_pending?
 
@@ -274,7 +279,14 @@ class PostOgCard
     room = HEIGHT - PAD - AVATAR - 28 - 30 - top
 
     blocks = []
-    if title_text.present?
+    if reading
+      title = fit(reading.title, sizes: [ 72, 64, 58 ], width: inner, max_height: 150, weight: "Bold")
+      blocks << title
+      rest = room - (title ? title.height + 18 : 0)
+      words = reading.verse_text ? "“#{clean(reading.verse_text)}” #{reading.verse}" : clean(reading.burden || body_text)
+      blocks << fit(words, sizes: [ 36, 32, 30, 28 ], width: inner, max_height: [ rest, 220 ].min, weight: reading.verse_text ? "SemiBold" : "Regular",
+                           color: reading.verse_text ? INK : MUTED) if rest > 40 && words.present?
+    elsif title_text.present?
       title = fit(title_text, sizes: [ 70, 64, 58, 52, 46, 42 ], width: inner, max_height: (room * 0.72).floor, weight: "Bold")
       blocks << title
       rest = room - (title ? title.height + 18 : 0)
@@ -302,7 +314,7 @@ class PostOgCard
     place(tint(mask("verified"), palette[:accent_2]), name_x + name.width + 10, y + 7) if shown_verified?
     place(text_image(shown_handle ? "@#{shown_handle} · #{date}" : date, size: 23, color: MUTED), name_x, y + 46)
 
-    cta = text_image("Join the conversation", size: 22, weight: "Bold", color: ON_ACCENT)
+    cta = text_image(reading ? "#{reading.read_label} →" : "Join the conversation", size: 22, weight: "Bold", color: ON_ACCENT)
     pill_w = cta.width + 56
     pill_x = WIDTH - PAD - pill_w
     pill_y = HEIGHT - PAD - 58

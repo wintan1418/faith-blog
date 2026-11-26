@@ -30,6 +30,29 @@ module DailyBibleHelper
     label.present? ? "What stood out to me in #{label} today: " : "What stood out to me in my Bible reading today: "
   end
 
+  # "Share this prayer": the burden, the points with their verses and the
+  # closing prayer, ready for the composer.
+  def daily_bible_prayer_share_text(chapter, prayer)
+    parts = [ "Praying through #{chapter} today." ]
+    parts << "Today's burden: #{prayer.burden}" if prayer.burden.present?
+    parts << prayer.points.map { |point| "• #{point.text} (#{point.reference})" }.join("\n") if prayer.points?
+    parts << prayer.body
+    parts.join("\n\n")
+  end
+
+  # Verses offered as the key verse on "Share what I read": the prayer's key
+  # verses and the chapter's well-known ones first, then every verse.
+  # => [[label, slug, text], …] suggested, and [[number, slug, text], …] all.
+  def daily_bible_share_verses(chapter, prayer, passage)
+    texts = passage.primary.to_h
+    suggested = (prayer.verse_references + Scripture::Catalog.popular_in(chapter.book, chapter.chapter))
+                .reject(&:range?).uniq(&:slug).select { |ref| texts.key?(ref.verse_start) }.first(4)
+    all = texts.map { |number, text| [ number, Scripture::Reference.build(chapter.book, chapter.chapter, number).slug, text ] }
+    [ suggested.map { |ref| [ ref.to_s, ref.slug, texts[ref.verse_start] ] }, all ]
+  rescue StandardError
+    [ [], [] ]
+  end
+
   def daily_bible_streak_text(streak) = "#{streak}-day streak"
 
   # Reminder times on the sheet: every half hour from 5:00 to 22:00.

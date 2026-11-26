@@ -267,6 +267,8 @@ application.register("around-hello", AroundHelloController)
 
 import DailyBibleController from "./daily_bible_controller"
 application.register("daily-bible", DailyBibleController)
+import ReadingShareController from "./reading_share_controller"
+application.register("reading-share", ReadingShareController)
 
 import BibleDwellController from "./bible_dwell_controller"
 application.register("bible-dwell", BibleDwellController)

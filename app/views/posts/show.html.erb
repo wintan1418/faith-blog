@@ -92,9 +92,13 @@
             </figure>
           <% end %>
 
-          <div class="post-body" data-toc-target="body" data-controller="scripture">
-            <%= render_rich_social_text(@post.content, class_name: "fc-social-text") %>
-          </div>
+          <% if @post.reading_reflection? %>
+            <%= render "posts/reading_card", post: @post %>
+          <% else %>
+            <div class="post-body" data-toc-target="body" data-controller="scripture">
+              <%= render_rich_social_text(@post.content, class_name: "fc-social-text") %>
+            </div>
+          <% end %>
 
           <% if @post.game_share.present? %>
             <%= render "posts/game_share_card", post: @post %>

@@ -18,6 +18,24 @@ class DailyBibleTest < ActionDispatch::IntegrationTest
 
   def habit = BibleHabit.for(@member).reload
 
+  JOHN_ONE = {
+    burden: "John 1 calls us to worship Jesus as the eternal Word made flesh, and to receive him as the light no darkness can put out.",
+    points: [
+      { "kind" => "praise", "text" => "Praise Jesus as the Word who was with God and was God from the beginning.", "reference" => "John 1:1" },
+      { "kind" => "intercession", "text" => "Pray for people around you still walking in darkness to see his light.", "reference" => "John 1:2" },
+      { "kind" => "application", "text" => "Ask for courage to point others to Jesus today, as John the Baptist did.", "reference" => "John 1:3" }
+    ],
+    prayer: "Lord Jesus, you are the Word who was with God in the beginning, and through you all things were made. " \
+            "I worship you as the light that shines in the darkness. Shine into the places in me that still prefer the dark. " \
+            "Draw my friends and neighbours to your light. Make me, like John, someone who points to you and not to myself. Amen."
+  }.freeze
+
+  def store_john_one_prayer
+    ChapterPrayer.create!(slug: "john-1", reference: "John 1", version: ChapterPrayer::VERSION, burden: JOHN_ONE[:burden],
+                          points: JOHN_ONE[:points], key_verses: [ "John 1:1", "John 1:3" ], verses: [ "John 1:1", "John 1:3" ],
+                          themes: [ "The Word made flesh", "Light and darkness" ], body: JOHN_ONE[:prayer], generated_at: Time.current)
+  end
+
   test "the feed shows today's reading with Read and I've read it" do
     sign_in @member
     get feed_path
@@ -44,8 +62,8 @@ class DailyBibleTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Read today"
     assert_includes response.body, "You and 1 other brother or sister read today"
     assert_includes response.body, "Next: John 2"
-    assert_includes response.body, "Share what stood out"
-    assert_includes response.body, "What stood out to me in John 1 today"
+    assert_select "turbo-stream template button[data-testid=share-what-i-read]", text: /Share what I read/
+    assert_includes response.body, %(src="#{new_daily_bible_share_path(chapter: 'john-1')}")
     assert_not_includes response.body, "early_reader"
     assert_includes response.body, "+#{Seeds.points_for('bible_read')} seeds"
     assert habit.read_today?
@@ -172,16 +190,26 @@ class DailyBibleTest < ActionDispatch::IntegrationTest
     assert_select "section[aria-label='Daily Bible'] .adash-kpi", count: 5
   end
 
-  test "after reading on the feed, Pray it opens with a prayer from the chapter; Amen marks it prayed" do
-    ChapterPrayer.create!(slug: "john-1", reference: "John 1", verses: [ "John 1:4", "John 1:5" ], generated_at: Time.current,
-                          body: "Lord Jesus, you are the Word who was with God in the beginning. I thank you that your light shines in my darkness. Help me to receive you today and to live as your child. Amen.")
+  test "after reading on the feed, Pray it opens the chapter's burden, prayer points with their verses, and a closing prayer" do
+    store_john_one_prayer
     sign_in @member
     post daily_bible_read_path, params: { source: "card" }, headers: TURBO
     assert_includes response.body, 'data-daily-bible-open-prayer-value="true"'
-    assert_includes response.body, "Pray it · John 1"
-    assert_includes response.body, "your light shines in my darkness"
-    assert_select "dialog.db-prayer-sheet .db-prayer-verses a[href=?]", scripture_page_path("john-1-4"), text: "John 1:4"
-    assert_select "dialog.db-prayer-sheet button[data-composer-modal-mode-param=prayer]", text: /Share this prayer/
+    assert_select "dialog.db-prayer-sheet [data-testid=pray-it]" do
+      assert_select ".db-kicker", text: /Pray it · John 1/
+      assert_select ".db-burden-text", text: JOHN_ONE[:burden]
+      assert_select "li.db-point", count: 3
+      assert_select "li.db-point:first-child .db-point-kind", text: "Praise"
+      assert_select "li.db-point:first-child .db-point-text", text: JOHN_ONE[:points].first["text"]
+      # From the feed, a verse reference opens the chapter at that verse.
+      assert_select "li.db-point:first-child a.db-point-ref[href=?]", scripture_page_path("john-1", anchor: "v1"), text: /John 1:1/
+      assert_select "li.db-point:last-child a.db-point-ref[href=?]", scripture_page_path("john-1", anchor: "v3"), text: /John 1:3/
+      assert_select ".db-prayer-text", text: JOHN_ONE[:prayer]
+      assert_select "button[data-composer-modal-mode-param=prayer]", text: /Share this prayer/
+    end
+    share_text = css_select("dialog.db-prayer-sheet button[data-composer-modal-mode-param=prayer]").first["data-composer-modal-prefill-param"]
+    assert_includes share_text, "Today's burden: #{JOHN_ONE[:burden]}"
+    assert_includes share_text, "• #{JOHN_ONE[:points].first['text']} (John 1:1)"
 
     post daily_bible_amen_path, params: { chapter: "john-1" }, headers: TURBO
     assert_includes response.body, "Read &amp; prayed today"
@@ -193,12 +221,23 @@ class DailyBibleTest < ActionDispatch::IntegrationTest
     assert_equal 1, @member.seed_events.where(kind: "bible_prayed").count, "seeds once a day"
   end
 
+  test "on the chapter page a prayer point's verse just scrolls to it" do
+    store_john_one_prayer
+    sign_in @member
+    post daily_bible_read_path, params: { source: "chapter", chapter: "john-1" }, headers: TURBO
+    get scripture_page_path("john-1")
+    assert_select "#daily_bible_bar_end a.db-point-ref[href='#v1']", text: /John 1:1/
+    assert_select "#v1.sx-cv"
+  end
+
   test "the chapter page shows Pray it after reading, with the fallback until the prayer is written" do
     sign_in @member
     post daily_bible_read_path, params: { source: "chapter", chapter: "psalm-23" }, headers: TURBO
     assert_select "turbo-stream[target=daily_bible_bar_end] template .db-prayer", text: /Pray it · Psalm 23/
     get scripture_page_path("psalm-23")
-    assert_select "#daily_bible_bar_end .db-prayer-text", text: /Lord, thank you for speaking through Psalm 23 today/
+    assert_select "#daily_bible_bar_end .db-burden-text", text: /who he is in Psalm 23/
+    assert_select "#daily_bible_bar_end .db-prayer-wait", text: /being prepared/
+    assert_select "#daily_bible_bar_end .db-prayer-text", text: /\ALord, I have read Psalm 23/
     assert_select "#daily_bible_bar_top", text: /A short prayer from this chapter is waiting at the end/
   end
 

@@ -1,0 +1,21 @@
+<%# "My notes" on a chapter page: the member's own notes on this chapter,
+    private, saved per chapter (ChapterNote). They can choose to include them
+    when sharing what they read. Locals: chapter, note (or nil), saved (optional). %>
+<details id="chapter_notes" class="db-notes" <%= "open" if note || local_assigns[:saved] %>>
+  <summary class="db-notes-head">
+    <span class="db-notes-title"><%= render_icon("pen", classes: "db-i16") %> My notes on <%= chapter %></span>
+    <span class="db-notes-private"><%= render_icon("lock", classes: "db-i14") %> Private</span>
+  </summary>
+  <%= form_with url: daily_bible_notes_path, method: :patch, class: "db-notes-form" do %>
+    <%= hidden_field_tag :chapter, chapter.slug %>
+    <%= text_area_tag :body, note&.body, rows: 5, maxlength: ChapterNote::MAX, class: "db-textarea",
+          placeholder: "What is God showing you here? A verse to remember, a question, a prayer…",
+          aria: { label: "My notes on #{chapter}" } %>
+    <div class="db-notes-foot">
+      <p class="db-notes-status" role="status">
+        <% if local_assigns[:saved] %><%= render_icon("check", classes: "db-i14") %> <%= note ? "Saved" : "Cleared" %><% elsif note %>Last saved <%= time_ago_in_words(note.updated_at) %> ago<% else %>Only you can see these. Include them when you share, if you like.<% end %>
+      </p>
+      <%= button_tag "Save notes", type: "submit", class: "db-btn db-btn-quiet db-btn-sm" %>
+    </div>
+  <% end %>
+</details>

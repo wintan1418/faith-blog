@@ -5,13 +5,19 @@ import { Controller } from "@hotwired/stimulus"
 // the browser's time zone so "today" and the reminder are the member's own.
 export default class extends Controller {
   static targets = ["sheet", "prayerSheet", "zoneField"]
-  static values = { zone: String, zoneUrl: String, openPrayer: Boolean }
+  static values = { zone: String, zoneUrl: String, openPrayer: Boolean, openSheet: Boolean }
 
   connect() {
     const zone = this.browserZone()
     if (this.hasZoneFieldTarget && zone) this.zoneFieldTarget.value = zone
     if (zone && zone !== this.zoneValue && this.zoneUrlValue) this.sendZone(zone)
     if (this.openPrayerValue && this.hasPrayerSheetTarget) this.show(this.prayerSheetTarget)
+    // "Start your daily reading" from a shared reading card: the plan picker.
+    if (this.openSheetValue && this.hasSheetTarget) {
+      this.openSheetValue = false
+      this.element.scrollIntoView({ block: "start" })
+      this.show(this.sheetTarget)
+    }
   }
 
   openSheet(event) {

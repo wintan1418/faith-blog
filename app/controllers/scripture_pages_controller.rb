@@ -41,6 +41,7 @@ class ScripturePagesController < ApplicationController
     return unless user_signed_in? && @reference.chapter?
 
     @bible_habit = BibleHabit.for(current_user)
+    @chapter_note = ChapterNote.for(current_user, @reference)
   rescue StandardError => e
     Rails.logger.warn("[daily_bible] scripture page: #{e.class}: #{e.message}")
     @bible_habit = nil
