@@ -199,6 +199,7 @@
         <%= render "seeds/rank_up_modal", user: current_user if user_signed_in? && current_user.rank_up_pending? %>
       </div>
       <%= render "shared/app_update_banner" if outdated_android_app? %>
+      <%= render "shared/ios_update_banner" if outdated_ios_app? %>
       <%= render "shared/verify_email_banner" if show_verify_email_banner? %>
       <%= render "shared/contact_privacy_notice" if user_signed_in? && current_user.contact_privacy_notice_pending? && controller_path != "settings/privacies" %>
       <%# Brethreign Celebrates: a light strip on the main pages (the feed has the full banner). %>

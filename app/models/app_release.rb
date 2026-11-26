@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # The newest app version on the store, and the oldest one still allowed in.
-# Admins set these on Admin → App versions after Google Play approves a release.
+# Admins set these on Admin → App versions after Google Play or the App Store approves a release.
 class AppRelease < ApplicationRecord
-  PLATFORMS = %w[android].freeze
+  PLATFORMS = %w[android ios].freeze
   VERSION_FORMAT = /\A\d+(\.\d+){0,3}\z/
 
   validates :platform, inclusion: { in: PLATFORMS }, uniqueness: true
@@ -13,6 +13,7 @@ class AppRelease < ApplicationRecord
   normalizes :latest_version, :minimum_version, with: ->(v) { v.to_s.strip.presence }
 
   def self.android = find_or_initialize_by(platform: "android")
+  def self.ios = find_or_initialize_by(platform: "ios")
 
   def latest = version(latest_version)
   def minimum = version(minimum_version)

@@ -28,6 +28,23 @@
   </div>
 
   <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
+    <h2 class="text-lg font-bold text-[var(--fc-ink)]">iPhone app</h2>
+    <p class="mt-1 text-sm text-[var(--fc-muted)]">Set this after the App Store releases a version. Members on an older iPhone or iPad app see an “Update available” banner (once a week at most).</p>
+
+    <%= form_with model: @ios_release, url: admin_app_release_path(platform: "ios"), method: :patch, class: "mt-5 space-y-4" do |f| %>
+      <% if @ios_release.errors.any? %>
+        <div class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"><%= @ios_release.errors.full_messages.to_sentence %></div>
+      <% end %>
+      <div>
+        <%= f.label :latest_version, "Latest version on the App Store", for: "ios_latest_version", class: "block text-sm font-bold text-[var(--fc-ink)]" %>
+        <%= f.text_field :latest_version, id: "ios_latest_version", placeholder: "1.0.11", inputmode: "decimal", class: field %>
+        <p class="mt-1 text-xs text-[var(--fc-muted)]">Older iPhone apps get the update banner.</p>
+      </div>
+      <div class="flex justify-end"><%= f.submit "Save", class: "fc-btn fc-btn-primary" %></div>
+    <% end %>
+  </div>
+
+  <div class="rounded-xl border border-[var(--fc-line-strong)] bg-[var(--fc-surface)] p-6">
     <h2 class="text-lg font-bold text-[var(--fc-ink)]">Who is on which version</h2>
     <p class="mt-1 text-sm text-[var(--fc-muted)]">The Android version each member last opened Brethreign with.</p>
 

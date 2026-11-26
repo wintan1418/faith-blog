@@ -222,6 +222,40 @@ module ApplicationHelper
 
   def android_update_card_key = "app-update-#{android_latest_version.to_s.tr('.', '-')}-w#{Date.current.cweek}"
 
+  # The iPhone/iPad app's version from its user agent ("Brethreign/1.0.11; …").
+  def ios_app_version
+    ua = request.user_agent.to_s
+    return unless hotwire_native_app? && ua.match?(/iPhone|iPad|iOS/) && !ua.include?("Android")
+
+    version = ua[%r{Brethreign/(\d+(?:\.\d+)*)}, 1]
+    version && Gem::Version.new(version)
+  end
+
+  # Newest version on the App Store, from Admin → App versions.
+  def ios_latest_version
+    return @ios_latest_version if defined?(@ios_latest_version)
+
+    @ios_latest_version = AppRelease.find_by(platform: "ios")&.latest
+  rescue ActiveRecord::ActiveRecordError, ArgumentError
+    @ios_latest_version = nil
+  end
+
+  def ios_update_available?
+    version = ios_app_version
+    latest = ios_latest_version
+    version.present? && latest.present? && version < latest
+  end
+
+  def ios_update_card_key = "ios-update-#{ios_latest_version.to_s.tr('.', '-')}-w#{Date.current.cweek}"
+
+  def outdated_ios_app?
+    ios_update_available? && !current_user&.card_dismissed?(ios_update_card_key)
+  end
+
+  def ios_store_url
+    app_store_url(:ios) || "https://apps.apple.com/app/brethreign"
+  end
+
   def android_store_url
     "https://play.google.com/store/apps/details?id=com.brethreign.app"
   end

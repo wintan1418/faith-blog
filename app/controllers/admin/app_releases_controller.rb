@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Admin → App versions: the newest Android version on Google Play, the oldest one
+# Admin → App versions: the newest Android (Google Play) and iPhone (App Store) versions, the oldest Android one
 # still allowed in, which versions members use, and a reminder for those behind.
 class Admin::AppReleasesController < ApplicationController
   before_action :authenticate_admin!
@@ -8,13 +8,16 @@ class Admin::AppReleasesController < ApplicationController
   layout "admin"
 
   def edit
+    @ios_release = AppRelease.ios
     load_stats
   end
 
   def update
     if @release.update(release_params)
-      redirect_to edit_admin_app_release_path, notice: "App versions saved."
+      redirect_to edit_admin_app_release_path, notice: "#{@release.platform == 'ios' ? 'iPhone' : 'Android'} app versions saved."
     else
+      @ios_release = @release.platform == "ios" ? @release : AppRelease.ios
+      @release = AppRelease.android if @release.platform == "ios"
       load_stats
       render :edit, status: :unprocessable_entity
     end
@@ -33,7 +36,7 @@ class Admin::AppReleasesController < ApplicationController
   private
 
   def set_release
-    @release = AppRelease.android
+    @release = params[:platform] == "ios" ? AppRelease.ios : AppRelease.android
   end
 
   def load_stats
