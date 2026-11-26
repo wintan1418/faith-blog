@@ -33,7 +33,7 @@ body:has(.welcome) .fc-rain { display: none; }
 /* On phones the caption already names Brethreign; the logo shows on computers. */
 /* Phones: the logo leads the page, above the new-dawn banner. */
 .welcome-logo { display: block; order: -1; height: 2.1rem; width: auto; align-self: flex-start; margin: 0.2rem 0 0.4rem; color: var(--fc-accent); }
-.welcome-logo .br-logo-mark { color: #3cdb9d; }
+.welcome-logo .br-logo-mark { color: var(--br-logo-mark); }
 html.theme-dark .welcome-logo .br-logo-word { color: #f5f1e6; }
 
 /* ── New dawn: the new B mark rises like the sun ──
