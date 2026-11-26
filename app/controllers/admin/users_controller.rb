@@ -30,10 +30,17 @@ class Admin::UsersController < ApplicationController
     @pagy, @users = pagy(scope.order(created_at: :desc), items: 25)
   end
 
-  # There is no member page or edit form in admin (these answered 406 from the
-  # dashboard's member links): the list, filtered to them, has every action.
+  # Everything about one member, for admins: account, profile (public or not),
+  # activity and recent breaths. Actions stay on the list and Security pages.
   def show
-    redirect_to admin_users_path(q: @user.username)
+    @profile = @user.profile
+    @recent_posts = @user.posts.order(created_at: :desc).limit(8)
+    @stats = {
+      "Breaths" => @user.posts.count, "Comments" => @user.comments.count,
+      "Followers" => @user.followers_count, "Following" => @user.following_count,
+      "Rooms" => @user.rooms.count, "Seeds" => @user.seeds_total.to_i,
+      "Reports made" => @user.reports.count, "Reports about them" => @user.reports_about.count
+    }
   end
 
   def edit
