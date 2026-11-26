@@ -52,13 +52,9 @@
         <% if portion %>
           <%= link_to "Next: #{portion.label}", scripture_page_path(portion.first.slug), class: "db-btn db-btn-quiet" %>
         <% end %>
-        <button type="button" class="db-btn db-btn-quiet"
-                data-action="click->composer-modal#openWith"
-                data-composer-modal-prefill-param="<%= daily_bible_share_prefill(chapter.to_s) %>">
-          <%= render_icon("pen", classes: "db-i16") %> Share what stood out
-        </button>
+        <%= render "daily_bible/share_button", chapter: chapter %>
       </div>
-      <%= render "daily_bible/prayer", habit: habit, chapter: chapter %>
+      <%= render "daily_bible/prayer", habit: habit, chapter: chapter, on_page: true %>
     <% end %>
   </div>
 <% end %>

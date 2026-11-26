@@ -1,0 +1,53 @@
+<%# "Read your Bible, pray every day" shared after reading a chapter
+    (ReadingShare): the chapter, the key verse, what stood out (the breath's
+    own words), notes the member chose to include, today's prayer burden,
+    their streak, and two ways in for whoever sees it: read this chapter, or
+    start a daily reading of your own. Shown in place of the plain body.
+    Local: post (reading_reflection?). %>
+<% share = post.reading_share_info %>
+<section class="rc-card" aria-label="<%= ReadingShare::TAGLINE %>: <%= share.chapter %>" data-testid="reading-card">
+  <div class="rc-top">
+    <p class="rc-kicker"><%= render_icon("bookopen", classes: "rc-i14") %> <%= ReadingShare::TAGLINE %></p>
+    <% if share.streak_label %>
+      <span class="rc-streak" title="Days in a row reading the Bible">🔥 <%= share.streak_label %></span>
+    <% end %>
+  </div>
+  <h3 class="rc-title"><%= link_to share.title, scripture_page_path(share.chapter.slug), data: { turbo_frame: "_top" } %></h3>
+
+  <% if share.verse_text %>
+    <blockquote class="rc-verse">
+      <p>“<%= share.verse_text %>”</p>
+      <cite><%= link_to share.verse.to_s, scripture_page_path(share.chapter.slug, anchor: "v#{share.verse.verse_start}"), data: { turbo_frame: "_top" } %> · KJV</cite>
+    </blockquote>
+  <% end %>
+
+  <% if share.note? %>
+    <div class="rc-block rc-note" data-controller="scripture">
+      <p class="rc-label">What stood out to <%= post.anonymous? ? "them" : "me" %></p>
+      <%= render_rich_social_text(post.content, class_name: "fc-social-text rc-note-copy") %>
+    </div>
+  <% end %>
+
+  <% if share.notes %>
+    <div class="rc-block rc-notes">
+      <p class="rc-label">From my notes</p>
+      <%= simple_format(share.notes, { class: "rc-notes-copy" }, wrapper_tag: "p") %>
+    </div>
+  <% end %>
+
+  <% if share.burden %>
+    <div class="rc-block rc-burden">
+      <p class="rc-label"><%= render_icon("pray", classes: "rc-i14") %> Today's prayer burden</p>
+      <p class="rc-burden-text"><%= share.burden %></p>
+    </div>
+  <% end %>
+
+  <div class="rc-ctas">
+    <%= link_to scripture_page_path(share.chapter.slug), class: "rc-btn rc-btn-primary", data: { turbo_frame: "_top", testid: "reading-card-read" } do %>
+      <%= render_icon("bookopen", classes: "rc-i16") %> <%= share.read_label %>
+    <% end %>
+    <%= link_to daily_bible_start_path, class: "rc-btn rc-btn-quiet", data: { turbo_frame: "_top", testid: "reading-card-start" } do %>
+      <%= render_icon("flame", classes: "rc-i16") %> Start your daily reading
+    <% end %>
+  </div>
+</section>
