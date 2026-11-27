@@ -101,4 +101,11 @@ class SeoBasicsTest < ActionDispatch::IntegrationTest
     assert_includes robots, "Sitemap: https://brethreign.com/sitemap.xml"
     assert_includes robots, "Disallow: /inbox"
   end
+
+  test "robots.txt keeps OpenAI's training crawler out but leaves search crawlers alone" do
+    robots = Rails.public_path.join("robots.txt").read
+    assert_match(/User-agent: GPTBot\nDisallow: \/\n/, robots)
+    assert_no_match(/OAI-SearchBot/i, robots.lines.grep_v(/\A#/).join)
+    assert_match(%r{Sitemap: https://brethreign.com/sitemap.xml}, robots)
+  end
 end

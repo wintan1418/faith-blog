@@ -11,4 +11,8 @@ Disallow: /circles
 Disallow: /users/password
 Disallow: /rails/
 
+# OpenAI's training crawler. OAI-SearchBot (ChatGPT search) is still allowed above.
+User-agent: GPTBot
+Disallow: /
+
 Sitemap: https://brethreign.com/sitemap.xml
