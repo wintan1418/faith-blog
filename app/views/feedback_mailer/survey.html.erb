@@ -1,0 +1,32 @@
+<div style="display: none; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0; max-height: 0; max-width: 0; overflow: hidden;">
+  <%= pluralize(@campaign.question_count, "question") %>, <%= @campaign.duration_label %>. Tell us what's working and what we should build next.
+</div>
+
+<div style="font-family: Inter, Arial, sans-serif; color: #17251d; line-height: 1.6; max-width: 640px; margin: 0 auto; padding: 12px;">
+  <p style="margin: 0 0 6px; color: #6c7c72; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 800;">Brethreign &middot; Member survey</p>
+
+  <h1 style="font-family: 'Fraunces', Georgia, serif; font-size: 26px; line-height: 1.2; margin: 0 0 16px; color: #17251d;"><%= @campaign.title %></h1>
+
+  <p style="color: #2b3a30; font-size: 15.5px; margin: 0 0 12px;">Hi <%= @user.display_name.presence || "there" %>,</p>
+  <p style="color: #2b3a30; font-size: 15.5px; margin: 0 0 12px;">
+    Brethreign is being built with you, not just for you. Would you give us <%= @campaign.duration_label %> to tell us honestly what's working, what isn't, and what you'd love us to build next?
+  </p>
+  <p style="color: #2b3a30; font-size: 15.5px; margin: 0 0 12px;">
+    It's <%= pluralize(@campaign.question_count, "question") %>, mostly quick taps. I read every answer myself.
+  </p>
+
+  <p style="margin: 24px 0 8px;">
+    <%= link_to "Take the survey", @survey_url, style: "display: inline-block; background: #10b981; color: #052016; font-weight: 800; padding: 13px 22px; border-radius: 10px; text-decoration: none;" %>
+  </p>
+  <p style="margin: 0 0 20px; color: #6c7c72; font-size: 13px;">You'll be asked to sign in if you aren't already.</p>
+
+  <p style="color: #2b3a30; font-size: 15.5px; margin: 0;">Thank you for being part of this.<br>Juwon (Wintan), founder of Brethreign</p>
+
+  <hr style="border: none; border-top: 1px solid #e6ece8; margin: 28px 0 16px;">
+  <p style="margin: 0; color: #6c7c72; font-size: 12px;">
+    Sent to <strong><%= @user.email %></strong> because email notifications are on for your Brethreign account.
+    <%= link_to "Unsubscribe", @unsubscribe_url, style: "color: #6c7c72;" %>
+    &middot;
+    <%= link_to "Notification settings", @settings_url, style: "color: #6c7c72;" %>
+  </p>
+</div>

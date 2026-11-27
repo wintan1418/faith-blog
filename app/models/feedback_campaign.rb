@@ -24,6 +24,12 @@ class FeedbackCampaign < ApplicationRecord
   # A platform audience is whoever used that platform in this window (Ahoy visits).
   PLATFORM_WINDOW = 60.days
   MAX_CHOICES = 6
+  # A longer survey's own questions (see #questions_text for how admins write them).
+  QUESTION_KINDS = %w[one many text rating].freeze
+  MAX_QUESTIONS = 20
+  MAX_OPTIONS = 12
+  # Rough reading-and-tapping time per question, for "about 3 minutes".
+  SECONDS_PER_QUESTION = 15
   # Members can opt out of surveys in Settings → Notifications (a remembered card key).
   OPT_OUT_KEY = "no-feedback-surveys"
   # After answering or declining one survey, the pop-up rests this long before the next.
@@ -37,8 +43,10 @@ class FeedbackCampaign < ApplicationRecord
   validates :follow_up_prompt, :choice_question, length: { maximum: 200 }, allow_blank: true
   validate :ends_after_start
   validate :choices_complete
+  validate :questions_complete
 
   before_validation :tidy_choices
+  before_validation :tidy_questions
 
   scope :recent, -> { order(created_at: :desc) }
   # Launched, started, not ended and not closed.
@@ -101,6 +109,93 @@ class FeedbackCampaign < ApplicationRecord
   def choice_options_text = choice_options.join("\n")
 
   def choices? = choice_question.present? && choice_options.size >= 2
+
+  # ── Longer surveys ────────────────────────────────────────────────────
+  #
+  # `questions` is a list of hashes: key ("q1"…), kind (one / many / text /
+  # rating), text, and optionally hint, options, max (for many) and optional.
+  # The rating's answer lives in FeedbackResponse#rating; the rest in #answers.
+
+  def long_form? = questions.present?
+
+  # The questions in the order members see them. A long survey without a
+  # rating entry gets the rating first.
+  def form_questions
+    return [] unless long_form?
+    return questions if questions.any? { |q| q["kind"] == "rating" }
+
+    [ { "key" => "rating", "kind" => "rating", "text" => rating_question || title } ] + questions
+  end
+
+  def answer_questions = questions.reject { |q| q["kind"] == "rating" }
+
+  def question_count = long_form? ? form_questions.size : [ 1, (choices? ? 1 : 0), (follow_up_prompt.present? ? 1 : 0) ].sum
+
+  def duration_label
+    return "30 seconds" unless long_form?
+
+    minutes = [ (question_count * SECONDS_PER_QUESTION / 60.0).round, 1 ].max
+    "about #{minutes} #{'minute'.pluralize(minutes)}"
+  end
+
+  # Admins write questions as plain text, one block per question:
+  #
+  #   # one: Where do you live?
+  #   Nigeria
+  #   Ghana
+  #
+  #   # many 3: What should we build next?
+  #   > Pick up to 3.
+  #   Job board
+  #   Calls
+  #
+  #   # text: What do you love most?
+  #   # rating: How likely are you to recommend Brethreign?
+  #   # one optional: Can we reach out to you?
+  #
+  # "many 3" allows up to three picks; "optional" lets members skip it;
+  # a line starting with ">" is a hint under the question.
+  QUESTION_HEADER = /\A#\s*(one|many|text|rating)(?:\s+(\d+))?(\s+optional)?\s*:\s*(.+)\z/i
+
+  def questions_text
+    questions.map do |q|
+      head = "# #{q['kind']}#{" #{q['max']}" if q['max']}#{' optional' if q['optional']}: #{q['text']}"
+      [ head, (q["hint"] && "> #{q['hint']}"), *Array(q["options"]) ].compact.join("\n")
+    end.join("\n\n")
+  end
+
+  def questions_text=(text)
+    @question_errors = []
+    parsed = []
+    text.to_s.split(/\r?\n/).each do |raw|
+      line = raw.strip
+      next if line.empty?
+
+      if (m = line.match(QUESTION_HEADER))
+        parsed << { "kind" => m[1].downcase, "max" => m[2]&.to_i, "optional" => m[3].present?, "text" => m[4].strip, "options" => [] }
+      elsif parsed.empty?
+        @question_errors << "start each question with a line like “# one: Your question?” (found “#{line.first(40)}”)"
+      elsif line.start_with?(">")
+        parsed.last["hint"] = line.delete_prefix(">").strip
+      else
+        parsed.last["options"] << line
+      end
+    end
+    self.questions = parsed
+  end
+
+  # { option => count } for a one / many question, over submitted answers.
+  def question_counts(question)
+    tally = Hash.new(0)
+    answered.pluck(:answers).each do |answers|
+      Array(answers[question["key"]]).each { |value| tally[value] += 1 }
+    end
+    Array(question["options"]).to_h { |option| [ option, tally[option] ] }
+  end
+
+  def question_answered_count(question)
+    answered.pluck(:answers).count { |answers| Array(answers[question["key"]]).any?(&:present?) }
+  end
 
   def audience_label = AUDIENCE_LABELS.fetch(audience.to_s, audience.to_s.humanize)
 
@@ -194,6 +289,43 @@ class FeedbackCampaign < ApplicationRecord
     self.choice_options = Array(choice_options).map { |o| o.to_s.squish.first(120) }.compact_blank.uniq.first(MAX_CHOICES)
     self.follow_up_prompt = follow_up_prompt.to_s.squish.presence
     self.choice_question = choice_question.to_s.squish.presence
+  end
+
+  def tidy_questions
+    list = Array(questions).filter_map do |q|
+      q = q.to_h.stringify_keys
+      kind = q["kind"].to_s.downcase
+      next unless QUESTION_KINDS.include?(kind)
+
+      tidy = { "kind" => kind, "text" => q["text"].to_s.squish.first(200) }
+      tidy["hint"] = q["hint"].to_s.squish.first(200) if q["hint"].present?
+      if %w[one many].include?(kind)
+        tidy["options"] = Array(q["options"]).map { |o| o.to_s.squish.first(120) }.compact_blank.uniq
+        tidy["max"] = q["max"].to_i if kind == "many" && q["max"].to_i.positive?
+      end
+      tidy["optional"] = true if q["optional"] && kind != "text"
+      tidy
+    end
+    # Keys follow the order; the rating's answer is the rating column.
+    number = 0
+    self.questions = list.first(MAX_QUESTIONS).map do |q|
+      q.merge("key" => (q["kind"] == "rating" ? "rating" : "q#{number += 1}"))
+    end
+  end
+
+  def questions_complete
+    Array(@question_errors).each { |message| errors.add(:questions, message) }
+    return if questions.blank?
+
+    errors.add(:questions, "can have only one rating") if questions.count { |q| q["kind"] == "rating" } > 1
+    questions.each do |q|
+      label = "“#{q['text'].to_s.first(40)}”"
+      errors.add(:questions, "#{label} needs its question text") if q["text"].blank? && q["kind"] != "rating"
+      next unless %w[one many].include?(q["kind"])
+
+      errors.add(:questions, "#{label} needs at least two answers") if q["options"].size < 2
+      errors.add(:questions, "#{label} has more than #{MAX_OPTIONS} answers") if q["options"].size > MAX_OPTIONS
+    end
   end
 
   def ends_after_start

@@ -30,6 +30,18 @@
     <%= f.text_area :choice_options_text, class: "fc-admin-input", rows: 4, placeholder: "The feed\nRooms\nThe Bible\nMessages" %>
   </div>
 
+  <details class="fc-admin-field afb-long" <%= "open" if campaign.long_form? || campaign.errors[:questions].any? %>>
+    <summary class="fc-admin-label">Longer survey: your own list of questions (optional)</summary>
+    <%= f.text_area :questions_text, class: "fc-admin-input afb-mono", rows: 16,
+          placeholder: "# one: Where do you live?\nNigeria\nGhana\nUnited Kingdom\n\n# many 3: What should we build next?\n> Pick up to 3.\nJob board\nVoice & video calls\nLive streams\n\n# text: What do you love most?\n\n# rating: How likely are you to recommend Brethreign to a friend?" %>
+    <p class="fc-admin-hint">
+      Start each question with <code># one:</code> (pick one), <code># many:</code> (pick several; <code># many 3:</code> allows up to 3),
+      <code># text:</code> (a text box) or <code># rating:</code> (where the rating above goes). Answers go one per line under it;
+      a line starting with <code>&gt;</code> is a hint. Add <code>optional</code> (e.g. <code># one optional:</code>) to let members skip it.
+      With a list here, the survey opens as its own page, the follow-up question above becomes the intro line, and the multiple-choice question above is not used.
+    </p>
+  </details>
+
   <div class="fc-admin-field">
     <%= f.label :audience, "Who is it for?", class: "fc-admin-label" %>
     <%= f.select :audience, FeedbackCampaign.audience_options, {}, class: "fc-admin-input" %>
@@ -51,6 +63,11 @@
   <label class="afb-radio">
     <%= f.check_box :also_push %>
     <span><strong>Also send a push notification</strong> — off by default. Everyone targeted gets an in-app alert either way; pushes go out in small batches.</span>
+  </label>
+
+  <label class="afb-radio">
+    <%= f.check_box :also_email %>
+    <span><strong>Also send an email</strong> — to members who have email notifications on, with a button straight to the survey.</span>
   </label>
 
   <div class="fc-admin-form-actions">

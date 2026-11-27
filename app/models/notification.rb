@@ -206,7 +206,7 @@ class Notification < ApplicationRecord
     when :page_mentioned
       "#{notifiable.try(:author_name) || 'Someone'} mentioned your page"
     when :feedback_request
-      "#{e.("💬 ")}We'd love your feedback — 30 seconds#{": #{notifiable.title}" if notifiable.respond_to?(:title)}"
+      "#{e.("💬 ")}We'd love your feedback — #{notifiable.try(:duration_label) || '30 seconds'}#{": #{notifiable.title}" if notifiable.respond_to?(:title)}"
     when :contact_shared
       "#{actor&.display_name || 'Someone'} shared their contact details with you"
     when :birthday

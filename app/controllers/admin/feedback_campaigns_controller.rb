@@ -94,7 +94,7 @@ class Admin::FeedbackCampaignsController < ApplicationController
 
   def campaign_params
     attrs = params.expect(feedback_campaign: [ :title, :rating_kind, :follow_up_prompt, :choice_question, :choice_options_text,
-                                               :audience, :also_push, :starts_at, :ends_at ])
+                                               :audience, :also_push, :also_email, :questions_text, :starts_at, :ends_at ])
     attrs[:choice_options] = attrs.delete(:choice_options_text).to_s.split(/\r?\n/) if attrs.key?(:choice_options_text)
     attrs[:rating_kind] = "stars" unless FeedbackCampaign.rating_kinds.key?(attrs[:rating_kind].to_s)
     attrs[:audience] = "everyone" unless FeedbackCampaign.audiences.key?(attrs[:audience].to_s)
@@ -108,10 +108,12 @@ class Admin::FeedbackCampaignsController < ApplicationController
 
   def csv_for(campaign)
     CSV.generate do |csv|
-      csv << [ "Submitted at", "Username", "Rating", campaign.choice_question.presence || "Choice", "Comment", "Platform" ].compact
+      questions = campaign.answer_questions
+      csv << [ "Submitted at", "Username", "Rating", campaign.choice_question.presence || "Choice", "Comment", "Platform",
+               *questions.map { |q| safe_cell(q["text"]) } ]
       campaign.answered.includes(:user).find_each do |answer|
         csv << [ answer.submitted_at.iso8601, answer.user&.username, answer.rating, safe_cell(answer.choice),
-                 safe_cell(answer.comment), answer.platform_label ]
+                 safe_cell(answer.comment), answer.platform_label, *questions.map { |q| safe_cell(answer.answer_text(q)) } ]
       end
     end
   end

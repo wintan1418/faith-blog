@@ -7,7 +7,7 @@ import { Controller } from "@hotwired/stimulus"
 //    have a dialog (composer, What's new…) open. "Not now" snoozes it for two
 //    days, "Don't ask again" ends it for this survey.
 export default class extends Controller {
-  static targets = ["rating", "submit", "thanks"]
+  static targets = ["rating", "submit", "thanks", "question", "bar", "count", "needs"]
   static values = {
     prompt: Boolean,
     delayMs: { type: Number, default: 20000 },
@@ -18,6 +18,7 @@ export default class extends Controller {
 
   connect() {
     this.syncRating()
+    this.progress()
     if (!this.promptValue) return
 
     this.element.hidden = true
@@ -124,5 +125,48 @@ export default class extends Controller {
       input.closest("label")?.classList.toggle("is-picked", i === picked)
     })
     if (this.hasSubmitTarget) this.submitTarget.disabled = picked < 0
+    if (this.hasNeedsTarget) this.needsTarget.hidden = picked >= 0
+  }
+
+  // ── Longer surveys ────────────────────────────────────────
+
+  // "5 of 12 answered" and the bar above the questions.
+  progress(event) {
+    const q = event?.target?.closest?.(".fb-q.is-missing")
+    if (q && q.querySelector("input:checked")) {
+      q.classList.remove("is-missing")
+      q.querySelector(".fb-q-missing")?.setAttribute("hidden", "")
+    }
+    if (!this.hasCountTarget) return
+    const total = this.questionTargets.length
+    const done = this.questionTargets.filter((q) =>
+      q.querySelector("input:checked") || [...q.querySelectorAll("textarea")].some((t) => t.value.trim())
+    ).length
+    this.countTarget.textContent = `${done} of ${total} answered`
+    if (this.hasBarTarget) this.barTarget.style.width = `${total ? (done / total) * 100 : 0}%`
+  }
+
+  // Before sending: jump to the first required question left blank.
+  check(event) {
+    let first = null
+    this.questionTargets.forEach((q) => {
+      const missing = q.dataset.required === "true" && !q.querySelector("input:checked")
+      q.classList.toggle("is-missing", missing)
+      const note = q.querySelector(".fb-q-missing")
+      if (note) note.hidden = !missing
+      if (missing && !first) first = q
+    })
+    if (!first) return
+    event.preventDefault()
+    first.scrollIntoView({ behavior: "smooth", block: "center" })
+  }
+
+  // "Pick up to 3": a fourth tick is undone.
+  limit(event) {
+    const box = event.target
+    const row = box.closest("[data-max]")
+    if (!row || !box.checked) return
+    const max = Number(row.dataset.max)
+    if (row.querySelectorAll("input:checked").length > max) box.checked = false
   }
 }
