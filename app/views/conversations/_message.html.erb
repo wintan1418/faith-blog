@@ -145,7 +145,7 @@
           <% end %>
 
           <% if message.body.present? %>
-            <div class="msg-body"><%= simple_format(message.body) %></div>
+            <div class="msg-body"><%= chat_text(message.body) %></div>
           <% end %>
 
           <% if !mine && MoneyTalk.mentions?(message.body) %>
