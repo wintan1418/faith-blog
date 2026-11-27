@@ -10,6 +10,8 @@
       <%= render "status", campaign: c %>
       <span><%= c.rating_nps? ? "0–10 (NPS)" : "1–5 stars" %></span> · <span><%= c.audience_label %></span>
       <% if c.also_push? %> · <span>with push</span><% end %>
+      <% if c.also_email? %> · <span>with email</span><% end %>
+      <% if c.long_form? %> · <span><%= pluralize(c.question_count, "question") %></span><% end %>
     </p>
     <h1 class="afb-title"><%= c.title %></h1>
     <p class="text-sm text-[var(--fc-muted)]">
@@ -48,6 +50,18 @@
       <li><strong>Multiple choice:</strong> <%= c.choices? ? "#{c.choice_question} (#{c.choice_options.join(' / ')})" : "none" %></li>
       <li><strong>Audience now:</strong> <%= number_with_delimiter(@audience_size) %> members</li>
     </ul>
+    <% if c.long_form? %>
+      <ol class="afb-qlist">
+        <% c.form_questions.each do |q| %>
+          <li>
+            <strong><%= q["kind"] == "rating" ? (q["text"].presence || c.rating_question || c.title) : q["text"] %></strong>
+            <span class="afb-qkind"><%= { "one" => "pick one", "many" => (q["max"] ? "pick up to #{q['max']}" : "pick any"), "text" => "text box", "rating" => (c.rating_nps? ? "0–10" : "1–5 stars") }[q["kind"]] %><%= " · optional" if q["optional"] %></span>
+            <% if q["options"].present? %><span class="afb-qopts"><%= q["options"].join(" · ") %></span><% end %>
+          </li>
+        <% end %>
+      </ol>
+      <p class="mt-3"><%= link_to "Preview it as a member sees it", feedback_survey_path(c), class: "fc-btn", target: "_blank", rel: "noopener" %></p>
+    <% end %>
   </div>
 <% else %>
   <div class="afb-stats">
@@ -79,6 +93,24 @@
         <% end %>
       </ul>
     </section>
+
+    <% c.answer_questions.select { |q| %w[one many].include?(q["kind"]) }.each do |q| %>
+      <% counts = c.question_counts(q) %>
+      <% q_max = [ counts.values.max.to_i, 1 ].max %>
+      <section class="afb-panel">
+        <p class="afb-panel-title"><%= q["text"] %></p>
+        <p class="afb-stat-note"><%= q["kind"] == "many" ? "Members could pick more than one" : "One answer each" %> · <%= c.question_answered_count(q) %> answered</p>
+        <ul class="afb-bars">
+          <% counts.sort_by { |_, n| -n }.each do |option, count| %>
+            <li class="afb-bar-row is-stacked">
+              <span class="afb-bar-label"><%= option %></span>
+              <span class="afb-bar-track"><span class="afb-bar-fill" style="width: <%= (count * 100.0 / q_max).round(1) %>%"></span></span>
+              <span class="afb-bar-count"><%= count %></span>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
 
     <% if c.choices? %>
       <% choices = c.choice_counts %>
@@ -124,6 +156,11 @@
             <% if answer.choice.present? %><p class="afb-answer-choice"><%= answer.choice %></p><% end %>
             <% if answer.comment.present? %>
               <p class="afb-answer-comment"><%= answer.comment %></p>
+            <% end %>
+            <% c.answer_questions.each do |q| %>
+              <% next if answer.answer_for(q).blank? %>
+              <p class="afb-answer-q"><span><%= q["text"] %></span>
+                <% if q["kind"] == "text" %><span class="afb-answer-comment"><%= answer.answer_text(q) %></span><% else %><strong><%= answer.answer_text(q) %></strong><% end %></p>
             <% end %>
           </li>
         <% end %>

@@ -1,0 +1,20 @@
+Brethreign · Member survey
+==========================
+
+<%= @campaign.title %>
+
+Hi <%= @user.display_name.presence || "there" %>,
+
+Brethreign is being built with you, not just for you. Would you give us <%= @campaign.duration_label %> to tell us honestly what's working, what isn't, and what you'd love us to build next?
+
+It's <%= pluralize(@campaign.question_count, "question") %>, mostly quick taps. I read every answer myself.
+
+Take the survey: <%= @survey_url %>
+
+Thank you for being part of this.
+Juwon (Wintan), founder of Brethreign
+
+—
+Sent to <%= @user.email %>.
+Unsubscribe: <%= @unsubscribe_url %>
+Notification settings: <%= @settings_url %>

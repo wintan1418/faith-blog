@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_27_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_27_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -648,6 +648,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_27_090000) do
     t.bigint "created_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "questions", default: [], null: false
+    t.boolean "also_email", default: false, null: false
     t.index ["created_by_id"], name: "index_feedback_campaigns_on_created_by_id"
     t.index ["launched_at", "starts_at"], name: "index_feedback_campaigns_on_launched_at_and_starts_at"
   end
@@ -665,6 +667,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_27_090000) do
     t.integer "snooze_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "answers", default: {}, null: false
     t.index ["feedback_campaign_id", "submitted_at"], name: "index_feedback_responses_on_campaign_and_submitted"
     t.index ["user_id", "feedback_campaign_id"], name: "index_feedback_responses_on_user_id_and_feedback_campaign_id", unique: true
   end

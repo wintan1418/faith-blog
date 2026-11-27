@@ -8,11 +8,22 @@
        aria-label="Quick feedback">
   <div class="fb-sheet-card">
     <div class="fb-sheet-top">
-      <span class="fb-kicker"><%= render_icon("chat", classes: "h-4 w-4") %> 30-second feedback</span>
+      <span class="fb-kicker"><%= render_icon("chat", classes: "h-4 w-4") %> <%= campaign.long_form? ? "Member survey · #{campaign.duration_label}" : "30-second feedback" %></span>
       <button type="button" class="fb-x" data-action="feedback#later" aria-label="Not now"><%= render_icon("x", classes: "h-4 w-4") %></button>
     </div>
     <div id="feedback_<%= campaign.id %>_sheet">
-      <%= render "feedback/form", campaign: campaign, response: response, context: "sheet" %>
+      <% if campaign.long_form? %>
+        <%# Too many questions for a pop-up: invite them to the survey page. %>
+        <p class="fb-question"><%= campaign.title %></p>
+        <p class="fb-sub"><%= pluralize(campaign.question_count, "question") %>, <%= campaign.duration_label %>. Every answer is read by the founder.</p>
+        <div class="fb-actions">
+          <%= link_to "Take the survey", feedback_survey_path(campaign), class: "fc-btn fc-btn-primary", data: { turbo_frame: "_top" } %>
+          <button type="button" class="fb-link" data-action="feedback#later">Not now</button>
+          <button type="button" class="fb-link is-quiet" data-action="feedback#never">Don't ask again</button>
+        </div>
+      <% else %>
+        <%= render "feedback/form", campaign: campaign, response: response, context: "sheet" %>
+      <% end %>
     </div>
   </div>
 </aside>

@@ -1,0 +1,76 @@
+<%# A longer survey (campaign.long_form?): every question on one page, with a progress bar.
+    Locals: campaign, response (may be nil). %>
+<% response ||= nil %>
+<% picked = response&.rating %>
+<% total = campaign.form_questions.size %>
+<%= form_with url: feedback_survey_path(campaign), method: :post, class: "fb-form fb-long",
+      data: { turbo_frame: "_top", action: "change->feedback#progress input->feedback#progress submit->feedback#check" } do |f| %>
+  <%= hidden_field_tag :context, "page" %>
+  <div class="fb-progress" aria-hidden="true">
+    <div class="fb-progress-bar"><span data-feedback-target="bar"></span></div>
+    <p class="fb-progress-count" data-feedback-target="count">0 of <%= total %> answered</p>
+  </div>
+  <% if response&.errors&.any? %>
+    <p class="fb-error" role="alert"><%= response.errors.full_messages.to_sentence %></p>
+  <% end %>
+
+  <% campaign.form_questions.each_with_index do |q, index| %>
+    <% kind = q["kind"] %>
+    <% name = kind == "rating" ? "feedback[rating]" : "feedback[answers][#{q['key']}]" %>
+    <% value = kind == "rating" ? picked : response&.answer_for(q) %>
+    <fieldset class="fb-q<%= " fb-rating #{campaign.rating_nps? ? 'is-nps' : 'is-stars'}" if kind == 'rating' %>"
+              data-feedback-target="question" data-kind="<%= kind %>" id="fb_q_<%= q['key'] %>"
+              <%= "data-required=true" if %w[one many rating].include?(kind) && !q["optional"] %>>
+      <legend class="fb-q-title">
+        <span class="fb-q-num"><%= index + 1 %></span>
+        <%= kind == "rating" ? (q["text"].presence || campaign.rating_question || campaign.title) : q["text"] %>
+        <% if q["optional"] || kind == "text" %><span class="fb-q-opt">(optional)</span><% end %>
+      </legend>
+      <p class="fb-q-missing" hidden>Please answer this one</p>
+      <% if q["hint"].present? %><p class="fb-sub"><%= q["hint"] %></p><% end %>
+
+      <% case kind %>
+      <% when "rating" %>
+        <div class="fb-scale" role="radiogroup" aria-label="<%= campaign.rating_nps? ? 'Score from 0 to 10' : 'Rating from 1 to 5 stars' %>">
+          <% campaign.rating_range.each do |n| %>
+            <label class="fb-pick" title="<%= campaign.rating_nps? ? n : pluralize(n, 'star') %>">
+              <input type="radio" name="<%= name %>" value="<%= n %>" class="sr-only" <%= "checked" if value == n %> required
+                     data-feedback-target="rating" data-action="change->feedback#pick">
+              <% if campaign.rating_nps? %>
+                <span class="fb-num"><%= n %></span>
+              <% else %>
+                <span class="fb-star" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M12 3.2l2.6 5.5 6 .8-4.4 4.1 1.1 5.9L12 16.6l-5.3 2.9 1.1-5.9L3.4 9.5l6-.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
+                <span class="sr-only"><%= pluralize(n, "star") %></span>
+              <% end %>
+            </label>
+          <% end %>
+        </div>
+        <% if campaign.rating_nps? %>
+          <div class="fb-scale-ends" aria-hidden="true"><span>Not likely</span><span>Very likely</span></div>
+        <% end %>
+      <% when "one", "many" %>
+        <div class="fb-chip-row" <%= "data-max=#{q['max']}" if q["max"] %>>
+          <% q["options"].each do |option| %>
+            <label class="fb-chip">
+              <% if kind == "many" %>
+                <input type="checkbox" name="<%= name %>[]" value="<%= option %>" class="sr-only"
+                       <%= "checked" if Array(value).include?(option) %> data-action="change->feedback#limit">
+              <% else %>
+                <input type="radio" name="<%= name %>" value="<%= option %>" class="sr-only" <%= "checked" if value == option %>>
+              <% end %>
+              <span><%= option %></span>
+            </label>
+          <% end %>
+        </div>
+      <% when "text" %>
+        <textarea name="<%= name %>" rows="3" maxlength="2000" class="fb-textarea" aria-label="<%= q['text'] %>"
+                  placeholder="A sentence or two helps a lot"><%= value %></textarea>
+      <% end %>
+    </fieldset>
+  <% end %>
+
+  <div class="fb-actions">
+    <button type="submit" class="fc-btn fc-btn-primary fb-submit" data-feedback-target="submit" <%= "disabled" unless picked %>>Send my answers</button>
+    <span class="fb-sub" data-feedback-target="needs"><%= "Pick a number for question #{campaign.form_questions.index { |q| q['kind'] == 'rating' }.to_i + 1} to send." unless picked %></span>
+  </div>
+<% end %>

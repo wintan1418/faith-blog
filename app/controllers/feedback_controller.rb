@@ -8,7 +8,7 @@ class FeedbackController < ApplicationController
   before_action :ensure_for_member
 
   def show
-    @response = @campaign.responses.find_by(user_id: current_user.id)
+    @response = @campaign.responses.find_by(user_id: current_user.id) unless @preview
     # Opening it from the alert counts as reading the alert.
     current_user.notifications.unread.where(notifiable: @campaign).update_all(read_at: Time.current)
   end
@@ -17,20 +17,22 @@ class FeedbackController < ApplicationController
     @response = find_or_build_response
     @context = params[:context] == "sheet" ? "sheet" : "page"
 
-    if @response.submitted?
+    if @preview
+      return redirect_to(feedback_survey_path(@campaign), notice: "Preview only: answers to a draft aren't saved.")
+    elsif @response.submitted?
       @saved = true
     elsif !@campaign.live?
       return redirect_to(feedback_survey_path(@campaign), alert: "This survey has closed. Thank you all the same.")
     else
       @saved = @response.submit!(rating: answer_params[:rating], comment: answer_params[:comment],
-                                 choice: answer_params[:choice], platform: request_platform)
+                                 choice: answer_params[:choice], answers: answer_params[:answers], platform: request_platform)
     end
 
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.update(
           "feedback_#{@campaign.id}_#{@context}",
-          partial: @saved ? "feedback/thanks" : "feedback/form",
+          partial: @saved ? "feedback/thanks" : (@campaign.long_form? && @context == "page" ? "feedback/long_form" : "feedback/form"),
           locals: { campaign: @campaign, response: @response, context: @context }
         ), status: (@saved ? :ok : :unprocessable_entity)
       end
@@ -56,14 +58,18 @@ class FeedbackController < ApplicationController
 
   private
 
+  # Admins may open a draft too, to preview it (answers aren't saved).
   def set_campaign
-    @campaign = FeedbackCampaign.where.not(launched_at: nil).find_by(id: params[:id])
+    scope = (current_user&.admin? || current_user&.super_admin?) ? FeedbackCampaign.all : FeedbackCampaign.where.not(launched_at: nil)
+    @campaign = scope.find_by(id: params[:id])
+    @preview = @campaign&.draft?
     render_not_found unless @campaign
   end
 
   # Members the survey is for, or who already got its alert or answered it.
   def ensure_for_member
     return if performed?
+    return if @preview
     return if @campaign.responses.exists?(user_id: current_user.id)
     return if current_user.notifications.exists?(notifiable: @campaign)
     return if @campaign.includes_user?(current_user)
@@ -90,7 +96,8 @@ class FeedbackController < ApplicationController
   end
 
   def answer_params
-    params.fetch(:feedback, {}).permit(:rating, :comment, :choice)
+    keys = @campaign.answer_questions.map { |q| q["kind"] == "many" ? { q["key"] => [] } : q["key"] }
+    params.fetch(:feedback, {}).permit(:rating, :comment, :choice, answers: keys)
   end
 
   def request_platform

@@ -3,7 +3,8 @@
 # Delivers a launched FeedbackCampaign: one "We'd love your feedback" alert per
 # targeted member. Alerts are written in batches (insert_all: no per-row
 # callbacks, so no email and no push storm). A push goes out only when the
-# admin ticked "also push", spread over a few minutes, batch by batch.
+# admin ticked "also push", spread over a few minutes, batch by batch; an email
+# (FeedbackMailer) only when they ticked "also email", spaced the same way.
 #
 # Runs at the campaign's start time (enqueued with wait_until). Safe to run
 # twice: delivered_at is claimed first, and members who already have the
@@ -39,12 +40,21 @@ class FeedbackCampaignDeliveryJob < ApplicationJob
       inserted = Notification.insert_all(rows, returning: %w[id])
       delivered += ids.size
       push(inserted.rows.flatten, wait: PUSH_SPACING * index) if campaign.also_push?
+      email(campaign, ids, wait: PUSH_SPACING * index) if campaign.also_email?
     end
 
     campaign.update_columns(targeted_count: delivered, updated_at: Time.current)
   end
 
   private
+
+  def email(campaign, user_ids, wait:)
+    User.where(id: user_ids, email_notifications_enabled: true).where.not(email: [ nil, "" ]).find_each do |user|
+      FeedbackMailer.with(campaign: campaign, user: user).survey.deliver_later(wait: wait)
+    end
+  rescue StandardError => e
+    Rails.logger.warn("[feedback] email batch failed: #{e.class}: #{e.message}")
+  end
 
   def push(notification_ids, wait:)
     return unless WebPushConfig.configured? || NativePushConfig.configured?
