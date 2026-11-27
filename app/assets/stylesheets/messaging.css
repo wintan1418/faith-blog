@@ -323,6 +323,8 @@
 .msg-bubble { position: relative; padding: 2px 0; font-size: 0.9rem; line-height: 1.5; color: var(--msg-ink); overflow-wrap: anywhere; }
 .msg-body p { margin: 0; }
 .msg-body p + p { margin-top: 0.4em; }
+/* Web addresses in a message (ChatTextHelper#chat_text): readable on both bubble colours. */
+.msg-body a.msg-link { color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
 .msg-edited { margin-left: 0.25rem; font-size: 0.72rem; color: var(--msg-muted); }
 .msg-deleted { font-style: italic; color: var(--msg-muted); }
 
